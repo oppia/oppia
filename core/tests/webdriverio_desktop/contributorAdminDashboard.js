@@ -16,32 +16,32 @@
  * @fileoverview End-to-end tests for the contributor admin dashboard page.
  */
 
-var action = require('../webdriverio_utils/action.js');
-var users = require('../webdriverio_utils/users.js');
-var general = require('../webdriverio_utils/general.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
+let action = require('../webdriverio_utils/action.js');
+let users = require('../webdriverio_utils/users.js');
+let general = require('../webdriverio_utils/general.js');
+let waitFor = require('../webdriverio_utils/waitFor.js');
 
-var ReleaseCoordinatorPage = require(
+let ReleaseCoordinatorPage = require(
   '../webdriverio_utils/ReleaseCoordinatorPage.js');
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
-var forms = require('../webdriverio_utils/forms.js');
-var ContributorDashboardPage = require(
+let AdminPage = require('../webdriverio_utils/AdminPage.js');
+let forms = require('../webdriverio_utils/forms.js');
+let ContributorDashboardPage = require(
   '../webdriverio_utils/ContributorDashboardPage.js');
-var ContributorDashboardAdminPage = require(
+let ContributorDashboardAdminPage = require(
   '../webdriverio_utils/ContributorDashboardAdminPage.js');
-var TopicsAndSkillsDashboardPage = require(
+let TopicsAndSkillsDashboardPage = require(
   '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
-var SkillEditorPage = require(
+let SkillEditorPage = require(
   '../webdriverio_utils/SkillEditorPage.js');
-var ExplorationEditorPage = require(
+let ExplorationEditorPage = require(
   '../webdriverio_utils/ExplorationEditorPage.js');
-var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
-var workflow = require('../webdriverio_utils/workflow.js');
-var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
-var CreatorDashboardPage = require(
+let StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+let workflow = require('../webdriverio_utils/workflow.js');
+let TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+let CreatorDashboardPage = require(
   '../webdriverio_utils/CreatorDashboardPage.js'
 );
-var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 
 describe('Contributor Admin Dashboard', function() {
   const TOPIC_NAMES = [
@@ -58,9 +58,9 @@ describe('Contributor Admin Dashboard', function() {
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
 
-  var releaseCoordinatorPage = null;
-  var adminPage = null;
-  var contributorDashboardAdminPage = null;
+  let releaseCoordinatorPage = null;
+  let adminPage = null;
+  let contributorDashboardAdminPage = null;
   let contributorDashboardPage = null;
   let topicsAndSkillsDashboardPage = null;
   let skillEditorPage = null;
@@ -146,8 +146,8 @@ describe('Contributor Admin Dashboard', function() {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
-        // eslint-disable-next-line oppia/e2e-action
-        await elem.setValue(TOPIC_ID);
+        await action.setValue(
+          'Topic Id', elem, TOPIC_ID, clickInputElement = false);
       });
 
     // Creating an exploration with an image.
@@ -161,9 +161,9 @@ describe('Contributor Admin Dashboard', function() {
         'An svg diagram.');
     }, true);
     await explorationEditorMainTab.setInteraction('EndExploration');
-    var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    let explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    var basicSettings = $('.e2e-test-settings-container');
+    let basicSettings = $('.e2e-test-settings-container');
     await action.click('Basic Settings', basicSettings);
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setCategory('Algebra');
@@ -272,7 +272,7 @@ describe('Contributor Admin Dashboard', function() {
     // They should be removed after the cd_admin_dashboard_new_ui flag is
     // deprecated.
     await releaseCoordinatorPage.getFeaturesTab();
-    var CdAdminDashboardNewUiFlag = (
+    let CdAdminDashboardNewUiFlag = (
       await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement());
     await releaseCoordinatorPage.enableFeature(
       CdAdminDashboardNewUiFlag);

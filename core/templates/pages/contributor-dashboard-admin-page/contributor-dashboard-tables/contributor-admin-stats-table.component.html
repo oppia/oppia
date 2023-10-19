@@ -124,7 +124,7 @@
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-raised-button disabled>
+        <button mat-raised-button (click)="openRoleEditor(element.contributorName)">
           {{ checkMobileView() ? 'EDIT ROLE' : 'EDIT' }}
         </button>
       </td>
@@ -379,6 +379,14 @@
   .oppia-align-center {
     font-size: 2em;
     width: 960px;
+  }
+  .mat-raised-button {
+    border: transparent;
+    box-shadow: 0;
+    color: #00645c;
+  }
+  .mat-raised-button:not {
+    box-shadow: 0;
   }
 
   table {
