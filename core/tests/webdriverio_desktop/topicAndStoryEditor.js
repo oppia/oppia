@@ -530,7 +530,7 @@ describe('Serial Chapter Launch functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.createStory(
-      storyName, 'topicandstoryeditortwo', 'Story description',
+      storyName, 'topicandstoryeditorthree', 'Story description',
       Constants.TEST_SVG_PATH);
     await users.logout();
   });
