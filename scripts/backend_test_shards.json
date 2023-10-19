@@ -299,7 +299,6 @@
         "core.domain.user_domain_test",
         "core.storage.opportunity.gae_models_test",
         "scripts.build_test",
-        "scripts.install_third_party_libs_test",
         "core.storage.statistics.gae_models_test",
         "core.storage.exploration.gae_models_test",
         "scripts.release_scripts.repo_specific_changes_fetcher_test",
