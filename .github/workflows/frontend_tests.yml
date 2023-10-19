@@ -60,18 +60,15 @@ jobs:
       # - uses: ./.github/actions/install-oppia-dependencies
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      # - name: Build Docker Containers
-      #   run: |
-      #     echo ---Building Docker Images---
-      #     docker compose build --no-cache
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Initialize Containers
         run: |
-          echo ---Initializing containers---
-          docker compose up angular-build -d
-          echo ---Copying node_modules from container---
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-      - name: Stop Containers
-        run: make stop
+          sudo make build
+          sudo make run-devserver
+          make stop
       - name: Run frontend tests ${{ matrix.num_runs }}
         run: PYTHONIOENCODING=utf-8 make run_tests.frontend PYTHON_ARGS="--check_coverage"
       - name: Uploading fronted coverage reports as an artifact
