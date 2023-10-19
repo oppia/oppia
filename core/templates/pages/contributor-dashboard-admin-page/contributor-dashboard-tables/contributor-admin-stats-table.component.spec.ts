@@ -227,6 +227,34 @@ describe('Contributor stats component', () => {
         'role'
       ]);
     }));
+
+    it('should check for upperlimit for pagination', fakeAsync(() => {
+      component.dataSource = [];
+      component.statsPageNumber = 1;
+      component.itemsPerPage = 3;
+      fixture.detectChanges();
+      expect(component.getUpperLimitValueForPagination()).toEqual(3);
+    }));
+
+    it('should navigate to next page', fakeAsync(() => {
+      const goToSpy = spyOn(component, 'goToPageNumber');
+      component.statsPageNumber = 1;
+      fixture.detectChanges();
+
+      component.navigatePage(component.MOVE_TO_NEXT_PAGE);
+
+      expect(goToSpy).toHaveBeenCalledWith(2);
+    }));
+
+    it('should navigate to previous page', fakeAsync(() => {
+      const goToSpy = spyOn(component, 'goToPageNumber');
+      component.statsPageNumber = 1;
+      fixture.detectChanges();
+
+      component.navigatePage(component.MOVE_TO_PREV_PAGE);
+
+      expect(goToSpy).toHaveBeenCalledWith(0);
+    }));
   });
 
   describe('when user navigates to contributor admin page on mobile', () => {
