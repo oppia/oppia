@@ -91,7 +91,7 @@ export class CuratedExplorationValidationService {
   Validate exploration interactions.
   ***************************************** */
 
-  // Interactions are restricted to a whitelist.
+  // Interactions are restricted to an allowlist.
   async getStatesWithRestrictedInteractions(
       explorationId: string): Promise<string[]> {
     let allowedInteractionIds: string[] = [];

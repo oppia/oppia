@@ -135,7 +135,7 @@ describe('Ck editor copy content service', () => {
     );
   });
 
-  it('should not copy and paste non-whitelisted widgets', () => {
+  it('should not copy and paste non-allowed widgets', () => {
     expect(service.copyModeActive).toBe(false);
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
