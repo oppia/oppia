@@ -81,6 +81,12 @@ export class OutcomeEditorComponent implements OnInit {
     return this.stateEditorService.isInQuestionMode();
   }
 
+  shouldShowDestIfReallyStuck(): boolean {
+    return !this.savedOutcome.labelledAsCorrect || (
+      this.savedOutcome.destIfReallyStuck !== null &&
+      !this.isSelfLoopDestStuck(this.savedOutcome));
+  }
+
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
     return (this.outcome.feedback._html.length > 10000);
@@ -250,14 +256,28 @@ export class OutcomeEditorComponent implements OnInit {
   saveThisIfStuckDestination(): void {
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
     this.destinationIfStuckEditorIsOpen = false;
-    this.savedOutcome.destIfReallyStuck = (
-      cloneDeep(this.outcome.destIfReallyStuck));
+    if (
+      this.outcome.labelledAsCorrect &&
+      this.isSelfLoopDestStuck(this.outcome)) {
+      this.savedOutcome.destIfReallyStuck = null;
+    } else {
+      this.savedOutcome.destIfReallyStuck = (
+        cloneDeep(this.outcome.destIfReallyStuck));
+    }
+
     this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
     this.savedOutcome.labelledAsCorrect = (
       this.outcome.labelledAsCorrect);
+
+    if (
+      this.savedOutcome.labelledAsCorrect &&
+      this.isSelfLoopDestStuck(this.savedOutcome)) {
+      this.savedOutcome.destIfReallyStuck = null;
+      this.saveDestIfStuck.emit(this.savedOutcome);
+    }
 
     this.saveCorrectnessLabel.emit(this.savedOutcome);
   }
