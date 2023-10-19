@@ -209,7 +209,6 @@ jobs:
           prod_env=true docker compose up webpack-compiler angular-build
           prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
           docker compose exec dev-server python -m scripts.generate_build_directory
-          make stop
       - name: Checking server reachability for prod mode
         run: |
           for i in {1..50}; do

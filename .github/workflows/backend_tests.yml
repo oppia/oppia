@@ -22,25 +22,14 @@ jobs:
       - name: Install coverage and configparser
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage configparser
-      - name: Setting up containers
+      - name: Deleting ubuntu files
         run: |
-          docker compose up angular-build -d
-          docker compose up -d
-      - name: Checking server reachability
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - name: Initialize Containers
         run: |
-          for i in {1..50}; do
-            if curl -s http://localhost:8181/; then
-              echo ---Dev-server is up---
-              exit 0
-            else
-              echo ---Retrying in 30 seconds---
-              sleep 30
-            fi
-          done
-          echo ---Dev-server is not started after all retries---
-          exit 1
-      - name: Stopping containers
-        run: make stop
+          sudo make run-devserver
+          make stop
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 make run_tests.backend PYTHON_ARGS="--generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}"
