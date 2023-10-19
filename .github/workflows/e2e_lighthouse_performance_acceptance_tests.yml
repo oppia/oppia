@@ -231,7 +231,7 @@ jobs:
         #   sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} prod_env=true
         run: |
           export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:${PATH}
-          ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
+          sudo ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
