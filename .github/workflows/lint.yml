@@ -35,6 +35,10 @@ jobs:
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
       # - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Python deps
+        run: |
+          pip install --require-hashes --no-deps -r requirements.txt
+          pip install --require-hashes --no-deps -r requirements_dev.txt
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.third_party_size_check
