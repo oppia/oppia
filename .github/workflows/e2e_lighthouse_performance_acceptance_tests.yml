@@ -225,7 +225,7 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite }}
         # NOTE FOR SHIVKANT: adding npm i -- https://github.com/Shivkant-Chauhan/oppia/actions/runs/6574175775/job/17858694482
         run: |
-          export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:${PATH}
+          export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
@@ -451,8 +451,8 @@ jobs:
             exit 1
         - name: Run Acceptance Test ${{ matrix.suite }}
           run: |
-            export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:${PATH}
-            xvfb-run -a --server-args="-screen 0, 1285x1000x24" ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
+            export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
+            xvfb-run -a --server-args="-screen 0, 1285x1000x24" ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/${{ matrix.suite }}
           # run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
