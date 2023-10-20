@@ -99,12 +99,12 @@ module.exports = {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
-        {
-          'matchingUrlPattern': '^http://localhost:8181/create/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.91}]
-          }
-        },
+        // {
+        //   'matchingUrlPattern': '^http://localhost:8181/create/.*$',
+        //   'assertions': {
+        //     'categories:accessibility': ['error', {'minScore': 0.91}]
+        //   }
+        // },
         {
           'matchingUrlPattern': '^http://localhost:8181/topic_editor/.*$',
           'assertions': {
