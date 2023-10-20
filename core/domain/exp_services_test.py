@@ -2841,6 +2841,26 @@ version: 3
 
         self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
+    def test_export_to_zip_file_with_a_nonstandard_char(self) -> None:
+        """Test the export_to_zip_file() method with a nonstandard char."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='What is a Fraction?')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(zip_file_output)
+
+        self.assertEqual(zf.namelist(), ['What is a Fraction.yaml'])
+
+    def test_export_to_zip_file_with_all_nonstandard_chars(self) -> None:
+        """Test the export_to_zip_file() method with all nonstandard chars."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='?!!!!!?')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(zip_file_output)
+
+        self.assertEqual(zf.namelist(), ['exploration.yaml'])
+
     def test_export_to_zip_file_with_assets(self) -> None:
         """Test exporting an exploration with assets to a zip file."""
         exploration = self.save_new_valid_exploration(
