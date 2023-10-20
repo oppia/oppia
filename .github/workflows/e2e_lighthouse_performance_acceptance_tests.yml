@@ -212,7 +212,7 @@ jobs:
       - name: Checking server reachability for prod mode
         run: |
           for i in {1..50}; do
-            if curl -s http://localhost:8181/; then
+            if [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) == "200" ]] && [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) == "200" ]]; then
               echo "---Dev-server (prod mode) is up---"
               exit 0
             else
@@ -226,6 +226,7 @@ jobs:
         # NOTE FOR SHIVKANT: adding npm i -- https://github.com/Shivkant-Chauhan/oppia/actions/runs/6574175775/job/17858694482
         run: |
           export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
+          sudo npm i -g @wdio/selenium-standalone-service@7.7.4 --unsafe-perm=true --allow-root
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
@@ -439,11 +440,12 @@ jobs:
         - name: Checking server reachability for prod mode
           run: |
             for i in {1..50}; do
-              if curl -s http://localhost:8181/; then
+              if [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) == "200" ]] && [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) == "200" ]]; then
                 echo "---Dev-server (prod mode) is up---"
                 exit 0
               else
                 echo "---Retrying in 30 seconds---"
+                docker ps
                 sleep 30
               fi
             done
