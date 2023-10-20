@@ -30,6 +30,17 @@ jobs:
       #       ${{ runner.os }}-build-
       #       ${{ runner.os }}-
       # - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install Python deps
+        run: |
+          pip install --require-hashes --no-deps -r requirements.txt
+          pip install --require-hashes --no-deps -r requirements_dev.txt
+      - name: Install chrome
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_chrome_for_ci
+      - name: Start dev-server
+        run: |
+          sudo make build
+          sudo make run-devserver
       - run: |
           # Replace the 1.5 second timeout in lighthouse for retrieving
           # sourcemaps with a 10 second timeout. This timeout is not
@@ -49,17 +60,6 @@ jobs:
           sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
           echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
         shell: bash
-      - name: Install Python deps
-        run: |
-          pip install --require-hashes --no-deps -r requirements.txt
-          pip install --require-hashes --no-deps -r requirements_dev.txt
-      - name: Install chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.install_chrome_for_ci
-      - name: Start dev-server
-        run: |
-          sudo make build
-          sudo make run-devserver
       - name: Run Lighthouse accessibility checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         # run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard }}
