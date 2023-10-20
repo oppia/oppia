@@ -176,6 +176,7 @@ export class RatingsAndRecommendationsComponent {
 
   submitUserRating(ratingValue: number): void {
     this.learnerViewRatingService.submitUserRating(ratingValue);
+    this.feedbackPopOver.open();
   }
 
   signIn(srcElement: string): void {
