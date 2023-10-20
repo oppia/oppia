@@ -179,7 +179,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-        # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
+      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
       - name: Deleting ubuntu files
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -327,10 +327,21 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
+      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - name: Start dev-server
+        run: |
+          sudo make build
+          sudo make run-devserver
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
-        # run: 
+        # run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build --record_screen
+        run: |
+          ../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js -record ../lhci-puppeteer-video/video.mp4
+          ../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-1.js --max-old-space-size=4096
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -432,29 +443,32 @@ jobs:
         # - name: (Artifact re-build) Build Webpack
           # if: steps.download_artifact_1.outcome == 'failure'
           # run: python -m scripts.build --prod_env
-        - name: Initializing Containers in prod mode
-        # sudo make run-devserver
+          # - name: Initializing Containers in prod mode
+          #   run: |
+          #     sudo make build
+          #     sudo docker compose up angular-build -d
+          #     sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+          #     make stop
+          #     prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
+          #     prod_env=true docker compose up webpack-compiler angular-build
+          #     docker compose exec dev-server python -m scripts.generate_build_directory
+        - name: Start dev-server (dev-mode)
           run: |
             sudo make build
-            sudo docker compose up angular-build -d
-            sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-            make stop
-            prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
-            prod_env=true docker compose up webpack-compiler angular-build
-            docker compose exec dev-server python -m scripts.generate_build_directory
-        - name: Checking server reachability for prod mode
-          run: |
-            for i in {1..50}; do
-              if curl -s http://localhost:8181/community-library; then
-                echo "---Dev-server (prod mode) is up---"
-                exit 0
-              else
-                echo "---Retrying in 30 seconds---"
-                sleep 30
-              fi
-            done
-            echo "---Dev-server is not started after all retries---"
-            exit 1
+            sudo make run-devserver
+        # - name: Checking server reachability for prod mode
+        #   run: |
+        #     for i in {1..50}; do
+        #       if curl -s http://localhost:8181/community-library; then
+        #         echo "---Dev-server (prod mode) is up---"
+        #         exit 0
+        #       else
+        #         echo "---Retrying in 30 seconds---"
+        #         sleep 30
+        #       fi
+        #     done
+        #     echo "---Dev-server is not started after all retries---"
+        #     exit 1
         - name: Run Acceptance Test ${{ matrix.suite }}
           run: |
             export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
