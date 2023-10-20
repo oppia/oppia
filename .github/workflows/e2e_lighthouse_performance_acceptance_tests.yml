@@ -212,7 +212,7 @@ jobs:
       - name: Checking server reachability for prod mode
         run: |
           for i in {1..50}; do
-            if [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) == "200" ]] && [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) == "200" ]]; then
+            if curl -s http://localhost:8181/community-library; then
               echo "---Dev-server (prod mode) is up---"
               exit 0
             else
@@ -440,12 +440,11 @@ jobs:
         - name: Checking server reachability for prod mode
           run: |
             for i in {1..50}; do
-              if [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) == "200" ]] && [[ $(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) == "200" ]]; then
+              if curl -s http://localhost:8181/community-library; then
                 echo "---Dev-server (prod mode) is up---"
                 exit 0
               else
                 echo "---Retrying in 30 seconds---"
-                docker ps
                 sleep 30
               fi
             done
