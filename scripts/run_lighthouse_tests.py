@@ -36,8 +36,8 @@ from scripts import servers  # isort:skip
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
-SERVER_MODE_PROD: Final = 'dev'
-SERVER_MODE_DEV: Final = 'prod'
+# SERVER_MODE_PROD: Final = 'dev'
+# SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_PERFORMANCE: {
@@ -49,10 +49,10 @@ LIGHTHOUSE_CONFIG_FILENAMES: Final = {
         '2': '.lighthouserc-accessibility-2.js'
     }
 }
-APP_YAML_FILENAMES: Final = {
-    SERVER_MODE_PROD: 'app.yaml',
-    SERVER_MODE_DEV: 'app_dev.yaml'
-}
+# APP_YAML_FILENAMES: Final = {
+#     # SERVER_MODE_PROD: 'app.yaml',
+#     # SERVER_MODE_DEV: 'app_dev.yaml'
+# }
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -129,22 +129,22 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> None:
         sys.exit(1)
 
 
-def run_webpack_compilation() -> None:
-    """Runs webpack compilation."""
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-    for _ in range(max_tries):
-        try:
-            with servers.managed_webpack_compiler() as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    if not os.path.isdir(webpack_bundles_dir_name):
-        print('Failed to complete webpack compilation, exiting...')
-        sys.exit(1)
+# def run_webpack_compilation() -> None:
+#     """Runs webpack compilation."""
+#     max_tries = 5
+#     webpack_bundles_dir_name = 'webpack_bundles'
+#     for _ in range(max_tries):
+#         try:
+#             with servers.managed_webpack_compiler() as proc:
+#                 proc.wait()
+#         except subprocess.CalledProcessError as error:
+#             print(error.output)
+#             sys.exit(error.returncode)
+#         if os.path.isdir(webpack_bundles_dir_name):
+#             break
+#     if not os.path.isdir(webpack_bundles_dir_name):
+#         print('Failed to complete webpack compilation, exiting...')
+#         sys.exit(1)
 
 
 def export_url(line: str) -> None:
@@ -213,46 +213,46 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
-        server_mode = SERVER_MODE_DEV
+        # server_mode = SERVER_MODE_DEV
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
-        server_mode = SERVER_MODE_PROD
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-        if not parsed_args.skip_build:
-            # Builds webpack.
-            print('Building files in production mode.')
-            build.main(args=['--prod_env'])
-        else:
-            # Skip webpack build if skip_build flag is passed.
-            print('Building files in production mode skipping webpack build.')
-            build.main(args=[])
-            common.run_ng_compilation()
-            run_webpack_compilation()
-    else:
-        # Accessibility mode skip webpack build.
-        build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation()
+        # server_mode = SERVER_MODE_PROD
+    # if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+    #     if not parsed_args.skip_build:
+    #         # Builds webpack.
+    #         print('Building files in production mode.')
+    #         build.main(args=['--prod_env'])
+    #     else:
+    #         # Skip webpack build if skip_build flag is passed.
+    #         print('Building files in production mode skipping webpack build.')
+    #         build.main(args=[])
+    #         common.run_ng_compilation()
+    #         run_webpack_compilation()
+    # else:
+    #     # Accessibility mode skip webpack build.
+    #     build.main(args=[])
+    #     common.run_ng_compilation()
+    #     run_webpack_compilation()
 
-    with contextlib.ExitStack() as stack:
-        stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
+    # with contextlib.ExitStack() as stack:
+    #     stack.enter_context(servers.managed_redis_server())
+    #     stack.enter_context(servers.managed_elasticsearch_dev_server())
 
-        if constants.EMULATOR_MODE:
-            stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(servers.managed_cloud_datastore_emulator())
+    #     if constants.EMULATOR_MODE:
+    #         stack.enter_context(servers.managed_firebase_auth_emulator())
+    #         stack.enter_context(servers.managed_cloud_datastore_emulator())
 
-        env = os.environ.copy()
-        env['PIP_NO_DEPS'] = 'True'
-        stack.enter_context(servers.managed_dev_appserver(
-            APP_YAML_FILENAMES[server_mode],
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env))
+    #     env = os.environ.copy()
+    #     env['PIP_NO_DEPS'] = 'True'
+    #     stack.enter_context(servers.managed_dev_appserver(
+    #         APP_YAML_FILENAMES[server_mode],
+    #         port=GOOGLE_APP_ENGINE_PORT,
+    #         log_level='critical',
+    #         skip_sdk_update_check=True,
+    #         env=env))
 
-        run_lighthouse_puppeteer_script(parsed_args.record_screen)
-        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+    run_lighthouse_puppeteer_script(parsed_args.record_screen)
+    run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
 if __name__ == '__main__': # pragma: no cover
