@@ -12,12 +12,12 @@
 
     <div>
       <textarea [(ngModel)]="feedbackText" rows="5" class="e2e-test-exploration-feedback-textarea oppia-feedback-popover-textarea" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
-      [attr.aria-label]="('I18N_PLAYER_LEAVE_FEEDBACK' | translate)+ '. ' +('I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH })" placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
+                [attr.aria-label]="('I18N_PLAYER_LEAVE_FEEDBACK' | translate)+ '. ' +('I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH })" placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
       </textarea>
       <span class="oppia-input-box-subtitle">
         <em [innerHTML]="'I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH }"></em>
       </span>
-    </div>    
+    </div>
     <div class="oppia-feedback-popover-bottom-container">
       <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">
         <label>
