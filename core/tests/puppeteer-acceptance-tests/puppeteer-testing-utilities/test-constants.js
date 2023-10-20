@@ -24,6 +24,7 @@ let testConstants = {
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     BlogAdmin: 'http://localhost:8181/blog-admin',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
+    ContributorDashboardAdmin: 'http://localhost:8181/contributor-dashboard-admin/',
     AdminPage: 'http://localhost:8181/admin',
     RolesEditorTab: 'http://localhost:8181/admin#/roles',
     logout: 'http://localhost:8181/logout'

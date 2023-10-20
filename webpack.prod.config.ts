@@ -43,6 +43,7 @@ module.exports = merge(common, {
     })
   ],
   optimization: {
+    ...common.optimization,
     minimizer: [
       new TerserPlugin({
         cache: true,

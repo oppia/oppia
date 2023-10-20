@@ -33,7 +33,7 @@ class Ret:
 
 
 class GenerateBuildDirectoryTests(test_utils.GenericTestBase):
-    """Test the methods for installing third party."""
+    """Test the methods for generate build directory."""
 
     def test_generate_build_dir_under_docker(self) -> None:
         with self.assertRaisesRegex(KeyError, 'js/third_party.min.js'):
