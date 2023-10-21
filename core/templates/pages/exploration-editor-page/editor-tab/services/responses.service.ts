@@ -64,7 +64,7 @@ interface UpdateAnswerGroupFeedback {
 }
 
 interface DestIfReallyStuck {
-  destIfReallyStuck: string;
+  destIfReallyStuck: string | null;
 }
 
 interface UpdateRule {
@@ -232,7 +232,7 @@ export class ResponsesService {
       }
       if (updates.hasOwnProperty('destIfReallyStuck')) {
         let destIfReallyStuckUpdates = updates as {
-          destIfReallyStuck: string;
+          destIfReallyStuck: string | null;
         };
         answerGroup.outcome.destIfReallyStuck = (
           destIfReallyStuckUpdates.destIfReallyStuck);

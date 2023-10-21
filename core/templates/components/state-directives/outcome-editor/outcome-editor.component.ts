@@ -82,9 +82,8 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   shouldShowDestIfReallyStuck(): boolean {
-    return !this.savedOutcome.labelledAsCorrect || (
-      this.savedOutcome.destIfReallyStuck !== null &&
-      !this.isSelfLoopDestStuck(this.savedOutcome));
+    return !this.savedOutcome.labelledAsCorrect ||
+      this.savedOutcome.destIfReallyStuck !== null;
   }
 
   isFeedbackLengthExceeded(): boolean {
@@ -139,11 +138,9 @@ export class OutcomeEditorComponent implements OnInit {
       outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
-  isSelfLoopDestStuck(outcome: Outcome): boolean {
-    return Boolean (
-      outcome &&
-      outcome.destIfReallyStuck === (
-        this.stateEditorService.getActiveStateName()));
+  isDestIfReallyStuckSet(outcome: Outcome): boolean {
+    return outcome !== null &&
+      outcome.destIfReallyStuck !== null;
   }
 
   getCurrentInteractionId(): string {
@@ -203,10 +200,6 @@ export class OutcomeEditorComponent implements OnInit {
   openDestinationIfStuckEditor(): void {
     if (this.isEditable) {
       this.destinationIfStuckEditorIsOpen = true;
-      let activeStateName = this.stateEditorService.getActiveStateName();
-      if (!this.savedOutcome.destIfReallyStuck) {
-        this.outcome.destIfReallyStuck = activeStateName;
-      }
     }
   }
 
@@ -256,14 +249,8 @@ export class OutcomeEditorComponent implements OnInit {
   saveThisIfStuckDestination(): void {
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
     this.destinationIfStuckEditorIsOpen = false;
-    if (
-      this.outcome.labelledAsCorrect &&
-      this.isSelfLoopDestStuck(this.outcome)) {
-      this.savedOutcome.destIfReallyStuck = null;
-    } else {
-      this.savedOutcome.destIfReallyStuck = (
-        cloneDeep(this.outcome.destIfReallyStuck));
-    }
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
 
     this.saveDestIfStuck.emit(this.savedOutcome);
   }
@@ -271,13 +258,6 @@ export class OutcomeEditorComponent implements OnInit {
   onChangeCorrectnessLabel(): void {
     this.savedOutcome.labelledAsCorrect = (
       this.outcome.labelledAsCorrect);
-
-    if (
-      this.savedOutcome.labelledAsCorrect &&
-      this.isSelfLoopDestStuck(this.savedOutcome)) {
-      this.savedOutcome.destIfReallyStuck = null;
-      this.saveDestIfStuck.emit(this.savedOutcome);
-    }
 
     this.saveCorrectnessLabel.emit(this.savedOutcome);
   }
