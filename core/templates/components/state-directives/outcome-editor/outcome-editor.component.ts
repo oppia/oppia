@@ -138,11 +138,6 @@ export class OutcomeEditorComponent implements OnInit {
       outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
-  isDestIfReallyStuckSet(outcome: Outcome): boolean {
-    return outcome !== null &&
-      outcome.destIfReallyStuck !== null;
-  }
-
   getCurrentInteractionId(): string {
     return this.stateInteractionIdService.savedMemento;
   }

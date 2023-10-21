@@ -87,7 +87,7 @@ describe('Outcome Destination If Stuck Editor', () => {
           linkProperty: '',
           connectsDestIfStuck: false
         }
-      ], 'Introduction', ['End'])
+      ], 'Introduction', ['End']);
   });
 
   afterEach(() => {
@@ -306,5 +306,5 @@ describe('Outcome Destination If Stuck Editor', () => {
       id: '/',
       text: 'A New Card Called...'
     }]);
-  }))
+  }));
 });

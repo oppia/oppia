@@ -52,7 +52,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   newStateNamePattern!: RegExp;
   destinationChoices: DestinationChoice[] = [];
   maxLen!: number;
-  outcomeNewStateName!: string | null;
+  outcomeNewStateName!: string;
   currentStateName: string | null = null;
   directiveSubscriptions: Subscription = new Subscription();
 
