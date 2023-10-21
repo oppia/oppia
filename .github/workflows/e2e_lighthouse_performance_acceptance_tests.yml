@@ -319,6 +319,11 @@ jobs:
       # - name: (Artifact re-build) Build Webpack
       #   if: steps.download_artifact_1.outcome == 'failure'
       #   run: python -m scripts.build --prod_env
+      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -326,11 +331,6 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
-      - name: Deleting ubuntu files
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Start dev-server
         run: |
           sudo make build
