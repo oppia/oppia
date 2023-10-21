@@ -84,8 +84,7 @@
               <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_SUB_HEADING_3' | translate }}</h4>
               <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_GROWTH_CONTENT_3' | translate }}</p>
             </div>
-            <div class="">
-
+            <div>
               <ngb-carousel *ngIf="art.images.length > 0">
                 <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
@@ -106,7 +105,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
             </div>
           </div>
         </mat-tab>
@@ -125,8 +123,7 @@
               <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_SUB_HEADING_3' | translate }}</h4>
               <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_CONTENT_3' | translate }}</p>
             </div>
-            <div class="">
-
+            <div>
               <ngb-carousel *ngIf="development.images.length > 0">
                 <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
@@ -147,7 +144,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
             </div>
           </div>
         </mat-tab>
@@ -164,8 +160,7 @@
               <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_ART_AND_DESIGN_CONTENT_2' | translate }}</p>
 
             </div>
-            <div class="">
-
+            <div>
               <ngb-carousel *ngIf="art.images.length > 0">
                 <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
@@ -186,7 +181,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
             </div>
           </div>
         </mat-tab>
@@ -205,8 +199,7 @@
               <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_SUB_HEADING_3' | translate }}</h4>
               <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_TRANSLATION_CONTENT_3' | translate }}</p>
             </div>
-            <div class="">
-
+            <div>
               <ngb-carousel *ngIf="development.images.length > 0">
                 <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
@@ -227,7 +220,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
             </div>
           </div>
         </mat-tab>
@@ -246,8 +238,7 @@
               <h4 class="carousel-sub-header">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_SUB_HEADING_3' | translate }}</h4>
               <p>{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_CONTENT_3' | translate }}</p>
             </div>
-            <div class="">
-
+            <div>
               <ngb-carousel *ngIf="lessonCreation.images.length > 0">
                 <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
@@ -268,7 +259,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
             </div>
           </div>
         </mat-tab>
@@ -306,7 +296,7 @@
   }
 
   .volunteer-page button a {
-    color: rgba(255, 255, 255, 1);
+    color: #fff;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1em;
     font-weight: 500;
@@ -354,7 +344,7 @@
   }
 
   .oppia-volunteer-banner-content button {
-    height: 50px !important;
+    height: 50px;
     width: 100%;
   }
 
