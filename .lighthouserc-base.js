@@ -16,6 +16,10 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
+const dotenv = require('dotenv');
+
+dotenv.config({path: './core/tests/puppeteer/.env'});
+
 module.exports = {
   numberOfRuns: 3,
   puppeteerScript: 'puppeteer-login-script.js',
