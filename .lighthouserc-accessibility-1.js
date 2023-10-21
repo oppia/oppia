@@ -28,85 +28,85 @@ module.exports = {
     'assert': {
       'assertMatrix': [
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/$',
+          'matchingUrlPattern': '^http://localhost:8181/$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/about$',
+          'matchingUrlPattern': '^http://localhost:8181/about$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/admin$',
+          'matchingUrlPattern': '^http://localhost:8181/admin$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/blog-dashboard$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/community-library$',
+          'matchingUrlPattern': '^http://localhost:8181/community-library$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/contact$',
+          'matchingUrlPattern': '^http://localhost:8181/contact$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/contributor-dashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/contributor-dashboard$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/creator-dashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/creator-dashboard$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/delete-account$',
+          'matchingUrlPattern': '^http://localhost:8181/delete-account$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/donate$',
+          'matchingUrlPattern': '^http://localhost:8181/donate$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/emailDashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/emailDashboard$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/get-started$',
+          'matchingUrlPattern': '^http://localhost:8181/get-started$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/learner-dashboard$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/moderator$',
+          'matchingUrlPattern': '^http://localhost:8181/moderator$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 0.98}]
           }

@@ -73,7 +73,7 @@ describe('Library pages tour', function() {
     await libraryPage.get();
     await libraryPage.findExploration(SEARCH_TERM);
     await waitFor.urlToBe(
-      'http://localhost:9001/search/find?q=python&language_code=(%22en%22)');
+      'http://localhost:8181/search/find?q=python&language_code=(%22en%22)');
   });
 
   it('should visit the library index page', async function() {

@@ -51,7 +51,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
     'proto_files/text_classifier_pb2.py',
-    'proto_files/training_job_response_payload_pb2.py',
+    'proto_files/training_job_response_payload_pb2.py'
 ]
 
 

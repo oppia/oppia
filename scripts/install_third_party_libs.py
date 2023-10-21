@@ -22,17 +22,22 @@ import pathlib
 import shutil
 import subprocess
 import zipfile
+
+from core import feconf
 from scripts import install_python_dev_dependencies
+
 from typing import Final, List
 
-install_python_dev_dependencies.main(['--assert_compiled'])
+if not feconf.OPPIA_IS_DOCKERIZED:
+    install_python_dev_dependencies.main(['--assert_compiled'])
+
+    from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
@@ -164,6 +169,9 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
+
     setup.main(args=[])
     setup_gae.main(args=[])
 

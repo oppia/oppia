@@ -42,7 +42,7 @@ describe('Profile menu flow', function() {
     await general.navigateToTopicsAndSkillsDashboardPage();
     await waitFor.pageToFullyLoad();
     expect(await browser.getUrl()).toEqual(
-      'http://localhost:9001/topics-and-skills-dashboard');
+      'http://localhost:8181/topics-and-skills-dashboard');
   });
 
   describe('profile dropdown menu', function() {
@@ -55,7 +55,7 @@ describe('Profile menu flow', function() {
     it('should land on the learner dashboard after successful login',
       async function() {
         expect(await browser.getUrl()).toEqual(
-          'http://localhost:9001/learner-dashboard');
+          'http://localhost:8181/learner-dashboard');
       });
 
     it('should visit the profile page from the profile dropdown menu',
@@ -64,7 +64,7 @@ describe('Profile menu flow', function() {
         await action.click('Profile Link', profileLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getUrl()).toEqual(
-          'http://localhost:9001/profile/desktopAndMobileVisitor');
+          'http://localhost:8181/profile/desktopAndMobileVisitor');
       });
 
     it('should visit the creator dashboard from the profile dropdown menu',
@@ -73,7 +73,7 @@ describe('Profile menu flow', function() {
         await action.click('Creator Dashboard Link', creatorDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getUrl()).toEqual(
-          'http://localhost:9001/creator-dashboard');
+          'http://localhost:8181/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
@@ -82,7 +82,7 @@ describe('Profile menu flow', function() {
         await action.click('Learner Dashboard Link', learnerDashboardLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getUrl()).toEqual(
-          'http://localhost:9001/learner-dashboard');
+          'http://localhost:8181/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
@@ -97,7 +97,7 @@ describe('Profile menu flow', function() {
         await action.click('Preferences Link', preferencesLink);
         await waitFor.pageToFullyLoad();
         expect(await browser.getUrl()).toEqual(
-          'http://localhost:9001/preferences');
+          'http://localhost:8181/preferences');
       });
   });
 

@@ -15,6 +15,12 @@ RUN apt-get update -y && apt-get upgrade -y \
     python3-matplotlib \
     unzip \
     wget
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+
+RUN curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_117.0.5938.149-1_amd64.deb
+RUN apt-get install -y ./google-chrome.deb
+RUN rm google-chrome.deb
 
 RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
@@ -54,11 +60,14 @@ RUN chmod -R 744 $BUF_DIR \
 # Installing python dependencies from the requirements_dev.txt file
 COPY requirements.txt .
 COPY requirements_dev.txt .
+COPY mypy_requirements.txt .
 
 RUN pip install --require-hashes --no-deps -r requirements.txt -t /app/oppia/third_party/python_libs
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
+RUN pip install -r mypy_requirements.txt -t /app/oppia/third_party/python3_libs
 RUN pip download --no-deps -r requirements.txt -d /root/.cache
 RUN pip download --no-deps -r requirements_dev.txt -d /root/.cache
+RUN pip download -r mypy_requirements.txt -d /root/.cache
 
 # Installing buf and proto for Linux -- this docker container is based on Linux
 COPY buf.gen.yaml .
