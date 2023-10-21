@@ -3,10 +3,11 @@
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)"
          class="oppia-info-card-bg-image"
          alt="{{ expCategory }}">
-    <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()">
+    <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()" tabindex="0">
       {{ expTitleTranslationKey | translate }}
     </h2>
     <h2 class="oppia-info-card-title break-word"
+        tabindex="0"
         *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
     </h2>
@@ -19,10 +20,11 @@
           {{ expDesc | truncateAndCapitalize: 90 }}
         </h4>
         <h4 class="oppia-exploration-description"
+            tabindex="0"
             *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </h4>
-        <h4 [ngClass]="(checkpointCount === 1) ? 'd-none' : 'progress-bar-label-text'">
+        <h4 tabindex="0" [ngClass]="(checkpointCount === 1) ? 'd-none' : 'progress-bar-label-text'">
           Learning Progress
         </h4>
         <div class="progress-bar-container"
@@ -49,6 +51,8 @@
                     class="btn btn-secondary save-progress-btn"
                     *ngIf="(!userIsLoggedIn && checkpointCount>1)"
                     [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
+                    tabindex="0"
+                    (keydown.enter)="saveLoggedOutProgress()"
                     (click)="saveLoggedOutProgress()">
               {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
             </button>
