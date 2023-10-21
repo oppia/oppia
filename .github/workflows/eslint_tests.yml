@@ -35,15 +35,11 @@ jobs:
       #     docker compose build --no-cache
       - name: Initialize Containers
         run: |
-          echo ---Initializing containers---
-          docker compose up angular-build -d
-          echo ---Copying node_modules from container---
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-      - name: Stop Containers
-        run: make stop
+          sudo make build
+          sudo make run-devserver
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 make run_tests.custom_eslint
+        run: docker compose exec dev-server python -m scripts.run_custom_eslint_tests
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
