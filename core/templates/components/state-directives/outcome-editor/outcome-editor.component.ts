@@ -246,7 +246,6 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationIfStuckEditorIsOpen = false;
     this.savedOutcome.destIfReallyStuck = (
       cloneDeep(this.outcome.destIfReallyStuck));
-
     this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
