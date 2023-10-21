@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 import enum
 import json
 import re
@@ -26,7 +27,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Final, List, TypedDict
+from typing import Final, List, Optional, TypedDict
 
 
 class ServerMode(enum.Enum):
@@ -69,7 +70,7 @@ class FeatureFlagDict(TypedDict):
     force_enable_for_all_users: bool
     rollout_percentage: int
     user_group_ids: List[str]
-    last_updated: str
+    last_updated: Optional[str]
 
 
 class FeatureFlag:
@@ -85,7 +86,7 @@ class FeatureFlag:
         force_enable_for_all_users: bool,
         rollout_percentage: int,
         user_group_ids: List[str],
-        last_updated: str
+        last_updated: Optional[datetime.datetime] = None
     ) -> None:
         self._name = name
         self._description = description
@@ -177,19 +178,21 @@ class FeatureFlag:
         self._user_group_ids = user_group_ids
 
     @property
-    def last_updated(self) -> str:
-        """Returns the last_updated of the feature flag.
+    def last_updated(self) -> Optional[datetime.datetime]:
+        """Returns the last_updated field of the feature flag.
+        When the feature flag has not been updated yet, last_updated
+        will be None.
 
         Returns:
-            str. The last_updated of the feature flag.
+            Optional[datetime.datetime]. The last_updated of the feature flag.
         """
         return self._last_updated
 
-    def set_last_updated(self, last_updated: str) -> None:
-        """Sets the last_updated of FeatureFlag.
+    def set_last_updated(self, last_updated: datetime.datetime) -> None:
+        """Sets the last_updated field of the FeatureFlag.
 
         Args:
-            last_updated: str. The new value of last_updated.
+            last_updated: datetime.datetime. The new value of last_updated.
         """
         self._last_updated = last_updated
 
@@ -234,6 +237,8 @@ class FeatureFlag:
         Returns:
             dict. A dict mapping of all fields of FeatureFlag object.
         """
+        last_updated = utils.convert_naive_datetime_to_string(
+            self.last_updated) if self.last_updated else None
         return {
             'name': self._name,
             'description': self._description,
@@ -241,7 +246,7 @@ class FeatureFlag:
             'force_enable_for_all_users': self._force_enable_for_all_users,
             'rollout_percentage': self._rollout_percentage,
             'user_group_ids': self._user_group_ids,
-            'last_updated': self._last_updated
+            'last_updated': last_updated
         }
 
     @classmethod
@@ -255,6 +260,9 @@ class FeatureFlag:
         Returns:
             FeatureFlag. The corresponding FeatureFlag domain object.
         """
+        last_updated = utils.convert_string_to_naive_datetime_object(
+            feature_dict['last_updated']
+        ) if isinstance(feature_dict['last_updated'], str) else None
         return cls(
             feature_dict['name'],
             feature_dict['description'],
@@ -262,7 +270,7 @@ class FeatureFlag:
             feature_dict['force_enable_for_all_users'],
             feature_dict['rollout_percentage'],
             feature_dict['user_group_ids'],
-            feature_dict['last_updated']
+            last_updated
         )
 
     def serialize(self) -> str:

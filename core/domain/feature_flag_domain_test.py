@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -29,6 +31,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
     """Tests for FeatureFlag."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
+        current_time = datetime.datetime.utcnow()
         feature = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
@@ -36,7 +39,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                current_time)
         })
 
         self.assertIsInstance(feature, feature_flag_domain.FeatureFlag)
@@ -46,7 +50,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         self.assertFalse(feature.force_enable_for_all_users)
         self.assertEqual(feature.rollout_percentage, 0)
         self.assertEqual(feature.user_group_ids, [])
-        self.assertEqual(feature.last_updated, 'August 25, 2023')
+        self.assertEqual(feature.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
         feature_flag_dict: feature_flag_domain.FeatureFlagDict = {
@@ -56,7 +60,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         }
         feature = feature_flag_domain.FeatureFlag.from_dict(feature_flag_dict)
         self.assertDictEqual(feature.to_dict(), feature_flag_dict)
@@ -69,18 +74,20 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
+        current_time = datetime.datetime.utcnow()
         feature.set_force_enable_for_all_users(True)
         feature.set_rollout_percentage(50)
         feature.set_user_group_ids(['user_group_1', 'user_group_2'])
-        feature.set_last_updated('August 26, 2023')
+        feature.set_last_updated(current_time)
 
         self.assertTrue(feature.force_enable_for_all_users)
         self.assertEqual(feature.rollout_percentage, 50)
         self.assertEqual(
             feature.user_group_ids, ['user_group_1', 'user_group_2'])
-        self.assertEqual(feature.last_updated, 'August 26, 2023')
+        self.assertEqual(feature.last_updated, current_time)
 
     def test_validate_feature_passes_without_exception(self) -> None:
         feature = feature_flag_domain.FeatureFlag.from_dict({
@@ -90,7 +97,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         feature.validate()
 
@@ -102,7 +110,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -118,7 +127,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
@@ -132,7 +142,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
@@ -151,7 +162,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -170,7 +182,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -194,7 +207,8 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
         })
         self.assertEqual(
             feature.to_dict(),

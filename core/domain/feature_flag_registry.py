@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-import datetime
 import enum
 
+from core import utils
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.platform import models
@@ -66,14 +66,13 @@ class Registry:
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': datetime.datetime.now(
-                datetime.timezone.utc).strftime("%B %d, %Y")
+            'last_updated': None
         }
+        if cls.feature_registry.get(name.value):
+            raise Exception(
+                'Feature flag with name %s already exists.' % name.value)
         feature = feature_flag_domain.FeatureFlag.from_dict(feature_flag_dict)
         feature.validate()
-        if cls.feature_registry.get(feature.name):
-            raise Exception(
-                'Feature flag with name %s already exists.' % feature.name)
         cls.feature_registry[feature.name] = feature
         return feature
 
@@ -152,8 +151,7 @@ class Registry:
         feature.set_user_group_ids(user_group_ids)
         updated_model_instance = config_models.FeatureFlagModel.get(
             feature.name, strict=False)
-        last_updated = updated_model_instance.last_updated.strftime("%B %d, %Y")
-        feature.set_last_updated(last_updated)
+        feature.set_last_updated(updated_model_instance.last_updated)
 
         cls.feature_registry[feature.name] = feature
 
@@ -164,7 +162,7 @@ class Registry:
     def load_feature_flag_from_storage(
         cls, name: str
     ) -> Optional[feature_flag_domain.FeatureFlag]:
-        """Loads feature flag from storage.
+        """Loads feature flag from storage, if not present returns None.
 
         Args:
             name: str. The name of the feature flag.
@@ -177,6 +175,8 @@ class Registry:
             name, strict=False)
 
         if feature_model:
+            last_updated = utils.convert_naive_datetime_to_string(
+                feature_model.last_updated)
             feature_with_init_settings = cls.feature_registry[name]
             return feature_flag_domain.FeatureFlag.from_dict({
                 'name': feature_with_init_settings.name,
@@ -186,7 +186,7 @@ class Registry:
                     feature_model.force_enable_for_all_users),
                 'rollout_percentage': feature_model.rollout_percentage,
                 'user_group_ids': feature_model.user_group_ids,
-                'last_updated': feature_model.last_updated.strftime("%B %d, %Y")
+                'last_updated': last_updated
             })
         else:
             return None

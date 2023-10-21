@@ -36,6 +36,7 @@ class FeatureNames(enum.Enum):
     FEATURE_A = 'feature_a'
     FEATURE_B = 'feature_b'
     FEATURE_C = 'feature_c'
+    FEATURE_D = 'feature_d'
 
 
 FeatureStages = feature_flag_domain.FeatureStages
@@ -101,14 +102,70 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
         expected_dicts = [
-            self.dev_feature.to_dict(),
-            self.test_feature.to_dict(),
-            self.prod_feature.to_dict(),
+            registry.Registry.get_feature_flag(self.dev_feature.name).to_dict(),
+            registry.Registry.get_feature_flag(
+                self.test_feature.name).to_dict(),
+            registry.Registry.get_feature_flag(
+                self.prod_feature.name).to_dict(),
         ]
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             self.assertEqual(
                 feature_services.get_all_feature_flag_dicts(),
                 expected_dicts)
+
+    def test_feature_is_correctly_fetched_when_not_present_in_storage(
+        self) -> None:
+        dev_feature = registry.Registry.get_feature_flag(self.dev_feature.name)
+        test_feature = registry.Registry.get_feature_flag(
+            self.test_feature.name)
+        prod_feature = registry.Registry.get_feature_flag(
+            self.prod_feature.name)
+
+        expected_dicts = [
+            dev_feature.to_dict(),
+            test_feature.to_dict(),
+            prod_feature.to_dict()
+        ]
+        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
+            with self.swap_to_always_return(
+                feature_services,
+                'load_feature_flags_from_storage',
+                {
+                    dev_feature.name: None,
+                    test_feature.name: test_feature,
+                    prod_feature.name: prod_feature
+                }
+            ):
+                with self.swap_to_always_return(
+                    caching_services,
+                    'get_multi',
+                    {
+                        dev_feature.name: None,
+                        test_feature.name: None,
+                        prod_feature.name: None
+                    }
+                ):
+                    self.assertEqual(
+                        feature_services.get_all_feature_flag_dicts(),
+                        expected_dicts)
+
+    def test_get_all_features_dicts_raises_error_when_feature_not_present(
+        self) -> None:
+        swap_all_feature_flags = self.swap(
+            feature_services,
+            'ALL_FEATURE_FLAGS',
+            [
+                FeatureNames.FEATURE_A,
+                FeatureNames.FEATURE_B,
+                FeatureNames.FEATURE_C,
+                FeatureNames.FEATURE_D
+            ]
+        )
+        with swap_all_feature_flags:
+            with self.assertRaisesRegex(
+                Exception, 'Feature flag not found: feature_d'
+            ):
+                feature_services.get_all_feature_flag_dicts()
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(
         self
@@ -120,6 +177,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             ):
                 feature_services.is_feature_flag_enabled(
                     self.owner_id, 'feature_that_does_not_exist')
+
+    def test_updating_non_existing_feature_results_in_error(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Unknown feature flag: unknown_feature'
+        ):
+            feature_services.update_feature_flag(
+                'unknown_feature',
+                True,
+                0,
+                []
+            )
 
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(
         self
@@ -299,47 +367,19 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         user_id, self.dev_feature.name))
         return feature_status_for_users
 
-    def test_feature_flag_enabled_for_25_perc_logged_in_users(self) -> None:
+    def test_feature_flag_not_enabled_for_all_users(self) -> None:
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
         feature_status_for_users = self._get_feature_status_for_users(
-            25, user_ids)
+            0, user_ids)
 
         total_count_of_users_having_feature_enabled = 0
         for feature_status in feature_status_for_users:
             if feature_status == True:
                 total_count_of_users_having_feature_enabled += 1
 
-        self.assertEqual(total_count_of_users_having_feature_enabled, 1)
-
-    def test_feature_flag_enabled_for_50_perc_logged_in_users(self) -> None:
-        user_1_id, user_2_id, user_3_id = (
-            self._signup_multiple_users_and_return_ids())
-        user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
-        feature_status_for_users = self._get_feature_status_for_users(
-            50, user_ids)
-
-        total_count_of_users_having_feature_enabled = 0
-        for feature_status in feature_status_for_users:
-            if feature_status == True:
-                total_count_of_users_having_feature_enabled += 1
-
-        self.assertEqual(total_count_of_users_having_feature_enabled, 2)
-
-    def test_feature_flag_enabled_for_75_perc_logged_in_users(self) -> None:
-        user_1_id, user_2_id, user_3_id = (
-            self._signup_multiple_users_and_return_ids())
-        user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
-        feature_status_for_users = self._get_feature_status_for_users(
-            75, user_ids)
-
-        total_count_of_users_having_feature_enabled = 0
-        for feature_status in feature_status_for_users:
-            if feature_status == True:
-                total_count_of_users_having_feature_enabled += 1
-
-        self.assertEqual(total_count_of_users_having_feature_enabled, 3)
+        self.assertEqual(total_count_of_users_having_feature_enabled, 0)
 
     def test_feature_flag_enabled_for_100_perc_logged_in_users(self) -> None:
         user_1_id, user_2_id, user_3_id = (
