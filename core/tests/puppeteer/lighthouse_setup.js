@@ -161,6 +161,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(
       dismissWelcomeModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
+    process.env.exploration_id = explorationEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -206,6 +207,7 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.waitForSelector(createStoryButtonSelector);
 
     topicEditorUrl = await page.url();
+    process.env.topic_id = topicEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -238,6 +240,7 @@ const getStoryEditorUrl = async function(browser, page) {
     await page.click(confirmStoryCreationButton);
     await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
+    process.env.story_id = storyEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -269,6 +272,7 @@ const getSkillEditorUrl = async function(browser, page) {
     skillEditorUrl = await pages[2].url();
     if (await skillEditorUrl.includes('topic_editor')) {
       skillEditorUrl = await pages[3].url();
+      process.env.skill_id = skillEditorUrl.split('/')[4];
     }
   } catch (e) {
     // eslint-disable-next-line no-console
