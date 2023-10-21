@@ -86,7 +86,7 @@ var BlogDashboardPage = function() {
     await action.click(
       'Blog dashboard link from dropdown', blogDashboardLink);
     await waitFor.pageToFullyLoad();
-    await waitFor.urlRedirection('http://localhost:9001/blog-dashboard');
+    await waitFor.urlRedirection('http://localhost:8181/blog-dashboard');
   };
 
   this.navigateToBlogDashboardPageWithBackButton = async function() {
