@@ -19,9 +19,6 @@ jobs:
           sudo apt update
           sudo apt install python2 -y
       - uses: ./.github/actions/merge
-      # - name: Install Third Party Dependencies
-      #   if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-      #   run: python -m scripts.install_third_party_libs
       - name: Initialize Containers
         run: |
           echo ---Initializing containers---
