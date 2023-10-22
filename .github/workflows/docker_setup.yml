@@ -1,5 +1,5 @@
 name: Docker Setup Test
-on: []
+on: [pull_request]
 
 jobs:
   build:
