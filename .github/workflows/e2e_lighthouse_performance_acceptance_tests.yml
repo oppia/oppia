@@ -2,77 +2,7 @@ name: End-to-End, Lighthouse CI performance and Acceptance tests
 on: [push]
 
 jobs:
-  # build:
-  #   runs-on:  ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-22.04]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.8.15'
-  #         architecture: 'x64'
-  #         cache: 'pip'
-  #         cache-dependency-path: |
-  #           requirements.in
-  #           requirements.txt
-  #           requirements_dev.in
-  #           requirements_dev.txt
-  #     - uses: ./.github/actions/merge
-  #     - name: Cache node modules and third_party/static
-  #       uses: actions/cache@v3
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         path: |
-  #           /home/runner/work/oppia/yarn_cache
-  #           /home/runner/work/oppia/oppia/third_party/static
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     # - uses: ./.github/actions/install-oppia-dependencies
-  #     - name: Install Python deps
-  #       run: |
-  #         pip install --require-hashes --no-deps -r requirements.txt
-  #         pip install --require-hashes --no-deps -r requirements_dev.txt
-  #     - name: Install chrome
-  #       run: python -m scripts.install_chrome_for_ci
-  #     - name: Install ffmpeg
-  #       run: sudo apt install ffmpeg
-  #       # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
-  #     - name: Deleting ubuntu files
-  #       run: |
-  #         sudo rm -rf /usr/share/dotnet
-  #         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-  #     - name: Build Webpack and Angular bundles
-  #       # run: python -m scripts.build --prod_env
-  #       run: |
-  #         sudo make build
-  #         docker compose up angular-build -d
-  #         sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-  #         make stop
-  #         prod_env=true docker compose up dev-server -d --no-deps
-  #         prod_env=true docker compose up webpack-compiler angular-build
-  #         docker compose exec dev-server python -m scripts.generate_build_directory
-  #     - name: Stopping Containers
-  #       run: make stop
-  #     - name: Zip build files
-  #       # We avoid using ../ or absolute paths because unzip treats these as
-  #       # security issues and will refuse to follow them.
-  #       run: |
-  #         zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-  #       working-directory: /home/runner/work/oppia
-  #     - name: Upload build files artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: build_files
-  #         path: /home/runner/work/oppia/build_files.zip
-  #         retention-days: 1
   e2e_test:
-    # needs: build
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -152,25 +82,6 @@ jobs:
         with:
           name: build_files
           path: /home/runner/work/oppia/
-      # - name: Unzip build files
-      #   if: steps.download_artifact_1.outcome != 'failure'
-      #   run: |
-      #     ls -la
-      #     unzip build_files.zip
-      #     rm build_files.zip
-      #     echo "Files in ./:"
-      #     ls -la .
-      #     echo "Files in oppia_tools:"
-      #     ls -la oppia_tools
-      #     echo "Files in oppia:"
-      #     ls -la oppia
-      #     echo "Files in build:"
-      #     ls -la oppia/build
-      #     echo "Files in third_party:"
-      #     ls -la oppia/third_party
-        # working-directory: /home/runner/work/oppia
-        # shell: bash
-      # - uses: ./.github/actions/install-oppia-dependencies
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -196,37 +107,35 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      # - name: (Artifact re-build) Build Webpack
-      #   if: steps.download_artifact_1.outcome == 'failure'
-      #   run: python -m scripts.build --prod_env
       - name: Initializing Containers in prod mode
-      # sudo make run-devserver
         run: |
           sudo make build
-          sudo docker compose up angular-build -d
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-          make stop
-          prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
-          prod_env=true docker compose up webpack-compiler angular-build
-          docker compose exec dev-server python -m scripts.generate_build_directory
-      - name: Checking server reachability for prod mode
-        run: |
-          for i in {1..50}; do
-            if curl -s http://localhost:8181/community-library; then
-              echo "---Dev-server (prod mode) is up---"
-              exit 0
-            else
-              echo "---Retrying in 30 seconds---"
-              sleep 30
-            fi
-          done
-          echo "---Dev-server is not started after all retries---"
-          exit 1
+          sudo make run-devserver
+        # run: |
+        #   sudo make build
+        #   sudo docker compose up angular-build -d
+        #   sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+        #   make stop
+        #   prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
+        #   prod_env=true docker compose up webpack-compiler angular-build
+        #   docker compose exec dev-server python -m scripts.generate_build_directory
+      # - name: Checking server reachability for prod mode
+      #   run: |
+      #     for i in {1..50}; do
+      #       if curl -s http://localhost:8181/community-library; then
+      #         echo "---Dev-server (prod mode) is up---"
+      #         exit 0
+      #       else
+      #         echo "---Retrying in 30 seconds---"
+      #         sleep 30
+      #       fi
+      #     done
+      #     echo "---Dev-server is not started after all retries---"
+      #     exit 1
       - name: Run E2E Test ${{ matrix.suite }}
-        # NOTE FOR SHIVKANT: adding npm i -- https://github.com/Shivkant-Chauhan/oppia/actions/runs/6574175775/job/17858694482
         run: |
           export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
-          sudo npm i -g @wdio/selenium-standalone-service@7.7.4 --unsafe-perm=true --allow-root
+          sudo chmod -R 777 /home/runner/work/oppia/oppia
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
@@ -255,7 +164,6 @@ jobs:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   lighthouse:
-    # needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -286,24 +194,6 @@ jobs:
         with:
           name: build_files
           path: /home/runner/work/oppia/
-      # - name: Unzip build files
-      #   if: steps.download_artifact_1.outcome != 'failure'
-      #   run: |
-      #     ls -la
-      #     unzip build_files.zip
-      #     rm build_files.zip
-      #     echo "Files in ./:"
-      #     ls -la .
-      #     echo "Files in oppia_tools:"
-      #     ls -la oppia_tools
-      #     echo "Files in oppia:"
-      #     ls -la oppia
-      #     echo "Files in build:"
-      #     ls -la oppia/build
-      #     echo "Files in third_party:"
-      #     ls -la oppia/third_party
-      #   working-directory: /home/runner/work/oppia
-      #   shell: bash
       - name: (Artifact re-build) Cache third_party/static
         if: steps.download_artifact_1.outcome == 'failure'
         uses: actions/cache@v3
@@ -316,9 +206,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      # - name: (Artifact re-build) Build Webpack
-      #   if: steps.download_artifact_1.outcome == 'failure'
-      #   run: python -m scripts.build --prod_env
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -334,15 +221,7 @@ jobs:
       - name: Start dev-server
         run: |
           sudo make build
-          sudo docker compose up angular-build -d
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-          make stop
-          prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
-          prod_env=true docker compose up webpack-compiler angular-build
-          docker compose exec dev-server python -m scripts.generate_build_directory
-        # run: |
-        #   sudo make build
-        #   sudo make run-devserver
+          sudo make run-devserver
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
@@ -361,7 +240,6 @@ jobs:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
-      # needs: build
       runs-on:  ${{ matrix.os }}
       strategy:
         matrix:
@@ -402,25 +280,6 @@ jobs:
           with:
             name: build_files
             path: /home/runner/work/oppia/
-        # - name: Unzip build files
-        #   if: steps.download_artifact_1.outcome != 'failure'
-        #   run: |
-        #     ls -la
-        #     unzip build_files.zip
-        #     rm build_files.zip
-        #     echo "Files in ./:"
-        #     ls -la .
-        #     echo "Files in oppia_tools:"
-        #     ls -la oppia_tools
-        #     echo "Files in oppia:"
-        #     ls -la oppia
-        #     echo "Files in build:"
-        #     ls -la oppia/build
-        #     echo "Files in third_party:"
-        #     ls -la oppia/third_party
-        #   working-directory: /home/runner/work/oppia
-        #   shell: bash
-        # - uses: ./.github/actions/install-oppia-dependencies
         - name: Install Python deps
           run: |
             pip install --require-hashes --no-deps -r requirements.txt
@@ -446,48 +305,14 @@ jobs:
               ${{ runner.os }}-build-${{ env.cache-name }}-
               ${{ runner.os }}-build-
               ${{ runner.os }}-
-        # - name: (Artifact re-build) Build Webpack
-          # if: steps.download_artifact_1.outcome == 'failure'
-          # run: python -m scripts.build --prod_env
-          # - name: Initializing Containers in prod mode
-          #   run: |
-          #     sudo make build
-          #     sudo docker compose up angular-build -d
-          #     sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-          #     make stop
-          #     prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
-          #     prod_env=true docker compose up webpack-compiler angular-build
-          #     docker compose exec dev-server python -m scripts.generate_build_directory
-        - name: Start dev-server (dev-mode)
+        - name: Start dev-server
           run: |
             sudo make build
-            sudo docker compose up angular-build -d
-            sudo docker cp oppia-angular-build:/app/oppia/node_modules .
-            make stop
-            prod_env=true docker compose up dev-server redis datastore firebase elasticsearch -d --no-deps
-            prod_env=true docker compose up webpack-compiler angular-build
-            docker compose exec dev-server python -m scripts.generate_build_directory
-          # run: |
-          #   sudo make build
-          #   sudo make run-devserver prod_env=true
-        # - name: Checking server reachability for prod mode
-        #   run: |
-        #     for i in {1..50}; do
-        #       if curl -s http://localhost:8181/community-library; then
-        #         echo "---Dev-server (prod mode) is up---"
-        #         exit 0
-        #       else
-        #         echo "---Retrying in 30 seconds---"
-        #         sleep 30
-        #       fi
-        #     done
-        #     echo "---Dev-server is not started after all retries---"
-        #     exit 1
+            sudo make run-devserver
         - name: Run Acceptance Test ${{ matrix.suite }}
           run: |
             export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
             xvfb-run -a --server-args="-screen 0, 1285x1000x24" ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/${{ matrix.suite }}
-          # run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
