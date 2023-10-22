@@ -383,10 +383,12 @@ class ReviewableOpportunitiesHandler(
                 for reference in topic.get_all_story_references()
                 if reference.story_is_published
             ],
-            strict=True
+            strict=False
         )
         topic_exp_ids = []
         for story in topic_stories:
+            if story is None:
+                continue
             for node in story.story_contents.get_ordered_nodes():
                 if node.exploration_id is None:
                     raise Exception(

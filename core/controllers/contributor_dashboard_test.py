@@ -513,6 +513,37 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     params={'topic_name': 'topic'}
                 )
 
+    def test_skip_story_if_story_is_none(self) -> None:
+        # Create a new exploration and linked story.
+        continue_state_name = 'continue state'
+        exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
+            '100',
+            self.owner_id,
+            ['Introduction', continue_state_name, 'End state'],
+            ['TextInput', 'Continue'],
+            category='Algebra',
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, exp_100.id)
+        self.create_story_for_translation_opportunity(
+            self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
+            exp_100.id)
+        corrupt_story = None
+        swap_with_corrupt_story = self.swap_to_always_return(
+            story_fetchers, 'get_stories_by_ids', [corrupt_story]
+        )
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Get translation opportunities with 'None' story.
+        with swap_with_corrupt_story:
+            response = self.get_json(
+                '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+                params={'topic_name': 'topic'}
+            )
+
+        # The 'None' story should be skipped.
+        self.assertEqual(len(response['opportunities']), 0)
+
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
         self
     ) -> None:
