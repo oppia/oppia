@@ -334,7 +334,7 @@ jobs:
       - name: Start dev-server
         run: |
           sudo make build
-          sudo make run-devserver
+          sudo make run-devserver prod_env=true
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
@@ -453,7 +453,7 @@ jobs:
         - name: Start dev-server (dev-mode)
           run: |
             sudo make build
-            sudo make run-devserver
+            sudo make run-devserver prod_env=true
         # - name: Checking server reachability for prod mode
         #   run: |
         #     for i in {1..50}; do
