@@ -163,6 +163,26 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.lighthouse: ## Runs the lighthouse tests for the parsed shard
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the lighthouse tests.
+	$(MAKE) start-devserver
+	@echo '------------------------------------------------------'
+	@echo '  Starting lighthouse tests, mode: $(mode), shard number: $(shard)'
+	@echo '------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	@echo '------------------------------------------------------'
+	@echo '  lighthouse tests has been executed successfully....'
+	@echo '------------------------------------------------------'
+	$(MAKE) stop
+
 OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
