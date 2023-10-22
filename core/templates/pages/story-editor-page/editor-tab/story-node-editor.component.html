@@ -126,14 +126,14 @@
           </div>
           <div *ngIf="!chapterOutlineIsShown">
             <div class="outline-content-container" *ngIf="!outlineEditViewIsShown">
-              <input class="chapter-outline-editor-content e2e-test-rte"
+              <input class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
                      readonly
                      (click)="makeChapterOutlineEditable()"
                      placeholder="Open chapter outline editor.">
               <label class="fas fa-pencil-alt oppia-icon" (click)="makeChapterOutlineEditable()"></label>
             </div>
             <div class="outline-content-container" *ngIf="outlineEditViewIsShown">
-              <button class="chapter-outline-editor-content e2e-test-rte"
+              <button class="chapter-outline-editor-content e2e-test-node-outline-editor-content e2e-test-rte"
                       (click)="makeChapterOutlineEditable()"
                       [innerHTML]="outlineEditViewIsShown">
               </button>
