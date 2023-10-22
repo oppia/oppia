@@ -255,6 +255,8 @@ exports.config = {
     }
   }],
 
+  runner: 'local',
+
   // ===================
   // Test Configurations
   // ===================

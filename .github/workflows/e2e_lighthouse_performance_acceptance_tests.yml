@@ -135,9 +135,6 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite }}
         run: |
           export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
-          export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
-          export PATH=$PATH:$JAVA_HOME/bin
-
           sudo chmod -R 777 /home/runner/work/oppia/oppia
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
