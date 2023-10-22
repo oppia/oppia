@@ -1,5 +1,5 @@
 name: End-to-End coverage and Typescript test
-on: [push]
+on: [push
 
 jobs:
   e2e_coverage_and_typescript_tests:

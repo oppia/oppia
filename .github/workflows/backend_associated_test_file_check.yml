@@ -1,5 +1,5 @@
 name: Backend associated test file check
-on: [push]
+on: [push
 
 jobs:
   run_tests:
