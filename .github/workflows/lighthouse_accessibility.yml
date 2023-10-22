@@ -1,5 +1,5 @@
 name: Lighthouse CI accessibility tests
-on: [push
+on:
 
 jobs:
   lighthouse:

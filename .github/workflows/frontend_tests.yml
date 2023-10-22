@@ -1,5 +1,5 @@
 name: Frontend Karma tests
-on: [push
+on:
 
 jobs:
   generate-job-strategy-matrix:

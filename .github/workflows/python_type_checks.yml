@@ -1,5 +1,5 @@
 name: Python type checks
-on: [push
+on:
 
 jobs:
   run_tests:
