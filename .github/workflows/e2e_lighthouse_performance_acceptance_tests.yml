@@ -110,7 +110,8 @@ jobs:
       - name: Initializing Containers in prod mode
         run: |
           sudo make build
-          sudo make run-devserver
+          sudo docker compose up angular-build -d
+          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
         # run: |
         #   sudo make build
         #   sudo docker compose up angular-build -d
@@ -134,9 +135,8 @@ jobs:
       #     exit 1
       - name: Run E2E Test ${{ matrix.suite }}
         run: |
-          export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
           sudo chmod -R 777 /home/runner/work/oppia/oppia
-          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
+          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
