@@ -138,6 +138,7 @@ jobs:
       #     exit 1
       - name: Run E2E Test ${{ matrix.suite }}
         run: |
+          sudo chmod -R 777 /home/runner/work/oppia/oppia
           sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
         # run: |
         #   export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
