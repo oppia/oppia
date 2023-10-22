@@ -1,5 +1,6 @@
 name: Backend associated test file check
-on:
+# not on pull_request and not on forked repo
+on: []
 
 jobs:
   run_tests:

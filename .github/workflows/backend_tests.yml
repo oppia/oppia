@@ -1,5 +1,5 @@
 name: Backend tests
-on:
+on: []
 
 jobs:
   run_tests:
