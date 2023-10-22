@@ -255,6 +255,7 @@ exports.config = {
     }
   }],
 
+  runner: 'local',
   hostname: '0.0.0.0',
   port: 4444,
 
