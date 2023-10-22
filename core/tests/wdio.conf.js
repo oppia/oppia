@@ -268,7 +268,7 @@ exports.config = {
   // the path portion of your baseUrl. If your `url` parameter starts
   // without a scheme or `/` (like `some/path`), the base url gets
   //  prepended directly.
-  baseUrl: 'http://localhost:9001',
+  baseUrl: 'http://localhost:8181',
 
   // Default timeout in milliseconds for request
   // if browser driver or grid doesn't send response.
@@ -353,7 +353,7 @@ exports.config = {
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
 
     // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:9001');
+    browser.url('http://localhost:8181');
   },
   /**
     * Function to be executed before a test (in Mocha/Jasmine only)
