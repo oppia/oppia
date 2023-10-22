@@ -109,6 +109,8 @@ jobs:
             ${{ runner.os }}-
       - name: Initializing Containers in prod mode
         run: |
+          javac --version
+          exit 1
           sudo make build
           sudo make run-devserver
         # run: |
