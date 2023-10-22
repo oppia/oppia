@@ -68,7 +68,7 @@ describe('Ratings and recommendations component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
 
   const mockNgbPopover = jasmine.createSpyObj(
-    'NgbPopover', ['close', 'toggle']);
+    'NgbPopover', ['close', 'toggle', 'open']);
 
 
   class MockWindowRef {
@@ -266,6 +266,7 @@ describe('Ratings and recommendations component', () => {
 
   it('should submit user rating when user clicks on rating star', () => {
     spyOn(learnerViewRatingService, 'submitUserRating');
+    componentInstance.feedbackPopOver = mockNgbPopover;
     const userRating = 5;
 
     componentInstance.submitUserRating(userRating);
