@@ -136,7 +136,7 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite }}
         run: |
           sudo chmod -R 777 /home/runner/work/oppia/oppia
-          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
