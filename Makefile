@@ -141,6 +141,13 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+list_flags.acceptance: ## Lists the flags for the acceptance tests
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  Flags for the acceptance tests'
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  suite: The suite to run the acceptance tests'
+	@echo '----------------------------------------------------------------------------------------'
+
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
@@ -152,18 +159,32 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	else \
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
+# Adding env variable for the mobile view
+	@export MOBILE=${MOBILE}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	sharding_instances := 3
+	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-run_tests.lighthouse: ## Runs the lighthouse tests for the parsed shard
+list_flags.e2e: ## Lists the flags for the e2e tests
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  Flags for the e2e tests'
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  suite: The suite to run the e2e tests'
+	@echo '  sharding_instances: Sets the number of parallel browsers to open while sharding.
+	@echo '  CHROME_VERSION: Uses the specified version of the chrome driver.
+	@echo '  MOBILE: Run e2e test in mobile viewport.'
+	@echo '  DEBUG: Runs the webdriverio test in debugging mode.'
+	@echo '----------------------------------------------------------------------------------------'
+
+run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -174,14 +195,43 @@ run_tests.lighthouse: ## Runs the lighthouse tests for the parsed shard
 	fi
 # Starting the development server for the lighthouse tests.
 	$(MAKE) start-devserver
-	@echo '------------------------------------------------------'
-	@echo '  Starting lighthouse tests, mode: $(mode), shard number: $(shard)'
-	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
-	@echo '------------------------------------------------------'
-	@echo '  lighthouse tests has been executed successfully....'
-	@echo '------------------------------------------------------'
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
+
+run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the lighthouse tests.
+	$(MAKE) start-devserver
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
+	$(MAKE) stop
+
+list_flags.lighthouse: ## Lists the flags for the lighthouse tests
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  Flags for the lighthouse tests'
+	@echo '----------------------------------------------------------------------------------------'
+	@echo '  shard: The shard number to run the lighthouse tests'
+	@echo '----------------------------------------------------------------------------------------'
 
 OS_NAME := $(shell uname)
 
