@@ -11,46 +11,46 @@ jobs:
           - accessibility
           - additionalEditorFeatures
           - additionalEditorFeaturesModals
-          # - additionalPlayerFeatures
-          # - adminPage
-          # - blogDashboard
-          # - blog
-          # - checkpointFeatures
-          # - classroomPage
-          # - classroomPageFileUploadFeatures
-          # - collections
-          # - contributorDashboard
-          # - contributorAdminDashboard
-          # - coreEditorAndPlayerFeatures
-          # - creatorDashboard
-          # - embedding
-          # - explorationFeedbackTab
-          # - explorationImprovementsTab
-          # - explorationHistoryTab
-          # - explorationStatisticsTab
-          # - explorationTranslationTab
-          # - extensions
-          # - featureGating
-          # - feedbackUpdates
-          # - fileUploadExtensions
-          # - fileUploadFeatures
-          # - learner
-          # - learnerDashboard
-          # - library
-          # - navigation
-          # - playVoiceovers
-          # - preferences
-          # - profileFeatures
-          # - profileMenu
-          # - publication
-          # - skillEditor
-          # - subscriptions
-          # - topicsAndSkillsDashboard
-          # - topicAndStoryEditor
-          # - topicAndStoryEditorFileUploadFeatures
-          # - topicAndStoryViewer
-          # - users
-          # - wipeout
+          - additionalPlayerFeatures
+          - adminPage
+          - blogDashboard
+          - blog
+          - checkpointFeatures
+          - classroomPage
+          - classroomPageFileUploadFeatures
+          - collections
+          - contributorDashboard
+          - contributorAdminDashboard
+          - coreEditorAndPlayerFeatures
+          - creatorDashboard
+          - embedding
+          - explorationFeedbackTab
+          - explorationImprovementsTab
+          - explorationHistoryTab
+          - explorationStatisticsTab
+          - explorationTranslationTab
+          - extensions
+          - featureGating
+          - feedbackUpdates
+          - fileUploadExtensions
+          - fileUploadFeatures
+          - learner
+          - learnerDashboard
+          - library
+          - navigation
+          - playVoiceovers
+          - preferences
+          - profileFeatures
+          - profileMenu
+          - publication
+          - skillEditor
+          - subscriptions
+          - topicsAndSkillsDashboard
+          - topicAndStoryEditor
+          - topicAndStoryEditorFileUploadFeatures
+          - topicAndStoryViewer
+          - users
+          - wipeout
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -108,13 +108,9 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Initializing Containers in prod mode
-        # run: |
-        #   sudo make build
-        #   sudo make run-devserver
         run: |
           sudo make build
-          sudo docker compose up angular-build -d
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+          sudo make run-devserver
         # run: |
         #   sudo make build
         #   sudo docker compose up angular-build -d
@@ -138,12 +134,9 @@ jobs:
       #     exit 1
       - name: Run E2E Test ${{ matrix.suite }}
         run: |
+          export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
           sudo chmod -R 777 /home/runner/work/oppia/oppia
-          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
-        # run: |
-        #   export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
-        #   sudo chmod -R 777 /home/runner/work/oppia/oppia
-        #   sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/npx ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
+          sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite ${{ matrix.suite }} $(google-chrome --version | awk '{print $3}') --params.devMode=True --capabilities[0].maxInstances=3
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
