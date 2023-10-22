@@ -2,12 +2,12 @@
   <picture>
     <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
     <source type="image/png" [srcset]="profilePicturePngDataUrl">
-    <img [src]="profilePicturePngDataUrl" class="rounded-circle" alt="User Avatar">
+    <img [src]="profilePicturePngDataUrl" class="rounded-circle" [alt]="username">
   </picture>
 </a>
 
 <picture *ngIf="!isUsernameLinkable(username)">
   <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
   <source type="image/png" [srcset]="profilePicturePngDataUrl">
-  <img [src]="profilePicturePngDataUrl" class="rounded-circle" alt="User Avatar">
+  <img [src]="profilePicturePngDataUrl" class="rounded-circle" [alt]="username">
 </picture>
