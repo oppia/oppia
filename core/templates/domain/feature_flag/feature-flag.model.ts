@@ -16,60 +16,60 @@
  * @fileoverview Frontend Model for Feature Flag.
 */
 
-  export enum FeatureStage {
-    DEV = 'dev',
-    TEST = 'test',
-    PROD = 'prod',
+export enum FeatureStage {
+  DEV = 'dev',
+  TEST = 'test',
+  PROD = 'prod',
+}
+
+export interface FeatureFlagBackendDict {
+  'name': string;
+  'description': string;
+  'feature_stage': FeatureStage;
+  'force_enable_for_all_users': boolean;
+  'rollout_percentage': number;
+  'user_group_ids': string[];
+  'last_updated': string;
+}
+
+/**
+ * Frontend domain object representation of feature flags.
+ *
+ * On the frontend side, this class is used to reflect the edit made to
+ * feature flags in the release coordinator page.
+ */
+export class FeatureFlag {
+  readonly name: string;
+  readonly description: string;
+  readonly featureStage: FeatureStage;
+  forceEnableForAllUsers: boolean;
+  rolloutPercentage: number;
+  userGroupIds: string[];
+  lastUpdated: string;
+
+  constructor(
+      name: string, description: string, featureStage: FeatureStage,
+      forceEnableForAllUsers: boolean, rolloutPercentage: number,
+      userGroupIds: string[], lastUpdated: string) {
+    this.name = name;
+    this.description = description;
+    this.featureStage = featureStage;
+    this.forceEnableForAllUsers = forceEnableForAllUsers;
+    this.rolloutPercentage = rolloutPercentage;
+    this.userGroupIds = userGroupIds;
+    this.lastUpdated = lastUpdated;
   }
 
-  export interface FeatureFlagBackendDict {
-    'name': string;
-    'description': string;
-    'feature_stage': FeatureStage;
-    'force_enable_for_all_users': boolean;
-    'rollout_percentage': number;
-    'user_group_ids': string[];
-    'last_updated': string;
+  static createFromBackendDict(
+      backendDict: FeatureFlagBackendDict): FeatureFlag {
+    return new FeatureFlag(
+      backendDict.name,
+      backendDict.description,
+      backendDict.feature_stage,
+      backendDict.force_enable_for_all_users,
+      backendDict.rollout_percentage,
+      backendDict.user_group_ids,
+      backendDict.last_updated
+    );
   }
-
-  /**
-   * Frontend domain object representation of feature flags.
-   *
-   * On the frontend side, this class is used to reflect the edit made to
-   * feature flags in the release coordinator page.
-   */
-  export class FeatureFlag {
-    readonly name: string;
-    readonly description: string;
-    readonly featureStage: FeatureStage;
-    forceEnableForAllUsers: boolean;
-    rolloutPercentage: number;
-    userGroupIds: string[];
-    lastUpdated: string;
-
-    constructor(
-        name: string, description: string, featureStage: FeatureStage,
-        forceEnableForAllUsers: boolean, rolloutPercentage: number,
-        userGroupIds: string[], lastUpdated: string) {
-      this.name = name;
-      this.description = description;
-      this.featureStage = featureStage;
-      this.forceEnableForAllUsers = forceEnableForAllUsers;
-      this.rolloutPercentage = rolloutPercentage;
-      this.userGroupIds = userGroupIds;
-      this.lastUpdated = lastUpdated;
-    }
-
-    static createFromBackendDict(
-        backendDict: FeatureFlagBackendDict): FeatureFlag {
-      return new FeatureFlag(
-        backendDict.name,
-        backendDict.description,
-        backendDict.feature_stage,
-        backendDict.force_enable_for_all_users,
-        backendDict.rollout_percentage,
-        backendDict.user_group_ids,
-        backendDict.last_updated
-      );
-    }
-  }
+}

@@ -28,8 +28,6 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.tests import test_utils
 
-from typing import List
-
 FeatureStages = feature_flag_domain.FeatureStages
 
 

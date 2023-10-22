@@ -35,8 +35,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 interface IntSchema {
-  type: 'int',
-  validators: object[]
+  type: 'int';
+  validators: object[];
 }
 
 @Component({
@@ -83,11 +83,11 @@ export class FeaturesTabComponent implements OnInit {
     return {
       type: 'int',
       validators: [{
-          'id': 'is_at_least',
-          'min_value': 1
+        id: 'is_at_least',
+        min_value: 1
       }, {
-          'id': 'is_at_most',
-          'max_value': 100
+        id: 'is_at_most',
+        max_value: 100
       }]
     };
   }
@@ -168,7 +168,7 @@ export class FeaturesTabComponent implements OnInit {
       ) || !isEqual(
         original.rolloutPercentage, feature.rolloutPercentage
       ) || !isEqual(
-          original.userGroupIds, feature.userGroupIds)
+        original.userGroupIds, feature.userGroupIds)
     );
   }
 

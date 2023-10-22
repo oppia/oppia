@@ -65,7 +65,6 @@ describe('Release coordinator page feature tab', function() {
   let updateApiSpy: jasmine.Spy;
 
   let mockConfirmResult: (val: boolean) => void;
-  let mockPromptResult: (msg: string | null) => void;
 
   beforeEach(async(() => {
     TestBed
@@ -95,7 +94,6 @@ describe('Release coordinator page feature tab', function() {
       alert: () => null
     } as unknown as Window);
     mockConfirmResult = val => confirmResult = val;
-    mockPromptResult = msg => promptResult = msg;
 
     spyOn(featureApiService, 'getFeatureFlags').and.resolveTo({
       featureFlags: [
@@ -424,22 +422,22 @@ describe('Release coordinator page feature tab', function() {
     });
 
     it('should return issues if rollout percentage is not between 10 and 100',
-    () => {
-      const issues = component.validateFeatureFlag(
-        FeatureFlag.createFromBackendDict({
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          name: 'dummy_feature_flag_for_e2e_tests',
-          force_enable_for_all_users: false,
-          rollout_percentage: 110,
-          user_group_ids: [],
-          last_updated: '19 September 2023'
-        })
-      );
+      () => {
+        const issues = component.validateFeatureFlag(
+          FeatureFlag.createFromBackendDict({
+            description: 'This is a dummy feature flag.',
+            feature_stage: FeatureStage.DEV,
+            name: 'dummy_feature_flag_for_e2e_tests',
+            force_enable_for_all_users: false,
+            rollout_percentage: 110,
+            user_group_ids: [],
+            last_updated: '19 September 2023'
+          })
+        );
 
-      expect(issues).toEqual(
-        ['Rollout percentage should be between 0 to 100.']);
-    });
+        expect(issues).toEqual(
+          ['Rollout percentage should be between 0 to 100.']);
+      });
   });
 
   describe('.dummyFeatureFlagForE2eTestsIsEnabled', () => {

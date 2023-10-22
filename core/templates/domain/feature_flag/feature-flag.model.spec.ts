@@ -16,26 +16,26 @@
  * @fileoverview Unit tests for FeatureFlagModel.
  */
 
-  import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
+import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
 
-  describe('FeatureFlagModel', () => {
-    it('should create an instance from a backend dict.', () => {
-      const feature = FeatureFlag.createFromBackendDict({
-        name: 'feature name',
-        description: 'This is a feature for test.',
-        feature_stage: 'dev',
-        force_enable_for_all_users: true,
-        rollout_percentage: 0,
-        user_group_ids: [],
-        last_updated: 'September 4, 2023'
-      });
-
-      expect(feature.name).toEqual('feature name');
-      expect(feature.description).toEqual('This is a feature for test.');
-      expect(feature.featureStage).toEqual('dev');
-      expect(feature.forceEnableForAllUsers).toBeTrue();
-      expect(feature.rolloutPercentage).toEqual(0);
-      expect(feature.userGroupIds).toEqual([]);
-      expect(feature.lastUpdated).toEqual('September 4, 2023');
+describe('FeatureFlagModel', () => {
+  it('should create an instance from a backend dict.', () => {
+    const feature = FeatureFlag.createFromBackendDict({
+      name: 'feature name',
+      description: 'This is a feature for test.',
+      feature_stage: 'dev',
+      force_enable_for_all_users: true,
+      rollout_percentage: 0,
+      user_group_ids: [],
+      last_updated: 'September 4, 2023'
     });
+
+    expect(feature.name).toEqual('feature name');
+    expect(feature.description).toEqual('This is a feature for test.');
+    expect(feature.featureStage).toEqual('dev');
+    expect(feature.forceEnableForAllUsers).toBeTrue();
+    expect(feature.rolloutPercentage).toEqual(0);
+    expect(feature.userGroupIds).toEqual([]);
+    expect(feature.lastUpdated).toEqual('September 4, 2023');
   });
+});

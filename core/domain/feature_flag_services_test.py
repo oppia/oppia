@@ -23,12 +23,13 @@ import enum
 from core import feconf
 from core.constants import constants
 from core.domain import caching_services
-from core.domain import feature_flag_services as feature_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
+from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
-from typing import List
+from typing import List, Tuple
+
 
 class FeatureNames(enum.Enum):
     """Enum for parameter names."""
@@ -57,7 +58,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         # Feature names that might be used in following tests.
         self.feature_names = ['feature_a', 'feature_b', 'feature_c']
         self.feature_name_enums = [
-            FeatureNames.FEATURE_A, FeatureNames.FEATURE_B, FeatureNames.FEATURE_C]
+            FeatureNames.FEATURE_A,
+            FeatureNames.FEATURE_B,
+            FeatureNames.FEATURE_C
+        ]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             self.feature_names)
@@ -235,7 +239,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         self.test_feature.name: False,
                         self.prod_feature.name: True,
                     })
-            
+
     def test_evaluate_dev_feature_for_dev_server_returns_true(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with self.swap(constants, 'DEV_MODE', True):
@@ -338,7 +342,12 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         self.assertFalse(feature_services.is_feature_flag_enabled(
             None, self.dev_feature.name))
 
-    def _signup_multiple_users_and_return_ids(self):
+    def _signup_multiple_users_and_return_ids(self) -> Tuple[int, int, int]:
+        """Signup multiple users and returns user ids of them
+
+        Returns:
+            Tuple[int, int, int]. The tuple of user ids.
+        """
         user_1_email = 'user1@example.com'
         user_1_username = 'username1'
         self.signup(user_1_email, user_1_username)
@@ -356,7 +365,19 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
     def _get_feature_status_for_users(
         self, rollout_percentage: int, user_ids: List[str]
-    ):
+    ) -> List[bool]:
+        """Helper function to return the feature status of the
+        feature flag as per rollout percentage for given users.
+
+        Args:
+            rollout_percentage: int. The rollout percentage.
+            user_ids: List[bool]. The user ids of the users for
+                which we want the feature status.
+
+        Returns:
+            feature_status_for_users: List[bool]. The feature status
+            for the users.
+        """
         feature_status_for_users = []
         with self.swap_all_feature_names_set:
             feature_services.update_feature_flag(
@@ -376,7 +397,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         total_count_of_users_having_feature_enabled = 0
         for feature_status in feature_status_for_users:
-            if feature_status == True:
+            if feature_status is True:
                 total_count_of_users_having_feature_enabled += 1
 
         self.assertEqual(total_count_of_users_having_feature_enabled, 0)
@@ -390,7 +411,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         total_count_of_users_having_feature_enabled = 0
         for feature_status in feature_status_for_users:
-            if feature_status == True:
+            if feature_status is True:
                 total_count_of_users_having_feature_enabled += 1
 
         self.assertEqual(total_count_of_users_having_feature_enabled, 4)

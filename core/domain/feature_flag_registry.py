@@ -58,6 +58,9 @@ class Registry:
 
         Returns:
             feature_flag_domain.FeatureFlag. The FeatureFlag object.
+
+        Raises:
+            Exception. Feature flag with the same name already exists.
         """
         feature_flag_dict: feature_flag_domain.FeatureFlagDict = {
             'name': name.value,

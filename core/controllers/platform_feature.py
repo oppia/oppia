@@ -36,8 +36,7 @@ class PlatformFeaturesEvaluationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests. Evaluates and returns all feature flags.
-        """
+        """Handles GET requests. Evaluates and returns all feature flags."""
         result_dict = (
             feature_flag_services.evaluate_all_feature_flag_values(
                 self.user_id)

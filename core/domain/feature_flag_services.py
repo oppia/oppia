@@ -21,8 +21,8 @@ from __future__ import annotations
 import hashlib
 import secrets
 
-from core import utils
 from core import platform_feature_list
+from core import utils
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
@@ -68,6 +68,10 @@ def update_feature_flag(
         rollout_percentage: int. The percentage of logged-in users for which
             the feature will be enabled.
         user_group_ids: List[str]. The list of ids of UserGroup objects.
+
+    Raises:
+        FeatureFlagNotFoundException. Feature flag trying to update does
+        not exist.
     """
     if feature_name not in ALL_FEATURES_NAMES_SET:
         raise FeatureFlagNotFoundException(
@@ -89,6 +93,9 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
     Returns:
         list(dict). A list containing the dict mappings of all fields of the
         feature flags.
+
+    Raises:
+        Exception. Feature flag does not exists.
     """
     feature_flags = []
     features_to_fetch_from_storage = []
@@ -216,10 +223,7 @@ def is_feature_flag_enabled(
         hash_value = int(hashed_user_id, 16)
         mod_result = hash_value % 1000
         threshold = (feature_flag.rollout_percentage / 100) * 1000
-        if mod_result < threshold:
-            return True
-        else:
-            return False
+        return bool(mod_result < threshold)
     return False
 
 

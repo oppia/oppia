@@ -21,9 +21,9 @@ import enum
 from core import feconf
 from core.constants import constants
 from core.domain import caching_services
+from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
 from core.domain import feature_flag_services
-from core.domain import feature_flag_domain
 from core.tests import test_utils
 
 
