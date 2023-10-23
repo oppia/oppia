@@ -34,6 +34,7 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { AppConstants } from 'app.constants';
 
 describe('Interaction validator', function() {
   var bivs, WARNING_TYPES, agof;
@@ -64,7 +65,7 @@ describe('Interaction validator', function() {
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
     agof = $injector.get('AnswerGroupObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
 
@@ -149,6 +150,23 @@ describe('Interaction validator', function() {
             'In answer group 1, self-loops should not be labelled as correct.'
       }]);
     });
+
+    it('should have a warning for a correct answer group with destIfStuck',
+      function() {
+        goodOutcomeDest.labelledAsCorrect = true;
+        goodOutcomeDest.destIfReallyStuck = 'destIfReallyStuck';
+        var answerGroups = [
+          agof.createNew([], goodOutcomeDest, false, null)
+        ];
+        var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+        expect(warnings).toEqual([{
+          type: WARNING_TYPES.ERROR,
+          message:
+              'In answer group 1, correct answer should not have the ' +
+              'destination for really stuck users, because it is useless'
+        }]);
+      }
+    );
 
     it('should not have any warnings for a non-confusing default outcome',
       function() {
