@@ -1,15 +1,16 @@
 name: End-to-End, Lighthouse CI performance and Acceptance tests
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+on: [push]
+# on:
+#   merge_group:
+#     types: [checks_requested]
+#   push:
+#     branches:
+#       - develop
+#       - release-*
+#   pull_request:
+#     branches:
+#       - develop
+#       - release-*
 
 jobs:
   e2e_test:
@@ -17,50 +18,51 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        suite:
-          - accessibility
-          - additionalEditorFeatures
-          - additionalEditorFeaturesModals
-          - additionalPlayerFeatures
-          - adminPage
-          - blogDashboard
-          - blog
-          - checkpointFeatures
-          - classroomPage
-          - classroomPageFileUploadFeatures
-          - collections
-          - contributorDashboard
-          - contributorAdminDashboard
-          - coreEditorAndPlayerFeatures
-          - creatorDashboard
-          - embedding
-          - explorationFeedbackTab
-          - explorationImprovementsTab
-          - explorationHistoryTab
-          - explorationStatisticsTab
-          - explorationTranslationTab
-          - extensions
-          - featureGating
-          - feedbackUpdates
-          - fileUploadExtensions
-          - fileUploadFeatures
-          - learner
-          - learnerDashboard
-          - library
-          - navigation
-          - playVoiceovers
-          - preferences
-          - profileFeatures
-          - profileMenu
-          - publication
-          - skillEditor
-          - subscriptions
-          - topicsAndSkillsDashboard
-          - topicAndStoryEditor
-          - topicAndStoryEditorFileUploadFeatures
-          - topicAndStoryViewer
-          - users
-          - wipeout
+        suite: [
+          accessibility,
+          additionalEditorFeatures,
+          additionalEditorFeaturesModals,
+          additionalPlayerFeatures,
+          adminPage,
+          blogDashboard,
+          blog,
+          checkpointFeatures,
+          classroomPage,
+          classroomPageFileUploadFeatures,
+          collections,
+          contributorDashboard,
+          contributorAdminDashboard,
+          coreEditorAndPlayerFeatures,
+          creatorDashboard,
+          embedding,
+          explorationFeedbackTab,
+          explorationImprovementsTab,
+          explorationHistoryTab,
+          explorationStatisticsTab,
+          explorationTranslationTab,
+          extensions,
+          featureGating,
+          feedbackUpdates,
+          fileUploadExtensions,
+          fileUploadFeatures,
+          learner,
+          learnerDashboard,
+          library,
+          navigation,
+          playVoiceovers,
+          preferences,
+          profileFeatures,
+          profileMenu,
+          publication,
+          skillEditor,
+          subscriptions,
+          topicsAndSkillsDashboard,
+          topicAndStoryEditor,
+          topicAndStoryEditorFileUploadFeatures,
+          topicAndStoryViewer,
+          users,
+          wipeout
+        ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
