@@ -163,7 +163,7 @@ describe('Interaction validator', function() {
           type: WARNING_TYPES.ERROR,
           message:
               'In answer group 1, correct answer should not have the ' +
-              'destination for really stuck users, because it is useless'
+              'destination for really stuck learners, because it is useless'
         }]);
       }
     );
