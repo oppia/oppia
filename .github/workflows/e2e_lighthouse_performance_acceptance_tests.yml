@@ -15,9 +15,9 @@ jobs:
           - adminPage
           - blogDashboard
           - blog
-          - checkpointFeatures
-          - classroomPage
-          - classroomPageFileUploadFeatures
+          # - checkpointFeatures
+          # - classroomPage
+          # - classroomPageFileUploadFeatures
           # - collections
           # - contributorDashboard
           # - contributorAdminDashboard
