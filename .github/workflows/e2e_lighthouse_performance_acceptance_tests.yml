@@ -11,13 +11,13 @@ jobs:
           - accessibility
           - additionalEditorFeatures
           - additionalEditorFeaturesModals
-          # - additionalPlayerFeatures
-          # - adminPage
-          # - blogDashboard
-          # - blog
-          # - checkpointFeatures
-          # - classroomPage
-          # - classroomPageFileUploadFeatures
+          - additionalPlayerFeatures
+          - adminPage
+          - blogDashboard
+          - blog
+          - checkpointFeatures
+          - classroomPage
+          - classroomPageFileUploadFeatures
           # - collections
           # - contributorDashboard
           # - contributorAdminDashboard
