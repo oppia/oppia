@@ -119,11 +119,9 @@ var ContributorDashboardAdminPage = function() {
 
     if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION) {
       return $$(userTranslationReviewerLanguageCss);
-    } 
-    else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER) {
+    } else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER) {
       return $$(userVoiceoverReviewerLanguageCss);
-    }
-    else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION) {
+    } else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION) {
       return $(userQuestionReviewerCss);
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
       return $(userQuestionContributorCss);
@@ -197,7 +195,7 @@ var ContributorDashboardAdminPage = function() {
   };
 
   this.expectUserToBeVoiceoverReviewer = async function(
-    username, languageDescription) {
+      username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
       username, CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER);
     var languageList = await Promise.all(contributionRights.map(
