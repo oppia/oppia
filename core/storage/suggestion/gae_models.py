@@ -103,6 +103,8 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS: Final = (
 # waited for a review longer than the threshold number of days.
 SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS: Final = 7
 
+SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION: Final = 3
+
 # The maximum number of suggestions, that have been waiting too long for review,
 # to email admins about.
 MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN: Final = 10
@@ -458,6 +460,34 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).order(
             cls.last_updated
         ).fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
+
+    @classmethod
+    def get_new_suggestions_waiting_for_review(
+        cls, suggestion_type
+    ):
+        """Returns new suggestions of a specific type and language code.
+
+        Args:
+            suggestion_type: str. The type of the suggestion (e.g., 'translate_content').
+            language_code: str. The ISO 639-1 language code.
+            max_suggestions: int. The maximum number of suggestions to retrieve.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of new suggestions matching the criteria.
+        """
+        threshold_time = (
+            datetime.datetime.utcnow() - datetime.timedelta(
+                days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION))
+        print('I am here yo', cls.query())
+        return (
+            cls.get_all().filter(datastore_services.all_of(
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.created_on > threshold_time
+            ))
+            .order(-cls.created_on)  # Sort by the most recently created first.
+            .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
+        )
 
     @classmethod
     def get_translation_suggestions_submitted_within_given_dates(

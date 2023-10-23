@@ -36,6 +36,8 @@ from core.jobs.batch_jobs import user_stats_computation_jobs
 
 from typing import Dict
 
+from core.constants import constants
+
 
 class CronModelsCleanupHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -197,6 +199,66 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})
+
+
+class CronMailReviewerNewSuggestionsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for mailing reviewers about new suggestions on the Contributor Dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Sends email notifications to reviewers about new suggestions on the Contributor Dashboard.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return self.render_json({})
+
+        if not platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
+            return self.render_json({})
+
+        suggestion_type = 'your_suggestion_type'
+
+        new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications(
+            suggestion_type)
+        # Organize suggestions by language code and reviewers.
+        suggestions_by_language = {}
+
+        for suggestion in new_suggestions_info:
+            # Extract the language_property from the suggestion.
+            language_property = suggestion.language_code
+
+            # Initialize the language entry if it doesn't exist in the dictionary.
+            if language_property not in suggestions_by_language:
+                suggestions_by_language[language_property] = {
+                    'reviewer_ids': [],
+                    'suggestions': []
+                }
+
+            reviewer_usernames = user_services.get_contributor_usernames(
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_property)
+            reviewer_ids = []
+            for username in reviewer_usernames:
+                reviewer_ids.append(
+                    user_services.get_user_id_from_username(username))
+            suggestions_by_language[language_property][
+                'reviewer_ids'].extend(reviewer_ids)
+            suggestions_by_language[language_property][
+                'suggestions'].append(suggestion)
+        print('This is funnn', suggestions_by_language)
+
+        # Send email notifications to reviewers based on the organized data.
+        email_manager.send_reviewer_notifications(suggestions_by_language)
+
         return self.render_json({})
 
 
