@@ -1,6 +1,15 @@
 name: Backend associated test file check
-# not on pull_request and not on forked repo
-on: [pull_request]
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   run_tests:
