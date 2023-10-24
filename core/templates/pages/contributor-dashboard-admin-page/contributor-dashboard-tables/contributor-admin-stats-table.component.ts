@@ -79,7 +79,7 @@ export class ContributorAdminStatsTable implements OnInit {
     QuestionReviewerStats[] = [];
 
   nextOffset: number = 0;
-  more: boolean = false;
+  more: boolean = true;
 
   expandedElement: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
@@ -94,6 +94,12 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
+  itemsPerPageChoice: number[] = [20, 50, 100];
+  itemsPerPage: number = 20;
+  statsPageNumber: number = 0;
+  MOVE_TO_NEXT_PAGE: string = 'next_page';
+  MOVE_TO_PREV_PAGE: string = 'prev_page';
+  firstTimeFetchingData: boolean = true;
 
   constructor(
     private windowRef: WindowRef,
@@ -179,6 +185,14 @@ export class ContributorAdminStatsTable implements OnInit {
       });
   }
 
+  getUpperLimitValueForPagination(): number {
+    return (
+      Math.min((
+        (this.statsPageNumber * this.itemsPerPage) +
+          this.itemsPerPage), (this.statsPageNumber * this.itemsPerPage) +
+          this.dataSource.length));
+  }
+
   openRoleEditor(username: string): void {
     this.expandedElement = null;
     if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
@@ -198,6 +212,7 @@ export class ContributorAdminStatsTable implements OnInit {
     if (changes) {
       this.loadingMessage = 'Loading';
       this.noDataMessage = '';
+      this.refreshPagination();
       this.updateColumnsToDisplay();
     }
   }
@@ -227,8 +242,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
           (response) => {
@@ -261,8 +276,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
           (response) => {
@@ -299,8 +314,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
           (response) => {
@@ -333,8 +348,8 @@ export class ContributorAdminStatsTable implements OnInit {
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
           this.filter,
-          20,
-          0,
+          this.itemsPerPage,
+          this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
           (response) => {
@@ -347,6 +362,31 @@ export class ContributorAdminStatsTable implements OnInit {
               this.noDataMessage = 'No statistics to display';
             }
           });
+    }
+  }
+
+  refreshPagination(): void {
+    this.loadingMessage = 'Loading';
+    this.nextOffset = 0;
+    this.dataSource = [];
+    this.more = true;
+    this.firstTimeFetchingData = true;
+    this.goToPageNumber(0);
+  }
+
+  goToPageNumber(pageNumber: number): void {
+    this.statsPageNumber = pageNumber;
+    this.nextOffset = (pageNumber * this.itemsPerPage);
+    this.updateColumnsToDisplay();
+  }
+
+  navigatePage(direction: string): void {
+    if (direction === this.MOVE_TO_NEXT_PAGE) {
+      this.loadingMessage = 'Loading';
+      this.goToPageNumber(this.statsPageNumber + 1);
+    } else {
+      this.loadingMessage = 'Loading';
+      this.goToPageNumber(this.statsPageNumber - 1);
     }
   }
 }
