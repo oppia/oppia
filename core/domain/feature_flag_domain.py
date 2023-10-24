@@ -46,6 +46,7 @@ ALLOWED_FEATURE_STAGES: Final = [
     FeatureStages.PROD.value
 ]
 
+
 def get_server_mode() -> ServerMode:
     """Returns the current server mode.
 

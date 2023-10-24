@@ -71,7 +71,7 @@ def update_feature_flag(
 
     Raises:
         FeatureFlagNotFoundException. Feature flag trying to update does
-        not exist.
+            not exist.
     """
     if feature_name not in ALL_FEATURES_NAMES_SET:
         raise FeatureFlagNotFoundException(
