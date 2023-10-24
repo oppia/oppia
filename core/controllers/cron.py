@@ -227,7 +227,9 @@ class CronMailReviewerNewSuggestionsHandler(
 
         new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
         # Organize suggestions by language code and reviewers.
-        suggestions_by_language = DefaultDict(lambda: {'reviewer_ids': [], 'suggestions': []})
+        suggestions_by_language: DefaultDict[
+            str, Dict[str, list]] = DefaultDict(
+                lambda: {'reviewer_ids': [], 'suggestions': []})
 
         for suggestion in new_suggestions_info:
             language_property = suggestion.language_code

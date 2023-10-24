@@ -1700,13 +1700,10 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> List[
     ]
 
 
-def get_new_suggestions_for_reviewer_notifications():
+def get_new_suggestions_for_reviewer_notifications() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
     """Retrieves and organizes new suggestions for reviewer email notifications.
-
-    Args:
-        suggestion_type: str. The type of the suggestion (e.g., 'translate_content').
-        language_code: str. The ISO 639-1 language code.
-        max_suggestions: int. The maximum number of new suggestions to retrieve.
 
     Returns:
         list[ReviewableSuggestionEmailInfo]. A list of email content info objects for new suggestions.

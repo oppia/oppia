@@ -464,8 +464,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_new_suggestions_waiting_for_review(
         cls,
-    ):
-        """Returns new suggestions of a specific type and language code.
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Returns new suggestions waiting for review that were
+        submitted within timespan of SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
+        days.
 
         Returns:
             list(GeneralSuggestionModel). A list of new suggestions

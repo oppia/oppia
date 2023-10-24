@@ -1777,7 +1777,8 @@ def _send_suggestions_waiting_too_long_email(
             recipient_email=admin_emails[index])
 
 
-def send_reviewer_notifications(suggestions_by_language):
+def send_reviewer_notifications(
+    suggestions_by_language) -> None:
     """Sends email notifications to reviewers about new suggestions.
 
     Args:
