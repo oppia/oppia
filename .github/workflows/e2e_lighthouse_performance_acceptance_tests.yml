@@ -1,16 +1,15 @@
 name: End-to-End, Lighthouse CI performance and Acceptance tests
-on: [push]
-# on:
-#   merge_group:
-#     types: [checks_requested]
-#   push:
-#     branches:
-#       - develop
-#       - release-*
-#   pull_request:
-#     branches:
-#       - develop
-#       - release-*
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   e2e_test:
@@ -103,8 +102,9 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Check on failures
         if: steps.e2e_suite.outcome != 'success'
+        # Waiting for 10 minutes is because we are waiting for the other e2e suites before exiting. By this, we are not stopping all the other suites if any flaky test fails.
         run: |
-          echo "--- E2E tests suite ${{ matrix.suite }} failed ---"
+          echo "--- E2E tests suite ${{ matrix.suite }} failed. Check the above step for the logs. ---"
           echo "--- Waiting for 10 minutes before exiting all the other e2e suites ---"
           sleep 600
           exit 1
