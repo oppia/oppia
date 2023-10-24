@@ -28,7 +28,7 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
 
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Mapping, Optional, Set
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -85,7 +85,7 @@ def update_feature_flag(
     )
 
 
-def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
+def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlagDict]:
     """Returns dict representations of all feature flags. This method is used
     for providing detailed feature flags information to the release
     coordinator page.
@@ -101,14 +101,15 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
     features_to_fetch_from_storage = []
     all_feature_flag_dicts = []
 
-    for feature in ALL_FEATURE_FLAGS:
+    for feature_name_enum in ALL_FEATURE_FLAGS:
         feature_from_cache = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None, [feature.value]
-        ).get(feature.value)
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None,
+            [feature_name_enum.value]
+        ).get(feature_name_enum.value)
         if feature_from_cache is not None:
             feature_flags.append(feature_from_cache)
         else:
-            features_to_fetch_from_storage.append(feature.value)
+            features_to_fetch_from_storage.append(feature_name_enum.value)
 
     features_from_storage = load_feature_flags_from_storage(
         features_to_fetch_from_storage)
@@ -137,7 +138,7 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlag]:
 
 def load_feature_flags_from_storage(
     feature_names_list: List[str]
-) -> Dict[str, Optional[feature_flag_domain.FeatureFlag]]:
+) -> Mapping[str, Optional[feature_flag_domain.FeatureFlag]]:
     """Loads feature flags from the storage layer.
 
     Args:
@@ -149,7 +150,8 @@ def load_feature_flags_from_storage(
         Dictionary having key as the feature name and value as the feature
         flag domain model if present in the storage layer otherwise None.
     """
-    feature_name_to_feature_flag_model_dict = {}
+    feature_name_to_feature_flag_model_dict: Dict[str, Optional[
+        feature_flag_domain.FeatureFlag]] = {}
     feature_models = config_models.FeatureFlagModel.get_multi(
         feature_names_list)
 

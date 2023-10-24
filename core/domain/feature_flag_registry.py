@@ -154,6 +154,8 @@ class Registry:
         feature.set_user_group_ids(user_group_ids)
         updated_model_instance = config_models.FeatureFlagModel.get(
             feature.name, strict=False)
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model_instance is not None
         feature.set_last_updated(updated_model_instance.last_updated)
 
         cls.feature_registry[feature.name] = feature

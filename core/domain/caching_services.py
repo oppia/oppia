@@ -51,7 +51,8 @@ if MYPY: # pragma: no cover
         skill_domain.Skill,
         story_domain.Story,
         topic_domain.Topic,
-        platform_parameter_domain.PlatformParameter
+        platform_parameter_domain.PlatformParameter,
+        feature_flag_domain.FeatureFlag
     ]
 
 memory_cache_services = models.Registry.import_cache_services()

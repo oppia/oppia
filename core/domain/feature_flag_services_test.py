@@ -342,7 +342,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         self.assertFalse(feature_services.is_feature_flag_enabled(
             None, self.dev_feature.name))
 
-    def _signup_multiple_users_and_return_ids(self) -> Tuple[int, int, int]:
+    def _signup_multiple_users_and_return_ids(self) -> Tuple[str, str, str]:
         """Signup multiple users and returns user ids of them
 
         Returns:

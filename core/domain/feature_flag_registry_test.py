@@ -103,6 +103,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             FeatureNames.FEATURE_A.value)
         memcache_feature = registry.Registry.load_feature_flag_from_memcache(
             FeatureNames.FEATURE_A.value)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert memcache_feature is not None
         self.assertEqual(feature.to_dict(), memcache_feature.to_dict())
 
     def test_existing_feature_gets_updated(self) -> None:
