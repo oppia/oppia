@@ -479,6 +479,27 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.author_id, add_translation_change_dict,
             'test description')
 
+    def _create_translation_suggestion_2(
+        self
+    ) -> suggestion_registry.BaseSuggestion:
+        """Creates a translation suggestion."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': self.default_translation_html,
+            'data_format': 'html'
+        }
+
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description')
+    
     def _mock_send_contributor_dashboard_reviewers_emails(
         self,
         suggestions_by_language
@@ -539,12 +560,11 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-
         for _, data in self.suggestion_by_language.items():
                 reviewer_ids = data['reviewer_ids']
                 suggestions = data['suggestions']
-                # self.assertEqual(len(suggestions), 1)
-                self.assertEqual(len(reviewer_ids), 1)
+                self.assertEqual(len(suggestions), 0)
+                self.assertEqual(len(reviewer_ids), 0)
 
         self.logout()
 
@@ -618,6 +638,45 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         for _, data in self.suggestion_by_language.items():
             reviewer_ids = data['reviewer_ids']
             self.assertEqual(len(reviewer_ids), 0)
+
+        self.logout()
+
+    def test_email_sent_to_reviewers_successfully(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
+        translation_suggestion = self._create_translation_suggestion_2()
+        expected_reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+
+
+        with self.can_send_emails, self.testapp_swap:
+            with swap_platform_parameter_value, self.swap(
+                email_manager,
+                'send_reviewer_notifications',
+                self._mock_send_contributor_dashboard_reviewers_emails):
+                response = self.get_json(
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+
+        # Check the response and ensure the email notifications are sent successfully.
+        self.assertEqual(response, {})
+
+        # For 'hi' language
+        hi_data = self.suggestion_by_language['hi']
+        self.assertEqual(len(hi_data['suggestions']), 1)
+        self.assertEqual(len(hi_data['reviewer_ids']), 0)
+
+        # For 'en' language
+        en_data = self.suggestion_by_language['en']
+        self.assertEqual(len(en_data['suggestions']), 1)
+        self.assertEqual(len(en_data['reviewer_ids']), 1)
+        self.assertEqual(en_data['reviewer_ids'][0], self.reviewer_id)
+
 
         self.logout()
 

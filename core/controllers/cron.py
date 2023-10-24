@@ -34,7 +34,7 @@ from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
-from typing import Dict
+from typing import Dict, DefaultDict
 
 from core.constants import constants
 
@@ -225,36 +225,20 @@ class CronMailReviewerNewSuggestionsHandler(
         ):
             return self.render_json({})
 
-        suggestion_type = 'your_suggestion_type'
-
-        new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications(
-            suggestion_type)
+        new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
         # Organize suggestions by language code and reviewers.
-        suggestions_by_language = {}
+        suggestions_by_language = DefaultDict(lambda: {'reviewer_ids': [], 'suggestions': []})
 
         for suggestion in new_suggestions_info:
-            # Extract the language_property from the suggestion.
             language_property = suggestion.language_code
-
-            # Initialize the language entry if it doesn't exist in the dictionary.
-            if language_property not in suggestions_by_language:
-                suggestions_by_language[language_property] = {
-                    'reviewer_ids': [],
-                    'suggestions': []
-                }
-
             reviewer_usernames = user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                language_property)
-            reviewer_ids = []
-            for username in reviewer_usernames:
-                reviewer_ids.append(
-                    user_services.get_user_id_from_username(username))
-            suggestions_by_language[language_property][
-                'reviewer_ids'].extend(reviewer_ids)
-            suggestions_by_language[language_property][
-                'suggestions'].append(suggestion)
-        print('This is funnn', suggestions_by_language)
+                language_property
+            )
+            reviewer_ids = [user_services.get_user_id_from_username(username) for username in reviewer_usernames]
+
+            suggestions_by_language[language_property]['reviewer_ids'].extend(reviewer_ids)
+            suggestions_by_language[language_property]['suggestions'].append(suggestion)
 
         # Send email notifications to reviewers based on the organized data.
         email_manager.send_reviewer_notifications(suggestions_by_language)

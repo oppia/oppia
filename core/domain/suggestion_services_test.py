@@ -6754,7 +6754,6 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             len(info_about_suggestions_waiting_too_long_for_review), 0)
 
     def test_get_new_suggestions_for_reviewer_notifications_past_threshold(self):
-        suggestion_type = 'translate_content'
         max_suggestions = 3
         threshold_days = 2
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
@@ -6770,7 +6769,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 threshold_days):
-                suggestion_info = suggestion_services.get_new_suggestions_for_reviewer_notifications(suggestion_type)
+                suggestion_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
 
             # Assert that the correct number of suggestions is returned.
             self.assertEqual(len(suggestion_info), 3)

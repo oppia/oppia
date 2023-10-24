@@ -1700,9 +1700,7 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> List[
     ]
 
 
-def get_new_suggestions_for_reviewer_notifications(
-    suggestion_type
-):
+def get_new_suggestions_for_reviewer_notifications():
     """Retrieves and organizes new suggestions for reviewer email notifications.
 
     Args:
@@ -1716,9 +1714,7 @@ def get_new_suggestions_for_reviewer_notifications(
     new_suggestions = [
         get_suggestion_from_model(suggestion_model) for suggestion_model in(
             suggestion_models.GeneralSuggestionModel
-            .get_new_suggestions_waiting_for_review(
-                suggestion_type
-            )
+            .get_new_suggestions_waiting_for_review()
         )
     ]
 

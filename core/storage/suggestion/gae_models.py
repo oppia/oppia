@@ -463,7 +463,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_new_suggestions_waiting_for_review(
-        cls, suggestion_type
+        cls,
     ):
         """Returns new suggestions of a specific type and language code.
 

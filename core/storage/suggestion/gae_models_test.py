@@ -1268,8 +1268,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         # Call the method under test.
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-            results = suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review(
-                suggestion_type)
+            results = suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review()
 
         # Assert that the correct number of suggestions is returned.
         self.assertEqual(len(results), max_suggestions)
