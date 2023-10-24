@@ -157,14 +157,17 @@ class FeatureFlagsHandler(
 
             force_enable_for_all_users = self.normalized_payload.get(
                 'force_enable_for_all_users')
-            # Ruling out the possibility of any other type for mypy type checking.
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
             assert force_enable_for_all_users is not None
             rollout_percentage = self.normalized_payload.get(
                 'rollout_percentage')
-            # Ruling out the possibility of any other type for mypy type checking.
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
             assert rollout_percentage is not None
             user_group_ids = self.normalized_payload.get('user_group_ids')
-            # Ruling out the possibility of any other type for mypy type checking.
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
             assert user_group_ids is not None
             try:
                 feature_services.update_feature_flag(
