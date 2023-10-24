@@ -2,8 +2,8 @@
   <div class="modal-header oppia-modal-header"
        [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
        <h3 tabindex="0" *ngIf="!stateInteractionIdService.displayed" [oppiaFocusOn]="chooseInteractionHeader">
-      Choose Interaction
-    </h3>
+        Choose Interaction
+      </h3>
 
     <h3 class="oppia-customization-header"
         tabindex="0"
@@ -55,7 +55,7 @@
     <div class="e2e-test-multiple-options"
          *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
-            tabindex="0"
+           tabindex="0"
            class="oppia-interaction-customization-label">
         {{ customizationArgSpec.description }}
       </div>
