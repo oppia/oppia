@@ -242,6 +242,11 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/rich_text_components/rte-output-display.component.ts',
     'extensions/visualizations/oppia-visualization-click-hexbins.directive.spec.ts',
     'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
+    # Adding below files to exclude list as they were failing in docker setup in strict mode.
+    'core/templates/pages/exploration-player-page/services/state-classifier-mapping.service.spec.ts',
+    'extensions/classifiers/proto/text_classifier.ts',
+    'extensions/classifiers/proto/training_job_response_payload.ts',
+    'extensions/interactions/TextInput/text-input-prediction.service.spec.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 

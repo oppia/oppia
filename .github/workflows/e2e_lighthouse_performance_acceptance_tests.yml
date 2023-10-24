@@ -102,11 +102,11 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Check on failures
         if: steps.e2e_suite.outcome != 'success'
-        # Waiting for 10 minutes is because we are waiting for the other e2e suites before exiting. By this, we are not stopping all the other suites if any flaky test fails.
+        # Waiting for ~15minutes is because we are waiting for the other e2e suites before exiting. By this, we are not stopping all the other suites if any flaky test fails.
         run: |
           echo "--- E2E tests suite ${{ matrix.suite }} failed. Check the above step for the logs. ---"
-          echo "--- Waiting for 10 minutes before exiting all the other e2e suites ---"
-          sleep 600
+          echo "--- Waiting before exiting all the other e2e suites ---"
+          sleep 1000
           exit 1
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}

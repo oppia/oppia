@@ -114,7 +114,7 @@ def main(args: Optional[List[str]] = None) -> None:
     # Cloud SDK comes with certain packages preinstalled including webapp2,
     # jinja2, and pyyaml so this function makes sure that those libraries are
     # installed.
-    import dev_appserver
+    import dev_appserver # pylint: disable=import-error
     dev_appserver.fix_sys_path()
 
     # We are using both google app engine apis that are contained in the Google
