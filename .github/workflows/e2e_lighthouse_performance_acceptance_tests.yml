@@ -13,59 +13,7 @@ on: [push]
 #       - release-*
 
 jobs:
-  build_server:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8.15'
-          architecture: 'x64'
-      - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Attempt to download build files artifact
-        id: download_artifact_1
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/
-      - name: (Artifact re-build) Cache third_party/static
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
-      - name: Deleting ubuntu files
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Start dev-server
-        run: |
-          sudo make build
-          sudo make run-devserver
   e2e_test:
-    needs: build_server
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -76,10 +24,10 @@ jobs:
           additionalEditorFeaturesModals,
           additionalPlayerFeatures,
           adminPage,
-          # blogDashboard,
-          # blog,
-          # checkpointFeatures,
-          # classroomPage,
+          blogDashboard,
+          blog,
+          checkpointFeatures,
+          classroomPage,
           # classroomPageFileUploadFeatures,
           # collections,
           # contributorDashboard,
@@ -128,37 +76,24 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Attempt to download build files artifact
-        id: download_artifact_1
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/
-      - name: Checking server reachability
-        run: |
-          for i in {1..50}; do
-            if curl -s http://localhost:8181/; then
-              echo ---Dev-server is up---
-              exit 0
-            else
-              echo ---Retrying in 30 seconds---
-              sleep 30
-            fi
-          done
-          echo ---Dev-server is not started after all retries---
-          exit 1
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: /home/runner/work/oppia/yarn_cache
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+      # - name: Attempt to download build files artifact
+      #   id: download_artifact_1
+      #   uses: actions/download-artifact@v3
+      #   continue-on-error: true
+      #   with:
+      #     name: build_files
+      #     path: /home/runner/work/oppia/
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -172,18 +107,18 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: (Artifact re-build) Cache third_party/static
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      # - name: (Artifact re-build) Cache third_party/static
+      #   if: steps.download_artifact_1.outcome == 'failure'
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: /home/runner/work/oppia/oppia/third_party/static
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
       - name: Initializing Containers
         run: |
           sudo make build
@@ -207,12 +142,12 @@ jobs:
         with:
           name: webdriverio-screenshots
           path: /home/runner/work/oppia/webdriverio-screenshots
-      - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: webpack-bundles
-          path: /home/runner/work/oppia/oppia/build
+      # - name: Uploading webpack bundles as an artifact
+      #   if: ${{ failure() }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: webpack-bundles
+      #     path: /home/runner/work/oppia/oppia/build
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
