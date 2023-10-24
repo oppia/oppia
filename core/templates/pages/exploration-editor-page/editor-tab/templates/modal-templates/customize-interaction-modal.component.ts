@@ -152,7 +152,7 @@ export class CustomizeInteractionModalComponent
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
 
-  @ViewChild('customizeInteractionHeader') 
+  @ViewChild('customizeInteractionHeader')
     customizeInteractionHeader!: ElementRef;
 
   constructor(
