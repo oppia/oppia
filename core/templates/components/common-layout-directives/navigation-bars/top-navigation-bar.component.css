@@ -163,7 +163,6 @@
 }
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;
-  overflow-x: hidden;
   overflow-y: auto;
   width: 300px;
 }
