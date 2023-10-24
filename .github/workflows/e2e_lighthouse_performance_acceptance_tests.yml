@@ -94,6 +94,7 @@ jobs:
           sudo docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run E2E Test ${{ matrix.suite }}
+        id: e2e_suite
         run: |
           sudo chmod -R 777 /home/runner/work/oppia/oppia
           sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
@@ -101,7 +102,7 @@ jobs:
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Check on failures
-        if: steps.hello.outputs.status == 'failure' || steps.world.outputs.status == 'failure'
+        if: steps.e2e_suite.outputs.status == 'failure'
         run: |
           echo "--- E2E tests suite ${{ matrix.suite }} failed ---"
           echo "--- Waiting for 10 minutes before exiting all the other e2e suites ---"
