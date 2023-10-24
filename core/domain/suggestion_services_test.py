@@ -6753,7 +6753,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self.assertEqual(
             len(info_about_suggestions_waiting_too_long_for_review), 0)
 
-    def test_get_new_suggestions_for_reviewer_notifications_past_threshold(self):
+    def test_get_new_suggestions_for_reviewer_notifications_past_threshold(
+        self) -> None:
         max_suggestions = 3
         threshold_days = 2
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):

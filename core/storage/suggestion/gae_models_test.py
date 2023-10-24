@@ -1249,7 +1249,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     .get_suggestions_waiting_too_long_for_review()
                 )
 
-    def test_get_new_suggestions_waiting_for_review(self):
+    def test_get_new_suggestions_waiting_for_review(
+        self) -> None:
         suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
         max_suggestions = 1
 

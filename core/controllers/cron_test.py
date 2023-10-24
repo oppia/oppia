@@ -502,7 +502,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def _mock_send_contributor_dashboard_reviewers_emails(
         self,
-        suggestions_by_language
+        suggestions_by_language: De
     ) -> None:
         """Mocks
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
