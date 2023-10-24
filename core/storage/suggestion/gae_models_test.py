@@ -1249,7 +1249,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     .get_suggestions_waiting_too_long_for_review()
                 )
 
-
     def test_get_new_suggestions_waiting_for_review(self):
         suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
         max_suggestions = 1
@@ -1262,17 +1261,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'reviewer_2', self.change_cmd, self.score_category,
                 's.thread1', None)
 
-            # Adjust the creation time to make it eligible for email.
-            mocked_time_eligible_for_review = (
-                self.mocked_datetime_utcnow - datetime.timedelta(days=2))
-
         # Call the method under test.
         with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
-            results = suggestion_models.GeneralSuggestionModel.get_new_suggestions_waiting_for_review()
+            results = (suggestion_models.GeneralSuggestionModel.
+                get_new_suggestions_waiting_for_review())
 
         # Assert that the correct number of suggestions is returned.
         self.assertEqual(len(results), max_suggestions)
-
 
     def test_get_suggestions_waiting_too_long_if_not_contributor_suggestion(
         self

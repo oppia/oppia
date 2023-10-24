@@ -499,7 +499,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
-    
+
     def _mock_send_contributor_dashboard_reviewers_emails(
         self,
         suggestions_by_language
@@ -654,7 +654,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-
         with self.can_send_emails, self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
                 email_manager,
@@ -676,7 +675,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.assertEqual(len(en_data['suggestions']), 1)
         self.assertEqual(len(en_data['reviewer_ids']), 1)
         self.assertEqual(en_data['reviewer_ids'][0], self.reviewer_id)
-
 
         self.logout()
 

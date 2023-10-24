@@ -5223,20 +5223,12 @@ class NotifyReviewersNewSuggestionsTests(
                                 'reviewer_ids': [self.reviewer_1_id],
                                 'suggestions': [reviewable_suggestion_email_info]
                             }})
-                        
                     )
-                    print('Reviewable suggestion info',reviewable_suggestion_email_info)
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].html, expected_email_html_body)
-        # print(messages[0].)
-        # self.assertEqual(messages[0].html, expected_email_html_body)
-        # Make sure correct email model is stored.
-        print('Reviewer email want to sent is', self.REVIEWER_1_EMAIL)
-        # self._assert_email_data_stored_in_sent_email_model_is_correct(
-        #     expected_email_html_body, self.reviewer_1_id,
-        #     self.REVIEWER_1_EMAIL)
+
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
         test_utils.EmailTestBase):

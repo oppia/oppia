@@ -467,25 +467,21 @@ class GeneralSuggestionModel(base_models.BaseModel):
     ):
         """Returns new suggestions of a specific type and language code.
 
-        Args:
-            suggestion_type: str. The type of the suggestion (e.g., 'translate_content').
-            language_code: str. The ISO 639-1 language code.
-            max_suggestions: int. The maximum number of suggestions to retrieve.
-
         Returns:
-            list(GeneralSuggestionModel). A list of new suggestions matching the criteria.
+            list(GeneralSuggestionModel). A list of new suggestions
+            matching the criteria.
         """
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION))
-        print('I am here yo', cls.query())
+
         return (
             cls.get_all().filter(datastore_services.all_of(
                 cls.status == STATUS_IN_REVIEW,
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 cls.created_on > threshold_time
             ))
-            .order(-cls.created_on)  # Sort by the most recently created first.
+            .order(-cls.created_on)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
         )
 
