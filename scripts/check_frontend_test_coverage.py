@@ -43,6 +43,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'App.ts',
     'Base.ts',
+    # Two lines not covered, voiceover needs refactoring.
+    'contributor-dashboard-admin-page.component.ts'
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'exploration-states.service.ts',
@@ -67,8 +69,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
-    # Two lines not covered, voiceover needs refactoring.
-    'contributor-dashboard-admin-page.component.ts'
 ]
 
 
