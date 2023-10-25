@@ -642,7 +642,6 @@ def _send_email(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
             intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
         )
-        print('EMAIL HAS BEEN SENT SIR')
 
     _send_email_transactional()
 

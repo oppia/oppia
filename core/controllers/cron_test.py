@@ -628,8 +628,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-        print('reviewers',self.reviewer_ids_by_language)
-        print('suggestions', self.reviewable_suggestions_by_language)
         self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
         self.logout()

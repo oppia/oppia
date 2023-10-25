@@ -42,7 +42,8 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union, DefaultDict)
+    Callable, Dict, Final, List, Optional, Sequence, Set, Type,
+    Union, DefaultDict)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -5024,7 +5025,7 @@ class NotifyReviewersNewSuggestionsTests(
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
         translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime('en',
+            self._create_translation_suggestion_in_lang_with_html_and_datetime('en', # pylint: disable=line-too-long
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         self.reviewable_suggestion_email_info = (
@@ -5040,18 +5041,18 @@ class NotifyReviewersNewSuggestionsTests(
     def _create_reviewable_suggestion_email_infos_from_suggestions(
             self,
             suggestions: List[suggestion_registry.BaseSuggestion]
-        ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
-            """Creates a list of ReviewableSuggestionEmailInfo objects from
-            the given suggestions.
-            """
+    ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
 
-            return [
-                (
-                    suggestion_services
-                    .create_reviewable_suggestion_email_info_from_suggestion(
-                        suggestion)
-                ) for suggestion in suggestions
-            ]
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
 
     def _assert_email_data_stored_in_sent_email_model_is_correct(
         self,
@@ -5177,8 +5178,10 @@ class NotifyReviewersNewSuggestionsTests(
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 reviewer_ids_by_language: DefaultDict[
                         str, List[str]] = defaultdict(list)
-                suggestions_by_language: DefaultDict[str, List[
-                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                suggestions_by_language: (DefaultDict[str, List[
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]]) = defaultdict(
+                                list)
                 reviewer_ids_by_language['en'] = []
                 suggestions_by_language['en'] = []
 
@@ -5213,12 +5216,14 @@ class NotifyReviewersNewSuggestionsTests(
         expected_email_html_body = (
             'Hi reviewer1' +
             ',<br><br>There are new opportunities to review translations ' +
-            'that we think you might be interested in on the Contributor Dashboard page. ' +
-            'Here are some examples of contributions that are waiting for review:' +
+            'that we think you might be interested in on the Contributor ' +
+            'Dashboard page. Here are some examples of contributions that ' +
+            'are waiting for review:'
             '<br><br>The following suggestions are available for review: ' +
             '<br><br><ul><li>The following English translation suggestion was ' +
             'submitted for review 2 days ago:<br>What is the meaning of life?' +
-            '</li><br></ul><br>Please take some time to review any of the above contributions ' +
+            '</li><br></ul><br>Please take some time to review any of the above ' +
+            'contributions '
             '(if they still need a review) or any other contributions on the dashboard. ' +
             'We appreciate your help!<br><br>Thanks again, and happy reviewing!<br><br>' +
             'The Oppia Contributor Dashboard Team'
