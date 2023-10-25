@@ -100,7 +100,7 @@ class FeatureFlagsHandler(
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': False
+                'default_value': None
             },
             'rollout_percentage': {
                 'schema': {
@@ -113,7 +113,7 @@ class FeatureFlagsHandler(
                         'max_value': 100
                     }]
                 },
-                'default_value': 0
+                'default_value': None
             },
             'user_group_ids': {
                 'schema': {
@@ -122,7 +122,7 @@ class FeatureFlagsHandler(
                         'type': 'unicode'
                     }
                 },
-                'default_value': []
+                'default_value': None
             }
         }
     }
