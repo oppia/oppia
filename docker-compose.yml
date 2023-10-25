@@ -88,7 +88,6 @@ services:
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      - DATASTORE_HOST=datastore
       - save_datastore=${save_datastore:-false}
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache
@@ -133,13 +132,13 @@ services:
       - PATH=/usr/local/bin/
     volumes:
       - redis_dump:/data/dump.db
-      - ./redis_docker.conf:/app/oppia/redis_docker.conf
+      - ./redis.conf:/app/oppia/redis.conf
     healthcheck:
       test: redis-cli ping
       timeout: 5s
       interval: 30s
       retries: 5
-    command: redis-server /app/oppia/redis_docker.conf
+    command: redis-server /app/oppia/redis.conf
 
   elasticsearch:
     image: elasticsearch:7.17.0

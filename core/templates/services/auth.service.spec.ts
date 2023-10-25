@@ -70,8 +70,6 @@ describe('Auth service', function() {
     spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
       .and.returnValue(true);
 
-    // TODO(#18260): Change this when we permanently move to the Docker Setup.
-    process.env.OPPIA_IS_DOCKERIZED = 'true';
     expect(AuthService.firebaseEmulatorConfig).toEqual(['0.0.0.0', 9099]);
   });
 

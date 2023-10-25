@@ -37,11 +37,6 @@ from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
 )
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import install_python_dev_dependencies
-    from scripts import install_third_party_libs
-    from scripts import servers
-
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
@@ -145,9 +140,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = (
-    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
-)
+APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 
 APP_YAML_FILEPATH = 'app.yaml'
 
@@ -193,32 +186,6 @@ class DependencyBundleDict(TypedDict):
     fontsPath: str
 
 
-def run_webpack_compilation(source_maps: bool = False) -> None:
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Whether to compile with source maps.
-    """
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-
-    for _ in range(max_tries):
-        try:
-            managed_webpack_compiler = (
-                servers.managed_webpack_compiler(use_source_maps=source_maps))
-            with managed_webpack_compiler as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    else:
-        # We didn't break out of the loop, meaning all attempts have failed.
-        print('Failed to complete webpack compilation, exiting...')
-        sys.exit(1)
-
-
 def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     """Build the javascript files.
 
@@ -239,8 +206,6 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -331,21 +296,13 @@ def _minify_and_create_sourcemap(
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    # TODO(#18260): Change this when we permanently move to
-    # the Dockerized Setup.
-    if feconf.OPPIA_IS_DOCKERIZED:
-        subprocess.check_call(
-            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
-            ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
-            ' -o /app/oppia/third_party/generated/js/third_party.min.js',
-            shell=True
-        )
-    else:
-        cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-            common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
-            source_map_properties, target_file_path)
-        subprocess.check_call(cmd, shell=True)
+    subprocess.check_call(
+        'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
+        ' /app/oppia/third_party/generated/js/third_party.js'
+        ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
+        ' -o /app/oppia/third_party/generated/js/third_party.min.js',
+        shell=True
+    )
 
 
 def _generate_copy_tasks_for_fonts(
@@ -687,40 +644,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], webfonts_dir))
-
-
-def build_using_ng() -> None:
-    """Execute angular build process. This runs the angular compiler and
-    generates an ahead of time compiled bundle. This bundle can be found in the
-    dist/oppia-angular-prod folder.
-    """
-    print('Building using angular cli')
-    managed_ng_build_process = servers.managed_ng_build(
-        use_prod_env=True, watch_mode=False)
-    with managed_ng_build_process as p:
-        p.wait()
-    assert get_file_count('dist/oppia-angular-prod') > 0, (
-        'angular generated bundle should be non-empty')
-
-
-def build_using_webpack(config_path: str) -> None:
-    """Execute webpack build process. This takes all TypeScript files we have in
-    /templates and generates JS bundles according the require() imports
-    and also compiles HTML pages into the /backend_prod_files/webpack_bundles
-    folder. The files are later copied into /build/webpack_bundles.
-
-    Args:
-        config_path: str. Webpack config to be used for building.
-    """
-
-    print('Building webpack')
-    managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path,
-        max_old_space_size=MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD)
-    with managed_webpack_compiler as p:
-        p.wait()
-    assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
-        'webpack_bundles should be non-empty.')
 
 
 def hash_should_be_inserted(filepath: str) -> bool:
@@ -1405,15 +1328,10 @@ def generate_python_package() -> None:
     # for the package build and we need to verify that they are actually not
     # needed.
     try:
-        print('Remove dev dependencies')
-        install_python_dev_dependencies.main(['--uninstall'])
-
         print('Building Oppia package...')
         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
         print('Oppia package build completed.')
     finally:
-        install_python_dev_dependencies.install_installation_tools()
-        install_third_party_libs.main()
         print('Dev dependencies reinstalled')
 
 
@@ -1458,13 +1376,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            generate_python_package()
-            if options.source_maps:
-                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-            else:
-                build_using_webpack(WEBPACK_PROD_CONFIG)
-            build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)

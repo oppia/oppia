@@ -24,9 +24,7 @@ import site
 import subprocess
 import sys
 
-from core import feconf
 from scripts import common
-from scripts import install_third_party_libs
 
 from typing import Final, List, Optional, Tuple
 
@@ -177,9 +175,6 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/a/10095099 and
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
-
-    if not feconf.OPPIA_IS_DOCKERIZED:
-        install_third_party_libraries(parsed_args.skip_install)
 
         print('Installing Mypy and stubs for third party libraries.')
         return_code, mypy_exec_path = install_mypy_prerequisites(

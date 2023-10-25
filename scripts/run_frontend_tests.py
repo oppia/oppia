@@ -30,7 +30,6 @@ from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
-from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -115,9 +114,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     run_dtslint_type_tests()
     if parsed_args.dtslint_only:
         return
-
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
 
     common.setup_chrome_bin_env_variable()
     # We need to create an empty hashes.json file for the build so that

@@ -28,7 +28,6 @@ from typing import List, Optional
 
 from . import pre_commit_linter
 from .. import concurrent_task_utils
-from .. import install_third_party_libs
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 PYLINTRC_FILEPATH = os.path.join(os.getcwd(), '.pylintrc')

@@ -31,8 +31,6 @@ from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import concurrent_task_utils
-from scripts import install_third_party_libs
-from scripts import servers
 
 from typing import Callable, Final, List, Tuple
 
