@@ -20,6 +20,24 @@ help: ## Display this help message.
 	@echo "Please use \`make <target>' where <target> is one of the followings."
 	@awk -F ':.*?## ' '/^[a-zA-Z]/ && NF==2 {printf "\033[36m  %-28s\033[0m %s\n", $$1, $$2}' Makefile | sort
 	@echo "List of docker services name: \033[32m $(ALL_SERVICES) \033[0m"
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  Flags for the e2e tests"
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  suite: The suite to run the e2e tests"
+	@echo "  sharding_instances: Sets the number of parallel browsers to open while sharding."
+	@echo "  CHROME_VERSION: Uses the specified version of the chrome driver."
+	@echo "  MOBILE: Run e2e test in mobile viewport."
+	@echo "  DEBUG: Runs the webdriverio test in debugging mode."
+	@echo ""
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  Flags for the acceptance tests"
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  suite: The suite to run the acceptance tests"
+	@echo ""
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  Flags for the lighthouse tests"
+	@echo "----------------------------------------------------------------------------------------"
+	@echo "  shard: The shard number to run the lighthouse tests"
 
 
 build.%: ## Builds the given docker service. Example: make build.datastore
@@ -141,13 +159,6 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-list_flags.acceptance: ## Lists the flags for the acceptance tests
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  Flags for the acceptance tests'
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  suite: The suite to run the acceptance tests'
-	@echo '----------------------------------------------------------------------------------------'
-
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
@@ -172,17 +183,6 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
-
-list_flags.e2e: ## Lists the flags for the e2e tests
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  Flags for the e2e tests'
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  suite: The suite to run the e2e tests'
-	@echo '  sharding_instances: Sets the number of parallel browsers to open while sharding.
-	@echo '  CHROME_VERSION: Uses the specified version of the chrome driver.
-	@echo '  MOBILE: Run e2e test in mobile viewport.'
-	@echo '  DEBUG: Runs the webdriverio test in debugging mode.'
-	@echo '----------------------------------------------------------------------------------------'
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
 	@echo 'Shutting down any previously started server.'
@@ -225,13 +225,6 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
-
-list_flags.lighthouse: ## Lists the flags for the lighthouse tests
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  Flags for the lighthouse tests'
-	@echo '----------------------------------------------------------------------------------------'
-	@echo '  shard: The shard number to run the lighthouse tests'
-	@echo '----------------------------------------------------------------------------------------'
 
 OS_NAME := $(shell uname)
 
