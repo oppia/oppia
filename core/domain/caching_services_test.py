@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
@@ -918,6 +920,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [feature_flag_id]),
             {})
 
+        current_time = datetime.datetime.utcnow()
         feature = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
@@ -925,7 +928,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
-            'last_updated': 'August 25, 2023'
+            'last_updated': utils.convert_naive_datetime_to_string(
+                current_time)
         })
 
         caching_services.set_multi(
