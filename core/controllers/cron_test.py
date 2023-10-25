@@ -564,13 +564,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        
-        self.reviewable_suggestions_by_language: DefaultDict[
-            str, List[
-                suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
-        self.reviewer_ids_by_language: DefaultDict[
-            str, List[str]] = defaultdict(list)
-
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(

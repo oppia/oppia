@@ -230,7 +230,7 @@ class CronMailReviewerNewSuggestionsHandler(
         new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
         
         # Initialize dictionaries to organize data.
-        reviewer_ids_by_language: DefaultDict[str, List[Optional[str]]] = defaultdict(list)
+        reviewer_ids_by_language: DefaultDict[str, List[str]] = defaultdict(list)
         suggestions_by_language: DefaultDict[
             str, List[
                 suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
