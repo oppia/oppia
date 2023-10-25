@@ -16,7 +16,7 @@
  * @fileoverview Component for the Editor tab in the exploration editor page.
  */
 
-import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
@@ -56,7 +56,6 @@ import { ContextService } from 'services/context.service';
 export class ExplorationEditorTabComponent
     implements OnInit, OnDestroy {
     @Input() explorationIsLinkedToStory: boolean;
-    @ViewChild('creatingInOppia') creatingInOppia!: ElementRef;
 
     directiveSubscriptions = new Subscription();
     TabName: string;
@@ -455,11 +454,6 @@ export class ExplorationEditorTabComponent
       }, () => {
         this.explorationNextContentIdIndexService.restoreFromMemento();
       });
-      setTimeout(() => {
-        this.creatingInOppia.nativeElement.focus();
-        console.log('focus');
-      });
-      console.log('focus out of timeout');
     }
 
     ngOnDestroy(): void {
