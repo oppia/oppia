@@ -354,7 +354,7 @@ URLS = [
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
         r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
-        contributor_dashboard.PinLessonsHandler,
+        contributor_dashboard.LessonsPinningHandler,
     ),
     get_redirect_route(
         r'/gettranslatabletexthandler',

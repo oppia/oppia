@@ -443,7 +443,7 @@ class ReviewableOpportunitiesHandler(
         return list(ordered_exp_opp_summaries.values())
 
 
-class PinLessonsHandlerNormalizedRequestDict(TypedDict):
+class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ReviewableOpportunitiesHandler's
     normalized_request dictionary.
     """
@@ -453,9 +453,9 @@ class PinLessonsHandlerNormalizedRequestDict(TypedDict):
     opportunity_id: Optional[str]
 
 
-class PinLessonsHandler(
+class LessonsPinningHandler(
     base.BaseHandler[
-        PinLessonsHandlerNormalizedRequestDict,
+        LessonsPinningHandlerNormalizedRequestDict,
         Dict[str, str],
     ]
 ):
