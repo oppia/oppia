@@ -44,7 +44,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'App.ts',
     'Base.ts',
     # Two lines not covered, voiceover needs refactoring.
-    'contributor-dashboard-admin-page.component.ts'
+    'contributor-dashboard-admin-page.component.ts', 
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'exploration-states.service.ts',
