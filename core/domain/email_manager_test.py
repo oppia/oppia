@@ -5157,12 +5157,8 @@ class NotifyReviewersNewSuggestionsTests(
                         str, List[str]] = defaultdict(list)
                 suggestions_by_language: DefaultDict[str, List[
                         suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
-                reviewer_ids_by_language = {
-                        'en': []
-                }
-                suggestions_by_language = {
-                        'en': []
-                }
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
 
                 email_manager.send_reviewer_notifications(
                     reviewer_ids_by_language,
@@ -5183,12 +5179,8 @@ class NotifyReviewersNewSuggestionsTests(
                         str, List[str]] = defaultdict(list)
                 suggestions_by_language: DefaultDict[str, List[
                         suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
-                reviewer_ids_by_language = {
-                        'en': []
-                }
-                suggestions_by_language = {
-                        'en': []
-                }
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
 
                 email_manager.send_reviewer_notifications(
                     reviewer_ids_by_language,
@@ -5239,11 +5231,8 @@ class NotifyReviewersNewSuggestionsTests(
                         str, List[str]] = defaultdict(list)
                     suggestions_by_language: DefaultDict[str, List[
                         suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
-                    reviewer_ids_by_language = {
-                        'en': [self.reviewer_1_id]}
-                    suggestions_by_language = {
-                        'en': [reviewable_suggestion_email_info]
-                    }
+                    reviewer_ids_by_language['en'] = [self.reviewer_1_id]
+                    suggestions_by_language['en'] = [reviewable_suggestion_email_info]
 
                     email_manager.send_reviewer_notifications(
                         reviewer_ids_by_language,

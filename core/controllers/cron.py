@@ -243,7 +243,9 @@ class CronMailReviewerNewSuggestionsHandler(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_property
             )
+
             reviewer_ids = [user_services.get_user_id_from_username(username) for username in reviewer_usernames]
+            reviewer_ids = [id for id in reviewer_ids if id is not None]
             reviewer_ids_by_language[language_property].extend(reviewer_ids)
 
             # Collect suggestions.
