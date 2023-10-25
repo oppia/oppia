@@ -1106,7 +1106,6 @@ def get_pinned_lesson(
         topic_id
     )
     if pinned_opportunity and pinned_opportunity.opportunity_id is not None:
-
         # If the model exists and has a valid opportunity_id, return it.
         model = opportunity_models.ExplorationOpportunitySummaryModel.get(
             pinned_opportunity.opportunity_id)
