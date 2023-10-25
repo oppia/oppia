@@ -191,8 +191,7 @@ class UnusedTopicsHandler(
         topics_not_in_classroom = [
             topic.to_dict() for topic in all_topics
             if not any(
-                topic.id in
-                list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+                topic.id in classroom.topic_id_to_prerequisite_topic_ids
                 for classroom in all_classrooms
             )
         ]
