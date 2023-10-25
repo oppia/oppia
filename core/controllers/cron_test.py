@@ -44,7 +44,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, Final, List, Set, Union
+from typing import DefaultDict, Dict, Final, List, Set, Union
 import webtest
 
 MYPY = False
@@ -502,7 +502,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
     def _mock_send_contributor_dashboard_reviewers_emails(
         self,
-        suggestions_by_language: De
+        suggestions_by_language: DefaultDict[
+            str, Dict[str, Dict[str, List[
+                suggestion_registry.ReviewableSuggestionEmailInfo]]]]
     ) -> None:
         """Mocks
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
@@ -541,8 +543,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.reviewers_suggestion_email_infos = []
-        self.reviewer_ids = []
         self.suggestion_by_language = {}
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
