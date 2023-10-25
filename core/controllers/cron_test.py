@@ -15,6 +15,7 @@
 """Tests for the cron jobs."""
 
 from __future__ import annotations
+from collections import defaultdict
 
 import datetime
 
@@ -530,8 +531,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
 
-        for _, reviewer_ids in self.reviewer_ids_by_language:
-            self.assertEqual(len(reviewer_ids), 0)
+        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
         self.logout()
 
@@ -564,8 +564,12 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.reviewable_suggestions_by_language = {}
-        self.reviewer_ids_by_language = {}
+        
+        self.reviewable_suggestions_by_language: DefaultDict[
+            str, List[
+                suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+        self.reviewer_ids_by_language: DefaultDict[
+            str, List[str]] = defaultdict(list)
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -583,8 +587,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
 
-        for _, reviewer_ids in self.reviewer_ids_by_language:
-            self.assertEqual(len(reviewer_ids), 0)
+        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
         self.logout()
 
