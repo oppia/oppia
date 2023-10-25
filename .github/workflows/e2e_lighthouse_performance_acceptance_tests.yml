@@ -131,36 +131,6 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Attempt to download build files artifact
-        id: download_artifact_1
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/
-      - name: (Artifact re-build) Cache third_party/static
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/oppia/third_party/static
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -217,24 +187,6 @@ jobs:
               requirements_dev.in
               requirements_dev.txt
         - uses: ./.github/actions/merge
-        - name: Cache node modules
-          uses: actions/cache@v3
-          env:
-            cache-name: cache-node-modules
-          with:
-            path: /home/runner/work/oppia/yarn_cache
-            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-
-              ${{ runner.os }}-build-
-              ${{ runner.os }}-
-        - name: Attempt to download build files artifact
-          id: download_artifact_1
-          uses: actions/download-artifact@v3
-          continue-on-error: true
-          with:
-            name: build_files
-            path: /home/runner/work/oppia/
         - name: Install Python deps
           run: |
             pip install --require-hashes --no-deps -r requirements.txt
@@ -248,18 +200,6 @@ jobs:
           run: |
             sudo rm -rf /usr/share/dotnet
             sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        - name: (Artifact re-build) Cache third_party/static
-          if: steps.download_artifact_1.outcome == 'failure'
-          uses: actions/cache@v3
-          env:
-            cache-name: cache-node-modules
-          with:
-            path: /home/runner/work/oppia/oppia/third_party/static
-            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('dependencies.json') }}
-            restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-
-              ${{ runner.os }}-build-
-              ${{ runner.os }}-
         - name: Start dev-server
           run: |
             sudo make build
