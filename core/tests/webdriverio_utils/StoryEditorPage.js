@@ -40,6 +40,11 @@ var StoryEditorPage = function() {
   var confirmChapterCreationButton = $(
     '.e2e-test-confirm-chapter-creation-button');
   var publishStoryButton = $('.e2e-test-publish-story-button');
+  var publishChapterButton = $('.e2e-test-publish-chapters-button');
+  var markAsReadyToPublishButton = $(
+    '.e2e-test-mark-as-ready-to-publish-button');
+  var markAsDraftButton = $('.e2e-test-mark-as-draft-button');
+  var publishChangesButton = $('.e2e-test-publish-changes-button');
   var unpublishStoryButton = $('.e2e-test-unpublish-story-button');
   var saveStoryNotesEditorButton = $('.e2e-test-save-story-notes-button');
   var storyDescriptionField = $('.e2e-test-story-description-field');
@@ -86,6 +91,9 @@ var StoryEditorPage = function() {
   var chapterTitlesSelector = function() {
     return $$('.e2e-test-chapter-title');
   };
+  var chapterStatusSelector = function() {
+    return $$('.e2e-test-chapter-status');
+  };
   var discardOption = $('.e2e-test-show-discard-option');
   var discardChangesButton = $('.e2e-test-discard-story-changes');
   var explorationAlreadyPresentMsg = $('.e2e-test-invalid-exp-id');
@@ -93,11 +101,15 @@ var StoryEditorPage = function() {
   var explorationIdSaveButton = $('.e2e-test-exploration-id-save-button');
   var nextChapterCard = $('.e2e-test-next-chapter-card');
   var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
+  var plannedPublicationDateInput = $(
+    '.e2e-test-planned-publication-date-input');
   var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
   var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
   var nodeOutlineEditorRteContentSelector = function() {
     return $$('.e2e-test-rte');
   };
+  var publishUptoChaptersDropdownSelector = $(
+    '.e2e-test-publish-up-to-chapter-dropdown');
   var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
   var createChapterThumbnailButton = $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
@@ -253,6 +265,13 @@ var StoryEditorPage = function() {
     }
   };
 
+  this.expectChapterStatusToBe = async function(index, status) {
+    var chapterTitles = await chapterStatusSelector();
+    var chapterStatusText = await action.getText(
+      'Chapter Status', chapterTitles[index]);
+    expect(chapterStatusText).toEqual(status);
+  };
+
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
     await waitFor.visibilityOf(
       chapterTitle,
@@ -377,14 +396,6 @@ var StoryEditorPage = function() {
       closeSaveModalButton,
       'Commit message modal takes too long to disappear.');
     await waitFor.pageToFullyLoad();
-
-    // Wait for the "Save Draft" button to be reset.
-    if (width > 1000) {
-      await waitFor.visibilityOf(
-        saveStoryButton, 'Save Story Button taking too long to appear.');
-      await waitFor.textToBePresentInElement(
-        saveStoryButton, 'Save Draft', 'Story could not be saved.');
-    }
   };
 
   this.expectSaveStoryDisabled = async function() {
@@ -421,6 +432,48 @@ var StoryEditorPage = function() {
       'Node Description Input', nodeDescriptionInputField);
     await action.setValue(
       'Node Description Input', nodeDescriptionInputField, nodeDescription);
+  };
+
+  this.setNodePlannedPublicationDate = async function(dateString) {
+    await waitFor.visibilityOf(
+      plannedPublicationDateInput,
+      'PlannedPublicationDateInput takes too long to be visible'
+    );
+
+    await action.setValue(
+      'Planned Publication Date Input', plannedPublicationDateInput,
+      dateString);
+  };
+
+  this.setNodeStatusToReadyToPublish = async function() {
+    await action.click(
+      'Mark As Ready To Publish Button', markAsReadyToPublishButton);
+  };
+
+  this.setNodeStatusToDraft = async function() {
+    await action.click('Mark As Draft Button', markAsDraftButton);
+  };
+
+  this.publishNodeChanges = async function() {
+    await action.click('Publish Changes Button', publishChangesButton);
+  };
+
+  this.publishNodes = async function(chapterIndex) {
+    await action.select(
+      'Publish up to Chapter Dropdown',
+      publishUptoChaptersDropdownSelector, Number(chapterIndex) + 1);
+    await action.click('Publish Chapters Button', publishChapterButton);
+  };
+
+  this.unpublishNodes = async function(chapterIndex) {
+    await action.select(
+      'Publish Up to Chapter Dropdown',
+      publishUptoChaptersDropdownSelector, Number(chapterIndex) + 1);
+    await action.click('Unpublish Story Button', publishChapterButton);
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Unpublish message modal takes too long to disappear.');
   };
 
   this.expectNodeDescription = async function(nodeDescription) {

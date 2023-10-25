@@ -139,6 +139,22 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
+  // Remove this method after the serial_chapter_launch_curriculum_admin_view
+  // feature flag is deprecated.
+  this.getSerialChapterCurriculumAdminFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if (await action.getText('Feature Flag', elem.$(featureNameLocator)) ===
+          'serial_chapter_launch_curriculum_admin_view') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // This function is meant to be used to enable a feature gated behind
   // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.
