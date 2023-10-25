@@ -5152,10 +5152,13 @@ class NotifyReviewersNewSuggestionsTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-                data= {'en': {
-                        'reviewer_ids': [],
-                        'suggestions': []
-                    }}
+                data: DefaultDict[str, Dict[
+                    str, List[Union[
+                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]= {
+                        'en': {
+                            'reviewer_ids': [],
+                            'suggestions': []
+                        }}
                 default_data = DefaultDict(lambda: DefaultDict(list)) 
                 for language, language_data in data.items():
                     default_data[language]['reviewer_ids'] = language_data['reviewer_ids']
@@ -5172,7 +5175,9 @@ class NotifyReviewersNewSuggestionsTests(
          with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                data = {'en': {
+                data: DefaultDict[str, Dict[
+                    str, List[Union[
+                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]= {'en': {
                         'reviewer_ids': [],
                         'suggestions': [self.reviewable_suggestion_email_info]
                     }}
@@ -5222,7 +5227,9 @@ class NotifyReviewersNewSuggestionsTests(
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
-                        data =  {
+                        data: DefaultDict[str, Dict[
+                    str, List[Union[
+                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]] =  {
                             'en': {
                                 'reviewer_ids': [self.reviewer_1_id],
                                 'suggestions': [reviewable_suggestion_email_info]

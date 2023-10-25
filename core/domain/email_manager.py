@@ -1778,9 +1778,9 @@ def _send_suggestions_waiting_too_long_email(
 
 
 def send_reviewer_notifications(
-    suggestions_by_language: DefaultDict[
-            str, Dict[str, Dict[str, List[
-                suggestion_registry.ReviewableSuggestionEmailInfo]]]]) -> None:
+    suggestions_by_language: DefaultDict[str, Dict[
+        str, List[Union[
+            str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]) -> None:
     """Sends email notifications to reviewers about new suggestions.
 
     Args:
@@ -1798,7 +1798,6 @@ def send_reviewer_notifications(
         if not reviewer_ids:
             logging.error('No reviewers found to notify')
             continue
-
 
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
