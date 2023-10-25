@@ -21,6 +21,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 @Component({
   selector: 'oppia-welcome-modal',
@@ -39,6 +40,7 @@ export class WelcomeModalComponent
     private contextService: ContextService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
+    private focusManagerService: FocusManagerService,
   ) {
     super(ngbActiveModal);
   }
@@ -49,6 +51,7 @@ export class WelcomeModalComponent
       this.explorationId);
     this.editorWelcomeImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/editor_welcome.svg');
+      this.focusManagerService.setFocus('welcome');
   }
 
   cancel(): void {

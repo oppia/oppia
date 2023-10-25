@@ -16,7 +16,7 @@
  * @fileoverview Component for the Editor tab in the exploration editor page.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
@@ -56,6 +56,7 @@ import { ContextService } from 'services/context.service';
 export class ExplorationEditorTabComponent
     implements OnInit, OnDestroy {
     @Input() explorationIsLinkedToStory: boolean;
+    @ViewChild('creatingInOppia') creatingInOppia!: ElementRef;
 
     directiveSubscriptions = new Subscription();
     TabName: string;
@@ -119,10 +120,22 @@ export class ExplorationEditorTabComponent
           document.querySelector<HTMLElement>(
             '.joyride-step__holder').style.zIndex = '1020';
 
+          document.querySelector<HTMLElement>(
+            '.joyride-step__counter').tabIndex = 0;
+
+          document.querySelector<HTMLElement>(
+            '.e2e-test-joyride-title').focus();
+
           if (value.number === 2) {
             $('html, body').animate({
               scrollTop: (true ? 0 : 20)
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
 
           if (value.number === 4) {
@@ -133,6 +146,12 @@ export class ExplorationEditorTabComponent
             $('html, body').animate({
               scrollTop: document.getElementById(idToScrollTo)?.offsetTop - 200
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
 
           if (value.number === 6) {
@@ -143,6 +162,12 @@ export class ExplorationEditorTabComponent
             $('html, body').animate({
               scrollTop: document.getElementById(idToScrollTo)?.offsetTop - 200
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
         },
         () => {},
@@ -430,6 +455,11 @@ export class ExplorationEditorTabComponent
       }, () => {
         this.explorationNextContentIdIndexService.restoreFromMemento();
       });
+      setTimeout(() => {
+        this.creatingInOppia.nativeElement.focus();
+        console.log('focus');
+      });
+      console.log('focus out of timeout');
     }
 
     ngOnDestroy(): void {
