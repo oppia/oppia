@@ -419,7 +419,7 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
             self.physics_classroom_dict)
         classroom_config_services.update_or_create_classroom_model(
             self.physics_classroom)
-   
+
     def test_returns_newly_added_unused_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
