@@ -1778,25 +1778,27 @@ def _send_suggestions_waiting_too_long_email(
 
 
 def send_reviewer_notifications(
-    suggestions_by_language: DefaultDict[str, Dict[
-        str, List[Union[
-            str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]) -> None:
+    reviewer_ids_by_language: DefaultDict[str, List[str]],
+    suggestions_by_language: DefaultDict[str, List[
+        suggestion_registry.ReviewableSuggestionEmailInfo]],
+) -> None:
     """Sends email notifications to reviewers about new suggestions.
 
     Args:
-        suggestions_by_language: dict. A dictionary that organizes new suggestions
-        by language code and reviewer IDs.
+        suggestions_by_language: A dictionary that organizes
+            new suggestions by language code.
+        reviewer_ids_by_language: A dictionary that organizes reviewer
+            IDs by language code.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
         return
 
-    for language_code, data in suggestions_by_language.items():
-        reviewer_ids = data['reviewer_ids']
-        suggestions = data['suggestions']
+    for language_code, suggestions in suggestions_by_language.items():
+        reviewer_ids = reviewer_ids_by_language[language_code]
 
         if not reviewer_ids:
-            logging.error('No reviewers found to notify')
+            logging.error(f'No reviewers found for language {language_code} to notify')
             continue
 
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
@@ -1820,7 +1822,6 @@ def send_reviewer_notifications(
 
             # Send the email to each reviewer.
             reviewer_email = user_services.get_email_from_user_id(reviewer_id)
-            print('Body shody',email_body)
 
             _send_email(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,

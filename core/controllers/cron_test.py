@@ -458,6 +458,18 @@ class CronMailReviewerNewSuggestionsHandlerTests(
     REVIEWER_USERNAME: Final = 'reviewer'
     REVIEWER_EMAIL: Final = 'reviewer@community.org'
 
+    def _mock_send_contributor_dashboard_reviewers_emails(
+            self,
+            reviewer_by_language: DefaultDict[str, List[str]],
+            reviewable_suggestions_by_language: DefaultDict[str, List[suggestion_registry.ReviewableSuggestionEmailInfo]]
+        ) -> None:
+            """Mocks email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
+            it's not possible to send mail with self.testapp_swap, i.e with the URLs
+            defined in main.
+            """
+            self.reviewer_ids_by_language = reviewer_by_language
+            self.reviewable_suggestions_by_language = reviewable_suggestions_by_language
+
     def _create_translation_suggestion(
         self
     ) -> suggestion_registry.BaseSuggestion:
@@ -500,19 +512,28 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.author_id, add_translation_change_dict,
             'test description')
 
-    def _mock_send_contributor_dashboard_reviewers_emails(
-        self,
-        suggestions_by_language: DefaultDict[
-            str, Dict[str, Dict[str, List[
-                suggestion_registry.ReviewableSuggestionEmailInfo]]]]
+    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
+        self
     ) -> None:
-        """Mocks
-        email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
-        it's not possible to send mail with self.testapp_swap, i.e with the URLs
-        defined in main.
-        """
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            False
+        )
 
-        self.suggestion_by_language = suggestions_by_language
+        with self.can_send_emails, self.testapp_swap:
+            with swap_platform_parameter_value, self.swap(
+                email_manager,
+                'send_reviewer_notifications',
+                self._mock_send_contributor_dashboard_reviewers_emails):
+                self.get_json(
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+
+        for _, reviewer_ids in self.reviewer_ids_by_language:
+            self.assertEqual(len(reviewer_ids), 0)
+
+        self.logout()
 
     def setUp(self) -> None:
         super().setUp()
@@ -543,7 +564,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.suggestion_by_language = {}
+        self.reviewable_suggestions_by_language = {}
+        self.reviewer_ids_by_language = {}
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -560,35 +582,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-        for _, data in self.suggestion_by_language.items():
-                reviewer_ids = data['reviewer_ids']
-                suggestions = data['suggestions']
-                self.assertEqual(len(suggestions), 0)
-                self.assertEqual(len(reviewer_ids), 0)
 
-        self.logout()
-
-    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            False
-        )
-
-        with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-
-            for _, data in self.suggestion_by_language.items():
-                reviewer_ids = data['reviewer_ids']
-                self.assertEqual(len(reviewer_ids), 0)
+        for _, reviewer_ids in self.reviewer_ids_by_language:
+            self.assertEqual(len(reviewer_ids), 0)
 
         self.logout()
 
@@ -610,9 +606,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                     self.get_json(
                         '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
 
-            for _, data in self.suggestion_by_language.items():
-                reviewer_ids = data['reviewer_ids']
-                suggestions = data['suggestions']
+            for language_code, reviewer_ids in self.reviewer_ids_by_language.items():
+                suggestions = self.reviewable_suggestions_by_language[language_code]
                 self.assertEqual(len(suggestions), 1)
                 self.assertEqual(len(reviewer_ids), 1)
                 self.assertEqual(reviewer_ids[0], self.reviewer_id)
@@ -626,6 +621,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         )
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_id, self.language_code)
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_id, 'hi'
+        )
 
         with self.can_send_emails, self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
@@ -634,10 +632,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-
-        for _, data in self.suggestion_by_language.items():
-            reviewer_ids = data['reviewer_ids']
-            self.assertEqual(len(reviewer_ids), 0)
+        print('reviewers',self.reviewer_ids_by_language)
+        print('suggestions', self.reviewable_suggestions_by_language)
+        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
         self.logout()
 
@@ -666,15 +663,17 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.assertEqual(response, {})
 
         # For 'hi' language
-        hi_data = self.suggestion_by_language['hi']
-        self.assertEqual(len(hi_data['suggestions']), 1)
-        self.assertEqual(len(hi_data['reviewer_ids']), 0)
+        hi_reviewer_ids = self.reviewer_ids_by_language['hi']
+        hi_reviewable_suggestions = self.reviewable_suggestions_by_language['hi']
+        self.assertEqual(len(hi_reviewable_suggestions), 1)
+        self.assertEqual(len(hi_reviewer_ids), 0)
 
         # For 'en' language
-        en_data = self.suggestion_by_language['en']
-        self.assertEqual(len(en_data['suggestions']), 1)
-        self.assertEqual(len(en_data['reviewer_ids']), 1)
-        self.assertEqual(en_data['reviewer_ids'][0], self.reviewer_id)
+        en_reviewer_ids = self.reviewer_ids_by_language['en']
+        en_reviewable_suggestions = self.reviewable_suggestions_by_language['en']
+        self.assertEqual(len(en_reviewable_suggestions), 1)
+        self.assertEqual(len(en_reviewer_ids), 1)
+        self.assertEqual(en_reviewer_ids[0], self.reviewer_id)
 
         self.logout()
 

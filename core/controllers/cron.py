@@ -15,6 +15,7 @@
 """Controllers for the cron jobs."""
 
 from __future__ import annotations
+from collections import defaultdict
 
 from core import feconf
 from core.controllers import acl_decorators
@@ -227,27 +228,32 @@ class CronMailReviewerNewSuggestionsHandler(
             return self.render_json({})
 
         new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
-        # Organize suggestions by language code and reviewers.
-        suggestions_by_language: DefaultDict[str, Dict[
-                    str, List[Union[
-                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]] = DefaultDict(
-                lambda: {'reviewer_ids': [], 'suggestions': []})
+        
+        # Initialize dictionaries to organize data.
+        reviewer_ids_by_language: DefaultDict[str, List[str]] = defaultdict(list)
+        suggestions_by_language: DefaultDict[
+            str, List[
+                suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
 
         for suggestion in new_suggestions_info:
             language_property = suggestion.language_code
+
+            # Collect reviewer IDs.
             reviewer_usernames = user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_property
             )
             reviewer_ids = [user_services.get_user_id_from_username(username) for username in reviewer_usernames]
+            reviewer_ids_by_language[language_property].extend(reviewer_ids)
 
-            suggestions_by_language[language_property]['reviewer_ids'].extend(reviewer_ids)
-            suggestions_by_language[language_property]['suggestions'].append(suggestion)
+            # Collect suggestions.
+            suggestions_by_language[language_property].append(suggestion)
 
         # Send email notifications to reviewers based on the organized data.
-        email_manager.send_reviewer_notifications(suggestions_by_language)
+        email_manager.send_reviewer_notifications(reviewer_ids_by_language, suggestions_by_language)
 
         return self.render_json({})
+
 
 
 class CronAppFeedbackReportsScrubberHandlerPage(

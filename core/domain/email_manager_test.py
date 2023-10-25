@@ -15,6 +15,7 @@
 """Tests for methods relating to sending emails."""
 
 from __future__ import annotations
+from collections import defaultdict
 
 import datetime
 import logging
@@ -5152,18 +5153,21 @@ class NotifyReviewersNewSuggestionsTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-                data: DefaultDict[str, Dict[
-                    str, List[Union[
-                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]= {
-                        'en': {
-                            'reviewer_ids': [],
-                            'suggestions': []
-                        }}
-                default_data = DefaultDict(lambda: DefaultDict(list)) 
-                for language, language_data in data.items():
-                    default_data[language]['reviewer_ids'] = language_data['reviewer_ids']
-                    default_data[language]['suggestions'] = language_data['suggestions']
-                email_manager.send_reviewer_notifications(default_data)
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = defaultdict(list)
+                suggestions_by_language: DefaultDict[str, List[
+                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                reviewer_ids_by_language = {
+                        'en': []
+                }
+                suggestions_by_language = {
+                        'en': []
+                }
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
@@ -5175,24 +5179,28 @@ class NotifyReviewersNewSuggestionsTests(
          with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                data: DefaultDict[str, Dict[
-                    str, List[Union[
-                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]]= {'en': {
-                        'reviewer_ids': [],
-                        'suggestions': [self.reviewable_suggestion_email_info]
-                    }}
-                default_data = DefaultDict(lambda: DefaultDict(list)) 
-                for language, language_data in data.items():
-                    default_data[language]['reviewer_ids'] = language_data['reviewer_ids']
-                    default_data[language]['suggestions'] = language_data['suggestions']
-                email_manager.send_reviewer_notifications(default_data)
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = defaultdict(list)
+                suggestions_by_language: DefaultDict[str, List[
+                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                reviewer_ids_by_language = {
+                        'en': []
+                }
+                suggestions_by_language = {
+                        'en': []
+                }
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
                 logs[0],
-                'No reviewers found to notify')
+                'No reviewers found for language en to notify')
 
     def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
         self
@@ -5227,19 +5235,20 @@ class NotifyReviewersNewSuggestionsTests(
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
-                        data: DefaultDict[str, Dict[
-                    str, List[Union[
-                        str, suggestion_registry.ReviewableSuggestionEmailInfo]]]] =  {
-                            'en': {
-                                'reviewer_ids': [self.reviewer_1_id],
-                                'suggestions': [reviewable_suggestion_email_info]
-                            }}
-                        default_data = DefaultDict(lambda: DefaultDict(list)) 
-                        for language, language_data in data.items():
-                            default_data[language]['reviewer_ids'] = language_data['reviewer_ids']
-                            default_data[language]['suggestions'] = language_data['suggestions']
+                    reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = defaultdict(list)
+                    suggestions_by_language: DefaultDict[str, List[
+                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                    reviewer_ids_by_language = {
+                        'en': [self.reviewer_1_id]}
+                    suggestions_by_language = {
+                        'en': [reviewable_suggestion_email_info]
+                    }
 
-                        email_manager.send_reviewer_notifications(default_data)
+                    email_manager.send_reviewer_notifications(
+                        reviewer_ids_by_language,
+                        suggestions_by_language
+                    )
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
