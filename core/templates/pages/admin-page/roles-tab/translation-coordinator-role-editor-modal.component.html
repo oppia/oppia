@@ -1,0 +1,50 @@
+<div class="modal-header e2e-test-language-selector-modal">
+  <h4 class="modal-title">Translation Coordinator role editor</h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p *ngIf="coordinatedLanguageIds.length">User has rights in the following languages:</p>
+  <p *ngIf="!coordinatedLanguageIds.length">Please assign users to required language:</p>
+  <ul>
+    <li *ngFor="let languageId of coordinatedLanguageIds">
+      <div class="d-flex justify-content-between">
+        <span>{{ languageIdToName[languageId] }}</span>
+        <div class="mat-icon-button oppia-progress-spinner" *ngIf="languageIdInUpdate === languageId">
+          <mat-spinner [diameter]="24"></mat-spinner>
+        </div>
+        <button mat-button matSuffix mat-icon-button
+                *ngIf="languageIdInUpdate !== languageId && coordinatedLanguageIds.length > 1"
+                aria-label="Clear"
+                (click)="removeLanguageId(languageId)">
+          <mat-icon matListIcon>close</mat-icon>
+        </button>
+      </div>
+    </li>
+    <li *ngIf="languageIdsForSelection.length">
+      <div class="d-inline-flex mt-3 w-100">
+        <select class="w-50 e2e-test-language-selector" placeholder="Select new language to add" label="Language selector" ngbAutofocus [(ngModel)]="newLanguageId">
+          <option *ngFor="let languageId of languageIdsForSelection" [value]="languageId">{{ languageIdToName[languageId] }}</option>
+        </select>
+        <button mat-icon-button color="primary" (click)="addLanguage()" class="e2e-test-language-selector-add-button">
+          <mat-icon aria-label="Example icon-button with a heart icon">add</mat-icon>
+        </button>
+      </div>
+    </li>
+    <li *ngIf="!languageIdsForSelection.length">
+      <i *ngIf="coordinatedLanguageIds.length">There are no languages remaining, looks like user is assigned to all the languages.</i>
+    </li>
+  </ul>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark e2e-test-language-selector-close-button" (click)="close()">Close</button>
+</div>
+
+<style>
+  .oppia-progress-spinner {
+    align-items: center;
+    display: flex;
+    width: 32px;
+  }
+</style>

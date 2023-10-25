@@ -25,26 +25,37 @@ help: ## Display this help message.
 build.%: ## Builds the given docker service. Example: make build.datastore
 	docker compose build $*
 
-build: ## Builds the all docker services.
+build: ## Builds the all docker setup.
+	$(MAKE) install_node
 	docker compose build
 
 run-devserver: # Runs the dev-server
-	docker compose up dev-server -d --no-deps
-	$(MAKE) update.requirements
 	docker compose up angular-build -d
 	$(MAKE) update.package
+	docker cp oppia-angular-build:/app/oppia/node_modules .
+	docker compose stop angular-build
+	docker compose up dev-server -d --no-deps
+	$(MAKE) update.requirements
 	$(MAKE) run-offline
 
 run-offline: # Runs the dev-server in offline mode
-	docker compose up dev-server -d
-	@printf 'Please wait while the development server starts...\n\n'
-	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
-		sleep 5; \
-	done
-	@echo 'Development server started at port 8181.'
+	$(MAKE) start-devserver
 	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
+
+start-devserver: ## Starts the development server for the tests
+	docker compose up dev-server -d
+	@printf 'Please wait while the development server starts...\n\n'
+	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
+		printf "▓"; \
+		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
+			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
+		fi; \
+		sleep 1; \
+	done
+	@printf '\n\n'
+	@echo 'Development server started at port 8181.'
 
 init: build run-devserver ## Initializes the build and runs dev-server.
 
@@ -80,9 +91,79 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
-run_tests.lints: ## Runs the linter tests
-	docker compose run --no-deps --entrypoint "python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)" dev-server
+run_tests.lint: ## Runs the linter tests
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
 
-run-backend-tests: ## [Not ready for use] Runs the backend tests
-	@echo "Run the backend test on the following module: $(RUN_ARGS)"
-	@echo "Not in use, under construction!"
+run_tests.backend: ## Runs the backend tests
+	$(MAKE) stop
+	docker compose up datastore dev-server redis firebase -d --no-deps
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests started....'
+	@echo '------------------------------------------------------'
+	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests has been executed successfully....'
+	@echo '------------------------------------------------------'
+	$(MAKE) stop
+
+run_tests.frontend: ## Runs the frontend unit tests
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
+
+run_tests.typescript: ## Runs the typescript checks
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
+
+run_tests.custom_eslint: ## Runs the custome eslint tests
+	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
+
+run_tests.mypy: ## Runs mypy checks
+	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
+
+run_tests.check_backend_associated_tests: ## Runs the backend associate tests
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
+
+run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop 
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the acceptance tests.
+	$(MAKE) start-devserver
+	@echo '------------------------------------------------------'
+	@echo '  Starting acceptance test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
+	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
+	@echo '------------------------------------------------------'
+	@echo '  Acceptance test has been executed successfully....'
+	@echo '------------------------------------------------------'
+	$(MAKE) stop
+
+CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+
+run_tests.e2e: ## Runs the e2e tests for the parsed suite
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the e2e tests.
+	$(MAKE) start-devserver
+	@echo '------------------------------------------------------'
+	@echo '  Starting e2e test for the suite: $(suite)'
+	@echo '------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	@echo '------------------------------------------------------'
+	@echo '  e2e test has been executed successfully....'
+	@echo '------------------------------------------------------'
+	$(MAKE) stop
+
+OS_NAME := $(shell uname)
+
+install_node: ## Installs node-16.13.0 in the oppia_tools directory
+	sh ./docker/install_node.sh
