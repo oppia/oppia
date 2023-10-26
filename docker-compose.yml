@@ -88,6 +88,7 @@ services:
     container_name: oppia-cloud-datastore
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - DATASTORE_HOST=datastore
       - save_datastore=${save_datastore:-false}
     volumes:
       - cloud_datastore_emulator_cache:/app/cloud_datastore_emulator_cache

@@ -176,15 +176,6 @@ def main(args: Optional[List[str]] = None) -> int:
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-        print('Installing Mypy and stubs for third party libraries.')
-        return_code, mypy_exec_path = install_mypy_prerequisites(
-            parsed_args.install_globally)
-        if return_code != 0:
-            print('Cannot install Mypy and stubs for third party libraries.')
-            sys.exit(1)
-
-        print('Installed Mypy and stubs for third party libraries.')
-
     mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
 
     print('Starting Mypy type checks.')
