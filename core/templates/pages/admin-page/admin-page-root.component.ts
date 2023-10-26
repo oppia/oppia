@@ -24,19 +24,19 @@ import { PageHeadService } from 'services/page-head.service';
 
 
 @Component({
-    selector: 'oppia-admin-page-root',
-    templateUrl: './admin-page-root.component.html',
+  selector: 'oppia-admin-page-root',
+  templateUrl: './admin-page-root.component.html',
 })
 export class AdminPageRootComponent extends BaseRootComponent {
-    constructor(
-        pageHeadService: PageHeadService,
-        translateService: TranslateService
-    ) {
+  constructor(
+      pageHeadService: PageHeadService,
+      translateService: TranslateService
+  ) {
     super(
-        pageHeadService,
-        translateService,
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE,
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META
+      pageHeadService,
+      translateService,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META
     );
-    }
+  }
 }
