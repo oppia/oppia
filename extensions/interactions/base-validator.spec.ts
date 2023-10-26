@@ -158,7 +158,8 @@ describe('Interaction validator', function() {
         const answerGroups = [
           agof.createNew([], goodOutcomeDest, false, null)
         ];
-        const warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+        const warnings = bivs.getAnswerGroupWarnings(
+          answerGroups, currentState);
         expect(warnings).toEqual([{
           type: WARNING_TYPES.ERROR,
           message:
