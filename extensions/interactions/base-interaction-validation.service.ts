@@ -66,8 +66,8 @@ export class baseInteractionValidationService {
 
     // This does not check the default outcome.
     for (var i = 0; i < answerGroups.length; i++) {
-      let answerGroup = answerGroups[i];
-      let groupId = String(i + 1);
+      const answerGroup = answerGroups[i];
+      const groupId = String(i + 1);
       if (answerGroup.outcome.isConfusing(stateName)) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,

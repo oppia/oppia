@@ -24,6 +24,7 @@
  * tests to ensure it is working properly.
  */
 
+import { AppConstants } from 'app.constants';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // interaction validators is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
@@ -34,7 +35,6 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-import { AppConstants } from 'app.constants';
 
 describe('Interaction validator', function() {
   var bivs, WARNING_TYPES, agof;
@@ -155,10 +155,10 @@ describe('Interaction validator', function() {
       function() {
         goodOutcomeDest.labelledAsCorrect = true;
         goodOutcomeDest.destIfReallyStuck = 'destIfReallyStuck';
-        var answerGroups = [
+        const answerGroups = [
           agof.createNew([], goodOutcomeDest, false, null)
         ];
-        var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+        const warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
           type: WARNING_TYPES.ERROR,
           message:
