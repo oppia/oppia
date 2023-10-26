@@ -55,6 +55,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        console.log(ctrl)
         ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
         ctrl.UserIsTranslationAdmin = false;
@@ -130,7 +131,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 formResponse.username
               ).then((contributionRights) => {
                 if (
-                  ctrl.CD_USER_CATEGORIES.hasOwnProperty(
+                  ctrl.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
                     'REVIEW_TRANSLATION')) {
                   ctrl.contributionReviewersResult = {
                     REVIEW_TRANSLATION: getLanguageDescriptions(
@@ -139,7 +140,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                   };
                 }
                 if (
-                  ctrl.CD_USER_CATEGORIES.hasOwnProperty(
+                  ctrl.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
                     'REVIEW_QUESTION')) {
                   ctrl.contributionReviewersResult.REVIEW_QUESTION = (
                     contributionRights.can_review_questions),
@@ -286,7 +287,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 SUBMIT_QUESTION: CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
               };
             }
-            ctrl.CD_USER_CATEGORIES = {
+            ctrl.CD_USER_RIGHTS_CATEGORIES = {
               ...translationCategories,
               ...questionCategories
             };
