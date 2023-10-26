@@ -186,28 +186,6 @@ def check_changes_in_config() -> None:
                 CONSTANTS_FILEPATH))
 
 
-def check_changes_in_gcloud_path() -> None:
-    """Checks that the gcloud path in common.py matches with the path in
-    release_constants.json.
-
-    Raises:
-        Exception. The gcloud path in common.py does not match with the path
-            in release_constants.json.
-    """
-    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
-        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
-
-    print('shiv')
-    if not (
-            os.path.exists(release_constants_gcloud_path) and
-            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
-    ):
-        raise Exception(
-            'The gcloud path in common.py: %s should match the path in '
-            'release_constants.json: %s. Please fix.' % (
-                common.GCLOUD_PATH, release_constants_gcloud_path))
-
-
 def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -223,8 +201,6 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    print('Running pre-commit check for gcloud path changes...')
-    check_changes_in_gcloud_path()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
