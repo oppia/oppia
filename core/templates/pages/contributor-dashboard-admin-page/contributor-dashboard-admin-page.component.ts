@@ -55,7 +55,6 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        console.log(ctrl)
         ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
         ctrl.UserIsTranslationAdmin = false;
