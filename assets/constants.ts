@@ -6022,7 +6022,7 @@ export default {
   "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "review_question",
   "CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION": "submit_question",
   "CD_USER_RIGHTS_CATEGORIES": [
-    "translation", "question", "submit_question"
+    "review_translation", "review_question", "review_voiceover", "submit_question"
   ],
 
   "SUGGESTIONS_SORT_KEY_DATE": "Date",
