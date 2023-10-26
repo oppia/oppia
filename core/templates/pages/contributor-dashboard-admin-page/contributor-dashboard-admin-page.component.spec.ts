@@ -134,7 +134,7 @@ describe('Contributor dashboard admin page ', function() {
         'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
       const addContributionRightsAction = {
-        category: 'translation',
+        category: 'review_translation',
         isValid: () => true,
         languageCode: 'en',
         username: 'user1'
@@ -156,7 +156,7 @@ describe('Contributor dashboard admin page ', function() {
         'addContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
       const addContributionRightsAction = {
-        category: 'translation',
+        category: 'review_translation',
         isValid: () => true,
         languageCode: 'en',
         username: 'user1'
@@ -175,7 +175,7 @@ describe('Contributor dashboard admin page ', function() {
       'when updating user rights for category translation', fakeAsync(() => {
       ctrl.$onInit();
       // Setting category to be translation.
-      ctrl.formData.addContributionReviewer.category = 'translation';
+      ctrl.formData.addContributionReviewer.category = 'review_translation';
       ctrl.formData.addContributionReviewer.languageCode = 'en';
       ctrl.formData.addContributionReviewer.username = 'user1';
       $scope.$apply();
@@ -189,7 +189,7 @@ describe('Contributor dashboard admin page ', function() {
       'when updating user rights for category voiceover', fakeAsync(() => {
       ctrl.$onInit();
       // Setting category to be voiceover.
-      ctrl.formData.addContributionReviewer.category = 'voiceOver';
+      ctrl.formData.addContributionReviewer.category = 'review_voiceover';
       ctrl.formData.addContributionReviewer.username = 'user1';
       $scope.$apply();
 
@@ -334,7 +334,7 @@ describe('Contributor dashboard admin page ', function() {
         'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
       const removeContributionRightsAction = {
-        category: 'translation',
+        category: 'review_translation',
         isValid: () => true,
         languageCode: 'en',
         method: 'all',
@@ -360,7 +360,7 @@ describe('Contributor dashboard admin page ', function() {
         'removeContributionReviewerAsync')
         .and.returnValue(Promise.resolve(null));
       const removeContributionRightsAction = {
-        category: 'translation',
+        category: 'review_translation',
         isValid: () => true,
         languageCode: 'en',
         method: 'all',
@@ -455,7 +455,7 @@ describe('Contributor dashboard admin page ', function() {
         $scope.$apply();
         // Note that rights is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
-        ctrl.formData.viewContributionReviewers.category = 'voiceOver';
+        ctrl.formData.viewContributionReviewers.category = 'review_voiceover';
         ctrl.formData.viewContributionReviewers.username = 'user1';
         $scope.$apply();
 
@@ -486,7 +486,7 @@ describe('Contributor dashboard admin page ', function() {
         $scope.$apply();
         // Note that rights is filter criterion here.
         ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
-        ctrl.formData.viewContributionReviewers.category = 'translation';
+        ctrl.formData.viewContributionReviewers.category = 'review_translation';
         ctrl.formData.viewContributionReviewers.languageCode = 'en';
         ctrl.formData.viewContributionReviewers.username = 'user1';
         $scope.$apply();
@@ -562,7 +562,7 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.$onInit();
         $scope.$apply();
         // Setting category to translation.
-        ctrl.formData.removeContributionReviewer.category = 'translation';
+        ctrl.formData.removeContributionReviewer.category = 'review_translation';
         ctrl.formData.removeContributionReviewer.languageCode = 'en';
         ctrl.formData.removeContributionReviewer.username = 'user1';
         ctrl.formData.removeContributionReviewer.method = 'specific';
@@ -578,7 +578,7 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.$onInit();
         $scope.$apply();
         // Setting category to voiceover.
-        ctrl.formData.removeContributionReviewer.category = 'voiceOver';
+        ctrl.formData.removeContributionReviewer.category = 'review_voiceover';
         ctrl.formData.removeContributionReviewer.username = 'user1';
         ctrl.formData.removeContributionReviewer.method = 'specific';
         $scope.$apply();
