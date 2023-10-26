@@ -12,4 +12,4 @@ COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 
 RUN npm install -g yarn@1.22.15 --force
-RUN yarn install
+RUN yarn install 
