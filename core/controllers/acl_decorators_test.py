@@ -2557,7 +2557,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_guest_user_cannot_manage_contributors_role(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/translation',
+                '/can_manage_contributors_role/review_translation',
                 expected_status_int=401)
 
         self.assertEqual(
