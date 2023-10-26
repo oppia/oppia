@@ -30,14 +30,16 @@ import { AppConstants } from 'app.constants';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 import { LoggerService } from 'services/contextual/logger.service';
 import { Outcome, OutcomeObjectFactory, } from 'domain/exploration/OutcomeObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Rule } from 'domain/exploration/rule.model';
@@ -104,6 +106,7 @@ export class ResponsesService {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService
@@ -381,6 +384,88 @@ export class ResponsesService {
 
   changeActiveRuleIndex(newIndex: number): void {
     this._activeRuleIndex = newIndex;
+  }
+
+  shouldHideDefaultAnswerGroup(): boolean {
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    let answerGroups = this.getAnswerGroups();
+    // This array contains the text of each of the possible answers
+    // for the interaction.
+    let answerChoices = [];
+    let customizationArgs = (
+      this.stateCustomizationArgsService.savedMemento);
+    let handledAnswersArray: InteractionRuleInputs[] = [];
+
+    if (interactionId === 'MultipleChoiceInput') {
+      let numChoices = this.getAnswerChoices().length;
+      let choiceIndices = [];
+      // Collect all answers which have been handled by at least one
+      // answer group.
+      for (let i = 0; i < answerGroups.length; i++) {
+        for (let j = 0; j < answerGroups[i].rules.length; j++) {
+          handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
+        }
+      }
+      for (let i = 0; i < numChoices; i++) {
+        choiceIndices.push(i);
+      }
+      // We only suppress the default warning if each choice index has
+      // been handled by at least one answer group.
+      return choiceIndices.every((choiceIndex) => {
+        return handledAnswersArray.indexOf(choiceIndex) !== -1;
+      });
+    } else if (interactionId === 'ItemSelectionInput') {
+      let maxSelectionCount = (
+        (customizationArgs as ItemSelectionInputCustomizationArgs)
+          .maxAllowableSelectionCount.value);
+      if (maxSelectionCount === 1) {
+        let numChoices = this.getAnswerChoices().length;
+        // This array contains a list of booleans, one for each answer
+        // choice. Each boolean is true if the corresponding answer has
+        // been covered by at least one rule, and false otherwise.
+        handledAnswersArray = [];
+        for (let i = 0; i < numChoices; i++) {
+          handledAnswersArray.push(false);
+          answerChoices.push(this.getAnswerChoices()[i].val);
+        }
+
+        let answerChoiceToIndex:
+         Record<string, number> = {};
+        answerChoices.forEach((answerChoice, choiceIndex) => {
+          answerChoiceToIndex[answerChoice as string] = choiceIndex;
+        });
+
+        answerGroups.forEach((answerGroup) => {
+          let rules = answerGroup.rules;
+          rules.forEach((rule) => {
+            let ruleInputs = rule.inputs.x;
+            Object.keys(ruleInputs).forEach((ruleInput) => {
+              let choiceIndex = answerChoiceToIndex[ruleInput];
+              if (rule.type === 'Equals' ||
+                  rule.type === 'ContainsAtLeastOneOf') {
+                handledAnswersArray[choiceIndex] = true;
+              } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
+                for (let i = 0; i < handledAnswersArray.length; i++) {
+                  if (i !== choiceIndex) {
+                    handledAnswersArray[i] = true;
+                  }
+                }
+              }
+            });
+          });
+        });
+
+        let areAllChoicesCovered = handledAnswersArray.every(
+          (handledAnswer) => {
+            return handledAnswer;
+          });
+        // We only suppress the default warning if each choice text has
+        // been handled by at least one answer group, based on rule
+        // type.
+        return areAllChoicesCovered;
+      }
+    }
+    return false;
   }
 
   updateAnswerGroup(

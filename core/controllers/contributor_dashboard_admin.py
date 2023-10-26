@@ -27,6 +27,7 @@ from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import user_domain
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict, Union
@@ -368,12 +369,14 @@ class ContributionRightsDataHandler(
         user_rights = (
             user_services.get_user_contribution_rights(user_id))
         response: Dict[str, Union[List[str], bool]] = {}
-        if feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles or
+            feconf.ROLE_ID_TRANSLATION_COORDINATOR in self.roles):
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes)
             }
-        if feconf.ROLE_ID_QUESTION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_QUESTION_ADMIN in self.roles or
+            feconf.ROLE_ID_QUESTION_COORDINATOR in self.roles):
             response.update({
                 'can_review_questions': user_rights.can_review_questions,
                 'can_submit_questions': user_rights.can_submit_questions
@@ -784,8 +787,8 @@ class CommunityContributionStatsHandler(
 
 
 def get_translation_coordinator_frontend_dict(
-    backend_stats: List[suggestion_registry.TranslationCoordinatorStats]
-) -> List[suggestion_registry.TranslationCoordinatorStatsDict]:
+    backend_stats: List[user_domain.TranslationCoordinatorStats]
+) -> List[user_domain.TranslationCoordinatorStatsDict]:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 

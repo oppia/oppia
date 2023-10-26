@@ -25,6 +25,7 @@ import { VolunteerPageComponent } from './volunteer-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PageTitleService } from 'services/page-title.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -38,7 +39,10 @@ describe('Volunteer page', () => {
   let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [VolunteerPageComponent],
+      declarations: [
+        VolunteerPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
         UrlInterpolationService,
         NgbCarouselConfig,

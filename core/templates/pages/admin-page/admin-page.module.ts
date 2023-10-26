@@ -31,6 +31,7 @@ import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 import { AdminPageComponent } from './admin-page.component';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
+import { TranslationCoordinatorRoleEditorModalComponent } from './roles-tab/translation-coordinator-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
@@ -67,7 +68,8 @@ import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-pag
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
     Error404PageComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    TranslationCoordinatorRoleEditorModalComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -79,7 +81,9 @@ import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-pag
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
     Error404PageComponent,
+    TranslationCoordinatorRoleEditorModalComponent
   ],
 })
+
 export class AdminPageModule {
 }

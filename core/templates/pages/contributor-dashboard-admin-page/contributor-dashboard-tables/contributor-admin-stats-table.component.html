@@ -1,16 +1,37 @@
 <div class="example-container">
-  <div *ngIf="loadingMessage">
+  <div *ngIf="loadingMessage && !noDataMessage" class="e2e-test-loading-message">
     <div class="oppia-align-center">
       <span>{{ loadingMessage }}</span>
       <loading-dots></loading-dots>
+    </div>
+  </div>
+  <div *ngIf="!loadingMessage && noDataMessage" class="e2e-test-no-data-message">
+    <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
+    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+      <mat-card layout="row" class="oppia-mat-card">
+        <div class="translation-reviewer stats-card" tabindex="0">
+          <h2>{{ noDataMessage }}</h2>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+    <div class="dashboard-list-header-count">
+      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+    </div>
+    <div class="results-per-page-div">
+      <span>Results per page: </span>
+      <select [(ngModel)]="itemsPerPage" aria-label="Results Per Page" (change)="refreshPagination()">
+        <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+      </select>
     </div>
   </div>
   <table mat-table
          [dataSource]="dataSource"
          multiTemplateDataRows
          [class.isMobile]="true"
-         class="mat-elevation-z8"
-         *ngIf="!loadingMessage">
+         class="mat-elevation-z8 e2e-test-stats-table"
+         *ngIf="!loadingMessage && !noDataMessage">
 
     <ng-container matColumnDef="contributorName">
       <th mat-header-cell *matHeaderCellDef class="user-header"><b> User </b></th>
@@ -114,7 +135,9 @@
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-raised-button disabled>EDIT</button>
+        <button mat-raised-button (click)="openRoleEditor(element.contributorName)">
+          {{ checkMobileView() ? 'EDIT ROLE' : 'EDIT' }}
+        </button>
       </td>
     </ng-container>
 
@@ -140,19 +163,12 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="mobile-role" *ngIf="checkMobileView()">
-      <th mat-header-cell *matHeaderCellDef><b> </b></th>
-      <td mat-cell *matCellDef="let element">
-        <button mat-raised-button disabled>EDIT ROLE</button>
-      </td>
-    </ng-container>
-
     <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
     <ng-container matColumnDef="expandedDetail">
       <td mat-cell
           *matCellDef="let element"
           [attr.colspan]="columnsToDisplay.length">
-        <div class="example-element-detail"
+        <div class="example-element-detail e2e-test-expanded-row"
              [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
           <div class="details-container"
                *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
@@ -295,7 +311,7 @@
               <div class="attribute-container">
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value">
+                  <div class="attribute-value e2e-test-topic-names">
                     {{ element.topicsWithQuestionSubmissions ? element.topicsWithQuestionSubmissions.join(', ') : 'No topics available' }}
                   </div>
                 </div>
@@ -344,7 +360,9 @@
                 <div class="attribute-sub-container">
                   <div class="attribute-key">Active Topics</div>
                   <div class="attribute-value">
-                    {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
+                    <span class="e2e-test-topic-names">
+                      {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -357,28 +375,64 @@
     <b><tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr></b>
     <tr mat-row
         *matRowDef="let element; columns: columnsToDisplay"
-        class="example-element-row"
+        class="example-element-row e2e-test-stats-list-item"
         [class.example-expanded-row]="expandedElement === element"
         (click)="expandedElement = expandedElement === element ? null : element">
     </tr>
-    <div *ngIf="checkMobileView()">
-      <tr mat-row *matRowDef="let element; columns: ['mobile-role']" class="mobile-edit-role"></tr>
-    </div>
     <tr mat-row
         *matRowDef="let row; columns: ['expandedDetail']"
         class="example-detail-row">
     </tr>
   </table>
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !checkMobileView()">
+    <div class="dashboard-list-footer-count">
+      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+    </div>
+    <div class="dashboard-list-pagination">
+      <div>
+        <i class="fa fa-angle-left stats-pagination-arrow" (click)="navigatePage(MOVE_TO_PREV_PAGE)" *ngIf="statsPageNumber > 0"></i>
+        <span class="dashboard-list-pagination-value">
+          <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
+        </span>
+        <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
+      </div>
+      <div>
+        <span>Results per page: </span>
+        <select [(ngModel)]="itemsPerPage" aria-label="Results Per Page" (change)="refreshPagination()">
+          <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+    <div class="navigate-page-div">
+      <i class="fa fa-angle-left stats-pagination-arrow" (click)="navigatePage(MOVE_TO_PREV_PAGE)" *ngIf="statsPageNumber > 0"></i>
+      <span class="dashboard-list-pagination-value">
+        <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
+      </span>
+      <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
+    </div>
+  </div>
 </div>
 
 <style>
+  .stats-pagination-arrow {
+    cursor: pointer;
+  }
   .oppia-align-center {
     font-size: 2em;
     width: 960px;
   }
+  .mat-raised-button {
+    border: transparent;
+    box-shadow: 0;
+    color: #00645c;
+  }
+  .mat-raised-button:not {
+    box-shadow: 0;
+  }
 
   table {
-    margin: 10px;
     max-width: 960px;
   }
 
@@ -511,8 +565,70 @@
     border-top-left-radius: 5px;
     width: 50px;
   }
+  .dashboard-list-footer {
+    background: #fff;
+    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px 20px;
+  }
+  .dashboard-list-header {
+    background: #fff;
+    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+    color: #333;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px 20px;
+  }
+  .dashboard-list-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+  }
+  .dashboard-list-pagination-value {
+    font-size: 16px;
+    outline: none;
+    padding: 0 4px;
+  }
+  .dashboard-list-pagination-active {
+    background-color: #00645c;
+    border-radius: 5px;
+    box-shadow: 0 3px 3px #707070;
+    color: #fff;
+    display: inline-block;
+    font-size: 16px;
+    height: 23px;
+    outline: none;
+    padding: 0 4px;
+    text-align: center;
+    width: 23px;
+  }
+  .dashboard-list-pagination-active span {
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+  }
+  select {
+    background: transparent;
+    border: transparent;
+    color: #00645c;
+    padding: 0 5px 0;
+  }
 
   @media only screen and (max-width: 800px) {
+    .dashboard-list-footer {
+      color: #333;
+      justify-content: center;
+      padding: 10px 10px;
+      width: -webkit-fill-available;
+    }
+    .dashboard-list-header {
+      padding: 10px 10px;
+      width: -webkit-fill-available;
+    }
     .mobile-chevron {
       padding-left: 50%;
     }
@@ -552,6 +668,7 @@
     .example-container {
       align-items: baseline;
       display: flex;
+      flex-direction: column;
       justify-content: space-around;
     }
 

@@ -141,7 +141,27 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids: List[str],
         ordered_nodes: List[story_domain.StoryNode]
     ) -> Tuple[List[str], Optional[str], List[str]]:
-        """Records node completion."""
+        """Records node completion.
+
+        Args:
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+            completed_node_ids: List[str]. A list of IDS of completed nodes.
+            ordered_nodes: List[story_domain.StoryNode]. A list of story
+                nodes in order.
+
+        Returns:
+            3-Tuple(next_exp_ids, next_node_id, completed_node_ids). Where:
+                next_exp_ids: List[str]. The next_exp_ids list contains
+                    the exploration IDs of the next node(s) to be explored
+                next_node_id: str. The ID of the next node to be explored.
+                completed_node_ids: List[str]. An updated list of IDS that
+                    represents all the nodes the user has completed.
+
+        Raises:
+            PageNotFoundException. The new structure viewer updates are
+                not enabled, or the provided story_id or node_id is invalid.
+        """
         assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException

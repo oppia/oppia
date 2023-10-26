@@ -24,9 +24,10 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -281,8 +282,10 @@ class BlogPostHandler(
 
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
-        max_no_of_tags = config_domain.Registry.get_config_property(
-            'max_number_of_tags_assigned_to_blog_post', strict=True).value
+        max_no_of_tags = platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+        )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         blog_post_dict = blog_post.to_dict()
