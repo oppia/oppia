@@ -562,7 +562,8 @@ describe('Contributor dashboard admin page ', function() {
         ctrl.$onInit();
         $scope.$apply();
         // Setting category to translation.
-        ctrl.formData.removeContributionReviewer.category = 'review_translation';
+        ctrl.formData.removeContributionReviewer.category =
+          'review_translation';
         ctrl.formData.removeContributionReviewer.languageCode = 'en';
         ctrl.formData.removeContributionReviewer.username = 'user1';
         ctrl.formData.removeContributionReviewer.method = 'specific';
