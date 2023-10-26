@@ -45,7 +45,6 @@ from typing import Dict, Final, List, Optional, Tuple, Type
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -519,6 +518,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """
+    print('Make sure that you have docker engine running so that the tests can execute successfully.\n')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
