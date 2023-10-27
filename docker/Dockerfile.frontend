@@ -11,5 +11,6 @@ RUN apt-get update -y && apt-get upgrade -y \
 COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 
+COPY yarn.lock .
 RUN npm install -g yarn@1.22.15 --force
-RUN yarn install
+RUN yarn install --pure-lockfile
