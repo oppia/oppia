@@ -16,7 +16,7 @@
  * @fileoverview Component for the Customize Interaction Modal Component.
  */
 
-import { AfterContentChecked, ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, Injector, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
@@ -58,6 +58,7 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 type DefaultCustomizationArg = (
   DefaultValueHtml[] |
@@ -151,10 +152,14 @@ export class CustomizeInteractionModalComponent
   customizationModalReopened: boolean;
   isinteractionOpen: boolean;
 
+  @ViewChild('customizeInteractionHeader')
+    customizeInteractionHeader!: ElementRef;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
+    private focusManagerService: FocusManagerService,
     private injector: Injector,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
     private interactionObjectFactory: InteractionObjectFactory,
@@ -251,6 +256,9 @@ export class CustomizeInteractionModalComponent
     }
 
     this.stateCustomizationArgsService.onSchemaBasedFormsShown.emit();
+    setTimeout(() => {
+      this.customizeInteractionHeader.nativeElement.focus();
+    });
   }
 
   returnToInteractionSelector(): void {
@@ -421,6 +429,10 @@ export class CustomizeInteractionModalComponent
 
   ngAfterContentChecked(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  ngAfterViewInit(): void {
+    this.focusManagerService.setFocus('chooseInteractionHeader');
   }
 
   ngOnInit(): void {

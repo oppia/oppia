@@ -1,15 +1,17 @@
 <div class="oppia-interaction-header-container">
   <div class="modal-header oppia-modal-header"
        [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
-    <h3 *ngIf="!stateInteractionIdService.displayed">
+    <h3 tabindex="0" *ngIf="!stateInteractionIdService.displayed" [oppiaFocusOn]="chooseInteractionHeader">
       Choose Interaction
     </h3>
 
     <h3 class="oppia-customization-header"
+        tabindex="0"
+        #customizeInteractionHeader
         *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
       Customize Interaction ({{ getTitle(stateInteractionIdService.displayed) }})
     </h3>
-    <i class="fa fa-times" (click)="cancel()"></i>
+    <i class="fa fa-times" aria-label="close" (click)="cancel()" (keydown.enter)="cancel()" tabindex="0"></i>
   </div>
 </div>
 
@@ -34,7 +36,7 @@
                  placement="bottom"
                  tabindex="0"
                  triggers="mouseenter:mouseleave">
-              <button class="oppia-interaction-card">
+              <button class="oppia-interaction-card" tabindex="-1">
                 <img [src]="getInteractionThumbnailImageUrl(interactionId)">
                 <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
                   {{ getTitle(interactionId) }}
@@ -53,6 +55,7 @@
     <div class="e2e-test-multiple-options"
          *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
+           tabindex="0"
            class="oppia-interaction-customization-label">
         {{ customizationArgSpec.description }}
       </div>
