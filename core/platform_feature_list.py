@@ -79,7 +79,8 @@ DEV_FEATURES_LIST = [
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST: List[FeatureNames] = [
-    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
