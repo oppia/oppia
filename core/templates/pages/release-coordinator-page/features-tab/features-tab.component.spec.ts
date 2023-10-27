@@ -104,7 +104,7 @@ describe('Release coordinator page feature tab', function() {
           force_enable_for_all_users: false,
           rollout_percentage: 0,
           user_group_ids: [],
-          last_updated: '19 September 2023'
+          last_updated: null
         })
       ],
       serverStage: 'dev'
@@ -145,6 +145,76 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
+  describe('.getLastUpdatedDate', () => {
+    it('should return the string when the feature has not been ' +
+    'updated yet', (() => {
+      expect(component.getLastUpdatedDate(
+        component.featureFlags[0])).toEqual(
+          'The feature has not been updated yet.');
+    }));
+
+    it('should return the human readable last updated string from date-time ' +
+    'object string', () => {
+      let featureFlag = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.PROD,
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 0,
+        user_group_ids: [],
+        last_updated: '08/17/2023, 15:30:45:123456'
+      });
+
+      expect(component.getLastUpdatedDate(featureFlag)).toEqual(
+        '17 Aug 2023');
+    });
+  });
+
+  describe('.getFeatureStageString()', () => {
+    it('should return text for dev feature stage', () => {
+      expect(component.getFeatureStageString(
+        component.featureFlags[0])).toBe(
+          'Dev (can only be enabled on dev server).');
+    });
+
+    it('should return text for test feature stage', () => {
+      let featureFlagTestStage = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.TEST,
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 0,
+        user_group_ids: [],
+        last_updated: null
+      });
+      expect(component.getFeatureStageString(
+        featureFlagTestStage)).toBe(
+          'Test (can only be enabled on dev and test server).');
+    });
+
+    it('should return text for prod feature stage', () => {
+      let featureFlagProdStage = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.PROD,
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 0,
+        user_group_ids: [],
+        last_updated: null
+      });
+      expect(component.getFeatureStageString(
+        component.featureFlags[0])).toBe(
+          'Prod (can only be enabled on dev, test and prod server).');
+    });
+
+    it('should return text for unknown feature stage', () => {
+      let feature = component.featureFlags[0];
+      feature.serverStage = 'unknown';
+      expect(component.getFeatureStageString(
+        )).toBe('Unknown feature stage.');
+    });
+  });
+
   describe('.getFeatureValidOnCurrentServer', () => {
     let featureFlagDevStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
@@ -153,7 +223,7 @@ describe('Release coordinator page feature tab', function() {
       force_enable_for_all_users: false,
       rollout_percentage: 0,
       user_group_ids: [],
-      last_updated: '19 September 2023'
+      last_updated: null
     });
 
     let featureFlagProdStage = FeatureFlag.createFromBackendDict({
@@ -163,7 +233,7 @@ describe('Release coordinator page feature tab', function() {
       force_enable_for_all_users: false,
       rollout_percentage: 0,
       user_group_ids: [],
-      last_updated: '19 September 2023'
+      last_updated: null
     });
 
     afterEach(() => {
@@ -390,12 +460,11 @@ describe('Release coordinator page feature tab', function() {
       const featureFlag = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
         feature_stage: FeatureStage.DEV,
-        is_feature: true,
         name: 'invalid',
         force_enable_for_all_users: false,
         rollout_percentage: 0,
         user_group_ids: [],
-        last_updated: '19 September 2023'
+        last_updated: null
       });
 
       expect(() => {
@@ -414,7 +483,7 @@ describe('Release coordinator page feature tab', function() {
           force_enable_for_all_users: false,
           rollout_percentage: 0,
           user_group_ids: [],
-          last_updated: '19 September 2023'
+          last_updated: null
         })
       );
 
@@ -431,7 +500,7 @@ describe('Release coordinator page feature tab', function() {
             force_enable_for_all_users: false,
             rollout_percentage: 110,
             user_group_ids: [],
-            last_updated: '19 September 2023'
+            last_updated: null
           })
         );
 

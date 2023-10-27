@@ -92,6 +92,43 @@ export class FeaturesTabComponent implements OnInit {
     };
   }
 
+  getLastUpdatedDate(feature: FeatureFlag): string {
+    if (feature.lastUpdated === null) {
+      return 'The feature has not been updated yet.';
+    }
+
+    const dateParts = feature.lastUpdated.split(', ')[0].split('/');
+    const timeParts = feature.lastUpdated.split(', ')[1].split(':');
+
+    const year = parseInt(dateParts[2], 10);
+    const month = parseInt(dateParts[0], 10) - 1;
+    const day = parseInt(dateParts[1], 10);
+    const hour = parseInt(timeParts[0], 10);
+    const minute = parseInt(timeParts[1], 10);
+    const second = parseInt(timeParts[2], 10);
+    const millisecond = parseInt(timeParts[3], 10);
+
+    const parsedDate = new Date(
+      year, month, day, hour, minute, second, millisecond);
+
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric'
+    };
+    return parsedDate.toLocaleDateString(undefined, options);
+  }
+
+  getFeatureStageString(feature: FeatureFlag): string {
+    if (feature.featureStage === 'dev') {
+      return 'Dev (can only be enabled on dev server).'
+    } else if (feature.featureStage === 'test') {
+      return 'Test (can only be enabled on dev and test server).'
+    } else if (feature.featureStage === 'prod') {
+      return 'Prod (can only be enabled on dev, test and prod server).'
+    } else {
+      return 'Unknown feature stage.'
+    }
+  }
+
   getFeatureValidOnCurrentServer(feature: FeatureFlag): boolean {
     if (this.serverStage === this.DEV_SERVER_STAGE) {
       return true;

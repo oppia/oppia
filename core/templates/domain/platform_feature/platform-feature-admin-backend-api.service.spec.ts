@@ -116,15 +116,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const newRules = [
-        PlatformParameterRule.createFromBackendDict({
-          filters: [],
-          value_when_matched: false
-        })
-      ];
-
       featureAdminService.updateFeatureFlag(
-        'feature_name', 'update message', newRules
+        'feature_name', true, 0, []
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -143,15 +136,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    const newRules = [
-      PlatformParameterRule.createFromBackendDict({
-        filters: [],
-        value_when_matched: false
-      })
-    ];
-
     featureAdminService.updateFeatureFlag(
-      'feature_name', 'update message', newRules
+      'feature_name', true, 0, []
     ).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

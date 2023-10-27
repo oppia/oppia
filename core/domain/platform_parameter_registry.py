@@ -378,96 +378,11 @@ class Registry:
 
 
 # Platform parameters should all be defined below.
-Registry.create_feature_flag(
-    ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-    'This is a dummy feature flag for the e2e tests.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
 Registry.create_platform_parameter(
     ParamNames.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
     platform_parameter_domain.DataTypes.STRING
 )
-
-Registry.create_feature_flag(
-    ParamNames.END_CHAPTER_CELEBRATION,
-    'This flag is for the end chapter celebration feature.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.CHECKPOINT_CELEBRATION,
-    'This flag is for the checkpoint celebration feature.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    'This flag enables showing per-contributor accomplishments on the' +
-    ' contributor dashboard.',
-    platform_parameter_domain.FeatureStages.PROD,
-)
-
-Registry.create_feature_flag(
-    ParamNames.ANDROID_BETA_LANDING_PAGE,
-    'This flag is for Android beta promo landing page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.BLOG_PAGES,
-    'This flag is for blog home page, blog author profile page and blog post' +
-    ' page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.DIAGNOSTIC_TEST,
-    'This flag is for the diagnostic test functionality.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    'This flag is for serial chapter launch feature and making changes only' +
-    'in the curriculum admin view.',
-    platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
-    'This flag is for serial chapter launch feature and making changes only' +
-    'in the learner view.',
-    platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    'This flag is to show redesigned learner dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.SHOW_TRANSLATION_SIZE,
-    'This flag is to show translation size on translation cards in' +
-    'contributor dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    'This flag is to show feedback updates in the' +
-    'profile pic drop-down menu.',
-     platform_parameter_domain.FeatureStages.DEV)
-
-Registry.create_feature_flag(
-    ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
-    'This flag is to show new contributor admin dashboard.',
-    platform_parameter_domain.FeatureStages.TEST)
-
-Registry.create_feature_flag(
-    ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
-    'Exposes the Improvements Tab for creators in the exploration editor.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.LEARNER_GROUPS_ARE_ENABLED,
-    'Enable learner groups feature',
-    platform_parameter_domain.FeatureStages.PROD)
 
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,

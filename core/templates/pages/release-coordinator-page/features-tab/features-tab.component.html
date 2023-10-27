@@ -1,13 +1,6 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
-<div class="save-default-values-button">
-  <button
-          class="btn btn-primary"
-          (click)="saveDefaultValueToStorage()">
-    Save default values to storage
-  </button>
-</div>
 <div *ngFor="let featureFlag of featureFlags;">
-  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-admin-features e2e-test-feature-flag">
+  <div *ngIf="getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features e2e-test-feature-flag">
     <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
     <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Description:</b></div>
@@ -15,37 +8,52 @@
     </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Feature Stage:</b></div>
-      <div class="col-10">{{featureFlag.featureStage}}</div>
+      <div class="col-10">{{ getFeatureStageString(featureFlag) }}</div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Force enable for all users:</b></div>
+      <div class="col-2"><b>Force-enable for all users:</b></div>
       <div class="col-10">
         <div>
-          <select [(ngModel)]="featureFlag.defaultValue">
+          <select [(ngModel)]="featureFlag.forceEnableForAllUsers">
             <option [ngValue]="true">Yes</option>
             <option [ngValue]="false">No</option>
           </select>
         </div>
         <div>
-          <small><i>Setting this to "Yes" will force enable the feature for all the users, both <b>logged-in</b> and <b>logged-out</b>. Setting this property will disable the effect of all the other properties and enable the feature for all the users.</i></small>
+          <small><i>Setting this to "Yes" will force-enable the feature for all the users, both <b>logged-in</b> and <b>logged-out</b>. Setting this property will disable the effect of all the other properties and enable the feature for all the users.</i></small>
         </div>
       </div>
     </div>
     <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Rollout percentage for logged-in users:</b></div>
+      <div class="col-2"><b>Rollout percentage for logged-in users (0-100):</b></div>
       <div class="col-10">
-        <schema-based-editor [schema]="getSchema()" [(ngModel)]="featureFlag.rolloutPercentage">
-        </schema-based-editor>
+        <div class="row">
+          <div class="col-3">
+            <schema-based-editor [disabled]="featureFlag.forceEnableForAllUsers" [schema]="getSchema()" [(ngModel)]="featureFlag.rolloutPercentage">
+            </schema-based-editor>
+          </div>
+          <div class="col-1">
+            <div class="d-flex flex-column">
+              <div *ngIf="featureFlag.forceEnableForAllUsers" class="mb-2" matTooltip="This value is not applied if the feature is force-enabled for all users (see above)." matTooltipPosition="right">
+                <i class="fas fa-info-circle practice-tab-info-circle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
         <div>
           <small><i>This feature will only be enabled for the above percentage of <b>logged-in</b> users. We recommend rolling out the feature to logged-in users first, and once we are sure that doing so doesn't break anything, extending it to logged-out users as well using the "Force-enable for all users" control below.</i></small>
         </div>
       </div>
     </div>
+    <div class="row oppia-feature-top-margin">
+      <div class="col-2"><b>Last Updated:</b></div>
+      <div class="col-10">{{ getLastUpdatedDate(featureFlag) }}</div>
+    </div>
     <div class="row oppia-control-buttons-container oppia-feature-top-margin">
       <!-- Control Buttons -->
       <button
               class="btn btn-primary e2e-test-save-button"
-              (click)="updateFeatureRulesAsync(featureFlag)"
+              (click)="updateFeatureFlag(featureFlag)"
               [disabled]="!isFeatureFlagChanged(featureFlag)">
         Save
       </button>
@@ -60,7 +68,7 @@
 </div>
 
 <div *ngFor="let featureFlag of featureFlags;">
-  <div *ngIf="!getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-admin-features">
+  <div *ngIf="!getFeatureValidOnCurrentServer(featureFlag)" class="container oppia-page-card oppia-long-text oppia-features">
     <div class="oppia-feature-configuration-warning">
       <i class="material-icons oppia-feature-configuration-warning-icon">&#xe002;</i>
       This feature flag is in {{featureFlag.featureStage}} stage, and cannot be configured on this server (which is in {{serverStage}} server mode).
@@ -73,8 +81,8 @@
   </div>
 </div>
 
-<div *ngIf="featureFlags.length === 0 && featureFlagsAreFetched" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator e2e-test-no-feature">
-  No platform features are available.
+<div *ngIf="featureFlags.length === 0 && featureFlagsAreFetched" class="oppia-page-card oppia-long-text oppia-features oppia-empty-indicator e2e-test-no-feature">
+  No features flags are available.
 </div>
 
 <div *ngIf="dummyFeatureFlagForE2eTestsIsEnabled" class="oppia-dev-mode e2e-test-angular-dummy-feature-indicator">
@@ -84,15 +92,6 @@
 
 
 <style>
-  .save-default-values-button {
-    align-items: center;
-    display: flex;
-    float: right;
-    font-size: 12px;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-
   .oppia-feature-configuration-warning-icon {
     color: #827127;
   }
@@ -106,23 +105,23 @@
     padding-left: 0.25rem;
   }
 
-  .oppia-admin-features .oppia-flex-center {
+  .oppia-features .oppia-flex-center {
     align-items: center;
     display: flex;
     justify-content: center;
   }
 
-  .oppia-admin-features .oppia-flex-horizon-center {
+  .oppia-features .oppia-flex-horizon-center {
     display: flex;
     justify-content: center;
   }
 
-  .oppia-admin-features .oppia-flex-vertical-center {
+  .oppia-features .oppia-flex-vertical-center {
     align-items: center;
     display: flex;
   }
 
-  .oppia-admin-features .oppia-control-buttons-container {
+  .oppia-features .oppia-control-buttons-container {
     align-items: center;
     border-top: 1px solid #dee2e6;
     display: flex;
@@ -130,11 +129,11 @@
     padding-top: 10px;
   }
 
-  .oppia-admin-features .oppia-control-buttons-container button {
+  .oppia-features .oppia-control-buttons-container button {
     margin-left: 5px;
   }
 
-  .oppia-admin-features .oppia-conjunction-indicator {
+  .oppia-features .oppia-conjunction-indicator {
     align-items: center;
     display: flex;
     font-size: 12px;
@@ -144,23 +143,23 @@
     width: 100%;
   }
 
-  .oppia-admin-features .oppia-conjunction-indicator > .horizontal-line {
+  .oppia-features .oppia-conjunction-indicator > .horizontal-line {
     border-bottom: 1px dotted #dee2e6;
     flex-grow: 1;
     height: 0;
   }
 
-  .oppia-admin-features .oppia-input-error {
+  .oppia-features .oppia-input-error {
     margin-left: 15px;
     position: relative;
   }
 
-  .oppia-admin-features .oppia-input-error .input-error-symbol {
+  .oppia-features .oppia-input-error .input-error-symbol {
     color: #ff6347;
     font-weight: bold;
   }
 
-  .oppia-admin-features .oppia-input-error .tooltip {
+  .oppia-features .oppia-input-error .tooltip {
     background-color: #f5f5f5;
     border: 1px solid #ff6347;
     border-radius: 3px;
@@ -173,54 +172,54 @@
     width: 200px;
   }
 
-  .oppia-admin-features .oppia-input-error:hover .tooltip {
+  .oppia-features .oppia-input-error:hover .tooltip {
     display: inherit;
     opacity: 1;
   }
 
-  .oppia-admin-features .oppia-feature-top-margin {
+  .oppia-features .oppia-feature-top-margin {
     margin-top: 10px;
   }
 
-  .oppia-admin-features .oppia-feature-bottom-margin {
+  .oppia-features .oppia-feature-bottom-margin {
     margin-bottom: 15px;
   }
 
-  .oppia-admin-features .oppia-feature-name {
+  .oppia-features .oppia-feature-name {
     border-bottom: 1px solid #dee2e6;
   }
 
-  .oppia-admin-features .oppia-description-content {
+  .oppia-features .oppia-description-content {
     overflow-wrap: anywhere;
   }
 
-  .oppia-admin-features .oppia-condition-container {
+  .oppia-features .oppia-condition-container {
     align-items: center;
     display: flex;
     justify-content: space-around;
   }
 
-  .oppia-admin-features .oppia-filter-container {
+  .oppia-features .oppia-filter-container {
     border: 1px solid #dee2e6;
     padding-bottom: 10px;
     padding-top: 10px;
   }
 
-  .oppia-admin-features .oppia-rule-container {
+  .oppia-features .oppia-rule-container {
     border: 1px solid #a8a8a8;
     padding-bottom: 10px;
     padding-top: 10px;
   }
 
-  .oppia-admin-features.oppia-empty-indicator {
+  .oppia-features.oppia-empty-indicator {
     max-width: 1050px;
   }
 
-  .oppia-admin-features .oppia-condition-input {
+  .oppia-features .oppia-condition-input {
     max-width: 100px;
   }
 
-  .oppia-admin-features .oppia-rule-moving-buttons-container {
+  .oppia-features .oppia-rule-moving-buttons-container {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -228,7 +227,7 @@
     padding: 1px
   }
 
-  .oppia-admin-features .admin-note {
+  .oppia-features .admin-note {
     display: flex;
     font-weight: bold;
     justify-content: center;

@@ -29,7 +29,7 @@ export interface FeatureFlagBackendDict {
   'force_enable_for_all_users': boolean;
   'rollout_percentage': number;
   'user_group_ids': string[];
-  'last_updated': string;
+  'last_updated': string | null;
 }
 
 /**
@@ -45,7 +45,7 @@ export class FeatureFlag {
   forceEnableForAllUsers: boolean;
   rolloutPercentage: number;
   userGroupIds: string[];
-  lastUpdated: string;
+  lastUpdated: string | null;
 
   constructor(
       name: string, description: string, featureStage: FeatureStage,

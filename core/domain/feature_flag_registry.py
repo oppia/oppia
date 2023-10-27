@@ -21,6 +21,7 @@ from __future__ import annotations
 import enum
 
 from core import utils
+from core import platform_feature_list
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.platform import models
@@ -32,6 +33,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
+
+FeatureNames = platform_feature_list.FeatureNames
 
 
 class Registry:
@@ -237,3 +240,89 @@ class Registry:
                 feature.user_group_ids
             )
         return model_instance
+
+
+Registry.create_feature_flag(
+    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+    'This is a dummy feature flag for the e2e tests.',
+    feature_flag_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    FeatureNames.END_CHAPTER_CELEBRATION,
+    'This flag is for the end chapter celebration feature.',
+    feature_flag_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    FeatureNames.CHECKPOINT_CELEBRATION,
+    'This flag is for the checkpoint celebration feature.',
+    feature_flag_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    'This flag enables showing per-contributor accomplishments on the' +
+    ' contributor dashboard.',
+    feature_flag_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    FeatureNames.ANDROID_BETA_LANDING_PAGE,
+    'This flag is for Android beta promo landing page.',
+    feature_flag_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    FeatureNames.BLOG_PAGES,
+    'This flag is for blog home page, blog author profile page and blog post' +
+    ' page.',
+    feature_flag_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    FeatureNames.DIAGNOSTIC_TEST,
+    'This flag is for the diagnostic test functionality.',
+    feature_flag_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the curriculum admin view.',
+    feature_flag_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the learner view.',
+    feature_flag_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    'This flag is to show redesigned learner dashboard.',
+    feature_flag_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    FeatureNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in' +
+    'contributor dashboard.',
+    feature_flag_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
+    'This flag is to show feedback updates in the' +
+    'profile pic drop-down menu.',
+     feature_flag_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    'This flag is to show new contributor admin dashboard.',
+    feature_flag_domain.FeatureStages.TEST)
+
+Registry.create_feature_flag(
+    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    feature_flag_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
+    'Enable learner groups feature',
+    feature_flag_domain.FeatureStages.PROD)

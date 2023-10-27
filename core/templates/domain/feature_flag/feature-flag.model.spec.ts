@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for FeatureFlagModel.
  */
 
-import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
+import { FeatureFlag, FeatureStage } from 'domain/feature_flag/feature-flag.model';
 
 describe('FeatureFlagModel', () => {
   it('should create an instance from a backend dict.', () => {
     const feature = FeatureFlag.createFromBackendDict({
       name: 'feature name',
       description: 'This is a feature for test.',
-      feature_stage: 'dev',
+      feature_stage: FeatureStage.DEV,
       force_enable_for_all_users: true,
       rollout_percentage: 0,
       user_group_ids: [],
