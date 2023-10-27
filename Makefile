@@ -164,6 +164,52 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
+## Flag for Lighthouse test
+## shard: The shard number to run the lighthouse tests
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the lighthouse tests.
+	$(MAKE) start-devserver
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
+	$(MAKE) stop
+
+run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
+## Flag for Lighthouse test
+## shard: The shard number to run the lighthouse tests
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+# Adding node to the path.
+	@if [ "$(OS_NAME)" = "Windows" ]; then \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
+	else \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
+	fi
+# Starting the development server for the lighthouse tests.
+	$(MAKE) start-devserver
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
+	@echo '-----------------------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096
+	@echo '-----------------------------------------------------------------------'
+	@echo '  Lighthouse tests has been executed successfully....'
+	@echo '-----------------------------------------------------------------------'
+	$(MAKE) stop
+
 OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory

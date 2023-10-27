@@ -76,6 +76,7 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - uses: ./.github/actions/merge
+      # Installing python dependencies becuase we are executing a python script for installing chrome in CI.
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -132,6 +133,7 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
+      # Installing python dependencies becuase we are executing a python script for installing chrome in CI.
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
@@ -144,15 +146,14 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Start dev-server
+      - name: Initializing Containers
         run: |
           sudo make build
-          sudo make run-devserver
+          sudo docker compose up angular-build -d
+          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          ../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js -record ../lhci-puppeteer-video/video.mp4
-          ../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${{ matrix.shard }}.js --max-old-space-size=4096
+        run: make run_tests.lighthouse_performance shard=${{ matrix.shard }}
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -188,6 +189,7 @@ jobs:
               requirements_dev.in
               requirements_dev.txt
         - uses: ./.github/actions/merge
+        # Installing python dependencies becuase we are executing a python script for installing chrome in CI.
         - name: Install Python deps
           run: |
             pip install --require-hashes --no-deps -r requirements.txt
