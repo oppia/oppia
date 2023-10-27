@@ -150,7 +150,7 @@ describe('Release coordinator page feature tab', function() {
     'updated yet', (() => {
       expect(component.getLastUpdatedDate(
         component.featureFlags[0])).toEqual(
-          'The feature has not been updated yet.');
+        'The feature has not been updated yet.');
     }));
 
     it('should return the human readable last updated string from date-time ' +
@@ -174,7 +174,7 @@ describe('Release coordinator page feature tab', function() {
     it('should return text for dev feature stage', () => {
       expect(component.getFeatureStageString(
         component.featureFlags[0])).toBe(
-          'Dev (can only be enabled on dev server).');
+        'Dev (can only be enabled on dev server).');
     });
 
     it('should return text for test feature stage', () => {
@@ -189,7 +189,7 @@ describe('Release coordinator page feature tab', function() {
       });
       expect(component.getFeatureStageString(
         featureFlagTestStage)).toBe(
-          'Test (can only be enabled on dev and test server).');
+        'Test (can only be enabled on dev and test server).');
     });
 
     it('should return text for prod feature stage', () => {
@@ -203,8 +203,8 @@ describe('Release coordinator page feature tab', function() {
         last_updated: null
       });
       expect(component.getFeatureStageString(
-        component.featureFlags[0])).toBe(
-          'Prod (can only be enabled on dev, test and prod server).');
+        featureFlagProdStage)).toBe(
+        'Prod (can only be enabled on dev, test and prod server).');
     });
 
     it('should return text for unknown feature stage', () => {

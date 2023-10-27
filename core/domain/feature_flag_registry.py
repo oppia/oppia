@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import enum
 
-from core import utils
 from core import platform_feature_list
+from core import utils
 from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.platform import models

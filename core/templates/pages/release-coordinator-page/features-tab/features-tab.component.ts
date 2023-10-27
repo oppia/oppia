@@ -119,13 +119,13 @@ export class FeaturesTabComponent implements OnInit {
 
   getFeatureStageString(feature: FeatureFlag): string {
     if (feature.featureStage === 'dev') {
-      return 'Dev (can only be enabled on dev server).'
+      return 'Dev (can only be enabled on dev server).';
     } else if (feature.featureStage === 'test') {
-      return 'Test (can only be enabled on dev and test server).'
+      return 'Test (can only be enabled on dev and test server).';
     } else if (feature.featureStage === 'prod') {
-      return 'Prod (can only be enabled on dev, test and prod server).'
+      return 'Prod (can only be enabled on dev, test and prod server).';
     } else {
-      return 'Unknown feature stage.'
+      return 'Unknown feature stage.';
     }
   }
 
