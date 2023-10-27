@@ -80,7 +80,7 @@ update.package: ## Installs the npm requirements for the project
 # TODO(#18260): Permanently change the yarn configurations in `.yarnrc` when permanently moving to Docker Setup.
 # Creating a .yarnrc file to use yarn under docker
 	@echo 'cache-folder "/root/.yarn-cache"' > .yarnrc
-	${SHELL_PREFIX} angular-build yarn install
+	${SHELL_PREFIX} angular-build yarn install --pure-lockfile
 # Reverting the .yarnrc file to the original state, so that it works in python setup also.
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
