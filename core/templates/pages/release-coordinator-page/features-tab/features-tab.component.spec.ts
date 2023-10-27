@@ -211,7 +211,7 @@ describe('Release coordinator page feature tab', function() {
       let feature = component.featureFlags[0];
       feature.serverStage = 'unknown';
       expect(component.getFeatureStageString(feature)).toBe(
-      'Unknown feature stage.');
+        'Unknown feature stage.');
     });
   });
 
