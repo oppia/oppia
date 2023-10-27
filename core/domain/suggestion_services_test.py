@@ -6761,7 +6761,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
             # Create and save new suggestion models.
             suggestions = []
-            for i in range(1, max_suggestions + 1):
+            for _ in range(1, max_suggestions + 1):
                 suggestion = self._create_translation_suggestion()
                 suggestions.append(suggestion)
 
@@ -6770,7 +6770,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 threshold_days):
-                suggestion_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
+                suggestion_info = (suggestion_services.
+                    get_new_suggestions_for_reviewer_notifications())
 
             # Assert that the correct number of suggestions is returned.
             self.assertEqual(len(suggestion_info), 3)

@@ -15,7 +15,6 @@
 """Controllers for the cron jobs."""
 
 from __future__ import annotations
-from collections import defaultdict
 
 from core import feconf
 from core.controllers import acl_decorators
@@ -35,8 +34,9 @@ from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
+from collections import defaultdict
 
-from typing import Dict, DefaultDict, List, Optional
+from typing import Dict, DefaultDict, List
 
 from core.constants import constants
 
@@ -207,7 +207,8 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
 class CronMailReviewerNewSuggestionsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler for mailing reviewers about new suggestions on the Contributor Dashboard.
+    """Handler for mailing reviewers about new suggestions
+    on the Contributor Dashboard.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -216,7 +217,8 @@ class CronMailReviewerNewSuggestionsHandler(
 
     @acl_decorators.can_perform_cron_tasks
     def get(self) -> None:
-        """Sends email notifications to reviewers about new suggestions on the Contributor Dashboard.
+        """Sends email notifications to reviewers about new
+        suggestions on the Contributor Dashboard.
         """
         if not feconf.CAN_SEND_EMAILS:
             return self.render_json({})
@@ -227,13 +229,16 @@ class CronMailReviewerNewSuggestionsHandler(
         ):
             return self.render_json({})
 
-        new_suggestions_info = suggestion_services.get_new_suggestions_for_reviewer_notifications()
-        
+        new_suggestions_info = (suggestion_services.
+            get_new_suggestions_for_reviewer_notifications())
+
         # Initialize dictionaries to organize data.
-        reviewer_ids_by_language: DefaultDict[str, List[str]] = defaultdict(list)
+        reviewer_ids_by_language: DefaultDict[
+            str, List[str]] = defaultdict(list)
         suggestions_by_language: DefaultDict[
             str, List[
-                suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                suggestion_registry.
+                    ReviewableSuggestionEmailInfo]] = defaultdict(list)
 
         for suggestion in new_suggestions_info:
             language_property = suggestion.language_code
@@ -255,7 +260,6 @@ class CronMailReviewerNewSuggestionsHandler(
         email_manager.send_reviewer_notifications(reviewer_ids_by_language, suggestions_by_language)
 
         return self.render_json({})
-
 
 
 class CronAppFeedbackReportsScrubberHandlerPage(

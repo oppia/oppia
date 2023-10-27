@@ -462,14 +462,17 @@ class CronMailReviewerNewSuggestionsHandlerTests(
     def _mock_send_contributor_dashboard_reviewers_emails(
             self,
             reviewer_by_language: DefaultDict[str, List[str]],
-            reviewable_suggestions_by_language: DefaultDict[str, List[suggestion_registry.ReviewableSuggestionEmailInfo]]
+            reviewable_suggestions_by_language: DefaultDict[
+                str, List[
+                    suggestion_registry.ReviewableSuggestionEmailInfo]]
         ) -> None:
-            """Mocks email_manager.send_mail_to_notify_contributor_dashboard_reviewers as
-            it's not possible to send mail with self.testapp_swap, i.e with the URLs
-            defined in main.
-            """
-            self.reviewer_ids_by_language = reviewer_by_language
-            self.reviewable_suggestions_by_language = reviewable_suggestions_by_language
+        """Mocks
+        email_manager.send_mail_to_notify_contributor_dashboard_reviewers
+        as it's not possible to send mail with self.testapp_swap,
+        i.e with the URLs defined in main.
+        """
+        self.reviewer_ids_by_language = reviewer_by_language
+        self.reviewable_suggestions_by_language = reviewable_suggestions_by_language
 
     def _create_translation_suggestion(
         self
@@ -528,8 +531,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 email_manager,
                 'send_reviewer_notifications',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+                (self.get_json(
+                    '/cron/mail/reviewers/new_cont' +
+                    'ributor_dashboard_suggestions'))
 
         self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
@@ -564,7 +568,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.reviewer_ids_by_language: DefaultDict[str, List[str]] = defaultdict(list)
+        self.reviewer_ids_by_language: DefaultDict[
+            str, List[str]] = defaultdict(list)
         self.reviewable_suggestions_by_language:  DefaultDict[
             str, List[
                 suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
@@ -583,7 +588,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 'send_reviewer_notifications',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+                    '/cron/mail/reviewers/new_contr' +
+                    'ibutor_dashboard_suggestions')
 
         self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 

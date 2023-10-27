@@ -1706,7 +1706,8 @@ def get_new_suggestions_for_reviewer_notifications() -> List[
     """Retrieves and organizes new suggestions for reviewer email notifications.
 
     Returns:
-        list[ReviewableSuggestionEmailInfo]. A list of email content info objects for new suggestions.
+        list[ReviewableSuggestionEmailInfo]. A list of email content info
+            objects for new suggestions.
     """
     new_suggestions = [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (
@@ -1718,9 +1719,10 @@ def get_new_suggestions_for_reviewer_notifications() -> List[
     email_content_info = []
 
     for suggestion in new_suggestions:
-        suggestion_info = create_reviewable_suggestion_email_info_from_suggestion(
-            suggestion
-        )
+        suggestion_info = (
+            create_reviewable_suggestion_email_info_from_suggestion(
+                suggestion
+        ))
         email_content_info.append(suggestion_info)
 
     return email_content_info
