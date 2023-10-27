@@ -99,6 +99,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
 import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
 import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
+import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({
   imports: [
@@ -119,7 +120,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     SharedComponentsModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    DirectivesModule
   ],
   declarations: [
     DeleteStateSkillModalComponent,
