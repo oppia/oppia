@@ -1,15 +1,16 @@
 name: Backend tests
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+on: [push]
+# on:
+#   merge_group:
+#     types: [checks_requested]
+#   push:
+#     branches:
+#       - develop
+#       - release-*
+#   pull_request:
+#     branches:
+#       - develop
+#       - release-*
 
 jobs:
   run_tests:
