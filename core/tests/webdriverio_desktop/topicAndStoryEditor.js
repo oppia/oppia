@@ -546,7 +546,7 @@ describe('Serial Chapter Launch functionality', function() {
       await storyEditorPage.saveStory('First save');
       await storyEditorPage.navigateToChapterWithName('Chapter 1');
       await storyEditorPage.changeNodeDescription('Chapter description 1');
-      await storyEditorPage.setNodePlannedPublicationDate('25-10-2030');
+      await storyEditorPage.setNodePlannedPublicationDate('2-5-2030');
       await storyEditorPage.changeNodeOutline(
         await forms.toRichText('First outline'));
       await storyEditorPage.saveStory('Change chapter details');
@@ -567,7 +567,7 @@ describe('Serial Chapter Launch functionality', function() {
       await storyEditorPage.changeNodeDescription('Chapter description 2');
       await storyEditorPage.changeNodeOutline(
         await forms.toRichText('Second outline'));
-      await storyEditorPage.setNodePlannedPublicationDate('24-10-2030');
+      await storyEditorPage.setNodePlannedPublicationDate('2-1-2030');
       await storyEditorPage.saveStory('Change chapter details');
       await storyEditorPage.setNodeStatusToReadyToPublish();
       await storyEditorPage.navigateToStoryEditorTab();
