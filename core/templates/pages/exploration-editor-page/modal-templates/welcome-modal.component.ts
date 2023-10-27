@@ -50,7 +50,7 @@ export class WelcomeModalComponent
       this.explorationId);
     this.editorWelcomeImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/editor_welcome.svg');
-    this.welcomeHeading.nativeElement.focus();
+    this.welcomeHeading?.nativeElement.focus();
   }
 
   cancel(): void {

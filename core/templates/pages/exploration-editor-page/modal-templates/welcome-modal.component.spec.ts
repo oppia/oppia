@@ -83,7 +83,7 @@ describe('Welcome Modal Component', () => {
   });
 
   it ('should evaluate exploration id when component is initialized', () => {
-    const welcomeModalRef = new ElementRef(document.createElement('h3'));
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
     component.welcomeHeading = welcomeModalRef;
     expect(component.explorationId).toBe(explorationId);
     expect(component.editorWelcomeImgUrl).toBe(
@@ -93,7 +93,7 @@ describe('Welcome Modal Component', () => {
   });
 
   it ('should close the modal', () => {
-    const welcomeModalRef = new ElementRef(document.createElement('h3'));
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
     component.welcomeHeading = welcomeModalRef;
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
