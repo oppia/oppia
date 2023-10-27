@@ -1,15 +1,16 @@
 name: End-to-End, Lighthouse CI performance and Acceptance tests
-on:
-  merge_group:
-    types: [checks_requested]
-  push:
-    branches:
-      - develop
-      - release-*
-  pull_request:
-    branches:
-      - develop
-      - release-*
+on: [push]
+# on:
+#   merge_group:
+#     types: [checks_requested]
+#   push:
+#     branches:
+#       - develop
+#       - release-*
+#   pull_request:
+#     branches:
+#       - develop
+#       - release-*
 
 jobs:
   e2e_test:
@@ -202,14 +203,13 @@ jobs:
           run: |
             sudo rm -rf /usr/share/dotnet
             sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        - name: Start dev-server
+        - name: Initializing Containers
           run: |
             sudo make build
-            sudo make run-devserver
+            sudo docker compose up angular-build -d
+            sudo docker cp oppia-angular-build:/app/oppia/node_modules .
         - name: Run Acceptance Test ${{ matrix.suite }}
-          run: |
-            export PATH=/home/runner/work/oppia/oppia_tools/node-16.13.0/bin:${PATH}
-            xvfb-run -a --server-args="-screen 0, 1285x1000x24" ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/${{ matrix.suite }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite }}
         - name: Uploading webpack bundles as an artifact
           if: ${{ failure() }}
           uses: actions/upload-artifact@v3
