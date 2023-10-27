@@ -186,7 +186,7 @@
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
-/app_dev_docker.yaml @oppia/dev-workflow-reviewers
+/app_dev.yaml @oppia/dev-workflow-reviewers
 /docker-compose.yml @oppia/dev-workflow-reviewers
 /docker/ @oppia/dev-workflow-reviewers
 /Makefile @oppia/dev-workflow-reviewers

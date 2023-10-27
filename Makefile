@@ -77,7 +77,7 @@ update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
 
 update.package: ## Installs the npm requirements for the project
-	${SHELL_PREFIX} angular-build yarn install
+	${SHELL_PREFIX} angular-build yarn install --pure-lockfile
 
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*

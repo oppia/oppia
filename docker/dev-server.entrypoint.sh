@@ -28,7 +28,7 @@ if [ "$prod_env" = "true" ]; then
   build_cmd+=" --prod_env"
   dev_appserver_cmd+=" /app/oppia/app.yaml"
 else
-  dev_appserver_cmd+=" /app/oppia/app_dev_docker.yaml"
+  dev_appserver_cmd+=" /app/oppia/app_dev.yaml"
 fi
 if [ "$maintenance_mode" = "true" ]; then
   build_cmd+=" --maintenance_mode"
