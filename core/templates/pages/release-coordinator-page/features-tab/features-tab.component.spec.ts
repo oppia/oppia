@@ -210,8 +210,8 @@ describe('Release coordinator page feature tab', function() {
     it('should return text for unknown feature stage', () => {
       let feature = component.featureFlags[0];
       feature.serverStage = 'unknown';
-      expect(component.getFeatureStageString(
-        )).toBe('Unknown feature stage.');
+      expect(component.getFeatureStageString(feature)).toBe(
+      'Unknown feature stage.');
     });
   });
 
