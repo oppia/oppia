@@ -98,8 +98,6 @@ jobs:
         id: e2e_suite
         run: |
           sudo chmod -R 777 /home/runner/work/oppia/oppia
-          npm install selenium-standalone@9.3.0 -g
-          selenium-standalone install && selenium-standalone start > /dev/null 2>&1 &
           sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
