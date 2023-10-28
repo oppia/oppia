@@ -472,9 +472,8 @@ var StoryEditorPage = function() {
     var nodeOutlineEditorRteContent = (
       await nodeOutlineEditorRteContentSelector());
     var outlineEditorRteContentText = (
-      await nodeOutlineEditorRteContent[0].getText());
-    var nodeOutlineText = await nodeOutline.replace(/<.+?>/g, '');
-    expect(outlineEditorRteContentText).toEqual(nodeOutlineText);
+      await nodeOutlineEditorRteContent[0].getValue());
+    expect( outlineEditorRteContentText).toEqual(nodeOutline);
   };
 
   this.expectExplorationIdAlreadyExistWarning = async function() {
