@@ -302,9 +302,11 @@ describe('State Interaction component', () => {
 
     component.focusOnCustomizeInteraction(event);
 
-    expect(customizeInteractionButtonRef.nativeElement.focus).toHaveBeenCalled();
+    expect(
+      customizeInteractionButtonRef
+      .nativeElement.focus).toHaveBeenCalled();
   });
-  
+
   it('should focus on customize interaction title when ' +
    'shift + tab are pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
@@ -312,23 +314,25 @@ describe('State Interaction component', () => {
       document.createElement('button'));
     component.collapseAnswersAndResponsesButton =
       collapseAnswersAndResponsesButtonRef;
-    spyOn(component.collapseAnswersAndResponsesButton
+    spyOn(
+      component.collapseAnswersAndResponsesButton
       .nativeElement, 'focus');
 
     component.focusOnCollapseAnswersAndResponses(event);
 
-    expect(component.collapseAnswersAndResponsesButton
+    expect(
+      component.collapseAnswersAndResponsesButton
       .nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should open Interaction Customizer Modal ' +
   'when enter is pressed', () => {
-   const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
 
-   component.focusOnCollapseAnswersAndResponses(event);
+    component.focusOnCollapseAnswersAndResponses(event);
 
-   expect(component.openInteractionCustomizerModal).toHaveBeenCalled();
- });
+    expect(component.openInteractionCustomizerModal).toHaveBeenCalled();
+  });
 
   it('should save interaction when user click save', fakeAsync(() => {
     stateInteractionIdService.displayed = 'EndExploration';

@@ -49,37 +49,38 @@
           <source type="image/png"
                   [srcset]="getStaticImageUrl('/avatar/user_blue_72px.png')">
           <img [src]="getStaticImageUrl('/avatar/user_blue_72px.png')"
-          class="oppia-editor-card-avatar"
-          alt="">
+               class="oppia-editor-card-avatar"
+               alt="">
         </picture>
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
             <div *ngIf="hasLoaded"
-            class="e2e-test-interaction"
-            [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
-            <div class="oppia-interaction-preview oppia-transition-200"
-            (click)="openInteractionCustomizerModal()"
-            *ngIf="editabilityService.isEditable()"
-            role="button"
-            aria-label="edit interaction">
-          </div>
-            <div>
-                <oppia-interaction-display [htmlData]="interactionPreviewHtml"
-                                           classStr="oppia-interaction-preview-container">
-                </oppia-interaction-display>
+                 class="e2e-test-interaction"
+                 [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
+              <div class="oppia-interaction-preview oppia-transition-200"
+                   (click)="openInteractionCustomizerModal()"
+                   *ngIf="editabilityService.isEditable()"
+                   role="button"
+                   aria-label="edit interaction">
+              </div>
+              <div>
+                  <oppia-interaction-display [htmlData]="interactionPreviewHtml"
+                                            classStr="oppia-interaction-preview-container">
+                  </oppia-interaction-display>
               </div>
             </div>
-            <button tabindex="0" 
+            <button tabindex="0"
                     class="oppia-open-interaction-customizer-button fas fa-pen"
                     (click)="openInteractionCustomizerModal()"
                     (keydown)="focusOnCollapseAnswersAndResponses($event)"
+                    *ngIf="editabilityService.isEditable()"
                     aria-label="Customize Interaction"
                     #customizeInteractionButton>
             </button>
             <button type="button"
-            class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
-            (click)="deleteInteraction()"
-            *ngIf="editabilityService.isEditable()">
+                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
+                    (click)="deleteInteraction()"
+                    *ngIf="editabilityService.isEditable()">
               <i class="fas fa-times oppia-delete-interaction-icon" title="Delete interaction"></i>
             </button>
           </div>
