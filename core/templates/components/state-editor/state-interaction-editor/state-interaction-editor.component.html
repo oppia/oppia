@@ -39,13 +39,13 @@
   </div>
 
   <div *ngIf="interactionId && interactionEditorIsShown"
-  class="oppia-exp-interaction-container">
-  <div class="oppia-state-interaction-content oppia-mobile-collapsible-card">
-    <div class="oppia-editor-card-body"
-    title="{{getCurrentInteractionName()}}">
-    <picture *ngIf="!windowIsNarrow">
+       class="oppia-exp-interaction-container">
+    <div class="oppia-state-interaction-content oppia-mobile-collapsible-card">
+      <div class="oppia-editor-card-body"
+           title="{{getCurrentInteractionName()}}">
+        <picture *ngIf="!windowIsNarrow">
           <source type="image/webp"
-          [srcset]="getStaticImageUrl('/avatar/user_blue_72px.webp')">
+                  [srcset]="getStaticImageUrl('/avatar/user_blue_72px.webp')">
           <source type="image/png"
                   [srcset]="getStaticImageUrl('/avatar/user_blue_72px.png')">
           <img [src]="getStaticImageUrl('/avatar/user_blue_72px.png')"
@@ -63,7 +63,7 @@
             role="button"
             aria-label="edit interaction">
           </div>
-              <div>
+            <div>
                 <oppia-interaction-display [htmlData]="interactionPreviewHtml"
                                            classStr="oppia-interaction-preview-container">
                 </oppia-interaction-display>

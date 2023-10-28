@@ -294,8 +294,10 @@ describe('State Interaction component', () => {
 
   it('should focus on customize interaction button when tab is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab' });
-    const customizeInteractionButtonRef = new ElementRef(document.createElement('button'));
-    component.customizeInteractionButton = customizeInteractionButtonRef;
+    const customizeInteractionButtonRef = new ElementRef(
+      document.createElement('button'));
+    component.customizeInteractionButton =
+      customizeInteractionButtonRef;
     spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
 
     component.focusOnCustomizeInteraction(event);
@@ -306,13 +308,17 @@ describe('State Interaction component', () => {
   it('should focus on customize interaction title when ' +
    'shift + tab are pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
-    const collapseAnswersAndResponsesButtonRef = new ElementRef(document.createElement('button'));
-    component.collapseAnswersAndResponsesButton = collapseAnswersAndResponsesButtonRef;
-    spyOn(component.collapseAnswersAndResponsesButton.nativeElement, 'focus');
+    const collapseAnswersAndResponsesButtonRef = new ElementRef(
+      document.createElement('button'));
+    component.collapseAnswersAndResponsesButton =
+      collapseAnswersAndResponsesButtonRef;
+    spyOn(component.collapseAnswersAndResponsesButton
+      .nativeElement, 'focus');
 
     component.focusOnCollapseAnswersAndResponses(event);
 
-    expect(component.collapseAnswersAndResponsesButton.nativeElement.focus).toHaveBeenCalled();
+    expect(component.collapseAnswersAndResponsesButton
+      .nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should open Interaction Customizer Modal ' +

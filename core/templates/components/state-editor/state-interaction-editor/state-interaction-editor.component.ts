@@ -71,8 +71,10 @@ export class StateInteractionEditorComponent
   @Output() onSaveSolution = new EventEmitter<Solution>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
-  @ViewChild('customizeInteractionButton') customizeInteractionButton!: ElementRef;
-  @ViewChild('collapseAnswersAndResponsesButton') collapseAnswersAndResponsesButton!: ElementRef;
+  @ViewChild('customizeInteractionButton')
+    customizeInteractionButton!: ElementRef;
+  @ViewChild('collapseAnswersAndResponsesButton')
+    collapseAnswersAndResponsesButton!: ElementRef;
 
   customizationModalReopened: boolean;
   DEFAULT_TERMINAL_STATE_CONTENT: string;
@@ -162,13 +164,13 @@ export class StateInteractionEditorComponent
     event.preventDefault();
     this.customizeInteractionButton.nativeElement.focus();
   }
-  
+
   focusOnCollapseAnswersAndResponses(event: KeyboardEvent): void {
-    if(event.key === 'Enter') {
+    if (event.key === 'Enter') {
       event.preventDefault();
       this.openInteractionCustomizerModal();
     }
-    if(event.shiftKey && event.key === 'Tab') {
+    if (event.shiftKey && event.key === 'Tab') {
       event.preventDefault();
       this.collapseAnswersAndResponsesButton.nativeElement.focus();
     }
