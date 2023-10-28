@@ -659,7 +659,6 @@
 /core/templates/third-party-imports/ @oppia/lace-frontend-reviewers
 /.lighthouserc*.js @oppia/dev-workflow-reviewers
 /puppeteer-login-script.js @oppia/dev-workflow-reviewers
-/scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
 /webpack.*.ts @oppia/data-and-stability-reviewers
 
 

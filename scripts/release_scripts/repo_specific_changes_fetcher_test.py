@@ -78,8 +78,6 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         expected_scripts = {
             'scripts/setup.py': True,
             'scripts/setup_gae.py': True,
-            'scripts/install_third_party_libs.py': False,
-            'scripts/install_third_party.py': False
         }
         self.assertEqual(actual_scripts, expected_scripts)
 

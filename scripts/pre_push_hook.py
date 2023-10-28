@@ -483,37 +483,6 @@ def does_diff_include_ci_config_or_js_files(diff_files: List[bytes]) -> bool:
     return False
 
 
-def check_for_backend_python_library_inconsistencies() -> None:
-    """Checks the state of the 'third_party/python_libs' folder and compares it
-    to the required libraries specified in 'requirements.txt'.
-    If any inconsistencies are found, the script displays the inconsistencies
-    and exits.
-    """
-    mismatches = install_python_prod_dependencies.get_mismatches()
-
-    if mismatches:
-        print(
-            'Your currently installed python libraries do not match the\n'
-            'libraries listed in your "requirements.txt" file. Here is a\n'
-            'full list of library/version discrepancies:\n')
-
-        print(
-            '{:<35} |{:<25}|{:<25}'.format(
-                'Library', 'Requirements Version',
-                'Currently Installed Version'))
-        for library_name, version_strings in mismatches.items():
-            print('{!s:<35} |{!s:<25}|{!s:<25}'.format(
-                library_name, version_strings[0], version_strings[1]))
-        print('\n')
-        common.print_each_string_after_two_new_lines([
-            'Please fix these discrepancies by editing the `requirements.in`\n'
-            'file or running `scripts.install_third_party` to regenerate\n'
-            'the `third_party/python_libs` directory.\n'])
-        sys.exit(1)
-    else:
-        print('Python dependencies consistency check succeeded.')
-
-
 def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -541,8 +510,6 @@ def main(args: Optional[List[str]] = None) -> None:
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
-
-    check_for_backend_python_library_inconsistencies()
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
         with ChangedBranch(branch):

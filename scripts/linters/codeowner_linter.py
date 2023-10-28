@@ -44,7 +44,6 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/requirements_dev.txt',
     '/requirements_dev.in',
     '/yarn.lock',
-    '/scripts/install_third_party_libs.py',
     '/.github/',
     '/.github/CODEOWNERS',
     '/.github/stale.yml',

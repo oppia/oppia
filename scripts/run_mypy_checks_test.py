@@ -31,11 +31,6 @@ PYTHON_CMD: Final = 'python3'
 MYPY_SCRIPT_MODULE: Final = 'scripts.run_mypy_checks'
 
 
-def mock_install_third_party_libs_main() -> None:
-    """Mock for install_third_party_libs."""
-    return
-
-
 class Ret:
     """Return object that gives user-prefix error."""
 
@@ -55,10 +50,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-
-        self.install_swap = self.swap_with_checks(
-            install_third_party_libs, 'main',
-            mock_install_third_party_libs_main)
 
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -126,17 +117,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.mypy_install_swap = self.swap_with_checks(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites)
-
-    def test_install_third_party_libraries_with_skip_install_as_true(
-        self
-    ) -> None:
-        run_mypy_checks.install_third_party_libraries(True)
-
-    def test_install_third_party_libraries_with_skip_install_as_false(
-        self
-    ) -> None:
-        with self.install_swap:
-            run_mypy_checks.install_third_party_libraries(False)
 
     def test_get_mypy_cmd_without_files(self) -> None:
         expected_cmd = [

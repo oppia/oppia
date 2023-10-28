@@ -72,16 +72,6 @@ _PARSER.add_argument(
 )
 
 
-def install_third_party_libraries(skip_install: bool) -> None:
-    """Run the installation script.
-
-    Args:
-        skip_install: bool. Whether to skip running the installation script.
-    """
-    if not skip_install:
-        install_third_party_libs.main()
-
-
 def get_mypy_cmd(
     files: Optional[List[str]],
     mypy_exec_path: str,

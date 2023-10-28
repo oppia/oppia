@@ -62,7 +62,6 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/dependencies.json',
     '/package.json',
     '/yarn.lock',
-    '/scripts/install_third_party_libs.py',
     '/.github/CODEOWNERS',
     '/.github/stale.yml']
 
@@ -78,7 +77,6 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 'dependencies.json',
                 'package.json',
                 'yarn.lock',
-                'scripts/install_third_party_libs.py',
                 '.github/CODEOWNERS',
                 '.github/stale.yml']
 
@@ -89,7 +87,6 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 'dependencies.json',
                 'package.json',
                 'yarn.lock',
-                'scripts/install_third_party_libs.py',
                 '.github/CODEOWNERS',
                 '.github/stale.yml',
                 'core/domain/new_file.py']

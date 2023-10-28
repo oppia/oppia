@@ -54,11 +54,7 @@ class RunTestsTests(test_utils.GenericTestBase):
         def mock_popen(cmd: str, shell: bool) -> None:
             if cmd == 'bash scripts/run_e2e_tests.sh' and shell:
                 scripts_called['run_e2e_tests'] = True
-        def mock_install_third_party_libs() -> None:
-            pass
 
-        swap_install_third_party_libs = self.swap(
-            install_third_party_libs, 'main', mock_install_third_party_libs)
         swap_setup = self.swap(setup, 'main', mock_setup)
         swap_setup_gae = self.swap(setup_gae, 'main', mock_setup_gae)
         swap_frontend_tests = self.swap(
@@ -70,14 +66,13 @@ class RunTestsTests(test_utils.GenericTestBase):
         # whenever it is imported.
         # The run_tests script imports the run_backend_tests script.
         # Therefore, it has to be imported under a mock as well.
-        with swap_install_third_party_libs:
-            from scripts import run_backend_tests
-            from scripts import run_tests
-            swap_backend_tests = self.swap(
-                run_backend_tests, 'main', mock_backend_tests)
-            with print_swap, swap_setup, swap_setup_gae, swap_popen:
-                with swap_frontend_tests, swap_backend_tests:
-                    run_tests.main(args=[])
+        from scripts import run_backend_tests
+        from scripts import run_tests
+        swap_backend_tests = self.swap(
+            run_backend_tests, 'main', mock_backend_tests)
+        with print_swap, swap_setup, swap_setup_gae, swap_popen:
+            with swap_frontend_tests, swap_backend_tests:
+                run_tests.main(args=[])
 
         for script in scripts_called:
             self.assertTrue(script)

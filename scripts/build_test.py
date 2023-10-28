@@ -1009,16 +1009,10 @@ class BuildTests(test_utils.GenericTestBase):
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         clean_swap = self.swap(build, 'clean', mock_clean)
-        install_python_dev_dependencies_swap = self.swap_with_checks(
-            install_python_dev_dependencies,
-            'main',
-            lambda _: None,
-            expected_args=[(['--uninstall'],)]
-        )
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
-                with clean_swap, install_python_dev_dependencies_swap:
+                with clean_swap:
                     build.main(args=['--prod_env', '--source_maps'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1142,13 +1136,10 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler',
-            mock_managed_webpack_compiler)
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
 
-        with webpack_compiler_swap, get_file_count_swap:
+        with get_file_count_swap:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
     def test_build_using_webpack_command_with_incorrect_filecount_fails(
@@ -1166,13 +1157,10 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler',
-            mock_managed_webpack_compiler)
         get_file_count_swap = self.swap(
             build, 'get_file_count', mock_get_file_count)
 
-        with webpack_compiler_swap, get_file_count_swap:
+        with get_file_count_swap:
             with self.assertRaisesRegex(
                 AssertionError, 'webpack_bundles should be non-empty.'
             ):
@@ -1203,8 +1191,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         # The webpack compilation processes will be called 4 times as mock_isdir
         # will return true after 4 calls.
         self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
         self.exit_stack.enter_context(self.swap_with_checks(
             os.path, 'isdir', mock_os_path_isdir))
@@ -1219,9 +1205,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 return False
             return old_os_path_isdir(path)
 
-        # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             os.path, 'isdir', mock_os_path_isdir))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -1238,8 +1221,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             return old_os_path_isdir(path)
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -1251,9 +1232,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
         return_code = 2
-        self.exit_stack.enter_context(self.swap_to_always_raise(
-            servers, 'managed_webpack_compiler',
-            error=subprocess.CalledProcessError(return_code, [])))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))

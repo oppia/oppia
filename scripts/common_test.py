@@ -93,9 +93,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
-        with self.print_swap, swap_ng_build, swap_isdir:
+        with self.print_swap, swap_isdir:
             common.run_ng_compilation()
 
         self.assertNotIn(
@@ -106,15 +104,13 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_ng_compilation_failed(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
         swap_sys_exit = self.swap_with_checks(
             sys,
             'exit',
             lambda _: None,
             expected_args=[(1,)]
         )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_swap, swap_isdir, swap_sys_exit:
             common.run_ng_compilation()
 
         self.assertIn(
@@ -141,12 +137,6 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
             return MockFailedCompilerContextManager()
 
-        swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_failed_context_manager,
-            expected_args=[]
-        )
         swap_isdir = self.swap_with_checks(
             os.path,
             'isdir',
@@ -163,7 +153,7 @@ class CommonTests(test_utils.GenericTestBase):
             lambda _: None,
             expected_args=[(1,), (1,), (1,)]
         )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_swap, swap_isdir, swap_sys_exit:
             common.run_ng_compilation()
 
     @contextlib.contextmanager
@@ -181,22 +171,6 @@ class CommonTests(test_utils.GenericTestBase):
             yield server.server_address[1]
         finally:
             server.server_close()
-
-    def test_protoc_version_matches_protobuf(self) -> None:
-        """Check that common.PROTOC_VERSION matches the version of protobuf in
-        requirements.in.
-        """
-        with open(
-            install_python_dev_dependencies.REQUIREMENTS_DEV_FILE_PATH,
-            'r',
-            encoding='utf-8',
-        ) as f:
-            for line in f:
-                if line.startswith('protobuf'):
-                    line = line.strip()
-                    protobuf_version = line.split('==')[1]
-                    break
-        self.assertEqual(common.PROTOC_VERSION, protobuf_version)
 
     def test_is_x64_architecture_in_x86(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 1)

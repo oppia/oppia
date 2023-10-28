@@ -31,7 +31,6 @@ from core.tests import test_utils
 from typing import Dict, List, Optional, Tuple
 
 from . import common
-from . import install_python_prod_dependencies
 from . import pre_push_hook
 
 
@@ -876,11 +875,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exit_error(error_code: int) -> None:
             self.assertEqual(error_code, 1)
 
-        swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches',
-            mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
-        with self.print_swap, swap_sys_exit, swap_get_mismatches:
+        with self.print_swap, swap_sys_exit:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
         self.assertEqual(
@@ -913,11 +909,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exit_error(error_code: int) -> None:
             self.assertEqual(error_code, 1)
 
-        swap_get_mismatches = self.swap(
-            install_python_prod_dependencies, 'get_mismatches',
-            mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
-        with self.print_swap, swap_sys_exit, swap_get_mismatches:
+        with self.print_swap, swap_sys_exit:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
         self.assertEqual(
@@ -940,12 +933,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_main_with_no_inconsistencies_in_backend_python_libs(self) -> None:
         def mock_get_mismatches() -> Dict[str, Tuple[str, str]]:
             return {}
-        swap_get_mismatches = self.swap(
-            install_python_prod_dependencies,
-            'get_mismatches',
-            mock_get_mismatches)
 
-        with swap_get_mismatches, self.print_swap:
+        with self.print_swap:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
         self.assertEqual(

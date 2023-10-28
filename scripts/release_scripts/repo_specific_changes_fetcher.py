@@ -111,8 +111,7 @@ def get_setup_scripts_changes_status(
     """
     setup_script_filepaths = [
         'scripts/%s' % item for item in [
-            'setup.py', 'setup_gae.py', 'install_third_party_libs.py',
-            'install_third_party.py']]
+            'setup.py', 'setup_gae.py']]
     changed_filenames = _get_changed_filenames_since_tag(
         release_tag_to_diff_against)
     changes_dict = {

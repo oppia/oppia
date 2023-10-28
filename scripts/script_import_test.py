@@ -41,10 +41,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             cmd_tokens: List[str], *_args: str, **_kwargs: str
         ) -> None:
             commands.append(cmd_tokens)
-        run_swap = self.swap(subprocess, 'run', mock_run)
 
-        with run_swap:
-            from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long
         expected_commands = [
             [sys.executable, '-m', 'pip', 'install', version_string]
             for version_string in (

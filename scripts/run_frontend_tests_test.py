@@ -26,7 +26,6 @@ from core.tests import test_utils
 from . import build
 from . import check_frontend_test_coverage
 from . import common
-from . import install_third_party_libs
 from . import run_frontend_tests
 
 
@@ -136,8 +135,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.swap_build = self.swap(build, 'main', mock_build)
         self.swap_common = self.swap(
             common, 'print_each_string_after_two_new_lines', lambda _: None)
-        self.swap_install_third_party_libs = self.swap(
-            install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
 
@@ -175,7 +172,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
 
@@ -194,7 +191,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_frontend_tests_rerun(self) -> None:
         with self.swap_flaky_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
 
@@ -220,7 +217,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_frontend_tests_rerun_twice(self) -> None:
         with self.swap_flaky_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
 
@@ -248,7 +245,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_frontend_tests_failed(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--verbose'])
 
@@ -263,7 +260,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_frontend_tests_are_run_correctly_on_production(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--run_minified_tests'])
 
@@ -280,7 +277,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_coverage_checks_are_not_run_when_frontend_tests_fail(
         self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--check_coverage'])
 
@@ -296,7 +293,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_combined_frontend_spec_file_download_failed(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(
                         args=['--download_combined_frontend_spec_file'])
@@ -314,7 +311,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_combined_frontend_spec_file_is_downloaded_correctly(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
+            with self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(
                         args=['--download_combined_frontend_spec_file'])
