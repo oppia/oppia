@@ -1,11 +1,5 @@
 <oppia-angular-root *ngIf="!loading && isSuperAdmin">
-  <oppia-base-content>
-    <navbar-breadcrumb>
-    </navbar-breadcrumb>
-    <content>
-      <oppia-admin-page></oppia-admin-page>
-    </content>
-  </oppia-base-content>
+  <oppia-admin-page></oppia-admin-page>
 </oppia-angular-root>
 
 <oppia-error-page-root *ngIf="!loading && !isSuperAdmin"></oppia-error-page-root>

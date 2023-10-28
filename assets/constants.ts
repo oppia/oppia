@@ -6520,7 +6520,7 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ADIMN_PAGE": {
       "ROUTE": "admin",
-      "TITLE": "Oppia admin page",
+      "TITLE": "Oppia Admin Panel",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
