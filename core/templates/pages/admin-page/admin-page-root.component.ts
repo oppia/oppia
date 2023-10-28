@@ -21,6 +21,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { BaseRootComponent } from 'pages/base-root.component';
 import { PageHeadService } from 'services/page-head.service';
+import { UserService } from 'services/user.service';
 
 
 @Component({
@@ -28,9 +29,14 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './admin-page-root.component.html',
 })
 export class AdminPageRootComponent extends BaseRootComponent {
+  loading: boolean = true;
+  isSuperAdmin: boolean = false;
+  userService: UserService;
+
   constructor(
       pageHeadService: PageHeadService,
-      translateService: TranslateService
+      translateService: TranslateService,
+      userService: UserService
   ) {
     super(
       pageHeadService,
@@ -38,5 +44,14 @@ export class AdminPageRootComponent extends BaseRootComponent {
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META
     );
+    this.userService = userService;
+  }
+
+  ngOnInit(): void {
+    super.ngOnInit();
+    this.userService.getUserInfoAsync().then(userInfo => {
+      this.loading = false;
+      this.isSuperAdmin = userInfo.isSuperAdmin();
+    });
   }
 }

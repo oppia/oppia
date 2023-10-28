@@ -13,29 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the error page.
+ * @fileoverview Module for the error page with routing.
+ * This captures any 404 errors that occur due to a mismatching route.
  */
 
 import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { Error404PageRootComponent } from './error-404-page-root.component';
-import { Error404PageComponent } from './error-404-page.component';
+import { Error404PageRoutingModule } from './error-404-page-routing.module';
+import { Error404PageModule } from './error-404-page.module';
 
 @NgModule({
   imports: [
-    SharedComponentsModule
-  ],
-  declarations: [
-    Error404PageComponent,
-    Error404PageRootComponent,
-  ],
-  entryComponents: [
-    Error404PageComponent,
-    Error404PageRootComponent,
-  ],
-  exports: [
-    Error404PageComponent,
-    Error404PageRootComponent
+    Error404PageModule,
+    Error404PageRoutingModule
   ]
 })
-export class Error404PageModule {}
+export class Error404PageWithRouteModule {}

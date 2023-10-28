@@ -38,8 +38,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
 import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
 import { AdminPageRootComponent } from './admin-page-root.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
-import { AdminPermissionResolver } from './services/admin-auth-guard';
-import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-page.component';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
@@ -50,11 +49,9 @@ import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-pag
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([{
       path: '',
-      resolve: {
-        permissions: AdminPermissionResolver
-      },
       component: AdminPageRootComponent
     }]),
+    Error404PageModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -67,7 +64,7 @@ import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-pag
     TopicManagerRoleEditorModalComponent,
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
-    Error404PageComponent,
+    // Error404PageComponent,
     RolesAndActionsVisualizerComponent,
     TranslationCoordinatorRoleEditorModalComponent
   ],
@@ -80,7 +77,7 @@ import { Error404PageComponent } from 'pages/error-pages/error-404/error-404-pag
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
-    Error404PageComponent,
+    // Error404PageComponent,
     TranslationCoordinatorRoleEditorModalComponent
   ],
 })
