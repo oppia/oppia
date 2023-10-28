@@ -64,7 +64,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     TopicManagerRoleEditorModalComponent,
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
-    // Error404PageComponent,
     RolesAndActionsVisualizerComponent,
     TranslationCoordinatorRoleEditorModalComponent
   ],
@@ -77,7 +76,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
-    // Error404PageComponent,
     TranslationCoordinatorRoleEditorModalComponent
   ],
 })
