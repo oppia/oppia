@@ -64,7 +64,7 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Dict, List, Optional, TypedDict, Union, cast
+from typing import Any, Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
@@ -107,7 +107,9 @@ class AdminPage(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    def get(self) -> None:
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'get' method with different number of arguments and types.
+    def get(self, *args: Any, **kwargs: Any) -> None:  #
         """Renders the admin page."""
 
         self.render_template('oppia-root.mainpage.html')
