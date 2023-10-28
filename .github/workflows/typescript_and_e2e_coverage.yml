@@ -25,6 +25,7 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
+      # Installing python dependencies becuase we are executing a python script for installing chrome in CI.
       - name: Install Python deps
         run: |
           pip install --require-hashes --no-deps -r requirements.txt
