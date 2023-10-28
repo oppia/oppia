@@ -328,6 +328,7 @@ describe('State Interaction component', () => {
   it('should open Interaction Customizer Modal ' +
   'when enter is pressed', () => {
     const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    spyOn(component, 'openInteractionCustomizerModal');
 
     component.focusOnCollapseAnswersAndResponses(event);
 
