@@ -119,7 +119,7 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     SharedComponentsModule,
     ExplorationPlayerViewerCommonModule,
     OppiaCkEditorCopyToolBarModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     DeleteStateSkillModalComponent,

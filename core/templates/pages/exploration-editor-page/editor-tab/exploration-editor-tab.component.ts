@@ -119,10 +119,22 @@ export class ExplorationEditorTabComponent
           document.querySelector<HTMLElement>(
             '.joyride-step__holder').style.zIndex = '1020';
 
+          document.querySelector<HTMLElement>(
+            '.joyride-step__counter').tabIndex = 0;
+
+          document.querySelector<HTMLElement>(
+            '.e2e-test-joyride-title').focus();
+
           if (value.number === 2) {
             $('html, body').animate({
               scrollTop: (true ? 0 : 20)
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
 
           if (value.number === 4) {
@@ -133,6 +145,12 @@ export class ExplorationEditorTabComponent
             $('html, body').animate({
               scrollTop: document.getElementById(idToScrollTo)?.offsetTop - 200
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
 
           if (value.number === 6) {
@@ -143,6 +161,12 @@ export class ExplorationEditorTabComponent
             $('html, body').animate({
               scrollTop: document.getElementById(idToScrollTo)?.offsetTop - 200
             }, 1000);
+
+            document.querySelector<HTMLElement>(
+              '.joyride-step__counter').tabIndex = 0;
+
+            document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title').focus();
           }
         },
         () => {},
