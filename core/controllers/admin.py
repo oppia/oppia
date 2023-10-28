@@ -109,7 +109,7 @@ class AdminPage(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
-    def get(self, *args: Any, **kwargs: Any) -> None:  #
+    def get(self, *args: Any, **kwargs: Any) -> None:
         """Renders the admin page."""
 
         self.render_template('oppia-root.mainpage.html')
