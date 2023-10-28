@@ -304,7 +304,7 @@ describe('State Interaction component', () => {
 
     expect(
       customizeInteractionButtonRef
-      .nativeElement.focus).toHaveBeenCalled();
+        .nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should focus on customize interaction title when ' +
@@ -316,13 +316,13 @@ describe('State Interaction component', () => {
       collapseAnswersAndResponsesButtonRef;
     spyOn(
       component.collapseAnswersAndResponsesButton
-      .nativeElement, 'focus');
+        .nativeElement, 'focus');
 
     component.focusOnCollapseAnswersAndResponses(event);
 
     expect(
       component.collapseAnswersAndResponsesButton
-      .nativeElement.focus).toHaveBeenCalled();
+        .nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should open Interaction Customizer Modal ' +
