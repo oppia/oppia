@@ -7,21 +7,41 @@
                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
 
-  <mat-card [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
-          *ngIf="!isRefresherExploration" [style.padding]="0" class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card" (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)" [ngStyle]="{'margin': '5px'}">
-    <a class="oppia-focus-indicator-blue"
+  <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
+            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
+            *ngIf="!isRefresherExploration"
+            tabindex="0"
+            [style.padding]="0"
+            class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card oppia-focus-indicator-blue"
+            (mouseenter)="setHoverState(true)"
+            (mouseleave)="setHoverState(false)"
+            [ngStyle]="{'margin': '5px'}">
+    <a #explorationAnchor
        [href]="getExplorationLink()"
+       tabindex="-1"
        target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-        <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ category }}">
+        <img class="thumbnail-image" [src]="thumbnailIcon" [alt]="'category: ' + category + '.'">
         <span class="activity-title e2e-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
-            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
-            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()"
+                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'">
+              {{ explorationTitle | truncate:40 }}
+            </span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()"
+                  [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
+              {{ expTitleTranslationKey | translate | truncate:40 }}
+            </span>
           </span>
           <span *ngIf="!isWindowLarge">
-            <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
-            <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+            <span *ngIf="!isHackyExpTitleTranslationDisplayed()"
+                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'">
+              {{ explorationTitle | truncate:40 }}
+            </span>
+            <span *ngIf="isHackyExpTitleTranslationDisplayed()"
+                  [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
+              {{ expTitleTranslationKey | translate | truncate:40 }}
+            </span>
           </span>
         </span>
       </div>
@@ -29,8 +49,14 @@
       <div class="summary-section"
            section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective e2e-test-exp-summary-tile-objective">
-          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()">{{ objective | truncateAndCapitalize:95 }}</span>
-          <span *ngIf="isHackyExpObjectiveTranslationDisplayed()">{{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}</span>
+          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()"
+                [attr.aria-label]="'objective:' + objective + '.'">
+            {{ objective | truncateAndCapitalize:95 }}
+          </span>
+          <span *ngIf="isHackyExpObjectiveTranslationDisplayed()"
+                [attr.aria-label]="'objective:' + expObjectiveTranslationKey + '.'">
+            {{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}
+          </span>
         </div>
         <div *ngIf="!objective" class="objective">
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
