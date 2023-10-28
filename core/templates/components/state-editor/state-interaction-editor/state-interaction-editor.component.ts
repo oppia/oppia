@@ -71,8 +71,10 @@ export class StateInteractionEditorComponent
   @Output() onSaveSolution = new EventEmitter<Solution>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
+
   @ViewChild('customizeInteractionButton')
     customizeInteractionButton!: ElementRef;
+
   @ViewChild('collapseAnswersAndResponsesButton')
     collapseAnswersAndResponsesButton!: ElementRef;
 
