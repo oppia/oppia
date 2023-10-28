@@ -37,8 +37,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
 import { AdminPageRootComponent } from './admin-page-root.component';
-import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
 
 @NgModule({
   imports: [
@@ -51,7 +51,8 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
       path: '',
       component: AdminPageRootComponent
     }]),
-    Error404PageModule
+    Error404PageModule,
+    AdminBlogAdminCommonModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -64,7 +65,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     TopicManagerRoleEditorModalComponent,
     AdminPlatformParametersTabComponent,
     AdminPageRootComponent,
-    RolesAndActionsVisualizerComponent,
     TranslationCoordinatorRoleEditorModalComponent
   ],
   entryComponents: [

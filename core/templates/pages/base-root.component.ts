@@ -16,25 +16,29 @@
  * @fileoverview Base root component for all pages.
  */
 
-import { OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { PageHeadService } from 'services/page-head.service';
 
-interface MetaTagData {
+export interface MetaTagData {
   readonly PROPERTY_TYPE: string;
   readonly PROPERTY_VALUE: string;
   readonly CONTENT: string;
 }
 
-export class BaseRootComponent implements OnInit, OnDestroy {
+@Component({
+  template: ''
+})
+export abstract class BaseRootComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  abstract title: string;
+  abstract meta: MetaTagData[];
+
   constructor(
     private pageHeadService: PageHeadService,
     private translateService: TranslateService,
-    private title: string,
-    private readonly meta: readonly MetaTagData[]
   ) { }
 
   setPageTitleAndMetaTags(): void {

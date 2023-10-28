@@ -19,7 +19,7 @@
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
-import { BaseRootComponent } from 'pages/base-root.component';
+import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 import { PageHeadService } from 'services/page-head.service';
 import { UserService } from 'services/user.service';
 
@@ -29,6 +29,11 @@ import { UserService } from 'services/user.service';
   templateUrl: './admin-page-root.component.html',
 })
 export class AdminPageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE;
+  meta: MetaTagData[] =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META as
+    unknown as Readonly<MetaTagData>[];
+
   loading: boolean = true;
   isSuperAdmin: boolean = false;
   userService: UserService;
@@ -38,12 +43,7 @@ export class AdminPageRootComponent extends BaseRootComponent {
       translateService: TranslateService,
       userService: UserService
   ) {
-    super(
-      pageHeadService,
-      translateService,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META
-    );
+    super(pageHeadService, translateService);
     this.userService = userService;
   }
 
