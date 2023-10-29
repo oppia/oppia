@@ -472,7 +472,7 @@ var StoryEditorPage = function() {
     var nodeOutlineEditorRteContent = (
       await nodeOutlineEditorRteContentSelector());
     var outlineEditorRteContentText = (
-      await nodeOutlineEditorRteContent[0].getValue());
+      await nodeOutlineEditorRteContent[0].getText());
     expect( outlineEditorRteContentText).toEqual(nodeOutline);
   };
 
