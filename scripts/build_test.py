@@ -25,7 +25,6 @@ import io
 import os
 import re
 import subprocess
-import sys
 import tempfile
 import threading
 
@@ -33,7 +32,7 @@ from core import feconf
 from core import utils
 from core.tests import test_utils
 
-from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
+from typing import ContextManager, Deque, Dict, List, Tuple, Union
 
 from . import build
 from . import common

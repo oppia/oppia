@@ -196,35 +196,35 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_files_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            with self.install_swap, self.install_mypy_prereq_swap_success:
+            with self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=['--files', 'file1.py'])
                 self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            with self.install_swap, self.install_mypy_prereq_swap_success:
+            with self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
     def test_main_with_files_with_mypy_errors(self) -> None:
         with self.install_mypy_prereq_swap_success:
-            with self.install_swap, self.popen_swap_failure:
+            with self.popen_swap_failure:
                 with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self) -> None:
         with self.popen_swap_failure:
-            with self.install_swap, self.install_mypy_prereq_swap_success:
+            with self.install_mypy_prereq_swap_success:
                 with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=[])
 
     def test_main_with_install_prerequisites_success(self) -> None:
-        with self.popen_swap_success, self.install_swap:
+        with self.popen_swap_success:
             with self.mypy_install_swap:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
     def test_main_with_install_prerequisites_failure(self) -> None:
-        with self.popen_swap_failure, self.install_swap:
+        with self.popen_swap_failure:
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

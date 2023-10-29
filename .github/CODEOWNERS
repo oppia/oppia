@@ -747,7 +747,6 @@
 /dependencies.json @oppia/dependency-reviewers
 /package.json @oppia/dependency-reviewers
 /yarn.lock @oppia/dependency-reviewers
-/scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
 /.github/ @oppia/dev-workflow-reviewers
 /.github/CODEOWNERS @oppia/dev-workflow-reviewers
 /.github/stale.yml @oppia/dev-workflow-reviewers

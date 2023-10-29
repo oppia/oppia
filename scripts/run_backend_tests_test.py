@@ -109,8 +109,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.terminal_logs.append(msg)
         self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
 
-        def mock_context_manager(**_: str) -> MockCompilerContextManager:
-            return MockCompilerContextManager()
         self.swap_execute_task = self.swap(
             concurrent_task_utils, 'execute_tasks', lambda *unused_args: None)
         self.swap_check_call = self.swap_with_checks(

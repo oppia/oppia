@@ -96,16 +96,6 @@ class CommonTests(test_utils.GenericTestBase):
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
 
-        class MockFailedCompilerContextManager:
-            def __init__(self) -> None:
-                pass
-
-            def __enter__(self) -> MockFailedCompiler:
-                return MockFailedCompiler()
-
-            def __exit__(self, *unused_args: str) -> None:
-                pass
-
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:
         """Context manager for starting and stoping an HTTP TCP server.

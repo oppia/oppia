@@ -24,7 +24,6 @@ in start, then adding the same import statement in a test function
 
 from __future__ import annotations
 
-import subprocess
 import sys
 
 from core.tests import test_utils
@@ -37,10 +36,6 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
 
     def test_import_with_missing_packages(self) -> None:
         commands: List[List[str]] = []
-        def mock_run(
-            cmd_tokens: List[str], *_args: str, **_kwargs: str
-        ) -> None:
-            commands.append(cmd_tokens)
 
         expected_commands = [
             [sys.executable, '-m', 'pip', 'install', version_string]

@@ -25,10 +25,8 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import threading
 
-from core import feconf
 from core import utils
 from scripts import common
 
@@ -261,18 +259,14 @@ def _join_files(
             write_to_file_stream(target_file_stream, source_file.read())
 
 
-def _minify_and_create_sourcemap(
-    source_path: str, target_file_path: str
-) -> None:
+def _minify_and_create_sourcemap(source_path: str) -> None:
     """Minifies and generates source map for a JS file. This function is only
     meant to be used with third_party.min.js.
 
     Args:
         source_path: str. Path to JS file to minify.
-        target_file_path: str. Path to location of the minified file.
     """
     print('Minifying and creating sourcemap for %s' % source_path)
-    source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     subprocess.check_call(
         'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
         ' /app/oppia/third_party/generated/js/third_party.js'

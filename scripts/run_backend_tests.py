@@ -64,7 +64,7 @@ import time
 
 from typing import Dict, Final, List, Optional, Tuple, cast
 
-from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
