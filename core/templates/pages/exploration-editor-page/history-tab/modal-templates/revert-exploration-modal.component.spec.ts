@@ -85,6 +85,6 @@ describe('Revert Exploration Modal Component', function() {
 
     expect(
       component.revertExplorationHeadingRef.nativeElement.focus
-      ).toHaveBeenCalled();
+    ).toHaveBeenCalled();
   });
 });
