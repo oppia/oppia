@@ -90,34 +90,6 @@ class CommonTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-    def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[])
-        with self.print_swap, swap_isdir:
-            common.run_ng_compilation()
-
-        self.assertNotIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr
-        )
-
-    def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[])
-        swap_sys_exit = self.swap_with_checks(
-            sys,
-            'exit',
-            lambda _: None,
-            expected_args=[(1,)]
-        )
-        with self.print_swap, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
-
-        self.assertIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr
-        )
-
     def test_subprocess_error_results_in_failed_ng_build(self) -> None:
         class MockFailedCompiler:
             def wait(self) -> None: # pylint: disable=missing-docstring

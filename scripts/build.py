@@ -185,29 +185,6 @@ class DependencyBundleDict(TypedDict):
     css: List[str]
     fontsPath: str
 
-
-def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
-    """Build the javascript files.
-
-    Args:
-        dev_mode: bool. Represents whether to run the related commands in dev
-            mode.
-        source_maps: bool. Represents whether to use source maps while
-            building webpack.
-    """
-    if not dev_mode:
-        print('Generating files for production mode...')
-
-        build_args = ['--prod_env']
-        if source_maps:
-            build_args.append('--source_maps')
-        main(args=build_args)
-
-    else:
-        main(args=[])
-        common.run_ng_compilation()
-
-
 def generate_app_yaml(deploy_mode: bool = False) -> None:
     """Generate app.yaml from app_dev.yaml.
 

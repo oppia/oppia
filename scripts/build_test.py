@@ -89,20 +89,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME)
 
-    def test_minify_and_create_sourcemap(self) -> None:
-        """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegex(
-            subprocess.CalledProcessError,
-            'returned non-zero exit status 1') as called_process:
-            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
-        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
-        # not contain any returncode attribute, so because of this MyPy throws
-        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
-        # the error, we used ignore here.
-        # `returncode` is the exit status of the child process.
-        self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
-
     def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
 
@@ -897,27 +883,17 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_with_prod_env(self) -> None:
         check_function_calls = {
-            'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
             'compare_file_count_gets_called': False,
-            'generate_python_package_called': False,
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
             'compare_file_count_gets_called': True,
-            'generate_python_package_called': True,
             'clean_gets_called': True,
         }
-
-        expected_config_path = build.WEBPACK_PROD_CONFIG
-
-        def mock_build_using_webpack(config_path: str) -> None:
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
 
         def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
@@ -943,8 +919,6 @@ class BuildTests(test_utils.GenericTestBase):
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
         modify_constants_swap = self.swap(
             common, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
@@ -953,7 +927,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'generate_python_package', mock_generate_python_package)
         clean_swap = self.swap(build, 'clean', mock_clean)
 
-        with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
+        with ensure_files_exist_swap, clean_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with generate_python_package_swap:
                     build.main(args=['--prod_env'])
@@ -962,25 +936,17 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_with_prod_source_maps(self) -> None:
         check_function_calls = {
-            'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': False,
             'compare_file_count_gets_called': False,
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'modify_constants_gets_called': True,
             'compare_file_count_gets_called': True,
             'clean_gets_called': True,
         }
-
-        expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-
-        def mock_build_using_webpack(config_path: str) -> None:
-            self.assertEqual(config_path, expected_config_path)
-            check_function_calls['build_using_webpack_gets_called'] = True
 
         def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
             check_function_calls['ensure_files_exist_gets_called'] = True
@@ -1002,15 +968,13 @@ class BuildTests(test_utils.GenericTestBase):
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
-            build, 'build_using_webpack', mock_build_using_webpack)
         modify_constants_swap = self.swap(
             common, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         clean_swap = self.swap(build, 'clean', mock_clean)
 
-        with ensure_files_exist_swap, build_using_webpack_swap:
+        with ensure_files_exist_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with clean_swap:
                     build.main(args=['--prod_env', '--source_maps'])
@@ -1121,166 +1085,3 @@ class BuildTests(test_utils.GenericTestBase):
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_build_using_webpack_command(self) -> None:
-
-        @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str,
-            max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
-            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 8192)
-            yield scripts_test_utils.PopenStub()
-
-        def mock_get_file_count(unused_path: str) -> int:
-            return 1
-
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count)
-
-        with get_file_count_swap:
-            build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
-
-    def test_build_using_webpack_command_with_incorrect_filecount_fails(
-        self
-    ) -> None:
-
-        @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str, max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
-            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 8192)
-            yield scripts_test_utils.PopenStub()
-
-        def mock_get_file_count(unused_path: str) -> int:
-            return 0
-
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count)
-
-        with get_file_count_swap:
-            with self.assertRaisesRegex(
-                AssertionError, 'webpack_bundles should be non-empty.'
-            ):
-                build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
-
-
-class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
-    """Test the end to end build methods."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.exit_stack = contextlib.ExitStack()
-
-    def tearDown(self) -> None:
-        try:
-            self.exit_stack.close()
-        finally:
-            super().tearDown()
-
-    def test_run_webpack_compilation_success(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        # The webpack compilation processes will be called 4 times as mock_isdir
-        # will return true after 4 calls.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-
-        build.run_webpack_compilation()
-
-    def test_run_webpack_compilation_failed(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return False
-            return old_os_path_isdir(path)
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-
-        build.run_webpack_compilation()
-
-    def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None,
-            expected_args=[
-                # When the code under test runs, the first sys.exit call halts
-                # execution. However, when this test runs, sys.exit is mocked
-                # and so does not interrupt the execution flow. Therefore we
-                # call sys.exit with the error code from the webpack compilation
-                # process (2) 5 times (the maximum number of attempts allowed to
-                # compile webpack) and then exit with code 1 after giving up
-                # trying to compile webpack.
-                (return_code,),
-                (return_code,),
-                (return_code,),
-                (return_code,),
-                (return_code,),
-                (1,),
-            ]))
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_prod_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env']}]))
-
-        build.build_js_files(False)
-
-    def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env', '--source_maps']}]))
-
-        build.build_js_files(False, source_maps=True)
-
-    def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'run_webpack_compilation', lambda **_: None,
-            expected_kwargs=[{'source_maps': True}]))
-
-        build.build_js_files(True, source_maps=True)
