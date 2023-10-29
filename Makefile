@@ -210,6 +210,16 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e tests are captured in CI
+	docker compose up dev-server -d --no-deps
+	$(SHELL_PREFIX) dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
+	$(MAKE) stop
+
+run_tests.typescript_tests: ## Runs the typescript tests
+	docker compose up dev-server -d --no-deps
+	$(SHELL_PREFIX) dev-server python -m scripts.typescript_checks $(PYTHON_ARGS)
+	$(MAKE) stop
+
 OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory

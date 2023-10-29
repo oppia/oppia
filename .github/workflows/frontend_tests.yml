@@ -56,6 +56,7 @@ jobs:
       - uses: ./.github/actions/merge
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      # Deleting ubuntu files for getting more space (refer: https://github.com/actions/runner-images/issues/2840#issuecomment-1284059930)
       - name: Deleting ubuntu files
         run: |
           sudo rm -rf /usr/share/dotnet
