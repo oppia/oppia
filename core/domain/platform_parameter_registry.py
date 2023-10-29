@@ -429,7 +429,7 @@ Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
