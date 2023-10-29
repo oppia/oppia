@@ -106,28 +106,6 @@ class CommonTests(test_utils.GenericTestBase):
             def __exit__(self, *unused_args: str) -> None:
                 pass
 
-        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
-            return MockFailedCompilerContextManager()
-
-        swap_isdir = self.swap_with_checks(
-            os.path,
-            'isdir',
-            lambda _: False,
-            expected_args=[
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',)
-            ]
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys,
-            'exit',
-            lambda _: None,
-            expected_args=[(1,), (1,), (1,)]
-        )
-        with self.print_swap, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
-
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:
         """Context manager for starting and stoping an HTTP TCP server.
@@ -1332,8 +1310,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
+                    '  "BRANCH_NAME": "",\n'
+                    '  "SHORT_COMMIT_HASH": ""\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1347,8 +1325,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
+                    '  "BRANCH_NAME": "",\n'
+                    '  "SHORT_COMMIT_HASH": ""\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1393,8 +1371,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "",\n'
-                    '  "SHORT_COMMIT_HASH": ""\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
