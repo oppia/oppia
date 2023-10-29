@@ -237,7 +237,13 @@ class ExplorationHandler(
                     'draft_changes': {},
                     'email_preferences': {},
                     'next_content_id_index': 0,
-                    'exploration_metadata': {}
+                    'exploration_metadata': {},
+                    'cloned_from': '',
+                    'status': '',
+                    'community_owned': False,
+                    'mute_feedback_notifications': False,
+                    'mute_suggestion_notifications': False,
+                    ...
                 }
             exploration_data['show_state_editor_tutorial_on_load'] = bool(
                 self.user_id and not has_seen_editor_tutorial)
