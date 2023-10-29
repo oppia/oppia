@@ -163,8 +163,9 @@ describe('Interaction validator', function() {
         expect(warnings).toEqual([{
           type: WARNING_TYPES.ERROR,
           message:
-              'In answer group 1, correct answer should not have the ' +
-              'destination for really stuck learners, because it is useless'
+              'The answer group 1 is labelled as \'correct\', ' +
+              'but includes a \'destination for really stuck learners\'. ' +
+              'The latter is unnecessary and should be removed.'
         }]);
       }
     );

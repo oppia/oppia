@@ -90,9 +90,9 @@ export class baseInteractionValidationService {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            `In answer group ${groupId}, correct answer should ` +
-            'not have the destination for really stuck learners, ' +
-            'because it is useless')
+            `The answer group ${groupId} is labelled as 'correct', ` +
+            'but includes a \'destination for really stuck learners\'. ' +
+            'The latter is unnecessary and should be removed.')
         });
       }
     }
