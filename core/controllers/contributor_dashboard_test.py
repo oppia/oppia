@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import unittest.mock
 
 from core import feconf
 from core.constants import constants
@@ -37,7 +38,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from unittest.mock import patch
 
 from typing import Dict, List, cast
 
@@ -528,7 +528,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'translation_in_review_counts': {},
             'is_pinned': True
         }
-        with patch.object(
+        with unittest.mock.patch.object(
             opportunity_services,
             'get_pinned_lesson',
             return_value=mock_pinned_lesson_summary

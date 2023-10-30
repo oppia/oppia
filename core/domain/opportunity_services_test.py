@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import unittest.mock
 
 from core import feconf
 from core.constants import constants
@@ -44,8 +45,6 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, List, Union
-
-from unittest.mock import MagicMock
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1056,7 +1055,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic_id = 'topic123'
         lesson_id = 'lesson456'
 
-        mock_opportunity_summary = MagicMock(
+        mock_opportunity_summary = unittest.mock.MagicMock(
             id=lesson_id,
             topic_id=topic_id,
             topic_name='topic',
