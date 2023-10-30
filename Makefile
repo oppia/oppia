@@ -18,7 +18,7 @@ echo_flags:
 
 help: ## Display this help message.
 	@echo "Please use \`make <target>' where <target> is one of the followings."
-	@awk -F ':.*?## ' '/^[a-zA-Z]/ && NF==2 {printf "\033[36m  %-28s\033[0m %s\n", $$1, $$2}' Makefile | sort
+	@egrep '## .*' $(MAKEFILE_LIST) | sed -e 's/##//' | awk 'BEGIN {FS = ":"}; {if ($$2 == "") printf "%-10s\n", $$1; else printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo "List of docker services name: \033[32m $(ALL_SERVICES) \033[0m"
 
 
@@ -29,7 +29,7 @@ build: ## Builds the all docker setup.
 	$(MAKE) install_node
 	docker compose build
 
-run-devserver: # Runs the dev-server
+run-devserver: ## Runs the dev-server
 	docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
@@ -38,7 +38,7 @@ run-devserver: # Runs the dev-server
 	$(MAKE) update.requirements
 	$(MAKE) run-offline
 
-run-offline: # Runs the dev-server in offline mode
+run-offline: ## Runs the dev-server in offline mode
 	$(MAKE) start-devserver
 	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
@@ -80,7 +80,7 @@ update.package: ## Installs the npm requirements for the project
 # TODO(#18260): Permanently change the yarn configurations in `.yarnrc` when permanently moving to Docker Setup.
 # Creating a .yarnrc file to use yarn under docker
 	@echo 'cache-folder "/root/.yarn-cache"' > .yarnrc
-	${SHELL_PREFIX} angular-build yarn install
+	${SHELL_PREFIX} angular-build yarn install --pure-lockfile
 # Reverting the .yarnrc file to the original state, so that it works in python setup also.
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
@@ -123,6 +123,8 @@ run_tests.check_backend_associated_tests: ## Runs the backend associate tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
+## Flag for Acceptance tests
+## suite: The suite to run the acceptance tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop 
 # Adding node to the path.
@@ -145,6 +147,12 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
+## Flags for the e2e tests
+## suite: The suite to run the e2e tests
+## sharding_instances: Sets the number of parallel browsers to open while sharding.
+## CHROME_VERSION: Uses the specified version of the chrome driver.
+## MOBILE: Run e2e test in mobile viewport.
+## DEBUG: Runs the webdriverio test in debugging mode.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -153,12 +161,15 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	else \
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
+# Adding env variable for the mobile view
+	@export MOBILE=${MOBILE}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=3
+	sharding_instances := 3
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
