@@ -44,9 +44,7 @@ import { ExplorationStats, ExplorationStatsBackendDict } from
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
-  CyclicStateTransitionsPlaythroughIssueBackendDict,
-  EarlyQuitPlaythroughIssueBackendDict,
-  MultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
+  PlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssueModel,
   PlaythroughIssueType,
@@ -63,12 +61,12 @@ describe('Exploration improvements task registrar service', () => {
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict:
-    CyclicStateTransitionsPlaythroughIssueBackendDict;
+    PlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict:
-    EarlyQuitPlaythroughIssueBackendDict;
+    PlaythroughIssueBackendDict;
   let expStatsBackendDict: ExplorationStatsBackendDict;
   let misPlaythroughIssueBackendDict:
-    MultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
+    PlaythroughIssueBackendDict;
   let stateBackendDict: StateBackendDict;
   let stateStatsBackendDict: StateStatsBackendDict;
   let statesBackendDict: {[stateName: string]: StateBackendDict};
