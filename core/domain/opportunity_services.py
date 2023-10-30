@@ -1070,18 +1070,22 @@ def update_pinned_opportunity_model(
             opportunity_id=lesson_id
         )
     else:
-        # Update the model's opportunity_id with the given lesson_id.
-        pinned_opportunity.opportunity_id = lesson_id
-        pinned_opportunity.update_timestamps()
-        pinned_opportunity.put()
+        if pinned_opportunity:
+            # Update the model's opportunity_id with the given lesson_id.
+            pinned_opportunity.opportunity_id = lesson_id
+            pinned_opportunity.update_timestamps()
+            pinned_opportunity.put()
 
 
 def get_pinned_lesson(
     user_id: str,
     language_code: str,
     topic_id: str
-) -> opportunity_domain.ExplorationOpportunitySummary:
+) -> Optional[opportunity_domain.ExplorationOpportunitySummary]:
     """Retrieves the pinned lesson for a user in a specific language and topic.
+
+    NOTE: If the pinned lesson exists, it will have the 'is_pinned'
+    attribute set to True.
 
     Args:
         user_id: str. The ID of the user for whom to retrieve the pinned
@@ -1090,9 +1094,6 @@ def get_pinned_lesson(
             desired language.
         topic_id: str. The ID of the topic for which to retrieve
             the pinned lesson.
-
-    NOTE: If the pinned lesson exists, it will have the 'is_pinned'
-    attribute set to True.
 
     Returns:
         ExplorationOpportunitySummary or None. The pinned lesson as an

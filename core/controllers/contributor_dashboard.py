@@ -35,8 +35,8 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import (Dict, List, Optional, Sequence, Tuple, TypedDict, Union, OrderedDict)  # pylint: disable=line-too-long
-
+from typing import (Dict, List, Optional, Sequence, Tuple,
+                    TypedDict, Union, OrderedDict)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -417,11 +417,12 @@ class ReviewableOpportunitiesHandler(
         pinned_opportunity_summary = None
         if topic_name:
             topic = topic_fetchers.get_topic_by_name(topic_name)
-            pinned_opportunity_summary = opportunity_services.get_pinned_lesson(
-                self.user_id,
-                language,
-                topic.id
-            )
+            if language and self.user_id:
+                pinned_opportunity_summary = opportunity_services.get_pinned_lesson(
+                    self.user_id,
+                    language,
+                    topic.id
+                )
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
@@ -484,7 +485,7 @@ class LessonsPinningHandler(
     }
 
     @acl_decorators.open_access
-    def put(self):
+    def put(self) -> None:
         """Handles pinning/unpinning lessons."""
         assert self.normalized_request is not None
         assert self.user_id is not None
@@ -492,9 +493,10 @@ class LessonsPinningHandler(
         language_code = self.normalized_request.get('language_code')
         opportunity_id = self.normalized_request.get('opportunity_id')
 
-        opportunity_services.update_pinned_opportunity_model(
-            self.user_id, language_code, topic_id, opportunity_id
-        )
+        if language_code and topic_id:
+            opportunity_services.update_pinned_opportunity_model(
+                self.user_id, language_code, topic_id, opportunity_id
+            )
 
         self.render_json(self.values)
 
