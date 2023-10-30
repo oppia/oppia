@@ -573,13 +573,10 @@ def minify_third_party_libs(third_party_directory_path: str) -> None:
     third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
-    minified_third_party_js_filepath = os.path.join(
-        third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)
     minified_third_party_css_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
-    _minify_and_create_sourcemap(
-        third_party_js_filepath, minified_third_party_js_filepath)
+    _minify_and_create_sourcemap(third_party_js_filepath)
     _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
     safe_delete_file(third_party_js_filepath)
