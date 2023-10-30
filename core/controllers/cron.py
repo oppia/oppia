@@ -34,9 +34,8 @@ from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
-from collections import defaultdict
 
-from typing import Dict, DefaultDict, List
+from typing import DefaultDict, Dict, List
 
 from core.constants import constants
 
@@ -235,11 +234,11 @@ class CronMailReviewerNewSuggestionsHandler(
 
         # Initialize dictionaries to organize data.
         reviewer_ids_by_language: DefaultDict[
-            str, List[str]] = defaultdict(list)
+            str, List[str]] = DefaultDict(list)
         suggestions_by_language: DefaultDict[
             str, List[
                 suggestion_registry.
-                    ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                    ReviewableSuggestionEmailInfo]] = DefaultDict(list)
 
         for suggestion in new_suggestions_info:
             language_property = suggestion.language_code

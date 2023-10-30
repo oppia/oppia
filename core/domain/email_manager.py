@@ -1798,7 +1798,8 @@ def send_reviewer_notifications(
 
         if not reviewer_ids:
             logging.error(
-                f'No reviewers found for language {language_code} to notify')
+                'No reviewers found for language %s to notify') % (
+                    language_code)
             continue
 
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
@@ -1807,12 +1808,13 @@ def send_reviewer_notifications(
             'There are new <a href="%s%s">opportunities</a>' +
             ' to review translations that we think you might be interested' +
             ' in on the Contributor Dashboard page. Here are some examples' +
-            ' of contributions that are waiting for review:<br><br>'
-            'The following suggestions are available for review: <br><br><ul>%s</ul><br>'
-            'Please take some time to review any of the above contributions' +
-            ' (if they still need a review) or any other contributions on the dashboard.' +
-            ' We appreciate your help!<br><br>Thanks again, and happy reviewing!<br><br>'
-            'The Oppia Contributor Dashboard Team'
+            ' of contributions that are waiting for review:<br><br>' +
+            'The following suggestions are available for review: ' +
+            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
+            'of the above contributions (if they still need a review)' +
+            ' or any other contributions on the dashboard.' +
+            ' We appreciate your help!<br><br>Thanks again, '
+            'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
         )
         suggestion_descriptions = []
         for suggestion in suggestions:
