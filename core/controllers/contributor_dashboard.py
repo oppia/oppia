@@ -35,8 +35,8 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import (Dict, List, Optional, Sequence, Tuple,
-                    TypedDict, Union, OrderedDict)
+from typing import (Dict, List, Optional, OrderedDict, Sequence, Tuple,
+                    TypedDict, Union)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -332,11 +332,11 @@ class ReviewableOpportunitiesHandler(
             for opp in self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
             ):
-                if opp is not None:
-                    if isinstance(opp, dict):
-                        opportunity_dicts.append(opp)
-                    else:
-                        opportunity_dicts.append(opp.to_dict())
+                if opp is not None and isinstance(
+                    opp, opportunity_domain.PartialExplorationOpportunitySummaryDict):
+                    opportunity_dicts.append(opp)
+                elif opp is not None:
+                    opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -434,10 +434,10 @@ class ReviewableOpportunitiesHandler(
         # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            exp_opp_summaries.pop(pinned_opportunity_summary['id'], None)
+            pinned_opportunity_id = pinned_opportunity_summary.id
+            exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
-                pinned_opportunity_summary['id']
-            ] = pinned_opportunity_summary
+                pinned_opportunity_id] = pinned_opportunity_summary
 
         for item in exp_opp_summaries.values():
             ordered_exp_opp_summaries[item.id] = item
