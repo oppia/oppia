@@ -43,7 +43,6 @@ ParamNames = params.ParamNames
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     params.ParamNames.SHOW_TRANSLATION_SIZE
@@ -54,6 +53,7 @@ DEV_FEATURES_LIST = [
 TEST_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
