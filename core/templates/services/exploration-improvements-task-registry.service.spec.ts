@@ -42,12 +42,9 @@ import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats, ExplorationStatsBackendDict } from
   'domain/statistics/exploration-stats.model';
 import {
-  CyclicStateTransitionsPlaythroughIssue,
-  EarlyQuitPlaythroughIssue,
-  PlaythroughIssueBackendDict,
-  MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueModel,
+  PlaythroughIssue,
   PlaythroughIssueType,
+  PlaythroughIssueBackendDict
 } from 'domain/statistics/playthrough-issue.model';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
@@ -241,18 +238,17 @@ describe('Exploration improvements task registrar service', () => {
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
     return (
-      PlaythroughIssueModel.createFromBackendDict(dict)
-    ) as CyclicStateTransitionsPlaythroughIssue;
+      PlaythroughIssue.createFromBackendDict(dict)
+    );
   };
   const makeEqPlaythroughIssue = (dict = eqPlaythroughIssueBackendDict) => {
     return (
-      PlaythroughIssueModel.createFromBackendDict(dict)
-    ) as EarlyQuitPlaythroughIssue;
+      PlaythroughIssue.createFromBackendDict(dict)
+    );
   };
   const makeMisPlaythroughIssue = (dict = misPlaythroughIssueBackendDict) => {
     return (
-      PlaythroughIssueModel.createFromBackendDict(dict)) as
-       MultipleIncorrectSubmissionsPlaythroughIssue;
+      PlaythroughIssue.createFromBackendDict(dict));
   };
 
   it('should initialize successfully using default test values', () => {
