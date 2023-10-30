@@ -15,7 +15,6 @@
 """Tests for methods relating to sending emails."""
 
 from __future__ import annotations
-from collections import defaultdict
 
 import datetime
 import logging
@@ -42,8 +41,8 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, Dict, Final, List, Optional, Sequence, Set, Type,
-    Union, DefaultDict)
+    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Type,
+    Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -5155,10 +5154,10 @@ class NotifyReviewersNewSuggestionsTests(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
                 reviewer_ids_by_language: DefaultDict[
-                        str, List[str]] = defaultdict(list)
+                        str, List[str]] = DefaultDict(list)
                 suggestions_by_language: DefaultDict[str, List[
                         suggestion_registry.
-                            ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                            ReviewableSuggestionEmailInfo]] = DefaultDict(list)
                 reviewer_ids_by_language['en'] = []
                 suggestions_by_language['en'] = []
 
@@ -5178,10 +5177,10 @@ class NotifyReviewersNewSuggestionsTests(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 reviewer_ids_by_language: DefaultDict[
-                        str, List[str]] = defaultdict(list)
+                        str, List[str]] = DefaultDict(list)
                 suggestions_by_language: (DefaultDict[str, List[
                         suggestion_registry.
-                            ReviewableSuggestionEmailInfo]]) = defaultdict(
+                            ReviewableSuggestionEmailInfo]]) = DefaultDict(
                                 list)
                 reviewer_ids_by_language['en'] = []
                 suggestions_by_language['en'] = []
@@ -5225,20 +5224,18 @@ class NotifyReviewersNewSuggestionsTests(
             'was submitted for review 2 days ago:<br>What is the' +
             ' meaning of life?</li><br></ul><br>Please take some time ' +
             'to review any of the above contributions '
-            '(if they still need a review) or any other contributions on the dashboard. ' +
-            'We appreciate your help!<br><br>Thanks again, and happy reviewing!<br><br>' +
-            'The Oppia Contributor Dashboard Team'
+            '(if they still need a review) or any other contributions ' +
+            'on the dashboard. We appreciate your help!<br><br>Thanks again,' +
+            ' and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
             )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
                 with self.swap_get_platform_parameter_value:
                     reviewer_ids_by_language: DefaultDict[
-                        str, List[str]] = defaultdict(list)
-                    suggestions_by_language: DefaultDict[
-                        str, List[
-                            suggestion_registry.ReviewableSuggestionEmailInfo]] = (
-                                defaultdict(list))
+                        str, List[str]] = DefaultDict(list)
+                    suggestions_by_language: DefaultDict[str, List[suggestion_registry.ReviewableSuggestionEmailInfo]] = ( # pylint: disable=line-too-long
+                        DefaultDict(list))
                     reviewer_ids_by_language['en'] = [self.reviewer_1_id]
                     suggestions_by_language['en'] = [
                         reviewable_suggestion_email_info]

@@ -15,7 +15,6 @@
 """Tests for the cron jobs."""
 
 from __future__ import annotations
-from collections import defaultdict
 
 import datetime
 
@@ -570,10 +569,10 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.reviewer_ids_by_language: DefaultDict[
-            str, List[str]] = defaultdict(list)
+            str, List[str]] = DefaultDict(list)
         self.reviewable_suggestions_by_language: DefaultDict[
             str, List[suggestion_registry.ReviewableSuggestionEmailInfo]] = (
-                defaultdict(list))
+                DefaultDict(list))
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -615,7 +614,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
 
-        for language_code, reviewer_ids in self.reviewer_ids_by_language.items():
+        for language_code, reviewer_ids in self.reviewer_ids_by_language.items(): # pylint: disable=line-too-long
             suggestions = self.reviewable_suggestions_by_language[language_code]
             self.assertEqual(len(suggestions), 1)
             self.assertEqual(len(reviewer_ids), 1)
@@ -653,6 +652,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             'get_platform_parameter_value',
             True
         )
+
+        _ = self._create_translation_suggestion_2()
 
         with self.can_send_emails, self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
