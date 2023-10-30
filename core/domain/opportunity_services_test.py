@@ -42,9 +42,10 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from unittest.mock import MagicMock
 
 from typing import Dict, List, Union
+
+from unittest.mock import MagicMock
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1076,7 +1077,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             # Test pinning an opportunity.
             opportunity_services.update_pinned_opportunity_model(
                 user_id, language_code, topic_id, lesson_id)
-            
+
             pinned_opportunity = opportunity_services.get_pinned_lesson(
                 user_id, language_code, topic_id)
 
@@ -1106,6 +1107,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 topic_id,
                 None
             )
+
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):

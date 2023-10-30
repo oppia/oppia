@@ -1091,14 +1091,13 @@ def get_pinned_lesson(
         topic_id: str. The ID of the topic for which to retrieve
             the pinned lesson.
 
+    NOTE: If the pinned lesson exists, it will have the 'is_pinned'
+    attribute set to True.
+
     Returns:
         ExplorationOpportunitySummary or None. The pinned lesson as an
-            ExplorationOpportunitySummary object, or None if no
-            pinned lesson exists.
-
-    Note:
-        If the pinned lesson exists, it will have the 'is_pinned'
-            attribute set to True.
+        ExplorationOpportunitySummary object, or None if no
+        pinned lesson exists.
     """
     pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
         user_id,

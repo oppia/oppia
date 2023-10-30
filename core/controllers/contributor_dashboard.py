@@ -35,7 +35,7 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, OrderedDict
+from typing import (Dict, List, Optional, Sequence, Tuple, TypedDict, Union, OrderedDict)  # pylint: disable=line-too-long
 
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[

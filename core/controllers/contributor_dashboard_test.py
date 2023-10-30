@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import datetime
-import json
 
 from core import feconf
 from core.constants import constants
