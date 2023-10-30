@@ -21,6 +21,7 @@ var common = require('./webpack.common.config.ts');
 var path = require('path');
 var webpack = require('webpack');
 var analyticsConstants = require('./assets/analytics-constants.json');
+const TerserPlugin = require('terser-webpack-plugin');
 
 
 module.exports = merge(common, {
@@ -40,5 +41,15 @@ module.exports = merge(common, {
         analyticsConstants.SITE_NAME_FOR_ANALYTICS
       ),
     })
-  ]
+  ],
+  optimization: {
+    ...common.optimization,
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: false,
+        sourceMap: true,
+      }),
+    ],
+  }
 });
