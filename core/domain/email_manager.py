@@ -1803,7 +1803,7 @@ def send_reviewer_notifications(
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
             'Hi %s,<br><br>'
-            'There are new opportunities to review translations that we think you might be interested in on the Contributor Dashboard page. Here are some examples of contributions that are waiting for review:<br><br>'
+            'There are new <a href="%s%s">opportunities</a> to review translations that we think you might be interested in on the Contributor Dashboard page. Here are some examples of contributions that are waiting for review:<br><br>'
             'The following suggestions are available for review: <br><br><ul>%s</ul><br>'
             'Please take some time to review any of the above contributions (if they still need a review) or any other contributions on the dashboard. We appreciate your help!<br><br>'
             'Thanks again, and happy reviewing!<br><br>'
@@ -1817,7 +1817,8 @@ def send_reviewer_notifications(
 
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
-            email_body = email_body_template % (reviewer_username, ''.join(suggestion_descriptions))
+            email_body = email_body_template % (reviewer_username, feconf.OPPIA_SITE_URL,
+                        feconf.CONTRIBUTOR_DASHBOARD_URL,''.join(suggestion_descriptions))
 
             # Send the email to each reviewer.
             reviewer_email = user_services.get_email_from_user_id(reviewer_id)

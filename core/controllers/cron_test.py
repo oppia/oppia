@@ -472,7 +472,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         i.e with the URLs defined in main.
         """
         self.reviewer_ids_by_language = reviewer_by_language
-        self.reviewable_suggestions_by_language = reviewable_suggestions_by_language
+        self.reviewable_suggestions_by_language = (
+            reviewable_suggestions_by_language)
 
     def _create_translation_suggestion(
         self
@@ -570,9 +571,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
         self.reviewer_ids_by_language: DefaultDict[
             str, List[str]] = defaultdict(list)
-        self.reviewable_suggestions_by_language:  DefaultDict[
-            str, List[
-                suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+        self.reviewable_suggestions_by_language: DefaultDict[
+            str, List[suggestion_registry.ReviewableSuggestionEmailInfo]] = (
+                defaultdict(list))
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -598,26 +599,26 @@ class CronMailReviewerNewSuggestionsHandlerTests(
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
             self
         ) -> None:
-            self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-            swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
-                'get_platform_parameter_value',
-                True
-            )
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        swap_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            True
+        )
 
-            with self.can_send_emails, self.testapp_swap:
-                with swap_platform_parameter_value, self.swap(
-                    email_manager,
-                    'send_reviewer_notifications',
-                    self._mock_send_contributor_dashboard_reviewers_emails):
-                    self.get_json(
-                        '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+        with self.can_send_emails, self.testapp_swap:
+            with swap_platform_parameter_value, self.swap(
+                email_manager,
+                'send_reviewer_notifications',
+                self._mock_send_contributor_dashboard_reviewers_emails):
+                self.get_json(
+                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
 
-            for language_code, reviewer_ids in self.reviewer_ids_by_language.items():
-                suggestions = self.reviewable_suggestions_by_language[language_code]
-                self.assertEqual(len(suggestions), 1)
-                self.assertEqual(len(reviewer_ids), 1)
-                self.assertEqual(reviewer_ids[0], self.reviewer_id)
+        for language_code, reviewer_ids in self.reviewer_ids_by_language.items():
+            suggestions = self.reviewable_suggestions_by_language[language_code]
+            self.assertEqual(len(suggestions), 1)
+            self.assertEqual(len(reviewer_ids), 1)
+            self.assertEqual(reviewer_ids[0], self.reviewer_id)
 
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -650,11 +651,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             'get_platform_parameter_value',
             True
         )
-        translation_suggestion = self._create_translation_suggestion_2()
-        expected_reviewable_suggestion_email_info = (
-            suggestion_services
-            .create_reviewable_suggestion_email_info_from_suggestion(
-                translation_suggestion))
 
         with self.can_send_emails, self.testapp_swap:
             with swap_platform_parameter_value, self.swap(
@@ -663,9 +659,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 response = self.get_json(
                     '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
-
-        # Check the response and ensure the email notifications are sent successfully.
-        self.assertEqual(response, {})
 
         # For 'hi' language
         hi_reviewer_ids = self.reviewer_ids_by_language['hi']

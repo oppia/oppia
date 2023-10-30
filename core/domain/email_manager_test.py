@@ -5157,7 +5157,8 @@ class NotifyReviewersNewSuggestionsTests(
                 reviewer_ids_by_language: DefaultDict[
                         str, List[str]] = defaultdict(list)
                 suggestions_by_language: DefaultDict[str, List[
-                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]] = defaultdict(list)
                 reviewer_ids_by_language['en'] = []
                 suggestions_by_language['en'] = []
 
@@ -5215,7 +5216,7 @@ class NotifyReviewersNewSuggestionsTests(
             datetime.timedelta(days=review_wait_time))
         expected_email_html_body = (
             'Hi reviewer1' +
-            ',<br><br>There are new opportunities to review translations ' +
+            ',<br><br>There are new <a href="%s%s">opportunities</a> to review translations ' +
             'that we think you might be interested in on the Contributor ' +
             'Dashboard page. Here are some examples of contributions that ' +
             'are waiting for review:'
@@ -5246,7 +5247,8 @@ class NotifyReviewersNewSuggestionsTests(
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].html, expected_email_html_body)
+        self.assertEqual(messages[0].html, (expected_email_html_body % ( feconf.OPPIA_SITE_URL,
+                        feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(

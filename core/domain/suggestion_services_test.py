@@ -6770,8 +6770,9 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 threshold_days):
-                suggestion_info = (suggestion_services.
-                    get_new_suggestions_for_reviewer_notifications())
+                suggestion_info = (
+                    suggestion_services.
+                        get_new_suggestions_for_reviewer_notifications())
 
             # Assert that the correct number of suggestions is returned.
             self.assertEqual(len(suggestion_info), 3)
