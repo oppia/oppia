@@ -107,23 +107,6 @@ export class ContributorBadgesComponent {
     const allContributionStats = await this
       .contributionAndReviewStatsService.fetchAllStats(username);
 
-    if (allContributionStats.translation_review_stats.length > 0) {
-      allContributionStats.translation_review_stats.forEach((stat) => {
-        const languageDescription =
-          this.languageUtilService.getAudioLanguageDescription(
-            stat.language_code);
-
-        this.totalTranslationStats[languageDescription] = {
-          language: this.languageUtilService.getShortLanguageDescription(
-            languageDescription),
-          submissions: 0,
-          reviews: 0,
-          corrections: 0
-        };
-        this.reviewableLanguages.push(languageDescription);
-      });
-    }
-
     this.userCanReviewQuestionSuggestions = (
       userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
@@ -161,10 +144,21 @@ export class ContributorBadgesComponent {
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
 
-        this.totalTranslationStats[languageDescription].reviews += (
-          stat.reviewed_translations_count);
-        this.totalTranslationStats[languageDescription].corrections += (
-          stat.accepted_translations_with_reviewer_edits_count);
+        if (!this.totalTranslationStats[languageDescription]) {
+          this.totalTranslationStats[languageDescription] = {
+            language: this.languageUtilService.getShortLanguageDescription(
+              languageDescription),
+            submissions: 0,
+            reviews: stat.reviewed_translations_count,
+            corrections: stat.accepted_translations_with_reviewer_edits_count
+          };
+          this.reviewableLanguages.push(languageDescription);
+        } else {
+          this.totalTranslationStats[languageDescription].reviews += (
+            stat.reviewed_translations_count);
+          this.totalTranslationStats[languageDescription].corrections += (
+            stat.accepted_translations_with_reviewer_edits_count);
+        }
       });
     }
     if (allContributionStats.question_contribution_stats.length > 0) {

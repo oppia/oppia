@@ -167,10 +167,10 @@ describe('Contributor Certificate Download Modal Component', () => {
     expect(component.errorMessage).toEqual('Invalid date range.');
   });
 
-  it('should function correctly', () => {
+  it('should not show errors for valid dates', () => {
     const today = new Date();
-    let fromDate = new Date();
-    let toDate = new Date();
+    const fromDate = new Date();
+    const toDate = new Date();
     fromDate.setDate(today.getDate() - 2);
     toDate.setDate(today.getDate() - 1);
     component.fromDate = fromDate.toDateString();
