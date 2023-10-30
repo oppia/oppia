@@ -64,7 +64,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightshandler/translation');
+      '/contributionrightshandler/review_translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
