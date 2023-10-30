@@ -35,8 +35,9 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import (Dict, List, Optional, OrderedDict, Sequence, Tuple,
-                    TypedDict, Union)
+from typing import (
+    Dict, List, Optional, OrderedDict, Sequence, Tuple,
+    TypedDict, Union)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -326,17 +327,15 @@ class ReviewableOpportunitiesHandler(
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
-            opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
+            ReviewableOpportunitiesHandlerNormalizedRequestDict
+            ] = []
         if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
+            for opp in (
+                self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
-            ):
-                if opp is not None and isinstance(
-                    opp, opportunity_domain.PartialExplorationOpportunitySummaryDict):
+            )):
+                if opp is not None:
                     opportunity_dicts.append(opp)
-                elif opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -418,11 +417,12 @@ class ReviewableOpportunitiesHandler(
         if topic_name:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if language and self.user_id:
-                pinned_opportunity_summary = opportunity_services.get_pinned_lesson(
-                    self.user_id,
-                    language,
-                    topic.id
-                )
+                pinned_opportunity_summary = (
+                    opportunity_services.get_pinned_lesson(
+                        self.user_id,
+                        language,
+                        topic.id
+                    ))
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
@@ -440,7 +440,8 @@ class ReviewableOpportunitiesHandler(
                 pinned_opportunity_id] = pinned_opportunity_summary
 
         for item in exp_opp_summaries.values():
-            ordered_exp_opp_summaries[item.id] = item
+            if item is not None:
+                ordered_exp_opp_summaries[item.id] = item
         return list(ordered_exp_opp_summaries.values())
 
 
