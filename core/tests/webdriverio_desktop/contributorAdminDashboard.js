@@ -285,10 +285,12 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.get();
 
     await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
     await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
     await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
     await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
@@ -316,7 +318,7 @@ describe('Contributor Admin Dashboard', function() {
 
       await contributorDashboardAdminPage.switchLanguage('English');
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectNoStatsElement(0);
+      await contributorDashboardAdminPage.expectNoStatsElement();
 
       await users.logout();
     });
