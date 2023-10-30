@@ -528,6 +528,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'translation_in_review_counts': {},
             'is_pinned': True
         }
+
+        # Here we use object because every type is
+        # inherited from object class.
         with unittest.mock.patch.object(
             opportunity_services,
             'get_pinned_lesson',

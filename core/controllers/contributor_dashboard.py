@@ -327,7 +327,7 @@ class ReviewableOpportunitiesHandler(
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
-            ReviewableOpportunitiesHandlerNormalizedRequestDict
+            opportunity_domain.PartialExplorationOpportunitySummaryDict
             ] = []
         if self.user_id:
             for opp in (
@@ -335,7 +335,7 @@ class ReviewableOpportunitiesHandler(
                 self.user_id, topic_name, language
             )):
                 if opp is not None:
-                    opportunity_dicts.append(opp)
+                    opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }

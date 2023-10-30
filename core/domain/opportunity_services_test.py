@@ -1081,7 +1081,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 user_id, language_code, topic_id)
 
             self.assertIsNotNone(pinned_opportunity)
-            self.assertEqual(pinned_opportunity.id, lesson_id)
+            if pinned_opportunity is not None:
+                self.assertEqual(pinned_opportunity.id, lesson_id)
 
             # Test unpinning the opportunity.
             opportunity_services.update_pinned_opportunity_model(
