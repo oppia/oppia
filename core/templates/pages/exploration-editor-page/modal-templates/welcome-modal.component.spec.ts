@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for WelcomeModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from
@@ -83,6 +83,8 @@ describe('Welcome Modal Component', () => {
   });
 
   it ('should evaluate exploration id when component is initialized', () => {
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
+    component.welcomeHeading = welcomeModalRef;
     expect(component.explorationId).toBe(explorationId);
     expect(component.editorWelcomeImgUrl).toBe(
       '/assets/images/general/editor_welcome.svg');
@@ -91,6 +93,8 @@ describe('Welcome Modal Component', () => {
   });
 
   it ('should close the modal', () => {
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
+    component.welcomeHeading = welcomeModalRef;
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalledWith();
