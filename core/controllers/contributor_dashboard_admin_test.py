@@ -430,7 +430,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcontributorusershandler/translation', params={
+            '/getcontributorusershandler/review_translation', params={
                 'language_code': 'hi'
             })
 
@@ -443,7 +443,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
-        response = self.get_json('/getcontributorusershandler/question')
+        response = self.get_json('/getcontributorusershandler/review_question')
 
         self.assertEqual(len(response['usernames']), 1)
         self.assertTrue('question' in response['usernames'])

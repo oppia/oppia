@@ -52,7 +52,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should add contribution rights to the user given the' +
     'name when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'translation';
+    let category = 'review_translation';
     let languageCode = 'en';
     let username = 'validUser';
     let payload = {
@@ -79,7 +79,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should fail to add contribution rights to the user when user does' +
     'not exist when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'translation';
+    let category = 'review_translation';
     let languageCode = 'en';
     let username = 'InvalidUser';
     let payload = {
@@ -91,7 +91,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightshandler/translation');
+      '/contributionrightshandler/review_translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -106,7 +106,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should get the data of contribution rights given the role' +
     'when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'translation';
+    let category = 'review_translation';
     let languageCode = 'en';
     let result = ['validUsername'];
     cdabas.viewContributionReviewersAsync(
@@ -114,7 +114,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler/translation?language_code=en');
+      '/getcontributorusershandler/review_translation?language_code=en');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -125,14 +125,14 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalledWith(result);
     expect(failHandler).not.toHaveBeenCalled();
 
-    category = 'question';
+    category = 'review_question';
 
     cdabas.viewContributionReviewersAsync(
       category, null
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
-      '/getcontributorusershandler/question');
+      '/getcontributorusershandler/review_question');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -219,7 +219,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should remove user contribution rights given the username' +
     'when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'translation';
+    let category = 'review_translation';
     let languageCode = 'en';
     let username = 'validUser';
     let payload = {
@@ -244,7 +244,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should fail to remove user contribution rights when user does' +
     'not exist when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'translation';
+    let category = 'review_translation';
     let languageCode = 'en';
     let username = 'InvalidUser';
     let payload = {
