@@ -38,23 +38,15 @@ export interface ExplorationQuitCustomizationArgs {
   'time_spent_in_state_in_msecs': {value: number};
 }
 
-// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This type takes one of the values of the above customization args based
-// on the type of ActionType.
-type ActionCustomizationArgs<ActionType> = (
-  ActionType extends 'ExplorationStart' ?
-  ExplorationStartCustomizationArgs :
-  ActionType extends 'AnswerSubmit' ? AnswerSubmitCustomizationArgs :
-  ActionType extends 'ExplorationQuit' ?
-  ExplorationQuitCustomizationArgs : never);
+type LearnerActionCustomizationArgs =
+  | ExplorationStartCustomizationArgs
+  | AnswerSubmitCustomizationArgs
+  | ExplorationQuitCustomizationArgs;
 
-// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This interface takes the type of backend dict according to the ActionType
-// parameter.
-interface LearnerActionBackendDictBase<ActionType> {
-  'action_type': ActionType;
-  'action_customization_args': ActionCustomizationArgs<ActionType>;
-  'schema_version': number;
+interface LearnerActionBackendDict {
+  action_type: LearnerActionType;
+  action_customization_args: LearnerActionCustomizationArgs;
+  schema_version: number;
 }
 
 export enum LearnerActionType {
@@ -63,30 +55,16 @@ export enum LearnerActionType {
   ExplorationQuit = 'ExplorationQuit',
 }
 
-export type ExplorationStartLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<LearnerActionType.ExplorationStart>);
-
-export type AnswerSubmitLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<LearnerActionType.AnswerSubmit>);
-
-export type ExplorationQuitLearnerActionBackendDict = (
-  LearnerActionBackendDictBase<LearnerActionType.ExplorationQuit>);
-
-export type LearnerActionBackendDict = (
-  ExplorationStartLearnerActionBackendDict |
-  AnswerSubmitLearnerActionBackendDict |
-  ExplorationQuitLearnerActionBackendDict);
-
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the LearnerActionType parameter.
-class LearnerActionBase<LearnerActionType> {
+class LearnerActionBase {
   constructor(
     public readonly actionType: LearnerActionType,
-    public actionCustomizationArgs: ActionCustomizationArgs<LearnerActionType>,
+    public actionCustomizationArgs: LearnerActionCustomizationArgs,
     public schemaVersion: number
   ) {}
 
-  toBackendDict(): LearnerActionBackendDictBase<LearnerActionType> {
+  toBackendDict(): LearnerActionBackendDict {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -96,13 +74,13 @@ class LearnerActionBase<LearnerActionType> {
 }
 
 export class ExplorationStartLearnerAction extends
-  LearnerActionBase<LearnerActionType.ExplorationStart> {}
+  LearnerActionBase {}
 
 export class AnswerSubmitLearnerAction extends
-  LearnerActionBase<LearnerActionType.AnswerSubmit> {}
+  LearnerActionBase {}
 
 export class ExplorationQuitLearnerAction extends
-  LearnerActionBase<LearnerActionType.ExplorationQuit> {}
+  LearnerActionBase {}
 
 export type LearnerAction = (
   ExplorationStartLearnerAction |
@@ -168,7 +146,7 @@ export class LearnerActionModel {
       default:
         break;
     }
-    const invalidBackendDict: never = learnerActionBackendDict;
+    const invalidBackendDict = learnerActionBackendDict;
     throw new Error(
       'Backend dict does not match any known action type: ' +
       angular.toJson(invalidBackendDict));
