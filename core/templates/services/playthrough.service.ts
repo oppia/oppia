@@ -27,7 +27,7 @@ import {
   EarlyQuitCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs
 } from 'domain/statistics/playthrough-issue.model';
-import { LearnerAction, LearnerActionModel } from
+import { LearnerAction } from
   'domain/statistics/learner-action.model';
 import { Playthrough, PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
@@ -208,7 +208,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions = [
-      LearnerActionModel.createNewExplorationStartAction({
+      LearnerAction.createNewExplorationStartAction({
         state_name: {value: initStateName},
       })
     ];
@@ -230,7 +230,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      LearnerActionModel.createNewAnswerSubmitAction({
+      LearnerAction.createNewAnswerSubmitAction({
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
         interaction_id: {value: interactionId},
@@ -250,7 +250,7 @@ export class PlaythroughService {
     }
 
     this.recordedLearnerActions.push(
-      LearnerActionModel.createNewExplorationQuitAction({
+      LearnerAction.createNewExplorationQuitAction({
         state_name: {value: stateName},
         time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
       }));

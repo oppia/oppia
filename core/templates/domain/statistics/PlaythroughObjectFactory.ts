@@ -21,9 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  LearnerActionModel,
-  LearnerActionBackendDict,
   LearnerAction,
+  LearnerActionBackendDict,
 } from 'domain/statistics/learner-action.model';
 import {
   EarlyQuitCustomizationArgs,
@@ -150,7 +149,7 @@ export class PlaythroughObjectFactory {
   createFromBackendDict(
       playthroughBackendDict: PlaythroughBackendDict): Playthrough {
     var actions = playthroughBackendDict.actions.map(
-      LearnerActionModel.createFromBackendDict);
+      LearnerAction.createFromBackendDict);
 
     switch (playthroughBackendDict.issue_type) {
       case 'EarlyQuit':

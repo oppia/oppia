@@ -43,7 +43,7 @@ type LearnerActionCustomizationArgs =
   | AnswerSubmitCustomizationArgs
   | ExplorationQuitCustomizationArgs;
 
-interface LearnerActionBackendDict {
+export interface LearnerActionBackendDict {
   action_type: LearnerActionType;
   action_customization_args: LearnerActionCustomizationArgs;
   schema_version: number;
@@ -55,9 +55,7 @@ export enum LearnerActionType {
   ExplorationQuit = 'ExplorationQuit',
 }
 
-// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This class takes the type according to the LearnerActionType parameter.
-class LearnerActionBase {
+export class LearnerAction {
   constructor(
     public readonly actionType: LearnerActionType,
     public actionCustomizationArgs: LearnerActionCustomizationArgs,
@@ -71,52 +69,42 @@ class LearnerActionBase {
       schema_version: this.schemaVersion,
     };
   }
-}
 
-export class ExplorationStartLearnerAction extends
-  LearnerActionBase {}
-
-export class AnswerSubmitLearnerAction extends
-  LearnerActionBase {}
-
-export class ExplorationQuitLearnerAction extends
-  LearnerActionBase {}
-
-export type LearnerAction = (
-  ExplorationStartLearnerAction |
-  AnswerSubmitLearnerAction |
-  ExplorationQuitLearnerAction);
-
-export class LearnerActionModel {
   static createNewExplorationStartAction(
       actionCustomizationArgs: ExplorationStartCustomizationArgs
-  ): ExplorationStartLearnerAction {
-    return new ExplorationStartLearnerAction(
-      LearnerActionType.ExplorationStart, actionCustomizationArgs,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  ): LearnerAction {
+    return new LearnerAction(
+      LearnerActionType.ExplorationStart,
+      actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
   }
 
   static createNewAnswerSubmitAction(
       actionCustomizationArgs: AnswerSubmitCustomizationArgs
-  ): AnswerSubmitLearnerAction {
-    return new AnswerSubmitLearnerAction(
-      LearnerActionType.AnswerSubmit, actionCustomizationArgs,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  ): LearnerAction {
+    return new LearnerAction(
+      LearnerActionType.AnswerSubmit,
+      actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
   }
 
   static createNewExplorationQuitAction(
       actionCustomizationArgs: ExplorationQuitCustomizationArgs
-  ): ExplorationQuitLearnerAction {
-    return new ExplorationQuitLearnerAction(
-      LearnerActionType.ExplorationQuit, actionCustomizationArgs,
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  ): LearnerAction {
+    return new LearnerAction(
+      LearnerActionType.ExplorationQuit,
+      actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
   }
 
   /**
    * @typedef LearnerActionBackendDict
    * @property {string} actionType - type of an action.
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action.
+   * @property {Object.<string, *>} LearnerActionCustomizationArgs
+   *  - customization dict for an action.
    * @property {number} schemaVersion - schema version of the class instance.
    *   Defaults to the latest schema version.
    */
@@ -126,29 +114,37 @@ export class LearnerActionModel {
    * @returns {LearnerAction}
    */
   static createFromBackendDict(
-      learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
+      learnerActionBackendDict: LearnerActionBackendDict
+  ): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case LearnerActionType.ExplorationStart:
-        return new ExplorationStartLearnerAction(
+        return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict.action_customization_args,
-          learnerActionBackendDict.schema_version);
+          learnerActionBackendDict
+            .action_customization_args as ExplorationStartCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       case LearnerActionType.AnswerSubmit:
-        return new AnswerSubmitLearnerAction(
+        return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict.action_customization_args,
-          learnerActionBackendDict.schema_version);
+          learnerActionBackendDict
+            .action_customization_args as AnswerSubmitCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       case LearnerActionType.ExplorationQuit:
-        return new ExplorationQuitLearnerAction(
+        return new LearnerAction(
           learnerActionBackendDict.action_type,
-          learnerActionBackendDict.action_customization_args,
-          learnerActionBackendDict.schema_version);
+          learnerActionBackendDict
+            .action_customization_args as ExplorationQuitCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       default:
         break;
     }
     const invalidBackendDict = learnerActionBackendDict;
     throw new Error(
       'Backend dict does not match any known action type: ' +
-      angular.toJson(invalidBackendDict));
+        angular.toJson(invalidBackendDict)
+    );
   }
 }
