@@ -1,12 +1,12 @@
 <ng-template #EditorTabTourPreviewTab>
-  <h3 class="e2e-test-joyride-title">Preview</h3>
-  <p>At any time, you can click the <b>preview</b> button to play through your exploration.</p>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Preview</h3>
+  <p tabindex="0">At any time, you can click the <b>preview</b> button to play through your exploration.</p>
 </ng-template>
 
 <div class="navbar-helper">
   <div class="navbar-tabs">
     <div class="navbar-text">
-      {{ getNavbarText() }}
+      <h1>{{ getNavbarText() }}</h1>
       <span class="e2e-test-autosave-indicator autosave-indicator" *ngIf="autosaveIsInProgress">
         &emsp;Auto Saving ...
       </span>
@@ -318,11 +318,14 @@
 
   .navbar-text {
     align-items: center;
-    color: #fff;
     display: flex;
+    margin-left: 3%;
+  }
+
+  .navbar-text h1 {
+    color: #fff;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 20px;
-    margin-left: 3%;
   }
 
   .navbar-icons {
