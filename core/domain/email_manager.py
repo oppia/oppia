@@ -1784,9 +1784,9 @@ def send_reviewer_notifications(
     """Sends email notifications to reviewers about new suggestions.
 
     Args:
-        suggestions_by_language: A dictionary that organizes
+        suggestions_by_language: dict. A dictionary that organizes
             new suggestions by language code.
-        reviewer_ids_by_language: A dictionary that organizes reviewer
+        reviewer_ids_by_language: dict. A dictionary that organizes reviewer
             IDs by language code.
     """
     if not feconf.CAN_SEND_EMAILS:
@@ -1797,28 +1797,34 @@ def send_reviewer_notifications(
         reviewer_ids = reviewer_ids_by_language[language_code]
 
         if not reviewer_ids:
-            logging.error(f'No reviewers found for language {language_code} to notify')
+            logging.error(
+                f'No reviewers found for language {language_code} to notify')
             continue
 
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
             'Hi %s,<br><br>'
-            'There are new <a href="%s%s">opportunities</a> to review translations that we think you might be interested in on the Contributor Dashboard page. Here are some examples of contributions that are waiting for review:<br><br>'
+            'There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:<br><br>'
             'The following suggestions are available for review: <br><br><ul>%s</ul><br>'
-            'Please take some time to review any of the above contributions (if they still need a review) or any other contributions on the dashboard. We appreciate your help!<br><br>'
-            'Thanks again, and happy reviewing!<br><br>'
+            'Please take some time to review any of the above contributions' +
+            ' (if they still need a review) or any other contributions on the dashboard.' +
+            ' We appreciate your help!<br><br>Thanks again, and happy reviewing!<br><br>'
             'The Oppia Contributor Dashboard Team'
         )
         suggestion_descriptions = []
         for suggestion in suggestions:
             suggestion_descriptions.append(
-                _create_html_for_reviewable_suggestion_email_info(suggestion)
-            )
+                _create_html_for_reviewable_suggestion_email_info(suggestion))
 
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
-            email_body = email_body_template % (reviewer_username, feconf.OPPIA_SITE_URL,
-                        feconf.CONTRIBUTOR_DASHBOARD_URL,''.join(suggestion_descriptions))
+            email_body = email_body_template % (
+                reviewer_username, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
+                    suggestion_descriptions))
 
             # Send the email to each reviewer.
             reviewer_email = user_services.get_email_from_user_id(reviewer_id)

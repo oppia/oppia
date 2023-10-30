@@ -612,7 +612,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 'send_reviewer_notifications',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+                    '/cron/mail/reviewers/new_cont' +
+                    'ributor_dashboard_suggestions')
 
         for language_code, reviewer_ids in self.reviewer_ids_by_language.items():
             suggestions = self.reviewable_suggestions_by_language[language_code]
@@ -639,7 +640,8 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 'send_reviewer_notifications',
                 self._mock_send_contributor_dashboard_reviewers_emails):
                 self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+                    '/cron/mail/reviewers/new_' +
+                    'contributor_dashboard_suggestions')
         self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
 
         self.logout()
@@ -657,18 +659,21 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 email_manager,
                 'send_reviewer_notifications',
                 self._mock_send_contributor_dashboard_reviewers_emails):
-                response = self.get_json(
-                    '/cron/mail/reviewers/new_contributor_dashboard_suggestions')
+                self.get_json(
+                    '/cron/mail/reviewers/new_contr' +
+                    'ibutor_dashboard_suggestions')
 
-        # For 'hi' language
+        # For 'hi' language.
         hi_reviewer_ids = self.reviewer_ids_by_language['hi']
-        hi_reviewable_suggestions = self.reviewable_suggestions_by_language['hi']
+        hi_reviewable_suggestions = (
+            self.reviewable_suggestions_by_language['hi'])
         self.assertEqual(len(hi_reviewable_suggestions), 1)
         self.assertEqual(len(hi_reviewer_ids), 0)
 
-        # For 'en' language
+        # For 'en' language.
         en_reviewer_ids = self.reviewer_ids_by_language['en']
-        en_reviewable_suggestions = self.reviewable_suggestions_by_language['en']
+        en_reviewable_suggestions = (
+            self.reviewable_suggestions_by_language['en'])
         self.assertEqual(len(en_reviewable_suggestions), 1)
         self.assertEqual(len(en_reviewer_ids), 1)
         self.assertEqual(en_reviewer_ids[0], self.reviewer_id)

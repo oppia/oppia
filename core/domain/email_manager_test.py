@@ -5025,8 +5025,8 @@ class NotifyReviewersNewSuggestionsTests(
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
         translation_suggestion = (
-            self._create_translation_suggestion_in_lang_with_html_and_datetime('en', # pylint: disable=line-too-long
-                '<p>What is the meaning of life?</p>',
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
+                'en', '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         self.reviewable_suggestion_email_info = (
             suggestion_services
@@ -5174,7 +5174,7 @@ class NotifyReviewersNewSuggestionsTests(
                 logs[0], 'This app cannot send emails to users.')
 
     def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
-         with self.swap_get_platform_parameter_value, self.capture_logging(
+        with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
                 reviewer_ids_by_language: DefaultDict[
@@ -5216,15 +5216,15 @@ class NotifyReviewersNewSuggestionsTests(
             datetime.timedelta(days=review_wait_time))
         expected_email_html_body = (
             'Hi reviewer1' +
-            ',<br><br>There are new <a href="%s%s">opportunities</a> to review translations ' +
-            'that we think you might be interested in on the Contributor ' +
-            'Dashboard page. Here are some examples of contributions that ' +
-            'are waiting for review:'
+            ',<br><br>There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:'
             '<br><br>The following suggestions are available for review: ' +
-            '<br><br><ul><li>The following English translation suggestion was ' +
-            'submitted for review 2 days ago:<br>What is the meaning of life?' +
-            '</li><br></ul><br>Please take some time to review any of the above ' +
-            'contributions '
+            '<br><br><ul><li>The following English translation suggestion ' +
+            'was submitted for review 2 days ago:<br>What is the' +
+            ' meaning of life?</li><br></ul><br>Please take some time ' +
+            'to review any of the above contributions '
             '(if they still need a review) or any other contributions on the dashboard. ' +
             'We appreciate your help!<br><br>Thanks again, and happy reviewing!<br><br>' +
             'The Oppia Contributor Dashboard Team'
@@ -5235,10 +5235,13 @@ class NotifyReviewersNewSuggestionsTests(
                 with self.swap_get_platform_parameter_value:
                     reviewer_ids_by_language: DefaultDict[
                         str, List[str]] = defaultdict(list)
-                    suggestions_by_language: DefaultDict[str, List[
-                        suggestion_registry.ReviewableSuggestionEmailInfo]] = defaultdict(list)
+                    suggestions_by_language: DefaultDict[
+                        str, List[
+                            suggestion_registry.ReviewableSuggestionEmailInfo]] = (
+                                defaultdict(list))
                     reviewer_ids_by_language['en'] = [self.reviewer_1_id]
-                    suggestions_by_language['en'] = [reviewable_suggestion_email_info]
+                    suggestions_by_language['en'] = [
+                        reviewable_suggestion_email_info]
 
                     email_manager.send_reviewer_notifications(
                         reviewer_ids_by_language,
@@ -5247,8 +5250,9 @@ class NotifyReviewersNewSuggestionsTests(
 
         messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].html, (expected_email_html_body % ( feconf.OPPIA_SITE_URL,
-                        feconf.CONTRIBUTOR_DASHBOARD_URL)))
+        self.assertEqual(
+            messages[0].html, (expected_email_html_body % (
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(

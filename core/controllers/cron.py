@@ -229,8 +229,9 @@ class CronMailReviewerNewSuggestionsHandler(
         ):
             return self.render_json({})
 
-        new_suggestions_info = (suggestion_services.
-            get_new_suggestions_for_reviewer_notifications())
+        new_suggestions_info = (
+            suggestion_services
+                .get_new_suggestions_for_reviewer_notifications())
 
         # Initialize dictionaries to organize data.
         reviewer_ids_by_language: DefaultDict[
@@ -249,7 +250,9 @@ class CronMailReviewerNewSuggestionsHandler(
                 language_property
             )
 
-            reviewer_ids = [user_services.get_user_id_from_username(username) for username in reviewer_usernames]
+            reviewer_ids = [
+                user_services.get_user_id_from_username(
+                    username) for username in reviewer_usernames]
             reviewer_ids = [id for id in reviewer_ids if id is not None]
             reviewer_ids_by_language[language_property].extend(reviewer_ids)
 
@@ -257,7 +260,8 @@ class CronMailReviewerNewSuggestionsHandler(
             suggestions_by_language[language_property].append(suggestion)
 
         # Send email notifications to reviewers based on the organized data.
-        email_manager.send_reviewer_notifications(reviewer_ids_by_language, suggestions_by_language)
+        email_manager.send_reviewer_notifications(
+            reviewer_ids_by_language, suggestions_by_language)
 
         return self.render_json({})
 
