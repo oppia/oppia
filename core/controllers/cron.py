@@ -26,8 +26,8 @@ from core.domain import email_manager
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_list
 from core.domain import story_services
-from core.domain import suggestion_services
 from core.domain import suggestion_registry
+from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
