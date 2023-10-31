@@ -20,11 +20,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
 import { FeatureFlagDomainConstants } from
   'domain/feature_flag/feature-flag-domain.constants';
-import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from
+import { FeatureStage } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -36,20 +35,13 @@ describe('PlatformFeatureAdminBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureFlagsResponse = {
     feature_flags: [{
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.DEV,
       name: 'dummy_feature_flag_for_e2e_tests',
-      description: 'this is a dummy feature',
-      data_type: 'bool',
-      rules: [{
-        filters: [{
-          type: PlatformParameterFilterType.PlatformType,
-          conditions: [['=', 'Web'] as [string, string]]
-        }],
-        value_when_matched: true
-      }],
-      rule_schema_version: 1,
-      default_value: false,
-      is_feature: true,
-      feature_stage: FeatureStage.DEV
+      force_enable_for_all_users: false,
+      rollout_percentage: 0,
+      user_group_ids: [],
+      last_updated: null
     }],
     server_stage: 'dev'
   };
@@ -73,7 +65,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict)),
+        dict => FeatureFlag.createFromBackendDict(dict)),
       serverStage: featureFlagsResponse.server_stage
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
