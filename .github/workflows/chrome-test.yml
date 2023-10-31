@@ -1,0 +1,15 @@
+name: Installing google chrome test
+on: [push]
+
+jobs:
+  install_chrome:
+    name: Installing chrome with version
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 107.0.5304.68
+      - run: chrome --version
