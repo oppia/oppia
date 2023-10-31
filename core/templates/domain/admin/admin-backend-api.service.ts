@@ -385,6 +385,19 @@ export class AdminBackendApiService {
     });
   }
 
+  async populateTopicsWithExplorationIdsAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER,
+	{}
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
   async getNumberOfPendingDeletionRequestAsync(
   ): Promise<PendingDeletionRequestBackendResponse> {
     return new Promise((resolve, reject) => {

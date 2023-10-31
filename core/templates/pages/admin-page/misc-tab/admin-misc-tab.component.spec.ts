@@ -607,16 +607,44 @@ describe('Admin misc tab component ', () => {
 
     it('should not delete user account in case of backend ' +
       'error', fakeAsync(() => {
-      let uesrModelSpy = spyOn(
+      const userModelSpy = spyOn(
         adminBackendApiService, 'deleteUserAsync')
         .and.rejectWith('Internal Server Error.');
 
       component.deleteUser();
       tick();
 
-      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(userModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when populating topics with exploration ids', () => {
+    it('should populate all topics successfully', fakeAsync(() => {
+      const topicModelSpy = spyOn(
+	adminBackendApiService, 'populateTopicsWithExplorationIdsAsync')
+	.and.returnValue(Promise.resolve());
+
+      component.populateTopicsWithExplorationIds();
+      tick();
+
+      expect(topicModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+	'Successfully populated topics with exploration ids');
+    }));
+
+    it('should not populate topics in case of server error', fakeAsync(() => {
+      const topicModelSpy = spyOn(
+	adminBackendApiService, 'populateTopicsWithExplorationIdsAsync')
+	.and.rejectWith('Internal Server Error');
+
+      component.populateTopicsWithExplorationIds();
+      tick();
+
+      expect(topicModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+	'Server error: Internal Server Error');
     }));
   });
 

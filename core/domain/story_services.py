@@ -166,15 +166,18 @@ def apply_change_list(
                 # exploration. If it does, store the index of that node.
                 delete_index = -1
                 for index, node in enumerate(story.story_contents.nodes):
-                    if node.id == delete_story_node_cmd.node_id and (
-                        node.exploration_id):
+                    if (
+                            node.id == delete_story_node_cmd.node_id
+                            and node.exploration_id
+                        ):
                         delete_index = index
                         break
                 story.delete_node(delete_story_node_cmd.node_id)
 
                 if delete_index > -1:
                     old_mapping = topic_fetchers.get_topic_by_id(
-                        story.corresponding_topic_id).story_exploration_mapping
+                        story.corresponding_topic_id
+                    ).story_exploration_mapping
                     new_mapping = {
                         topic_story_id: exp_ids
                         if topic_story_id != story.id
@@ -195,9 +198,10 @@ def apply_change_list(
                             'old_value': old_mapping,
                             'new_value': new_mapping
                         })],
-                        'Story Exploration Mapping: Removed exploration ' + (
-                            old_mapping[story.id][delete_index] +
-                            ' from story ' + story.id + '.'
+                        (
+                            'Story Exploration Mapping: Removed exploration '
+                            + old_mapping[story.id][delete_index]
+                            + ' from story ' + story.id + '.'
                         )
                     )
             elif (change.cmd ==
@@ -329,8 +333,11 @@ def apply_change_list(
                     )
                     replace_index = -1
                     for index, node in enumerate(story.story_contents.nodes):
-                        if (node.id == update_node_exploration_id_cmd.node_id
-                            and node.exploration_id):
+                        if (
+                                node.id ==
+                                    update_node_exploration_id_cmd.node_id
+                                and node.exploration_id
+                            ):
                             replace_index = index
                             break
                     story.update_node_exploration_id(
@@ -339,18 +346,17 @@ def apply_change_list(
                     )
 
                     if update_node_exploration_id_cmd.new_value:
-                        old_mapping = (
-                            topic_fetchers.get_topic_by_id(
-                                story.corresponding_topic_id)
-                            .story_exploration_mapping
-                        )
+                        old_mapping = topic_fetchers.get_topic_by_id(
+                            story.corresponding_topic_id
+                        ).story_exploration_mapping
                         new_mapping = {
                             topic_story_id: (
                                 (
-                                    exp_ids[:replace_index] + (
-                                        [update_node_exploration_id_cmd
-                                            .new_value] +
-                                        exp_ids[replace_index + 1:]
+                                    (
+                                        exp_ids[:replace_index]
+                                        + [update_node_exploration_id_cmd
+                                            .new_value]
+                                        + exp_ids[replace_index + 1:]
                                     )
                                     if replace_index > -1
                                     else exp_ids + [
@@ -376,9 +382,10 @@ def apply_change_list(
                                 'old_value': old_mapping,
                                 'new_value': new_mapping
                             })],
-                            'Story exploration mapping: Added exploration ' + (
-                                update_node_exploration_id_cmd.new_value +
-                                ' to story ' + story.id + '.'
+                            (
+                                'Story exploration mapping: Added exploration '
+                                + update_node_exploration_id_cmd.new_value
+                                + ' to story ' + story.id + '.'
                             )
                         )
                 elif (change.property_name ==
@@ -528,15 +535,16 @@ def apply_change_list(
                         right = update_node_cmd.old_value
 
                     old_mapping = topic_fetchers.get_topic_by_id(
-                        story.corresponding_topic_id).story_exploration_mapping
+                        story.corresponding_topic_id
+                    ).story_exploration_mapping
                     new_mapping = {
                         topic_story_id: (
                             (
-                                exp_ids[:left] +
-                                [exp_ids[right]] +
-                                exp_ids[left + 1:right] +
-                                [exp_ids[left]] +
-                                exp_ids[right + 1:]
+                                exp_ids[:left]
+                                + [exp_ids[right]]
+                                + exp_ids[left + 1:right]
+                                + [exp_ids[left]]
+                                + exp_ids[right + 1:]
                             )
                             if topic_story_id == story.id
                             else exp_ids
@@ -557,11 +565,11 @@ def apply_change_list(
                             'new_value': new_mapping
                         })],
                         (
-                            'Story exploration mapping: Swapped exploration ' +
-                            old_mapping[story.id][left] +
-                            ' with exploration ' +
-                            old_mapping[story.id][right] +
-                            ' within story ' + story.id + '.'
+                            'Story exploration mapping: Swapped exploration '
+                            + old_mapping[story.id][left]
+                            + ' with exploration '
+                            + old_mapping[story.id][right]
+                            + ' within story ' + story.id + '.'
                         )
                     )
             elif (

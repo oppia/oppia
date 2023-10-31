@@ -362,6 +362,43 @@ describe('Admin backend api service', () => {
     }));
   });
 
+  describe('populateTopicsWithExplorationIdsAsync', () => {
+    it('should make request to populate topics with '
+      + 'exploration ids', fakeAsync(() => {
+      abas.populateTopicsWithExplorationIdsAsync().then(
+        successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+	AdminPageConstants.ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER);
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush({ status: 200, statusText: 'Success.' });
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      const errorMessage = 'Cannot populate topic with existing mapping.';
+
+      abas.populateTopicsWithExplorationIdsAsync().then(
+        successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+	AdminPageConstants.ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER);
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush(
+	{ error: errorMessage },
+	{ status: 500, statusText: 'Internal Server Error' });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    }));
+  });
+
   describe('assignManagerToTopicAsync', () => {
     it('should make request to assign user to a topic', fakeAsync(() => {
       let topicID = 'topic1234';

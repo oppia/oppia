@@ -195,6 +195,18 @@ export class AdminMiscTabComponent {
       });
   }
 
+  populateTopicsWithExplorationIds(): void {
+    this.setStatusMessage.emit(
+      'Populating topics with exploration ids...');
+    this.adminBackendApiService.populateTopicsWithExplorationIdsAsync()
+      .then(() => {
+        this.setStatusMessage.emit(
+	  'Successfully populated topics with exploration ids');
+      }, (errorResponse) => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      });
+  }
+
   getNumberOfPendingDeletionRequestModels(): void {
     this.setStatusMessage.emit(
       'Getting the number of users that are being deleted...');

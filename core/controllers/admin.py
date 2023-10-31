@@ -54,6 +54,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -2091,6 +2092,48 @@ class UpdateBlogPostHandler(
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
         self.render_json({})
+
+
+class PopulateTopicsWithExplorationIdsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to backfill all topics with its stories' exploration ids."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Initializes story_exploration_mapping of all topics."""
+
+        for topic in topic_fetchers.get_all_topics():
+            topic_story_ids = [ref.story_id for ref in (
+                topic.canonical_story_references
+                + topic.additional_story_references)]
+
+            new_mapping: Dict[str, List[str]] = {
+                story_id: (
+                    story_fetchers.get_story_by_id(story_id).story_contents
+                    .get_all_linked_exp_ids()
+                ) for story_id in topic_story_ids
+            }
+
+            assert topic.story_exploration_mapping is None
+            change_list = [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_STORY_EXPLORATION_MAPPING),
+                'old_value': topic.story_exploration_mapping,
+                'new_value': new_mapping
+            })]
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic.id, change_list,
+                'Populated topic ' + topic.id
+                + ' with story_exploration_mapping')
+
+        self.render_json({});
 
 
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):

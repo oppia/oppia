@@ -179,8 +179,7 @@ class TopicModel(base_models.VersionedModel):
     # and the explorations that are linked to each story. This field must be
     # kept in-sync with updates made to an owned story's explorations and to
     # the topic's ownership of said stories.
-    story_exploration_mapping = datastore_services.JsonProperty(
-        indexed=True, default={})
+    story_exploration_mapping = datastore_services.JsonProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -299,7 +298,7 @@ class TopicModel(base_models.VersionedModel):
     def get_all_story_exploration_mappings(
         cls,
         name: Optional[str] = None
-        ) -> List[Dict[str, List[str]]]:
+    ) -> List[Dict[str, List[str]]]:
         """Gets each TopicModel's story_exploration_mapping property. The models
         to get said property can be filtered by topic name, if given.
 

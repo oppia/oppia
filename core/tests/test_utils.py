@@ -3661,8 +3661,7 @@ version: 1
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         meta_tag_content: str = 'topic meta tag content',
         practice_tab_is_displayed: bool = False,
-        page_title_fragment_for_web: str = 'topic page title',
-        story_exploration_mapping: Optional[Dict[str, List[str]]] = None
+        page_title_fragment_for_web: str = 'topic page title'
     ) -> topic_domain.Topic:
         """Creates an Oppia Topic and saves it.
 
@@ -3694,28 +3693,38 @@ version: 1
                 displayed.
             page_title_fragment_for_web: str. The page title fragment for the
                 topic.
-            story_exploration_mapping: dict(str, list(str)). A dictionary
-                that maps from the topic's story ids to a list of exploration
-                ids that belong to that story. If not given, the final
-                dictionary will include all the provided story ids, each mapping
-                to an empty list.
 
         Returns:
             Topic. A newly-created topic.
         """
+        canonical_story_ids = canonical_story_ids or []
+        additional_story_ids = additional_story_ids or []
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (canonical_story_ids or [])
+            for story_id in canonical_story_ids
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (additional_story_ids or [])
+            for story_id in additional_story_ids
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
         skill_ids_for_diagnostic_test = []
         for subtopic in subtopics:
             skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
+        story_exploration_mapping: Dict[str, List[str]] = {}
+        for story_id in canonical_story_ids + additional_story_ids:
+            story = story_fetchers.get_story_by_id(story_id)
+            story_exploration_mapping[story_id] = (
+                # If the story's explorations were linked when the story was
+                # saved before the topic was saved, then gather the linked
+                # exploration ids.
+                # If the story's explorations are to be linked after saving the
+                # topic, then an empty list would be more appropriate, as the
+                # exploration ids would be added to the topic when linked to
+                # the story.
+                story.get_all_linked_exp_ids() if story else []
+            )
 
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
@@ -3726,11 +3735,7 @@ version: 1
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
             page_title_fragment_for_web, skill_ids_for_diagnostic_test,
-            story_exploration_mapping or {
-                story_id: []
-                for story_id
-                in (canonical_story_ids or []) + (additional_story_ids or [])
-            })
+            story_exploration_mapping)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 

@@ -288,6 +288,9 @@ URLS = [
     get_redirect_route(
         r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
     get_redirect_route(
+        r'%s' % feconf.POPULATE_TOPICS_WITH_EXPLORATION_IDS_URL,
+        admin.PopulateTopicsWithExplorationIdsHandler),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(
