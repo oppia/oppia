@@ -138,7 +138,7 @@
       </li>
       <li class="oppia-editor-publish-button-container">
         <button type="button"
-                class="btn btn-secondary oppia-editor-publish-button e2e-test-publish-story-button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-publish-chapters-button"
                 (click)="changeChapterStatus('Published')"
                 [ngClass]="{'btn-success': !isPublishButtonDisabled() && !getChangeListLength()}"
                 [disabled]="isPublishButtonDisabled() || getChangeListLength() > 0">
@@ -205,7 +205,7 @@
           matTooltipClass="oppia-mat-tooltip-list"
           [matTooltipDisabled]="isChapterPublishable()">
         <button type="button"
-                class="btn btn-secondary oppia-editor-publish-button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-mark-as-ready-to-publish-button"
                 (click)="changeChapterStatus('Ready To Publish')"
                 [ngClass]="{'btn-success': isChapterPublishable() && getChangeListLength() === 0}"
                 [disabled]="!isChapterPublishable() || getChangeListLength() > 0">
@@ -267,7 +267,7 @@
       </li>
       <li class="oppia-editor-publish-button-container">
         <button type="button"
-                class="btn btn-secondary oppia-editor-publish-button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-mark-as-draft-button"
                 (click)="changeChapterStatus('Draft')"
                 [disabled]="getChangeListLength() > 0">
           <span class="oppia-save-publish-button-label">
@@ -286,7 +286,7 @@
                 [matTooltipDisabled]="isChapterPublishable()"
                 aria-label="List that shows issues preventing to publish changes"
                 class="w-100">
-            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-publish-changes-button"
                     [ngClass]="{'btn-success': getChangeListLength() && isChapterPublishable()}"
                     (click)="saveChanges()"
                     [disabled]="!getChangeListLength() || !isChapterPublishable()">

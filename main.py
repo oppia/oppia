@@ -278,6 +278,9 @@ URLS = [
     get_redirect_route(
         r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
     get_redirect_route(
+        r'/translationcoordinatorrolehandler',
+        admin.TranslationCoordinatorRoleHandler),
+    get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -1154,7 +1157,7 @@ URLS.extend((
         oppia_root.OppiaRootPage),
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
-        oppia_root.OppiaLightweightRootPage
+        oppia_root.OppiaRootPage
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,

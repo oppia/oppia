@@ -2555,6 +2555,23 @@ version: 1
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
 
+    def set_translation_coordinators(
+        self, translation_coordinator_usernames: List[str], language_id: str
+    ) -> None:
+        """Sets role of given users as TRANSLATION_COORDINATOR.
+
+        Args:
+            translation_coordinator_usernames: list(str). List of usernames.
+            language_id: str. The language Id.
+        """
+        with self.super_admin_context():
+            for username in translation_coordinator_usernames:
+                self.put_json('/translationcoordinatorrolehandler', {
+                    'username': username,
+                    'action': 'assign',
+                    'language_id': language_id
+                }, csrf_token=self.get_new_csrf_token())
+
     def set_moderators(self, moderator_usernames: List[str]) -> None:
         """Sets role of given users as MODERATOR.
 
