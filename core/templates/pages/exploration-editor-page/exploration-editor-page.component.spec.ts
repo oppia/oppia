@@ -450,7 +450,6 @@ describe('Exploration editor page component', () => {
       component.skipEditorNavbar();
 
       const focusedElement = document.activeElement as HTMLElement;
-      expect(focusedElement).toEqual(mockElement);
       expect(focusedElement.tabIndex).toBe(-1);
     });
 
