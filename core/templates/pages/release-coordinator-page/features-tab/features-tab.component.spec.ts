@@ -208,8 +208,15 @@ describe('Release coordinator page feature tab', function() {
     });
 
     it('should return text for unknown feature stage', () => {
-      let feature = component.featureFlags[0];
-      feature.featureStage = 'unknown';
+      let feature = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: 'unknown',
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 0,
+        user_group_ids: [],
+        last_updated: null
+      });
       expect(component.getFeatureStageString(feature)).toBe(
         'Unknown feature stage.');
     });
