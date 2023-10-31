@@ -92,9 +92,9 @@ describe('Preferred Languages Component', () => {
 
   it('should filter choices when search query is non-empty', () => {
     const mockChoices = [
-      { id: 'en', text: 'English' },
-      { id: 'fr', text: 'French' },
-      { id: 'de', text: 'German' }
+      { id: 'en', text: 'English', ariaLabelInEnglish: 'English' },
+      { id: 'fr', text: 'French', ariaLabelInEnglish: 'French' },
+      { id: 'de', text: 'German', ariaLabelInEnglish: 'German' }
     ];
     componentInstance.choices = [...mockChoices];
     componentInstance.searchQuery = 'en';
