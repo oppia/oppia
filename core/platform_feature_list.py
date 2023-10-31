@@ -69,8 +69,6 @@ class FeatureNames(enum.Enum):
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE
@@ -80,7 +78,8 @@ DEV_FEATURES_LIST = [
 # be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
