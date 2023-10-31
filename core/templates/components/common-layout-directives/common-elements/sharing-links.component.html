@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
 <div class="oppia-sharing-links" [ngClass]="getFontAndFlexClass()">
   <div class="fx-main-center fx-cross-center padding-0-2">
     <a title="Facebook" class="fx-main-center fx-cross-start" [href]="getUrl('facebook')" (click)="registerShareEvent('facebook')" target="_window">
@@ -7,7 +9,7 @@
   </div>
   <div class="fx-main-center fx-cross-center padding-0-2 twitter-icon">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fab fa-twitter-square" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
+      <i class="oppia-share-icons fa-brands fa-square-x-twitter" [ngClass]="{'blog-post-sharing-link-icon': shareType === 'blog','font-small': smallFont, 'font-big': !smallFont}" ></i>
       <span class="oppia-icon-accessibility-label">Share on Twitter</span>
     </a>
   </div>
@@ -106,8 +108,8 @@
     font-size: 2.01rem;
   }
 
-  i.oppia-share-icons.fab.fa-twitter-square {
-    color: #1da1f2;
+  i.oppia-share-icons.fa-brands.fa-square-x-twitter {
+    color: #000;
     font-size: 2.01rem;
   }
 
