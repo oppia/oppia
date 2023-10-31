@@ -16,5 +16,8 @@ jobs:
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Install Chrome
-        run: sh ../actions/install-chrome/install-chrome.sh
+        run: |
+          pwd
+          ls
+          sh .github/actions/install-chrome/install-chrome.sh
       - run: chrome --version
