@@ -37,8 +37,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
 import { AdminPageRootComponent } from './admin-page-root.component';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
+import { ErrorPageModuleWithoutRouter } from 'pages/error-pages/error-page-without-router.module';
 
 @NgModule({
   imports: [
@@ -51,7 +51,7 @@ import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
       path: '',
       component: AdminPageRootComponent
     }]),
-    Error404PageModule,
+    ErrorPageModuleWithoutRouter,
     AdminBlogAdminCommonModule
   ],
   declarations: [

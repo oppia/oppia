@@ -18,7 +18,7 @@
 
 // This error page is used for status codes 400, 401 and 500.
 
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
@@ -33,7 +33,7 @@ export class ErrorPageRootComponent implements OnDestroy {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  statusCode!: string;
+  @Input() statusCode: string | null = null;
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -43,11 +43,13 @@ export class ErrorPageRootComponent implements OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let bodyTag = (
-      this.windowRef.nativeWindow.document.getElementsByTagName('body'));
-    // Read status code from errorCode attribute on body tag.
-    let errorCode = bodyTag[0].getAttribute('errorCode');
-    this.statusCode = errorCode ? errorCode : '404';
+    if (this.statusCode === null) {
+      const bodyTag = (
+        this.windowRef.nativeWindow.document.getElementsByTagName('body'));
+      // Read status code from errorCode attribute on body tag.
+      const errorCode = bodyTag[0].getAttribute('errorCode');
+      this.statusCode = errorCode ? errorCode : '404';
+    }
     // Update the default page title.
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {

@@ -288,8 +288,8 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 routes.push({
   path: '**',
   loadChildren: () => import(
-    'pages/error-pages/error-404/error-404-page-with-route.module').then(
-    m => m.Error404PageWithRouteModule)
+    'pages/error-pages/error-404/error-404-page.module').then(
+    m => m.Error404PageModule)
 });
 
 @NgModule({

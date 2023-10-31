@@ -27,6 +27,7 @@ import { ErrorPageRootComponent } from './error-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { ErrorPageRoutingModule } from 'pages/error-pages/error-page-routing.module';
+import { ErrorPageModuleWithoutRouter } from './error-page-without-router.module';
 
 @NgModule({
   imports: [
@@ -34,11 +35,8 @@ import { ErrorPageRoutingModule } from 'pages/error-pages/error-page-routing.mod
     HttpClientModule,
     SharedComponentsModule,
     ErrorPageRoutingModule,
-    ToastrModule.forRoot(toastrConfig)
-  ],
-  declarations: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
+    ToastrModule.forRoot(toastrConfig),
+    ErrorPageModuleWithoutRouter
   ],
   entryComponents: [
     ErrorPageComponent,

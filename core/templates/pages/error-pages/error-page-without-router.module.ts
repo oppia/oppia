@@ -13,18 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the error page with routing.
- * This captures any 404 errors that occur due to a mismatching route.
+ * @fileoverview Module for the error page.
  */
 
 import { NgModule } from '@angular/core';
-import { Error404PageRoutingModule } from './error-404-page-routing.module';
-import { Error404PageModule } from './error-404-page.module';
+import { ToastrModule } from 'ngx-toastr';
+
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { ErrorPageComponent } from './error-page.component';
+import { ErrorPageRootComponent } from './error-page-root.component';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
-    Error404PageModule,
-    Error404PageRoutingModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
+  ],
+  declarations: [
+    ErrorPageComponent,
+    ErrorPageRootComponent,
+  ],
+  exports: [
+    ErrorPageComponent,
+    ErrorPageRootComponent
   ]
 })
-export class Error404PageWithRouteModule {}
+export class ErrorPageModuleWithoutRouter {}
