@@ -78,6 +78,9 @@ implements OnInit {
     const sortedSkillSummaries = this.groupedSkillSummaries.current.concat(
       this.groupedSkillSummaries.others);
     const allowSkillsFromOtherTopics = true;
+    const addedSkillsIds = this.skill.getPrerequisiteSkillIds();
+    addedSkillsIds.push(this.skill.getId());
+
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent, {
@@ -94,6 +97,7 @@ implements OnInit {
       allowSkillsFromOtherTopics);
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
+    modalRef.componentInstance.addedSkillsIds = addedSkillsIds;
 
     const whenResolved = (summary: SkillSummary): void => {
       let skillId = summary.id;
