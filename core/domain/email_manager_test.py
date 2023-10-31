@@ -6274,8 +6274,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
             [
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
             ])
         for category_details in (
             email_manager.NEW_CD_USER_EMAIL_DATA.values()
@@ -6457,8 +6457,8 @@ class CDUserEmailTest(test_utils.EmailTestBase):
             sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()),
                 [
                     constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                     constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
                 ])
         for category_details in (
                 email_manager.REMOVED_CD_USER_EMAIL_DATA.values()):
