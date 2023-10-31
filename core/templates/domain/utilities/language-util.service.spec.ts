@@ -266,13 +266,16 @@ describe('Language util service', function() {
 
     expect(lus.getLanguageIdsAndTexts()).toEqual([{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }, {
       id: 'ar',
-      text: 'العربية'
+      text: 'العربية',
+      ariaLabelInEnglish: 'Arabic'
     }, {
       id: 'bg',
-      text: 'български'
+      text: 'български',
+      ariaLabelInEnglish: 'Bulgarian'
     }]);
   });
 
