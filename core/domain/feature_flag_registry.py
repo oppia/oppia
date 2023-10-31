@@ -287,13 +287,13 @@ Registry.create_feature_flag(
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
-    feature_flag_domain.FeatureStages.DEV)
+    feature_flag_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the learner view.',
-    feature_flag_domain.FeatureStages.DEV)
+    feature_flag_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
