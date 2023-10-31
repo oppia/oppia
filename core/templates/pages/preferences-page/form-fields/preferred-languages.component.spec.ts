@@ -100,16 +100,16 @@ describe('Preferred Languages Component', () => {
     componentInstance.searchQuery = 'en';
     componentInstance.onSearchInputChange();
     const expectedFilteredChoice = [
-      { id: 'en', text: 'English' },
-      { id: 'fr', text: 'French' }
+      { id: 'en', text: 'English', ariaLabelInEnglish: 'English' },
+      { id: 'fr', text: 'French', ariaLabelInEnglish: 'French' },
     ];
     expect(componentInstance.filteredChoices).toEqual(expectedFilteredChoice);
   });
 
   it('should not show any choices when search query does not match', () => {
     const mockChoices = [
-      { id: 'en', text: 'English' },
-      { id: 'fr', text: 'French' }
+      { id: 'en', text: 'English', ariaLabelInEnglish: 'English' },
+      { id: 'fr', text: 'French', ariaLabelInEnglish: 'French' },
     ];
     componentInstance.choices = [...mockChoices];
     componentInstance.searchQuery = 'de';
@@ -122,7 +122,8 @@ describe('Preferred Languages Component', () => {
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }];
     componentInstance.languageInput = {
       nativeElement: {
@@ -138,7 +139,8 @@ describe('Preferred Languages Component', () => {
     componentInstance.preferredLanguages = ['en'];
     let choices = [{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }];
     componentInstance.choices = choices;
     componentInstance.remove('en');

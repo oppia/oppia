@@ -183,7 +183,7 @@ describe('Preferences Page Component', () => {
         [{
           id: 'en',
           text: 'English',
-          ariaLabel: 'English'
+          ariaLabelInEnglish: 'English'
         }]);
       componentInstance.ngOnInit();
       tick();
