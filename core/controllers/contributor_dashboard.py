@@ -336,7 +336,7 @@ class ReviewableOpportunitiesHandler(
             )):
                 if opp is not None:
                     if isinstance(opp, dict):
-                        opportunity_dicts.append(opp)
+                        opportunity_dicts.append(opp) # type: ignore[arg-type]
                     else:
                         opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -437,7 +437,7 @@ class ReviewableOpportunitiesHandler(
         # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            pinned_opportunity_id = pinned_opportunity_summary['id']
+            pinned_opportunity_id = pinned_opportunity_summary.id
             exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
                 pinned_opportunity_id] = pinned_opportunity_summary
