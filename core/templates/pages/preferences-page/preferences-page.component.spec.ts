@@ -182,7 +182,8 @@ describe('Preferences Page Component', () => {
       spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue(
         [{
           id: 'en',
-          text: 'English'
+          text: 'English',
+          ariaLabel: 'English'
         }]);
       componentInstance.ngOnInit();
       tick();
