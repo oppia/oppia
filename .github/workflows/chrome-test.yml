@@ -11,5 +11,5 @@ jobs:
     steps:
       - uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: 107.0.5304.68
+          chrome-version: 100303
       - run: chrome --version
