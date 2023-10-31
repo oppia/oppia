@@ -6017,14 +6017,14 @@ export default {
   "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
   "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
 
-  "CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION": "review_translation",
-  "CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER": "review_voiceover",
-  "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "review_question",
+  "CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER": "voiceover",
+  "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "question",
   "CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION": "submit_question",
   "CD_USER_RIGHTS_CATEGORIES": [
-    "review_translation",
-    "review_question",
-    "review_voiceover",
+    "translation",
+    "question",
+    "voiceover",
     "submit_question"
   ],
 

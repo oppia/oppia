@@ -2546,7 +2546,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_translation',
+                '/can_manage_contributors_role/translation',
                 expected_status_int=401)
 
         self.assertEqual(
@@ -2557,7 +2557,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_guest_user_cannot_manage_contributors_role(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_translation',
+                '/can_manage_contributors_role/translation',
                 expected_status_int=401)
 
         self.assertEqual(
@@ -2570,7 +2570,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_translation')
+                '/can_manage_contributors_role/translation')
 
         self.assertEqual(response['success'], 1)
         self.logout()
@@ -2580,7 +2580,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_question',
+                '/can_manage_contributors_role/question',
                 expected_status_int=401)
 
         self.assertEqual(
@@ -2593,7 +2593,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_question')
+                '/can_manage_contributors_role/question')
 
         self.assertEqual(response['success'], 1)
         self.logout()
@@ -2603,7 +2603,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/can_manage_contributors_role/review_translation',
+                '/can_manage_contributors_role/translation',
                 expected_status_int=401)
 
         self.assertEqual(
