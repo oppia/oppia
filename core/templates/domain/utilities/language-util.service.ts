@@ -54,7 +54,7 @@ interface SupportedContentLanguageBackendDict {
 export interface LanguageIdAndText {
   id: string;
   text: string;
-  ariaLabel: string;
+  ariaLabelInEnglish: string;
 }
 
 interface ContentLanguage {
@@ -152,7 +152,7 @@ export class LanguageUtilService {
         return {
           id: languageItem.code,
           text: this.getShortLanguageDescription(languageItem.description),
-          ariaLabel: languageItem.ariaLabelInEnglish
+          ariaLabelInEnglish: languageItem.ariaLabelInEnglish
         };
       });
     return languageIdsAndTexts;

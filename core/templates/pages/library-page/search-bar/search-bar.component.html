@@ -139,7 +139,7 @@
         <li ngbDropdownItem
             *ngIf="selectionDetails.languageCodes.selections[item.id]">
           <a tabindex="0"
-             [attr.aria-label]="item.ariaLabel + ' selected'"
+             [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
              *ngIf="!first && !last"
@@ -150,7 +150,7 @@
             </i>
           </a>
           <a tabindex="0"
-             [attr.aria-label]="item.ariaLabel + ' selected'"
+             [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
              *ngIf="first"
@@ -162,7 +162,7 @@
             </i>
           </a>
           <a tabindex="0"
-             [attr.aria-label]="item.ariaLabel + ' selected'"
+             [attr.aria-label]="item.ariaLabelInEnglish + ' selected'"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
              *ngIf="last"
@@ -186,7 +186,7 @@
         <li ngbDropdownItem
             *ngIf="!selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)"
-             [attr.aria-label]="item.ariaLabel"
+             [attr.aria-label]="item.ariaLabelInEnglish"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              tabindex="0"
              *ngIf="!first && !last"
@@ -201,7 +201,7 @@
           <a tabindex="0"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
              (click)="toggleSelection('languageCodes', item.id)"
-             [attr.aria-label]="item.ariaLabel"
+             [attr.aria-label]="item.ariaLabelInEnglish"
              *ngIf="first"
              (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})"
              class="dropdown-item">
@@ -214,7 +214,7 @@
           </a>
           <a tabindex="0"
              (keydown.enter)="toggleSelection('languageCodes', item.id)"
-             [attr.aria-label]="item.ariaLabel"
+             [attr.aria-label]="item.ariaLabelInEnglish"
              (click)="toggleSelection('languageCodes', item.id)"
              *ngIf="last"
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
