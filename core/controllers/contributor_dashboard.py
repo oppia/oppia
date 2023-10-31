@@ -335,7 +335,10 @@ class ReviewableOpportunitiesHandler(
                 self.user_id, topic_name, language
             )):
                 if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                    if isinstance(opp, dict):
+                        opportunity_dicts.append(opp)
+                    else:
+                        opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -434,14 +437,14 @@ class ReviewableOpportunitiesHandler(
         # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            pinned_opportunity_id = pinned_opportunity_summary.id
+            pinned_opportunity_id = pinned_opportunity_summary['id']
             exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
                 pinned_opportunity_id] = pinned_opportunity_summary
 
         for item in exp_opp_summaries.values():
             if item is not None:
-                ordered_exp_opp_summaries[item.id] = item
+                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
         return list(ordered_exp_opp_summaries.values())
 
 

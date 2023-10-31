@@ -489,7 +489,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_reviewable_translation_opportunities_with_pinned_opportunity( # pylint: disable=line-too-long
             self
         ) -> None:
-            # Create a translation suggestion in Hindi.
+        # Create a translation suggestion in Hindi.
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content_0',
@@ -542,11 +542,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'topic',
                 '0'
             )
-
             response = self.get_json(
                 '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
                 params={'language_code': 'hi', 'topic_name': 'topic'})
-
             expected_opp_dict_1 = {
                 'id': '0',
                 'topic_name': 'topic',
