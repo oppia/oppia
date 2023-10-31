@@ -54,6 +54,7 @@ interface SupportedContentLanguageBackendDict {
 export interface LanguageIdAndText {
   id: string;
   text: string;
+  ariaLabel: string;
 }
 
 interface ContentLanguage {
