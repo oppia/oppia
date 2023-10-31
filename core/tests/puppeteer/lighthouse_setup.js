@@ -58,7 +58,7 @@ var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
 var expCategoryDropdownElement = $(
   '.e2e-test-exploration-category-metadata-modal');
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
-var explorationConfirmPublish = '.e2e-test-confirm-publish'
+var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
 var topicNameField = '.e2e-test-new-topic-name-field';
 var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
@@ -221,7 +221,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await (
       await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
     ).setValue('Algorithms');
-    
+
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
     await page.waitForSelector(explorationConfirmPublish, {visible: true});
