@@ -38,14 +38,6 @@ class MockTranslateService {
   }
 }
 
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
-}
-
 describe('Blog Author Profile Page Root', () => {
   let fixture: ComponentFixture<BlogAuthorProfilePageRootComponent>;
   let component: BlogAuthorProfilePageRootComponent;
@@ -55,7 +47,6 @@ describe('Blog Author Profile Page Root', () => {
   let loaderService: LoaderService;
   let translateService: TranslateService;
   let userService: UserService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,10 +65,6 @@ describe('Blog Author Profile Page Root', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -94,7 +81,6 @@ describe('Blog Author Profile Page Root', () => {
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
     urlService = TestBed.inject(UrlService);
-    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
     spyOn(urlService, 'getBlogAuthorUsernameFromUrl')
       .and.returnValue('author');
   });
@@ -165,7 +151,6 @@ describe('Blog Author Profile Page Root', () => {
 
   it('should initialize and show error page when blog project feature is ' +
   'disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(false));
     spyOn(
@@ -189,7 +174,6 @@ describe('Blog Author Profile Page Root', () => {
 
   it('should initialize and validate access when blog project feature is ' +
   'disabled but user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(true));
     spyOn(

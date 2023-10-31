@@ -60,10 +60,7 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
     this.authorUsername = this.urlService.getBlogAuthorUsernameFromUrl();
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
-      ) {
+      if (userCanEditBlogPost) {
         this.accessValidationBackendApiService
           .validateAccessToBlogAuthorProfilePage(this.authorUsername)
           .then(() => {

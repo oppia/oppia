@@ -33,8 +33,6 @@ import { UserService } from 'services/user.service';
 })
 export class BlogHomePageRootComponent implements OnDestroy, OnInit {
   directiveSubscriptions = new Subscription();
-  errorPageIsShown: boolean = false;
-  pageIsShown: boolean = false;
 
   constructor(
     private accessValidationBackendApiService:
@@ -58,20 +56,14 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
       if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
         userCanEditBlogPost
       ) {
         this.accessValidationBackendApiService
           .validateAccessToBlogHomePage()
-          .then((resp) => {
-            this.pageIsShown = true;
-          }, (err) => {
-            this.errorPageIsShown = true;
-          }).then(() => {
+          .then(() => {
             this.loaderService.hideLoadingScreen();
           });
       } else {
-        this.errorPageIsShown = true;
         this.loaderService.hideLoadingScreen();
       }
     });

@@ -52,9 +52,6 @@ export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   testimonials: Testimonial[] = [];
   userIsLoggedIn: boolean = false;
-  androidPageIsEnabled: boolean = (
-    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
-  );
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -64,7 +61,6 @@ export class SplashPageComponent implements OnInit {
     private windowRef: WindowRef,
     private userService: UserService,
     private loaderService: LoaderService,
-    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   getStaticImageUrl(imagePath: string): string {

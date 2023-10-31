@@ -25,7 +25,6 @@ import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { LoaderService } from 'services/loader.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -39,14 +38,6 @@ class MockTranslateService {
   }
 }
 
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
-}
-
 describe('Blog Home Page Root', () => {
   let fixture: ComponentFixture<BlogHomePageRootComponent>;
   let component: BlogHomePageRootComponent;
@@ -55,7 +46,6 @@ describe('Blog Home Page Root', () => {
   let loaderService: LoaderService;
   let userService: UserService;
   let translateService: TranslateService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,10 +64,6 @@ describe('Blog Home Page Root', () => {
           provide: TranslateService,
           useClass: MockTranslateService
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -92,7 +78,6 @@ describe('Blog Home Page Root', () => {
       AccessValidationBackendApiService);
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
-    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
   });
 
   it('should successfully instantiate the component',
@@ -100,8 +85,7 @@ describe('Blog Home Page Root', () => {
       expect(component).toBeDefined();
     });
 
-  it('should initialize and show page when access is valid and blog project' +
-  ' feature is enabled', fakeAsync(() => {
+  it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(false));
     spyOn(
@@ -117,8 +101,6 @@ describe('Blog Home Page Root', () => {
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
       .toHaveBeenCalled();
-    expect(component.pageIsShown).toBeTrue();
-    expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
@@ -139,14 +121,10 @@ describe('Blog Home Page Root', () => {
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
         .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
 
-  it('should initialize and show error page when blog project feature is' +
-  ' disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
+  it('should initialize user can not edit blog posts', fakeAsync(() => {
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(false));
     spyOn(
@@ -161,14 +139,11 @@ describe('Blog Home Page Root', () => {
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
       .not.toHaveBeenCalled();
-    expect(component.pageIsShown).toBeFalse();
-    expect(component.errorPageIsShown).toBeTrue();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
   it('should initialize and validate access when blog project feature is ' +
   'disabled and user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
       Promise.resolve(true));
     spyOn(
@@ -185,7 +160,6 @@ describe('Blog Home Page Root', () => {
     expect(
       accessValidationBackendApiService.validateAccessToBlogHomePage)
       .toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 

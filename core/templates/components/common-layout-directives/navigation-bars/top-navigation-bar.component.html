@@ -149,7 +149,7 @@
                 <span class="nav-item-right d-flex flex-column">
                   <a class="nav-content mb-5"
                      tabindex="0"
-                     (blur)="androidPageIsEnabled ? null : learnDropdown.close()"
+                     (blur)="null"
                      href="/community-library"
                      (click)="navigateToClassroomPage('/community-library')">
                     <div class="nav-item-right-head">
@@ -166,7 +166,7 @@
                       <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </a>
-                  <a *ngIf="androidPageIsEnabled"
+                  <a
                      class="nav-content"
                      tabindex="0"
                      (blur)="learnDropdown.close()"
@@ -242,7 +242,7 @@
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
+                <span class="fas fa-external-link-alt launch" ></span>
               </a>
             </li>
           </ul>

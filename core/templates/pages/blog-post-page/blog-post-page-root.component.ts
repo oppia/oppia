@@ -66,9 +66,7 @@ export class BlogPostPageRootComponent implements OnDestroy, OnInit {
     this.blogPostUrlFragment = this.urlService.getBlogPostUrlFromUrl();
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
+      if (userCanEditBlogPost
       ) {
         this.accessValidationBackendApiService
           .validateAccessToBlogPostPage(this.blogPostUrlFragment)
