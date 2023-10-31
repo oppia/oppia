@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
@@ -36,8 +37,6 @@ from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
 from typing import DefaultDict, Dict, List
-
-from core.constants import constants
 
 
 class CronModelsCleanupHandler(

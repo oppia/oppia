@@ -1798,7 +1798,7 @@ def send_reviewer_notifications(
 
         if not reviewer_ids:
             message = 'No reviewers found for language %s to notify'
-            logging.error(message) % language_code
+            logging.error(message % language_code)
             continue
 
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
