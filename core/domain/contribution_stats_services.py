@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.platform import models
 
 from typing import List, Optional, Sequence, Tuple
@@ -463,7 +464,7 @@ def get_question_reviewer_total_stats(
 
 def get_all_translation_coordinator_stats(
     sort: str
-) -> List[suggestion_registry.TranslationCoordinatorStats]:
+) -> List[user_domain.TranslationCoordinatorStats]:
     """Gets all TranslationCoordinatorStats corresponding to the supplied
     user and converts them to their corresponding domain objects.
 
@@ -490,7 +491,7 @@ def get_all_translation_coordinator_stats(
                 -model_class.coordinators_count).fetch()
         )
     return [
-        suggestion_registry.TranslationCoordinatorStats(
+        user_domain.TranslationCoordinatorStats(
             model.id,
             model.coordinator_ids,
             model.coordinators_count
