@@ -93,7 +93,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
   nextExplorationId!: string;
-  whitelistedCollectionIdsForGuestProgress;
+  allowedCollectionIdsForGuestProgress;
   collectionSummary;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
@@ -346,8 +346,8 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
-    this.whitelistedCollectionIdsForGuestProgress = (
-      AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
+    this.allowedCollectionIdsForGuestProgress = (
+      AppConstants.ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
 
     this.fetchSummaryAsync(this.collectionId);
 

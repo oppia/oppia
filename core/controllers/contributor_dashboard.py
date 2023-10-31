@@ -358,9 +358,6 @@ class ReviewableOpportunitiesHandler(
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
-
-        Raises:
-            Exception. No exploration_id found for the node_id.
         """
         # 1. Fetch all the exploration IDs of chapters in stories under the
         #    topic(s).
@@ -368,6 +365,7 @@ class ReviewableOpportunitiesHandler(
         # 3. Get story exploration nodes in order, filtering for explorations
         #    that have in review translation suggestions.
         topic_exp_ids = topic_fetchers.get_all_story_exploration_ids(topic_name)
+
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(

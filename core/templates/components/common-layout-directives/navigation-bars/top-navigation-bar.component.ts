@@ -21,7 +21,6 @@
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -33,13 +32,12 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -157,10 +155,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   );
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
@@ -216,31 +211,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
     this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
-
-    // TODO(#18362): Resolve the console error on the signup page and then
-    // add the error catch block to the 'validateAccessToClassroomPage'
-    // and 'fetchClassroomDataAsync'.
-    this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-      this.classroomBackendApiService.fetchClassroomDataAsync(
-        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-        .then((classroomData) => {
-          this.classroomData = classroomData.getTopicSummaries();
-          this.classroomBackendApiService.onInitializeTranslation.emit();
-          // Store hacky tranlation keys of topics.
-          for (let i = 0; i < this.classroomData.length; i++) {
-            let topicSummary = this.classroomData[i];
-            let hackyTopicTranslationKey = (
-              this.i18nLanguageCodeService.getTopicTranslationKey(
-                topicSummary.getId(), TranslationKeyType.TITLE
-              )
-            );
-            this.topicTitlesTranslationKeys.push(
-              hackyTopicTranslationKey
-            );
-          }
-        });
-    });
 
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
