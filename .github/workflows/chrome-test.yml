@@ -9,6 +9,12 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
       - uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: 178135
