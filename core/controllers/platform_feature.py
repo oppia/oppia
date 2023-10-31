@@ -60,7 +60,7 @@ class PlatformFeatureDummyHandler(
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
         if not feature_flag_services.is_feature_flag_enabled(
-            self.user_id, platform_feature_list.ParamNames.
+            self.user_id, platform_feature_list.FeatureNames.
             DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
         ):
             raise self.PageNotFoundException()

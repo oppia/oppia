@@ -52,7 +52,7 @@ def is_learner_group_feature_enabled() -> bool:
         bool. Whether the learner group feature is enabled.
     """
     return bool(platform_feature_services.is_feature_enabled(
-        platform_feature_list.ParamNames.
+        platform_feature_list.FeatureNames.
         LEARNER_GROUPS_ARE_ENABLED.value))
 
 

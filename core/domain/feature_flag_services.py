@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
-ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
+ALL_FEATURE_FLAGS: List[platform_feature_list.FeatureNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST

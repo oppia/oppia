@@ -239,7 +239,7 @@ class ExplorationImprovementsConfigHandler(
                 exp_fetchers.get_exploration_by_id(exploration_id).version),
             'is_improvements_tab_enabled': (
                 platform_feature_services.is_feature_enabled(
-                    platform_feature_list.ParamNames.
+                    platform_feature_list.FeatureNames.
                     IS_IMPROVEMENTS_TAB_ENABLED.value)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
                 platform_feature_services.get_platform_parameter_value(

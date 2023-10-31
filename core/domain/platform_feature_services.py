@@ -45,7 +45,7 @@ from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List, Set
 
-ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
+ALL_FEATURE_FLAGS: List[platform_feature_list.FeatureNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
