@@ -18,6 +18,7 @@
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
+           role="button"
            aria-label="Exploration Editor Button">
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </a>
