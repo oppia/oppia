@@ -50,7 +50,7 @@ export class FeatureFlag {
   constructor(
       name: string, description: string, featureStage: FeatureStage,
       forceEnableForAllUsers: boolean, rolloutPercentage: number,
-      userGroupIds: string[], lastUpdated: string) {
+      userGroupIds: string[], lastUpdated: string | null) {
     this.name = name;
     this.description = description;
     this.featureStage = featureStage;
