@@ -58,7 +58,8 @@ describe('Preferred Languages Component', () => {
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }];
     componentInstance.formCtrl = new FormControl(value);
     componentInstance.ngAfterViewInit();
@@ -78,11 +79,13 @@ describe('Preferred Languages Component', () => {
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }];
     componentInstance.filteredChoices = [{
       id: 'en',
-      text: 'English'
+      text: 'English',
+      ariaLabelInEnglish: 'English'
     }];
     expect(componentInstance.validInput('en')).toBeTrue();
   });
