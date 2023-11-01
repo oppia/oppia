@@ -441,6 +441,7 @@ import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { ContributorDashboardAdminStatsBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service';
 import { InsertScriptService } from './insert-script.service';
+import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -653,6 +654,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['InteractiveMapValidationService', InteractiveMapValidationService],
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
+  ['IsLoggedInGuard', IsLoggedInGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
