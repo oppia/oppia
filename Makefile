@@ -91,7 +91,7 @@ run_tests.lint: ## Runs the linter tests
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 	docker compose up datastore dev-server redis firebase -d --no-deps
-	$(MAKE) update.requirements
+# $(MAKE) update.requirements
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
