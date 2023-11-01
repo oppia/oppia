@@ -219,7 +219,6 @@
         "core.storage.suggestion.gae_models_test",
         "core.storage.auth.gae_models_test",
         "scripts.linters.html_linter_test",
-        "scripts.script_import_test",
         "scripts.setup_gae_test",
         "scripts.linters.general_purpose_linter_test",
         "core.storage.app_feedback_report.gae_models_test",
