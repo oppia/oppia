@@ -197,7 +197,7 @@ export class SkillSelectorComponent implements OnInit {
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
     let skills: string[] = this.untriagedSkillSummaries
       .filter(
-        val => !this.addedSkillsIds ? true : 
+        val => !this.addedSkillsIds ? true :
         !this.addedSkillsIds.includes(val.id)
       )
       .map(val => {
