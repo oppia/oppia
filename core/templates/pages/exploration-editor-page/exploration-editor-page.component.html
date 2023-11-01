@@ -11,13 +11,14 @@
         &emsp;Auto Saving ...
       </span>
     </div>
-    <div class="navbar-icons">
+    <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
         <a href="#"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
+           role="button"
            aria-label="Exploration Editor Button">
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </a>
@@ -50,6 +51,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Translation Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()">
           <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </a>
@@ -62,6 +64,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Preview Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectPreviewTab()">
           <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
         </a>
@@ -74,6 +77,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Setting Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectSettingsTab()">
           <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
         </a>
@@ -86,6 +90,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Statistics Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectStatsTab()">
           <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
         </a>
@@ -98,6 +103,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Improvement Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectImprovementsTab()">
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
@@ -110,6 +116,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration History Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectHistoryTab()">
           <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
         </a>
@@ -122,6 +129,7 @@
            placement="bottom"
            tabindex="0"
            aria-label="Exploration Feedback Button"
+           role="button"
            (keydown.enter)="!connectedToInternet || selectFeedbackTab()">
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </a>
@@ -140,11 +148,12 @@
            (keydown.enter)="!connectedToInternet || showUserHelpModal()"
            placement="bottom"
            class="nav-link oppia-editor-navbar-tab-anchor"
+           role="button"
            aria-label="Exploration Help Button">
           <i class="fas fa-question-circle navbar-tab-icon"></i>
         </a>
       </li>
-    </div>
+    </ul>
   </div>
   <div *ngIf="explorationEditorPageHasInitialized && editabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">
     This exploration is currently locked to new edits. Please contact an admin for assistance.
@@ -330,6 +339,7 @@
 
   .navbar-icons {
     display: flex;
+    margin-bottom: 0;
     margin-right: 5%;
   }
 

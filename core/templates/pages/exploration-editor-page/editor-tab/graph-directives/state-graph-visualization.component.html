@@ -31,6 +31,7 @@ with the same id on the page. -->
                     [ngClass]="{'clickable': canNavigateToNode(node.id)}"
                     [attr.style]="node.style"
                     (click)="sendOnClickFunctionData(node.id)"
+                    role="button"
                     [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">
               </rect>
               <title>{{getNodeTitle(node)}}</title>
@@ -45,6 +46,7 @@ with the same id on the page. -->
                  ngbTooltip="{{getNodeErrorMessage(node.label)}}"
                  placement="top">
                 <rect (click)="sendOnClickFunctionData(node.id)" class="oppia-graph-warning-message clickable oppia-error-message-fill"
+                      role="alertdialog"
                       width="22" height="22"
                       [attr.x]="node.x0" [attr.y]="node.y0 - 8"
                       [attr.transform]="getHighlightTransform(node.x0, node.y0)"
