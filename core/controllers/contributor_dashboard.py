@@ -500,15 +500,14 @@ class LessonsPinningHandler(
         """Handles pinning/unpinning lessons."""
         assert self.normalized_request is not None
         assert self.user_id is not None
-        topic_id = self.normalized_request.get('topic_id')
-        language_code = self.normalized_request.get('language_code')
-        opportunity_id = self.normalized_request.get('opportunity_id')
+        topic_id = self.normalized_payload.get('topic_id')
+        language_code = self.normalized_payload.get('language_code')
+        opportunity_id = self.normalized_payload.get('opportunity_id')
 
         if language_code and topic_id:
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id, language_code, topic_id, opportunity_id
             )
-
         self.render_json(self.values)
 
 
