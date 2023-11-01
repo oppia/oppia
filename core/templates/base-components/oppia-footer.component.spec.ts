@@ -61,5 +61,5 @@ describe('OppiaFooterComponent', () => {
   it('should get the pages registered with frontend', () => {
     expect(component.PAGES_REGISTERED_WITH_FRONTEND)
       .toBe(AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-    });
+  });
 });

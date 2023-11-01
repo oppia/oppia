@@ -25,7 +25,6 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './android-page-root.component.html'
 })
 export class AndroidPageRootComponent {
-
   constructor(
     private pageHeadService: PageHeadService,
   ) {}

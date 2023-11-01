@@ -369,7 +369,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   getOppiaBlogUrl(): string {
-      return this.OPPIA_BLOG_URL;
+    return this.OPPIA_BLOG_URL;
   }
 
   changeLanguage(languageCode: string): void {
