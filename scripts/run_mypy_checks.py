@@ -106,56 +106,6 @@ def get_mypy_cmd(
     return cmd
 
 
-def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
-    """Install mypy and type stubs from mypy_requirements.txt.
-
-    Args:
-        install_globally: bool. Whether mypy and its requirements are to be
-            installed globally.
-
-    Returns:
-        tuple(int, str). The return code from installing prerequisites and the
-        path of the mypy executable.
-
-    Raises:
-        Exception. No USER_BASE found for the user.
-    """
-    # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
-    # install packages globally for CI. In CI, pip installation is not in a way
-    # we expect.
-    if install_globally:
-        cmd = [
-            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
-            MYPY_REQUIREMENTS_FILE_PATH
-        ]
-    else:
-        cmd = [
-            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
-            MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
-            '--upgrade'
-        ]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output = process.communicate()
-    if b'can\'t combine user with prefix' in output[1]:
-        uextention_text = ['--user', '--prefix=', '--system']
-        new_process = subprocess.Popen(
-            cmd + uextention_text, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        new_process.communicate()
-        if site.USER_BASE is None:
-            raise Exception(
-                'No USER_BASE found for the user.'
-            )
-        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
-        return (new_process.returncode, mypy_exec_path)
-    else:
-        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
-        mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
-        return (process.returncode, mypy_exec_path)
-
-
 def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)

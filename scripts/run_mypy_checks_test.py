@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import os
-import site
 import subprocess
 
 from core.tests import test_utils
@@ -78,28 +77,9 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.popen_swap_failure = self.swap(
             subprocess, 'Popen', mock_popen_failure)
 
-        self.install_mypy_prereq_swap_success = self.swap(
-            run_mypy_checks,
-            'install_mypy_prerequisites',
-            lambda _: (0, 'exec')
-        )
-        self.install_mypy_prereq_swap_failure = self.swap(
-            run_mypy_checks,
-            'install_mypy_prerequisites',
-            lambda _: (1, 'exec')
-        )
-
         self.directories_swap = self.swap(
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
-
-        def mock_install_mypy_prerequisites_success(
-            unused_ci: bool
-        ) -> Tuple[int, str]:
-            return (0, self.mypy_cmd_path)
-        self.swap_install_success = self.swap(
-            run_mypy_checks, 'install_mypy_prerequisites',
-            mock_install_mypy_prerequisites_success)
 
         def mock_popen_user_prefix_error_call(
             cmd_tokens: List[str], *unused_args: str, **unused_kwargs: str
@@ -111,12 +91,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
         self.mypy_cmd_path = os.path.join(
             os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
-
-        def mock_install_mypy_prerequisites(unused_ci: bool) -> Tuple[int, str]:
-            return (0, self.mypy_cmd_path)
-        self.mypy_install_swap = self.swap_with_checks(
-            run_mypy_checks, 'install_mypy_prerequisites',
-            mock_install_mypy_prerequisites)
 
     def test_get_mypy_cmd_without_files(self) -> None:
         expected_cmd = [
@@ -144,42 +118,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                 ['file1.py', 'file2.py'], self.mypy_cmd_path, False)
             self.assertEqual(cmd, expected_cmd)
 
-    def test_install_mypy_prerequisites(self) -> None:
-        with self.popen_swap_success:
-            code, path = run_mypy_checks.install_mypy_prerequisites(False)
-            self.assertEqual(code, 0)
-            self.assertEqual(path, self.mypy_cmd_path)
-
-    def test_install_mypy_prerequisites_for_ci(self) -> None:
-        with self.popen_swap_success:
-            code, _ = run_mypy_checks.install_mypy_prerequisites(True)
-            self.assertEqual(code, 0)
-
-    def test_install_mypy_prerequisites_with_user_prefix_error(self) -> None:
-        with self.popen_swap_user_prefix_error:
-            code, path = run_mypy_checks.install_mypy_prerequisites(False)
-            self.assertEqual(code, 0)
-            self.assertNotEqual(path, self.mypy_cmd_path)
-
-    def test_error_is_raised_with_none_user_base(
-        self
-    ) -> None:
-        with self.popen_swap_user_prefix_error:
-            with self.swap(site, 'USER_BASE', None):
-                with self.assertRaisesRegex(
-                    Exception,
-                    'No USER_BASE found for the user.'
-                ):
-                    run_mypy_checks.install_mypy_prerequisites(False)
-
-    def test_install_mypy_prerequisites_with_wrong_script(self) -> None:
-        with self.popen_swap_failure:
-            with self.swap(
-                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'
-            ):
-                code, _ = run_mypy_checks.install_mypy_prerequisites(False)
-                self.assertEqual(code, 1)
-
     def test_running_script_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
             process = subprocess.Popen(
@@ -196,35 +134,20 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_files_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            with self.install_mypy_prereq_swap_success:
-                process = run_mypy_checks.main(args=['--files', 'file1.py'])
-                self.assertEqual(process, 0)
+            process = run_mypy_checks.main(args=['--files', 'file1.py'])
+            self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            with self.install_mypy_prereq_swap_success:
-                process = run_mypy_checks.main(args=[])
-                self.assertEqual(process, 0)
+            process = run_mypy_checks.main(args=[])
+            self.assertEqual(process, 0)
 
     def test_main_with_files_with_mypy_errors(self) -> None:
-        with self.install_mypy_prereq_swap_success:
-            with self.popen_swap_failure:
-                with self.assertRaisesRegex(SystemExit, '2'):
-                    run_mypy_checks.main(args=['--files', 'file1.py'])
+        with self.popen_swap_failure:
+            with self.assertRaisesRegex(SystemExit, '2'):
+                run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self) -> None:
         with self.popen_swap_failure:
-            with self.install_mypy_prereq_swap_success:
-                with self.assertRaisesRegex(SystemExit, '2'):
-                    run_mypy_checks.main(args=[])
-
-    def test_main_with_install_prerequisites_success(self) -> None:
-        with self.popen_swap_success:
-            with self.mypy_install_swap:
-                process = run_mypy_checks.main(args=[])
-                self.assertEqual(process, 0)
-
-    def test_main_with_install_prerequisites_failure(self) -> None:
-        with self.popen_swap_failure:
-            with self.assertRaisesRegex(SystemExit, '1'):
+            with self.assertRaisesRegex(SystemExit, '2'):
                 run_mypy_checks.main(args=[])
