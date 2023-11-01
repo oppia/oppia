@@ -26,7 +26,6 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { UrlService } from 'services/contextual/url.service';
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogAuthorProfilePageRootComponent } from './blog-author-profile-page-root.component';
@@ -148,51 +147,6 @@ describe('Blog Author Profile Page Root', () => {
       expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
-
-  it('should initialize and show error page when blog project feature is ' +
-  'disabled and user can not edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToBlogAuthorProfilePage'
-    );
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage)
-      .not.toHaveBeenCalledWith();
-    expect(component.pageIsShown).toBeFalse();
-    expect(component.errorPageIsShown).toBeTrue();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled but user can edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToBlogAuthorProfilePage'
-    ).and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage)
-      .toHaveBeenCalledWith('author');
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(

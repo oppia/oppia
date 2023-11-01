@@ -28,6 +28,7 @@ import './social-buttons.component.css';
   styleUrls: ['./social-buttons.component.css']
 })
 export class SocialButtonsComponent {
+  constructor() {}
 }
 
 angular.module('oppia').directive('oppiaSocialButtons',

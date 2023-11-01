@@ -24,7 +24,6 @@ import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -33,6 +32,8 @@ import { UserService } from 'services/user.service';
 })
 export class BlogHomePageRootComponent implements OnDestroy, OnInit {
   directiveSubscriptions = new Subscription();
+  errorPageIsShown: boolean = false;
+  pageIsShown: boolean = false;
 
   constructor(
     private accessValidationBackendApiService:
@@ -41,7 +42,6 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
     private pageHeadService: PageHeadService,
     private translateService: TranslateService,
     private userService: UserService,
-    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   ngOnInit(): void {
@@ -55,17 +55,15 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
 
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        userCanEditBlogPost
-      ) {
-        this.accessValidationBackendApiService
-          .validateAccessToBlogHomePage()
-          .then(() => {
-            this.loaderService.hideLoadingScreen();
-          });
-      } else {
-        this.loaderService.hideLoadingScreen();
-      }
+      this.accessValidationBackendApiService
+        .validateAccessToBlogHomePage()
+        .then((resp) => {
+          this.pageIsShown = true;
+        }, (err) => {
+          this.errorPageIsShown = true;
+        }).then(() => {
+          this.loaderService.hideLoadingScreen();
+        });
     });
   }
 

@@ -62,4 +62,9 @@ describe('OppiaFooterComponent', () => {
     expect(component.PAGES_REGISTERED_WITH_FRONTEND)
       .toBe(AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
   });
+
+  it('should return correct blog url if the blog homepage feature is enabled',
+    () => {
+      expect(component.getOppiaBlogUrl()).toEqual('/blog');
+    });
 });

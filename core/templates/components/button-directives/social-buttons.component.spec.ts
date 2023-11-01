@@ -25,11 +25,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 describe('SocialButtonsComponent', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SocialButtonsComponent, MockTranslatePipe]
+      declarations: [SocialButtonsComponent, MockTranslatePipe],
+      providers: []
     }).compileComponents();
   }));
 

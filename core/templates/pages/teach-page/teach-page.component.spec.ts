@@ -31,7 +31,6 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-
 class MockWindowRef {
   _window = {
     location: {

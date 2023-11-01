@@ -63,7 +63,7 @@ describe('Blog Home Page Root', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        },
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -121,47 +121,10 @@ describe('Blog Home Page Root', () => {
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
         .toHaveBeenCalled();
+      expect(component.pageIsShown).toBeFalse();
+      expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
-
-  it('should initialize user can not edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage');
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
-      .not.toHaveBeenCalled();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled and user can edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage'
-    ).and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogHomePage)
-      .toHaveBeenCalled();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(

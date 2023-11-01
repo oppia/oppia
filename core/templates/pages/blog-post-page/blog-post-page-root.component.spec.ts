@@ -34,7 +34,6 @@ import { PageHeadService } from 'services/page-head.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogPostPageRootComponent } from './blog-post-page-root.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 
 class MockTranslateService {
@@ -166,54 +165,6 @@ describe('Blog Post Page Root', () => {
       expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
-
-  it('should initialize and show error page when blog project feature is' +
-  ' disabled and user can not edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage');
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'fetchBlogPostData');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostUrlFragment).toBe('sample-post');
-    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-      .not.toHaveBeenCalled();
-    expect(component.fetchBlogPostData).not.toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeTrue();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled and user can edit blog posts', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-      .and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'fetchBlogPostData');
-
-    component.ngOnInit();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostUrlFragment).toBe('sample-post');
-
-    tick();
-
-    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-      .toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
-  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(
