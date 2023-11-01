@@ -66,21 +66,33 @@ export class baseInteractionValidationService {
 
     // This does not check the default outcome.
     for (var i = 0; i < answerGroups.length; i++) {
-      if (answerGroups[i].outcome.isConfusing(stateName)) {
+      const answerGroup = answerGroups[i];
+      const groupId = String(i + 1);
+      if (answerGroup.outcome.isConfusing(stateName)) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
             'Please specify what Oppia should do in Oppia response ' +
-            String(i + 1) + '.')
+            `${groupId}.`)
         });
       }
-      if (answerGroups[i].outcome.dest === stateName &&
-          answerGroups[i].outcome.labelledAsCorrect) {
+      if (answerGroup.outcome.dest === stateName &&
+          answerGroup.outcome.labelledAsCorrect) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'In answer group ' + String(i + 1) + ', self-loops should ' +
+            `In answer group ${groupId}, self-loops should ` +
             'not be labelled as correct.')
+        });
+      }
+      if (answerGroup.outcome.labelledAsCorrect &&
+        answerGroup.outcome.destIfReallyStuck !== null) {
+        partialWarningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            `The answer group ${groupId} is labelled as 'correct', ` +
+            'but includes a \'destination for really stuck learners\'. ' +
+            'The latter is unnecessary and should be removed.')
         });
       }
     }

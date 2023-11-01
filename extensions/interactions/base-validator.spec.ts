@@ -24,6 +24,7 @@
  * tests to ensure it is working properly.
  */
 
+import { AppConstants } from 'app.constants';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // interaction validators is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
@@ -64,7 +65,7 @@ describe('Interaction validator', function() {
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
     agof = $injector.get('AnswerGroupObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
 
@@ -149,6 +150,25 @@ describe('Interaction validator', function() {
             'In answer group 1, self-loops should not be labelled as correct.'
       }]);
     });
+
+    it('should have a warning for a correct answer group with destIfStuck',
+      function() {
+        goodOutcomeDest.labelledAsCorrect = true;
+        goodOutcomeDest.destIfReallyStuck = 'destIfReallyStuck';
+        const answerGroups = [
+          agof.createNew([], goodOutcomeDest, false, null)
+        ];
+        const warnings = bivs.getAnswerGroupWarnings(
+          answerGroups, currentState);
+        expect(warnings).toEqual([{
+          type: WARNING_TYPES.ERROR,
+          message:
+              'The answer group 1 is labelled as \'correct\', ' +
+              'but includes a \'destination for really stuck learners\'. ' +
+              'The latter is unnecessary and should be removed.'
+        }]);
+      }
+    );
 
     it('should not have any warnings for a non-confusing default outcome',
       function() {
