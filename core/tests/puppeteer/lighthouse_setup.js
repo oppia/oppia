@@ -179,7 +179,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(stateEditSelector);
     await page.click(stateEditSelector);
 
-    await page.waitForSelector(stateEditorInput);
+    await page.waitForSelector(stateEditorInput, {visible: true});
     await page.waitForSelector(saveContentButton);
     await page.click(saveContentButton);
     await page.waitForSelector(addInteractionButton);
