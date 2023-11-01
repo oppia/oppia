@@ -32,9 +32,6 @@ import {
   PlaythroughIssueCustomizationArgs
 } from 'domain/statistics/playthrough-issue.model';
 
-// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This interface takes the type of backend dict according to the IssueType
-// parameter.
 interface PlaythroughBackendDict {
   'issue_type': PlaythroughIssueType;
   'issue_customization_args': PlaythroughIssueCustomizationArgs;
@@ -43,10 +40,7 @@ interface PlaythroughBackendDict {
   'actions': LearnerActionBackendDict[];
 }
 
-
-// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
-// This class takes the type according to the IssueType parameter.
-abstract class PlaythroughBase {
+class PlaythroughBase {
   constructor(
     public readonly issueType: PlaythroughIssueType,
     public issueCustomizationArgs: PlaythroughIssueCustomizationArgs,
@@ -54,7 +48,25 @@ abstract class PlaythroughBase {
     public expVersion: number,
     public actions: LearnerAction[]) { }
 
-  abstract getStateNameWithIssue(): string;
+  getStateNameWithIssue(): string {
+    switch (this.issueType) {
+      case PlaythroughIssueType.EarlyQuit: {
+        const args = this.issueCustomizationArgs as EarlyQuitCustomizationArgs;
+        return args.state_name.value;
+      }
+      case PlaythroughIssueType.MultipleIncorrectSubmissions: {
+        const args = this.issueCustomizationArgs as
+          MultipleIncorrectSubmissionsCustomizationArgs;
+        return args.state_name.value;
+      }
+      case PlaythroughIssueType.CyclicStateTransitions: {
+        const args = this
+          .issueCustomizationArgs as CyclicStateTransitionsCustomizationArgs;
+        const stateNames = args.state_names.value;
+        return stateNames[stateNames.length - 1];
+      }
+    }
+  }
 
   toBackendDict(): PlaythroughBackendDict {
     return {
@@ -67,29 +79,11 @@ abstract class PlaythroughBase {
   }
 }
 
-export class EarlyQuitPlaythrough extends PlaythroughBase {
-  getStateNameWithIssue(): string {
-    const args = this.issueCustomizationArgs as EarlyQuitCustomizationArgs;
-    return args.state_name.value;
-  }
-}
+export class EarlyQuitPlaythrough extends PlaythroughBase {}
 
-export class MultipleIncorrectSubmissionsPlaythrough extends PlaythroughBase {
-  getStateNameWithIssue(): string {
-    const args = this.issueCustomizationArgs as
-      MultipleIncorrectSubmissionsCustomizationArgs;
-    return args.state_name.value;
-  }
-}
+export class MultipleIncorrectSubmissionsPlaythrough extends PlaythroughBase {}
 
-export class CyclicStateTransitionsPlaythrough extends PlaythroughBase {
-  getStateNameWithIssue(): string {
-    const args = this.issueCustomizationArgs as
-      CyclicStateTransitionsCustomizationArgs;
-    const stateNames = args.state_names.value;
-    return stateNames[stateNames.length - 1];
-  }
-}
+export class CyclicStateTransitionsPlaythrough extends PlaythroughBase {}
 
 export type Playthrough = (
   EarlyQuitPlaythrough |
