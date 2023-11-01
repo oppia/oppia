@@ -37,11 +37,11 @@ jobs:
           sudo make build
           sudo make run-devserver
       - name: Check that all e2e test files are captured in wdio.conf.js
-        run: docker compose exec dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
+        run: make run_tests.check_e2e_tests_are_captured_in_ci
       - name: Run typescript tests
-        run: docker compose exec dev-server python -m scripts.typescript_checks
+        run: make run_tests.typescript_tests
       - name: Run typescript tests in strict mode
-        run: docker compose exec dev-server python -m scripts.typescript_checks --strict_checks
+        run: make run_tests.typescript_tests PYTHON_ARGS="--strict_checks"
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

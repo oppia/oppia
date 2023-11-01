@@ -114,6 +114,9 @@ def main(args: Optional[List[str]] = None) -> None:
     # Cloud SDK comes with certain packages preinstalled including webapp2,
     # jinja2, and pyyaml so this function makes sure that those libraries are
     # installed.
+    # The pylint check for import-error is disabled because the dev_appserver
+    # executable is present within the Docker containers but not on the local
+    # machine.
     import dev_appserver # pylint: disable=import-error
     dev_appserver.fix_sys_path()
 
