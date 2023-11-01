@@ -93,10 +93,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_check_backend_python_library_for_inconsistencies() -> None:
             return
 
-        self.swap_check_backend_python_libs = self.swap(
-            pre_push_hook,
-            'check_for_backend_python_library_inconsistencies',
-            mock_check_backend_python_library_for_inconsistencies)
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.get_remote_name_swap = self.swap(
             pre_push_hook, 'get_remote_name', mock_get_remote_name)
@@ -672,8 +668,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
                 with self.assertRaisesRegex(SystemExit, '1'):
-                    with self.swap_check_backend_python_libs:
-                        pre_push_hook.main(args=[])
+                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n' in self.print_arr)
@@ -693,8 +688,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with check_output_swap, self.assertRaisesRegex(
                     SystemExit, '1'
                 ):
-                    with self.swap_check_backend_python_libs:
-                        pre_push_hook.main(args=[])
+                    pre_push_hook.main(args=[])
         self.assertIn(
             '\nCould not change branch to branch1. This is most probably '
             'because you are in a dirty state. Change manually to the branch '
@@ -709,8 +703,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.execute_mypy_checks_swap:
                         with self.assertRaisesRegex(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                            pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
             in self.print_arr)
@@ -722,8 +715,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.execute_mypy_checks_swap:
                         with self.assertRaisesRegex(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                            pre_push_hook.main(args=[])
         self.assertIn(
             'Push failed, please correct the mypy type annotation issues '
             'above.', self.print_arr)
@@ -743,8 +735,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegex(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
 
@@ -764,8 +755,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegex(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks in '
             'strict mode.' in self.print_arr)
@@ -785,8 +775,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegex(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed due to some backend files lacking an '
             'associated test file.' in self.print_arr)
@@ -806,8 +795,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
                         with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegex(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
@@ -828,8 +816,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                         with self.ci_config_or_js_files_swap:
                             with self.execute_mypy_checks_swap:
                                 with self.assertRaisesRegex(SystemExit, '1'):
-                                    with self.swap_check_backend_python_libs:
-                                        pre_push_hook.main(args=[])
+                                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing e2e test configuration check.'
             in self.print_arr)
@@ -841,8 +828,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_install_hook() -> None:
             check_function_calls['install_hook_is_called'] = True
         with self.swap(
-            pre_push_hook, 'install_hook', mock_install_hook), (
-                self.swap_check_backend_python_libs):
+            pre_push_hook, 'install_hook', mock_install_hook):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self) -> None:
@@ -857,86 +843,4 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with run_script_and_get_returncode_swap:
                         with self.js_or_ts_swap:
                             with self.execute_mypy_checks_swap:
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
-
-    def test_main_exits_when_mismatches_exist_in_backend_python_libs(
-        self
-    ) -> None:
-        """Test that main exits with correct error message when mismatches are
-        found between the installed python libraries in
-        `third_party/python_libs` and the compiled 'requirements.txt' file.
-        """
-        def mock_get_mismatches() -> Dict[str, Tuple[str, str]]:
-            return {
-                'library': ('version', 'version')
-            }
-
-        def mock_exit_error(error_code: int) -> None:
-            self.assertEqual(error_code, 1)
-
-        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
-        with self.print_swap, swap_sys_exit:
-            pre_push_hook.check_for_backend_python_library_inconsistencies()
-
-        self.assertEqual(
-            self.print_arr,
-            [
-                'Your currently installed python libraries do not match the\n'
-                'libraries listed in your "requirements.txt" file. Here is a\n'
-                'full list of library/version discrepancies:\n',
-                'Library                             |Requirements Version     '
-                '|Currently Installed Version',
-                'library                             |version                  '
-                '|version                  ',
-                '\n',
-                'Please fix these discrepancies by editing the '
-                '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
-                '`third_party/python_libs` directory.\n\n'
-            ])
-
-    def test_main_exits_when_missing_backend_python_lib(self) -> None:
-        """Test that main exits with correct error message when a python
-        library required in `requirements.txt` is missing in
-        `third_party/python_libs`.
-        """
-        def mock_get_mismatches() -> Dict[str, Tuple[str, None]]:
-            return {
-                'library': ('version', None)
-            }
-
-        def mock_exit_error(error_code: int) -> None:
-            self.assertEqual(error_code, 1)
-
-        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
-        with self.print_swap, swap_sys_exit:
-            pre_push_hook.check_for_backend_python_library_inconsistencies()
-
-        self.assertEqual(
-            self.print_arr,
-            [
-                'Your currently installed python libraries do not match the\n'
-                'libraries listed in your "requirements.txt" file. Here is a\n'
-                'full list of library/version discrepancies:\n',
-                'Library                             |Requirements Version     '
-                '|Currently Installed Version',
-                'library                             |version                  '
-                '|None                     ',
-                '\n',
-                'Please fix these discrepancies by editing the '
-                '`requirements.in`\nfile or running '
-                '`scripts.install_third_party` to regenerate\nthe '
-                '`third_party/python_libs` directory.\n\n'
-            ])
-
-    def test_main_with_no_inconsistencies_in_backend_python_libs(self) -> None:
-        def mock_get_mismatches() -> Dict[str, Tuple[str, str]]:
-            return {}
-
-        with self.print_swap:
-            pre_push_hook.check_for_backend_python_library_inconsistencies()
-
-        self.assertEqual(
-            self.print_arr,
-            ['Python dependencies consistency check succeeded.'])
+                                pre_push_hook.main(args=[])
