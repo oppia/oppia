@@ -35,7 +35,7 @@ import {
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This interface takes the type of backend dict according to the IssueType
 // parameter.
-interface PlaythroughBackendDictBase {
+interface PlaythroughBackendDict {
   'issue_type': PlaythroughIssueType;
   'issue_customization_args': PlaythroughIssueCustomizationArgs;
   'exp_id': string;
@@ -43,19 +43,6 @@ interface PlaythroughBackendDictBase {
   'actions': LearnerActionBackendDict[];
 }
 
-export type EarlyQuitPlaythroughBackendDict = (
-  PlaythroughBackendDictBase);
-
-export type MultipleIncorrectSubmissionsPlaythroughBackendDict = (
-  PlaythroughBackendDictBase);
-
-export type CyclicStateTransitionsPlaythroughBackendDict = (
-  PlaythroughBackendDictBase);
-
-export type PlaythroughBackendDict = (
-  EarlyQuitPlaythroughBackendDict |
-  MultipleIncorrectSubmissionsPlaythroughBackendDict |
-  CyclicStateTransitionsPlaythroughBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the IssueType parameter.
@@ -69,7 +56,7 @@ abstract class PlaythroughBase {
 
   abstract getStateNameWithIssue(): string;
 
-  toBackendDict(): PlaythroughBackendDictBase {
+  toBackendDict(): PlaythroughBackendDict {
     return {
       exp_id: this.expId,
       exp_version: this.expVersion,
