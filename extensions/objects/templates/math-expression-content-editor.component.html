@@ -9,8 +9,10 @@
   <div>
     <textarea [ngModel]="localValue.label" (ngModelChange)="debouncedUpdate$.next($event)" placeholder="Enter a math expression using LaTeX, e.g. '\frac{x}{y}'"></textarea>
   </div>
-  Preview:
-  <span *ngIf="localValue.label" [oppiaMathJax]="localValue.label">
+  <span tabindex="0">
+    Preview:
+    <span *ngIf="localValue.label" [oppiaMathJax]="localValue.label" [attr.aria-label]="localValue.label">
+    </span>
   </span>
   <span *ngIf="!localValue.label" [oppiaMathJax]="placeholderText" class="text-secondary">
   </span>
