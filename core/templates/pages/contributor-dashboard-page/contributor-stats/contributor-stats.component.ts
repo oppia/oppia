@@ -90,6 +90,7 @@ export class ContributorStatsComponent {
   selectedContributionType: string | undefined = '';
   username: string = '';
   ITEMS_PER_PAGE: number = 5;
+  dataLoading = false;
 
   userCanReviewTranslationSuggestions: boolean = false;
   userCanReviewQuestionSuggestions: boolean = false;
@@ -179,6 +180,7 @@ export class ContributorStatsComponent {
   async ngOnInit(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     const username = userInfo.getUsername();
+    this.dataLoading = true;
 
     if (username === null) {
       throw new Error('Cannot fetch username.');
@@ -214,6 +216,7 @@ export class ContributorStatsComponent {
     }
 
     await this.fetchStats();
+    this.dataLoading = false;
   }
 
   toggleDropdown(): void {
