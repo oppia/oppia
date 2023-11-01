@@ -37,6 +37,7 @@ var ExplorationEditorPage =
   require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -436,6 +437,7 @@ describe('Serial Chapter Launch functionality', function() {
     topicViewerPage = (
       new TopicViewerPage.TopicViewerPage());
     adminPage = new AdminPage.AdminPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     await users.createAndLoginCurriculumAdminUser(
       userEmail, 'creatorSerialChapterTest');
@@ -471,6 +473,10 @@ describe('Serial Chapter Launch functionality', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(topicId);
       });
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
