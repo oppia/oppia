@@ -54,7 +54,8 @@ var saveDraftButton = '.e2e-test-save-draft-button';
 var publishExplorationButton = '.e2e-test-publish-exploration';
 var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
 var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
-var expCategoryDropdownElement = '.e2e-test-exploration-category-metadata-modal';
+var expCategoryDropdownElement =
+  '.e2e-test-exploration-category-metadata-modal';
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
 var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
@@ -218,7 +219,8 @@ const getExplorationEditorUrl = async function(browser, page) {
 
     await page.click(expCategoryDropdownElement);
 
-    const categorySector = await page.$$('.e2e-test-exploration-category-selector-choice=Algebra');
+    const categorySector = await page.$$(
+      '.e2e-test-exploration-category-selector-choice=Algebra');
     await categorySector[0].click();
 
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
