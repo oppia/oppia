@@ -29,7 +29,7 @@ import {
   PlaythroughIssueCustomizationArgs
 } from 'domain/statistics/playthrough-issue.model';
 
-interface PlaythroughBackendDict {
+export interface PlaythroughBackendDict {
   'issue_type': PlaythroughIssueType;
   'issue_customization_args': PlaythroughIssueCustomizationArgs;
   'exp_id': string;
@@ -161,15 +161,3 @@ export class Playthrough {
       angular.toJson(invalidBackendDict));
   }
 }
-
-// export class EarlyQuitPlaythrough extends PlaythroughBase {}
-
-// export class MultipleIncorrectSubmissionsPlaythrough extends PlaythroughBase {}
-
-// export class CyclicStateTransitionsPlaythrough extends PlaythroughBase {}
-
-// export type Playthrough = (
-//   EarlyQuitPlaythrough |
-//   MultipleIncorrectSubmissionsPlaythrough |
-//   CyclicStateTransitionsPlaythrough);
-

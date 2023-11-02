@@ -22,6 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
+import { PlaythroughIssueType } from
+  'domain/statistics/playthrough-issue.model';
 import { Playthrough, PlaythroughBackendDict } from
   'domain/statistics/playthrough.model';
 import {
@@ -53,7 +55,7 @@ describe('Playthrough backend api service', () => {
     let playthroughDict: PlaythroughBackendDict = {
       exp_id: 'expId1',
       exp_version: 1,
-      issue_type: 'MultipleIncorrectSubmissions',
+      issue_type: PlaythroughIssueType.MultipleIncorrectSubmissions,
       issue_customization_args: {
         state_name: {
           value: 'stateName'

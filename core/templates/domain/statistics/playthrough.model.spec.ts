@@ -21,6 +21,8 @@ import { LearnerAction, LearnerActionType } from
   'domain/statistics/learner-action.model';
 import { Playthrough } from
   'domain/statistics/playthrough.model';
+import {PlaythroughIssueType} from
+  'domain/statistics/playthrough-issue.model';
 
 describe('Playthrough Object Factory', () => {
   it('should create a new playthrough', () => {
@@ -37,7 +39,7 @@ describe('Playthrough Object Factory', () => {
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughObject.issueType).toEqual(PlaythroughIssueType.EarlyQuit);
     expect(playthroughObject.issueCustomizationArgs).toEqual({
       state_name: {value: 'state'},
       time_spent_in_exp_in_msecs: {value: 30000}
@@ -49,7 +51,7 @@ describe('Playthrough Object Factory', () => {
     var playthroughDictObject = Playthrough.createFromBackendDict({
       exp_id: 'expId1',
       exp_version: 1,
-      issue_type: 'CyclicStateTransitions',
+      issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
         state_names: {
           value: ['state1', 'state2']
@@ -74,7 +76,7 @@ describe('Playthrough Object Factory', () => {
       {
         exp_id: 'expId1',
         exp_version: 1,
-        issue_type: 'EarlyQuit',
+        issue_type: PlaythroughIssueType.EarlyQuit,
         issue_customization_args: {
           state_name: {
             value: 'state'
@@ -112,7 +114,7 @@ describe('Playthrough Object Factory', () => {
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('EarlyQuit');
+    expect(playthroughObject.issueType).toEqual(PlaythroughIssueType.EarlyQuit);
     expect(playthroughObject.issueCustomizationArgs).toEqual({
       state_name: {
         value: 'state'
@@ -175,7 +177,7 @@ describe('Playthrough Object Factory', () => {
     expect(playthroughDict).toEqual({
       exp_id: 'expId1',
       exp_version: 1,
-      issue_type: 'EarlyQuit',
+      issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000}
