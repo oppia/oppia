@@ -22,8 +22,9 @@ import functools
 import logging
 import re
 
-from core import android_validation_constants, platform_feature_list
+from core import android_validation_constants
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.controllers import base
