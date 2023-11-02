@@ -103,20 +103,10 @@ export class ContributorBadgesComponent {
     if (userContributionRights === null) {
       throw new Error('Cannot fetch user contribution rights.');
     }
-    userContributionRights.can_review_translation_for_language_codes.map(
-      (languageCode) => {
-        const languageDescription = this.languageUtilService
-          .getAudioLanguageDescription(
-            languageCode);
-        this.totalTranslationStats[languageDescription] = {
-          language: this.languageUtilService.getShortLanguageDescription(
-            languageDescription),
-          submissions: 0,
-          reviews: 0,
-          corrections: 0
-        };
-        this.reviewableLanguages.push(languageDescription);
-      });
+
+    const allContributionStats = await this
+      .contributionAndReviewStatsService.fetchAllStats(username);
+
     this.userCanReviewQuestionSuggestions = (
       userContributionRights.can_review_questions);
     this.userCanSuggestQuestions = (
@@ -125,11 +115,8 @@ export class ContributorBadgesComponent {
       this.userCanSuggestQuestions ||
       this.userCanReviewQuestionSuggestions);
 
-    const allContributionStats = await this
-      .contributionAndReviewStatsService.fetchAllStats(username);
-
     if (allContributionStats.translation_contribution_stats.length > 0) {
-      await allContributionStats.translation_contribution_stats.map((stat) => {
+      allContributionStats.translation_contribution_stats.forEach((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
@@ -152,15 +139,26 @@ export class ContributorBadgesComponent {
       });
     }
     if (allContributionStats.translation_review_stats.length > 0) {
-      await allContributionStats.translation_review_stats.map((stat) => {
+      allContributionStats.translation_review_stats.forEach((stat) => {
         const languageDescription =
           this.languageUtilService.getAudioLanguageDescription(
             stat.language_code);
 
-        this.totalTranslationStats[languageDescription].reviews += (
-          stat.reviewed_translations_count);
-        this.totalTranslationStats[languageDescription].corrections += (
-          stat.accepted_translations_with_reviewer_edits_count);
+        if (!this.totalTranslationStats[languageDescription]) {
+          this.totalTranslationStats[languageDescription] = {
+            language: this.languageUtilService.getShortLanguageDescription(
+              languageDescription),
+            submissions: 0,
+            reviews: stat.reviewed_translations_count,
+            corrections: stat.accepted_translations_with_reviewer_edits_count
+          };
+          this.reviewableLanguages.push(languageDescription);
+        } else {
+          this.totalTranslationStats[languageDescription].reviews += (
+            stat.reviewed_translations_count);
+          this.totalTranslationStats[languageDescription].corrections += (
+            stat.accepted_translations_with_reviewer_edits_count);
+        }
       });
     }
     if (allContributionStats.question_contribution_stats.length > 0) {
