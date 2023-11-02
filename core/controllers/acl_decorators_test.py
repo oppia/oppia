@@ -35,6 +35,9 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -45,10 +48,6 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
-from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry as registry
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -3309,10 +3308,6 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        # self.mock_feature_flag = registry.Registry.create_feature_flag(
-        #     platform_parameter_list.ParamNames.FEATURE_A,
-        #     'a mock of the cd_admin_dashboard_new_ui feature flag',
-        #     platform_parameter_domain.FeatureStages.DEV)
 
     def test_banned_user_cannot_access_contributor_dashboard_admin_page(
         self
@@ -3331,14 +3326,19 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self
     ) -> None:
         feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value, self.owner_id, 'flag update',
+            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            self.owner_id, 'flag update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'platform_type',
                             'conditions': [
-                                ['=', platform_parameter_domain.ALLOWED_PLATFORM_TYPES[0]]
+                                [
+                                    '=',
+                                    platform_parameter_domain
+                                    .ALLOWED_PLATFORM_TYPES[0]
+                                ]
                             ]
                         }
                     ],
@@ -3359,18 +3359,23 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
-    def test_question_coordinator_can_access_new_contributor_dashboard_admin_page(
+    def test_question_coordinator_can_access_new_cd_admin_page(
         self
     ) -> None:
         feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value, self.owner_id, 'flag update',
+            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            self.owner_id, 'flag update',
             [
                 platform_parameter_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
                             'type': 'platform_type',
                             'conditions': [
-                                ['=', platform_parameter_domain.ALLOWED_PLATFORM_TYPES[0]]
+                                [
+                                    '=',
+                                    platform_parameter_domain
+                                    .ALLOWED_PLATFORM_TYPES[0]
+                                ]
                             ]
                         }
                     ],
