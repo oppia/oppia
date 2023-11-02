@@ -45,6 +45,10 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
+from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_registry as registry
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -3296,6 +3300,8 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mark_user_banned(self.banned_user)
         self.user = user_services.get_user_actions_info(
             user_services.get_user_id_from_username(self.username))
@@ -3303,6 +3309,10 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        # self.mock_feature_flag = registry.Registry.create_feature_flag(
+        #     platform_parameter_list.ParamNames.FEATURE_A,
+        #     'a mock of the cd_admin_dashboard_new_ui feature flag',
+        #     platform_parameter_domain.FeatureStages.DEV)
 
     def test_banned_user_cannot_access_contributor_dashboard_admin_page(
         self
@@ -3315,6 +3325,66 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
             'admin page.'
         )
         self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
+        self
+    ) -> None:
+        feature_services.update_feature_flag(
+            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value, self.owner_id, 'flag update',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', platform_parameter_domain.ALLOWED_PLATFORM_TYPES[0]]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ]
+        )
+        self.add_user_role(
+            self.username, feconf.ROLE_ID_QUESTION_ADMIN)
+        self.login(self.user_email)
+        with self.swap(constants, 'DEV_MODE', True):
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = (
+            'You do not have credentials to access contributor dashboard '
+            'admin page.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_question_coordinator_can_access_new_contributor_dashboard_admin_page(
+        self
+    ) -> None:
+        feature_services.update_feature_flag(
+            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value, self.owner_id, 'flag update',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                ['=', platform_parameter_domain.ALLOWED_PLATFORM_TYPES[0]]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ]
+        )
+        self.add_user_role(
+            self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
+        self.login(self.user_email)
+        with self.swap(constants, 'DEV_MODE', True):
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_question_admin_can_access_contributor_dashboard_admin_page(
