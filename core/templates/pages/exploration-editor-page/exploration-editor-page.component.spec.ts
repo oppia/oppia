@@ -597,7 +597,8 @@ describe('Exploration editor page component', () => {
       const ariaLabel = component.generateAriaLabelForWarnings();
 
       expect(ariaLabel).toBe(
-        'Total warnings: 3. Warning 1: Warning 2: Warning 3');
+        'Total warnings: 3. Warning 1: Warning 1. Warning 2: ' +
+        'Warning 2. Warning 3: Warning 3');
     });
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
