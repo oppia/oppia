@@ -399,6 +399,14 @@ describe('Answer Classification Service', () => {
               normalizedStrSet: ['FuzzilyCorrect']
             }
           }
+        }, {
+          rule_type: 'Equals',
+          inputs: {
+            x: {
+              contentId: 'rule_input_short_answer',
+              normalizedStrSet: ['ans']
+            }
+          }
         }],
       }];
 
@@ -416,6 +424,9 @@ describe('Answer Classification Service', () => {
 
       expect(answerClassificationService.isAnswerOnlyMisspelled(
         state.interaction, 'InCORrectAnkwpr')).toEqual(false);
+
+      expect(answerClassificationService.isAnswerOnlyMisspelled(
+        state.interaction, 'an')).toEqual(false);
     });
   });
 
