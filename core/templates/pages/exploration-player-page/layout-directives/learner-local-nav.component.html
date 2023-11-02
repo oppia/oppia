@@ -27,13 +27,16 @@
     </a>
   </li>
   <li class="nav-item">
-    <a *ngIf="username" (click)="showFlagExplorationModal()" href="#"
-       (keydown.enter)="showFlagExplorationModal()"
-       ngbTooltip="{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}" placement="bottom"
-       tabindex="0" class="nav-link e2e-test-report-exploration-button">
+    <div tabindex="0"
+         *ngIf="username"
+         class="nav-link e2e-test-report-exploration-button"
+         ngbTooltip="{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}"
+         (click)="showFlagExplorationModal()"
+         (keydown.enter)="showFlagExplorationModal()"
+         placement="bottom">
       <i class="fas fa-flag exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
-    </a>
+    </div>
   </li>
 </ul>
 
