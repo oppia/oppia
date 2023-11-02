@@ -13,34 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PlaythroughObjectFactory.
+ * @fileoverview Unit tests for the Playthrough model.
  */
 
-import { TestBed } from '@angular/core/testing';
 
 import { LearnerAction, LearnerActionType } from
   'domain/statistics/learner-action.model';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
+import { Playthrough } from
+  'domain/statistics/playthrough.model';
 
 describe('Playthrough Object Factory', () => {
-  let pof: PlaythroughObjectFactory;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [PlaythroughObjectFactory]
-    });
-
-    pof = TestBed.get(PlaythroughObjectFactory);
-  });
-
   it('should create a new playthrough', () => {
     let actions = [LearnerAction.createNewExplorationStartAction({
       state_name: {
         value: 'state'
       }
     })];
-    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+    let playthroughObject = Playthrough.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
@@ -57,7 +46,7 @@ describe('Playthrough Object Factory', () => {
   });
 
   it('should create same objects from backend dict and direct values.', () => {
-    var playthroughDictObject = pof.createFromBackendDict({
+    var playthroughDictObject = Playthrough.createFromBackendDict({
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'CyclicStateTransitions',
@@ -69,18 +58,19 @@ describe('Playthrough Object Factory', () => {
       actions: []
     });
 
-    var playthroughObject = pof.createNewCyclicStateTransitionsPlaythrough(
-      'expId1', 1, {
-        state_names: {
-          value: ['state1', 'state2']
-        }
-      }, []);
+    var playthroughObject = Playthrough
+      .createNewCyclicStateTransitionsPlaythrough(
+        'expId1', 1, {
+          state_names: {
+            value: ['state1', 'state2']
+          }
+        }, []);
 
     expect(playthroughDictObject).toEqual(playthroughObject);
   });
 
   it('should create a new playthrough from a backend dict', () => {
-    let playthroughObject = pof.createFromBackendDict(
+    let playthroughObject = Playthrough.createFromBackendDict(
       {
         exp_id: 'expId1',
         exp_version: 1,
@@ -175,7 +165,7 @@ describe('Playthrough Object Factory', () => {
         value: 2
       }
     })];
-    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+    let playthroughObject = Playthrough.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000}
@@ -236,27 +226,29 @@ describe('Playthrough Object Factory', () => {
     // 'playthroughDict' has an invalid value of 'issue_type' property. We need
     // to do that in order to test validations.
     // @ts-expect-error
-    expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
-      'Backend dict does not match any known issue type: ' +
+    expect(() => Playthrough.createFromBackendDict(playthroughDict))
+      .toThrowError(
+        'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
 
   it('should identify the problematic state', () => {
-    let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
+    let eqPlaythrough = Playthrough.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
       }, []);
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
-    var misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
-      'expId1', 1, {
-        state_name: {value: 'state'},
-        num_times_answered_incorrectly: {value: 10},
-      }, []);
+    var misPlaythrough = Playthrough
+      .createNewMultipleIncorrectSubmissionsPlaythrough(
+        'expId1', 1, {
+          state_name: {value: 'state'},
+          num_times_answered_incorrectly: {value: 10},
+        }, []);
     expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
 
-    var cstPlaythrough = pof.createNewCyclicStateTransitionsPlaythrough(
+    var cstPlaythrough = Playthrough.createNewCyclicStateTransitionsPlaythrough(
       'expId1', 1, {
         state_names: {
           value: ['state1', 'state2']

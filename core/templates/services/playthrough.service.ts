@@ -29,8 +29,8 @@ import {
 } from 'domain/statistics/playthrough-issue.model';
 import { LearnerAction } from
   'domain/statistics/learner-action.model';
-import { Playthrough, PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
+import { Playthrough } from
+  'domain/statistics/playthrough.model';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
@@ -191,7 +191,7 @@ export class PlaythroughService {
   constructor(
       private explorationFeaturesService: ExplorationFeaturesService,
       private playthroughBackendApiService: PlaythroughBackendApiService,
-      private playthroughObjectFactory: PlaythroughObjectFactory) {}
+  ) {}
 
   initSession(
       explorationId: string, explorationVersion: number,
@@ -281,19 +281,19 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     if (this.misTracker && this.misTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory
+      return Playthrough
         .createNewMultipleIncorrectSubmissionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.misTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory
+      return Playthrough
         .createNewCyclicStateTransitionsPlaythrough(
           this.explorationId, this.explorationVersion,
           this.cstTracker.generateIssueCustomizationArgs(),
           this.recordedLearnerActions);
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-      return this.playthroughObjectFactory
+      return Playthrough
         .createNewEarlyQuitPlaythrough(
           this.explorationId, this.explorationVersion,
           this.eqTracker.generateIssueCustomizationArgs(),

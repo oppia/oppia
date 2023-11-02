@@ -22,15 +22,14 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory, PlaythroughBackendDict } from
-  'domain/statistics/PlaythroughObjectFactory';
+import { Playthrough, PlaythroughBackendDict } from
+  'domain/statistics/playthrough.model';
 import {
   LearnerActionType,
 } from 'domain/statistics/learner-action.model';
 
 describe('Playthrough backend api service', () => {
   let pbas: PlaythroughBackendApiService;
-  let pof: PlaythroughObjectFactory;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -39,7 +38,6 @@ describe('Playthrough backend api service', () => {
     });
 
     pbas = TestBed.get(PlaythroughBackendApiService);
-    pof = TestBed.get(PlaythroughObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -89,7 +87,7 @@ describe('Playthrough backend api service', () => {
         schema_version: 1
       }]
     };
-    let playthorughObject = pof.createFromBackendDict(playthroughDict);
+    let playthorughObject = Playthrough.createFromBackendDict(playthroughDict);
 
     let onSuccess = jasmine.createSpy('onSuccess');
     let onFailure = jasmine.createSpy('onFailure');
