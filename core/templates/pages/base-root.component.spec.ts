@@ -63,7 +63,7 @@ describe('Base root component', () => {
     const updateTitleAndMetaTagsSpy = spyOn(
       pageHeadService, 'updateTitleAndMetaTags');
     spyOnProperty(translateServie, 'onLangChange', 'get').and.returnValue(
-      of(null) as EventEmitter<LangChangeEvent>);
+      of(null) as unknown as EventEmitter<LangChangeEvent>);
 
     component.ngOnInit();
     flush();
