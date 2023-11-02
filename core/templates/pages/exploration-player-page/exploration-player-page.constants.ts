@@ -68,6 +68,10 @@ export const ExplorationPlayerConstants = {
 
   // Threshold value of edit distance for judging an answer as a misspelling.
   THRESHOLD_EDIT_DISTANCE_FOR_MISSPELLINGS: 2,
+  // Answers shorter than this will not be checked for misspellings.
+  // If half of the symbols in the answer are wrong it's probably
+  // not a misspelling.
+  MIN_ANSWER_LENGTH_TO_CHECK_MISSPELLINGS: 5,
 
   /* This should match the CSS class defined in the tutor card directive. */
   AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
