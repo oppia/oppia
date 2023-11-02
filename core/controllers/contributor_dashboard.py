@@ -460,8 +460,8 @@ class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    topic_name: str
     language_code: str
+    topic_id: str
     opportunity_id: Optional[str]
 
 
@@ -498,7 +498,7 @@ class LessonsPinningHandler(
     @acl_decorators.open_access
     def put(self) -> None:
         """Handles pinning/unpinning lessons."""
-        assert self.normalized_request is not None
+        assert self.normalized_payload is not None
         assert self.user_id is not None
         topic_id = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
