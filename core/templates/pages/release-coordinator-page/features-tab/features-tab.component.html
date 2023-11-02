@@ -11,6 +11,27 @@
       <div class="col-10">{{ getFeatureStageString(featureFlag) }}</div>
     </div>
     <div class="row oppia-feature-top-margin">
+      <div class="col-2"><b>Rollout percentage for logged-in users (0-100):</b></div>
+      <div class="col-10">
+        <div class="row">
+          <div class="col-3">
+            <schema-based-editor [disabled]="featureFlag.forceEnableForAllUsers" [schema]="getSchema()" [(ngModel)]="featureFlag.rolloutPercentage">
+            </schema-based-editor>
+          </div>
+          <div class="col-1">
+            <div class="d-flex flex-column">
+              <div *ngIf="featureFlag.forceEnableForAllUsers" class="mb-2" matTooltip="This value is not applied if the feature is force-enabled for all users (see below)." matTooltipPosition="right">
+                <i class="fas fa-info-circle practice-tab-info-circle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <small><i>This feature will only be enabled for the above percentage of <b>logged-in</b> users. We recommend rolling out the feature to logged-in users first, and once we are sure that doing so doesn't break anything, extending it to logged-out users as well using the "Force-enable for all users" control below.</i></small>
+        </div>
+      </div>
+    </div>
+    <div class="row oppia-feature-top-margin">
       <div class="col-2"><b>Force-enable for all users:</b></div>
       <div class="col-10">
         <div>
@@ -21,27 +42,6 @@
         </div>
         <div>
           <small><i>Setting this to "Yes" will force-enable the feature for all the users, both <b>logged-in</b> and <b>logged-out</b>. Setting this property will disable the effect of all the other properties and enable the feature for all the users.</i></small>
-        </div>
-      </div>
-    </div>
-    <div class="row oppia-feature-top-margin">
-      <div class="col-2"><b>Rollout percentage for logged-in users (0-100):</b></div>
-      <div class="col-10">
-        <div class="row">
-          <div class="col-3">
-            <schema-based-editor [disabled]="featureFlag.forceEnableForAllUsers" [schema]="getSchema()" [(ngModel)]="featureFlag.rolloutPercentage">
-            </schema-based-editor>
-          </div>
-          <div class="col-1">
-            <div class="d-flex flex-column">
-              <div *ngIf="featureFlag.forceEnableForAllUsers" class="mb-2" matTooltip="This value is not applied if the feature is force-enabled for all users (see above)." matTooltipPosition="right">
-                <i class="fas fa-info-circle practice-tab-info-circle"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <small><i>This feature will only be enabled for the above percentage of <b>logged-in</b> users. We recommend rolling out the feature to logged-in users first, and once we are sure that doing so doesn't break anything, extending it to logged-out users as well using the "Force-enable for all users" control below.</i></small>
         </div>
       </div>
     </div>
