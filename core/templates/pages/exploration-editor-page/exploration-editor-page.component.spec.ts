@@ -590,13 +590,14 @@ describe('Exploration editor page component', () => {
         { message: 'Warning 2' },
         { message: 'Warning 3' },
       ];
-  
+
       spyOn(component, 'getWarnings').and.returnValue(mockWarnings);
       spyOn(component, 'countWarnings').and.returnValue(mockWarnings.length);
-  
+
       const ariaLabel = component.generateAriaLabelForWarnings();
-  
-      expect(ariaLabel).toBe('Total warnings: 3. Warning 1: Warning 2: Warning 3');
+
+      expect(ariaLabel).toBe(
+        'Total warnings: 3. Warning 1: Warning 2: Warning 3');
     });
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {

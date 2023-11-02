@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for confirm leave modal component.
  */
 
-import { NO_ERRORS_SCHEMA,ElementRef } from '@angular/core';
+import { NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmLeaveModalComponent } from './confirm-leave-modal.component';
@@ -55,5 +55,5 @@ describe('Confirm Leave Modal Component', function() {
     component.ngAfterViewInit();
 
     expect(confirmHeaderRef.nativeElement.focus).toHaveBeenCalled();
-  } );
+  });
 });

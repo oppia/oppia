@@ -33,6 +33,7 @@ export class ConfirmLeaveModalComponent
   ) {
     super(ngbActiveModal);
   }
+  
   ngAfterViewInit(): void {
     this.confirmHeaderRef.nativeElement.focus();
   }

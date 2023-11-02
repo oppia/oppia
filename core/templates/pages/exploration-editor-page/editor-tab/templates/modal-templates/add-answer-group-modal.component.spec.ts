@@ -186,7 +186,7 @@ describe('Add Answer Group Modal Component', () => {
     component.ngAfterViewInit();
 
     expect(addResponseRef.nativeElement.focus).toHaveBeenCalled();
-  } );
+  });
 
   it('should save answer group response when closing the modal', () => {
     component.saveResponse(false);

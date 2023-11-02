@@ -194,9 +194,9 @@ export class AddAnswerGroupModalComponent
      this.tmpOutcome.feedback = outcome.feedback;
    }
 
-    ngAfterViewInit(): void {
-      this.addResponseRef.nativeElement.focus();
-    }
+   ngAfterViewInit(): void {
+     this.addResponseRef.nativeElement.focus();
+   }
 
    ngOnDestroy(): void {
      this.eventBusGroup.unsubscribe();
