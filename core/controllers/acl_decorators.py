@@ -1248,9 +1248,9 @@ def can_access_contributor_dashboard_admin_page(
 
         if new_dashboard_enabled and (
             role_services
-            .ACTION_ACCESS_NEW_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
-                self.user.actions
-            )):
+            .ACTION_ACCESS_NEW_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE
+            in self.user.actions
+        ):
             return handler(self, **kwargs)
 
         if not new_dashboard_enabled and (
