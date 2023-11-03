@@ -102,7 +102,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://localhost:8181/create/.*$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.91}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
