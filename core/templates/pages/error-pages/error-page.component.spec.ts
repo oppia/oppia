@@ -44,7 +44,7 @@ describe('ErrorPageComponent', () => {
     expect(component.getStatusCode()).toBeInstanceOf(Number);
   });
 
-  it('should get static image url',() => {
+  it('should get static the image url', () => {
     expect(component.getStaticImageUrl('/general/oops_mint.webp'))
       .toBe('/assets/images/general/oops_mint.webp');
   });
