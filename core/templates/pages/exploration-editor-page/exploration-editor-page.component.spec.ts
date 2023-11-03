@@ -442,6 +442,17 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
+    it('should skip to main content', () => {
+      const mockElement = document.createElement('div');
+      mockElement.classList.add('exploration-editor-content');
+      document.body.appendChild(mockElement);
+
+      component.skipEditorNavbar();
+
+      const focusedElement = document.activeElement as HTMLElement;
+      expect(focusedElement.tabIndex).toBe(-1);
+    });
+
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);

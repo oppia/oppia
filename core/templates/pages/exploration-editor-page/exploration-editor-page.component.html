@@ -11,6 +11,13 @@
         &emsp;Auto Saving ...
       </span>
     </div>
+    <a role="button"
+       tabindex="0"
+       (click)="skipEditorNavbar()"
+       (keydown.enter)="skipEditorNavbar()"
+       class="oppia-skip-to-content e2e-test-skip-link">
+      Skip Editor Navigation Bar
+    </a>
     <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
