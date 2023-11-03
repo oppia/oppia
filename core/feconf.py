@@ -1615,7 +1615,7 @@ CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
 TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
-QUESTION_TEAM_LEAD = 'Jatin Kumar Jadoun'
+QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
