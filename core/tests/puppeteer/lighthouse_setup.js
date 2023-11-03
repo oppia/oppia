@@ -43,7 +43,7 @@ var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
-var stateEditSelector = '.e2e-test-edit-content-pencil-button';
+var stateEditSelector = '.e2e-test-state-edit-content';
 var stateEditorInput = '.e2e-test-rte';
 var saveContentButton = '.e2e-test-save-state-content';
 var addInteractionButton = '.e2e-test-open-add-interaction-modal';
