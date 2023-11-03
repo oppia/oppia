@@ -44,7 +44,6 @@ var navbarToggle = '.oppia-navbar-dropdown-toggle';
 var createButtonSelector = '.e2e-test-create-activity';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
 var stateEditSelector = '.e2e-test-state-edit-content';
-var stateEditorInput = '.e2e-test-rte';
 var saveContentButton = '.e2e-test-save-state-content';
 var addInteractionButton = '.e2e-test-open-add-interaction-modal';
 var endIneractionSelector = '.e2e-test-interaction-tile-EndExploration';
@@ -179,8 +178,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(stateEditSelector);
     await page.click(stateEditSelector);
 
-    await page.waitForSelector(stateEditorInput, {visible: true});
-    await page.waitForSelector(saveContentButton);
+    await page.waitForSelector(saveContentButton, {visible: true});
     await page.click(saveContentButton);
     await page.waitForSelector(addInteractionButton);
     await page.click(addInteractionButton);
