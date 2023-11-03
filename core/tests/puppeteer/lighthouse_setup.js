@@ -232,8 +232,10 @@ const getExplorationEditorUrl = async function(browser, page) {
       }
     });
 
+    await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
+    await page.waitForTimeout(5000);
     await page.waitForSelector(explorationConfirmPublish, {visible: true});
     await page.click(explorationConfirmPublish);
 
