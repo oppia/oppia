@@ -291,7 +291,7 @@ routes.push(
     path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .ERROR.ROUTE}/:status_code`,
     loadChildren: () => import(
-      'pages/error-pages/error-page.module').then(
+      'pages/error-pages/error-page-migrated.module').then(
       m => m.ErrorPageModule)
   },
   // '**' wildcard route must be kept at the end,as it can override all other
@@ -300,7 +300,7 @@ routes.push(
   {
     path: '**',
     loadChildren: () => import(
-      'pages/error-pages/error-page.module').then(
+      'pages/error-pages/error-page-migrated.module').then(
       m => m.ErrorPageModule)
   }
 );

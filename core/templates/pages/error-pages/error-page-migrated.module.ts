@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,49 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the error page. This module has not
- * been migrated to angular router. Remove in favor
- * of error-page-migrated.module.ts once angular migration is complete.
+ * @fileoverview Module for the error page.
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_BASE_HREF } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { ErrorPageRoutingModule } from './error-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     HttpClientModule,
     SharedComponentsModule,
-    ErrorPageRoutingModule,
+    TranslateModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ErrorPageRootComponent
+      },
+    ]),
     ToastrModule.forRoot(toastrConfig),
-    TranslateModule
   ],
-  declarations: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
-  ],
-  entryComponents: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
-  ],
-  bootstrap: [
-    ErrorPageRootComponent
-  ],
-  providers: [
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
+  declarations: [ErrorPageComponent, ErrorPageRootComponent],
+  bootstrap: [ErrorPageRootComponent],
 })
 export class ErrorPageModule {}
