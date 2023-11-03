@@ -175,14 +175,16 @@ const getExplorationEditorUrl = async function(browser, page) {
       dismissWelcomeModalSelector, {visible: true});
 
     await page.click(dismissWelcomeModalSelector);
+    await page.waitForTimeout(3000);
     await page.waitForSelector(stateEditSelector, {visible: true});
     await page.click(stateEditSelector);
-
+    await page.waitForTimeout(5000);
     await page.waitForSelector(saveContentButton, {visible: true});
     await page.click(saveContentButton);
+    await page.waitForTimeout(2000);
     await page.waitForSelector(addInteractionButton, {visible: true});
     await page.click(addInteractionButton);
-
+    await page.waitForTimeout(3000);
     await page.waitForSelector(endIneractionSelector, {visible: true});
     await page.click(endIneractionSelector);
     await page.waitForSelector(saveInteractionButton, {visible: true});
