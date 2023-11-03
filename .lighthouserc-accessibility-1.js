@@ -54,7 +54,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://localhost:8181/community-library$',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {
