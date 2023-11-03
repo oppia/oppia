@@ -8,8 +8,8 @@
   <div class="modal-body oppia-long-text">
     <p class="e2e-test-exploration-save-modal">
       <span *ngIf="isExplorationPrivate">(Optional)</span>
-      Please enter a brief description of what you have changed:
-      <textarea rows="3" cols="50" [maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="oppia-commit-message-input e2e-test-commit-message-input" autofocus></textarea>
+      <label for="commitMessage">Please enter a brief description of what you have changed:</label>
+      <textarea id="commitMessage" rows="3" cols="50" [maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="oppia-commit-message-input e2e-test-commit-message-input" autofocus></textarea>
     </p>
     <button class="btn btn-secondary" (click)="onClickToggleDiffButton()">
       <span *ngIf="!showDiff">Show Changes</span>
