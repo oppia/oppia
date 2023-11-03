@@ -208,9 +208,11 @@ const getExplorationEditorUrl = async function(browser, page) {
       });
     } while (statusMessage !== successMessage);
 
+    await page.waitForTimeout(5000);
     await page.waitForSelector(publishExplorationButton);
     await page.click(publishExplorationButton);
 
+    await page.waitForTimeout(5000);
     await page.waitForSelector(explorationTitleInput, {visible: true});
     await page.type(explorationTitleInput, 'Sample exploration');
 
