@@ -55,7 +55,7 @@ var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
 var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
 var expCategoryDropdownElement =
   '.e2e-test-exploration-category-metadata-modal';
-var categoryInputLocator = '.mat-select-search-input.mat-input-element';
+var categoryInputLocator = '.mat-input-element';
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
 var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
@@ -169,7 +169,6 @@ const getExplorationEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
@@ -224,10 +223,10 @@ const getExplorationEditorUrl = async function(browser, page) {
 
     const categoryInputWithPlaceholder =
       await page.waitForSelector(
-      `${categoryInputLocator}[placeholder="Type new category here..."]`);
+        `${categoryInputLocator}[placeholder="Type new category here..."]`);
     await page.waitForTimeout(3000);
     await categoryInputWithPlaceholder.click();
-    await page.waitForTimeout(3000); 
+    await page.waitForTimeout(3000);
     await page.type(categoryInputWithPlaceholder, 'Algebra');
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
