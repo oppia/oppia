@@ -1795,6 +1795,14 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
+.oppia-rte-keyboard-accessibility-text {
+  color: #757575;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
 .oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
