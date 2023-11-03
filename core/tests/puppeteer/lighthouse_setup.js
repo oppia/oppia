@@ -221,9 +221,21 @@ const getExplorationEditorUrl = async function(browser, page) {
 
     await page.click(expCategoryDropdownElement);
 
-    const categoryInputWithPlaceholder =
-      await page.waitForSelector(
-        `${categoryInputLocator}[placeholder="Type new category here..."]`);
+    const categoryInputWithPlaceholder = await page.evaluate(() => {
+      const inputElements = document.querySelectorAll('.mat-input-element');
+      for (const input of inputElements) {
+        if (input.getAttribute('placeholder') === 'Type new category here...') {
+          return input;
+        }
+      }
+      return null;
+    });
+    await page.waitForTimeout(3000);
+    if (categoryInputWithPlaceholder) {
+      await categoryInputWithPlaceholder.click();
+      await page.waitForTimeout(1000);
+      await page.type(categoryInputWithPlaceholder, 'Algebra');
+    }
     await page.waitForTimeout(3000);
     await categoryInputWithPlaceholder.click();
     await page.waitForTimeout(3000);
