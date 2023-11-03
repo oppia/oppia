@@ -68,7 +68,8 @@ describe('Base root component', () => {
     component.ngOnInit();
     flush();
 
-    expect(instantSpy).toHaveBeenCalledOnceWith(component.title);
+    expect(instantSpy).toHaveBeenCalledOnceWith(
+      component.title, component.titleInterpolationParams);
     expect(updateTitleAndMetaTagsSpy).toHaveBeenCalledWith(
       translatedTitle, component.meta);
   }));

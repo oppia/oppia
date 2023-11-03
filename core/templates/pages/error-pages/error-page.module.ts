@@ -17,39 +17,33 @@
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_BASE_HREF, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
-import { ErrorPageRoutingModule } from 'pages/error-pages/error-page-routing.module';
-import { ErrorPageModuleWithoutRouter } from './error-page-without-router.module';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
     SharedComponentsModule,
-    ErrorPageRoutingModule,
+    TranslateModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ErrorPageRootComponent,
+      },
+    ]),
     ToastrModule.forRoot(toastrConfig),
-    ErrorPageModuleWithoutRouter
   ],
-  entryComponents: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
-  ],
-  bootstrap: [
-    ErrorPageRootComponent
-  ],
-  providers: [
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
+  declarations: [ErrorPageComponent, ErrorPageRootComponent],
+  bootstrap: [ErrorPageRootComponent],
 })
 export class ErrorPageModule {}

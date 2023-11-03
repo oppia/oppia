@@ -37,12 +37,18 @@ export abstract class BaseRootComponent implements OnInit, OnDestroy {
   abstract meta: MetaTagData[];
 
   constructor(
-    private pageHeadService: PageHeadService,
-    private translateService: TranslateService,
+    protected pageHeadService: PageHeadService,
+    protected translateService: TranslateService,
   ) { }
 
+  get titleInterpolationParams(): Object {
+    return {};
+  }
+
   setPageTitleAndMetaTags(): void {
-    let translatedTitle = this.translateService.instant(this.title);
+    const translatedTitle = this.translateService.instant(
+      this.title,
+      this.titleInterpolationParams);
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
       this.meta);

@@ -6559,6 +6559,11 @@ export default {
       "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
+    "ERROR": {
+      "ROUTE": "error",
+      "TITLE": "I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE",
+      "META": []
+    },
     "EXPLORATION_PLAYER": {
       "ROUTE": "explore/:exploration_id",
       "TITLE": "",
