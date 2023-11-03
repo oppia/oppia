@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
 import { AppConstants } from 'app.constants';
 
 import { UserInfo } from 'domain/user/user-info.model';
@@ -26,7 +26,9 @@ import { UserService } from 'services/user.service';
 import { IsLoggedInGuard } from './is-logged-in.guard';
 
 class MockRouter {
-  navigate(path, params) {}
+  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+    return Promise.resolve(true);
+  }
 }
 
 describe('IsLoggedInGuard', () => {

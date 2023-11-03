@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -26,7 +26,9 @@ import { UserService } from 'services/user.service';
 import { AdminAuthGuard } from './admin-auth.guard';
 
 class MockRouter {
-  navigate(path, params) {}
+  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+    return Promise.resolve(true);
+  }
 }
 
 describe('AdminAuthGuard', () => {
@@ -50,8 +52,7 @@ describe('AdminAuthGuard', () => {
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(UserInfo.createDefault())
     );
-    const navigateSpy = spyOn(
-      router, 'navigate').and.returnValue(Promise.resolve(true));
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     guard.canActivate(
       new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
@@ -70,8 +71,7 @@ describe('AdminAuthGuard', () => {
       Promise.resolve(new UserInfo(
         [], false, false, true, false, false, '', '', '', true))
     );
-    const navigateSpy = spyOn(
-      router, 'navigate').and.returnValue(Promise.resolve(true));
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     guard.canActivate(
       new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
