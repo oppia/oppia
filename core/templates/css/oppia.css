@@ -2139,7 +2139,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-header-warning-placement {
-  left: -0.5em;
+  left: 0.5em;
   position: absolute;
   top: 6px;
   z-index: 2;

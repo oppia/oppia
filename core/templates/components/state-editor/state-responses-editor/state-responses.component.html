@@ -41,8 +41,9 @@
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
+                   data-container="body"
                    placement="auto">
-                <div class="oppia-rule-header-warning-style" >
+                <div class="oppia-rule-header-warning-style">
                   ⚠
                 </div>
               </div>
