@@ -219,19 +219,15 @@ const getExplorationEditorUrl = async function(browser, page) {
 
     await page.click(expCategoryDropdownElement);
 
-    const optionElements = await page.$$eval(
-      '.e2e-test-exploration-category-selector-choice', (elements) => {
-      return elements.map((element) => {
-        const value = element.getAttribute('value');
-        if (value === 'Algebra') {
-          return element;
+    await page.evaluate(() => {
+      const optionElements = document.querySelectorAll('.e2e-test-exploration-category-selector-choice');
+      for (const option of optionElements) {
+        if (option.getAttribute('value') === 'Algebra') {
+          option.click();
+          break;
         }
-      });
+      }
     });
-
-    if (optionElements.length > 0) {
-      await optionElements[0].click();
-    }
 
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
