@@ -24,7 +24,8 @@
     "declaration-colon-space-before": "never",
     "no-descending-specificity": null,
     "order/properties-alphabetical-order": true,
-    "length-zero-no-unit": true
+    "length-zero-no-unit": true,
+    "selector-pseudo-element-no-unknown": [true, { "ignorePseudoElements": ["ng-deep"] }]
   },
 
   "overrides": [
