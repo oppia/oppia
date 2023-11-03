@@ -27,7 +27,7 @@ import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () => import('pages/admin-page/admin-page.module')
       .then(m => m.AdminPageModule),
     canActivate: [IsLoggedInGuard]
@@ -288,7 +288,8 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 routes.push(
   // Route to register all the custom error pages on oppia.
   {
-    path: 'error/:status_code',
+    path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .ERROR.ROUTE}/:status_code`,
     loadChildren: () => import(
       'pages/error-pages/error-page.module').then(
       m => m.ErrorPageModule)

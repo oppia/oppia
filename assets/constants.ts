@@ -6518,7 +6518,7 @@ export default {
 
   // Pages registered with angular router.
   "PAGES_REGISTERED_WITH_FRONTEND": {
-    "ADIMN_PAGE": {
+    "ADMIN": {
       "ROUTE": "admin",
       "TITLE": "Oppia Admin Panel",
       "META": [

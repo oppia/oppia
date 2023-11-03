@@ -26,6 +26,7 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
+import { AppConstants } from 'app.constants';
 import { UserService } from 'services/user.service';
 
 @Injectable({
@@ -48,7 +49,8 @@ export class AdminAuthGuard implements CanActivate {
     }
 
     this.router.navigate(
-      ['error/401']).then(() => {
+      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .ERROR.ROUTE}/401`]).then(() => {
       this.location.replaceState(state.url);
     });
     return false;

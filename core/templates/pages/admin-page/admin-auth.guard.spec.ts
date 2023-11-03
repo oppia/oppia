@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 
+import { AppConstants } from 'app.constants';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { AdminAuthGuard } from './admin-auth.guard';
@@ -57,7 +58,8 @@ describe('AdminAuthGuard', () => {
       (canActivate) => {
         expect(canActivate).toBeFalse();
         expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).toHaveBeenCalledWith(['error/401']);
+        expect(navigateSpy).toHaveBeenCalledWith([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
         done();
       });
   });

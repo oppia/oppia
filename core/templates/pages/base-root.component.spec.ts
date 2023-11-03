@@ -27,9 +27,9 @@ import { PageHeadService } from 'services/page-head.service';
 
 
 class MockComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE;
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;
   meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META as
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
     unknown as Readonly<MetaTagData>[];
 }
 

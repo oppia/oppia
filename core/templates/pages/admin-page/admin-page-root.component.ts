@@ -25,8 +25,8 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './admin-page-root.component.html',
 })
 export class AdminPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.TITLE;
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;
   meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META as
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
     unknown as Readonly<MetaTagData>[];
 }
