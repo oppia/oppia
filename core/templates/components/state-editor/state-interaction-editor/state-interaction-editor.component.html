@@ -2,7 +2,10 @@
           id="tutorialStateInteraction">
   <div>
     <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header"
+         tabindex="0"
+         #collapseAnswersAndResponsesButton
          (click)="toggleInteractionEditor()"
+         (keydown.tab)="focusOnCustomizeInteraction($event)"
          (keydown.enter)="toggleInteractionEditor()">
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
@@ -66,6 +69,14 @@
                 </oppia-interaction-display>
               </div>
             </div>
+            <button tabindex="0"
+                    class="oppia-open-interaction-customizer-button fas fa-pen"
+                    (click)="openInteractionCustomizerModal()"
+                    (keydown)="focusOnCollapseAnswersAndResponses($event)"
+                    *ngIf="editabilityService.isEditable()"
+                    aria-label="Customize Interaction"
+                    #customizeInteractionButton>
+            </button>
             <button type="button"
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
@@ -90,6 +101,26 @@
   .oppia-exp-interaction-card-header {
     font-size: 18px;
     margin: 0;
+  }
+
+  .oppia-open-interaction-customizer-button {
+    background-color: transparent;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    height: 0;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    width: 0;
+  }
+
+  .oppia-open-interaction-customizer-button:focus {
+    color: black;
+    height: 22px;
+    opacity: 0.8;
+    outline: 1px solid #000;
+    width: 22px;
   }
 
   .oppia-exp-interaction-card-header-container {

@@ -18,7 +18,7 @@
  * editor.
  */
 
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -71,6 +71,12 @@ export class StateInteractionEditorComponent
   @Output() onSaveSolution = new EventEmitter<Solution>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
+
+  @ViewChild('customizeInteractionButton')
+    customizeInteractionButton!: ElementRef;
+
+  @ViewChild('collapseAnswersAndResponsesButton')
+    collapseAnswersAndResponsesButton!: ElementRef;
 
   customizationModalReopened: boolean;
   DEFAULT_TERMINAL_STATE_CONTENT: string;
@@ -154,6 +160,22 @@ export class StateInteractionEditorComponent
     this.stateContentService.saveDisplayedValue();
     this.onSaveStateContent.emit(
       this.stateContentService.displayed);
+  }
+
+  focusOnCustomizeInteraction(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.customizeInteractionButton.nativeElement.focus();
+  }
+
+  focusOnCollapseAnswersAndResponses(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.openInteractionCustomizerModal();
+    }
+    if (event.shiftKey && event.key === 'Tab') {
+      event.preventDefault();
+      this.collapseAnswersAndResponsesButton.nativeElement.focus();
+    }
   }
 
   onCustomizationModalSavePostHook(): void {

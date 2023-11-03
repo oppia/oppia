@@ -17,7 +17,7 @@
  * @fileoverview Unit tests for 'State Interaction Editor Component'.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { StateInteractionEditorComponent } from './state-interaction-editor.component';
@@ -291,6 +291,49 @@ describe('State Interaction component', () => {
     tick();
     component.openInteractionCustomizerModal();
   }));
+
+  it('should focus on customize interaction button when tab is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab' });
+    const customizeInteractionButtonRef = new ElementRef(
+      document.createElement('button'));
+    component.customizeInteractionButton =
+      customizeInteractionButtonRef;
+    spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
+
+    component.focusOnCustomizeInteraction(event);
+
+    expect(
+      customizeInteractionButtonRef
+        .nativeElement.focus).toHaveBeenCalled();
+  });
+
+  it('should focus on customize interaction title when ' +
+   'shift + tab are pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+    const collapseAnswersAndResponsesButtonRef = new ElementRef(
+      document.createElement('button'));
+    component.collapseAnswersAndResponsesButton =
+      collapseAnswersAndResponsesButtonRef;
+    spyOn(
+      component.collapseAnswersAndResponsesButton
+        .nativeElement, 'focus');
+
+    component.focusOnCollapseAnswersAndResponses(event);
+
+    expect(
+      component.collapseAnswersAndResponsesButton
+        .nativeElement.focus).toHaveBeenCalled();
+  });
+
+  it('should open Interaction Customizer Modal ' +
+  'when enter is pressed', () => {
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    spyOn(component, 'openInteractionCustomizerModal');
+
+    component.focusOnCollapseAnswersAndResponses(event);
+
+    expect(component.openInteractionCustomizerModal).toHaveBeenCalled();
+  });
 
   it('should save interaction when user click save', fakeAsync(() => {
     stateInteractionIdService.displayed = 'EndExploration';
