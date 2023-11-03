@@ -159,8 +159,8 @@ export class ExplorationEngineService {
     const oldInteractionArgs = oldStateCard.
       getInteractionCustomizationArgs() as TextInputCustomizationArgs;
     const defaultOutcome = oldStateCard.getInteraction()?.defaultOutcome;
-    const shouldCheckForMisspelling = oldInteractionId === AppConstants.
-      INTERACTION_NAMES.TEXT_INPUT &&
+    const shouldCheckForMisspelling =
+      oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
       oldInteractionArgs.catchMisspellings &&
       angular.equals(outcome, defaultOutcome);
 

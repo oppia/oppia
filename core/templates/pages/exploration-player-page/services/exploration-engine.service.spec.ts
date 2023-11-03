@@ -705,7 +705,7 @@ describe('Exploration engine service ', () => {
         dest_if_really_stuck: 'Mid',
         feedback: {
           content_id: 'feedback_1',
-          html: 'Answer is incorrect'
+          html: 'default feedback'
         },
         labelled_as_correct: false,
         param_changes: [],
@@ -730,7 +730,7 @@ describe('Exploration engine service ', () => {
                   html: '<p>Good Job</p>'
                 },
                 param_changes: [],
-                dest_if_really_stuck: 'Mid',
+                dest_if_really_stuck: null,
                 dest: 'Mid'
               },
               training_data: [],
@@ -803,7 +803,7 @@ describe('Exploration engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
       expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(2);
       expect(submitAnswerSuccessCb.calls.argsFor(1)[feedbackArgPosition])
-        .toBe('Answer is incorrect');
+        .toBe('default feedback');
     });
   });
 
