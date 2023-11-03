@@ -17,12 +17,8 @@
  */
 
 import { Component } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
-import { PageHeadService } from 'services/page-head.service';
-import { UserService } from 'services/user.service';
-
 
 @Component({
   selector: 'oppia-admin-page-root',
@@ -33,25 +29,4 @@ export class AdminPageRootComponent extends BaseRootComponent {
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADIMN_PAGE.META as
     unknown as Readonly<MetaTagData>[];
-
-  loading: boolean = true;
-  isSuperAdmin: boolean = false;
-  userService: UserService;
-
-  constructor(
-      pageHeadService: PageHeadService,
-      translateService: TranslateService,
-      userService: UserService
-  ) {
-    super(pageHeadService, translateService);
-    this.userService = userService;
-  }
-
-  ngOnInit(): void {
-    super.ngOnInit();
-    this.userService.getUserInfoAsync().then(userInfo => {
-      this.loading = false;
-      this.isSuperAdmin = userInfo.isSuperAdmin();
-    });
-  }
 }

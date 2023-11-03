@@ -1,5 +1,3 @@
-<oppia-angular-root *ngIf="!loading && isSuperAdmin">
+<oppia-angular-root>
   <oppia-admin-page></oppia-admin-page>
 </oppia-angular-root>
-
-<oppia-error-page-root *ngIf="!loading && !isSuperAdmin" statusCode="401"></oppia-error-page-root>

@@ -23,13 +23,6 @@ import { CommonModule } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { AdminNavbarComponent } from './navbar/admin-navbar.component';
-import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
-import { OppiaAdminProdModeActivitiesTabComponent } from './activities-tab/admin-prod-mode-activities-tab.component';
-import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
-import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
-import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
-import { AdminPageComponent } from './admin-page.component';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
 import { TranslationCoordinatorRoleEditorModalComponent } from './roles-tab/translation-coordinator-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
@@ -37,8 +30,14 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
 import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
 import { AdminPageRootComponent } from './admin-page-root.component';
 import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
-import { ErrorPageModuleWithoutRouter } from 'pages/error-pages/error-page-without-router.module';
-import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
+import { AdminAuthGuard } from './admin-auth.guard';
+import { AdminNavbarComponent } from './navbar/admin-navbar.component';
+import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
+import { OppiaAdminProdModeActivitiesTabComponent } from './activities-tab/admin-prod-mode-activities-tab.component';
+import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
+import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
+import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
+import { AdminPageComponent } from './admin-page.component';
 
 @NgModule({
   imports: [
@@ -51,10 +50,9 @@ import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-
       {
         path: '',
         component: AdminPageRootComponent,
-        canActivate: [IsLoggedInGuard],
+        canActivate: [AdminAuthGuard],
       },
     ]),
-    ErrorPageModuleWithoutRouter,
     AdminBlogAdminCommonModule,
   ],
   declarations: [

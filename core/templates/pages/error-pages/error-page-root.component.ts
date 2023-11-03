@@ -18,7 +18,8 @@
 
 // This error page is used for status codes 400, 401 and 500.
 
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
@@ -33,23 +34,30 @@ export class ErrorPageRootComponent implements OnDestroy {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() statusCode: string | null = null;
+  statusCode: string | null = null;
   directiveSubscriptions = new Subscription();
+  validStatusCodes: string[] = ['400', '401', '404', '500'];
 
   constructor(
     private pageTitleService: PageTitleService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.statusCode = this.activatedRoute.snapshot.paramMap.get('status_code');
     if (this.statusCode === null) {
       const bodyTag = (
         this.windowRef.nativeWindow.document.getElementsByTagName('body'));
-      // Read status code from errorCode attribute on body tag.
-      const errorCode = bodyTag[0].getAttribute('errorCode');
-      this.statusCode = errorCode ? errorCode : '404';
+      this.statusCode = bodyTag[0].getAttribute('errorCode');
     }
+
+    if (!this.validStatusCodes.includes(this.statusCode) ||
+          this.activatedRoute.snapshot.url.length > 0) {
+      this.statusCode = '404';
+    }
+
     // Update the default page title.
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {

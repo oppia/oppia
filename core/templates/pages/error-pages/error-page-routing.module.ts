@@ -34,7 +34,7 @@ const routes: Route[] = [
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forChild(routes)
   ],
   exports: [
     RouterModule
