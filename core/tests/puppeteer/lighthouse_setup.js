@@ -218,7 +218,8 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.click(expCategoryDropdownElement);
 
     await page.evaluate(() => {
-      const optionElements = document.querySelectorAll('.e2e-test-exploration-category-selector-choice');
+      const optionElements = document.querySelectorAll(
+        '.e2e-test-exploration-category-selector-choice');
       for (const option of optionElements) {
         if (option.getAttribute('value') === 'Algebra') {
           option.click();
