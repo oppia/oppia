@@ -175,23 +175,23 @@ const getExplorationEditorUrl = async function(browser, page) {
       dismissWelcomeModalSelector, {visible: true});
 
     await page.click(dismissWelcomeModalSelector);
-    await page.waitForSelector(stateEditSelector);
+    await page.waitForSelector(stateEditSelector, {visible: true});
     await page.click(stateEditSelector);
 
     await page.waitForSelector(saveContentButton, {visible: true});
     await page.click(saveContentButton);
-    await page.waitForSelector(addInteractionButton);
+    await page.waitForSelector(addInteractionButton, {visible: true});
     await page.click(addInteractionButton);
 
-    await page.waitForSelector(endIneractionSelector);
+    await page.waitForSelector(endIneractionSelector, {visible: true});
     await page.click(endIneractionSelector);
-    await page.waitForSelector(saveInteractionButton);
+    await page.waitForSelector(saveInteractionButton, {visible: true});
     await page.click(saveInteractionButton);
 
-    await page.waitForSelector(saveChangesButton);
+    await page.waitForSelector(saveChangesButton, {visible: true});
     await page.click(saveChangesButton);
 
-    await page.waitForSelector(saveDraftButton);
+    await page.waitForSelector(saveDraftButton, {visible: true});
     await page.click(saveDraftButton);
 
     const successMessage = 'Changes saved.';
