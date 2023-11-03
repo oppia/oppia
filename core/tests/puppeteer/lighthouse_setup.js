@@ -236,11 +236,6 @@ const getExplorationEditorUrl = async function(browser, page) {
       await page.waitForTimeout(1000);
       await page.type(categoryInputWithPlaceholder, 'Algebra');
     }
-    await page.waitForTimeout(3000);
-    await categoryInputWithPlaceholder.click();
-    await page.waitForTimeout(3000);
-    await page.type(categoryInputWithPlaceholder, 'Algebra');
-    await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
     await page.waitForTimeout(5000);
