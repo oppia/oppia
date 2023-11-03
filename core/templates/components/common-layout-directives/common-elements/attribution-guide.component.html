@@ -41,9 +41,9 @@
         </button>
         <div class="container pt-4">
           <div class="font-weight-bold">
-            <span [innerHTML]="'I18N_ATTRIBUTION_TITLE' | translate"></span>
+            <span [innerHTML]="'I18N_ATTRIBUTION_TITLE' | translate" tabindex="0"></span>
           </div>
-          <div class="attribution-html-section">
+          <div class="attribution-html-section" tabindex="0">
             <div class="font-weight-bold">
               <span [innerHTML]="'I18N_ATTRIBUTION_HTML_TITLE' | translate"></span>
             </div>
@@ -61,7 +61,7 @@
             </div>
             <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
           </div>
-          <div class="attribution-print-section">
+          <div class="attribution-print-section" tabindex="0">
             <div class="font-weight-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
             <ol class="attribute-instructions">
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
