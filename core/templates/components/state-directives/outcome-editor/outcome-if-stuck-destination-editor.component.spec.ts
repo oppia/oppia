@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import { NodeDataDict, StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -39,6 +39,7 @@ describe('Outcome Destination If Stuck Editor', () => {
   let stateGraphLayoutService: StateGraphLayoutService;
   let focusManagerService: FocusManagerService;
   let PLACEHOLDER_OUTCOME_DEST_IF_STUCK = '/';
+  let DEFAULT_LAYOUT: NodeDataDict;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,14 +69,7 @@ describe('Outcome Destination If Stuck Editor', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
-  });
-
-  afterEach(() => {
-    component.ngOnDestroy();
-  });
-
-  it('should set component properties on initialization', fakeAsync(() => {
-    let computedLayout = stateGraphLayoutService.computeLayout(
+    DEFAULT_LAYOUT = stateGraphLayoutService.computeLayout(
       {
         Introduction: 'Introduction',
         State1: 'State1',
@@ -94,6 +88,14 @@ describe('Outcome Destination If Stuck Editor', () => {
           connectsDestIfStuck: false
         }
       ], 'Introduction', ['End']);
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    let computedLayout = DEFAULT_LAYOUT;
     spyOn(stateEditorService, 'getStateNames')
       .and.returnValue(['Introduction', 'State1', 'NewState', 'End']);
     spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
@@ -154,25 +156,7 @@ describe('Outcome Destination If Stuck Editor', () => {
 
   it('should update option names when state name is changed', fakeAsync(() => {
     let onStateNamesChangedEmitter = new EventEmitter();
-    let computedLayout = stateGraphLayoutService.computeLayout(
-      {
-        Introduction: 'Introduction',
-        State1: 'State1',
-        End: 'End'
-      }, [
-        {
-          source: 'Introduction',
-          target: 'State1',
-          linkProperty: '',
-          connectsDestIfStuck: false
-        },
-        {
-          source: 'State1',
-          target: 'End',
-          linkProperty: '',
-          connectsDestIfStuck: false
-        }
-      ], 'Introduction', ['End']);
+    let computedLayout = DEFAULT_LAYOUT;
     spyOnProperty(stateEditorService, 'onStateNamesChanged')
       .and.returnValue(onStateNamesChangedEmitter);
     spyOn(stateEditorService, 'getStateNames')
@@ -296,4 +280,31 @@ describe('Outcome Destination If Stuck Editor', () => {
 
     expect(component.getChanges.emit).toHaveBeenCalled();
   });
+
+  it('should not show active state', fakeAsync(() => {
+    let computedLayout = DEFAULT_LAYOUT;
+    spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
+      .and.returnValue(computedLayout);
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue('Introduction');
+    spyOn(stateEditorService, 'getStateNames')
+      .and.returnValues(['Introduction', 'State1', 'End']);
+
+    component.ngOnInit();
+    tick(10);
+
+    expect(component.destinationChoices).toEqual([{
+      id: null,
+      text: 'None'
+    }, {
+      id: 'State1',
+      text: 'State1'
+    }, {
+      id: 'End',
+      text: 'End'
+    }, {
+      id: '/',
+      text: 'A New Card Called...'
+    }]);
+  }));
 });

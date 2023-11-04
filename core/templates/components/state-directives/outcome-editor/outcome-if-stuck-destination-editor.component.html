@@ -12,7 +12,7 @@
       <select class="form-control oppia-form-control"
               [(ngModel)]="outcome.destIfReallyStuck"
               (ngModelChange)="onDestIfStuckSelectorChange()">
-        <option *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+        <option *ngFor="let choice of destinationChoices" [ngValue]="choice.id">{{ choice.text }}</option>
       </select>
     </span>
   </div>

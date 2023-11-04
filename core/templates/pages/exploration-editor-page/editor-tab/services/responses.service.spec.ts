@@ -297,7 +297,6 @@ describe('Responses Service', () => {
       rules: [new Rule('Contains', { x: 'correct'}, {})],
       outcome: {
         dest: 'State',
-        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -311,7 +310,7 @@ describe('Responses Service', () => {
       taggedSkillMisconceptionId: '',
       feedback: new SubtitledHtml('', 'This is a new feedback text'),
       dest: 'State',
-      dest_if_really_stuck: null,
+      destIfReallyStuck: 'destIfReallyStuck',
       refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
       labelledAsCorrect: true,
@@ -335,6 +334,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
