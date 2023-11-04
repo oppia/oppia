@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import unittest.mock
 
 from core import feconf
 from core.constants import constants
@@ -24,6 +25,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -146,7 +148,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
         self.expected_opportunity_dict_2 = {
             'id': '1',
@@ -155,7 +158,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
         self.expected_opportunity_dict_3 = {
             'id': '2',
@@ -164,7 +168,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
 
     def test_get_skill_opportunity_data(self) -> None:
@@ -481,6 +486,127 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1, self.expected_opportunity_dict_2])
 
+    def test_get_reviewable_translation_opportunities_with_pinned_opportunity( # pylint: disable=line-too-long
+            self
+        ) -> None:
+        # Create a translation suggestion in Hindi.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.owner_id, change_dict, 'description')
+
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content 2.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description 2')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Pin second opportunity.
+        mock_pinned_lesson_summary = {
+            'id': '0',
+            'topic_name': 'topic',
+            'story_title': 'title story_id_0',
+            'chapter_title': 'Node1',
+            'content_count': 2,
+            'translation_counts': {},
+            'translation_in_review_counts': {},
+            'is_pinned': True
+        }
+
+        # Here we use object because every type is
+        # inherited from object class.
+        with unittest.mock.patch.object(
+            opportunity_services,
+            'get_pinned_lesson',
+            return_value=mock_pinned_lesson_summary
+        ):
+            opportunity_services.update_pinned_opportunity_model(
+                self.CURRICULUM_ADMIN_USERNAME,
+                'hi',
+                'topic',
+                '0'
+            )
+            response = self.get_json(
+                '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+                params={'language_code': 'hi', 'topic_name': 'topic'})
+            expected_opp_dict_1 = {
+                'id': '0',
+                'topic_name': 'topic',
+                'story_title': 'title story_id_0',
+                'chapter_title': 'Node1',
+                'content_count': 2,
+                'translation_counts': {},
+                'translation_in_review_counts': {},
+                'is_pinned': True
+            }
+            expected_opp_dict_2 = {
+                'id': '1',
+                'topic_name': 'topic',
+                'story_title': 'title story_id_1',
+                'chapter_title': 'Node1',
+                'content_count': 2,
+                'translation_counts': {},
+                'translation_in_review_counts': {},
+                'is_pinned': False
+            }
+
+            self.assertEqual(
+                response['opportunities'], [expected_opp_dict_1, expected_opp_dict_2])
+
+    def test_pin_translation_opportunity(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        topic_id = 'topic123'
+        language_code = 'en'
+        opportunity_id = 'opp123'
+
+        request_dict = {
+            'topic_id': topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        _ = self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200)
+
+    def test_unpin_translation_opportunity(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        topic_id = 'topic123'
+        language_code = 'en'
+        opportunity_id = None
+
+        request_dict = {
+            'topic_id': topic_id,
+            'language_code': language_code,
+            'opportunity_id': opportunity_id
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        _ = self.put_json(
+            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+            request_dict,
+            csrf_token=csrf_token,
+            expected_status_int=200)
+
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
         continue_state_name = 'continue state'
@@ -607,7 +733,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 # Introduction + Continue + End state.
                 'content_count': 4,
                 'translation_counts': {},
-                'translation_in_review_counts': {}
+                'translation_in_review_counts': {},
+                'is_pinned': False
             }]
         )
 
@@ -703,7 +830,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 # Introduction + Multiple choice with 2 options + End state.
                 'content_count': 4,
                 'translation_counts': {},
-                'translation_in_review_counts': {}
+                'translation_in_review_counts': {},
+                'is_pinned': False
             }]
         )
 
@@ -849,7 +977,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
         expected_opportunity_dict_20 = {
             'id': exp_20.id,
@@ -858,7 +987,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node2',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
         expected_opportunity_dict_30 = {
             'id': exp_30.id,
@@ -867,7 +997,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'chapter_title': 'Node3',
             'content_count': 2,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
