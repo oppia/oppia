@@ -222,13 +222,13 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(expCategoryDropdownElement, {visible: true});
     await page.click(expCategoryDropdownElement);
     await page.waitForTimeout(3000);
-    const placeholderValue = "Type new category here...";
+    const placeholderValue = 'Type new category here...';
     const inputXPath = `//input[@placeholder="${placeholderValue}"]`;
     const [categoryInputWithPlaceholder] = await page.$x(inputXPath);
-    await page.waitForSelector(categoryInputWithPlaceholder, {visible: true});
-    await page.type(categoryInputWithPlaceholder, 'Algebra');
+    await categoryInputWithPlaceholder.click();
     await page.waitForTimeout(3000);
-
+    await page.keyboard.type('Algebra');
+    await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
     await page.waitForTimeout(5000);
