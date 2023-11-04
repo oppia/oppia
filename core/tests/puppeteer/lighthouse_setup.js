@@ -207,11 +207,11 @@ const getExplorationEditorUrl = async function(browser, page) {
       });
     } while (statusMessage !== successMessage);
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
     await page.waitForSelector(publishExplorationButton);
     await page.click(publishExplorationButton);
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
     await page.waitForSelector(explorationTitleInput, {visible: true});
     await page.type(explorationTitleInput, 'Sample exploration');
 
@@ -221,13 +221,12 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForTimeout(3000);
     await page.waitForSelector(expCategoryDropdownElement, {visible: true});
     await page.click(expCategoryDropdownElement);
+
     await page.waitForTimeout(3000);
-    const placeholderValue = 'Type new category here...';
-    const inputXPath = `//input[@placeholder="${placeholderValue}"]`;
-    const [categoryInputWithPlaceholder] = await page.$x(inputXPath);
-    await categoryInputWithPlaceholder.click();
+    await page.waitForSelector('mat-option'); 
     await page.waitForTimeout(3000);
-    await page.keyboard.type('Algebra');
+    await page.click('mat-option[ng-reflect-value="Algebra"]');
+
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
