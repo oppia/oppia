@@ -48,6 +48,8 @@
     width: 100px;
   }
 
+  /* :ng-deep is used to make the style class work for the class that is given to innerHTML
+     See this for context: stackoverflow.com/questions/44210786/style-not-working-for-innerhtml-in-angular/44215795#44215795 */
   ::ng-deep .oppia-contact-mail {
     text-decoration: underline;
   }
