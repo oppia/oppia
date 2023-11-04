@@ -53,6 +53,8 @@ var saveDraftButton = '.e2e-test-save-draft-button';
 var publishExplorationButton = '.e2e-test-publish-exploration';
 var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
 var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
+var expCategoryDropdownElement =
+  '.e2e-test-exploration-category-metadata-modal';
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
 var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
@@ -216,20 +218,17 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(explorationGoalInput, {visible: true});
     await page.type(explorationGoalInput, 'Sample exploration goal');
 
-    const categoryInputWithPlaceholder = await page.evaluate(() => {
-      const inputElements = document.querySelectorAll('.mat-input-element');
-      for (const input of inputElements) {
-        if (input.getAttribute('placeholder') === 'Type new category here...') {
-          return input;
-        }
-      }
-      return null;
-    });
     await page.waitForTimeout(3000);
-    if (categoryInputWithPlaceholder) {
-      await page.type(categoryInputWithPlaceholder, 'Algebra');
-    }
+    await page.waitForSelector(expCategoryDropdownElement, {visible: true});
+    await page.click(expCategoryDropdownElement);
     await page.waitForTimeout(3000);
+    const placeholderValue = "Type new category here...";
+    const inputXPath = `//input[@placeholder="${placeholderValue}"]`;
+    const [categoryInputWithPlaceholder] = await page.$x(inputXPath);
+    await page.waitForSelector(categoryInputWithPlaceholder, {visible: true});
+    await page.type(categoryInputWithPlaceholder, 'Algebra');
+    await page.waitForTimeout(3000);
+
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
     await page.click(expConfirmPublishButton);
     await page.waitForTimeout(5000);
