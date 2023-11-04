@@ -35,8 +35,9 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
-
+from typing import (
+    Dict, List, Optional, OrderedDict, Sequence, Tuple,
+    TypedDict, Union)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -327,13 +328,20 @@ class ReviewableOpportunitiesHandler(
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
+            ] = []
         if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
+            for opp in (
+                self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
-            ):
+            )):
+                # Here we use MyPy ignore because the method returns
+                # dictionary for the case of pinned opportunity.
+                # only handles str.
                 if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                    if isinstance(opp, dict):
+                        opportunity_dicts.append(opp) # type: ignore[arg-type]
+                    else:
+                        opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -413,9 +421,94 @@ class ReviewableOpportunitiesHandler(
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        return list(
+        pinned_opportunity_summary = None
+        if topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if language and self.user_id:
+                pinned_opportunity_summary = (
+                    opportunity_services.get_pinned_lesson(
+                        self.user_id,
+                        language,
+                        topic.id
+                    ))
+
+        exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids).values())
+                exp_ids
+            )
+        )
+
+        # If there is a pinned opportunity summary,
+        # add it to the list of opportunities at the top.
+        ordered_exp_opp_summaries = OrderedDict()
+        if pinned_opportunity_summary:
+            # Here we use MyPy ignore because the latest schema of
+            # dict is indexable.
+            pinned_opportunity_id = pinned_opportunity_summary['id'] # type: ignore[index]
+            exp_opp_summaries.pop(pinned_opportunity_id, None)
+            ordered_exp_opp_summaries[
+                pinned_opportunity_id] = pinned_opportunity_summary
+
+        for item in exp_opp_summaries.values():
+            if item is not None:
+                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
+        return list(ordered_exp_opp_summaries.values())
+
+
+class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+    topic_id: str
+    opportunity_id: Optional[str]
+
+
+class LessonsPinningHandler(
+    base.BaseHandler[
+        LessonsPinningHandlerNormalizedRequestDict,
+        Dict[str, str],
+    ]
+):
+    """Handler for pinning & unpinning lessons."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'opportunity_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
+    }
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Handles pinning/unpinning lessons."""
+        assert self.normalized_payload is not None
+        assert self.user_id is not None
+        topic_id = self.normalized_payload.get('topic_id')
+        language_code = self.normalized_payload.get('language_code')
+        opportunity_id = self.normalized_payload.get('opportunity_id')
+
+        if language_code and topic_id:
+            opportunity_services.update_pinned_opportunity_model(
+                self.user_id, language_code, topic_id, opportunity_id
+            )
+        self.render_json(self.values)
 
 
 class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
