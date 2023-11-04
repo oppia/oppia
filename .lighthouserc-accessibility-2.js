@@ -106,6 +106,12 @@ module.exports = {
           }
         },
         {
+          'matchingUrlPattern': '^http://localhost:8181/explore/.*$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
+        },
+        {
           'matchingUrlPattern': '^http://localhost:8181/topic_editor/.*$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]

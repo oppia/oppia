@@ -53,6 +53,7 @@ module.exports = {
       'http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
       'http://localhost:8181/learn/math',
       `http://localhost:8181/create/${process.env.exploration_id}`,
+      `http://localhost:8181/explore/${process.env.exploration_id}`,
       `http://localhost:8181/topic_editor/${process.env.topic_id}`,
       `http://localhost:8181/skill_editor/${process.env.skill_id}`,
       `http://localhost:8181/story_editor/${process.env.story_id}`
