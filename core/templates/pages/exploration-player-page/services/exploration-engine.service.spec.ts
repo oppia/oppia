@@ -702,7 +702,7 @@ describe('Exploration engine service ', () => {
       const answer = 'answr';
       const defaultOutcomeDict = {
         dest: 'Mid',
-        dest_if_really_stuck: 'Mid',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: 'default feedback'
