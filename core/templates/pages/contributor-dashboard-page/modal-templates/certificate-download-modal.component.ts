@@ -17,6 +17,7 @@
  */
 
 import { Component, Input } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -70,9 +71,7 @@ export class CertificateDownloadModalComponent {
     this.activeModal.close();
   }
 
-  downloadCertificate(): void {
-    this.errorsFound = false;
-    this.errorMessage = '';
+  validateDate(): void {
     if (
       !this.fromDate ||
       !this.toDate ||
@@ -88,6 +87,13 @@ export class CertificateDownloadModalComponent {
         'today\'s date';
       return;
     }
+    this.errorsFound = false;
+    this.errorMessage = '';
+  }
+
+  downloadCertificate(): void {
+    this.errorsFound = false;
+    this.errorMessage = '';
     this.certificateDownloading = true;
     this.contributionAndReviewService.downloadContributorCertificateAsync(
       this.username,
@@ -98,11 +104,11 @@ export class CertificateDownloadModalComponent {
     ).then((response: ContributorCertificateResponse) => {
       this.createCertificate(response);
       this.certificateDownloading = false;
-    }).catch(() => {
+    }).catch((err: HttpErrorResponse) => {
       this.errorsFound = true;
       this.certificateDownloading = false;
       this.errorMessage = (
-        'Not able to download contributor certificate');
+        err.error.error);
     });
   }
 
@@ -275,7 +281,7 @@ export class CertificateDownloadModalComponent {
 
       // Create an HTML link and clicks on it to download.
       const link = document.createElement('a');
-      link.download = 'certificate.jpeg';
+      link.download = 'certificate.png';
       link.href = canvas.toDataURL();
       link.click();
     };
