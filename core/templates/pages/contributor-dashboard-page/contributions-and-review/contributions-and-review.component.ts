@@ -498,7 +498,10 @@ export class ContributionsAndReview
     const topicName = dict.topic_name;
     const explorationId = dict.exploration_id;
     const existingPinnedOpportunity = Object.values(this.opportunities).find(
-      (opportunity) => (
+      (opportunity: {
+        topicName: string;
+        isPinned: boolean;
+      }) => (
         opportunity.topicName === topicName && opportunity.isPinned)
     );
 
