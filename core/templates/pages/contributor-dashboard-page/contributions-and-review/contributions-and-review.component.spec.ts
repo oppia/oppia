@@ -38,6 +38,8 @@ import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 class MockNgbModalRef {
@@ -90,7 +92,10 @@ describe('Contributions and review component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        MatIconModule,
+        HttpClientTestingModule,
+        MatSnackBarModule],
       declarations: [
         ContributionsAndReview
       ],
@@ -177,7 +182,8 @@ describe('Contributions and review component', () => {
             },
             translation_in_review_counts: {
               en: 2
-            }
+            },
+            is_pinned: false,
           }),
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '2',
@@ -190,7 +196,8 @@ describe('Contributions and review component', () => {
             },
             translation_in_review_counts: {
               en: 4
-            }
+            },
+            is_pinned: false
           })
         ],
         more: false
@@ -1372,19 +1379,24 @@ describe('Contributions and review component', () => {
     it('should load reviewable translation opportunities correctly', () => {
       component.loadReviewableTranslationOpportunities().then(
         ({opportunitiesDicts, more}) => {
+          console.log('this is loaded opp', opportunitiesDicts)
           expect(opportunitiesDicts).toEqual([
             {
               id: '1',
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
-              actionButtonTitle: 'Translations'
-            } as Opportunity,
+              actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 1'
+            } as unknown as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
-              actionButtonTitle: 'Translations'
-            } as Opportunity
+              actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 2'
+            } as unknown as Opportunity
           ]);
           expect(more).toEqual(false);
         });
