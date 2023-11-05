@@ -63,12 +63,17 @@ interface UpdateAnswerGroupFeedback {
   feedback: SubtitledHtml;
 }
 
+interface DestIfReallyStuck {
+  destIfReallyStuck: string | null;
+}
+
 interface UpdateRule {
   rules: Rule[];
 }
 
 export type UpdateActiveAnswerGroup = (
   AnswerGroup |
+  DestIfReallyStuck |
   UpdateAnswerGroupFeedback |
   UpdateAnswerGroupCorrectnessLabel |
   UpdateActiveAnswerGroupDest |
@@ -224,6 +229,13 @@ export class ResponsesService {
         };
         answerGroup.outcome.labelledAsCorrect = (
           labelledAsCorrectUpdates.labelledAsCorrect);
+      }
+      if (updates.hasOwnProperty('destIfReallyStuck')) {
+        let destIfReallyStuckUpdates = updates as {
+          destIfReallyStuck: string | null;
+        };
+        answerGroup.outcome.destIfReallyStuck = (
+          destIfReallyStuckUpdates.destIfReallyStuck);
       }
       if (updates.hasOwnProperty('trainingData')) {
         let trainingDataUpdates = updates as AnswerGroup;

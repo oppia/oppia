@@ -933,6 +933,7 @@ CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
     '/contributor-dashboard-admin-stats')
 COMMUNITY_CONTRIBUTION_STATS_URL = '/community-contribution-stats'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
