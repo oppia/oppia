@@ -49,11 +49,20 @@ export class OpportunitiesListComponent {
   @Input() progressBarRequired: boolean = false;
 
   @Input() showOpportunityButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = true;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
 
+  @Output() clickPinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
+
+  @Output() clickUnpinButton: EventEmitter<string> = (
+    new EventEmitter());
 
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];

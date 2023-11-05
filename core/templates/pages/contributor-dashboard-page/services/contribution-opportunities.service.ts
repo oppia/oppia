@@ -145,6 +145,28 @@ export class ContributionOpportunitiesService {
     return this._reloadOpportunitiesEventEmitter;
   }
 
+  async pinReviewableTranslationOpportunityAsync(
+      topicName: string,
+      languageCode: string,
+      explorationId?: string):
+    Promise<void> {
+    return this.contributionOpportunitiesBackendApiService
+      .pinTranslationOpportunity(
+        languageCode,
+        topicName,
+        explorationId);
+  }
+
+  async unpinReviewableTranslationOpportunityAsync(
+      topicName: string,
+      languageCode: string):
+    Promise<void> {
+    return this.contributionOpportunitiesBackendApiService
+      .unpinTranslationOpportunity(
+        languageCode,
+        topicName);
+  }
+
   get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
     return this._removeOpportunitiesEventEmitter;
   }

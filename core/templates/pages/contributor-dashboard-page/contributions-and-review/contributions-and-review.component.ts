@@ -41,6 +41,7 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface Suggestion {
   change: {
@@ -66,6 +67,7 @@ export interface ContributionsSummary {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
 }
 
 export interface Opportunity {
@@ -144,6 +146,8 @@ export class ContributionsAndReview
     };
   };
 
+  opportunities = {};
+
   /**
    * The feature flag state to gate the contributor_dashboard_accomplishments.
    * @type {boolean} - contributor_dashboard_accomplishments - A boolean value.
@@ -181,7 +185,8 @@ export class ContributionsAndReview
     private userService: UserService,
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
-    private htmlEscaperService: HtmlEscaperService
+    private htmlEscaperService: HtmlEscaperService,
+    private snackBar: MatSnackBar,
   ) {}
 
   getQuestionContributionsSummary(
@@ -474,14 +479,54 @@ export class ContributionsAndReview
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
+            isPinned: opportunity.isPinned,
+            topicName: opportunity.topicName
           };
           opportunitiesDicts.push(opportunityDict);
         });
-
+        this.opportunities = opportunitiesDicts;
         return {
           opportunitiesDicts: opportunitiesDicts,
           more: response.more
         };
+      });
+  }
+
+  pinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    const topicName = dict.topic_name;
+    const explorationId = dict.exploration_id;
+    const existingPinnedOpportunity = Object.values(this.opportunities).find(
+      (opportunity) => (
+        opportunity.topicName === topicName && opportunity.isPinned)
+    );
+
+    if (existingPinnedOpportunity) {
+      this.openSnackbarWithAction(
+        topicName, explorationId,
+        'A pinned opportunity already exists for this topic and language.',
+        'Pin Anyway'
+      );
+    } else {
+      this.contributionOpportunitiesService.
+        pinReviewableTranslationOpportunityAsync(
+          topicName, this.languageCode, explorationId).then(() => {
+          this.contributionOpportunitiesService
+            .reloadOpportunitiesEventEmitter.emit();
+        });
+    }
+  }
+
+  unpinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    const topicName = dict.topic_name;
+    this.contributionOpportunitiesService.
+      unpinReviewableTranslationOpportunityAsync(
+        topicName, this.languageCode).then(() => {
+        this.contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.emit();
       });
   }
 
@@ -698,6 +743,28 @@ export class ContributionsAndReview
     };
 
     $(document).on('click', this.closeDropdownWhenClickedOutside);
+  }
+
+  openSnackbarWithAction(
+      topicName: string,
+      explorationId: string,
+      message: string,
+      actionText: string
+  ): void {
+    const snackBarRef = this.snackBar.open(message, actionText, {
+      duration: 3000,
+    });
+
+    snackBarRef.onAction().subscribe(() => {
+      this.contributionOpportunitiesService.
+        pinReviewableTranslationOpportunityAsync(
+          topicName,
+          this.languageCode,
+          explorationId).then(() => {
+          this.contributionOpportunitiesService
+            .reloadOpportunitiesEventEmitter.emit();
+        });
+    });
   }
 
   onChangeLanguage(languageCode: string): void {

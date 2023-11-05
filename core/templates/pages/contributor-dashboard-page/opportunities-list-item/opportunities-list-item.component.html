@@ -135,6 +135,16 @@
 <!-- Desktop -->
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
+  <mat-icon *ngIf="showPinUnpinButton && !opportunity.isPinned"
+            class="pin-icon"
+            (click)="pinOpportunity()">
+            push_pin
+  </mat-icon>
+  <mat-icon *ngIf="showPinUnpinButton && opportunity.isPinned"
+            class="unpin-icon"
+            (click)="unpinOpportunity()">
+            push_pin
+  </mat-icon>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -164,6 +174,9 @@
 </button>
 
 <style>
+  mat-icon.pin-icon {
+    color: #a29a9a;
+  }
   .oppia-lazy-loading-container {
     height: 120px;
     margin-bottom: -20px;

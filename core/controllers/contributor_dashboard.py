@@ -444,7 +444,7 @@ class ReviewableOpportunitiesHandler(
         if pinned_opportunity_summary:
             # Here we use MyPy ignore because the latest schema of
             # dict is indexable.
-            pinned_opportunity_id = pinned_opportunity_summary['id'] # type: ignore[index]
+            pinned_opportunity_id = pinned_opportunity_summary.id # type: ignore[index]
             exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
                 pinned_opportunity_id] = pinned_opportunity_summary
@@ -500,11 +500,13 @@ class LessonsPinningHandler(
         """Handles pinning/unpinning lessons."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
-        topic_id = self.normalized_payload.get('topic_id')
+        topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
 
-        if language_code and topic_id:
+        if language_code and topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id, language_code, topic_id, opportunity_id
             )
