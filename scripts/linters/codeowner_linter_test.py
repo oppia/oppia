@@ -239,7 +239,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements(
-            ['Pattern on line 18 doesn\'t have codeowner'],
+            ['Pattern on line 17 doesn\'t have codeowner'],
             lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -253,7 +253,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
-            'Pattern on line 18 is invalid. Use full path '
+            'Pattern on line 17 is invalid. Use full path '
             'relative to the root directory'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
@@ -268,7 +268,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
-            'Pattern on line 18 is invalid. '
+            'Pattern on line 17 is invalid. '
             '\'**\' wildcard not allowed'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -282,7 +282,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
-            'Pattern on line 18 doesn\'t match '
+            'Pattern on line 17 doesn\'t match '
             'any file or directory'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
