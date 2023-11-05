@@ -109,6 +109,7 @@ class AdminPage(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
+    @acl_decorators.open_access
     def get(self, *args: Any, **kwargs: Any) -> None:
         """Renders the admin page."""
 
