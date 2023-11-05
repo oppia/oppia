@@ -225,7 +225,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements(
-            ['Please remove inline comment from line 17'],
+            ['Please remove inline comment from line 16'],
             lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
