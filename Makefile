@@ -73,7 +73,7 @@ stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
 
 update.requirements: ## Installs the python requirements for the project
-	${SHELL_PREFIX} dev-server pip install -r requirements.txt
+	${SHELL_PREFIX} dev-server pip install -r requirements.txt -t /app/oppia/third_party/python_libs
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
 
 update.package: ## Installs the npm requirements for the project
@@ -97,10 +97,11 @@ run_tests.lint: ## Runs the linter tests
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 	docker compose up datastore dev-server redis firebase -d --no-deps
+	$(MAKE) update.requirements
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
+	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)"
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -143,7 +144,11 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+ifeq ($(shell uname), Darwin)
+    CHROME_VERSION := $(shell /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{print $$3}')
+else
+    CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+endif
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## Flags for the e2e tests
@@ -167,7 +172,6 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	sharding_instances := 3
 	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
@@ -221,6 +225,7 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	$(MAKE) stop
 
 OS_NAME := $(shell uname)
+sharding_instances := 3
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
 	sh ./docker/install_node.sh
