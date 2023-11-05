@@ -109,7 +109,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       // represent all states, as well as an option to create a
       // new state.
       this.destinationChoices = [{
-        id: this.currentStateName,
+        id: null,
         text: 'None'
       }];
 
