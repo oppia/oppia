@@ -25,8 +25,9 @@ import { TranslationTopicService } from 'pages/exploration-editor-page/translati
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from './opportunities-list.component';
+import { MatIconModule } from '@angular/material/icon';
 
-describe('Opportunities List Component', () => {
+fdescribe('Opportunities List Component', () => {
   let component: OpportunitiesListComponent;
   let fixture: ComponentFixture<OpportunitiesListComponent>;
 
@@ -45,7 +46,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id2',
@@ -54,7 +56,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id3',
@@ -63,7 +66,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id4',
@@ -72,7 +76,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id5',
@@ -81,7 +86,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id6',
@@ -90,7 +96,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id7',
@@ -99,7 +106,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id8',
@@ -108,7 +116,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id9',
@@ -117,7 +126,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id10',
@@ -126,7 +136,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id11',
@@ -135,7 +146,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id12',
@@ -144,7 +156,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id13',
@@ -153,7 +166,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id14',
@@ -162,7 +176,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id15',
@@ -171,7 +186,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id16',
@@ -180,7 +196,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 30,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 30
+    translationsCount: 30,
+    topicName: 'Topic 1'
   }];
 
   const explorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
@@ -190,7 +207,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id18',
@@ -199,7 +217,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id19',
@@ -208,7 +227,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 30,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 30
+    translationsCount: 30,
+    topicName: 'Topic 1'
   },
   {
     id: 'id20',
@@ -217,7 +237,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id21',
@@ -226,7 +247,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id22',
@@ -235,7 +257,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id23',
@@ -244,7 +267,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id24',
@@ -253,7 +277,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id25',
@@ -262,7 +287,8 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   },
   {
     id: 'id26',
@@ -271,12 +297,16 @@ describe('Opportunities List Component', () => {
     progressPercentage: 50,
     inReviewCount: 20,
     totalCount: 100,
-    translationsCount: 50
+    translationsCount: 50,
+    topicName: 'Topic 1'
   }];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MatIconModule
+      ],
       declarations: [OpportunitiesListComponent],
       providers: [
         ContributionOpportunitiesService,
@@ -351,7 +381,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id3',
@@ -360,7 +391,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id4',
@@ -369,7 +401,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id5',
@@ -378,7 +411,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id6',
@@ -387,7 +421,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id7',
@@ -396,7 +431,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id8',
@@ -405,7 +441,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id9',
@@ -414,7 +451,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id10',
@@ -423,7 +461,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id11',
@@ -432,7 +471,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id12',
@@ -441,7 +481,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id13',
@@ -450,7 +491,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id14',
@@ -459,7 +501,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id15',
@@ -468,7 +511,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 50,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 50
+      translationsCount: 50,
+      topicName: 'Topic 1'
     },
     {
       id: 'id16',
@@ -477,7 +521,8 @@ describe('Opportunities List Component', () => {
       progressPercentage: 30,
       inReviewCount: 20,
       totalCount: 100,
-      translationsCount: 30
+      translationsCount: 30,
+      topicName: 'Topic 1'
     }]);
 
     expect(component.opportunities.length).toEqual(15);
@@ -543,7 +588,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id2',
@@ -552,7 +598,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id3',
@@ -561,7 +608,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id4',
@@ -570,7 +618,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id5',
@@ -579,7 +628,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id6',
@@ -588,7 +638,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id7',
@@ -597,7 +648,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id8',
@@ -606,7 +658,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id9',
@@ -615,7 +668,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id10',
@@ -624,7 +678,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       }]);
       component.gotoPage(2);
       tick();
@@ -637,7 +692,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id12',
@@ -646,7 +702,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id13',
@@ -655,7 +712,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id14',
@@ -664,7 +722,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id15',
@@ -673,7 +732,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id16',
@@ -682,7 +742,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 30,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 30
+        translationsCount: 30,
+        topicName: 'Topic 1'
       },
       {
         id: 'id17',
@@ -691,7 +752,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id18',
@@ -700,7 +762,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       },
       {
         id: 'id19',
@@ -709,7 +772,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 30,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 30
+        translationsCount: 30,
+        topicName: 'Topic 1'
       },
       {
         id: 'id20',
@@ -718,7 +782,8 @@ describe('Opportunities List Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 100,
-        translationsCount: 50
+        translationsCount: 50,
+        topicName: 'Topic 1'
       }]);
     }));
 

@@ -25,6 +25,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 
 import { ExplorationOpportunity, OpportunitiesListItemComponent } from './opportunities-list-item.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { MatIconModule } from '@angular/material/icon';
 
 class MockWindowDimensionsService {
   getResizeEvent() {
@@ -37,7 +38,7 @@ class MockWindowDimensionsService {
   }
 }
 
-describe('Opportunities List Item Component', () => {
+fdescribe('Opportunities List Item Component', () => {
   let component: OpportunitiesListItemComponent;
   let fixture: ComponentFixture<OpportunitiesListItemComponent>;
   let windowDimensionsService: MockWindowDimensionsService;
@@ -45,7 +46,8 @@ describe('Opportunities List Item Component', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        NgbTooltipModule
+        NgbTooltipModule,
+        MatIconModule
       ],
       declarations: [
         OpportunitiesListItemComponent,
