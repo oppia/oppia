@@ -30,6 +30,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { ErrorPageRoutingModule } from './error-page-routing.module';
+import { ErrorPageSharedModule } from './error-page-shared.module';
 
 @NgModule({
   imports: [
@@ -38,11 +39,8 @@ import { ErrorPageRoutingModule } from './error-page-routing.module';
     SharedComponentsModule,
     ErrorPageRoutingModule,
     ToastrModule.forRoot(toastrConfig),
-    TranslateModule
-  ],
-  declarations: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
+    TranslateModule,
+    ErrorPageSharedModule,
   ],
   entryComponents: [
     ErrorPageComponent,
