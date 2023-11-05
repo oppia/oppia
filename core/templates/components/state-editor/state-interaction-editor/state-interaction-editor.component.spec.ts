@@ -298,6 +298,8 @@ describe('State Interaction component', () => {
       document.createElement('button'));
     component.customizeInteractionButton =
       customizeInteractionButtonRef;
+    spyOn(component, 'getCurrentInteractionName').and.returnValue('Introduction');
+    component.interactionEditorIsShown = true;
     spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
 
     component.focusOnCustomizeInteraction(event);
