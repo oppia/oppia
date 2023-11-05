@@ -92,6 +92,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
 
+    def test_admin_get(self) -> None:
+        """Test `/admin` returns a 200 response."""
+        self.get_html_response('/admin', expected_status_int=200)
+
     def test_change_configuration_property(self) -> None:
         """Test that configuration properties can be changed."""
 
