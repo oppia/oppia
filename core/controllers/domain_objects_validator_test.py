@@ -32,7 +32,7 @@ from core.domain import stats_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -456,9 +456,15 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'content'):
             domain_objects_validator.validate_state_dict(invalid_state_dict)  # type: ignore[arg-type]
 
+
 class ValidateQuestionStateDict(test_utils.GenericTestBase):
     """Tests to validate question_state_dict coming from frontend."""
+
     def test_valid_object_raises_no_exception(self) -> None:
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {'html': '<p>1</p>', 'content_id': 'ca_choices_2'},
+            {'html': '<p>2</p>', 'content_id': 'ca_choices_3'}
+        ]
         question_state_dict: state_domain.StateDict = {
             'content': {'html': '', 'content_id': 'content_0'},
             'classifier_model_id': None,
@@ -495,12 +501,7 @@ class ValidateQuestionStateDict(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'showChoicesInShuffledOrder': {'value': True},
-                    'choices': {
-                        'value': [
-                            {'html': '<p>1</p>', 'content_id': 'ca_choices_2'},
-                            {'html': '<p>2</p>', 'content_id': 'ca_choices_3'}
-                        ]
-                    }
+                    'choices': {'value': choices_subtitled_dicts}
                 },
                 'default_outcome': {
                     'dest': None,
@@ -558,8 +559,9 @@ class ValidateQuestionStateDict(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         # The error is representing the keyerror.
         with self.assertRaisesRegex(Exception, 'content'):
-            domain_objects_validator.validate_question_state_dict(  # type: ignore[arg-type]
-                invalid_question_state_dict)
+            domain_objects_validator.validate_question_state_dict(
+                invalid_question_state_dict)  # type: ignore[arg-type]
+
 
 class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
     """Tests to validate suggestion images coming from frontend."""

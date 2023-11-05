@@ -263,6 +263,7 @@ def validate_state_dict(
     # after schema validation.
     return state_dict
 
+
 def validate_question_state_dict(
     question_state_dict: state_domain.StateDict
 ) -> state_domain.StateDict:
@@ -270,7 +271,7 @@ def validate_question_state_dict(
 
     Args:
         question_state_dict: dict. The dict representation of State object for
-        a question.
+            a question.
 
     Returns:
         State. The question_state_dict after validation.
