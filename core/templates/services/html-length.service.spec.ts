@@ -66,26 +66,47 @@ describe('Html Length Service', () => {
 
   it('should compute length for strings with only paragraph tag', () => {
     const htmlString = '<p>Earth Our home planet is the third planet' +
-      ' from the sun. Despite the vastness of the Solar System and' +
-      ' the rest of space, it is the only place that we know life' +
-      ' exists on. It is at just the right distance from the sun to' +
-      ' ensure a comfortable temperature for us to exist in.</p>';
+      ' from the sun.</p>';
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(54);
+    expect(result).toBe(11);
   });
 
   it('should compute length for strings with paragraph tag and' +
-    ' descendants text nodes', () => {
-    const htmlString = '<p><em>This is a brief exploration about' +
-      'conjugations in Spanish.</em>Consider the following sentence' +
-      ':<br><br><em> Yo jugar al fútbol con amigos los domingos.<br>' +
-      '<br></em> What verb conjugation goes in the blank?</p>';
+    'descendants text nodes', () => {
+    const testCases = [
+      {
+        input: '<p><em>This is a brief exploration about conjugations' +
+          ' in Spanish.</em></p>',
+        expected: 9
+      },
+      {
+        input: '<p>This is a test.</p>',
+        expected: 4
+      },
+      {
+        input: '<p><b>This text is bolded.</b><em> This is italic</em></p>',
+        expected: 7
+      },
+      {
+        input: '<p> Check out below<br><br><b> "Text is bolded"</b></p>',
+        expected: 6
+      },
+      {
+        input: '<p>🙂 Hello, how are you?</p>',
+        expected: 5
+      },
+      {
+        input: '<p>مر حبا كيف حالك؟</p>',
+        expected: 4
+      },
+    ];
 
-    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
-
-    expect(result).toBe(26);
+    for (const testCase of testCases) {
+      const result = htmlLengthService.computeHtmlLengthInWords(testCase.input);
+      expect(result).toBe(testCase.expected);
+    }
   });
 
   it('should compute length of content with text and non-text ' +

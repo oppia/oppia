@@ -47,7 +47,16 @@ from typing import Dict, List, Optional, TypedDict
 def _require_valid_version(
     version_from_payload: Optional[int], exploration_version: int
 ) -> None:
-    """Check that the payload version matches the given exploration version."""
+    """Check that the payload version matches the given exploration version.
+
+        Args:
+            version_from_payload: Optional[int]. The payload version.
+            exploration_version: int. The exploration version to compare with.
+
+        Raises:
+            InvalidInputException. The version_from_payload does not match
+                the exploration_version.
+    """
 
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(

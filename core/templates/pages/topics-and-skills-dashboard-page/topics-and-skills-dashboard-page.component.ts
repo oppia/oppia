@@ -92,7 +92,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
-
+  windowWidth: number = window.innerWidth;
   constructor(
     private focusManagerService: FocusManagerService,
     private createNewSkillModalService: CreateNewSkillModalService,
@@ -329,7 +329,10 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   @HostListener('window:resize')
   filterBoxOnResize(): void {
-    this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    if (window.innerWidth !== this.windowWidth) {
+      this.windowWidth = window.innerWidth;
+      this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    }
   }
 
   getUpperLimitValueForPagination(): number {

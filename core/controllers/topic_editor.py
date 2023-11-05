@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -178,9 +178,9 @@ class TopicEditorStoryHandler(
                             node.planned_publication_date))
                     if node.is_node_upcoming():
                         upcoming_chapters_count += 1
-                        upcoming_chapters_expected_days.append((
+                        upcoming_chapters_expected_days.append((int)((
                             planned_publication_date_msecs -
-                            current_time_msecs) / (1000.0 * 3600 * 24))
+                            current_time_msecs) / (1000.0 * 3600 * 24)))
                     if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
@@ -523,7 +523,7 @@ class EditableTopicDataHandler(
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():

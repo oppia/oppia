@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import enum
 
-from core import feconf
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
@@ -71,10 +70,8 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                 param_domain.PlatformParameterRule.from_dict({
                     'filters': [
                         {
-                            'type': 'server_mode',
-                            'conditions': [
-                                ['=', param_domain.ServerMode.DEV.value]
-                            ]
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Android']]
                         }
                     ],
                     'value_when_matched': True
@@ -193,27 +190,22 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
-            'clear rule', [], False
+            'clear rule', []
         )
 
         super().tearDown()
 
-    def _set_dummy_feature_status_for_mode(
-        self, is_enabled: bool, mode: param_domain.ServerMode
-    ) -> None:
+    def _set_dummy_feature_status(
+        self, feature_is_enabled: bool) -> None:
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             self.user_id,
             'update rule for testing purpose',
             [param_domain.PlatformParameterRule.from_dict({
-                'value_when_matched': is_enabled,
-                'filters': [{
-                    'type': 'server_mode',
-                    'conditions': [['=', mode.value]]
-                }]
-            })],
-            False
+                'value_when_matched': feature_is_enabled,
+                'filters': []
+            })]
         )
 
     def _mock_dummy_feature_stage(
@@ -230,97 +222,31 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
         return self.swap(feature, '_feature_stage', stage.value)
 
-    def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
-        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.DEV)
+    def test_get_with_dummy_feature_enabled_returns_ok(self) -> None:
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=404
+        )
 
-        with dev_mode_ctx, dummy_feature_dev_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerMode.DEV
-            )
+        self._set_dummy_feature_status(True)
+        result = self.get_json(
+            '/platform_feature_dummy_handler',
+        )
+        self.assertEqual(result, {'msg': 'ok'})
 
-            result = self.get_json(
-                '/platform_feature_dummy_handler',
-            )
-            self.assertEqual(result, {'msg': 'ok'})
+    def test_get_with_dummy_feature_disabled_raises_404(self) -> None:
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=404
+        )
+        self._set_dummy_feature_status(True)
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=200
+        )
 
-    def test_get_with_dummy_feature_disabled_in_dev_raises_404(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
-        dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.DEV)
-
-        with dev_mode_ctx, dummy_feature_dev_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerMode.DEV
-            )
-            self.get_json(
-                '/platform_feature_dummy_handler',
-                expected_status_int=404
-            )
-
-    def test_get_with_dummy_feature_enabled_in_test_returns_ok(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(
-            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
-        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.TEST)
-
-        with dev_mode_ctx, server_ctx, dummy_feature_prod_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerMode.TEST
-            )
-
-            result = self.get_json(
-                '/platform_feature_dummy_handler',
-            )
-            self.assertEqual(result, {'msg': 'ok'})
-
-    def test_get_with_dummy_feature_disabled_in_test_raises_404(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(
-            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
-        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.TEST)
-
-        with dev_mode_ctx, server_ctx, dummy_feature_prod_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerMode.TEST
-            )
-            self.get_json(
-                '/platform_feature_dummy_handler',
-                expected_status_int=404
-            )
-
-    def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(
-            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
-        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.PROD)
-
-        with dev_mode_ctx, server_ctx, dummy_feature_prod_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerMode.PROD
-            )
-
-            result = self.get_json(
-                '/platform_feature_dummy_handler',
-            )
-            self.assertEqual(result, {'msg': 'ok'})
-
-    def test_get_with_dummy_feature_disabled_in_prod_raises_404(self) -> None:
-        dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(
-            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
-        dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FeatureStages.PROD)
-
-        with dev_mode_ctx, server_ctx, dummy_feature_prod_stage_context:
-            self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerMode.PROD
-            )
-            self.get_json(
-                '/platform_feature_dummy_handler',
-                expected_status_int=404
-            )
+        self._set_dummy_feature_status(False)
+        self.get_json(
+            '/platform_feature_dummy_handler',
+            expected_status_int=404
+        )

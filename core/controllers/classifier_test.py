@@ -26,8 +26,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import classifier_services
-from core.domain import config_domain
-from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -57,12 +55,14 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
+        self.ADMIN_USERNAME = 'admusername'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup('moderator@example.com', 'mod')
+        self.signup(
+            feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         assets_list: List[Tuple[str, bytes]] = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -205,35 +205,13 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             classifier_services,
             'get_classifier_training_job_by_id',
             mock_get_classifier_training_job_by_id)
-        config_property = config_domain.Registry.get_config_property(
-            'notification_user_ids_for_failed_tasks')
-        assert config_property is not None
-        config_property.set_value(
-            'committer_id',
-            [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
 
         with can_send_emails_ctx, can_send_feedback_email_ctx:
             with fail_training_job:
-                # Adding moderator email to admin config page
-                # for sending emails for failed training jobs.
-                self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-                response_dict = self.get_json('/adminhandler')
-                response_config_properties = response_dict['config_properties']
-                expected_email_list = {
-                    'value': [self.get_user_id_from_email(
-                        self.CURRICULUM_ADMIN_EMAIL)]}
-                sys_config_list = response_config_properties[
-                    email_manager.NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.name]
-                self.assertDictContainsSubset(
-                    expected_email_list, sys_config_list)
-
-                # Check that there are no sent emails to either
+                # Check that there are no sent emails to the
                 # email address before posting json.
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
-                self.assertEqual(len(messages), 0)
-                messages = self._get_sent_email_messages(
-                    'moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
@@ -251,10 +229,6 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
-                self.assertEqual(len(messages), 1)
-                self.assertEqual(messages[0].subject, expected_subject)
-                messages = (
-                    self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject, expected_subject)
 

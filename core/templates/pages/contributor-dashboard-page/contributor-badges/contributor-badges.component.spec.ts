@@ -91,8 +91,8 @@ describe('Contributor badge component', () => {
     first_contribution_date: 'Mar 2021',
     last_contribution_date: 'Mar 2021'
   };
-  const akanSecondTopicTranslationReviewStat = {
-    language_code: 'ak',
+  const hindiTopicTranslationReviewStat = {
+    language_code: 'hi',
     topic_name: 'second_topic',
     reviewed_translations_count: 50,
     reviewed_translation_word_count: 100,
@@ -139,7 +139,7 @@ describe('Contributor badge component', () => {
     ],
     translation_review_stats: [
       akanFirstTopicTranslationReviewStat,
-      akanSecondTopicTranslationReviewStat,
+      hindiTopicTranslationReviewStat,
       spanishTranslationReviewStat
     ],
     question_contribution_stats: [questionContributionStat],
@@ -199,7 +199,10 @@ describe('Contributor badge component', () => {
           Promise.resolve(fetchAllStatsResponse));
         spyOn(
           languageUtilService, 'getAudioLanguageDescription')
-          .and.returnValues('Spanish', 'português', 'Hindi', 'Akan');
+          .and.returnValues(
+            'Akan', 'Akan', 'Spanish',
+            'Spanish', 'Akan', 'Hindi',
+            'Spanish', 'Spanish', 'português', 'Hindi',);
         spyOn(
           languageUtilService, 'getShortLanguageDescription')
           .and.returnValue('Language');

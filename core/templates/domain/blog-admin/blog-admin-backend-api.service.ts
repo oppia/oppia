@@ -19,12 +19,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-interface ConfigSchema {
+interface PlatformParameterSchema {
   type: string;
-  items?: {
-      type: string;
-  };
-  validators?: {}[];
 }
 
 interface UserRolesBackendResponse {
@@ -35,26 +31,26 @@ interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-export interface ConfigPropertiesBackendResponse {
+export interface PlatformParameterBackendResponse {
   [property: string]: {
     description: string;
     value: string[] | number;
-    schema: ConfigSchema;
+    schema: PlatformParameterSchema;
   };
 }
 
-export interface ConfigPropertyValues {
+export interface PlatformParameterValues {
   'max_number_of_tags_assigned_to_blog_post': number;
 }
 
 export interface BlogAdminPageDataBackendDict {
-  'config_properties': ConfigPropertiesBackendResponse;
+  'platform_parameters': PlatformParameterBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'updatable_roles': UserRolesBackendResponse;
 }
 
 export interface BlogAdminPageData {
-  configProperties: ConfigPropertiesBackendResponse;
+  platformParameters: PlatformParameterBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   updatableRoles: UserRolesBackendResponse;
 }
@@ -73,7 +69,7 @@ export class BlogAdminBackendApiService {
         resolve({
           updatableRoles: response.updatable_roles,
           roleToActions: response.role_to_actions,
-          configProperties: response.config_properties,
+          platformParameters: response.platform_parameters,
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -100,19 +96,11 @@ export class BlogAdminBackendApiService {
     });
   }
 
-  async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
-    let action = 'save_config_properties';
+  async savePlatformParametersAsync(
+      newPlatformParameterValues: PlatformParameterValues): Promise<void> {
+    let action = 'save_platform_parameters';
     let payload = {
-      new_config_property_values: newConfigPropertyValues
-    };
-    return this._postRequestAsync('/blogadminhandler', payload, action);
-  }
-
-  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
-    let action = 'revert_config_property';
-    let payload = {
-      config_property_id: configPropertyId
+      new_platform_parameter_values: newPlatformParameterValues
     };
     return this._postRequestAsync('/blogadminhandler', payload, action);
   }

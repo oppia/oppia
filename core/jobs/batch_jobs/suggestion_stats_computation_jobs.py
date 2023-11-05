@@ -917,7 +917,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         translation.rejected_translations_count),
                     rejected_translation_word_count=(
                         translation.rejected_translation_word_count),
-                    contribution_dates=translation.contribution_dates
+                    contribution_dates=sorted(translation.contribution_dates)
                 )
             )
             translation_contributions_stats_model.update_timestamps()

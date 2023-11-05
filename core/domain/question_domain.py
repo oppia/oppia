@@ -2018,7 +2018,10 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected version to be an integer, received %s' %
                 self.version)
-
+        if self.version < 0:
+            raise utils.ValidationError(
+                'Expected version to be non-negative, received %s' % (
+                    self.version))
         self.partial_validate()
 
     @classmethod
