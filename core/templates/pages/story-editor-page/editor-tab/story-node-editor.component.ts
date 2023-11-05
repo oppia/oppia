@@ -541,7 +541,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
-    this.chapterOutlineIsShown = false;
+    this.chapterOutlineIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.chapterTodoCardIsShown = (
       !this.windowDimensionsService.isWindowNarrow());
     this.prerequisiteSkillIsShown = (
