@@ -191,8 +191,8 @@ class ExplorationHandler(
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
         if self.normalized_request:
-            version = self.normalized_request.get('v')
-            apply_draft = self.normalized_request.get('apply_draft')
+            version = self.normalized_request['v']
+            apply_draft = self.normalized_request['apply_draft']
         else:
             version = None
             apply_draft = None
