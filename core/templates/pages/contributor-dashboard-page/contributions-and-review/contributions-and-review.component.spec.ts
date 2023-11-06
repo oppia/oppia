@@ -1507,25 +1507,24 @@ describe('Contributions and review component', () => {
     }));
 
     it('should call unpinReviewableTranslationOpportunityAsync',
-    fakeAsync(() => {
-      const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
-        contributionOpportunitiesService,
-        'unpinReviewableTranslationOpportunityAsync')
-        .and.returnValue(Promise.resolve({}));
+      fakeAsync(() => {
+        const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
+          contributionOpportunitiesService,
+          'unpinReviewableTranslationOpportunityAsync')
+          .and.returnValue(Promise.resolve({}));
 
-      component.languageCode = 'en';
-      const topicName = 'Dummy Topic 1';
+        component.languageCode = 'en';
+        const topicName = 'Dummy Topic 1';
 
-      component.unpinReviewableTranslationOpportunity(topicName);
-      tick();
+        component.unpinReviewableTranslationOpportunity(topicName);
+        tick();
 
-      expect(
-        unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-          'Dummy Topic 1', component.languageCode);
-    }));
+        expect(
+          unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+            'Dummy Topic 1', component.languageCode);
+      }));
 
-    it('should open a snackbar and call pinReviewableTranslationOpportunityAsync'
-    + 'when action is triggered', () => {
+    it('should open a snackbar when action is triggered', () => {
       const openSpy = spyOn(snackBar, 'open');
       snackBarRef = TestBed.inject(MatSnackBarRef);
 
@@ -1534,18 +1533,21 @@ describe('Contributions and review component', () => {
 
       component.openSnackbarWithAction(
         topicName, explorationId, 'Test message', 'Pin Anyway');
-      snackBarRef.onAction().subscribe(async () => {
-        expect(openSpy).toHaveBeenCalledWith('Test message', 'Pin Anyway', {duration: 3000});
+      snackBarRef.onAction().subscribe(async() => {
+        expect(openSpy).toHaveBeenCalledWith(
+          'Test message', 'Pin Anyway', {duration: 3000});
         expect(openSpy).toHaveBeenCalled();
 
         const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
-          contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync')
+          contributionOpportunitiesService,
+          'pinReviewableTranslationOpportunityAsync')
           .and.returnValue(Promise.resolve({}));
 
         snackBarRef.dismissWithAction();
 
-        expect(pinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-          topicName, component.languageCode, explorationId);
+        expect(
+          pinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+            topicName, component.languageCode, explorationId);
       });
     });
     // TODO(#9749): Rename and actually assert on something. This test currently
