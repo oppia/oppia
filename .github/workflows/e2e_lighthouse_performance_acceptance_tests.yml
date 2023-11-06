@@ -89,6 +89,7 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      # TODO(#19134): Tests under Docker must have minimum dependencies on host.
       - name: Initializing Containers
         run: |
           sudo make build
