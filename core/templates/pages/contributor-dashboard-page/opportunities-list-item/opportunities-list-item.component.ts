@@ -96,7 +96,6 @@ export class OpportunitiesListItemComponent {
   }
 
   unpinOpportunity(): void {
-    console.log('Emitting', this.opportunity.topicName)
     this.clickUnpinButton.emit(
       this.opportunity.topicName);
   }

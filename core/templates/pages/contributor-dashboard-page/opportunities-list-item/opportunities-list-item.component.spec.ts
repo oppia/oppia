@@ -257,7 +257,7 @@ describe('Opportunities List Item Component', () => {
         topic_name: 'Topic 1',
         exploration_id: '1'
       };
-  
+
       component.opportunity = {
         id: '1',
         labelText: 'Label text',
@@ -268,16 +268,16 @@ describe('Opportunities List Item Component', () => {
         translationsCount: 25,
         translationWordCount: 13,
         topicName: 'Topic 1'
-      }
+      };
       component.pinOpportunity();
-  
+
       expect(spy).toHaveBeenCalledWith(expectedPayload);
     });
-  
+
     it('should emit an unpin event with the correct properties', () => {
       const spy = spyOn(component.clickUnpinButton, 'emit');
       const expectedTopicName = 'Topic 1';
-  
+
       component.opportunity = {
         id: '1',
         labelText: 'Label text',
@@ -288,9 +288,9 @@ describe('Opportunities List Item Component', () => {
         translationsCount: 25,
         translationWordCount: 13,
         topicName: 'Topic 1'
-      }
+      };
       component.unpinOpportunity();
-  
+
       expect(spy).toHaveBeenCalledWith(expectedTopicName);
     });
   });

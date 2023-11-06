@@ -503,15 +503,12 @@ class LessonsPinningHandler(
         topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
-        print('I am unpinning')
         if language_code and topic_name:
-            print('I am unpinning 2')
             topic = topic_fetchers.get_topic_by_name(topic_name)
             topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id, language_code, topic_id, opportunity_id
             )
-            print('I am unpinning 3')
         self.render_json(self.values)
 
 

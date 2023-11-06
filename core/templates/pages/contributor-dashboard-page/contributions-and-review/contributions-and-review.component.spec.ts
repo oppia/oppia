@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Component, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContributionDetails, ContributionsAndReview, Opportunity, Suggestion, SuggestionDetails } from './contributions-and-review.component';
@@ -41,7 +41,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
-import {of, Subject} from 'rxjs'
+import {of, Subject} from 'rxjs';
 
 
 class MockNgbModalRef {
@@ -70,7 +70,7 @@ class MockPlatformFeatureService {
 }
 
 
-fdescribe('Contributions and review component', () => {
+describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
@@ -94,7 +94,7 @@ fdescribe('Contributions and review component', () => {
   const mockActiveTopicEventEmitter = new EventEmitter();
   let snackBar: MatSnackBar;
   let snackBarRef: MatSnackBarRef<any>;
-  
+
   class MockMatSnackBarRef {
     instance = { message: '' };
     afterDismissed = () => of({ action: '', dismissedByAction: false });
@@ -102,7 +102,7 @@ fdescribe('Contributions and review component', () => {
     dismissWithAction = (a, b, c) => {
       contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
         a, b, c
-      )
+      );
     };
   }
   beforeEach(waitForAsync(() => {
@@ -121,7 +121,7 @@ fdescribe('Contributions and review component', () => {
         },
         {
           provide: MatSnackBarRef,
-          useClass :MockMatSnackBarRef,
+          useClass: MockMatSnackBarRef,
         },
         ContextService,
         ContributionAndReviewService,
@@ -1400,7 +1400,6 @@ fdescribe('Contributions and review component', () => {
     it('should load reviewable translation opportunities correctly', () => {
       component.loadReviewableTranslationOpportunities().then(
         ({opportunitiesDicts, more}) => {
-          console.log('this is loaded opp', opportunitiesDicts)
           expect(opportunitiesDicts).toEqual([
             {
               id: '1',
@@ -1448,14 +1447,13 @@ fdescribe('Contributions and review component', () => {
         actionButtonTitle: 'Translations',
         isPinned: false,
         topicName: 'Topic 1'
-      }
-    ]
+      }];
 
       const dict = {
         topic_name: 'Topic 1',
         exploration_id: '1',
       };
-      component.languageCode = 'en'
+      component.languageCode = 'en';
       component.pinReviewableTranslationOpportunity(dict);
 
       expect(openSnackbarSpy).toHaveBeenCalledWith(
@@ -1467,7 +1465,8 @@ fdescribe('Contributions and review component', () => {
     it('should call pinReviewableTranslationOpportunityAsync if no pinned' +
     ' opportunity exists', fakeAsync(() => {
       const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
-        contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync')
+        contributionOpportunitiesService,
+        'pinReviewableTranslationOpportunityAsync')
         .and.returnValue(Promise.resolve({}));
 
       component.opportunities = [{
@@ -1493,8 +1492,7 @@ fdescribe('Contributions and review component', () => {
         actionButtonTitle: 'Translations',
         isPinned: false,
         topicName: 'Topic 1'
-      }
-      ]
+      }];
 
       const dict = {
         topic_name: 'Topic 3',
@@ -1508,9 +1506,11 @@ fdescribe('Contributions and review component', () => {
         .toHaveBeenCalledWith('Topic 3', component.languageCode, '8');
     }));
 
-    it('should call unpinReviewableTranslationOpportunityAsync', fakeAsync(() => {
+    it('should call unpinReviewableTranslationOpportunityAsync',
+    fakeAsync(() => {
       const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
-        contributionOpportunitiesService, 'unpinReviewableTranslationOpportunityAsync')
+        contributionOpportunitiesService,
+        'unpinReviewableTranslationOpportunityAsync')
         .and.returnValue(Promise.resolve({}));
 
       component.languageCode = 'en';
@@ -1519,31 +1519,33 @@ fdescribe('Contributions and review component', () => {
       component.unpinReviewableTranslationOpportunity(topicName);
       tick();
 
-      expect(unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-        'Dummy Topic 1', component.languageCode);
+      expect(
+        unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+          'Dummy Topic 1', component.languageCode);
     }));
 
-    fit('should open a snackbar and call pinReviewableTranslationOpportunityAsync when action is triggered', () => {
+    it('should open a snackbar and call pinReviewableTranslationOpportunityAsync'
+    + 'when action is triggered', () => {
       const openSpy = spyOn(snackBar, 'open');
       snackBarRef = TestBed.inject(MatSnackBarRef);
 
       const topicName = 'Dummy Topic 1';
       const explorationId = '123';
 
-      component.openSnackbarWithAction(topicName, explorationId, 'Test message', 'Pin Anyway');
+      component.openSnackbarWithAction(
+        topicName, explorationId, 'Test message', 'Pin Anyway');
       snackBarRef.onAction().subscribe(async () => {
-        expect(openSpy).toHaveBeenCalledWith('Test message', 'Pin Anyway', { duration: 3000 });
+        expect(openSpy).toHaveBeenCalledWith('Test message', 'Pin Anyway', {duration: 3000});
         expect(openSpy).toHaveBeenCalled();
 
         const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
           contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync')
           .and.returnValue(Promise.resolve({}));
-  
+
         snackBarRef.dismissWithAction();
 
         expect(pinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
           topicName, component.languageCode, explorationId);
-          
       });
     });
     // TODO(#9749): Rename and actually assert on something. This test currently

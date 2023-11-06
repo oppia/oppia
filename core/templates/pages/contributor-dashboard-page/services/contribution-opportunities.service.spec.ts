@@ -345,10 +345,10 @@ describe('Contribution Opportunities Service', () => {
         'en', 'Topic 1', 'exp 1').then(
         successHandler, failHandler
       );
-      tick();
+    tick();
 
-      expect(pinTranslationOpportunitySpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalled();
+    expect(pinTranslationOpportunitySpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
   }));
 
   it('should successfully unpin reviewable pinned translation' +
@@ -366,9 +366,9 @@ describe('Contribution Opportunities Service', () => {
         'en', 'Topic 1').then(
         successHandler, failHandler
       );
-      tick();
+    tick();
 
-      expect(unpinTranslationOpportunitySpy).toHaveBeenCalled();
-      expect(successHandler).toHaveBeenCalled();
+    expect(unpinTranslationOpportunitySpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
   }));
 });

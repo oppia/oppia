@@ -280,15 +280,15 @@ describe('Contribution Opportunities backend API service', function() {
         successHandler, failHandler
       );
 
-      const req = httpTestingController.expectOne(
-        '/pinned-opportunities');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({});
+    const req = httpTestingController.expectOne(
+      '/pinned-opportunities');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 
   it('should successfully unpin reviewable pinned translation' +
@@ -301,15 +301,15 @@ describe('Contribution Opportunities backend API service', function() {
         successHandler, failHandler
       );
 
-      const req = httpTestingController.expectOne(
-        '/pinned-opportunities');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({});
+    const req = httpTestingController.expectOne(
+      '/pinned-opportunities');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 
   it('should fetch reviewable translation opportunities by language',
