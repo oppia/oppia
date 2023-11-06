@@ -270,6 +270,48 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
+  it('should successfully pin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .pinTranslationOpportunity('en', 'Topic 1', 'exp 1').then(
+        successHandler, failHandler
+      );
+
+      const req = httpTestingController.expectOne(
+        '/pinned-opportunities');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully unpin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .unpinTranslationOpportunity('en', 'Topic 1').then(
+        successHandler, failHandler
+      );
+
+      const req = httpTestingController.expectOne(
+        '/pinned-opportunities');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should fetch reviewable translation opportunities by language',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

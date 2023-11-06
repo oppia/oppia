@@ -27,7 +27,7 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { OpportunitiesListComponent } from './opportunities-list.component';
 import { MatIconModule } from '@angular/material/icon';
 
-fdescribe('Opportunities List Component', () => {
+describe('Opportunities List Component', () => {
   let component: OpportunitiesListComponent;
   let fixture: ComponentFixture<OpportunitiesListComponent>;
 

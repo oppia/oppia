@@ -329,4 +329,46 @@ describe('Contribution Opportunities Service', () => {
     expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
   }));
+
+  it('should successfully pin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let pinTranslationOpportunitySpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'pinTranslationOpportunity')
+      .and.returnValue(Promise.resolve({}));
+
+    contributionOpportunitiesService
+      .pinReviewableTranslationOpportunityAsync(
+        'en', 'Topic 1', 'exp 1').then(
+        successHandler, failHandler
+      );
+      tick();
+
+      expect(pinTranslationOpportunitySpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalled();
+  }));
+
+  it('should successfully unpin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let unpinTranslationOpportunitySpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'unpinTranslationOpportunity')
+      .and.returnValue(Promise.resolve({}));
+
+    contributionOpportunitiesService
+      .unpinReviewableTranslationOpportunityAsync(
+        'en', 'Topic 1').then(
+        successHandler, failHandler
+      );
+      tick();
+
+      expect(unpinTranslationOpportunitySpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalled();
+  }));
 });

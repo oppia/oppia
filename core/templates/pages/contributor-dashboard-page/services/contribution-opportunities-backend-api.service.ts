@@ -157,6 +157,7 @@ export class ContributionOpportunitiesBackendApiService {
       languageCode: string,
       topicName: string,
   ): Promise<void> {
+    console.log(languageCode, topicName)
     return this.http
       .put<void>(this.UPDATE_PINNED_OPPORTUNITY_HANDLER_URL, {
         language_code: languageCode,

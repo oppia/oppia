@@ -522,9 +522,8 @@ export class ContributionsAndReview
   }
 
   unpinReviewableTranslationOpportunity(
-      dict: Record<string, string>
+      topicName: string
   ): void {
-    const topicName = dict.topic_name;
     this.contributionOpportunitiesService.
       unpinReviewableTranslationOpportunityAsync(
         topicName, this.languageCode).then(() => {

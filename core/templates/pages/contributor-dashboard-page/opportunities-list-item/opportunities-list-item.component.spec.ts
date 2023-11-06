@@ -38,7 +38,7 @@ class MockWindowDimensionsService {
   }
 }
 
-fdescribe('Opportunities List Item Component', () => {
+describe('Opportunities List Item Component', () => {
   let component: OpportunitiesListItemComponent;
   let fixture: ComponentFixture<OpportunitiesListItemComponent>;
   let windowDimensionsService: MockWindowDimensionsService;
@@ -216,7 +216,8 @@ fdescribe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
-        translationWordCount: 13
+        translationWordCount: 13,
+        topicName: 'Topic 1'
       };
       component.opportunityType = 'translation';
       component.clickActionButton.emit =
@@ -248,6 +249,49 @@ fdescribe('Opportunities List Item Component', () => {
         '.oppia-translation-length-label');
 
       expect(translationLengthLabel).toBeNull();
+    });
+
+    it('should emit a pin event with the correct properties', () => {
+      const spy = spyOn(component.clickPinButton, 'emit');
+      const expectedPayload = {
+        topic_name: 'Topic 1',
+        exploration_id: '1'
+      };
+  
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25,
+        translationWordCount: 13,
+        topicName: 'Topic 1'
+      }
+      component.pinOpportunity();
+  
+      expect(spy).toHaveBeenCalledWith(expectedPayload);
+    });
+  
+    it('should emit an unpin event with the correct properties', () => {
+      const spy = spyOn(component.clickUnpinButton, 'emit');
+      const expectedTopicName = 'Topic 1';
+  
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25,
+        translationWordCount: 13,
+        topicName: 'Topic 1'
+      }
+      component.unpinOpportunity();
+  
+      expect(spy).toHaveBeenCalledWith(expectedTopicName);
     });
   });
 });

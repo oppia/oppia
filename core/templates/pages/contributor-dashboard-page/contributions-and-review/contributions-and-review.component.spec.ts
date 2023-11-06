@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContributionDetails, ContributionsAndReview, Opportunity, Suggestion, SuggestionDetails } from './contributions-and-review.component';
@@ -40,6 +40,8 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import {of, Subject} from 'rxjs'
 
 
 class MockNgbModalRef {
@@ -67,7 +69,8 @@ class MockPlatformFeatureService {
   };
 }
 
-describe('Contributions and review component', () => {
+
+fdescribe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
@@ -89,7 +92,19 @@ describe('Contributions and review component', () => {
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
-
+  let snackBar: MatSnackBar;
+  let snackBarRef: MatSnackBarRef<any>;
+  
+  class MockMatSnackBarRef {
+    instance = { message: '' };
+    afterDismissed = () => of({ action: '', dismissedByAction: false });
+    onAction = () => new Subject<void>();
+    dismissWithAction = (a, b, c) => {
+      contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
+        a, b, c
+      )
+    };
+  }
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -103,6 +118,10 @@ describe('Contributions and review component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal
+        },
+        {
+          provide: MatSnackBarRef,
+          useClass :MockMatSnackBarRef,
         },
         ContextService,
         ContributionAndReviewService,
@@ -120,7 +139,8 @@ describe('Contributions and review component', () => {
           useValue: mockPlatformFeatureService
         },
         UserService,
-        OpportunitiesListComponent
+        OpportunitiesListComponent,
+        MatSnackBar
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -144,6 +164,7 @@ describe('Contributions and review component', () => {
       FormatRtePreviewPipe);
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
     translationTopicService = TestBed.inject(TranslationTopicService);
+    snackBar = TestBed.inject(MatSnackBar);
 
     spyOn(
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
@@ -1402,6 +1423,129 @@ describe('Contributions and review component', () => {
         });
     });
 
+    it('should open a snackbar if a pinned opportunity already exists', () => {
+      const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
+      component.opportunities = [{
+        id: '1',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: true,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '2',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '3',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      }
+    ]
+
+      const dict = {
+        topic_name: 'Topic 1',
+        exploration_id: '1',
+      };
+      component.languageCode = 'en'
+      component.pinReviewableTranslationOpportunity(dict);
+
+      expect(openSnackbarSpy).toHaveBeenCalledWith(
+        'Topic 1', '1',
+        'A pinned opportunity already exists for this topic and language.',
+        'Pin Anyway');
+    });
+
+    it('should call pinReviewableTranslationOpportunityAsync if no pinned' +
+    ' opportunity exists', fakeAsync(() => {
+      const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
+        contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync')
+        .and.returnValue(Promise.resolve({}));
+
+      component.opportunities = [{
+        id: '1',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: true,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '2',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '3',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      }
+      ]
+
+      const dict = {
+        topic_name: 'Topic 3',
+        exploration_id: '8',
+      };
+      component.languageCode = 'en';
+      component.pinReviewableTranslationOpportunity(dict);
+      tick();
+
+      expect(pinReviewableTranslationOpportunityAsyncSpy)
+        .toHaveBeenCalledWith('Topic 3', component.languageCode, '8');
+    }));
+
+    it('should call unpinReviewableTranslationOpportunityAsync', fakeAsync(() => {
+      const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
+        contributionOpportunitiesService, 'unpinReviewableTranslationOpportunityAsync')
+        .and.returnValue(Promise.resolve({}));
+
+      component.languageCode = 'en';
+      const topicName = 'Dummy Topic 1';
+
+      component.unpinReviewableTranslationOpportunity(topicName);
+      tick();
+
+      expect(unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+        'Dummy Topic 1', component.languageCode);
+    }));
+
+    fit('should open a snackbar and call pinReviewableTranslationOpportunityAsync when action is triggered', () => {
+      const openSpy = spyOn(snackBar, 'open');
+      snackBarRef = TestBed.inject(MatSnackBarRef);
+
+      const topicName = 'Dummy Topic 1';
+      const explorationId = '123';
+
+      component.openSnackbarWithAction(topicName, explorationId, 'Test message', 'Pin Anyway');
+      snackBarRef.onAction().subscribe(async () => {
+        expect(openSpy).toHaveBeenCalledWith('Test message', 'Pin Anyway', { duration: 3000 });
+        expect(openSpy).toHaveBeenCalled();
+
+        const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
+          contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync')
+          .and.returnValue(Promise.resolve({}));
+  
+        snackBarRef.dismissWithAction();
+
+        expect(pinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+          topicName, component.languageCode, explorationId);
+          
+      });
+    });
     // TODO(#9749): Rename and actually assert on something. This test currently
     // only exists to satisfy code coverage.
     it('should cover other code too', fakeAsync(() => {
@@ -1752,7 +1896,6 @@ describe('Contributions and review component', () => {
           component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       });
   });
-
 
   describe('when user is allowed to review questions and ' +
   'skill details are empty', () => {
