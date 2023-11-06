@@ -21,27 +21,20 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
 import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { ErrorPageSharedModule } from './error-page-shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
-    SharedComponentsModule,
-    TranslateModule,
     RouterModule.forChild([
       {
         path: '',
         component: ErrorPageRootComponent
       },
     ]),
-    ToastrModule.forRoot(toastrConfig),
     ErrorPageSharedModule,
   ],
   entryComponents: [ErrorPageComponent, ErrorPageRootComponent],

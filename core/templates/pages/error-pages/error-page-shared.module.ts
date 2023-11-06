@@ -19,10 +19,20 @@
  */
 
 import { NgModule } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { ToastrModule } from 'ngx-toastr';
+
 import { ErrorPageComponent } from './error-page.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
+  imports: [
+    SharedComponentsModule,
+    TranslateModule,
+    ToastrModule.forRoot(toastrConfig),
+  ],
   declarations: [ErrorPageComponent, ErrorPageRootComponent],
   exports: [ErrorPageComponent, ErrorPageRootComponent],
 })

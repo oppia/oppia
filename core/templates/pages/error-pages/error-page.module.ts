@@ -24,11 +24,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { TranslateModule } from '@ngx-translate/core';
 import { ErrorPageRoutingModule } from './error-page-routing.module';
 import { ErrorPageSharedModule } from './error-page-shared.module';
 
@@ -36,10 +32,7 @@ import { ErrorPageSharedModule } from './error-page-shared.module';
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule,
     ErrorPageRoutingModule,
-    ToastrModule.forRoot(toastrConfig),
-    TranslateModule,
     ErrorPageSharedModule,
   ],
   entryComponents: [
