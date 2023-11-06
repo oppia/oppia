@@ -594,9 +594,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             practice_tab_is_displayed= False ,
             page_title_fragment_for_web= 'dummy',
             skill_ids_for_diagnostic_test= [],
-            thumbnail_filename = [],
-            thumbnail_bg_color = [],
-            thumbnail_size_in_bytes = []
+            thumbnail_filename = 'svg',
+            thumbnail_bg_color = 'green',
+            thumbnail_size_in_bytes = 3
         )
 
         with unittest.mock.patch.object(
@@ -643,9 +643,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             practice_tab_is_displayed= False ,
             page_title_fragment_for_web= 'dummy',
             skill_ids_for_diagnostic_test= [],
-            thumbnail_filename = [],
-            thumbnail_bg_color = [],
-            thumbnail_size_in_bytes = []
+            thumbnail_filename = 'svg',
+            thumbnail_bg_color = 'green',
+            thumbnail_size_in_bytes = 3
         )
 
         with unittest.mock.patch.object(
