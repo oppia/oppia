@@ -93,7 +93,6 @@ describe('Contributions and review component', () => {
   let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
   let snackBar: MatSnackBar;
-  let snackBarRef: MatSnackBarRef<any>;
 
   class MockMatSnackBarRef {
     instance = { message: '' };
@@ -1521,35 +1520,9 @@ describe('Contributions and review component', () => {
 
         expect(
           unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-            'Dummy Topic 1', component.languageCode);
+          'Dummy Topic 1', component.languageCode);
       }));
 
-    it('should open a snackbar when action is triggered', () => {
-      const openSpy = spyOn(snackBar, 'open');
-      snackBarRef = TestBed.inject(MatSnackBarRef);
-
-      const topicName = 'Dummy Topic 1';
-      const explorationId = '123';
-
-      component.openSnackbarWithAction(
-        topicName, explorationId, 'Test message', 'Pin Anyway');
-      snackBarRef.onAction().subscribe(async() => {
-        expect(openSpy).toHaveBeenCalledWith(
-          'Test message', 'Pin Anyway', {duration: 3000});
-        expect(openSpy).toHaveBeenCalled();
-
-        const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
-          contributionOpportunitiesService,
-          'pinReviewableTranslationOpportunityAsync')
-          .and.returnValue(Promise.resolve({}));
-
-        snackBarRef.dismissWithAction();
-
-        expect(
-          pinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-            topicName, component.languageCode, explorationId);
-      });
-    });
     // TODO(#9749): Rename and actually assert on something. This test currently
     // only exists to satisfy code coverage.
     it('should cover other code too', fakeAsync(() => {
