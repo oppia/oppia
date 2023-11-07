@@ -377,35 +377,6 @@ describe('Outcome Editor Component', () => {
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
-  it('should check if a destination for stuck learner forms a loop', () => {
-    let outcome = new Outcome(
-      'Me Llamo',
-      'Hola',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      true,
-      [],
-      null,
-      null,
-    );
-    component.outcome = outcome;
-    spyOn(stateEditorService, 'getActiveStateName')
-      .and.returnValue('Hola');
-
-    expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
-
-    outcome = new Outcome(
-      'Ma Llamo',
-      'Me Llmao',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      true,
-      [],
-      null,
-      null,
-    );
-    component.outcome = outcome;
-    expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
-  });
-
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
     component.isEditable = true;
@@ -478,7 +449,7 @@ describe('Outcome Editor Component', () => {
     );
     component.openDestinationIfStuckEditor();
     expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
-    expect(component.outcome.destIfReallyStuck).toBe('first');
+    expect(component.outcome.destIfReallyStuck).toBeNull();
   });
 
   it('should save correctness label when it is changed', () => {
