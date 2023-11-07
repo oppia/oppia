@@ -442,9 +442,7 @@ class ReviewableOpportunitiesHandler(
         # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            # Here we use MyPy ignore because the latest schema of
-            # dict is indexable.
-            pinned_opportunity_id = pinned_opportunity_summary['id'] # type: ignore[index]
+            pinned_opportunity_id = pinned_opportunity_summary.id
             exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
                 pinned_opportunity_id] = pinned_opportunity_summary
