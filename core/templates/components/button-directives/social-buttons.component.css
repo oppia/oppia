@@ -59,8 +59,8 @@
   padding: 5px 6px;
 
 }
-
-.oppia-follow-github-icon {
+.github-icon {
+  background: #fff;
   color: #000;
 }
 .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
