@@ -150,11 +150,11 @@
         }
       },
       "fontAwesome": {
-        "version": "5.9.0",
+        "version": "6.4.2",
         "downloadFormat": "zip",
-        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
-        "rootDir": "fontawesome-free-5.9.0-web",
-        "targetDir": "fontawesome-free-5.9.0-web",
+        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/6.4.2/fontawesome-free-6.4.2-web.zip",
+        "rootDir": "fontawesome-free-6.4.2-web",
+        "targetDir": "fontawesome-free-6.4.2-web",
         "bundle": {
           "css": [
             "css/fontawesome.min.css",
