@@ -1031,11 +1031,11 @@ URLS = [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platform_features_evaluation_handler',
-        feature_flag.PlatformFeaturesEvaluationHandler),
+        r'/feature_flags_evaluation_handler',
+        feature_flag.FeatureFlagsEvaluationHandler),
     get_redirect_route(
-        r'/platform_feature_dummy_handler',
-        feature_flag.PlatformFeatureDummyHandler),
+        r'/feature_flag_dummy_handler',
+        feature_flag.FeatureFlagDummyHandler),
 
     get_redirect_route(
         r'%s' % (
