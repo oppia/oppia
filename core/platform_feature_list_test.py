@@ -31,7 +31,7 @@ from typing import Final, List
 
 FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),
-    'core/templates/domain/platform_feature',
+    'core/templates/domain/feature_flag',
     'feature-status-summary.model.ts')
 
 ENUM_BODY_REGEXP: Final = re.compile(

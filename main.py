@@ -57,7 +57,7 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import oppia_root
 from core.controllers import pages
-from core.controllers import platform_feature
+from core.controllers import feature_flag
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -1032,10 +1032,10 @@ URLS = [
 
     get_redirect_route(
         r'/platform_features_evaluation_handler',
-        platform_feature.PlatformFeaturesEvaluationHandler),
+        feature_flag.PlatformFeaturesEvaluationHandler),
     get_redirect_route(
         r'/platform_feature_dummy_handler',
-        platform_feature.PlatformFeatureDummyHandler),
+        feature_flag.PlatformFeatureDummyHandler),
 
     get_redirect_route(
         r'%s' % (
