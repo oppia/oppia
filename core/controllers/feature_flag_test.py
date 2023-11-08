@@ -20,9 +20,9 @@ import enum
 
 from core import platform_feature_list
 from core.domain import caching_services
-from core.domain import feature_flag_services as feature_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
+from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
 FeatureStages = feature_flag_domain.FeatureStages
@@ -65,8 +65,8 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'platform_feature_list.FeatureNames' Enum, but here for
-        # testing purposes we are providing a list of custom 'FeatureNames' enums
-        # for mocking the actual behavior, which causes MyPy to throw an
+        # testing purposes we are providing a list of custom 'FeatureNames'
+        # enums for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
         feature_services.ALL_FEATURE_FLAGS = feature_name_enums  # type: ignore[assignment]
@@ -90,9 +90,6 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
 class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagDummyHandler."""
-
-    def setUp(self) -> None:
-        super().setUp()
 
     def tearDown(self) -> None:
         feature_services.update_feature_flag(

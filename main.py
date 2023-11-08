@@ -43,6 +43,7 @@ from core.controllers import custom_landing_pages
 from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import feature_flag
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
@@ -57,7 +58,6 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import oppia_root
 from core.controllers import pages
-from core.controllers import feature_flag
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor

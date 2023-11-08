@@ -678,6 +678,7 @@
 
 # Dynamic Feature Gating project
 /core/controllers/platform_feature*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/feature_flag*.py @oppia/web-android-compatibility-reviewers
 /core/domain/platform_feature_services*.py @oppia/web-android-compatibility-reviewers
 /core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
 /core/domain/feature_flag*.py @oppia/web-android-compatibility-reviewers
