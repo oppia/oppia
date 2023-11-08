@@ -44,7 +44,7 @@ export class FeatureFlagBackendApiService {
   async fetchFeatureFlags():
       Promise<FeatureStatusSummary> {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
-      FeatureFlagDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL
+      FeatureFlagDomainConstants.feature_flags_evaluation_handler_URL
     ).toPromise();
 
     return FeatureStatusSummary.createFromBackendDict(

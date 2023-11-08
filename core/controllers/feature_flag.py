@@ -25,7 +25,7 @@ from core.domain import feature_flag_services
 from typing import Dict
 
 
-class PlatformFeaturesEvaluationHandler(
+class FeatureFlagsEvaluationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """The handler for retrieving feature flag values."""
@@ -45,7 +45,7 @@ class PlatformFeaturesEvaluationHandler(
         self.render_json(result_dict)
 
 
-class PlatformFeatureDummyHandler(
+class FeatureFlagDummyHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Dummy handler for testing e2e feature gating flow."""

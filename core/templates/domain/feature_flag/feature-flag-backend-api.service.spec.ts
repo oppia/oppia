@@ -61,7 +61,7 @@ describe('FeatureFlagBackendApiService', () => {
         flushMicrotasks();
 
         const url = FeatureFlagDomainConstants
-          .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+          .feature_flags_evaluation_handler_URL;
         httpTestingController.expectOne(url).flush(responseDict);
 
         flushMicrotasks();
@@ -82,7 +82,7 @@ describe('FeatureFlagBackendApiService', () => {
       flushMicrotasks();
 
       const url = FeatureFlagDomainConstants
-        .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+        .feature_flags_evaluation_handler_URL;
       httpTestingController
         .expectOne(url)
         .error(new ErrorEvent('Error'));

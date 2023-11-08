@@ -35,8 +35,8 @@ class FeatureNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
-    """Tests for the PlatformFeaturesEvaluationHandler."""
+class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
+    """Tests for the FeatureFlagsEvaluationHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -81,15 +81,15 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
 
     def test_feature_evaluation_is_correct(self) -> None:
         result = self.get_json(
-            '/platform_features_evaluation_handler'
+            '/feature_flags_evaluation_handler'
         )
         self.assertEqual(
             result,
             {self.dev_feature.name: False, self.prod_feature.name: True})
 
 
-class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
-    """Tests for the PlatformFeatureDummyHandler."""
+class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
+    """Tests for the FeatureFlagDummyHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -118,29 +118,29 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_dummy_feature_enabled_returns_ok(self) -> None:
         self.get_json(
-            '/platform_feature_dummy_handler',
+            '/feature_flag_dummy_handler',
             expected_status_int=404
         )
 
         self._set_dummy_feature_status(True)
         result = self.get_json(
-            '/platform_feature_dummy_handler',
+            '/feature_flag_dummy_handler',
         )
         self.assertEqual(result, {'msg': 'ok'})
 
     def test_get_with_dummy_feature_disabled_raises_404(self) -> None:
         self.get_json(
-            '/platform_feature_dummy_handler',
+            '/feature_flag_dummy_handler',
             expected_status_int=404
         )
         self._set_dummy_feature_status(True)
         self.get_json(
-            '/platform_feature_dummy_handler',
+            '/feature_flag_dummy_handler',
             expected_status_int=200
         )
 
         self._set_dummy_feature_status(False)
         self.get_json(
-            '/platform_feature_dummy_handler',
+            '/feature_flag_dummy_handler',
             expected_status_int=404
         )
