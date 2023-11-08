@@ -72,6 +72,9 @@ stop: ## Stops all the services.
 stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
 
+stop-tests: ## Stops the test services.
+	docker container ls -q --filter name=oppia-dev-server-run | xargs -I {} docker stop {}
+
 update.requirements: ## Installs the python requirements for the project
 	${SHELL_PREFIX} dev-server pip install -r requirements.txt -t /app/oppia/third_party/python_libs
 	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
@@ -92,6 +95,7 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
 run_tests.lint: ## Runs the linter tests
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
 
 run_tests.backend: ## Runs the backend tests
@@ -108,18 +112,23 @@ run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
 
 run_tests.mypy: ## Runs mypy checks
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
 
 run_tests.check_backend_associated_tests: ## Runs the backend associate tests
+	$(MAKE) stop-tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
