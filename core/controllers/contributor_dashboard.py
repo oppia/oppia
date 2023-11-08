@@ -334,9 +334,6 @@ class ReviewableOpportunitiesHandler(
                 self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
             )):
-                # Here we use MyPy ignore because the method returns
-                # dictionary for the case of pinned opportunity.
-                # only handles str.
                 if opp is not None:
                     opportunity_dicts.append(opp.to_dict())
         self.values = {
