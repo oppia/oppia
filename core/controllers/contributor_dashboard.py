@@ -338,10 +338,7 @@ class ReviewableOpportunitiesHandler(
                 # dictionary for the case of pinned opportunity.
                 # only handles str.
                 if opp is not None:
-                    if isinstance(opp, dict):
-                        opportunity_dicts.append(opp) # type: ignore[arg-type]
-                    else:
-                        opportunity_dicts.append(opp.to_dict())
+                    opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
