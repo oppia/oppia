@@ -30,12 +30,7 @@ jobs:
           sudo apt install python2 -y
       - uses: ./.github/actions/merge
       - name: Initialize Containers
-        run: |
-          echo ---Initializing containers---
-          docker compose up dev-server --no-deps -d
-          docker compose up angular-build -d
-          echo ---Copying node_modules from container---
-          sudo docker cp oppia-angular-build:/app/oppia/node_modules .
+        run: sudo make build
       - name: Stop Containers
         run: make stop
       - name: Run Mypy type checks

@@ -25,11 +25,6 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      - name: Initialize Containers
-        run: |
-          sudo make build
-          sudo make run-devserver
-          make stop
       - name: Run backend associated test file check
         run: PYTHONIOENCODING=utf-8 make run_tests.check_backend_associated_tests
       - name: Report failure if failed on oppia/oppia develop branch

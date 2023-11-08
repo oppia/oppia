@@ -3,6 +3,9 @@ SHELL := /bin/bash
 SHELL_PREFIX=docker compose exec
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
+OS_NAME := $(shell uname)
+sharding_instances := 3
+
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
 $(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
@@ -105,7 +108,7 @@ run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks $(PYTHON_ARGS)" dev-server
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
@@ -218,14 +221,6 @@ run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that a
 	docker compose up dev-server -d --no-deps
 	$(SHELL_PREFIX) dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
 	$(MAKE) stop
-
-run_tests.typescript_tests: ## Runs the typescript tests
-	docker compose up dev-server -d --no-deps
-	$(SHELL_PREFIX) dev-server python -m scripts.typescript_checks $(PYTHON_ARGS)
-	$(MAKE) stop
-
-OS_NAME := $(shell uname)
-sharding_instances := 3
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
 	sh ./docker/install_node.sh
