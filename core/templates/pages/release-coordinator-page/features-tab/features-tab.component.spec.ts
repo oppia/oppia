@@ -145,6 +145,23 @@ describe('Release coordinator page feature tab', function() {
     });
   });
 
+  describe('.getSchema', () => {
+    it('should return the schema for rollout-percentage', () => {
+      expect(component.getSchema()).toEqual(
+        {
+          type: 'int',
+          validators: [{
+            id: 'is_at_least',
+            min_value: 1
+          }, {
+            id: 'is_at_most',
+            max_value: 100
+          }]
+        }
+      );
+    });
+  });
+
   describe('.getLastUpdatedDate', () => {
     it('should return the string when the feature has not been ' +
     'updated yet', (() => {
@@ -166,7 +183,7 @@ describe('Release coordinator page feature tab', function() {
       });
 
       expect(component.getLastUpdatedDate(featureFlag)).toEqual(
-        'Aug 17, 2023');
+        '17 Aug 2023');
     });
   });
 
