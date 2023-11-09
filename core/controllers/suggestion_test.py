@@ -139,8 +139,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [
-            topic_domain.Subtopic(
+        topic.subtopics = [topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
@@ -2931,6 +2930,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
+        self.TOPIC2_ID = 'topic2'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
         # Needs to be 12 characters long.
@@ -2948,11 +2948,11 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_333'], 'image.svg',
+                1, 'Title', [self.SKILL_ID], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
+        topic.skill_ids_for_diagnostic_test = [self.SKILL_ID]
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
@@ -3051,6 +3051,16 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'change': self.translate_question_change,
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': 'skill_without_topic',
+                'target_version_at_submission': 1,
+                'change': self.translate_question_change,
+                'description': 'Add question to another skill'
+            }, csrf_token=csrf_token)
 
         self.logout()
         self.login(self.REVIEWER_EMAIL)
@@ -3124,7 +3134,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/skill/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': self.TOPIC_ID,
             })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
