@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -84,6 +84,12 @@ export class PreferencesPageComponent {
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  @ViewChild('firstRadio') firstRadio!: ElementRef;
+
+  @ViewChild('secondRadio') secondRadio!: ElementRef;
+
+  @ViewChild('thirdRadio') thirdRadio!: ElementRef;
 
   constructor(
     private ngbModal: NgbModal,
@@ -232,6 +238,30 @@ export class PreferencesPageComponent {
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
+  }
+
+  handleTabForFirstRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.secondRadio.nativeElement.focus();
+    }
+  }
+
+  handleTabForSecondRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.thirdRadio.nativeElement.focus();
+    } else if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.firstRadio.nativeElement.focus();
+    }
+  }
+
+  handleTabForThirdRadio(event: KeyboardEvent): void {
+    if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.secondRadio.nativeElement.focus();
+    }
   }
 
   getProfileImagePngDataUrl(username: string): string {

@@ -16,8 +16,9 @@
  * @fileoverview Service for Computing length of HTML strings.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, SecurityContext } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,7 @@ import { LoggerService } from './contextual/logger.service';
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
+    private sanitizer: DomSanitizer
   ) {}
 
   /**
@@ -46,18 +48,30 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
+    const sanitizedHtml = this.sanitizer.sanitize(
+      SecurityContext.HTML, htmlString) as string;
+    let totalWeight = this.calculateBaselineLength(sanitizedHtml);
+
+    // Identify custom tags using regex on the original HTML string.
+    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
+    const customTags = htmlString.match(customTagRegex);
+
+    if (customTags) {
+      for (const customTag of customTags) {
+        totalWeight += this.getWeightForNonTextNodes(customTag);
+      }
+    }
+    return totalWeight;
+  }
+
+  private calculateBaselineLength(sanitizedHtml: string): number {
     let domparser = new DOMParser();
-    let dom = domparser.parseFromString(htmlString, 'text/html');
-    const tagList = Array.from(dom.body.querySelectorAll(
-      'p,ul,ol,oppia-noninteractive-image,oppia-noninteractive-math'));
+    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
-    for (let tag of tagList) {
+    for (let tag of Array.from(dom.body.children)) {
       const ltag = tag.tagName.toLowerCase();
       if (this.textTags.includes(ltag)) {
         totalWeight += this.getWeightForTextNodes(tag as HTMLElement);
-      }
-      if (this.nonTextTags.includes(ltag)) {
-        totalWeight += this.getWeightForNonTextNodes(tag as HTMLElement);
       }
     }
     return totalWeight;
@@ -71,18 +85,16 @@ export class HtmlLengthService {
     return wordCount;
   }
 
-  private getWeightForNonTextNodes(nonTextNode: HTMLElement): number {
-    if (nonTextNode.tagName.toLowerCase() === 'oppia-noninteractive-math') {
+  private getWeightForNonTextNodes(nonTextNode: string): number {
+    if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;
     }
-    // <oppia-noninteractive-image>
-    const altText = nonTextNode.getAttribute('alt-with-value');
-    let wordCount = 0;
-    if (altText) {
-      wordCount = altText.trim().split(' ').length;
+    const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
+    let words = [];
+    if (altTextMatch && altTextMatch[1]) {
+      const altText = altTextMatch[1];
+      words = altText.trim().split(' ');
     }
-    // +2 is a bonus for images as sometimes images have text
-    // which needs to be translated as well.
-    return wordCount + 2;
+    return words.length + 2; // +2 as a bonus for images with text.
   }
 }

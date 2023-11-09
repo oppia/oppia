@@ -16,10 +16,8 @@
  * @fileoverview Unit tests for PlatformParameterModel.
  */
 
-import {
-  PlatformParameterFilterType,
-  ServerMode
-} from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter.model';
 import {
   PlatformParameter,
   PlatformParameterBackendDict,
@@ -35,8 +33,8 @@ describe('PlatformParameterModel', () => {
         {
           filters: [
             {
-              type: PlatformParameterFilterType.ServerMode,
-              conditions: [['=', ServerMode.Dev.toString()]]
+              type: PlatformParameterFilterType.PlatformType,
+              conditions: [['=', 'Web']]
             }
           ],
           value_when_matched: 'matched'
@@ -65,8 +63,8 @@ describe('PlatformParameterModel', () => {
         {
           filters: [
             {
-              type: PlatformParameterFilterType.ServerMode,
-              conditions: [['=', ServerMode.Dev.toString()]]
+              type: PlatformParameterFilterType.PlatformType,
+              conditions: [['=', 'Web']]
             }
           ],
           value_when_matched: 'matched'

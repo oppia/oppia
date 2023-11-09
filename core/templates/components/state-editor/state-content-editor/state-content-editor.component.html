@@ -53,6 +53,7 @@
 
 <div *ngIf="contentEditorIsOpen" class="e2e-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+  <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
   <schema-based-editor [schema]="HTML_SCHEMA"
                        [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
@@ -119,8 +120,9 @@
      display: block;
     }
   @media screen and (max-width: 700px) {
-    .oppia-editor-edit-icon {
-     display: none;
+    .oppia-editor-edit-icon-position {
+      right: -20px;
+      top: 20px;
     }
   }
 </style>

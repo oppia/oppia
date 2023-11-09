@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Customize Interaction Modal.
  */
 
-import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal, NgbModal, NgbModalModule, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -249,6 +249,10 @@ describe('Customize Interaction Modal Component', () => {
       .returnValue(true);
     spyOn(interactionDetailsCacheService, 'get').and
       .returnValue('RatioExpressionInput');
+    const mockCustomizeInteractionHeaderRef = new ElementRef(
+      document.createElement('h3'));
+    component.customizeInteractionHeader =
+      mockCustomizeInteractionHeaderRef;
 
     component.onChangeInteractionId('RatioExpressionInput');
 
@@ -264,6 +268,10 @@ describe('Customize Interaction Modal Component', () => {
 
     component.originalContentIdToContent =
       subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
+    const mockCustomizeInteractionHeaderRef = new ElementRef(
+      document.createElement('h3'));
+    component.customizeInteractionHeader =
+      mockCustomizeInteractionHeaderRef;
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(false);
@@ -317,6 +325,10 @@ describe('Customize Interaction Modal Component', () => {
 
     component.originalContentIdToContent =
       subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
+    const mockCustomizeInteractionHeaderRef = new ElementRef(
+      document.createElement('h3'));
+    component.customizeInteractionHeader =
+      mockCustomizeInteractionHeaderRef;
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBeFalse();

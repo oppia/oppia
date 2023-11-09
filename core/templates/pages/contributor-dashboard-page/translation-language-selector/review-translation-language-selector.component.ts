@@ -93,7 +93,9 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
       .then((preferredLanguageCode: string|null) => {
-        if (preferredLanguageCode) {
+        if (
+          preferredLanguageCode && this.languageSelection === 'Language'
+        ) {
           this.populateLanguageSelection(
             preferredLanguageCode);
         }

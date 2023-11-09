@@ -86,6 +86,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['all_nodes']
+            filtered_nodes = [node for node in all_nodes if
+                node.status != constants.STORY_NODE_STATUS_DRAFT]
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
@@ -96,13 +98,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
-                'node_titles': story_summary_dict['node_titles'],
+                'node_titles': [node.title for node in filtered_nodes],
                 'thumbnail_bg_color': story_summary_dict['thumbnail_bg_color'],
                 'thumbnail_filename': story_summary_dict['thumbnail_filename'],
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                'all_node_dicts': [node.to_dict() for node in all_nodes]
+                'all_node_dicts': [node.to_dict() for node in filtered_nodes]
             }
             canonical_story_dicts.append(canonical_story_dict)
 
