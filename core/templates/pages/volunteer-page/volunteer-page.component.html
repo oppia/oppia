@@ -9,7 +9,7 @@
         <p>{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT' | translate }}</p>
       </div>
 
-      <div class="hide-gt-xs">
+      <div class="hide-gt-xs mobBannerImg">
         <picture>
           <source type="image/webp"
                   [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mobBannerImgPath))">
@@ -29,7 +29,7 @@
 
     </div>
 
-    <div class="hide-xs flex-45">
+    <div class="hide-xs flex-45 bannerImg">
       <picture>
         <source type="image/webp"
                 [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
@@ -306,6 +306,16 @@
 
   .mat-tab-label, .mat-tab-label-content {
     color: #000;
+  }
+
+  .bannerImg {
+    height: auto;
+    width: 100%;
+  }
+
+  .mobBannerImg {
+    height: auto;
+    width: 100%;
   }
 
   .oppia-volunteer-h1 {
