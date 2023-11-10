@@ -78,7 +78,6 @@ class Registry:
             raise Exception(
                 'Feature flag with name %s already exists.' % name.value)
         feature = feature_flag_domain.FeatureFlag.from_dict(feature_flag_dict)
-        feature.validate()
         cls.feature_registry[feature.name] = feature
         return feature
 

@@ -110,11 +110,10 @@ export class FeaturesTabComponent implements OnInit {
 
     const parsedDate = new Date(
       year, month, day, hour, minute, second, millisecond);
-
     const options: Intl.DateTimeFormatOptions = {
-      day: 'numeric', month: 'short', year: 'numeric'
+      day: '2-digit', month: 'short', year: 'numeric'
     };
-    return parsedDate.toLocaleDateString(undefined, options);
+    return parsedDate.toLocaleDateString('en-US', options);
   }
 
   getFeatureStageString(feature: FeatureFlag): string {

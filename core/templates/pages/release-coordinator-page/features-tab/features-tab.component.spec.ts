@@ -183,7 +183,7 @@ describe('Release coordinator page feature tab', function() {
       });
 
       expect(component.getLastUpdatedDate(featureFlag)).toEqual(
-        '17 Aug 2023');
+        'Aug 17, 2023');
     });
   });
 
