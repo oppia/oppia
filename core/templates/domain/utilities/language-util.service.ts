@@ -48,17 +48,20 @@ interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
   'direction': string;
+  'ariaLabelInEnglish': string;
 }
 
 export interface LanguageIdAndText {
   id: string;
   text: string;
+  ariaLabelInEnglish: string;
 }
 
 interface ContentLanguage {
   code: string;
   description: string;
   direction: string;
+  ariaLabelInEnglish: string;
 }
 
 @Injectable({
@@ -148,7 +151,8 @@ export class LanguageUtilService {
       (languageItem: ContentLanguage) => {
         return {
           id: languageItem.code,
-          text: this.getShortLanguageDescription(languageItem.description)
+          text: this.getShortLanguageDescription(languageItem.description),
+          ariaLabelInEnglish: languageItem.ariaLabelInEnglish
         };
       });
     return languageIdsAndTexts;

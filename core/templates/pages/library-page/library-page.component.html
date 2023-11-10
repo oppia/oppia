@@ -87,6 +87,7 @@
             <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
                  class="e2e-test-library-{{group.protractor_id}}"
+                 (keydown.enter)="showFullResultsPage(group.categories, group.full_results_url)"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
@@ -101,6 +102,7 @@
           <div *ngIf="!libraryWindowIsNarrow" class="oppia-carousel-box">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, true)"
+                    tabindex="-1"
                     *ngIf="leftmostCardIndices[idx] != 0">
               <i class="fas fal fa-angle-left"></i>
             </button>
@@ -145,6 +147,7 @@
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, false)"
                     [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
+                    tabindex="-1"
                     aria-hidden="true">
               <i class="fas fal fa-angle-right"></i>
             </button>
