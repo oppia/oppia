@@ -111,7 +111,7 @@ var TopicsAndSkillsDashboardPage = function() {
     });
     await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getUrl()).toEqual(
-      'http://localhost:9001/topics-and-skills-dashboard');
+      'http://localhost:8181/topics-and-skills-dashboard');
   };
 
   // Only use this if the skills count is not zero. This is supposed to be used

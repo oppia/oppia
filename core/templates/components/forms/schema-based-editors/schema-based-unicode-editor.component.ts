@@ -160,11 +160,6 @@ implements ControlValueAccessor, OnInit, Validator {
           })
       );
     }
-    // So that focus is applied after all the functions in
-    // main thread have executed.
-    setTimeout(() => {
-      this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
-    }, 5);
   }
 
   onKeypress(evt: KeyboardEvent): void {

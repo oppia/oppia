@@ -1,4 +1,4 @@
-<div class="stats-container">
+<div class="stats-container" [hidden]="dataLoading">
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
     <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
@@ -182,13 +182,13 @@
         <button type="button"
                 class="oppia-pagination-button"
                 (click)="goToPreviousPage(translationStatByLanguageAndTopic.value)"
-                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex === 0">
+                [hidden]="translationStatByLanguageAndTopic.value.currentPageStartIndex === 0">
           <span class="material-icons">navigate_before</span>Previous
         </button>
         <button type="button"
                 class="oppia-pagination-button"
                 (click)="goToNextPage(translationStatByLanguageAndTopic.value)"
-                [disabled]="translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE >= translationStatByLanguageAndTopic.value.data.length">
+                [hidden]="translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE >= translationStatByLanguageAndTopic.value.data.length">
           Next<span class="material-icons">navigate_next</span>
         </button>
       </div>
@@ -330,13 +330,13 @@
         <button type="button"
                 class="oppia-pagination-button"
                 (click)="goToPreviousPage(statsData[type])"
-                [disabled]="statsData[type].currentPageStartIndex === 0">
+                [hidden]="statsData[type].currentPageStartIndex === 0">
           <span class="material-icons">navigate_before</span>Previous
         </button>
         <button type="button"
                 class="oppia-pagination-button"
                 (click)="goToNextPage(statsData[type])"
-                [disabled]="statsData[type].currentPageStartIndex + ITEMS_PER_PAGE >= statsData[type].data.length">
+                [hidden]="statsData[type].currentPageStartIndex + ITEMS_PER_PAGE >= statsData[type].data.length">
           Next<span class="material-icons">navigate_next</span>
         </button>
       </div>
@@ -360,8 +360,17 @@
     </mat-card>
   </div>
 </div>
+<div class="oppia-lazy-loading-container"
+     [hidden]="!dataLoading">
+  <lazy-loading></lazy-loading>
+</div>
 
 <style>
+  .oppia-lazy-loading-container {
+    height: 500px;
+    margin-bottom: -20px;
+    width: 100%;
+  }
   .certificate-download-button-container {
     overflow: hidden;
   }
@@ -569,6 +578,9 @@
   }
   @media (min-width: 700px) {
     .stats-container {
+      margin-left: 50px;
+    }
+    .oppia-lazy-loading-container {
       margin-left: 50px;
     }
   }
