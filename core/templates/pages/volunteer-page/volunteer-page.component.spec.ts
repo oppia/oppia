@@ -76,7 +76,7 @@ describe('Volunteer page', () => {
     component.ngOnInit();
 
     expect(component.bannerImgPath).toBe(
-      '/volunteer/banner.png');
+      '/volunteer/banner.webp');
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
