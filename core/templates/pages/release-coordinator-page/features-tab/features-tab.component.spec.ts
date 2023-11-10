@@ -375,7 +375,7 @@ describe('Release coordinator page feature tab', function() {
     );
 
     it('should not proceed if there is any validation issue', fakeAsync(() => {
-      mockConfirmResult(false);
+      mockConfirmResult(true);
 
       const featureFlag = component.featureFlags[0];
 

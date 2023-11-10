@@ -35,7 +35,7 @@
       <div class="col-2"><b>Force-enable for all users:</b></div>
       <div class="col-10">
         <div>
-          <select [(ngModel)]="featureFlag.forceEnableForAllUsers">
+          <select [(ngModel)]="featureFlag.forceEnableForAllUsers" class="e2e-test-value-selector">
             <option [ngValue]="true">Yes</option>
             <option [ngValue]="false">No</option>
           </select>
