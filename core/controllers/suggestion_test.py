@@ -139,7 +139,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
-        topic.subtopics = [topic_domain.Subtopic(
+        topic.subtopics = [
+            topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
@@ -2930,7 +2931,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
-        self.TOPIC2_ID = 'topic2'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
         # Needs to be 12 characters long.

@@ -900,13 +900,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
         ]
+        if skill_ids:
+            filters.append(cls.target_id.IN(skill_ids))
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
-            if skill_ids:
-                filters.append(cls.target_id.IN(skill_ids))
             suggestion_query = cls.get_all().filter(
                 datastore_services.all_of(*filters)).order(-cls.created_on)
 
@@ -932,8 +932,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             )
 
         filters.append(cls.author_id != user_id)
-        if skill_ids:
-            filters.append(cls.target_id.IN(skill_ids))
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(*filters))
 
