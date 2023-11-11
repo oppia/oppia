@@ -9,11 +9,11 @@
       </button>
     </div>
 
-    <h2>Exploration Feedback</h2>
+    <h2 tabindex="0">Exploration Feedback</h2>
 
     <div class="oppia-clear"></div>
 
-    <div *ngIf="threadData && threadData.feedbackThreads && threadData.feedbackThreads.length === 0">
+    <div *ngIf="threadData && threadData.feedbackThreads && threadData.feedbackThreads.length === 0" tabindex="0">
       <em>No feedback has been given for this exploration yet.</em>
     </div>
     <br>
@@ -22,7 +22,7 @@
                         (rowClick)="setActiveThread($event)">
     </oppia-thread-table>
 
-    <em *ngIf="!userIsLoggedIn">
+    <em *ngIf="!userIsLoggedIn" tabindex="0">
       To create a new feedback thread, please log in.
     </em>
   </div>

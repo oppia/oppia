@@ -386,10 +386,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       (
         this.elementRef.nativeElement as HTMLElement
       ).setAttribute('style', 'display: block');
-      // Focus on the CK editor text box.
-      (
-        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
-      ).focus();
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
       // Set the css and icons for each toolbar button.

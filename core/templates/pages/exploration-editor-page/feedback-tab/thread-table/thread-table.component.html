@@ -17,16 +17,16 @@
   </thead>
   <tr *ngFor="let thread of this.threads" (click)="onRowClick(thread.threadId)" class="oppia-feedback-tab-row e2e-test-oppia-feedback-tab-row">
     <td width="15%">
-      <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status)}}</span>
+      <span tabindex="0" [attr.aria-label]="'Status' + getHumanReadableStatus(thread.status)" [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status)}}</span>
     </td>
     <td width="45%">
-      <div class="e2e-test-exploration-feedback-subject">{{thread.subject | truncate:40 }}</div>
+      <div class="e2e-test-exploration-feedback-subject" tabindex="0" [attr.aria-label]="'Subject' + thread.subject">{{thread.subject | truncate:40 }}</div>
     </td>
     <td width="20%">
-      <span *ngIf="thread.originalAuthorName">{{thread.originalAuthorName}}</span>
+      <span tabindex="0" [attr.aria-label]="'Original author' + thread.originalAuthorName" *ngIf="thread.originalAuthorName">{{thread.originalAuthorName}}</span>
     </td>
     <td width="20%">
-      <span>{{getLocaleAbbreviatedDateTimeString(thread.lastUpdatedMsecs)}}</span>
+      <span tabindex="0" [attr.aria-label]="'Last updated' + getLocaleAbbreviatedDateTimeString(thread.lastUpdatedMsecs)">{{getLocaleAbbreviatedDateTimeString(thread.lastUpdatedMsecs)}}</span>
     </td>
   </tr>
 </table>

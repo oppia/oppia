@@ -82,7 +82,7 @@
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
     <div class="oppia-audio-visualiser">
-      <div class="oppia-mp3-converting" *ngIf="voiceoverRecorder.status().isRecording">
+      <div class="oppia-mp3-converting" *ngIf="voiceoverRecorder.status().isRecording" tabindex="0">
         Recording audio<loading-dots></loading-dots>
       </div>
       <div id="visualized" #visualized class="oppia-audio-wave-view" *ngIf="!voiceoverRecorder.status().isRecording && !audioIsCurrentlyBeingSaved">
@@ -90,7 +90,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
-    <div class="oppia-recording-timer">
+    <div class="oppia-recording-timer" tabindex="0">
       {{ recordingDate | formatTime }} / {{ recordingTimeLimit | formatTime }}
     </div>
   </div>
@@ -164,7 +164,7 @@
       </oppia-audio-slider>
     </div>
   </div>
-  <div class="oppia-content-wrapper oppia-recording-timer">
+  <div class="oppia-content-wrapper oppia-recording-timer" tabindex="0">
     <div *ngIf="isAudioAvailable && audioIsLoading">
       {{ startingDuration | formatTime }} / {{ durationSecs | formatTime }}
     </div>
@@ -212,13 +212,13 @@
     </button>
   </div>
 </div>
-<div class="oppia-translation-bottom-right-container" *ngIf="showRecorderWarning">
+<div class="oppia-translation-bottom-right-container" *ngIf="showRecorderWarning" tabindex="0">
   <span>
     <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
   </span>
 </div>
 <div class="oppia-translation-bottom-proTip" *ngIf="canVoiceover && !showRecorderWarning && !audioBlob && !isAudioAvailable">
-  <div class="alert alert-secondary">
+  <div class="alert alert-secondary" tabindex="0">
     <strong>ProTips</strong>
     <div>Use the "R" key to start/stop recording.</div>
     <div>Use a dedicated microphone for best results.</div>

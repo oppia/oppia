@@ -55,24 +55,25 @@
       <!-- Desktop -->
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
            *ngIf="!onMobile && isEditable" (click)="openFeedbackEditor()">
-        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
-           title="Edit Feedback">
+        <i *ngIf="isEditable" tabindex="0" (keydown.enter)="openFeedbackEditor()"
+           class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit Feedback" type="button">
         </i>
       </div>
 
-      <strong class="oppia-outcome-heading">Oppia tells the learner...</strong>
+      <strong class="oppia-outcome-heading" tabindex="0">Oppia tells the learner...</strong>
       <div class="position-relative">
         <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed">
-          <span class="oppia-confusing-outcome-warning-text">
+          <span class="oppia-confusing-outcome-warning-text" tabindex="0">
             <i class="material-icons">&#xE002;</i>
             Please give Oppia something useful to say here.
           </span>
         </span>
         <span *ngIf="(outcome && !isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed)"
               class="oppia-nothing-text">
-          <em>Nothing</em>
+          <em tabindex="0">Nothing</em>
         </span>
-        <span *ngIf="outcome && outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
+        <span *ngIf="outcome && outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text" tabindex="0">
           <oppia-rte-output-display class="oppia-rte-editor" [rteString]="outcome.feedback.html">
           </oppia-rte-output-display>
         </span>
@@ -91,7 +92,7 @@
     </oppia-outcome-feedback-editor>
   </form>
 
-  <div *ngIf="isFeedbackLengthExceeded()" class="oppia-length-validation-error">
+  <div *ngIf="isFeedbackLengthExceeded()" class="oppia-length-validation-error" tabindex="0">
     The feedback length is too long. Please use at most 500 characters.
   </div>
 
@@ -124,25 +125,25 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-dest-editor"
            *ngIf="isEditable" (click)="openDestinationEditor()">
-        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
-           title="Edit Destination">
+        <i *ngIf="isEditable" tabindex="0" class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit Destination" (keydown.enter)="openDestinationEditor()">
         </i>
       </div>
 
       <div>
-        <strong class="oppia-outcome-heading" *ngIf="displayFeedback">And afterwards, directs the learner
+        <strong class="oppia-outcome-heading" *ngIf="displayFeedback" tabindex="0">And afterwards, directs the learner
         to...</strong>
-        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
-        <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative">
+        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to...</strong>
+        <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative" tabindex="0">
           {{ outcome.dest }}
         </span>
-        <span *ngIf="isSelfLoop(outcome)" class="position-relative">
+        <span tabindex="0" *ngIf="isSelfLoop(outcome)" class="position-relative">
           <span *ngIf="!outcome.refresherExplorationId">(try again)</span>
           <span *ngIf="outcome.refresherExplorationId">
             (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
           </span>
         </span>
-        <div class="oppia-prerequisite-skill-text" *ngIf="outcome && outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+        <div tabindex="0" class="oppia-prerequisite-skill-text" *ngIf="outcome && outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
           <strong class="oppia-outcome-heading"> Attached prerequisite skill for the current state: </strong>
           {{ outcome.missingPrerequisiteSkillId }}
         </div>
@@ -189,18 +190,18 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-if-stuck-editor"
            *ngIf="isEditable" (click)="openDestinationIfStuckEditor()">
-        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
-           title="Edit If Stuck Destination">
+        <i *ngIf="isEditable" (keydown.enter)="openDestinationIfStuckEditor()" class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit If Stuck Destination" tabindex="0">
         </i>
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback">(Optional) If the learner is really stuck, direct them to</strong>
-        <strong *ngIf="!displayFeedback">(Optional) Oppia directs the stuck learner to...</strong>
-        <span *ngIf="outcome && outcome.destIfReallyStuck !== null" class="position-relative">
+        <strong *ngIf="displayFeedback" tabindex="0">(Optional) If the learner is really stuck, direct them to</strong>
+        <strong *ngIf="!displayFeedback" tabindex="0">(Optional) Oppia directs the stuck learner to...</strong>
+        <span tabindex="0" *ngIf="outcome && outcome.destIfReallyStuck !== null" class="position-relative">
           {{ outcome.destIfReallyStuck }}
         </span>
-        <span *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative"></span>
+        <span tabindex="0" *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative"></span>
       </div>
     </div>
   </div>

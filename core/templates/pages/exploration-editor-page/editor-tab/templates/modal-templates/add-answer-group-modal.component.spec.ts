@@ -25,7 +25,7 @@ import { Subscription } from 'rxjs';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { AddAnswerGroupModalComponent } from './add-answer-group-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -175,6 +175,17 @@ describe('Add Answer Group Modal Component', () => {
     var outcome2 = outcomeObjectFactory.createNew(
       'State Name', '1', 'a'.repeat(10001), []);
     expect(component.isFeedbackLengthExceeded(outcome2)).toBe(true);
+  });
+
+  it('should focus on the header after loading', () => {
+    const addResponseRef = new ElementRef(
+      document.createElement('h4'));
+    component.addResponseRef = addResponseRef;
+    spyOn(addResponseRef.nativeElement, 'focus');
+
+    component.ngAfterViewInit();
+
+    expect(addResponseRef.nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should save answer group response when closing the modal', () => {

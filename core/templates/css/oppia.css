@@ -1640,7 +1640,7 @@ pre.oppia-pre-wrapped-text {
   color: #009688;
 }
 .btn:focus, .btn:active:focus {
-  outline: 0;
+  outline: 1px solid #000;
 }
 .skipBtn {
   height: 25px;

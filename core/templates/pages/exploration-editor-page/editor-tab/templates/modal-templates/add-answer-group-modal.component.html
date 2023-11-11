@@ -1,5 +1,5 @@
 <div class="modal-header e2e-test-add-response-modal-header" ngbAutofocus>
-  <h3 tabindex="0">Add Response</h3>
+  <h3 tabindex="0" #addResponse>Add Response</h3>
   <i class="fa fa-times" tabindex="0" role="button" (keydown.enter)="cancel()" (click)="cancel()"></i>
 </div>
 
@@ -22,10 +22,10 @@
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
+          <strong tabindex="0">Oppia tells the learner...</strong>
           <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
             <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" (keydown.enter)="openFeedbackEditor()" aria-label="edit feedback button" tabindex="0" title="Edit Feedback">&#xE254;</i>
           </div>
-          <strong>Oppia tells the learner...</strong>
           <div class="position-relative">
             <span class="oppia-nothing-text">
               <em>Nothing</em>

@@ -16,7 +16,7 @@
  * @fileoverview Component for confirm leave modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -27,9 +27,14 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 export class ConfirmLeaveModalComponent
   extends ConfirmOrCancelModal {
+  @ViewChild('confirmHeader',) confirmHeaderRef!: ElementRef;
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
+  }
+
+  ngAfterViewInit(): void {
+    this.confirmHeaderRef.nativeElement.focus();
   }
 }

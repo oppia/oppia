@@ -15,14 +15,14 @@
            *ngIf="!interactionEditorIsShown"
            tabindex="0"
            role="button"
-           aria-label="Expand interaction"
+           aria-label="Expand interaction card"
            [attr.aria-hidden]="interactionEditorIsShown ? 'true' : 'false'">
         </i>
         <i class="fa fa-caret-up"
            *ngIf="interactionEditorIsShown"
            tabindex="0"
            role="button"
-           aria-label="collapse answers and responses"
+           aria-label="collapse interaction card"
            [attr.aria-hidden]="interactionEditorIsShown ? 'false' : 'true'">
         </i>
       </div>
@@ -32,6 +32,7 @@
       <button type="button"
               class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
               (click)="openInteractionCustomizerModal()"
+              aria-label="Add interaction"
               *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
       </button>

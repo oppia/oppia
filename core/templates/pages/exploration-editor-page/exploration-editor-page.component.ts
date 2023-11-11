@@ -429,6 +429,15 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  generateAriaLabelForWarnings(): string {
+    const warnings = this.getWarnings() as { message: string }[];
+    const warningLabels = warnings.map(
+      (warning, index) => 'Warning ' + (index + 1) + ': ' + warning.message)
+      .join('. ');
+
+    return 'Total warnings: ' + this.countWarnings() + '. ' + warningLabels;
+  }
+
   getNavbarText(): string {
     return 'Exploration Editor';
   }

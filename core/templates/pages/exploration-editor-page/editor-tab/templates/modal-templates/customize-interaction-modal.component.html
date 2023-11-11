@@ -64,12 +64,14 @@
                            [(ngModel)]="stateCustomizationArgsService.displayed[customizationArgSpec.name].value">
       </schema-based-editor>
       <div *ngIf="customizationArgSpec.schema.type === 'bool'"
+           tabindex="0"
            class="oppia-interaction-customization-label">
         {{ customizationArgSpec.description }}
       </div>
       <div class="oppia-interaction-customization-label-container"></div>
     </div>
     <div *ngIf="getCustomizationArgsWarningMessage()"
+         tabindex="0"
          class="alert alert-danger oppia-units-input-error">
       {{ getCustomizationArgsWarningMessage() }}
     </div>

@@ -8,7 +8,6 @@
              [disabled]="disabled"
              required="!notRequired"
              applyValidation [validators]="validators"
-             [oppiaFocusOn]="labelForFocusTarget"
              (blur)="inputBlur.emit()"
              (focus)="inputFocus.emit()">
     </mat-form-field>

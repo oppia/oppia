@@ -1,7 +1,7 @@
 <div [hidden]="!isGraphShown()" class="oppia-state-graph-animate-show">
   <div class="oppia-exp-graph-overview">
     <span class="oppia-exploration-overview-text">
-      <strong>Exploration Overview</strong>
+      <strong tabindex="0">Exploration Overview</strong>
     </span>
     <div>
       <span *ngIf="!showCheckpointCountWarningSign()">&#11088;</span>
@@ -10,7 +10,7 @@
             *ngIf="showCheckpointCountWarningSign()">
         <strong class="clickable">⚠️</strong>
       </span>
-      <span [ngClass]="{'checkpoint-count-error': showCheckpointCountWarningSign()}">
+      <span [ngClass]="{'checkpoint-count-error': showCheckpointCountWarningSign()}" tabindex="0">
         {{ getCheckpointCount() }}
         <span *ngIf="getCheckpointCount() <= 1">
           Checkpoint
@@ -21,6 +21,7 @@
       </span>
       <span ngbTooltip="Learners start at their last saved checkpoint when returning back from the lesson."
             placement="right-top"
+            tabindex="0"
             class="clickable">
         <strong>&#x24D8;</strong>
       </span>

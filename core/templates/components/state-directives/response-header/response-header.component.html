@@ -44,6 +44,10 @@
 
 <span class="oppia-delete-response-button oppia-transition-200 e2e-test-delete-response"
       *ngIf="editabilityService.isEditable() && !defaultOutcome && !outcome"
+      (keydown.enter)="deleteResponse($event)"
+      tabindex="0"
+      role="button"
+      aria-label="delete response"
       (click)="deleteResponse($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>
