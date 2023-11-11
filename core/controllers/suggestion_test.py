@@ -3046,20 +3046,20 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': feconf.ENTITY_TYPE_SKILL,
-                'target_id': self.SKILL_ID,
+                'target_id': 'skill_without_topic',
                 'target_version_at_submission': 1,
                 'change': self.translate_question_change,
-                'description': 'Add new question to skill'
+                'description': 'Add question for a skill without topic'
             }, csrf_token=csrf_token)
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': feconf.ENTITY_TYPE_SKILL,
-                'target_id': 'skill_without_topic',
+                'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': self.translate_question_change,
-                'description': 'Add question to another skill'
+                'description': 'Add new question for a skill with topic'
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -3135,9 +3135,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-                'topic_name': self.TOPIC_ID,
             })
-        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['suggestions']), 2)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_question_change)
@@ -3150,27 +3149,35 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion['author_name'], 'author')
         self.assertEqual(suggestion['status'], 'review')
         self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
+            response['target_id_to_opportunity_dict'][self.SKILL_ID],
             {
-                'skill1234567': {
-                    'id': 'skill1234567',
-                    'question_count': 0,
-                    'skill_description': 'skill to link question to',
-                    'skill_rubrics': [
-                        {
-                            'difficulty': 'Easy',
-                            'explanations': ['Explanation 1']
-                        }, {
-                            'difficulty': 'Medium',
-                            'explanations': ['Explanation 2']
-                        }, {
-                            'difficulty': 'Hard',
-                            'explanations': ['Explanation 3']
-                        }
-                    ]
-                }
+                'id': self.SKILL_ID,
+                'question_count': 0,
+                'skill_description': 'skill to link question to',
+                'skill_rubrics': [
+                    {
+                        'difficulty': 'Easy',
+                        'explanations': ['Explanation 1']
+                    }, {
+                        'difficulty': 'Medium',
+                        'explanations': ['Explanation 2']
+                    }, {
+                        'difficulty': 'Hard',
+                        'explanations': ['Explanation 3']
+                    }
+                ]
             }
         )
+
+    def test_skill_handler_with_topic_filter_returns_one_question(self) -> None:
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': self.TOPIC_ID,
+            })
+        self.assertEqual(len(response['suggestions']), 1)
 
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
