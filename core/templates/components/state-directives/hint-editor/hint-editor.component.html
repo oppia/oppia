@@ -8,13 +8,16 @@
         <div class="oppia-click-to-start-editing e2e-test-open-hint-editor"
              *ngIf="isEditable" (click)="openHintEditor()">
           <i *ngIf="isEditable"
+             tabindex="0"
+             (keydown.enter)="openHintEditor()"
+             aria-label="edit hint"
              class="fas fa-pen oppia-editor-edit-icon float-right"
              title="Edit Hint">
           </i>
         </div>
 
-        <strong>Hint #{{indexPlusOne}} is...</strong>
-        <span>
+        <strong tabindex="0">Hint #{{indexPlusOne}} is...</strong>
+        <span tabindex="0">
           <oppia-rte-output-display class="oppia-rte-editor"
                                     [rteString]="hint.hintContent.html">
           </oppia-rte-output-display>
@@ -26,7 +29,7 @@
   <div *ngIf="isEditable && hintEditorIsOpen">
     <div class="form-inline">
       <div class="oppia-rule-details-header">
-        <strong>Hint # {{indexPlusOne}} is...</strong>
+        <strong tabindex="0">Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
         <schema-based-editor [schema]="getSchema()"
                              [localValue]="hint.hintContent._html"
@@ -35,7 +38,7 @@
       </div>
     </div>
 
-    <div *ngIf="isHintLengthExceeded()" class="oppia-length-validation-error">
+    <div *ngIf="isHintLengthExceeded()" class="oppia-length-validation-error" tabindex="0">
       The hint length is too long. Please use at most 500 characters.
     </div>
 
