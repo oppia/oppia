@@ -3188,6 +3188,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(response, {})
 
+    def test_handler_with_non_existent_topic_raise_error(self) -> None:
+        self.get_json(
+            '/getreviewablesuggestions/topic/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'non_existent_topic'
+            },
+            expected_status_int=400
+        )
+
     def test_handler_with_invalid_suggestion_type_raise_error(self) -> None:
         self.get_json(
             '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
