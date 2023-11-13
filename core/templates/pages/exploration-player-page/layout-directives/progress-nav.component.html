@@ -31,9 +31,8 @@
       <!-- Special case for the 'Continue' interaction. -->
       <button mat-button
               *ngIf="interactionId === 'Continue'"
-              (click)="submit.emit()"
-              class="oppia-learner-confirm-button e2e-test-continue-button oppia-autofocus"
-              oppiaFocusOn="continue-btn">
+              (click)="onClickedContinueButtonFocus()"
+              class="oppia-learner-confirm-button e2e-test-continue-button">
         {{ interactionCustomizationArgs.buttonText.value.unicode }}
         <i class="fas fa-arrow-right oppia-arrow"></i>
       </button>

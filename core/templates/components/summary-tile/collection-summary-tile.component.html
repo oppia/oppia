@@ -1,11 +1,4 @@
 <div *ngIf="!mobileCardToBeShown">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                [activityType]="activityTypeCollection"
-                                [activityId]="getCollectionId"
-                                [activityTitle]="getCollectionTitle"
-                                [isContainerNarrow]="isContainerNarrow"
-                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-  </oppia-learner-dashboard-icons>
   <mat-card class="oppia-activity-summary-tile e2e-test-collection-card"
           [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
     <a [href]="getCollectionLink()" class="thumbnail">
@@ -41,6 +34,13 @@
       </div>
     </a>
   </mat-card>
+  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+  [activityType]="activityTypeCollection"
+  [activityId]="getCollectionId"
+  [activityTitle]="getCollectionTitle"
+  [isContainerNarrow]="isContainerNarrow"
+  [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+</oppia-learner-dashboard-icons>
 </div>
 
 <div *ngIf="mobileCardToBeShown">

@@ -409,7 +409,7 @@ legend {
   margin-left: -16px;
   position: relative;
   right: 13px;
-  top: 13px;
+  bottom: 250px;
   z-index: 10;
 }
 

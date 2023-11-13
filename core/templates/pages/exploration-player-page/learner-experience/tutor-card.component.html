@@ -18,8 +18,9 @@
            *ngIf="avatarImageIsShown">
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            [ngClass]="getContentAudioHighlightClass()">
-        <div tabindex="0">
+        <div tabindex="0" #rteOutputDiv class="oppia-exploration-content-focus">
           <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
+                                    #random
                                     class="e2e-test-conversation-content">
           </oppia-rte-output-display>
         </div>

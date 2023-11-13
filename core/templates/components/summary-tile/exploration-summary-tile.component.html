@@ -1,12 +1,4 @@
 <div *ngIf="!mobileCardToBeShown">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                [activityType]="activityType"
-                                [activityId]="explorationId"
-                                [activityTitle]="explorationTitle"
-                                [isContainerNarrow]="isContainerNarrow"
-                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-  </oppia-learner-dashboard-icons>
-
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
             [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
             *ngIf="!isRefresherExploration"
@@ -100,6 +92,13 @@
       </div>
     </a>
   </mat-card>
+  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+    [activityType]="activityType"
+    [activityId]="explorationId"
+    [activityTitle]="explorationTitle"
+    [isContainerNarrow]="isContainerNarrow"
+    [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+  </oppia-learner-dashboard-icons>
   <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
             *ngIf="isRefresherExploration" (click)="loadParentExploration()">
     <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
@@ -108,13 +107,6 @@
   </button>
 </div>
 <div *ngIf="mobileCardToBeShown">
-  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                [activityType]="activityType"
-                [activityId]="explorationId"
-                [activityTitle]="explorationTitle"
-                [isContainerNarrow]="isContainerNarrow"
-                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-  </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">
@@ -152,6 +144,13 @@
       </div>
     </a>
   </mat-card>
+  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+    [activityType]="activityType"
+    [activityId]="explorationId"
+    [activityTitle]="explorationTitle"
+    [isContainerNarrow]="isContainerNarrow"
+    [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+  </oppia-learner-dashboard-icons>
   <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
             *ngIf="isRefresherExploration" (click)="loadParentExploration()">
     <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>

@@ -16,7 +16,7 @@
  * @fileoverview Component for the Tutor Card.
  */
 
-import { Component, Input, SimpleChanges, ViewChild, Renderer2 } from '@angular/core';
+import { Component, Input, SimpleChanges, ViewChild, Renderer2, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
@@ -99,6 +99,7 @@ export class TutorCardComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('checkMark') checkMarkComponent!: EndChapterCheckMarkComponent;
   @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
+  @ViewChild('rteOutputDiv') rteOutputDiv!: ElementRef;
   @Input() displayedCard!: StateCard;
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
   @Input() startCardChangeAnimation!: boolean;
@@ -215,6 +216,13 @@ export class TutorCardComponent {
         }
       )
     );
+  }
+
+  ngAfterViewInit(): void {
+    if(this.rteOutputDiv) {
+      this.rteOutputDiv.nativeElement.focus();
+      console.log("called!")
+    }
   }
 
   ngOnDestroy(): void {

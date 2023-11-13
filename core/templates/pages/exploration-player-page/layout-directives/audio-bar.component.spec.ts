@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AudioBarComponent.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -103,7 +103,9 @@ describe('Audio Bar Component', () => {
     let secondaryTranslaionsSpy = spyOn(
       audioTranslationManagerService, 'setSecondaryAudioTranslations')
       .and.callThrough();
+    let audioBarContainer = new ElementRef(document.createElement('div'));
 
+    component.audioBarContainer = audioBarContainer;
     component.ngOnInit();
     component.expandAudioBar();
     component.isPaused = false;

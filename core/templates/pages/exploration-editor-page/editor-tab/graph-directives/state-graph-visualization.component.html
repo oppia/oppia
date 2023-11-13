@@ -5,6 +5,7 @@ with the same id on the page. -->
 <div [ngStyle]="{'height': getGraphHeightInPixels()}">
   <button *ngIf="maximize"
           (click)="sendOnMaximizeFunction()"
+          aria-label="Expand Map"
           class="btn btn-secondary btn-sm oppia-graph-resize-button">
     <i title="Expand Map" class="fas fa-expand-arrows-alt oppia-material-icons"></i>
   </button>
@@ -31,7 +32,7 @@ with the same id on the page. -->
                     [ngClass]="{'clickable': canNavigateToNode(node.id)}"
                     [attr.style]="node.style"
                     tabindex="0"
-                    (keydown.enter)="sendOnClickFunctionData(node.id)"
+                    (keydown.enter)="sendOnEnterFunctionData(node.id)"
                     (click)="sendOnClickFunctionData(node.id)"
                     role="button"
                     [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">

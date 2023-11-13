@@ -151,6 +151,16 @@ export class ProgressNavComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  onClickedContinueButtonFocus(): void {
+    this.submit.emit();
+    setTimeout(() => {
+      const elementToFocus = document.querySelector('.oppia-exploration-content-focus') as HTMLElement;
+      if (elementToFocus) {
+        elementToFocus.focus();
+      }
+    },1100);
+  }
+
   updateDisplayedCardInfo(): void {
     this.transcriptLength = this.playerTranscriptService.getNumCards();
     this.displayedCardIndex = (

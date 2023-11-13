@@ -17,7 +17,7 @@
  * audio translation in the learner view.
  */
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { Subscription } from 'rxjs';
@@ -48,6 +48,8 @@ export class AudioBarComponent {
   explorationPlayerModeIsActive: boolean;
   // Value may be null if the language is not available.
   selectedLanguage: { value: string | null };
+  @ViewChild('audioBarContainer') audioBarContainer!:
+    ElementRef<HTMLDivElement>;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -147,6 +149,9 @@ export class AudioBarComponent {
   expandAudioBar(): void {
     this.audioBarIsExpanded = true;
     this.audioBarStatusService.markAudioBarExpanded();
+    setTimeout(() => {
+      this.audioBarContainer.nativeElement.focus();
+    });
   }
 
   collapseAudioBar(): void {
