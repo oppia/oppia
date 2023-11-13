@@ -173,13 +173,12 @@ export class StateGraphVisualization
   sendOnEnterFunctionData(event: string): void {
     this.onClickFunction.emit(event);
     setTimeout(() => {
-      const elementToFocus = document.querySelector('.oppia-state-name-text') as HTMLElement;
+      const elementToFocus = document.querySelector(
+        '.oppia-state-name-text') as HTMLElement;
       if (elementToFocus) {
         elementToFocus.focus();
-        console.log("Inside focus")
       }
-    },1100);
-    console.log("Outside focus")
+    }, 1100);
   }
 
   redrawGraph(): void {

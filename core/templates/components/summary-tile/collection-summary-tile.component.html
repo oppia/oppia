@@ -35,12 +35,12 @@
     </a>
   </mat-card>
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-  [activityType]="activityTypeCollection"
-  [activityId]="getCollectionId"
-  [activityTitle]="getCollectionTitle"
-  [isContainerNarrow]="isContainerNarrow"
-  [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-</oppia-learner-dashboard-icons>
+    [activityType]="activityTypeCollection"
+    [activityId]="getCollectionId"
+    [activityTitle]="getCollectionTitle"
+    [isContainerNarrow]="isContainerNarrow"
+    [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+  </oppia-learner-dashboard-icons>
 </div>
 
 <div *ngIf="mobileCardToBeShown">

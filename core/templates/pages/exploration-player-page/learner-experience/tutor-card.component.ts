@@ -219,9 +219,8 @@ export class TutorCardComponent {
   }
 
   ngAfterViewInit(): void {
-    if(this.rteOutputDiv) {
+    if (this.rteOutputDiv) {
       this.rteOutputDiv.nativeElement.focus();
-      console.log("called!")
     }
   }
 

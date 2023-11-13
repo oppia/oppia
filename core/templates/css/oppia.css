@@ -403,13 +403,13 @@ legend {
 }
 
 .oppia-learner-dashboard-icon {
+  bottom: 250px;
   color: white;
   float: right;
   font-size: 19px;
   margin-left: -16px;
   position: relative;
   right: 13px;
-  bottom: 250px;
   z-index: 10;
 }
 

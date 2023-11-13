@@ -154,11 +154,12 @@ export class ProgressNavComponent {
   onClickedContinueButtonFocus(): void {
     this.submit.emit();
     setTimeout(() => {
-      const elementToFocus = document.querySelector('.oppia-exploration-content-focus') as HTMLElement;
+      const elementToFocus = document.querySelector(
+        '.oppia-exploration-content-focus') as HTMLElement;
       if (elementToFocus) {
         elementToFocus.focus();
       }
-    },1100);
+    }, 1100);
   }
 
   updateDisplayedCardInfo(): void {
