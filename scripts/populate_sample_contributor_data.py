@@ -102,6 +102,7 @@ class SampleDataInitializer:
         self.csrf_token = self._get_csrf_token()
         self._assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
         self._add_review_translation_rights(SUPER_ADMIN_USERNAME)
+        self._add_review_question_rights(SUPER_ADMIN_USERNAME)
         self._add_submit_question_rights(CONTRIBUTOR_USERNAME)
         self._generate_sample_new_structures_data()
         self._add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
@@ -220,6 +221,16 @@ class SampleDataInitializer:
 
         self._make_request(
             'POST', '/contributionrightshandler/translation', params=params)
+        
+    def _add_review_question_rights(self, username: str) -> None:
+        """Adds review question rights to the user with the given username."""
+        params = {
+        'payload': json.dumps({'username': username}),
+        'csrf_token': self.csrf_token
+        }
+
+        self._make_request(
+        'POST', '/contributionrightshandler/question', params=params)
 
     def _add_submit_question_rights(self, username: str) -> None:
         """Adds submit question rights to the user with the given username."""
