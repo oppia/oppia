@@ -80,7 +80,7 @@ class FeatureFlagsHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {
+        'PUT': {
             'action': {
                 'schema': {
                     'type': 'basestring',
@@ -137,8 +137,8 @@ class FeatureFlagsHandler(
         })
 
     @acl_decorators.can_access_release_coordinator_page
-    def post(self) -> None:
-        """Handles POST requests."""
+    def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
         try:

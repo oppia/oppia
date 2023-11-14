@@ -121,7 +121,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             'update_feature_flag.'
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json(
+            self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': None
@@ -163,7 +163,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
-            self.post_json(
+            self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
@@ -194,7 +194,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
-            response = self.post_json(
+            response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': 'test_feature_1',
@@ -225,7 +225,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
-            response = self.post_json(
+            response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': feature.name,
@@ -265,7 +265,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature_flag_registry.Registry.feature_registry[
             ParamNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
-            response = self.post_json(
+            response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
                     'feature_name': ParamNames.TEST_FEATURE_2.value,
