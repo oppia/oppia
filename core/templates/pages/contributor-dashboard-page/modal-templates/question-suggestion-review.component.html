@@ -21,7 +21,7 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-  <div class="oppia-question-details questionSuggestionDiv" (scroll)="handleScroll($event)" tabindex="0">
+    <div class="oppia-question-details questionSuggestionDiv" tabindex="0">
     <div class="oppia-question-suggestion">
       <strong class="oppia-difficulty-title">
         Selected Difficulty: {{skillDifficultyLabel}}
@@ -114,7 +114,6 @@
 </div>
 
 <style>
-
   /*This one makes it sticky */
   .modal-header {
     position: sticky;
@@ -122,28 +121,11 @@
     z-index: 1000;
     background-color: white; /* To ensure content doesn't show behind the header */
   }
-
   .oppia-suggestion-review-container {
     height: 1300px;
     padding-bottom: 0;
     padding-top: 0;
   }
-
-
-  .oppia-editor-card-with-avatar-sticky {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  .oppia-editor-card-avatar-sticky {
-    top: 15px;
-  }
-
-  /*Doest not seems to do anything */
-  .modal-header .oppia-question-header {
-    margin-top: 0;
-  }
-
   .oppia-close-button-position {
     font-size: 2.5rem;
     position: absolute;
@@ -247,7 +229,6 @@
       display: block;
       font-size: 20px;
     }
-
     .oppia-question-header {
       display: none;
     }

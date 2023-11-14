@@ -133,6 +133,7 @@ export class QuestionSuggestionReviewModalComponent
   questionId: string | null = null;
   isFirstItem: boolean = true;
   isLastItem: boolean = true;
+  shouldBeSticky: boolean = false;
 
   constructor(
     private contextService: ContextService,

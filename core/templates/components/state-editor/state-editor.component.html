@@ -23,8 +23,8 @@
   </p>
 </ng-template>
 
-<mat-card class="oppia-editor-card-with-avatar oppia-editor-card-with-avatar-sticky">
-  <div class="state-content-header-container" (click)="toggleConceptCard()">
+<mat-card class="oppia-editor-card-with-avatar" [ngClass]="{'oppia-editor-card-with-avatar-sticky': shouldBeSticky}">
+    <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
       <h3 class="oppia-exp-content-card-header">Content</h3>
       <i class="fa fa-caret-down"
@@ -39,8 +39,11 @@
   </div>
   <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown"  joyrideStep="editorTabTourContentEditorTab" [stepContent]="ContentEditorTab">
     <div class="oppia-editor-card-body oppia-editor-concept-container">
-      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar" [ngClass]="{'oppia-editor-card-avatar-sticky': isSticky}">
-      <div id="tutorialStateContent" class="oppia-editor-card-section" [ngClass]="{'state-content-editor-parent-container': !isSticky}">
+      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar">
+      <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
+<!--        This is "my changes" -->
+<!--      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar" [ngClass]="{'oppia-editor-card-avatar-sticky': isSticky}">-->
+<!--      <div id="tutorialStateContent" class="oppia-editor-card-section" [ngClass]="{'state-content-editor-parent-container': !isSticky}">-->
         <oppia-state-content-editor class="e2e-test-state-content-editor"
                                     (saveStateContent)="sendOnSaveStateContent($event)"
                                     [stateContentPlaceholder]="stateContentPlaceholder"
@@ -49,6 +52,7 @@
       </div>
     </div>
   </div>
+</mat-card>
 </mat-card>
 
 <div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
