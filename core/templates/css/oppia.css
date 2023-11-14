@@ -1640,7 +1640,7 @@ pre.oppia-pre-wrapped-text {
   color: #009688;
 }
 .btn:focus, .btn:active:focus {
-  outline: 0;
+  outline: 1px solid #000;
 }
 .skipBtn {
   height: 25px;
@@ -2139,7 +2139,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-header-warning-placement {
-  left: -0.5em;
+  left: 0.5em;
   position: absolute;
   top: 6px;
   z-index: 2;

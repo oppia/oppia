@@ -5125,277 +5125,332 @@ export default {
     "code": "en",
     "description": "English",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "English"
   }, {
     "code": "ar",
     "description": "العربية (Arabic)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Arabic"
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Albanian"
   }, {
     "code": "am",
     "description": "አማርኛ (Amharic)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Amharic"
   }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Azerbaijani"
   }, {
     "code": "bg",
     "description": "български (Bulgarian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Bulgarian"
   }, {
     "code": "bn",
     "description": "বাংলা (Bangla)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Bangla"
   }, {
     "code": "ca",
     "description": "català (Catalan)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Catalan"
   }, {
     "code": "zh",
     "description": "中文 (Chinese)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Chinese"
   }, {
     "code": "hr",
     "description": "hrvatski (Croatian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Croatian"
   }, {
     "code": "cs",
     "description": "čeština (Czech)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Czech"
   }, {
     "code": "da",
     "description": "dansk (Danish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Danish"
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Dutch"
   }, {
     "code": "fat",
     "description": "Fanti",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Fanti"
   }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Filipino"
   }, {
     "code": "fi",
     "description": "suomi (Finnish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Finnish"
   }, {
     "code": "fr",
     "description": "français (French)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "French"
   }, {
     "code": "lg",
     "description": "Luganda (Ganda)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Ganda"
   }, {
     "code": "de",
     "description": "Deutsch (German)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "German"
   }, {
     "code": "el",
     "description": "ελληνικά (Greek)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Greek"
   }, {
     "code": "ha",
     "description": "Harshen Hausa (Hausa)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hausa"
   }, {
     "code": "he",
     "description": "עברית (Hebrew)",
     "direction": "rtl",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hebrew"
   }, {
     "code": "hi",
     "description": "हिन्दी (Hindi)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hindi"
   }, {
     "code": "hi-en",
     "description": "Hinglish",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Hinglish"
   }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Hungarian"
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Indonesian"
   }, {
     "code": "ig",
     "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Igbo"
   }, {
     "code": "it",
     "description": "italiano (Italian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Italian"
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Japanese"
   }, {
     "code": "kab",
     "description": "Taqbaylit (Kabyle)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Kabyle"
   }, {
     "code": "ko",
     "description": "한국어 (Korean)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Korean"
   }, {
     "code": "lv",
     "description": "latviešu (Latvian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Latvian"
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Lithuanian"
   }, {
     "code": "mr",
     "description": "मराठी (Marathi)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Marathi"
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Norwegian"
   }, {
     "code": "fa",
     "description": "فارسی (Persian)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Persian"
   }, {
     "code": "pcm",
     "description": "Naijá (Nigerian Pidgin)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Nigerian Pidgin"
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Polish"
   }, {
     "code": "prs",
     "description": "دری (Dari)",
     "direction": "rtl",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Dari"
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Portuguese"
   }, {
     "code": "ro",
     "description": "română (Romanian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Romanian"
   }, {
     "code": "ru",
     "description": "pусский (Russian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Russian"
   }, {
     "code": "sr",
     "description": "cрпски (Serbian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Serbian"
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Slovak"
   }, {
     "code": "sl",
     "description": "slovenščina (Slovenian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Slovenian"
   }, {
     "code": "es",
     "description": "español (Spanish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Spanish"
   }, {
     "code": "sw",
     "description": "kiswahili (Swahili)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Swahili"
   }, {
     "code": "sv",
     "description": "svenska (Swedish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Swedish"
   }, {
     "code": "ta",
     "description": "தமிழ் (Tamil)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Tamil"
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Thai"
   }, {
     "code": "tr",
     "description": "Türkçe (Turkish)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Turkish"
   }, {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Ukrainian"
   }, {
     "code": "ur",
     "description": "اُردُو (Urdu)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Urdu"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
     "direction": "ltr",
-    "decimal_separator": ","
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Vietnamese"
   }, {
     "code": "yo",
     "description": "Èdè Yoùbá (Yoruba)",
     "direction": "ltr",
-    "decimal_separator": "."
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Yoruba"
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the

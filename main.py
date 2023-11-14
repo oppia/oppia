@@ -356,6 +356,10 @@ URLS = [
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
+        r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
+        contributor_dashboard.LessonsPinningHandler,
+    ),
+    get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
@@ -437,6 +441,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
+        classroom.UnusedTopicsHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),

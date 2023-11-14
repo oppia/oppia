@@ -1249,7 +1249,7 @@ class AdminRoleHandler(
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves information about users based on different filter
         criteria to populate the roles tab.
