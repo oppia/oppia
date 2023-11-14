@@ -46,6 +46,8 @@ services:
       - frontend_proto_files:/app/oppia/extensions/classifiers/proto
       - third_party:/app/oppia/third_party
       - pip_cache:/root/.cache
+      - node_modules:/app/oppia/node_modules
+      - ../karma_coverage_reports:/app/karma_coverage_reports
     environment:
       - CLOUDSDK_CORE_DISABLE_PROMPTS=1
       - PIP_NO_DEPS=True
@@ -56,6 +58,14 @@ services:
       - source_maps=${source_maps:-false}
       - disable_host_checking=${disable_host_checking:-false}
       - no_auto_restart=${no_auto_restart:-false}
+      - DATASTORE_DATASET=dev-project-id
+      - DATASTORE_EMULATOR_HOST=datastore:8089
+      - DATASTORE_EMULATOR_HOST_PATH=datastore:8089/datastore
+      - DATASTORE_HOST=http://datastore:8089
+      - DATASTORE_PROJECT_ID=dev-project-id
+      - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
+      - GOOGLE_CLOUD_PROJECT=dev-project-id
+      - REDIS_HOST=redis
     depends_on:
       - angular-build
       - webpack-compiler
