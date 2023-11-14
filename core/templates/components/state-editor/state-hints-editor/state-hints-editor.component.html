@@ -6,19 +6,19 @@
              (click)="toggleHintCard()"
              (keydown.enter)="toggleHintCard()">
           <div class="state-hints-header">
-            <h3 class="oppia-exp-hints-card-header" tabindex="0">Hints</h3>
+            <h3 class="oppia-exp-hints-card-header">Hints</h3>
             <i class="fa fa-caret-down"
                *ngIf="!hintCardIsShown"
                tabindex="0"
                role="button"
-               aria-label="Expand hint card"
+               aria-label="Expand interaction"
                [attr.aria-hidden]="hintCardIsShown ? 'true' : 'false'">
             </i>
             <i class="fa fa-caret-up"
                *ngIf="hintCardIsShown"
                tabindex="0"
                role="button"
-               aria-label="collapse hint card"
+               aria-label="collapse interaction"
                [attr.aria-hidden]="hintCardIsShown ? 'false' : 'true'">
             </i>
           </div>
@@ -27,7 +27,6 @@
           <div class="oppia-add-hint-button-container">
             <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
               <button type="button"
-                      aria-label="Add hint"
                       class="btn btn-primary oppia-add-hint-button e2e-test-oppia-add-hint-button"
                       (click)="openAddHintModal()"
                       [disabled]="stateHintsService.displayed.length >= 5">
@@ -54,8 +53,6 @@
                   </picture>
                 </span>
                 <a (click)="changeActiveHintIndex(index)"
-                   tabindex="0"
-                   (keydown.enter)="changeActiveHintIndex(index)"
                    class="oppia-rule-tab e2e-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
                   <oppia-response-header class="oppia-response-header-center"
