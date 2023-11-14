@@ -14,8 +14,7 @@
 
 /**
  * @fileoverview Module for the error page. This module has not
- * been migrated to angular router. Remove in favor
- * of error-page-migrated.module.ts once angular migration is complete.
+ * been migrated to angular router.
  */
 
 import { NgModule } from '@angular/core';
@@ -27,6 +26,9 @@ import { ErrorPageComponent } from './error-page.component';
 import { ErrorPageRootComponent } from './error-page-root.component';
 import { ErrorPageRoutingModule } from './error-page-routing.module';
 import { ErrorPageSharedModule } from './error-page-shared.module';
+
+// TODO (#19154): Remove this module in favor of error-page-migrated.module.ts
+// once angular migration is complete.
 
 @NgModule({
   imports: [
