@@ -144,6 +144,7 @@ class ValidModelNames(enum.Enum):
     BASE_MODEL = 'base_model'
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
+    BLOG_STATISTICS = 'blog_statistics'
     CLASSIFIER = 'classifier'
     CLASSROOM = 'classroom'
     COLLECTION = 'collection'
@@ -932,6 +933,7 @@ CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX = (
     '/contributor-dashboard-admin-stats')
 COMMUNITY_CONTRIBUTION_STATS_URL = '/community-contribution-stats'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
+PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
@@ -1222,6 +1224,7 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_QUESTION_COORDINATOR = 'QUESTION_COORDINATOR'
+ROLE_ID_TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR'
 
 ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
@@ -1240,7 +1243,8 @@ ALLOWED_USER_ROLES = [
     ROLE_ID_TOPIC_MANAGER,
     ROLE_ID_TRANSLATION_ADMIN,
     ROLE_ID_VOICEOVER_ADMIN,
-    ROLE_ID_QUESTION_COORDINATOR
+    ROLE_ID_QUESTION_COORDINATOR,
+    ROLE_ID_TRANSLATION_COORDINATOR
 ]
 
 # Intent of the User making query to role structure via admin interface. Used
@@ -1612,7 +1616,7 @@ CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
 TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
-QUESTION_TEAM_LEAD = 'Jatin Kumar Jadoun'
+QUESTION_TEAM_LEAD = 'Ryan Hsiao'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [

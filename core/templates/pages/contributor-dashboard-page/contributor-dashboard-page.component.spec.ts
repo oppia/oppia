@@ -194,7 +194,7 @@ describe('Contributor dashboard page', () => {
           'default-image-url-webp');
       }));
 
-    it('should not set active topic name when no topics are returned',
+    it('should set active topic name as default when no topics are returned',
       fakeAsync(() => {
         spyOn(userService, 'getUserContributionRightsDataAsync')
           .and.returnValue(Promise.resolve(userContributionRights));
@@ -205,8 +205,7 @@ describe('Contributor dashboard page', () => {
         tick();
 
         expect(component.topicName).toBeUndefined();
-        expect(translationTopicService.setActiveTopicName)
-          .not.toHaveBeenCalled();
+        expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
       }));
 
     it('should return language description in kebab case format', () => {

@@ -1,0 +1,122 @@
+<style>
+  .question-submitter-role-checkbox {
+    color: #00645c;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .question-role-editor-main-container {
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .question-role-editor-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: end;
+    padding: 15px;
+  }
+  .question-role-editor-footer-ruler {
+    border: 1px #333 solid;
+    margin-top: 5px;
+    opacity: 0.10;
+  }
+  .cancel-button {
+    border-color: #00645c;
+    border-radius: 5px;
+    color: #00645c;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.30px;
+    padding: 5px;
+    text-transform: uppercase;
+  }
+  .save-button {
+    background: #00645c;
+    border-radius: 5px;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.30px;
+    padding: 5px;
+    text-transform: uppercase;
+  }
+  .label {
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    left: 32px;
+    top: 0;
+    word-wrap: break-word
+  }
+  .label-explanation {
+    color: #667085;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    word-wrap: break-word
+  }
+  .title-container {
+    color: #00645c;
+    font-family: 'Capriola', Arial, sans-serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-top: 25px;
+  }
+  .sub-heading-container {
+    font-weight: 600;
+    margin-bottom: 5px;
+    margin-left: 20px;
+    word-spacing: 1.6px;
+  }
+  .label-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .attribute-container {
+    display: flex;
+    padding-bottom: 5px;
+    padding-left: 20px;
+  }
+  .loading-message {
+    color: #00645c;
+    font-size: xx-large;
+    padding: 20px;
+  }
+</style>
+<div class="question-role-editor-main-container">
+  <div>
+    <div class="title-container">Edit roles for user {{username}}</div>
+    <div class="sub-heading-container">User Role</div>
+    <div class="attribute-container">
+      <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
+        <i *ngIf="!rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+        <i *ngIf="rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+      </span>
+      <div class="label-container">
+        <div class="label">Question Submitter</div>
+        <div class="label-explanation">Submits questions for review</div>
+      </div>
+    </div>
+    <div class="attribute-container">
+      <span (click)="toggleQuestionReviewer()" (keydown.space)="toggleQuestionReviewer()" tabindex="0">
+        <i *ngIf="!rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
+        <i *ngIf="rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+      </span>
+      <div class="label-container">
+        <div class="label">Question Reviewer</div>
+        <div class="label-explanation">Reviews submitted questions</div>
+      </div>
+    </div>
+    <div class="question-role-editor-footer-ruler"></div>
+    <div class="question-role-editor-footer">
+      <button class="cancel-button" (click)="close()">Cancel</button>
+      <button class="save-button" (click)="saveAndClose()">Save Changes</button>
+    </div>
+  </div>
+</div>

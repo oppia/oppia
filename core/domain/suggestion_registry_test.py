@@ -4231,24 +4231,3 @@ class QuestionReviewerTotalContributionStatsUnitTests(
 
         self.assertDictEqual(
             actual_stats.to_frontend_dict(), expected_stats_dict)
-
-
-class TranslationCoordinatorStatsUnitTests(
-    test_utils.GenericTestBase):
-    """Tests for the TranslationCoordinatorStats class."""
-
-    expected_stats_dict = {
-        'language_id': 'en',
-        'coordinator_ids': ['user1', 'user2'],
-        'coordinators_count': 2
-    }
-
-    def test_to_dict(self) -> None:
-        actual_stats = suggestion_registry.TranslationCoordinatorStats( # pylint: disable=line-too-long
-            'en',
-            ['user1', 'user2'],
-            2
-        )
-
-        self.assertDictEqual(
-            actual_stats.to_dict(), self.expected_stats_dict)

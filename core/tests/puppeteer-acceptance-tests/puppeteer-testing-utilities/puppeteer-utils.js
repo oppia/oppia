@@ -135,6 +135,16 @@ module.exports = class baseUser {
   }
 
   /**
+   * This selects a value in a dropdown.
+   * @param {string} selector - The CSS selector of the input field.
+   * @param {string} option - The option to be selected.
+   */
+  async select(selector, option) {
+    await this.page.waitForSelector(selector);
+    await this.page.select(selector, option);
+  }
+
+  /**
    * This function navigates to the given URL.
    * @param {string} url - The URL to which the page has to be navigated.
    */

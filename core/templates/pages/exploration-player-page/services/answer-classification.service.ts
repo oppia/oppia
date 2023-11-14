@@ -233,6 +233,10 @@ export class AnswerClassificationService {
       interaction: Interaction,
       answer: string
   ): boolean {
+    if (answer.length <
+      ExplorationPlayerConstants.MIN_ANSWER_LENGTH_TO_CHECK_MISSPELLINGS) {
+      return false;
+    }
     var answerIsMisspelled = false;
     const answerGroups = interaction.answerGroups;
     for (var i = 0; i < answerGroups.length; ++i) {

@@ -916,5 +916,33 @@ describe('Admin page platform parameters tab', () => {
       expect(issues).toEqual(
         ['In rule 1, there should be at least one filter.']);
     });
+
+    it('should return issues if the app version condition is empty', () => {
+      const issues = AdminPlatformParametersTabComponent.validatePlatformParam(
+        PlatformParameter.createFromBackendDict({
+          data_type: 'bool',
+          default_value: false,
+          description: 'This is a dummy platform param.',
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: 'dummy_platform_parameter',
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.AppVersion,
+                  conditions: [['=', '']]
+                },
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual(
+        ['In rule 1, filter 1, condition 1, the app version is empty.']);
+    });
   });
 });

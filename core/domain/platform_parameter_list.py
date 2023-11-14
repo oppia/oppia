@@ -72,3 +72,4 @@ class ParamNames(enum.Enum):
     UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
         'unpublish_exploration_email_html_body')
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
+    RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'

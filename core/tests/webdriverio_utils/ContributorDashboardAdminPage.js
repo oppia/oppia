@@ -19,6 +19,7 @@
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var users = require('./users.js');
 
 var ContributorDashboardAdminPage = function() {
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
@@ -43,6 +44,24 @@ var ContributorDashboardAdminPage = function() {
   var viewContributionRightsMethodInputCss = (
     '.e2e-test-view-contribution-rights-method');
   var statusMessage = $('.e2e-test-status-message');
+  var statsListItemsSelector = function() {
+    return $$('.e2e-test-stats-list-item');
+  };
+  var statsTable = $('.e2e-test-stats-table');
+  var expandedRow = $('.e2e-test-expanded-row');
+  var copyButton = $('.e2e-test-copy-button');
+  var doneButton = $('.e2e-test-close-rich-text-component-editor');
+  var saveButton = $('.e2e-test-save-button');
+  var textbox = $('.e2e-test-description-box');
+  var acceptButton = $('.e2e-test-translation-accept-button');
+  var questionSubmitterTab = $('.e2e-test-question-submitters-tab');
+  var questionReviewerTab = $('.e2e-test-question-reviewers-tab');
+  var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
+  var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
+  var languageSelector = $('.e2e-test-language-selector');
+  var noDataMessage = $('.e2e-test-no-data-message');
+  var loadingMessage = $('.e2e-test-loading-message');
+  var languageDropdown = $('.e2e-test-language-selector-dropdown');
 
   this.get = async function() {
     await browser.url('/contributor-dashboard-admin');
@@ -114,6 +133,37 @@ var ContributorDashboardAdminPage = function() {
     }
   };
 
+  this.copyElementWithClassName = async function(
+      elementDescription, elementClassName) {
+    await action.click('Copy button', copyButton);
+    await action.click(elementDescription, elementClassName);
+    await action.setValue(
+      'Set Image description', textbox, 'An example description');
+    await action.click('Copy Done button', doneButton);
+    await action.click('Save button', saveButton);
+    await users.logout();
+  };
+
+  this.acceptTranslation = async function() {
+    await action.click('Translation accept button', acceptButton);
+  };
+
+  this.navigateToQuestionSubmitterTab = async function() {
+    await action.click('Question Submitter tab', questionSubmitterTab);
+  };
+
+  this.navigateToQuestionReviewerTab = async function() {
+    await action.click('Question Reviewer tab', questionReviewerTab);
+  };
+
+  this.navigateToTranslationSubmitterTab = async function() {
+    await action.click('Translation Submitter tab', translationSubmitterTab);
+  };
+
+  this.navigateToTranslationReviewerTab = async function() {
+    await action.click('Translation Reviewer tab', translationReviewerTab);
+  };
+
   this.assignTranslationReviewer = async function(
       username, languageDescription) {
     await _assignContributionRights(
@@ -136,6 +186,16 @@ var ContributorDashboardAdminPage = function() {
 
   this.assignQuestionContributor = async function(username) {
     await _assignContributionRights(username, CATEGORY_SUBMIT_QUESTION);
+  };
+
+  this.switchLanguage = async function(language) {
+    await action.click('Language Selector', languageSelector);
+    await waitFor.visibilityOf(
+      languageDropdown, 'Language Dropdown not visible');
+    var selectorOption = languageSelector.$(
+      `.e2e-test-language-selector-option=${language}`);
+    await action.click(`${language} option selector`, selectorOption);
+    await action.click('Language Selector', languageSelector);
   };
 
   this.expectUserToBeTranslationReviewer = async function(
@@ -176,6 +236,35 @@ var ContributorDashboardAdminPage = function() {
       contributionRights,
       'Submit Question Right Element taking too long to appear');
     expect(await contributionRights.getText()).toBe('Allowed');
+  };
+
+  this.expectStatsElementCountToBe = async function(elementsCount) {
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
+    await waitFor.visibilityOf(statsTable, 'stats table is not visible');
+    var statsListItems = await statsListItemsSelector();
+    expect(statsListItems.length).toBe(elementsCount);
+  };
+
+  this.expectNoStatsElement = async function() {
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
+    await waitFor.visibilityOf(
+      noDataMessage, 'No data message is not visible');
+  };
+
+  this.expectStatsRowsAreExpanded = async function() {
+    await waitFor.visibilityOf(statsTable, 'Stats table was not visible');
+    var statsListItems = await statsListItemsSelector();
+    await action.click('Stats row', statsListItems[0]);
+    await waitFor.visibilityOf(expandedRow, 'Expanded row not visible');
+    await action.click('Stats row', statsListItems[0]);
+    await waitFor.invisibilityOf(expandedRow, 'Expanded row still visible');
+  };
+
+  this.waitForLoadingMessageToDisappear = async function() {
+    await waitFor.invisibilityOf(
+      loadingMessage, 'Loading message did not disappear');
   };
 };
 

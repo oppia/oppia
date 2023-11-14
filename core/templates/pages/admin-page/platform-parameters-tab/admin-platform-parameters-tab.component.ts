@@ -395,6 +395,16 @@ export class AdminPlatformParametersTabComponent implements OnInit {
             continue;
           }
 
+          if (filter.type === PlatformParameterFilterType.AppVersion) {
+            if (condition[1] === '') {
+              issues.push(
+                `In rule ${ruleIndex + 1}, filter ${filterIndex + 1}, ` +
+                `condition ${conditionIndex + 1}, the app version is empty.`
+              );
+              continue;
+            }
+          }
+
           seenConditions.push(condition);
         }
       }

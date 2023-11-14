@@ -17,11 +17,11 @@
     <form class="form-horizontal" ng-submit="$ctrl.submitViewContributorUsersForm($ctrl.formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
       <div class="d-xl-inline-flex form-group">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="label-target-view-reviewer-method">
+        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="view-contributor-filter-method-select">
           Select Method
         </label>
         <div class="col-md-8 ml-auto">
-          <select id="label-target-view-reviewer-method"
+          <select id="view-contributor-filter-method-select"
                   ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
                   class="form-control e2e-test-view-contribution-rights-method"
                   ng-change="$ctrl.clearResults()">
@@ -32,9 +32,9 @@
       </div>
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
-        <label for="label-target-form-review-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+        <label for="view-contributor-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select id="label-target-form-review-category-select"
+          <select id="view-contributor-category-select"
                   class="form-control e2e-test-form-contribution-rights-category-select"
                   ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                   ng-model="$ctrl.formData.viewContributionReviewers.category"
@@ -45,9 +45,10 @@
 
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewContributionReviewers.category) && $ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+        <label for="view-contributor-language-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select ng-model="$ctrl.formData.viewContributionReviewers.languageCode"
+          <select id="view-contributor-language-select"
+                  ng-model="$ctrl.formData.viewContributionReviewers.languageCode"
                   class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
@@ -58,11 +59,18 @@
            ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_USERNAME">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewContributionReviewers.username" class="form-control e2e-test-form-contributor-username">
+          <input id="view-contributor-username-input"
+                 type="text"
+                 name="username"
+                 placeholder="Enter username"
+                 ng-model="$ctrl.formData.viewContributionReviewers.username"
+                 class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
 
-      <button type="submit" class="btn btn-success e2e-test-contribution-rights-form-submit-button"
+      <button id="view-contributor-submit-button"
+              type="submit"
+              class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.viewContributionReviewers.isValid()"
               value="view role">
         View Role
@@ -112,16 +120,16 @@
     <form class="form-horizontal" ng-submit="$ctrl.submitAddContributionRightsForm($ctrl.formData.addContributionReviewer)">
       <legend class="text-center">Add Contribution Rights</legend>
       <div class="d-xl-inline-flex form-group">
-        <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+        <label for="add-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <input type="text" id="label-target-form-reviewer-username" placeholder="Enter username" ng-model="$ctrl.formData.addContributionReviewer.username" class="form-control e2e-test-form-contributor-username">
+          <input type="text" id="add-contribution-rights-user-input" placeholder="Enter username" ng-model="$ctrl.formData.addContributionReviewer.username" class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
 
       <div class="d-xl-inline-flex form-group">
-        <label for="label-target-form-review-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
+        <label for="add-contribution-rights-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select id="label-target-form-review-category-select"
+          <select id="add-contribution-rights-category-select"
                   class="form-control e2e-test-form-contribution-rights-category-select"
                   ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
                   ng-model="$ctrl.formData.addContributionReviewer.category">
@@ -131,15 +139,20 @@
 
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.addContributionReviewer.category)">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+        <label for="add-contribution-rights-language-select"
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Select language
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select ng-model="$ctrl.formData.addContributionReviewer.languageCode"
+          <select id="add-contribution-rights-language-select"
+                  ng-model="$ctrl.formData.addContributionReviewer.languageCode"
                   class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
       </div>
       <button type="submit"
+              id="add-contribution-rights-submit-button"
               class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.addContributionReviewer.isValid()"
               value="update role">Add Rights
@@ -151,10 +164,10 @@
     <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionRightsForm($ctrl.formData.removeContributionReviewer)">
       <legend class="text-center">Remove Contribution Rights</legend>
       <div class="d-xl-inline-flex form-group">
-        <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+        <label for="remove-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <input type="text"
-                 id="label-target-form-reviewer-username"
+                 id="remove-contribution-rights-user-input"
                  class="form-control e2e-test-form-contributor-username"
                  placeholder="Enter username"
                  ng-model="$ctrl.formData.removeContributionReviewer.username">
@@ -162,24 +175,35 @@
       </div>
 
       <div class="d-xl-inline-flex form-group">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove from</label>
+        <label for="remove-contribution-rights-category-select"
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Remove from
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES" ng-model="$ctrl.formData.removeContributionReviewer.category" class="form-control">
+          <select id="remove-contribution-rights-category-select"
+                  ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
+                  ng-model="$ctrl.formData.removeContributionReviewer.category"
+                  class="form-control">
           </select>
         </div>
       </div>
 
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeContributionReviewer.category)">
-        <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+        <label for="remove-contribution-rights-language-select"
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Select language
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
+          <select id="remove-contribution-rights-language-select"
+                  ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
                   class="form-control e2e-test-form-language-select"
                   ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
           </select>
         </div>
       </div>
-      <button type="submit"
+      <button id="remove-contribution-rights-submit-button"
+              type="submit"
               class="btn btn-success e2e-test-contribution-rights-form-submit-button"
               ng-disabled="!$ctrl.formData.removeContributionReviewer.isValid()" value="update role">Remove Rights
       </button>

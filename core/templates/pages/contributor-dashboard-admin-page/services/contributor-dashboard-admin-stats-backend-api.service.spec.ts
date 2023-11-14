@@ -134,7 +134,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/translation/submission' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -193,7 +193,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/translation/review' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -252,7 +252,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/question/submission' +
-            '?page_size=20&offset=0&language_code=es');
+            '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -311,7 +311,7 @@ describe('Contribution Admin dasboard stats service', () => {
       spyOn(cdasbas, 'fetchContributorAdminStats').and.callThrough();
       const url = (
         '/contributor-dashboard-admin-stats/question/review' +
-                '?page_size=20&offset=0&language_code=es');
+                '?page_size=20&offset=0&language_code=en');
 
       cdasbas.fetchContributorAdminStats(
         ContributorAdminDashboardFilter.createDefault(),
@@ -382,6 +382,47 @@ describe('Contribution Admin dasboard stats service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should return assigned languages to the user', fakeAsync(
+    () => {
+      spyOn(cdasbas, 'fetchAssignedLanguageIds').and.callThrough();
+      const url = '/adminrolehandler?filter_criterion=username&username=user';
+
+      cdasbas.fetchAssignedLanguageIds('user').then(
+        successHandler, failHandler);
+      let req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        ['en', 'hi'],
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(cdasbas.fetchAssignedLanguageIds).toHaveBeenCalled();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should return topics data in math classroom', fakeAsync(
+    () => {
+      const url = '/classroom_data_handler/math';
+
+      cdasbas.fetchTopicChoices().then(
+        successHandler, failHandler);
+      let req = http.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush({topic_summary_dicts: [
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
+      ]},
+      { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      spyOn(cdasbas, 'fetchTopicChoices').and.returnValue(Promise.resolve([
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
+      ]));
     }));
 
   it('should return empty stats if contribution type is invalid', fakeAsync(

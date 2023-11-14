@@ -429,13 +429,13 @@ Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the learner view.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
@@ -457,7 +457,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     'This flag is to show new contributor admin dashboard.',
-    platform_parameter_domain.FeatureStages.DEV)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
@@ -555,4 +555,11 @@ Registry.create_platform_parameter(
     ),
     platform_parameter_domain.DataTypes.NUMBER,
     default=5
+)
+
+Registry.create_platform_parameter(
+    ParamNames.RECORD_PLAYTHROUGH_PROBABILITY,
+    'The probability of recording playthroughs',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.2
 )
