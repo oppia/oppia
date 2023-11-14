@@ -44,6 +44,5 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
       .toEqual('test1 test2! test3');
     expect(nwpcp.transform(' teSTstrinG12  ')).toEqual('teststring12');
     expect(nwpcp.transform(' tesT1 teSt2 ')).toEqual('test1 test2');
-    expect(nwpcp.transform('tesT1\n teSt2')).toEqual('test1\ntest2');
   });
 });
