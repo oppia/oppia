@@ -18,7 +18,7 @@
 
 import { EventBusGroup, EventBusService, Newable } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -59,6 +59,7 @@ export class AddAnswerGroupModalComponent
    // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() currentInteractionId!: string;
    @Input() stateName!: string;
+   @ViewChild('addResponse',) addResponseRef!: ElementRef;
 
    eventBusGroup!: EventBusGroup;
    tmpRule!: Rule;
@@ -191,6 +192,10 @@ export class AddAnswerGroupModalComponent
    updateAnswerGroupFeedback(outcome: Outcome): void {
      this.openFeedbackEditor();
      this.tmpOutcome.feedback = outcome.feedback;
+   }
+
+   ngAfterViewInit(): void {
+     this.addResponseRef.nativeElement.focus();
    }
 
    ngOnDestroy(): void {
