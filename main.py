@@ -442,6 +442,9 @@ URLS = [
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
+        r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
+        classroom.UnusedTopicsHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
