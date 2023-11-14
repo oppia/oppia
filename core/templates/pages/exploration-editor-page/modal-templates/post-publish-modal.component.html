@@ -1,17 +1,17 @@
 <div class="oppia-share-publish-modal e2e-test-share-publish-modal">
   <div class="modal-header oppia-share-publish-header">
     <img [src]="congratsImgUrl">
-    <h3>Awesome!</h3>
+    <h3 tabindex="0">Awesome!</h3>
   </div>
 
   <div class="modal-body oppia-long-text oppia-share-publish-body">
-    <p>
+    <p tabindex="0">
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      <p>Here's your exploration link:</p>
+      <p tabindex="0">Here's your exploration link:</p>
     </div>
-    <oppia-copy-url [urlToCopy]="explorationLink"></oppia-copy-url>
+    <oppia-copy-url tabindex="0" [urlToCopy]="explorationLink"></oppia-copy-url>
     <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
