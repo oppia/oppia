@@ -72,6 +72,8 @@ PROD_FEATURES_LIST: List[ParamNames] = [
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
 DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
+    params.ParamNames.ANDROID_BETA_LANDING_PAGE,
+    params.ParamNames.BLOG_PAGES,
 ]
 
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [
