@@ -210,18 +210,20 @@ class SampleDataInitializer:
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
     def _add_review_translation_rights(self, username: str) -> None:
-        """Adds review translation rights of language Akan to the user with the given username."""
+        """Adds review translation rights of language Akan to the user 
+        with the given username.
+        """
         params = {
             'payload': json.dumps({
                 'username': username,
-                "language_code": "ak"
+                'language_code': 'ak'
             }),
             'csrf_token': self.csrf_token
         }
 
         self._make_request(
             'POST', '/contributionrightshandler/translation', params=params)
-        
+
     def _add_review_question_rights(self, username: str) -> None:
         """Adds review question rights to the user with the given username."""
         params = {
