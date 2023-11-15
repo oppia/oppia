@@ -2218,8 +2218,7 @@ def send_email_to_new_cd_user(
     category_data = NEW_CD_USER_EMAIL_DATA[category]
     email_subject = 'You have been invited to %s Oppia %s' % (
         category_data['task'],
-        category_data['category']
-    )
+        category_data['category'])
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
