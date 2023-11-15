@@ -193,7 +193,7 @@
           [disableTooltip]="reviewMessage.length !== 0">
       <button class="btn btn-danger oppia-suggestion-resolve-button"
               *ngIf="reviewable"
-              [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
+              [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion || startedEditing"
               (click)="rejectAndReviewNext(reviewMessage)">
         <i [hidden]="!resolvingSuggestion"
            class="fa fa-spinner">
@@ -205,7 +205,7 @@
     </span>
     <span>
       <button class="btn btn-success oppia-suggestion-resolve-button e2e-test-translation-accept-button"
-              [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH"
+              [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || startedEditing"
               *ngIf="reviewable"
               (click)="acceptAndReviewNext()">
         <i [hidden]="!resolvingSuggestion"
@@ -335,7 +335,7 @@
   }
   .oppia-suggestion-resolve-button {
     margin-left: 10px;
-    min-width: 165px;
+    min-width: 130px;
   }
   .oppia-suggestion-review-panel-header-container {
     height: 12%;

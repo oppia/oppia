@@ -1,4 +1,5 @@
 <div [ngClass]="{'has-error': (explorationTitle.dirty || explorationTitle.touched) && !(explorationTitleService.displayed.length > 0)}">
+  <span [attr.aria-label]="'Choose a title for your exploration. (Please use at most ' + MAX_CHARS_IN_EXPLORATION_TITLE + ' characters, so that this fits in the summary card.)'" tabindex="0" class="sr-only"></span>
   <mat-form-field appearance="fill">
     <mat-label>{{ labelText }}</mat-label>
     <input matInput
