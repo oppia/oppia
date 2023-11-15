@@ -181,8 +181,8 @@ class FeatureFlag:
     @property
     def last_updated(self) -> Optional[datetime.datetime]:
         """Returns the last_updated field of the feature flag.
-        When the feature flag has not been updated yet, last_updated
-        will be None.
+        Date when the model was last updated, or None if there is no model
+        for this feature flag in the datastore.
 
         Returns:
             Optional[datetime.datetime]. The last_updated of the feature flag.
