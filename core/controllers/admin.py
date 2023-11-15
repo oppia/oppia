@@ -64,7 +64,7 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
