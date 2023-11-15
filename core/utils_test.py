@@ -783,7 +783,7 @@ class UtilsTests(test_utils.GenericTestBase):
         msecs = 1690761600000
         dt = utils.convert_millisecs_time_to_datetime_object(
             msecs + 1000.0 * time.timezone)
-        dt2 = datetime.datetime(2023, 7, 31)
+        dt2 = datetime.datetime(2023, 7, 30, 18, 30, tzinfo=datetime.timezone.utc)
         self.assertEqual(dt, dt2)
 
     def test_grouper(self) -> None:
