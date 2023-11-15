@@ -73,7 +73,7 @@ export class PlatformFeatureAdminBackendApiService {
       userGroupIds: string[]
   ):
       Promise<void> {
-    await this.http.post(
+    await this.http.put(
       FeatureFlagDomainConstants.FEATURE_FLAGS_URL,
       {
         action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,

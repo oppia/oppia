@@ -115,7 +115,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       const req = httpTestingController.expectOne(
         FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
       req.flush({});
-      expect(req.request.method).toEqual('POST');
+      expect(req.request.method).toEqual('PUT');
 
       flushMicrotasks();
 

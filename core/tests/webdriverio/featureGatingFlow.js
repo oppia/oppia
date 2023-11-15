@@ -56,7 +56,6 @@ describe('Feature Gating Flow', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
-    await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
     await releaseCoordinatorPage.saveChangeOfFeature(dummy);
     await users.logout();
   });
