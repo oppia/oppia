@@ -99,23 +99,6 @@ AllowedAdminConfigPropertyValueTypes = Union[
 ]
 
 
-class AdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Admin page shown in the App Engine admin console."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    # Here we use type Any because the sub-classes of 'Basehandler' can have
-    # 'get' method with different number of arguments and types.
-    @acl_decorators.open_access
-    def get(self, *args: Any, **kwargs: Any) -> None:
-        """Renders the admin page."""
-
-        self.render_template('oppia-root.mainpage.html')
-
-
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
