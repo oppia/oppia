@@ -332,11 +332,6 @@ class TopicSummaryModel(base_models.BaseModel):
     This should be used whenever the content blob of the topic is not
     needed (e.g. search results, etc).
 
-    A TopicSummaryModel instance stores the following information:
-
-        id, description, language_code, last_updated, created_on, version,
-        url_fragment.
-
     The key of each instance is the topic id.
     """
 
@@ -388,6 +383,14 @@ class TopicSummaryModel(base_models.BaseModel):
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
+    # A mapping from each story id belonging to the topic to a list of
+    # exploration ids that are linked to the corresponding story. This mapping
+    # represents the relationships between a topic, its stories,
+    # and the explorations that are linked to each story. This field must be
+    # kept in-sync with updates made to an owned story's explorations and to
+    # the topic's ownership of said stories.
+    story_exploration_mapping = datastore_services.JsonProperty(required=True,
+        indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -422,8 +425,44 @@ class TopicSummaryModel(base_models.BaseModel):
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_exploration_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_story_exploration_mappings(cls) -> List[Dict[str, List[str]]]:
+        """Gets each entity's story_exploration_mapping property.
+
+        Returns:
+            list(dict(str, list(str))). A list of
+            story_exploration_mapping values stored in each entity.
+        """ 
+        projections: Sequence[TopicModel] = cls.query(
+            projection=['story_exploration_mapping']
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        return [
+            projection.story_exploration_mapping for projection in projections
+        ]
+
+    @classmethod
+    def get_story_exploration_mappings_by_name(
+        cls, name: str
+    ) -> List[Dict[str, List[str]]]:
+        """Gets each entity's story_exploration_mapping property by topic name. 
+
+        Args:
+            name: str. The name of the topic to select entities for querying.
+
+        Returns:
+            list(dict(str, list(str))). A list of
+            story_exploration_mapping values stored in each entity.
+        """ 
+        projections: Sequence[TopicModel] = cls.query(
+            projection=['story_exploration_mapping']
+        ).filter(cls.name == name).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+        return [
+            projection.story_exploration_mapping for projection in projections
+        ]
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

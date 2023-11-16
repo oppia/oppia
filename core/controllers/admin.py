@@ -2095,6 +2095,26 @@ class UpdateBlogPostHandler(
         self.render_json({})
 
 
+class RegenerateTopicSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to regenerate the summaries of all topics."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Regenerates all topic summary models."""
+
+        for topic in topic_fetchers.get_all_topics():
+            topic_services.generate_topic_summary(topic.id)
+
+        self.render_json({});
+
+
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of TranslationCoordinatorRoleHandler's
     normalized_payload dictionary.

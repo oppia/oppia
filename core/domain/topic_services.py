@@ -1100,13 +1100,24 @@ def compute_summary_of_topic(
             additional_story_count += 1
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
-    total_model_published_node_count = published_node_count
+    topic_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
+    story_references = (
+        topic.canonical_story_references + topic.additional_story_references)
+    topic_model_story_exploration_mapping = {}
+
+    for story_ref in story_references:
+        story = story_fetchers.get_story_by_id(story_ref.story_id) 
+        topic_model_story_exploration_mapping.update({
+            story_ref.story_id: story.story_contents.get_all_linked_exp_ids()
+            if story else []
+        })
+
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
-        total_skill_count = total_skill_count + len(subtopic.skill_ids)
+        total_skill_count += len(subtopic.skill_ids)
 
     if topic.created_on is None or topic.last_updated is None:
         raise Exception(
@@ -1117,9 +1128,10 @@ def compute_summary_of_topic(
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, total_model_published_node_count,
+        total_skill_count, topic_model_published_node_count,
         topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
-        topic.created_on, topic.last_updated
+        topic_model_story_exploration_mapping, topic.created_on,
+        topic.last_updated
     )
 
     return topic_summary
@@ -1638,7 +1650,8 @@ def populate_topic_summary_model_fields(
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
-        'url_fragment': topic_summary.url_fragment
+        'url_fragment': topic_summary.url_fragment,
+        'story_exploration_mapping': topic_summary.story_exploration_mapping
     }
 
     if topic_summary_model is not None:
@@ -1699,7 +1712,7 @@ def get_chapter_counts_in_topic_summaries(
 
     Returns:
         Dict[str, TopicChapterCounts]. Dict of topic id and topic chapter
-        counts domain object.
+        counts domain obj8b8UbvPbEVOWect.
     """
 
     topic_summary_id_mapping: Dict[

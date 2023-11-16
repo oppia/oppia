@@ -1890,7 +1890,7 @@ class Topic:
                 the topic.
         """
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
-
+ 
     def add_uncategorized_skill_id(
         self, new_uncategorized_skill_id: str
     ) -> None:
@@ -2244,6 +2244,7 @@ class TopicSummaryDict(TypedDict):
     total_published_node_count: int
     thumbnail_filename: Optional[str]
     thumbnail_bg_color: Optional[str]
+    story_exploration_mapping: Dict[str, List[str]]
     topic_model_created_on: float
     topic_model_last_updated: float
 
@@ -2280,6 +2281,7 @@ class TopicSummary:
         thumbnail_filename: Optional[str],
         thumbnail_bg_color: Optional[str],
         url_fragment: str,
+        story_exploration_mapping: Dict[str, List[str]],
         topic_model_created_on: datetime.datetime,
         topic_model_last_updated: datetime.datetime
     ) -> None:
@@ -2309,6 +2311,9 @@ class TopicSummary:
                 thumbnail, or None if no background color provided for
                 the thumbnail.
             url_fragment: str. The url fragment of the topic.
+            story_exploration_mapping: dict(str, list(str)). The relationship
+                between the topic, its stories' ids, and the explorations' ids
+                that are linked to said stories.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -2331,6 +2336,7 @@ class TopicSummary:
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
         self.url_fragment = url_fragment
+        self.story_exploration_mapping = story_exploration_mapping
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -2435,6 +2441,7 @@ class TopicSummary:
             'total_published_node_count': self.total_published_node_count,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'story_exploration_mapping': self.story_exploration_mapping,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(
@@ -2480,11 +2487,11 @@ class TopicChapterCounts:
     """Domain object for chapter counts in a topic."""
 
     def __init__(
-            self,
-            total_upcoming_chapters_count: int,
-            total_overdue_chapters_count: int,
-            total_chapter_counts_for_each_story: List[int],
-            published_chapter_counts_for_each_story: List[int]
+        self,
+        total_upcoming_chapters_count: int,
+        total_overdue_chapters_count: int,
+        total_chapter_counts_for_each_story: List[int],
+        published_chapter_counts_for_each_story: List[int]
     ) -> None:
         """Constructs a TopicChapterCounts domain object.
 
