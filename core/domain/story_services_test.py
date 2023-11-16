@@ -1841,37 +1841,26 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated story initial_node_id.')
 
     def test_rearrange_node_in_story(self) -> None:
-        exp_id_2 = 'exp_id_2'
-        change_add_story_with_exploration = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_2,
-                'title': 'Title 2'
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': self.NODE_ID_2,
-                'old_value': None,
-                'new_value': exp_id_2
-            })
-        ]
+        change_add_story_with_exploration = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': self.NODE_ID_2,
+            'title': 'Title 2'
+        })]
         first: Final = 0
         second: Final = 1
 
+        change_add_story_node = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': self.NODE_ID_2,
+            'title': 'Title 2'
+        })]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_add_story_with_exploration,
+            self.USER_ID, self.STORY_ID, change_add_story_node,
             'Added story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_1)
         self.assertEqual(story.story_contents.nodes[second].id, self.NODE_ID_2)
-        self.assertDictEqual(
-            topic.story_exploration_mapping,
-            {self.STORY_ID: [self.EXP_ID, exp_id_2]}
-        )
 
         change_rearrange_story_node = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
@@ -1880,18 +1869,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': first
         })]
 
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_rearrange_story_node,
-            'Added story node.')
+        story_services.update_story(self.USER_ID, self.STORY_ID,
+            change_rearrange_story_node, 'Rearranged story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.nodes[second].id, self.NODE_ID_1)
-        self.assertDictEqual(
-            topic.story_exploration_mapping,
-            {self.STORY_ID: [exp_id_2, self.EXP_ID]}
-        )
 
     def test_cannot_update_node_exploration_id_with_invalid_node_id(
         self
@@ -2173,7 +2156,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertIsNone(story.story_contents.initial_node_id)
         self.assertDictEqual(
             topic.story_exploration_mapping,

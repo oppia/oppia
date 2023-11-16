@@ -537,6 +537,7 @@ def get_topic_summary_from_model(
         topic_summary_model.thumbnail_filename,
         topic_summary_model.thumbnail_bg_color,
         topic_summary_model.url_fragment,
+        topic_summary_model.story_exploration_mapping,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -764,8 +765,11 @@ def get_all_story_exploration_ids(
         list(str). A list of all exploration ids belonging to the stories in the
         topic(s) to search through.
     """
-    mappings = topic_models.TopicModel.get_all_story_exploration_mappings(
-        topic_name)
+    mappings = (
+        topic_models.TopicSummaryModel
+        .get_story_exploration_mappings_by_name(topic_name)
+        if topic_name
+        else topic_models.TopicSummaryModel.get_story_exploration_mappings())
 
     story_exp_ids = set()
     for mapping in mappings:

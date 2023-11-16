@@ -195,13 +195,12 @@ export class AdminMiscTabComponent {
       });
   }
 
-  populateTopicsWithExplorationIds(): void {
-    this.setStatusMessage.emit(
-      'Populating topics with exploration ids...');
-    this.adminBackendApiService.populateTopicsWithExplorationIdsAsync()
+  regenerateTopicSummaries(): void {
+    this.setStatusMessage.emit('Regenerating all topic summaries...');
+    this.adminBackendApiService.regenerateTopicSummariesAsync()
       .then(() => {
         this.setStatusMessage.emit(
-	  'Successfully populated topics with exploration ids');
+          'Successfully regenerated all topic summaries.');
       }, (errorResponse) => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);
       });

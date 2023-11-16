@@ -173,6 +173,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.total_published_node_count, 0)
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+        self.assertDictEqual(topic_summary.story_exploration_mapping, {
+            self.story_id_1: [],
+            self.story_id_2: [],
+            self.story_id_3: []
+        })
 
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
@@ -2180,7 +2185,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            story_exploration_mapping={
+                self.story_id_1: [],
+                self.story_id_2: [],
+                self.story_id_3: []
+            }
         )
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
         populated_model = topic_services.populate_topic_summary_model_fields(
@@ -2241,6 +2251,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             populated_model.url_fragment,
             topic_summary.url_fragment
         )
+        self.assertDictEqual(
+            populated_model.story_exploration_mapping,
+            topic_summary.story_exploration_mapping)
 
     def test_get_chapter_counts_in_topic_summaries(self) -> None:
         canonical_story_id_1 = story_services.get_new_story_id()

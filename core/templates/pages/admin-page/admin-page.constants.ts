@@ -37,8 +37,8 @@ export const AdminPageConstants = {
   ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL: '/adminsuperadminhandler',
   ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
   ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
-  ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER: 
-    '/populatetopicswithexplorationidshandler',
+  ADMIN_REGENERATE_TOPIC_SUMMARIES_HANDLER_URL:
+    '/regenerate_topic_summaries_handler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',
