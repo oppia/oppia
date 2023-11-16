@@ -329,7 +329,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'There are suggestions on the <a href="%s%s">Contributor Dashboard</a> '
         'that have been waiting for more than %s days for review. Please take '
         'a look at the suggestions mentioned below and help them get reviewed '
-        'by going to the <a href="%s%s#/roles">admin roles page</a> and either:'
+        'by going to the <a href="http://www.oppia.org/contributor-dashboard-admin%s">admin roles page</a> and either:'
         '<br><br><ul>'
         '<li>Add more reviewers to the suggestion types that have suggestions '
         'waiting too long for a review</li><br>'
@@ -347,6 +347,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Contributor Dashboard Suggestions Have Been Waiting Too Long for '
         'Review')
 }
+
 
 CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[
     str, Dict[str, Dict[str, str]]] = {
