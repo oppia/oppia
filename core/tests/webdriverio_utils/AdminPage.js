@@ -56,6 +56,12 @@ var AdminPage = function() {
   var usernameInputFieldForRolesEditing = $(
     '.e2e-test-username-for-role-editor');
   var viewRoleButton = $('.e2e-test-role-success');
+  var languageSelectorModal = $('.e2e-test-language-selector-modal');
+  var languageSelector = $('.e2e-test-language-selector');
+  var languageSelectorCloseButton = $(
+    '.e2e-test-language-selector-close-button');
+  var languageSelectorAddButton = $('.e2e-test-language-selector-add-button');
+  var editLanguageButton = $('.e2e-test-edit-language-button');
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -211,6 +217,47 @@ var AdminPage = function() {
       '-remove-button-container');
     await waitFor.visibilityOf(
       removeButtonElement, 'Role removal button takes too long to appear.');
+  };
+
+  this._selectLanguage = async function(language) {
+    await waitFor.visibilityOf(
+      languageSelectorModal,
+      'Language selector modal taking too long to appear');
+    await action.select(
+      'Language selector', languageSelector, language
+    );
+    await action.click('Add language button', languageSelectorAddButton);
+    await action.click('Close button', languageSelectorCloseButton);
+    await waitFor.invisibilityOf(
+      languageSelectorModal,
+      'Language selector modal taking too long to disappear');
+  };
+
+  this.makeUserTranslationCoordinator = async function(name, language) {
+    await this._editUserRole(name);
+
+    await action.click('Add new role', addNewRoleButton);
+    await action.matSelect(
+      'New role selector', roleSelector, 'translation coordinator');
+
+    await this._selectLanguage(language);
+
+    await waitFor.invisibilityOf(
+      progressSpinner, 'Progress spinner is taking too long to disappear.');
+    newRole = 'translation coordinator';
+    var removeButtonElement = $(
+      '.e2e-test-' + newRole.split(' ').join('-') +
+      '-remove-button-container');
+    await waitFor.visibilityOf(
+      removeButtonElement, 'Role removal button takes too long to appear.');
+  };
+
+  this.addLanguageToCoordinator = async function(name, language) {
+    await this._editUserRole(name);
+    await action.click(
+      'Edit coordinated languages button',
+      editLanguageButton);
+    await this._selectLanguage(language);
   };
 
   this.getUsersAsssignedToRole = async function(role) {

@@ -22,9 +22,9 @@ const puppeteer = require('puppeteer');
 const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 
 
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
-const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://127.0.0.1:8181/topics-and-skills-dashboard';
+const ADMIN_URL = 'http://localhost:8181/admin';
+const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
+const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://localhost:8181/topics-and-skills-dashboard';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
@@ -43,7 +43,20 @@ var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
-
+var stateEditSelector = '.e2e-test-state-edit-content';
+var saveContentButton = '.e2e-test-save-state-content';
+var addInteractionButton = '.e2e-test-open-add-interaction-modal';
+var endIneractionSelector = '.e2e-test-interaction-tile-EndExploration';
+var saveInteractionButton = '.e2e-test-save-interaction';
+var saveChangesButton = '.e2e-test-save-changes';
+var saveDraftButton = '.e2e-test-save-draft-button';
+var publishExplorationButton = '.e2e-test-publish-exploration';
+var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
+var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
+var expCategoryDropdownElement =
+  '.e2e-test-exploration-category-metadata-modal';
+var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
+var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
 var topicNameField = '.e2e-test-new-topic-name-field';
 var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
@@ -129,7 +142,7 @@ const setRole = async function(browser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+      'http://localhost:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(usernameInputFieldForRolesEditing);
     await page.type(usernameInputFieldForRolesEditing, 'username1');
     await page.waitForSelector(editUserRoleButton);
@@ -155,11 +168,72 @@ const getExplorationEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
       dismissWelcomeModalSelector, {visible: true});
+
+    await page.click(dismissWelcomeModalSelector);
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(stateEditSelector, {visible: true});
+    await page.click(stateEditSelector);
+    await page.waitForTimeout(5000);
+    await page.waitForSelector(saveContentButton, {visible: true});
+    await page.click(saveContentButton);
+    await page.waitForTimeout(2000);
+    await page.waitForSelector(addInteractionButton, {visible: true});
+    await page.click(addInteractionButton);
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(endIneractionSelector, {visible: true});
+    await page.click(endIneractionSelector);
+    await page.waitForSelector(saveInteractionButton, {visible: true});
+    await page.click(saveInteractionButton);
+
+    await page.waitForSelector(saveChangesButton, {visible: true});
+    await page.click(saveChangesButton);
+
+    await page.waitForSelector(saveDraftButton, {visible: true});
+    await page.click(saveDraftButton);
+
+    const successMessage = 'Changes saved.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.e2e-test-toast-message');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(publishExplorationButton);
+    await page.click(publishExplorationButton);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(explorationTitleInput, {visible: true});
+    await page.type(explorationTitleInput, 'Sample exploration');
+
+    await page.waitForSelector(explorationGoalInput, {visible: true});
+    await page.type(explorationGoalInput, 'Sample exploration goal');
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(expCategoryDropdownElement, {visible: true});
+    await page.click(expCategoryDropdownElement);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector('mat-option');
+    await page.waitForTimeout(3000);
+    await page.click('mat-option[ng-reflect-value="Algebra"]');
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(expConfirmPublishButton, {visible: true});
+    await page.click(expConfirmPublishButton);
+    await page.waitForTimeout(5000);
+    await page.waitForSelector(explorationConfirmPublish, {visible: true});
+    await page.click(explorationConfirmPublish);
+
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -280,7 +354,7 @@ const getSkillEditorUrl = async function(browser, page) {
 const generateDataForTopicAndStoryPlayer = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateTopicButton);
     await page.click(generateTopicButton);
@@ -306,7 +380,7 @@ const generateDataForTopicAndStoryPlayer = async function(browser, page) {
 const generateDataForClassroom = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/activities', { waitUntil: networkIdle });
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
 
     await page.waitForSelector(generateClassroomButton);
     await page.click(generateClassroomButton);

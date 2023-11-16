@@ -312,7 +312,7 @@ export class StoryEditorNavbarComponent implements OnInit {
                 this.story, nodes[i].getId(), null);
             }
           }
-          if (selectedChapterIndexInPublishUptoDropdown === -1) {
+          if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
             this.unpublishStory();
           }
           this.storyEditorStateService.saveStory(

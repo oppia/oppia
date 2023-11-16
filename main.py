@@ -278,6 +278,9 @@ URLS = [
     get_redirect_route(
         r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
     get_redirect_route(
+        r'/translationcoordinatorrolehandler',
+        admin.TranslationCoordinatorRoleHandler),
+    get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -352,6 +355,10 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
+    get_redirect_route(
+        r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
+        contributor_dashboard.LessonsPinningHandler,
+    ),
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
@@ -434,6 +441,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
+        classroom.UnusedTopicsHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
@@ -1154,7 +1164,7 @@ URLS.extend((
         oppia_root.OppiaRootPage),
     get_redirect_route(
         r'/learn/<classroom_url_fragment>',
-        oppia_root.OppiaLightweightRootPage
+        oppia_root.OppiaRootPage
     ),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,

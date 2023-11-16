@@ -49,7 +49,7 @@ class ClassroomPageTests(BaseClassroomControllerTests):
     def test_any_user_can_access_classroom_page(self) -> None:
         response = self.get_html_response('/learn/math')
         self.assertIn(
-            '<lightweight-oppia-root></lightweight-oppia-root>', response)
+            '<oppia-root></oppia-root>', response)
 
 
 class ClassroomAdminPageTests(BaseClassroomControllerTests):
@@ -124,6 +124,23 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {
+                topic_id_1: [],
+                topic_id_2: [],
+                topic_id_3: []
+            }
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+
+        classroom_config_services.create_new_classroom(math_classroom)
         self.logout()
 
         json_response = self.get_json(
@@ -385,3 +402,134 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
         json_response = self.get_json(
             non_existent_classroom_url, expected_status_int=404)
+
+
+class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.used_topic1 = topic_domain.Topic.create_default_topic(
+            'used_topic_1', 'used_topic1_name',
+            'frag-used-topic-one', 'description', 'fragm')        
+        topic_services.save_new_topic(self.owner_id, self.used_topic1)
+
+        self.physics_classroom_id = (
+            classroom_config_services.get_new_classroom_id())
+        self.physics_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': self.physics_classroom_id,
+            'name': 'physics',
+            'url_fragment': 'physics',
+            'course_details': 'Curated physics foundations course.',
+            'topic_list_intro': 'Start from the basics with our first topic.',
+            'topic_id_to_prerequisite_topic_ids': {
+                'topic_id_1': ['topic_id_2', 'topic_id_3'],
+                'topic_id_2': [],
+                'topic_id_3': [],
+                'used_topic_1': []
+            }
+        }
+        self.physics_classroom = classroom_config_domain.Classroom.from_dict(
+            self.physics_classroom_dict)
+        classroom_config_services.update_or_create_classroom_model(
+            self.physics_classroom)
+
+    def test_returns_newly_added_unused_topics(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        unused_topic1 = topic_domain.Topic.create_default_topic(
+            'unused_topic1', 'unused_topic1_name',
+            'frag-topic-one', 'description', 'fragm')
+        topic_services.save_new_topic(self.owner_id, unused_topic1)
+        unused_topics = [unused_topic1.to_dict()]
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            unused_topics
+        )
+
+        unused_topic2 = topic_domain.Topic.create_default_topic(
+            'unused_topic2', 'unused_topic2_name',
+            'frag-topic-two', 'description', 'fragm')
+        topic_services.save_new_topic(self.owner_id, unused_topic2)
+        unused_topics = [unused_topic1.to_dict(), unused_topic2.to_dict()]
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            unused_topics
+        )
+
+        self.logout()
+
+    def test_does_not_return_deleted_topic(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        unused_topic1 = topic_domain.Topic.create_default_topic(
+            'unused_topic1', 'unused_topic1_name',
+            'frag-topic-one', 'description', 'fragm')
+        topic_services.save_new_topic(self.owner_id, unused_topic1)
+
+        unused_topic2 = topic_domain.Topic.create_default_topic(
+            'unused_topic2', 'unused_topic2_name',
+            'frag-topic-two', 'description', 'fragm')
+        topic_services.save_new_topic(self.owner_id, unused_topic2)
+
+        unused_topics = [unused_topic1.to_dict(), unused_topic2.to_dict()]
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            unused_topics
+        )
+
+        topic_services.delete_topic(self.owner_id, unused_topic2.id, True)
+        unused_topics = [unused_topic1.to_dict()]
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            unused_topics
+        )
+
+        self.logout()
+
+    def test_returns_topic_if_unused_in_classroom(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            []
+        )
+
+        self.physics_classroom.topic_id_to_prerequisite_topic_ids.pop(
+            self.used_topic1.id
+            )
+        classroom_config_services.update_or_create_classroom_model(
+            self.physics_classroom)
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            [self.used_topic1.to_dict()]
+        )
+
+        self.logout()
+
+    def test_returns_no_topics_if_no_unused_topics(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        json_response = self.get_json(feconf.UNUSED_TOPICS_HANDLER_URL)
+        self.assertEqual(
+            json_response['unused_topics'],
+            []
+        )
+
+        self.logout()
+
+    def test_not_able_to_get_unused_topics_when_user_is_not_admin(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            feconf.UNUSED_TOPICS_HANDLER_URL, expected_status_int=401)
+        self.logout()
