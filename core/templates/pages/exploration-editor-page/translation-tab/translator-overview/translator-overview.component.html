@@ -9,6 +9,7 @@
       </span>
       <select id="audioTranslationLanguageCodeField"
               class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus"
+              [attr.aria-label]="inVoiceoverMode ? 'Voiceover language selector' : 'Translation language selector'"
               (change)="changeTranslationLanguage()"
               [(ngModel)]="languageCode">
         <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
@@ -41,7 +42,7 @@
     <div class="progress oppia-translation-progress-bar">
       <div class="progress-bar bg-success" role="progressbar" [ngStyle]="getTranslationProgressStyle()"></div>
     </div>
-    <span [attr.aria-label]="getTranslationProgressAriaLabel()" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">({{ numberOfRequiredAudio - numberOfAudioNotAvailable }}/{{ numberOfRequiredAudio }})</span>
+    <span tabindex="0" [attr.aria-label]="getTranslationProgressAriaLabel()" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">({{ numberOfRequiredAudio - numberOfAudioNotAvailable }}/{{ numberOfRequiredAudio }})</span>
   </div>
 </div>
 
