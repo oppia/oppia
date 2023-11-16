@@ -137,48 +137,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
 
-    def test_get_all_story_exploration_mappings(self) -> None:
-        topic, topic_2 = self._create_topics_with_story_exploration_mapping()
-
-        mappings = topic_models.TopicModel.get_all_story_exploration_mappings()
-
-        self.assertIn(topic.story_exploration_mapping, mappings)
-        self.assertIn(topic_2.story_exploration_mapping, mappings)
-
-    def test_get_story_exploration_mapping_in_topic_with_name(self) -> None:
-        topic, topic_2 = self._create_topics_with_story_exploration_mapping()
-
-        mappings = (
-            topic_models.TopicModel
-            .get_all_story_exploration_mappings(topic_2.name)
-        )
-
-        self.assertNotIn(topic.story_exploration_mapping, mappings)
-        self.assertIn(topic_2.story_exploration_mapping, mappings)
-
-    def _create_topics_with_story_exploration_mapping(
-        self
-    ) -> List[topic_domain.Topic]:
-        """Creates two topics with initial story_exploration_mapping.
-
-        Returns:
-            list(Topic). The topics that were created.
-        """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
-        topic.story_exploration_mapping = {
-            'story_11': ['exp_111', 'exp_112'],
-            'story_12': []
-        }
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-
-        topic_2 = topic_domain.Topic.create_default_topic(
-            '2', 'topic name 2', 'name-two', 'description', 'fragm-two')
-        topic_2.story_exploration_mapping = {'story_21': ['exp_211']}
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic_2)
-
-        return [topic, topic_2]
-
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""

@@ -80,8 +80,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
             'page_title_fragment_for_web': 'fragm',
-            'skill_ids_for_diagnostic_test': [],
-            'story_exploration_mapping': {}
+            'skill_ids_for_diagnostic_test': []
         }
         self.assertDictEqual(topic.to_dict(), expected_topic_dict)
 
@@ -133,20 +132,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_2')
         ]
-        self.topic.story_exploration_mapping = {
-            'story_id': [],
-            'story_id_1': [],
-            'story_id_2': []
-        }
 
         self.topic.delete_canonical_story('story_id_1')
 
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
             canonical_story_ids, ['story_id', 'story_id_2'])
-        self.assertEqual(
-            self.topic.story_exploration_mapping,
-            {'story_id': [], 'story_id_2': []})
         with self.assertRaisesRegex(
             Exception, 'The story_id story_id_5 is not present in the canonical'
             ' story references list of the topic.'):
@@ -352,10 +343,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
-        self.topic.story_exploration_mapping = {
-            'story_id': [],
-            'story_id_1': []
-        }
 
         self.topic.add_canonical_story('story_id_2')
 
@@ -363,9 +350,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        self.assertEqual(
-            self.topic.story_exploration_mapping,
-            {'story_id': [], 'story_id_1': [], 'story_id_2': []})
         with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'canonical story references list of the topic.'):
@@ -380,20 +364,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_2')
         ]
-        self.topic.story_exploration_mapping = {
-            'story_id': [],
-            'story_id_1': [],
-            'story_id_2': []
-        }
 
         self.topic.delete_additional_story('story_id_1')
 
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(
             additional_story_ids, ['story_id', 'story_id_2'])
-        self.assertEqual(
-            self.topic.story_exploration_mapping,
-            {'story_id': [], 'story_id_2': []})
         with self.assertRaisesRegex(
             Exception,
             'The story_id story_id_5 is not present in the additional'
@@ -407,10 +383,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
-        self.topic.story_exploration_mapping = {
-            'story_id': [],
-            'story_id_1': []
-        }
 
         self.topic.add_additional_story('story_id_2')
 
@@ -418,9 +390,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             additional_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        self.assertEqual(
-            self.topic.story_exploration_mapping,
-            {'story_id': [], 'story_id_1': [], 'story_id_2': []})
         with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'additional story references list of the topic.'):

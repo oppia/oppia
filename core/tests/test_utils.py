@@ -3712,19 +3712,6 @@ version: 1
         skill_ids_for_diagnostic_test = []
         for subtopic in subtopics:
             skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
-        story_exploration_mapping: Dict[str, List[str]] = {}
-        for story_id in canonical_story_ids + additional_story_ids:
-            story = story_fetchers.get_story_by_id(story_id)
-            story_exploration_mapping[story_id] = (
-                # If the story's explorations were linked when the story was
-                # saved before the topic was saved, then gather the linked
-                # exploration ids.
-                # If the story's explorations are to be linked after saving the
-                # topic, then an empty list would be more appropriate, as the
-                # exploration ids would be added to the topic when linked to
-                # the story.
-                story.get_all_linked_exp_ids() if story else []
-            )
 
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
@@ -3734,8 +3721,7 @@ version: 1
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web, skill_ids_for_diagnostic_test,
-            story_exploration_mapping)
+            page_title_fragment_for_web, skill_ids_for_diagnostic_test)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 

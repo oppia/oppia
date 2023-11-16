@@ -175,8 +175,7 @@ def get_topic_from_model(
         topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
         topic_model.page_title_fragment_for_web,
         topic_model.skill_ids_for_diagnostic_test,
-        topic_model.story_exploration_mapping, topic_model.created_on,
-        topic_model.last_updated)
+        topic_model.created_on, topic_model.last_updated)
 
 
 @overload
