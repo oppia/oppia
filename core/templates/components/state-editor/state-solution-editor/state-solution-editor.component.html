@@ -6,19 +6,19 @@
              (click)="toggleSolutionCard()"
              (keydown.enter)="toggleSolutionCard()">
           <div class="state-solution-header oppia-mobile-collapsible-card-header">
-            <h3 class="oppia-exp-solution-card-header">Solution</h3>
+            <h3 class="oppia-exp-solution-card-header" tabindex="0">Solution</h3>
             <i class="fa fa-caret-down"
                *ngIf="!solutionCardIsShown"
                tabindex="0"
                role="button"
-               aria-label="Expand answers and responses"
+               aria-label="Expand solutions card"
                [attr.aria-hidden]="solutionCardIsShown ? 'true' : 'false'">
             </i>
             <i class="fa fa-caret-up"
                *ngIf="solutionCardIsShown"
                tabindex="0"
                role="button"
-               aria-label="collapse answers and responses"
+               aria-label="collapse solutions card"
                [attr.aria-hidden]="solutionCardIsShown ? 'false' : 'true'">
             </i>
           </div>
@@ -28,6 +28,7 @@
             <div *ngIf="isEditable()">
               <button *ngIf="!savedMemento()"
                       type="button"
+                      aria-label="Add solution"
                       class="btn btn-secondary oppia-add-hint-button e2e-test-oppia-add-solution-button"
                       (click)="openAddOrUpdateSolutionModal()">
                 + ADD SOLUTION
@@ -43,12 +44,15 @@
                    *ngIf="!isSolutionValid()"
                    (click)="toggleInlineSolutionEditorIsActive()"
                    [ngbTooltip]="getInvalidSolutionTooltip()"
+                   tabindex="0"
                    placement="auto">
                 <div class="oppia-rule-header-warning-style">
                   ⚠
                 </div>
               </div>
               <a (click)="toggleInlineSolutionEditorIsActive()"
+                 (keydown.enter)="toggleInlineSolutionEditorIsActive()"
+                 tabindex="0"
                  class="oppia-rule-tab e2e-test-oppia-solution-tab">
                 <oppia-response-header [summary]="getSolutionSummary()"
                                        [defaultOutcome]="false"
@@ -68,7 +72,7 @@
           </ul>
           <div *ngIf="!savedMemento()" class="oppia-empty-solution-warning">
             <i class="material-icons oppia-empty-solution-warning-icon">&#xe002;</i>
-            <span [innerHTML]="'I18N_EMPTY_SOLUTION_MESSAGE' | translate"></span>
+            <span [innerHTML]="'I18N_EMPTY_SOLUTION_MESSAGE' | translate" tabindex="0"></span>
           </div>
         </div>
       </div>

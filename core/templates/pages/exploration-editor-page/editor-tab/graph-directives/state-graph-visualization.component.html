@@ -30,6 +30,8 @@ with the same id on the page. -->
                     [attr.x]="node.x0" [attr.y]="node.y0"
                     [ngClass]="{'clickable': canNavigateToNode(node.id)}"
                     [attr.style]="node.style"
+                    tabindex="0"
+                    (keydown.enter)="sendOnClickFunctionData(node.id)"
                     (click)="sendOnClickFunctionData(node.id)"
                     role="button"
                     [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">
@@ -65,10 +67,10 @@ with the same id on the page. -->
                       [attr.x]="node.x0 + node.width" [attr.y]="node.y0"
                       transform="translate(0, -15)"
                       class="clickable oppia-node-delete"
-                      (click)="onNodeDeletionClick(node.id)"
-                      [attr.aria-label]="'Delete' + getNodeTitle(node) + 'card'">
+                      (click)="onNodeDeletionClick(node.id)">
                 </rect>
-                <text [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
+                <text [attr.aria-label]="'Delete ' + getNodeTitle(node) + ' card'" (keydown.enter)="onNodeDeletionClick(node.id)"
+                      tabindex="0" [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
                   x
                 </text>
               </g>
