@@ -18,7 +18,6 @@
  */
 
 import { Component, Output, OnInit, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
@@ -220,7 +219,3 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.getDataAsync();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAdminDevModeActivitiesTab', downgradeComponent(
-    {component: AdminDevModeActivitiesTabComponent}));

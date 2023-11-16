@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the activities tab in the admin panel when Oppia
- * is in production mode.
+ * @fileoverview Admin page root component.
  */
+
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-admin-prod-mode-activities-tab',
-  templateUrl: './admin-prod-mode-activities-tab.component.html',
-  styleUrls: []
+  selector: 'oppia-admin-page-root',
+  templateUrl: './admin-page-root.component.html',
 })
-export class OppiaAdminProdModeActivitiesTabComponent {}
+export class AdminPageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;
+  meta: MetaTagData[] =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
+    unknown as Readonly<MetaTagData>[];
+}

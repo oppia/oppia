@@ -16,51 +16,44 @@
  * @fileoverview Module for the admin page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { ToastrModule } from 'ngx-toastr';
 
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
+import { TranslationCoordinatorRoleEditorModalComponent } from './roles-tab/translation-coordinator-role-editor-modal.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { toastrConfig } from 'pages/oppia-root/app.module';
+import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
+import { AdminPageRootComponent } from './admin-page-root.component';
+import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
+import { AdminAuthGuard } from './admin-auth.guard';
 import { AdminNavbarComponent } from './navbar/admin-navbar.component';
 import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { OppiaAdminProdModeActivitiesTabComponent } from
-  './activities-tab/admin-prod-mode-activities-tab.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { OppiaAdminProdModeActivitiesTabComponent } from './activities-tab/admin-prod-mode-activities-tab.component';
 import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 import { AdminPageComponent } from './admin-page.component';
-import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
-import { TranslationCoordinatorRoleEditorModalComponent } from './roles-tab/translation-coordinator-role-editor-modal.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
+    CommonModule,
     FormsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     SharedComponentsModule,
     SharedFormsModule,
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: AdminPageRootComponent,
+        canActivate: [AdminAuthGuard],
+      },
+    ]),
     AdminBlogAdminCommonModule,
-    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -71,8 +64,9 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
+    AdminPlatformParametersTabComponent,
+    AdminPageRootComponent,
     TranslationCoordinatorRoleEditorModalComponent,
-    AdminPlatformParametersTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -83,56 +77,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     TopicManagerRoleEditorModalComponent,
-    TranslationCoordinatorRoleEditorModalComponent
+    TranslationCoordinatorRoleEditorModalComponent,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
 })
-class AdminPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(AdminPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class AdminPageModule {}

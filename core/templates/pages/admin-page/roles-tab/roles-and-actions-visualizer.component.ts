@@ -17,7 +17,6 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -87,7 +86,3 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     this.activeRole = this.roles[3];
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRolesAndActionsVisualizer', downgradeComponent(
-    { component: RolesAndActionsVisualizerComponent }));
