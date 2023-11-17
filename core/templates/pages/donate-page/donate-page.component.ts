@@ -16,13 +16,10 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
@@ -41,7 +38,7 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
   templateUrl: './donate-page.component.html',
   styleUrls: []
 })
-export class DonatePageComponent implements OnInit, OnDestroy {
+export class DonatePageComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
@@ -52,11 +49,9 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   );
 
   constructor(
-    private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService,
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
     private ngbModal: NgbModal,
@@ -67,11 +62,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
     this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
 
     const searchParams = new URLSearchParams(
       this.windowRef.nativeWindow.location.search);
@@ -86,12 +76,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         }
       );
     }
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -137,11 +121,4 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         'to be added to the mailing list.', 10000);
     });
   }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-  }
 }
-
-angular.module('oppia').directive(
-  'donatePage', downgradeComponent({component: DonatePageComponent}));
