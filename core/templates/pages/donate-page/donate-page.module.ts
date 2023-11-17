@@ -22,13 +22,18 @@ import { DonatePageComponent } from './donate-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { DonatePageRootComponent } from './donate-page-root.component';
 import { CommonModule } from '@angular/common';
-import { DonatePageRoutingModule } from './donate-page-routing.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    DonatePageRoutingModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DonatePageRootComponent
+      }
+    ]),
     NgbModule
   ],
   declarations: [
