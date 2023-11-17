@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -41,7 +41,7 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 
 export interface Suggestion {
   change: {
@@ -103,6 +103,10 @@ export interface TabDetails {
   tabSubType: string;
   text: string;
   enabled: boolean;
+}
+
+export interface CustomMatSnackBarRef {
+  onAction(): Observable<void>;
 }
 
 @Component({
@@ -748,23 +752,32 @@ export class ContributionsAndReview
   }
 
   openSnackbarWithAction(
-      topicName: string,
-      explorationId: string,
-      message: string,
-      actionText: string
+    topicName: string,
+    explorationId: string,
+    message: string,
+    actionText: string
   ): void {
-    const snackBarRef = this.snackBar.open(message, actionText, {
+    const snackBarRef: CustomMatSnackBarRef = this.snackBar.open(message, actionText, {
       duration: 3000,
     });
 
+    this.handleSnackbarAction(snackBarRef, topicName, explorationId);
+  }
+
+  private handleSnackbarAction(
+    snackBarRef: CustomMatSnackBarRef,
+    topicName: string,
+    explorationId: string
+  ): void {
     snackBarRef.onAction().subscribe(() => {
-      this.contributionOpportunitiesService.
-        pinReviewableTranslationOpportunityAsync(
+      this.contributionOpportunitiesService
+        .pinReviewableTranslationOpportunityAsync(
           topicName,
           this.languageCode,
-          explorationId).then(() => {
-          this.contributionOpportunitiesService
-            .reloadOpportunitiesEventEmitter.emit();
+          explorationId
+        )
+        .then(() => {
+          this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
         });
     });
   }
