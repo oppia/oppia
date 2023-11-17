@@ -1730,8 +1730,10 @@ def get_chapter_counts_in_topic_summaries(
         overdue_chapters_count = 0
         total_chapter_counts = []
         published_chapter_counts = []
-        stories = [story_id_mapping[story_reference.story_id] for
-            story_reference in topic.canonical_story_references]
+        stories = []
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id in story_id_mapping:
+                stories.append(story_id_mapping[story_reference.story_id])
         for story in stories:
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
