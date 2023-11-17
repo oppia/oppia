@@ -19,10 +19,12 @@
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DonatePageComponent } from './donate-page.component';
+import { DonationBox } from './donation-box/donation-box.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { DonatePageRootComponent } from './donate-page-root.component';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { DonationBoxModal } from './donation-box/donation-box-modal.component';
 
 @NgModule({
   imports: [
@@ -31,18 +33,21 @@ import { RouterModule } from '@angular/router';
     RouterModule.forChild([
       {
         path: '',
-        component: DonatePageRootComponent
-      }
+        component: DonatePageRootComponent,
+      },
     ]),
-    NgbModule
+    NgbModule,
   ],
   declarations: [
     DonatePageComponent,
     DonatePageRootComponent,
+    DonationBox,
+    DonationBoxModal
   ],
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-  ]
+    DonationBoxModal
+  ],
 })
 export class DonatePageModule {}

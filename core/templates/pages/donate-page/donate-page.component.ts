@@ -19,10 +19,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
@@ -31,20 +29,37 @@ import { AlertsService } from 'services/alerts.service';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
+import {DonationBoxModal} from './donation-box/donation-box-modal.component';
 import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+
+interface ImpactStat {
+  imageUrl: string | null;
+  stat: string | null;
+  text: string;
+}
+
+interface DonationValue {
+  amount: string;
+  description: string;
+}
+
+interface Highlight {
+  imageUrl: string;
+  heading: string;
+  text: string;
+}
+
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class DonatePageComponent implements OnInit {
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
   emailAddress: string | null = null;
   name: string | null = null;
-  OPPIA_AVATAR_IMAGE_URL = (
-    this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
-  );
+  OPPIA_AVATAR_IMAGE_URL = this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg');
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -53,27 +68,105 @@ export class DonatePageComponent implements OnInit {
     private alertsService: AlertsService,
     private mailingListBackendApiService: MailingListBackendApiService,
     private ngbModal: NgbModal,
-    private insertScriptService: InsertScriptService,
+    private insertScriptService: InsertScriptService
   ) {}
 
   ngOnInit(): void {
-    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    //this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
 
-    const searchParams = new URLSearchParams(
-      this.windowRef.nativeWindow.location.search);
+    const searchParams = new URLSearchParams(this.windowRef.nativeWindow.location.search);
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
       // Show the "thanks for donating" modal.
-      this.ngbModal.open(
-        ThanksForDonatingModalComponent,
-        {
-          backdrop: 'static',
-          size: 'xl'
-        }
-      );
+      this.ngbModal.open(ThanksForDonatingModalComponent, {
+        backdrop: 'static',
+        size: 'xl',
+      });
     }
+  }
+
+  get donationValues(): DonationValue[] {
+    return [
+      {
+        amount: 'Your $10',
+        description: 'could provide the funds needed to educate 25 children on our platform.',
+      },
+      {
+        amount: 'Your $25',
+        description:
+          'could contribute to a program educating 20 children through a partner organization for a day.',
+      },
+      {
+        amount: 'Your $100',
+        description:
+          'could buy a phone for a child in Nigeria, allowing offline access to education.',
+      },
+    ];
+  }
+
+  get impactStats(): ImpactStat[][] {
+    return [
+      [
+        {
+          imageUrl: '/donate/content-2-graph.svg',
+          stat: null,
+          text: '60% Improved Test Results',
+        },
+        {
+          imageUrl: '/donate/content-2-screen.svg',
+          stat: null,
+          text: '10,500 Active Web Users',
+        },
+      ],
+      [
+        {
+          imageUrl: '/donate/content-2-phone.svg',
+          stat: null,
+          text: '100,000+ Downloads',
+        },
+        {
+          imageUrl: '/donate/content-2-area-graph.svg',
+          stat: null,
+          text: '6x Visitors Per Month',
+        },
+        {
+          imageUrl: '/donate/content-2-visitors.svg',
+          stat: null,
+          text: '443,000 Web Visitors',
+        },
+      ],
+      [
+        {
+          imageUrl: null,
+          stat: '98%',
+          text: 'of surveyed users said that they are encouraged to try out more lessons after using Oppia',
+        },
+      ],
+      [
+        {
+          imageUrl: null,
+          stat: '90%',
+          text: 'of surveyed users said that they would recommend Oppia to a friend',
+        },
+      ],
+    ];
+  }
+
+  get highlights(): Highlight[] {
+    return [
+      {
+        imageUrl: '/donate/highlights-1.png',
+        heading: 'Center for Youth Studies',
+        text: "This partnership provides after-school classes in Uyo, Akwa Ibom, South-South Nigeria. The program uses Oppia's resources to help primary and secondary school students.",
+      },
+      {
+        imageUrl: '/donate/highlights-2.png',
+        heading: 'The Special Youth Foundation',
+        text: "Our partnership started in 2022 to provide free maths lessons to young learners across 2 communities in Lagos, Nigeria. This partnership helped us reach over a 100 students with Oppia's maths lessons.",
+      },
+    ];
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -82,9 +175,12 @@ export class DonatePageComponent implements OnInit {
 
   getImageSet(imageName: string, imageExt: string): string {
     return (
-      this.getStaticImageUrl(imageName + '1x.' + imageExt) + ' 1x, ' +
-      this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
-      this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
+      this.getStaticImageUrl(imageName + '1x.' + imageExt) +
+      ' 1x, ' +
+      this.getStaticImageUrl(imageName + '15x.' + imageExt) +
+      ' 1.5x, ' +
+      this.getStaticImageUrl(imageName + '2x.' + imageExt) +
+      ' 2x'
     );
   }
 
@@ -94,29 +190,41 @@ export class DonatePageComponent implements OnInit {
   }
 
   subscribeToMailingList(): void {
-    this.mailingListBackendApiService.subscribeUserToMailingList(
-      String(this.emailAddress),
-      String(this.name),
-      AppConstants.MAILING_LIST_WEB_TAG
-    ).then((status) => {
-      if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
-        this.ngbModal.open(
-          ThanksForSubscribingModalComponent,
-          {
+    this.mailingListBackendApiService
+      .subscribeUserToMailingList(
+        String(this.emailAddress),
+        String(this.name),
+        AppConstants.MAILING_LIST_WEB_TAG
+      )
+      .then((status) => {
+        if (status) {
+          this.alertsService.addInfoMessage('Done!', 1000);
+          this.ngbModal.open(ThanksForSubscribingModalComponent, {
             backdrop: 'static',
-            size: 'xl'
-          }
-        );
-      } else {
+            size: 'xl',
+          });
+        } else {
+          this.alertsService.addInfoMessage(
+            'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+              'to be added to the mailing list.',
+            10000
+          );
+        }
+      })
+      .catch((errorResponse) => {
         this.alertsService.addInfoMessage(
           'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-          'to be added to the mailing list.', 10000);
-      }
-    }).catch(errorResponse => {
-      this.alertsService.addInfoMessage(
-        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
-        'to be added to the mailing list.', 10000);
+            'to be added to the mailing list.',
+          10000
+        );
+      });
+  }
+
+  openDonationBoxModal(): void {
+    this.ngbModal.open(DonationBoxModal, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal'
     });
   }
 }

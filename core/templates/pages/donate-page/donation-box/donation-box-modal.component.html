@@ -1,0 +1,44 @@
+<div class="modal-container">
+  <button type="button" class="close-btn" aria-label="Close" (click)="dismiss()">
+    <span class="close">&times;</span>
+  </button>
+  <donation-box></donation-box>
+</div>
+
+<style>
+  .modal-container {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .close-btn {
+    float: right;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    > span {
+      font-family: "Helvetica Neue", sans-serif;
+      color: #ffffff;
+      font-weight: 300;
+      opacity: 1;
+      font-size: 40px;
+    }
+  }
+
+  ::ng-deep .donation-box-modal .modal-content {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+  }
+
+  ::ng-deep .donation-box-modal .modal-dialog,
+  ::ng-deep .donation-box-modal .modal-content {
+    min-width: 70px;
+    max-width: 420px;
+  }
+</style>
