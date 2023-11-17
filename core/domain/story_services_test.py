@@ -357,13 +357,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             constants.STORY_NODE_STATUS_PUBLISHED)
         self.assertEqual(
             story.story_contents.nodes[1].
-            planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0))
+            planned_publication_date,
+            datetime.datetime(2023, 1, 2, 0, 0, tzinfo=datetime.timezone.utc))
         self.assertEqual(
             story.story_contents.nodes[1].
-            first_publication_date, datetime.datetime(2023, 1, 1, 0, 0))
+            first_publication_date,
+            datetime.datetime(2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc))
         self.assertEqual(
             story.story_contents.nodes[1].
-            last_modified, datetime.datetime(2023, 1, 1, 0, 0))
+            last_modified,
+            datetime.datetime(2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc))
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
