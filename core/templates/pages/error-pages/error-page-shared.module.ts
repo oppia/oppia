@@ -13,31 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the error page.
+ * @fileoverview Shared module for the error page
+ * to prevent double declarations of
+ * ErrorPageComponent and ErrorPageRootComponent.
  */
 
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { ToastrModule } from 'ngx-toastr';
 
 import { ErrorPageComponent } from './error-page.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { RouterModule } from '@angular/router';
-import { ErrorPageSharedModule } from './error-page-shared.module';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
-    CommonModule,
-    HttpClientModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: ErrorPageRootComponent
-      },
-    ]),
-    ErrorPageSharedModule,
+    SharedComponentsModule,
+    TranslateModule,
+    ToastrModule.forRoot(toastrConfig),
   ],
-  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
-  bootstrap: [ErrorPageRootComponent],
+  declarations: [ErrorPageComponent, ErrorPageRootComponent],
+  exports: [ErrorPageComponent, ErrorPageRootComponent],
 })
-export class ErrorPageModule {}
+export class ErrorPageSharedModule {}

@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -118,7 +117,3 @@ export class AdminNavbarComponent implements OnInit {
     this.getUserInfoAsync();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAdminNavbar', downgradeComponent(
-    {component: AdminNavbarComponent}));
