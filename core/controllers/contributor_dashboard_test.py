@@ -599,14 +599,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             version=1,
             story_reference_schema_version=1,
             meta_tag_content='tag',
-            practice_tab_is_displayed=False ,
+            practice_tab_is_displayed=False,
             page_title_fragment_for_web='dummy',
             skill_ids_for_diagnostic_test=[],
             thumbnail_filename='svg',
             thumbnail_bg_color='green',
-            thumbnail_size_in_bytes =3
+            thumbnail_size_in_bytes=3
         )
 
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
         with unittest.mock.patch.object(
             topic_fetchers,
             'get_topic_by_name',
@@ -648,14 +650,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             version=1,
             story_reference_schema_version=1,
             meta_tag_content='tag',
-            practice_tab_is_displayed=False ,
+            practice_tab_is_displayed=False,
             page_title_fragment_for_web='dummy',
             skill_ids_for_diagnostic_test=[],
             thumbnail_filename='svg',
             thumbnail_bg_color='green',
-            thumbnail_size_in_bytes =3
+            thumbnail_size_in_bytes=3
         )
 
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
         with unittest.mock.patch.object(
             topic_fetchers,
             'get_topic_by_name',

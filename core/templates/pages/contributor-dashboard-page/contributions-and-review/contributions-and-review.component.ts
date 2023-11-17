@@ -41,7 +41,7 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface Suggestion {
   change: {
@@ -106,7 +106,7 @@ export interface TabDetails {
 }
 
 export interface CustomMatSnackBarRef {
-  onAction(): Observable<void>;
+  onAction: () => Observable<void>;
 }
 
 @Component({
@@ -752,22 +752,23 @@ export class ContributionsAndReview
   }
 
   openSnackbarWithAction(
-    topicName: string,
-    explorationId: string,
-    message: string,
-    actionText: string
+      topicName: string,
+      explorationId: string,
+      message: string,
+      actionText: string
   ): void {
-    const snackBarRef: CustomMatSnackBarRef = this.snackBar.open(message, actionText, {
-      duration: 3000,
-    });
+    const snackBarRef: CustomMatSnackBarRef = this.snackBar.open(
+      message, actionText, {
+        duration: 3000,
+      });
 
     this.handleSnackbarAction(snackBarRef, topicName, explorationId);
   }
 
   private handleSnackbarAction(
-    snackBarRef: CustomMatSnackBarRef,
-    topicName: string,
-    explorationId: string
+      snackBarRef: CustomMatSnackBarRef,
+      topicName: string,
+      explorationId: string
   ): void {
     snackBarRef.onAction().subscribe(() => {
       this.contributionOpportunitiesService
@@ -777,7 +778,8 @@ export class ContributionsAndReview
           explorationId
         )
         .then(() => {
-          this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
+          this.contributionOpportunitiesService.
+            reloadOpportunitiesEventEmitter.emit();
         });
     });
   }

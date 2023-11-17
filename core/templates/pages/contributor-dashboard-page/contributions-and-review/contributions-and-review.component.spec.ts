@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionDetails, ContributionsAndReview, Opportunity, Suggestion, SuggestionDetails, CustomMatSnackBarRef } from './contributions-and-review.component';
+import { ContributionDetails, ContributionsAndReview, Opportunity, Suggestion, SuggestionDetails } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -40,8 +40,8 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSnackBar, MatSnackBarRef, MAT_SNACK_BAR_DATA, SimpleSnackBar } from '@angular/material/snack-bar';
-import {of, Subject, Observable} from 'rxjs';
+import { MatSnackBar, MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+import {of, Subject } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { delay } from 'rxjs/operators';
 
@@ -1531,37 +1531,31 @@ describe('Contributions and review component', () => {
           'Dummy Topic 1', component.languageCode);
       }));
 
-      it('should open snackbar and handle action', fakeAsync(() => {
-        spyOn(snackBar, 'open').and.callFake((message, actionText, config) => {
-          const data = TestBed.inject(MAT_SNACK_BAR_DATA);
-          data.onAction = of(null); // Simulate the action Observable
-          return {
-            onAction: () => data.onAction,
-            dismiss: () => {}, // You can add necessary methods here
-          };
-        });
-        spyOn(contributionOpportunitiesService, 'pinReviewableTranslationOpportunityAsync').and.returnValue(Promise.resolve());
-        // You should replace these with your actual values or mocks
-        const topicName = 'testTopic';
-        const explorationId = 'testExploration';
-        const message = 'Test message';
-        const actionText = 'Action text';
-    
-        component.openSnackbarWithAction(topicName, explorationId, message, actionText);
-    
-        tick();
-    
-        // Add your expectations here for when the action is triggered, e.g., make assertions on contributionOpportunitiesService methods
-    
-        // Simulate the PinAnyway action
-        fixture.detectChanges();
-        // Trigger the PinAnyway action, update the service method accordingly
-    
-        // Ensure the async operation is complete
-        tick();
-    
-        // Add more expectations here as needed
-      }));
+    it('should open snackbar and handle action', fakeAsync(() => {
+      spyOn(snackBar, 'open').and.callFake((message, actionText, config) => {
+        const data = TestBed.inject(MAT_SNACK_BAR_DATA);
+        data.onAction = of(null);
+        return {
+          onAction: () => data.onAction,
+          dismiss: () => {}
+        };
+      });
+      spyOn(
+        contributionOpportunitiesService,
+        'pinReviewableTranslationOpportunityAsync').and.returnValue(
+        Promise.resolve());
+      const topicName = 'testTopic';
+      const explorationId = 'testExploration';
+      const message = 'Test message';
+      const actionText = 'Action text';
+
+      component.openSnackbarWithAction(
+        topicName, explorationId, message, actionText);
+
+      tick();
+      fixture.detectChanges();
+      tick();
+    }));
 
     // TODO(#9749): Rename and actually assert on something. This test currently
     // only exists to satisfy code coverage.
