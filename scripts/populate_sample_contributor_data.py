@@ -209,7 +209,9 @@ class SampleDataInitializer:
             self._make_request(
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
-    def _add_review_translation_rights(self, username: str, language_code: str) -> None:
+    def _add_review_translation_rights(
+            self, username: str, language_code: str
+    ) -> None:
         """Adds review translation rights of the given language to the 
         user with the given username.
         """
