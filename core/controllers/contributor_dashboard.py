@@ -1142,7 +1142,7 @@ class ContributorCertificateHandler(
 
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
-        if to_datetime.date() > datetime.datetime.now().date():
+        if to_datetime.date() > datetime.datetime.now(datetime.timezone.utc).date():
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 

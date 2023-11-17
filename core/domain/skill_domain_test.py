@@ -71,8 +71,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
             None, False, ['skill_id_2'],
-            created_on=datetime.datetime.now(),
-            last_updated=datetime.datetime.now())
+            created_on=datetime.datetime.now(datetime.timezone.utc),
+            last_updated=datetime.datetime.now(datetime.timezone.utc))
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestBase._assert_validation_error().
@@ -1443,7 +1443,8 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(
             'skill_1', 'Description 1', 'en', 1,
-            0, 0, datetime.datetime.now(), datetime.datetime.now())
+            0, 0, datetime.datetime.now(datetime.timezone.utc),
+            datetime.datetime.now(datetime.timezone.utc))
         self.short_skill_summary = skill_domain.ShortSkillSummary(
             'skill_1', 'Description 1')
 

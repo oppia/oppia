@@ -1374,8 +1374,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         works as intended by leaving the topic unchanged. Added values
         for self.topic.created_on and last_updated.
         """
-        self.topic.created_on = datetime.datetime.now()
-        self.topic.last_updated = datetime.datetime.now()
+        self.topic.created_on = datetime.datetime.now(datetime.timezone.utc)
+        self.topic.last_updated = datetime.datetime.now(datetime.timezone.utc)
         self.assertEqual(
             self.topic.to_dict(),
             topic_domain.Topic.deserialize(
