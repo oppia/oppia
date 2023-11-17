@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { UrlInterpolationService } from
@@ -39,7 +38,6 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
   styleUrls: []
 })
 export class DonatePageComponent implements OnInit {
-  directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
   emailAddress: string | null = null;
