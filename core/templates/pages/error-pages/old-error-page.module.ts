@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,42 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the error page.
+ * @fileoverview Module for the error page. This module has not
+ * been migrated to angular router.
  */
 
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { ErrorPageComponent } from './error-page.component';
 import { ErrorPageRootComponent } from './error-page-root.component';
-import { RouterModule } from '@angular/router';
+import { ErrorPageRoutingModule } from './old-error-page-routing.module';
 import { ErrorPageSharedModule } from './error-page-shared.module';
+
+// TODO (#19154): Remove this module in favor of error-page-migrated.module.ts
+// once angular migration is complete.
 
 @NgModule({
   imports: [
-    CommonModule,
+    BrowserModule,
     HttpClientModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: ErrorPageRootComponent
-      },
-    ]),
+    ErrorPageRoutingModule,
     ErrorPageSharedModule,
   ],
-  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
-  bootstrap: [ErrorPageRootComponent],
+  entryComponents: [
+    ErrorPageComponent,
+    ErrorPageRootComponent,
+  ],
+  bootstrap: [
+    ErrorPageRootComponent
+  ],
+  providers: [
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
+    }
+  ]
 })
-export class ErrorPageModule {}
+export class OldErrorPageModule {}
