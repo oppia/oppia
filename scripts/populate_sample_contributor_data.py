@@ -101,7 +101,7 @@ class SampleDataInitializer:
         self._sign_in(SUPER_ADMIN_EMAIL)
         self.csrf_token = self._get_csrf_token()
         self._assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
-        self._add_review_translation_rights(SUPER_ADMIN_USERNAME)
+        self._add_review_translation_rights(SUPER_ADMIN_USERNAME, 'ak')
         self._add_review_question_rights(SUPER_ADMIN_USERNAME)
         self._add_submit_question_rights(CONTRIBUTOR_USERNAME)
         self._generate_sample_new_structures_data()
@@ -209,14 +209,14 @@ class SampleDataInitializer:
             self._make_request(
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
-    def _add_review_translation_rights(self, username: str) -> None:
-        """Adds review translation rights of language Akan to the user 
-        with the given username.
+    def _add_review_translation_rights(self, username: str, language_code: str) -> None:
+        """Adds review translation rights of the given language to the 
+        user with the given username.
         """
         params = {
             'payload': json.dumps({
                 'username': username,
-                'language_code': 'ak'
+                'language_code': language_code
             }),
             'csrf_token': self.csrf_token
         }
