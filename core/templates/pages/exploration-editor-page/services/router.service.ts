@@ -223,7 +223,8 @@ export class RouterService {
   isLocationSetToNonStateEditorTab(): boolean {
     let currentPath = (
       '/' +
-      (this.windowRef.nativeWindow.location.hash?.split('#')[1]?.split('/')[1]) ??
+      (this.windowRef.nativeWindow.location.hash?.
+       split('#')[1]?.split('/')[1]) ??
       '');
 
     return (
