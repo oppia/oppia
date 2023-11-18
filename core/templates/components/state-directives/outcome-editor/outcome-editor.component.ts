@@ -81,6 +81,11 @@ export class OutcomeEditorComponent implements OnInit {
     return this.stateEditorService.isInQuestionMode();
   }
 
+  shouldShowDestIfReallyStuck(): boolean {
+    return !this.savedOutcome.labelledAsCorrect ||
+      this.savedOutcome.destIfReallyStuck !== null;
+  }
+
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
     return (this.outcome.feedback._html.length > 10000);
@@ -131,13 +136,6 @@ export class OutcomeEditorComponent implements OnInit {
     return Boolean (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());
-  }
-
-  isSelfLoopDestStuck(outcome: Outcome): boolean {
-    return Boolean (
-      outcome &&
-      outcome.destIfReallyStuck === (
-        this.stateEditorService.getActiveStateName()));
   }
 
   getCurrentInteractionId(): string {
@@ -197,10 +195,6 @@ export class OutcomeEditorComponent implements OnInit {
   openDestinationIfStuckEditor(): void {
     if (this.isEditable) {
       this.destinationIfStuckEditorIsOpen = true;
-      let activeStateName = this.stateEditorService.getActiveStateName();
-      if (!this.savedOutcome.destIfReallyStuck) {
-        this.outcome.destIfReallyStuck = activeStateName;
-      }
     }
   }
 
