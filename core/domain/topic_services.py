@@ -1734,6 +1734,11 @@ def get_chapter_counts_in_topic_summaries(
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id in story_id_mapping:
                 stories.append(story_id_mapping[story_reference.story_id])
+            else:
+                logging.error(
+            f"Topic {topic.id} has canonical story references {topic.canonical_story_references} "
+            f"but story reference {story_reference.story_id} is not a valid story."
+        )
         for story in stories:
             nodes = story.story_contents.nodes
             total_chapters_count = len(nodes)
