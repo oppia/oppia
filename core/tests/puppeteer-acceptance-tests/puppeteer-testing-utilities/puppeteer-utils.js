@@ -48,7 +48,7 @@ module.exports = class baseUser {
          * headless mode. As per the expected behavior we need to make sure
          * every test passes on both modes. */
         headless: true,
-        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream', '--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
       .then(async(browser) => {
         this.browserObject = browser;

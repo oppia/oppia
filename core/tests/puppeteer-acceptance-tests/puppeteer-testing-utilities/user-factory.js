@@ -156,7 +156,7 @@ let createNewQuestionAdmin = async function(username, email) {
   await questionAdmin.signUpNewUser(
     username,
     'question_admin@example.com');
-  
+
   await superAdminInstance.assignRoleToUser(
     username, ROLE_QUESTION_ADMIN);
   await superAdminInstance.expectUserToHaveRole(
@@ -164,7 +164,7 @@ let createNewQuestionAdmin = async function(username, email) {
 
   activeUsers.push(questionAdmin);
   return questionAdmin;
-}
+};
 
 /**
  * The function closes all the browsers opened by different users.

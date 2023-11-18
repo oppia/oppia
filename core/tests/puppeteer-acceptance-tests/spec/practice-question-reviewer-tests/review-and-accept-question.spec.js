@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for question admins to add reviewing 
+ * @fileoverview Acceptance Test for question admins to add reviewing
  * question rights to users.
  */
 
@@ -32,7 +32,7 @@ describe('Question Admin', function() {
       await userFactory.createNewQuestionAdmin('questionAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to provide rights of reviewing and submitting questions to user.',
+  it('should be able to provide rights to review and submit questions to user.',
     async function() {
       let reviewer = await userFactory.createNewGuestUser(
         'reviewer', 'review@example.com');
@@ -42,7 +42,8 @@ describe('Question Admin', function() {
       await questionAdmin.addReviewQuestionRights('reviewer');
 
       await questionAdmin.viewContributionRightsForUser('reviewer');
-      await questionAdmin.expectDisplayedUsersToContainReviewQuestionRights('reviewer');
+      await questionAdmin.expectDisplayedUsersToContainReviewQuestionRights(
+        'reviewer');
       await questionAdmin.viewContributorReviewQuestionRightsByRole();
       await questionAdmin.expectUserToBeDisplayed('reviewer');
     }, DEFAULT_SPEC_TIMEOUT);
