@@ -25,7 +25,6 @@ const ContributorDashboardAdminUrl =
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-// Constants
 const reviewQuestionRightValue = 'question';
 const submitQuestionRightValue = 'submit_question';
 const usernameMethodValue = 'username';
@@ -112,10 +111,9 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to check if the username is displayed as one of the users 
+   * Function to check if the username is displayed as one of the users
    * with rights of reviewing question.
    * @param {string} username - the username of the user to check.
-   * 
    */
   async expectDisplayedUsersToContainReviewQuestionRights(username) {
     await this.page.waitForSelector(viewContributorReviewQuestionsResult);
