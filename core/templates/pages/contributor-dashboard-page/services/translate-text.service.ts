@@ -75,7 +75,7 @@ export class TranslateTextService {
   activeContentStatus: Status;
 
   constructor(
-    private translateTextBackedApiService:
+    private translateTextBackendApiService:
       TranslateTextBackendApiService
   ) { }
 
@@ -159,7 +159,7 @@ export class TranslateTextService {
     this.activeContentText = null;
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
-    this.translateTextBackedApiService.getTranslatableTextsAsync(
+    this.translateTextBackendApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
       this.stateWiseContents = translatableTexts.stateWiseContents;
       this.activeExpVersion = translatableTexts.explorationVersion;
@@ -225,7 +225,7 @@ export class TranslateTextService {
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: (reason: string) => void): void {
-    this.translateTextBackedApiService.suggestTranslatedTextAsync(
+    this.translateTextBackendApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
       this.activeContentId,
