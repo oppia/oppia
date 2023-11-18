@@ -61,6 +61,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -3523,6 +3524,38 @@ version: 1
         """
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
+
+    def link_explorations_to_story(
+        self, topic_id: str, story_id: str, *exp_ids: str
+    ) -> None:
+        """Appends a story node for each exploration id given in exp_ids to the
+        story with story_id.
+
+        Args:
+            story_id: str. ID of the story containing the new node.
+            *exp_ids: str. IDs of the exploration.
+        """
+        for exp_id in exp_ids:
+            story = story_fetchers.get_story_by_id(story_id)
+            node_id = story.story_contents.next_node_id
+
+            topic_services.update_story_and_topic_summary(
+                feconf.SYSTEM_COMMITTER_ID,
+                story_id,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': node_id,
+                    'title': node_id
+                }), story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name':
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': node_id,
+                    'old_value': None,
+                    'new_value': exp_id
+                })],
+                'Add exploration ' + exp_id + ' to story ' + story_id,
+                topic_id)
 
     def create_story_for_translation_opportunity(
         self,

@@ -81,8 +81,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
-            skill_ids_for_diagnostic_test=[],
-            story_exploration_mapping={}
+            skill_ids_for_diagnostic_test=[]
         )
         # We check that topic has not been saved before calling commit().
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
@@ -185,46 +184,65 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_story_exploration_mappings(self) -> None:
-        topic, topic_2 = self._create_topics_with_story_exploration_mapping()
+        topic_id = '1'
+        topic_2_id = '2'
+        topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
+        topic_2_story_exp_mapping = {'21': ['211']}
+
+        self.save_new_topic(topic_id, feconf.SYSTEM_COMMITTER_ID,
+            canonical_story_ids=['12'], additional_story_ids=['11'])
+        self.save_new_topic(topic_2_id, feconf.SYSTEM_COMMITTER_ID,
+            name='topic2', url_fragment='frag-two',
+            canonical_story_ids=['21'])
+        self._create_stories_by_mapping(topic_id, topic_story_exp_mapping)
+        self._create_stories_by_mapping(topic_2_id, topic_2_story_exp_mapping)
 
         mappings = (
             topic_models.TopicSummaryModel.get_story_exploration_mappings())
 
-        self.assertIn(topic.story_exploration_mapping, mappings)
-        self.assertIn(topic_2.story_exploration_mapping, mappings)
+        self.assertIn(topic_story_exp_mapping, mappings)
+        self.assertIn(topic_2_story_exp_mapping, mappings)
 
     def test_get_story_exploration_mappings_by_name(self) -> None:
-        topic, topic_2 = self._create_topics_with_story_exploration_mapping()
+        topic_id = '1'
+        topic_2_id = '2'
+        topic_2_name = 'topic2'
+        topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
+        topic_2_story_exp_mapping = {'21': ['211']}
+
+        self.save_new_topic(topic_id, feconf.SYSTEM_COMMITTER_ID,
+            canonical_story_ids=['12'], additional_story_ids=['11'])
+        self.save_new_topic(topic_2_id, feconf.SYSTEM_COMMITTER_ID,
+            name=topic_2_name, url_fragment='frag-two',
+            canonical_story_ids=['21'])
+        self._create_stories_by_mapping(topic_id, topic_story_exp_mapping)
+        self._create_stories_by_mapping(topic_2_id, topic_2_story_exp_mapping)
 
         mappings = (
             topic_models.TopicSummaryModel
-            .get_story_exploration_mappings_by_name(topic_2.name))
+            .get_story_exploration_mappings_by_name(topic_2_name))
 
-        self.assertNotIn(topic.story_exploration_mapping, mappings)
-        self.assertIn(topic_2.story_exploration_mapping, mappings)
+        self.assertNotIn(topic_story_exp_mapping, mappings)
+        self.assertIn(topic_2_story_exp_mapping, mappings)
 
-    def _create_topics_with_story_exploration_mapping(
-        self
-    ) -> List[topic_domain.Topic]:
-        """Creates two topics with initial story_exploration_mapping.
+    def _create_stories_by_mapping(
+        self, topic_id: str, story_exp_mapping: Dict[str, List[str]]
+    ) -> None:
+        """Creates stories using the story ids in story_exp_mapping and links
+        the mapped list of exp ids to the corresponding story. All stories
+        are created under the given topic_id.
 
-        Returns:
-            list(Topic). The topics that were created.
+        Args:
+            topic_id: str. The id of the corresponding topic of its stories.
+            story_exp_mapping: dict(str, list(str)). A mapping of story ids to
+                a list of exploration ids. This will create stories under the
+                topic_id and will link each of the given exploration ids to that
+                story.
         """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
-        topic.story_exploration_mapping = {
-            'story_11': ['exp_111', 'exp_112'],
-            'story_12': []
-        }
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-
-        topic_2 = topic_domain.Topic.create_default_topic(
-            '2', 'topic name 2', 'name-two', 'description', 'fragm-two')
-        topic_2.story_exploration_mapping = {'story_21': ['exp_211']}
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic_2)
-
-        return [topic, topic_2]
+        for story_id, exp_ids in story_exp_mapping.items():
+            self.save_new_story(story_id, feconf.SYSTEM_COMMITTER_ID,
+                corresponding_topic_id=topic_id)
+            self.link_explorations_to_story(topic_id, story_id, *exp_ids)
 
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):

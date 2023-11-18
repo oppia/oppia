@@ -285,6 +285,10 @@ def apply_change_list(
                         story_domain.UpdateStoryNodePropertyExplorationIdCmd,
                         change
                     )
+                    story.update_node_exploration_id(
+                        update_node_exploration_id_cmd.node_id,
+                        update_node_exploration_id_cmd.new_value
+                    )
                 elif (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_STATUS):
                     # Here we use cast because this 'elif'

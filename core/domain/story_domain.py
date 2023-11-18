@@ -1254,6 +1254,7 @@ class Story:
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             corresponding_topic_id: str. The id of the topic to which the story
+            :q
                 belongs.
             version: int. The version of the story.
             created_on: datetime.datetime. Date and time when the story is

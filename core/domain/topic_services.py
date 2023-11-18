@@ -1052,7 +1052,6 @@ def update_story_and_topic_summary(
             story.
         topic_id: str. The id of the topic to which the story is belongs.
     """
-    print("DEBUG: Updating story and topic summary...")
     story_services.update_story(
         committer_id, story_id, change_list, commit_message)
     # Generate new TopicSummary after a Story has been updated to
@@ -1109,10 +1108,12 @@ def compute_summary_of_topic(
         topic.canonical_story_references + topic.additional_story_references)
     topic_model_story_exploration_mapping = {}
     for story_ref in story_references:
-        story = story_fetchers.get_story_by_id(story_ref.story_id) 
+        story = story_fetchers.get_story_by_id(story_ref.story_id)
+
         topic_model_story_exploration_mapping.update({
-            story_ref.story_id: story.story_contents.get_all_linked_exp_ids()
-            if story else []
+            story_ref.story_id: (
+                story.story_contents.get_all_linked_exp_ids()
+                if story else [])
         })
 
     total_skill_count = topic_model_uncategorized_skill_count

@@ -160,6 +160,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIn('New Title', story_titles)
 
     def test_compute_summary(self) -> None:
+        story_1_exp_ids = ['exp-1']
+        story_2_exp_ids = ['exp-2', 'exp-3']
+        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_1,
+            *story_1_exp_ids)
+        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_2,
+            *story_2_exp_ids)
+
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -174,8 +181,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
         self.assertDictEqual(topic_summary.story_exploration_mapping, {
-            self.story_id_1: [],
-            self.story_id_2: [],
+            self.story_id_1: story_1_exp_ids,
+            self.story_id_2: story_2_exp_ids,
             self.story_id_3: []
         })
 
