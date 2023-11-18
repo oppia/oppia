@@ -21,6 +21,8 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ExplorationFooterComponent } from './exploration-footer.component';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -172,6 +174,10 @@ describe('ExplorationFooterComponent', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

@@ -18,6 +18,8 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { EditableExplorationBackendApiService }
   from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
@@ -272,6 +274,10 @@ describe('Exploration Player State Service', () => {
         {
           provide: ReadOnlyExplorationBackendApiService,
           useClass: MockReadOnlyExplorationBackendApiService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ]
     }).compileComponents();

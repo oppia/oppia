@@ -19,7 +19,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeBackendDict, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
@@ -55,6 +58,7 @@ describe('Exploration engine service ', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
+  let interactionObjectFactory: InteractionObjectFactory;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService:
@@ -63,6 +67,7 @@ describe('Exploration engine service ', () => {
   let urlService: UrlService;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
+  let translateService: TranslateService;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
@@ -372,6 +377,12 @@ describe('Exploration engine service ', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+      ],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ]
     });
 
@@ -388,6 +399,7 @@ describe('Exploration engine service ', () => {
     explorationFeaturesBackendApiService = TestBed.inject(
       ExplorationFeaturesBackendApiService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
@@ -397,7 +409,8 @@ describe('Exploration engine service ', () => {
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
-    textInputService = TestBed.get(TextInputRulesService);
+    textInputService = TestBed.inject(TextInputRulesService);
+    translateService = TestBed.inject(TranslateService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
   });
 
@@ -681,6 +694,116 @@ describe('Exploration engine service ', () => {
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Question content should not be empty.');
+    });
+
+    it('should return a different feedback for misspellings', () => {
+      const initSuccessCb = jasmine.createSpy('success');
+      const submitAnswerSuccessCb = jasmine.createSpy('success');
+      const answer = 'answr';
+      const defaultOutcomeDict = {
+        dest: 'Mid',
+        dest_if_really_stuck: null,
+        feedback: {
+          content_id: 'feedback_1',
+          html: 'default feedback'
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      };
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict(defaultOutcomeDict),
+        1, 0, 'default_outcome');
+
+      const lastCardInteraction =
+        interactionObjectFactory.createFromBackendDict({
+          id: 'TextInput',
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: true,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good Job</p>'
+                },
+                param_changes: [],
+                dest_if_really_stuck: null,
+                dest: 'Mid'
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: [
+                        'answer'
+                      ],
+                      contentId: 'rule_input_2'
+                    }
+                  },
+                  rule_type: 'Equals'
+                }
+              ],
+              tagged_skill_misconception_id: null
+            }
+          ],
+          default_outcome: defaultOutcomeDict,
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: true,
+            },
+            placeholder: {
+              value: 1,
+            },
+            catch_misspellings: {
+              value: true,
+            }
+          },
+          hints: [],
+          solution: null
+        });
+      const lastCard = StateCard.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', lastCardInteraction,
+        null, 'content_id', audioTranslationLanguageService);
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      spyOn(translateService, 'instant').and.callFake((key) => {
+        if ((key as string)
+          .startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')) {
+          return 'misspelled feedback';
+        }
+      });
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
+      const feedbackArgPosition = 2;
+      expect(submitAnswerSuccessCb.calls.argsFor(0)[feedbackArgPosition])
+        .toBe('misspelled feedback');
+
+      // Make outcome non-default, so that misspelling is not checked anymore.
+      answerClassificationResult.outcome.dest = 'End';
+      answerClassificationService.getMatchingClassificationResult =
+        jasmine.createSpy().and.returnValue(answerClassificationResult);
+
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+      expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(2);
+      expect(submitAnswerSuccessCb.calls.argsFor(1)[feedbackArgPosition])
+        .toBe('default feedback');
     });
   });
 

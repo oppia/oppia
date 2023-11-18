@@ -18,6 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { LearnerAnswerInfoCard } from './learner-answer-info-card.component';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
@@ -42,7 +44,13 @@ describe('LearnerAnswerInfoCard', () => {
       declarations: [
         LearnerAnswerInfoCard
       ],
-      providers: [BackgroundMaskService],
+      providers: [
+        BackgroundMaskService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));

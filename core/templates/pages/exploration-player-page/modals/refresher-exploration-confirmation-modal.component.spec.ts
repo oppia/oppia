@@ -19,6 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -65,7 +67,11 @@ describe('Refresher Exploration Confirmation Modal', () => {
           provide: UrlService,
           useClass: MockUrlService
         },
-        NgbActiveModal
+        NgbActiveModal,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ]
     });
   }));

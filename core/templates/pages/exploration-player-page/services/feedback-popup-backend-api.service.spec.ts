@@ -19,6 +19,8 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { FeedbackPopupBackendApiService } from './feedback-popup-backend-api.service';
 
 describe('Feedback Popup Backend Api Service', () => {
@@ -30,7 +32,13 @@ describe('Feedback Popup Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [FeedbackPopupBackendApiService]
+      providers: [
+        FeedbackPopupBackendApiService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ]
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     fbpas = TestBed.inject(FeedbackPopupBackendApiService);
