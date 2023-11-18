@@ -322,10 +322,10 @@ export class AdminBackendApiService {
     });
   }
 
-  async regenerateTopicSummaries(): Promise<void> {
+  async regenerateTopicSummariesAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
-        AdminPageConstants.REGENERATE_TOPIC_SUMMARIES_URL
+        AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
