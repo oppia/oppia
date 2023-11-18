@@ -225,7 +225,7 @@ export class RouterService {
       '/' +
       (
         this.windowRef.nativeWindow.location.hash?.
-        split('#')[1]?.split('/')[1]) ??
+          split('#')[1]?.split('/')[1]) ??
       '');
 
     return (
