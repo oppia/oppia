@@ -1093,7 +1093,7 @@ class UpdateQuestionSuggestionHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_state_dict
+                        domain_objects_validator.validate_question_state_dict
                     )
                 }
             },

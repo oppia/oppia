@@ -32,7 +32,7 @@ from core.domain import stats_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Dict, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -455,6 +455,112 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegex(Exception, 'content'):
             domain_objects_validator.validate_state_dict(invalid_state_dict)  # type: ignore[arg-type]
+
+
+class ValidateQuestionStateDict(test_utils.GenericTestBase):
+    """Tests to validate question_state_dict coming from frontend."""
+
+    def test_valid_object_raises_no_exception(self) -> None:
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {'html': '<p>1</p>', 'content_id': 'ca_choices_2'},
+            {'html': '<p>2</p>', 'content_id': 'ca_choices_3'}
+        ]
+        question_state_dict: state_domain.StateDict = {
+            'content': {'html': '', 'content_id': 'content_0'},
+            'classifier_model_id': None,
+            'linked_skill_id': None,
+            'interaction': {
+                'answer_groups': [{
+                    'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': 0}}],
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {'html': '', 'content_id': 'feedback_4'},
+                        'labelled_as_correct': True,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                },
+                {
+                    'rule_specs': [{'rule_type': 'Equals', 'inputs': {'x': 1}}],
+                    'outcome': {
+                        'dest': None,
+                        'dest_if_really_stuck': None,
+                        'feedback': {'html': '', 'content_id': 'feedback_5'},
+                        'labelled_as_correct': False,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': 'pBi3XobmC4zq-0'
+                }],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'showChoicesInShuffledOrder': {'value': True},
+                    'choices': {'value': choices_subtitled_dicts}
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'html': '', 'content_id': 'default_outcome_1'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'id': 'MultipleChoiceInput',
+                'solution': None
+            },
+            'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_choices_2': {},
+                    'ca_choices_3': {},
+                    'feedback_4': {},
+                    'feedback_5': {}
+                }
+            },
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False
+        }
+        domain_objects_validator.validate_question_state_dict(
+            question_state_dict)
+
+    def test_invalid_object_raises_exception(self) -> None:
+        invalid_question_state_dict: Dict[
+            str,
+            Optional[
+                Union[int, bool, Dict[str, Dict[str, Dict[str, str]]]]
+            ]
+        ] = {
+            'classifier_model_id': None,
+            'written_questions': {
+                'questions_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'next_content_id_index': 1,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        # The error is representing the keyerror.
+        with self.assertRaisesRegex(Exception, 'content'):
+            domain_objects_validator.validate_question_state_dict(
+                invalid_question_state_dict)  # type: ignore[arg-type]
 
 
 class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
