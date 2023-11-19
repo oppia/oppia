@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants'
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
