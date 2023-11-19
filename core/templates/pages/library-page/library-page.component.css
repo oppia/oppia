@@ -207,9 +207,11 @@ oppia-library-page .oppia-exploration-summary-header {
   max-width: 856px;
 }
 oppia-library-page .oppia-search-bar-container {
+  display: flex;
+  justify-content: center;
   margin: 0 auto 6vh auto;
   padding-bottom: 60px;
-  width: max-content;
+  width: 100%;
 }
 .oppia-library-no-exploration-groups {
   margin: 150px auto;
