@@ -895,7 +895,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
 
-        Raises: RuntimeError if skill_ids is empty.
+        Raises:
+            RuntimeError. If skill_ids is empty.
         """
 
         filters = [
@@ -904,7 +905,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ]
 
         if skill_ids is not None:
-            # if this is not filtered here, gae throws BadQueryError
+            # If this is not filtered here, gae throws BadQueryError.
             if len(skill_ids) == 0:
                 raise RuntimeError('skill_ids list can\'t be empty')
 

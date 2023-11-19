@@ -1014,7 +1014,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             RuntimeError,
             'skill_ids list can\'t be empty'):
-                (suggestion_models.GeneralSuggestionModel
+            (
+                suggestion_models.GeneralSuggestionModel
                 .get_in_review_question_suggestions_by_offset(
                     limit=10,
                     offset=0,
