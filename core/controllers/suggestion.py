@@ -766,8 +766,10 @@ class ReviewableSuggestionsHandler(
 
         Returns None to indicate that no filtering is needed.
         """
-        if (topic_name is None or
-            topic_name == constants.TOPIC_SENTINEL_NAME_ALL):
+        if (
+            topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
             return None
         topic = topic_fetchers.get_topic_by_name(topic_name)
         if topic is None:
