@@ -163,8 +163,11 @@ export class StateInteractionEditorComponent
   }
 
   focusOnCustomizeInteraction(event: KeyboardEvent): void {
-    event.preventDefault();
-    this.customizeInteractionButton.nativeElement.focus();
+    if (this.getCurrentInteractionName() !== '' &&
+      this.interactionEditorIsShown) {
+      event.preventDefault();
+      this.customizeInteractionButton.nativeElement.focus();
+    }
   }
 
   focusOnCollapseAnswersAndResponses(event: KeyboardEvent): void {
