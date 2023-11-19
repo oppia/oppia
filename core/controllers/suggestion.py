@@ -764,7 +764,8 @@ class ReviewableSuggestionsHandler(
     ) -> Optional[List[str]]:
         """gets all skill ids for the provided topic.
 
-        Returns None to indicate that no filtering is needed."""
+        Returns None to indicate that no filtering is needed.
+        """
         if (topic_name is None or
             topic_name == constants.TOPIC_SENTINEL_NAME_ALL):
             return None

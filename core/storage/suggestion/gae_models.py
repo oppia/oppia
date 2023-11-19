@@ -885,7 +885,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
             skill_ids: List[str] | None. The skills for which to return
-            question suggestions. None for returning all suggestions.
+                question suggestions. None for returning all suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
