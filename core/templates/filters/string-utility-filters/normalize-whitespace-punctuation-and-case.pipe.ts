@@ -53,6 +53,13 @@ export class NormalizeWhitespacePunctuationAndCasePipe
             isPunctuation(inputLine.charAt(j + 1)))) {
             result += currentChar;
           }
+        } else if (isPunctuation(currentChar)) {
+          if (j < inputLine.length - 1 && inputLine.charAt(j + 1) === ' ') {
+            result += currentChar + ' ';
+            j++;
+          } else {
+            result += currentChar;
+          }
         } else {
           result += currentChar;
         }
