@@ -2086,7 +2086,7 @@ class RegenerateTopicSummariesHandler(
     """Handler to regenerate the summaries of all topics."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
         'PUT': {}
     }
 

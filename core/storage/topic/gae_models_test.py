@@ -186,8 +186,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_story_exploration_mappings(self) -> None:
         topic_id = '1'
         topic_2_id = '2'
-        topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
-        topic_2_story_exp_mapping = {'21': ['211']}
+        topic_story_exp_mapping: Dict[str, List[str]] = {
+            '11': [],
+            '12': ['121', '122']
+        }
+        topic_2_story_exp_mapping: Dict[str, List[str]] = {'21': ['211']}
 
         self.save_new_topic(
             topic_id, feconf.SYSTEM_COMMITTER_ID,
@@ -209,8 +212,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         topic_id = '1'
         topic_2_id = '2'
         topic_2_name = 'topic2'
-        topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
-        topic_2_story_exp_mapping = {'21': ['211']}
+        topic_story_exp_mapping: Dict[str, List[str]] = {
+            '11': [],
+            '12': ['121', '122']
+        }
+        topic_2_story_exp_mapping: Dict[str, List[str]] = {'21': ['211']}
 
         self.save_new_topic(
             topic_id, feconf.SYSTEM_COMMITTER_ID,

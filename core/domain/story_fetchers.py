@@ -209,6 +209,8 @@ def get_story_by_id(
     try:
         story_model = story_models.StoryModel.get(
             story_id, strict=strict, version=version)
+        if story_model is None:
+            return None
         story = get_story_from_model(story_model)
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_STORY,

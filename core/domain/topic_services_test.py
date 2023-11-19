@@ -2371,6 +2371,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'total_published_node_count'],
                 'thumbnail_filename': topic_summary['thumbnail_filename'],
                 'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                'story_exploration_mapping': topic_summary[
+                    'story_exploration_mapping'],
                 'topic_model_created_on': topic_summary[
                     'topic_model_created_on'],
                 'topic_model_last_updated': topic_summary[

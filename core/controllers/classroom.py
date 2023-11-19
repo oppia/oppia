@@ -104,6 +104,8 @@ class ClassroomDataHandler(
                         topic_summary_dict['thumbnail_filename']),
                     'thumbnail_bg_color': (
                         topic_summary_dict['thumbnail_bg_color']),
+                    'story_exploration_mapping': (
+                        topic_summary_dict['story_exploration_mapping']),
                     'topic_model_created_on': (
                         topic_summary_dict['topic_model_created_on']),
                     'topic_model_last_updated': (

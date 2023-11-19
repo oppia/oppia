@@ -438,7 +438,7 @@ class TopicSummaryModel(base_models.BaseModel):
             list(dict(str, list(str))). A list of
             story_exploration_mapping values stored in each entity.
         """
-        projections: Sequence[TopicModel] = cls.query(
+        projections: Sequence[TopicSummaryModel] = cls.query(
             projection=['story_exploration_mapping']
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
         return [
@@ -458,7 +458,7 @@ class TopicSummaryModel(base_models.BaseModel):
             list(dict(str, list(str))). A list of
             story_exploration_mapping values stored in each entity.
         """
-        projections: Sequence[TopicModel] = cls.query(
+        projections: Sequence[TopicSummaryModel] = cls.query(
             projection=['story_exploration_mapping']
         ).filter(cls.name == name).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
         return [
