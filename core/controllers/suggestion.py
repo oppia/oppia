@@ -759,10 +759,15 @@ class ReviewableSuggestionsHandler(
         }
     }
 
-    def _get_skill_ids_for_topic(self, topic_name: Optional[str]) -> List[str]:
-        """gets all skill ids for the provided topic."""
-        if not topic_name or topic_name == constants.TOPIC_SENTINEL_NAME_ALL:
-            return []
+    def _get_skill_ids_for_topic(
+            self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed."""
+        if (topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL):
+            return None
         topic = topic_fetchers.get_topic_by_name(topic_name)
         if topic is None:
             raise self.InvalidInputException(

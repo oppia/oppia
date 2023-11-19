@@ -871,7 +871,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset: int,
         user_id: str,
         sort_key: Optional[str],
-        skill_ids: List[str],
+        skill_ids: Optional[List[str]],
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -884,8 +884,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
-            skill_ids: List[str]. The skills for which to return question
-                suggestions.
+            skill_ids: List[str] | None. The skills for which to return
+            question suggestions. None for returning all suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -900,7 +900,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
         ]
-        if skill_ids:
+        if skill_ids is not None:
             filters.append(cls.target_id.IN(skill_ids))
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:

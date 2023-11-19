@@ -904,7 +904,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=None,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
@@ -919,7 +919,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=prev_offset,
                 user_id=user_id,
                 sort_key=None,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
@@ -934,7 +934,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=prev_offset,
                 user_id=user_id,
                 sort_key=None,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 0)
@@ -960,7 +960,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 1)
@@ -974,7 +974,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -989,7 +989,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=[]))
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -1010,6 +1010,18 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, suggestion_1_id)
         self.assertEqual(offset, 2)
+
+        sorted_results, offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=10,
+                offset=0,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=[]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert sorted_results is not None
+        self.assertEqual(len(sorted_results), 0)
 
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
