@@ -1011,17 +1011,16 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[0].id, suggestion_1_id)
         self.assertEqual(offset, 2)
 
-        sorted_results, offset = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions_by_offset(
-                limit=10,
-                offset=0,
-                user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                skill_ids=[]))
-        # Ruling out the possibility of None for mypy type checking.
-        assert sorted_results is not None
-        self.assertEqual(len(sorted_results), 0)
+        with self.assertRaisesRegex(
+            RuntimeError,
+            'skill_ids list can\'t be empty'):
+                (suggestion_models.GeneralSuggestionModel
+                .get_in_review_question_suggestions_by_offset(
+                    limit=10,
+                    offset=0,
+                    user_id=user_id,
+                    sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                    skill_ids=[]))
 
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'

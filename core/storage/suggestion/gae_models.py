@@ -894,13 +894,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     one of the supplied language codes.
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
+
+        Raises: RuntimeError if skill_ids is empty.
         """
 
         filters = [
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
         ]
+
         if skill_ids is not None:
+            # if this is not filtered here, gae throws BadQueryError
+            if len(skill_ids) == 0:
+                raise RuntimeError('skill_ids list can\'t be empty')
+
             filters.append(cls.target_id.IN(skill_ids))
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
