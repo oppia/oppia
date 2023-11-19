@@ -2218,8 +2218,7 @@ def send_email_to_new_cd_user(
     category_data = NEW_CD_USER_EMAIL_DATA[category]
     email_subject = 'You have been invited to %s Oppia %s' % (
         category_data['task'],
-        category_data['category']
-    )
+        category_data['category'])
 
     if category in [
             constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
@@ -2319,19 +2318,15 @@ def send_email_to_removed_cd_user(
     if category not in REMOVED_CD_USER_EMAIL_DATA:
         raise Exception('Invalid category: %s' % category)
 
-    category_data = (
-        REMOVED_CD_USER_EMAIL_DATA[category])
-    if category in (
-        [constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION]):
+    category_data = REMOVED_CD_USER_EMAIL_DATA[category]
+    if category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
         email_subject = 'You have been unassigned as a %s submitter' % (
-        category_data['category'])
+            category_data['category'])
     else:
         email_subject = 'You have been unassigned as a %s reviewer' % (
-        category_data['category'])
+            category_data['category'])
 
-    if category in [
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-    ]:
+    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
