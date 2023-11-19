@@ -29,6 +29,11 @@ const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
 
+const contributorDashboardAdminPage = (
+  testConstants.URLs.ContributorDashboardAdmin);
+const addContributionRightsButton = (
+  );
+
 module.exports = class e2eSuperAdmin extends baseUser {
   /**
    * The function to assign a role to a user.
@@ -49,7 +54,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           return;
         }
       }
-      throw new Error(`Role ${role} does not exists.`);
+      throw new Error(`Role ${role} does not exist.`);
     }, role);
   }
 
@@ -100,5 +105,74 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }, role);
     showMessage(`User ${username} does not have the ${role} role!`);
     await this.goto(currentPageUrl);
+  }
+
+  /**
+   * The function to assign a contribution right to a user.
+   * @param {string} username - The username to which role would be assigned.
+   * @param {string} right - The contribution right that would be assigned to
+   *   the user.
+   * @param {string} language - The language to review translations in when
+   *   the review translations right would be assigned to the user.
+   */
+  async assignContributionRightToUser(username, right, language = '') {
+    const addContributionRightsCategorySelectDropdown = (
+      'select#add-contribution-rights-category-select');
+    const addContributionRightsLanguageSelectDropdown = (
+      'select#add-contribution-rights-language-select');
+
+    await this.goto(contributorDashboardAdminPage);
+    await this.page.evaluate(() => {
+      const errorHeader = document.querySelector(
+        'div.e2e-test-error-container div');
+      if (errorHeader.innerText === '401 - Unauthorized') {
+        throw new Error('User does not have the proper roles to access the ' +
+          'contributor dashboard admin page.');
+      }
+      showMessage('Error text: ' + errorHeader.innerText);
+    });
+
+    await this.type('input#add-contribution-rights-user-input', username);
+    await this.page.evaluate(async (right) => {
+      const availableRights = document.querySelectorAll(
+        `${addContributionRightsCategorySelectDropdown} option`);
+      for (const availableRight in availableRights) {
+        if (availableRight.innerText === right) {
+          await this.select(addContributionRightsCategorySelectDropdown, right);
+          return;
+	}
+      }
+      throw new Error(
+	`Contribution right ${right} is not one of the available rights.` +
+        ' Ensure that the text is spelled correctly and that the user has ' +
+        'the proper role to add said right.');
+    }, right);
+    if (right === testConstants.ContributorRights.ReviewTranslations) {
+      await this.page.evaluate(async (language) => {
+        const availableLanguages = document.querySelectorAll(
+          `${addContributionRightsLanguageSelectDropdown} option`); 
+        for (const availableLanguage in availableLanguages) {
+          if (availableLanguage.innerText === language) {
+            await this.select(
+              addContributionRightsLanguageSelectDropdown, language);
+            return;
+          }
+        }
+        throw new Error(
+          `Language ${language} is not one of the available languages.` +
+          ' Ensure that the text is spelled correctly.');
+      }, language);
+    } 
+    await this.clickOn('button#add-contribution-rights-submit-button');
+    await this.page.evaluate(() => {
+      const addContributionRightStatus = document.getElementsByClassName(
+        'e2e-test-status-message')[0].innerText;
+      if (addContributionRightStatus !== 'Success.' ||
+        addContributionRightStatus !== 'Adding contribution rights...') {
+        throw new Error(
+          `Server error when adding contribution rights: ${
+            addContributionRightStatus}`);
+      }
+    });
   }
 };
