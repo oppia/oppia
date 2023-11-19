@@ -20,6 +20,9 @@
         </span>
       </span>
     </mat-hint>
+    <div *ngIf="isEmojiError" style="color: red; font-size: 12px; margin-top: 5px;">
+      Emojis are not allowed in the title.
+    </div>
   </mat-form-field>
 </div>
 

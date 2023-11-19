@@ -41,7 +41,9 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   @Output() onInputFieldBlur = new EventEmitter<void>();
 
   MAX_CHARS_IN_EXPLORATION_TITLE!: number;
-
+  // Property to track if an emoji is found in the title
+  isEmojiError: boolean = false;
+  
   constructor(
     public explorationTitleService: ExplorationTitleService,
     private focusManagerService: FocusManagerService,
@@ -49,9 +51,15 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   ) { }
 
   inputFieldBlur(): void {
+    this.isEmojiError = this.containsEmoji(this.explorationTitleService.displayed);
     this.onInputFieldBlur.emit();
   }
-
+  // Function to check if a string contains emojis
+  containsEmoji(text: string): boolean {
+    const emojiPattern = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
+    return emojiPattern.test(text);
+  }
+  
   ngOnInit(): void {
     this.MAX_CHARS_IN_EXPLORATION_TITLE = (
       AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE);
@@ -68,6 +76,7 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+ 
 }
 
 angular.module('oppia').directive(
