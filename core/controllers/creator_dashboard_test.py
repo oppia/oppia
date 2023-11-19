@@ -110,11 +110,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_3: Final = 'Exploration title 3'
 
     def setUp(self) -> None:
-        """Set up the test case.
-
-        Performs the necessary setup steps, including signing up users
-        and retrieving user information.
-        """
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
@@ -586,6 +581,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_non_admins_can_not_upload_exploration(self) -> None:
+        """Test that non-admins cannot upload explorations."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -602,6 +598,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_upload_exploration(self) -> None:
+        """Test that admins can upload explorations."""
         with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
             self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
