@@ -3179,6 +3179,16 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(len(response['suggestions']), 1)
 
+    def test_skill_handler_with_all_topics_filter_returns_one_question(self) -> None:
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'All',
+            })
+        self.assertEqual(len(response['suggestions']), 2)
+
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
             '/getreviewablesuggestions/topic/add_question', {
