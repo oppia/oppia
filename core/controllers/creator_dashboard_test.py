@@ -621,6 +621,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
         self
     ) -> None:
+        """Test that exploration upload fails when file upload is not allowed."""
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
