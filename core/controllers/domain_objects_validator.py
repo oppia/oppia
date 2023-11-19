@@ -264,6 +264,29 @@ def validate_state_dict(
     return state_dict
 
 
+def validate_question_state_dict(
+    question_state_dict: state_domain.StateDict
+) -> state_domain.StateDict:
+    """Validates state dict for a question.
+
+    Args:
+        question_state_dict: dict. The dict representation of State object for
+            a question.
+
+    Returns:
+        State. The question_state_dict after validation.
+    """
+    question_state_object = state_domain.State.from_dict(question_state_dict)
+    # 'tagged_skill_misconception_id_required' is not None when a state is part
+    # of a Question object that tests a particular skill.
+    question_state_object.validate(
+        exp_param_specs_dict=None,
+        allow_null_interaction=True,
+        tagged_skill_misconception_id_required=True)
+
+    return question_state_dict
+
+
 def validate_email_dashboard_data(
     data: Dict[str, Optional[Union[bool, int]]]
 ) -> Dict[str, Optional[Union[bool, int]]]:
