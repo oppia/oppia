@@ -19,6 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { CheckpointCelebrationModalComponent } from './checkpoint-celebration-modal.component';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -250,6 +252,10 @@ describe('Checkpoint celebration modal component', function() {
         {
           provide: CheckpointCelebrationUtilityService,
           useClass: MockCheckpointCelebrationUtilityService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ]
     }).compileComponents();
