@@ -3179,7 +3179,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(len(response['suggestions']), 1)
 
-    def test_skill_handler_with_all_topics_filter_returns_one_question(self) -> None:
+    def test_skill_handler_with_all_topics_filter_returns_one_question(
+            self
+        ) -> None:
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
