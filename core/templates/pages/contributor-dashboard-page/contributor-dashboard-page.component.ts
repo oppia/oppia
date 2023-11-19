@@ -112,7 +112,15 @@ export class ContributorDashboardPageComponent
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
+
+    const isReviewingSuggestedQuestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'add_question' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
+
     return activeTabDetail.customizationOptions.includes('topic') ||
+      isReviewingSuggestedQuestions ||
       (
         activeTabType === 'reviews' &&
         activeSuggestionType === 'translate_content' &&
