@@ -19,9 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -584,10 +581,10 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_story(story_id_4, self.user_id, topic_id_2)
 
         exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_1,
-            exp_ids[0])
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_3,
-            *exp_ids[1:3])
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_1, exp_ids[0])
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_3, *exp_ids[1:3])
         self.link_explorations_to_story(topic_id_2, story_id_4, exp_ids[3])
 
         story_exp_ids = topic_fetchers.get_all_story_exploration_ids()
@@ -610,14 +607,14 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         topic_1_exp_ids = ['exp_1', 'exp_2', 'exp_3']
         topic_2_exp_ids = ['exp_4']
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_1,
-            topic_1_exp_ids[0])
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_3,
-            *topic_1_exp_ids[1:3])
-        self.link_explorations_to_story(topic_id_2, story_id_4,
-            topic_2_exp_ids[0])
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_1, topic_1_exp_ids[0])
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_3, *topic_1_exp_ids[1:3])
+        self.link_explorations_to_story(
+            topic_id_2, story_id_4, topic_2_exp_ids[0])
 
         story_exp_ids = topic_fetchers.get_all_story_exploration_ids(
             topic_2_name)
 
-        self.assertItemsEqual(topic_2_exp_ids, story_exp_ids) 
+        self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)

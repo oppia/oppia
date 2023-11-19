@@ -21,6 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants'
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
@@ -362,14 +363,13 @@ describe('Admin backend api service', () => {
     }));
   });
 
-  describe('populateTopicsWithExplorationIdsAsync', () => {
-    it('should make request to populate topics with '
-      + 'exploration ids', fakeAsync(() => {
-      abas.populateTopicsWithExplorationIdsAsync().then(
+  describe('regenerateTopicSummariesAsync', () => {
+    it('should make request to regenerate topic summaries', fakeAsync(() => {
+      abas.regenerateTopicSummariesAsync().then(
         successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-	AdminPageConstants.ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER);
+        AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL);
       expect(req.request.method).toEqual('PUT');
 
       req.flush({ status: 200, statusText: 'Success.' });
@@ -380,18 +380,18 @@ describe('Admin backend api service', () => {
     }));
 
     it('should call fail handler if the request fails', fakeAsync(() => {
-      const errorMessage = 'Cannot populate topic with existing mapping.';
+      const errorMessage = 'Failed to regenerate all topic summaries.';
 
-      abas.populateTopicsWithExplorationIdsAsync().then(
+      abas.regenerateTopicSummariesAsync().then(
         successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-	AdminPageConstants.ADMIN_POPULATE_TOPICS_WITH_EXPLORATION_IDS_HANDLER);
+        AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL);
       expect(req.request.method).toEqual('PUT');
 
       req.flush(
-	{ error: errorMessage },
-	{ status: 500, statusText: 'Internal Server Error' });
+        { error: errorMessage },
+        { status: 500, statusText: 'Internal Server Error' });
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();

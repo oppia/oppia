@@ -620,31 +620,32 @@ describe('Admin misc tab component ', () => {
     }));
   });
 
-  describe('when populating topics with exploration ids', () => {
-    it('should populate all topics successfully', fakeAsync(() => {
+  describe('when regenerating topic summaries', () => {
+    it('should regenerate all topic summaries successfully', fakeAsync(() => {
       const topicModelSpy = spyOn(
-	adminBackendApiService, 'populateTopicsWithExplorationIdsAsync')
-	.and.returnValue(Promise.resolve());
+        adminBackendApiService, 'regenerateTopicSummariesAsync')
+        .and.returnValue(Promise.resolve());
 
-      component.populateTopicsWithExplorationIds();
+      component.regenerateTopicSummaries();
       tick();
 
       expect(topicModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-	'Successfully populated topics with exploration ids');
+        'Successfully regenerated all topic summaries.');
     }));
 
-    it('should not populate topics in case of server error', fakeAsync(() => {
+    it('should not regenerate topic summaries in case of ' +
+      'server error', fakeAsync(() => {
       const topicModelSpy = spyOn(
-	adminBackendApiService, 'populateTopicsWithExplorationIdsAsync')
-	.and.rejectWith('Internal Server Error');
+        adminBackendApiService, 'regenerateTopicSummariesAsync')
+        .and.rejectWith('Internal Server Error');
 
-      component.populateTopicsWithExplorationIds();
+      component.regenerateTopicSummaries();
       tick();
 
       expect(topicModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-	'Server error: Internal Server Error');
+        'Server error: Internal Server Error');
     }));
   });
 

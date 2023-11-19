@@ -1760,61 +1760,34 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             })
 
 
-class PopulateTopicsWithExplorationIdsHandlerTest(test_utils.GenericTestBase):
+class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
     """Tests for PopulateTopicsWithExplorationIdsHandler."""
 
     def setUp(self) -> None:
         super().setUp()
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
 
-        self.topic_id = topic_fetchers.get_new_topic_id()
+    def test_regenerate_topic_summaries(self) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
+            topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', url_fragment='url-fragment',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
-        self.story_id = story_fetchers.get_new_story_id()
-        self.save_new_story(self.story_id, self.admin_id, topic_id)
-
-        self.exp_id = 'exp_1'
-        self.save_new_valid_exploration(self.exp_id, self.admin_id)
-
-        story_services.update_story(self.story_id, self.admin_id, [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': 'node_1',
-                'title': '1',
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': self.exp_id
-            })
-        ], 'Linked exploration to story.')
-
-        topic_model = topic_models.TopicModel.get(topic_id, strict=True)
-        topic_model.canonical_story_ids = [self.story_id]
-        topic_model.story_exploration_mapping = None
-        change_dicts = [change.to_dict() for change in change_list]
-        topic_model_to_commit.commit(
-            self.admin_id, commit_message, change_dicts)
-
-    def test_populate_topics_with_story_exploration_mapping(self) -> None:
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            feconf.POPULATE_TOPICS_WITH_EXPLORATION_IDS_URL, {},
-            csrf_token=csrf_token, expected_status_int=200)
 
-        topic = topic_fetchers.get_topic_by_id(self.topic_id)
-        assertDictEqual(topic.story_exploration_mapping, {
-            self.story_id: [self.exp_id]
-        })
+        with self.swap_with_call_counter(
+                topic_services, 'generate_topic_summary') as (
+                    generate_topic_summary):
+            self.put_json(
+                feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
+                csrf_token=csrf_token, expected_status_int=200)
+
+            self.assertGreaterEqual(
+                generate_topic_summary.times_called, 1)
 
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):

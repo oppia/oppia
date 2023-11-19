@@ -215,7 +215,7 @@ def get_story_by_id(
             sub_namespace,
             {story_id: story})
         return story
-    except:
+    except story_models.StoryModel.EntityNotFoundError:
         return None
 
 

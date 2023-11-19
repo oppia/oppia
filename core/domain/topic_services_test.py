@@ -162,10 +162,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_compute_summary(self) -> None:
         story_1_exp_ids = ['exp-1']
         story_2_exp_ids = ['exp-2', 'exp-3']
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_1,
-            *story_1_exp_ids)
-        self.link_explorations_to_story(self.TOPIC_ID, self.story_id_2,
-            *story_2_exp_ids)
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_1, *story_1_exp_ids)
+        self.link_explorations_to_story(
+            self.TOPIC_ID, self.story_id_2, *story_2_exp_ids)
 
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 

@@ -189,9 +189,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
         topic_2_story_exp_mapping = {'21': ['211']}
 
-        self.save_new_topic(topic_id, feconf.SYSTEM_COMMITTER_ID,
+        self.save_new_topic(
+            topic_id, feconf.SYSTEM_COMMITTER_ID,
             canonical_story_ids=['12'], additional_story_ids=['11'])
-        self.save_new_topic(topic_2_id, feconf.SYSTEM_COMMITTER_ID,
+        self.save_new_topic(
+            topic_2_id, feconf.SYSTEM_COMMITTER_ID,
             name='topic2', url_fragment='frag-two',
             canonical_story_ids=['21'])
         self._create_stories_by_mapping(topic_id, topic_story_exp_mapping)
@@ -210,9 +212,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         topic_story_exp_mapping = {'11': [], '12': ['121', '122']}
         topic_2_story_exp_mapping = {'21': ['211']}
 
-        self.save_new_topic(topic_id, feconf.SYSTEM_COMMITTER_ID,
+        self.save_new_topic(
+            topic_id, feconf.SYSTEM_COMMITTER_ID,
             canonical_story_ids=['12'], additional_story_ids=['11'])
-        self.save_new_topic(topic_2_id, feconf.SYSTEM_COMMITTER_ID,
+        self.save_new_topic(
+            topic_2_id, feconf.SYSTEM_COMMITTER_ID,
             name=topic_2_name, url_fragment='frag-two',
             canonical_story_ids=['21'])
         self._create_stories_by_mapping(topic_id, topic_story_exp_mapping)
@@ -240,7 +244,8 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
                 story.
         """
         for story_id, exp_ids in story_exp_mapping.items():
-            self.save_new_story(story_id, feconf.SYSTEM_COMMITTER_ID,
+            self.save_new_story(
+                story_id, feconf.SYSTEM_COMMITTER_ID,
                 corresponding_topic_id=topic_id)
             self.link_explorations_to_story(topic_id, story_id, *exp_ids)
 

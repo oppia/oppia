@@ -3532,6 +3532,7 @@ version: 1
         story with story_id.
 
         Args:
+            topic_id: str. ID of the topic that contains the story.
             story_id: str. ID of the story containing the new node.
             *exp_ids: str. IDs of the exploration.
         """

@@ -1452,7 +1452,7 @@ class Topic:
                 'story references list of the topic.' % story_id)
         self.canonical_story_references.append(
             StoryReference.create_default_story_reference(story_id)
-        ) 
+        )
 
     def add_additional_story(self, story_id: str) -> None:
         """Adds a story to the additional_story_references list.
@@ -1471,7 +1471,7 @@ class Topic:
                 'story references list of the topic.' % story_id)
         self.additional_story_references.append(
             StoryReference.create_default_story_reference(story_id)
-        ) 
+        )
 
     def delete_additional_story(self, story_id: str) -> None:
         """Removes a story from the additional_story_references list.

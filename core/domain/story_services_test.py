@@ -1782,11 +1782,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated story initial_node_id.')
 
     def test_rearrange_node_in_story(self) -> None:
-        change_add_story_with_exploration = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_ADD_STORY_NODE,
-            'node_id': self.NODE_ID_2,
-            'title': 'Title 2'
-        })]
         first: Final = 0
         second: Final = 1
 
@@ -1810,8 +1805,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': first
         })]
 
-        story_services.update_story(self.USER_ID, self.STORY_ID,
-            change_rearrange_story_node, 'Rearranged story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_rearrange_story_node,
+            'Rearranged story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_2)

@@ -389,8 +389,8 @@ class TopicSummaryModel(base_models.BaseModel):
     # and the explorations that are linked to each story. This field must be
     # kept in-sync with updates made to an owned story's explorations and to
     # the topic's ownership of said stories.
-    story_exploration_mapping = datastore_services.JsonProperty(required=True,
-        indexed=True)
+    story_exploration_mapping = datastore_services.JsonProperty(
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -426,7 +426,8 @@ class TopicSummaryModel(base_models.BaseModel):
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_exploration_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'story_exploration_mapping':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -436,7 +437,7 @@ class TopicSummaryModel(base_models.BaseModel):
         Returns:
             list(dict(str, list(str))). A list of
             story_exploration_mapping values stored in each entity.
-        """ 
+        """
         projections: Sequence[TopicModel] = cls.query(
             projection=['story_exploration_mapping']
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
@@ -456,7 +457,7 @@ class TopicSummaryModel(base_models.BaseModel):
         Returns:
             list(dict(str, list(str))). A list of
             story_exploration_mapping values stored in each entity.
-        """ 
+        """
         projections: Sequence[TopicModel] = cls.query(
             projection=['story_exploration_mapping']
         ).filter(cls.name == name).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
