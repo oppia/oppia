@@ -14,7 +14,7 @@
 	"I18N_ABOUT_PAGE_TEACH_BUTTON": "Jeg ønsker å undervise",
 	"I18N_ABOUT_PAGE_TITLE": "Om oss – Oppia",
 	"I18N_CONTACT_PAGE_HEADING": "Involver deg!",
-	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "Hvis du har en medieforespørsel, send den til <a href=\"mailto:press@oppia.org\">press@oppia.org</a>.",
+	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "Hvis du har en medieforespørsel, send den til <a class=\"oppia-contact-mail\" href=\"mailto:press@oppia.org\">press@oppia.org</a>.",
 	"I18N_CONTINUE_REGISTRATION": "Fortsett registrering",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Hva ønsker du å skape?",
 	"I18N_CREATE_ACTIVITY_TITLE": "Opprett en aktivitet",

@@ -39,6 +39,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
 
 
 class ExplorationOpportunitySummaryDict(
@@ -91,7 +92,8 @@ class ExplorationOpportunitySummary:
         translation_counts: Dict[str, int],
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
-        translation_in_review_counts: Dict[str, int]
+        translation_in_review_counts: Dict[str, int],
+        is_pinned: bool = False
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -116,6 +118,8 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
+            is_pinned: bool. Denotes whether the opportunity is pinned or not in
+                contributor dashboard.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -132,6 +136,7 @@ class ExplorationOpportunitySummary:
         self.language_codes_with_assigned_voice_artists = (
             language_codes_with_assigned_voice_artists)
         self.translation_in_review_counts = translation_in_review_counts
+        self.is_pinned = is_pinned
         self.validate()
 
     @classmethod
@@ -186,7 +191,8 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
-            'translation_in_review_counts': self.translation_in_review_counts
+            'translation_in_review_counts': self.translation_in_review_counts,
+            'is_pinned': self.is_pinned
         }
 
     def validate(self) -> None:
