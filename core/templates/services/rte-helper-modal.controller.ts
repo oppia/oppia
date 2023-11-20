@@ -311,7 +311,7 @@ export class RteHelperModalComponent {
     return url !== text;
   }
 
-  validateVideoStartEnd(): boolean {
+  isVideoStartTimeValid(): boolean {
     const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
       CustomizationArgsNameAndValueArray[number],
       {
@@ -322,19 +322,15 @@ export class RteHelperModalComponent {
     let end: number = 0;
     for (const arg of tmpCustomizationArgs) {
       if (arg.name === 'start') {
-        if (typeof arg.value === 'number') {
-          start = arg.value;
-        }
+        start = arg.value as number;
       } else if (arg.name === 'end') {
-        if (typeof arg.value === 'number') {
-          end = arg.value;
-        }
+        end = arg.value as number;
       }
     }
     if (start === 0 && end === 0) {
-      return false;
+      return true;
     }
-    return start >= end;
+    return start < end;
   }
 
   save(): void {
@@ -446,8 +442,8 @@ export class RteHelperModalComponent {
           customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
-          const validStartAndEnd = this.validateVideoStartEnd();
-          if (validStartAndEnd) {
+          const isVideoStartTimeValid = this.isVideoStartTimeValid();
+          if (!isVideoStartTimeValid) {
             return;
           }
         } else if (caName === 'text' && this.currentRteIsLinkEditor) {
