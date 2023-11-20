@@ -17,7 +17,6 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -293,8 +292,3 @@ export class AdminMiscTabComponent {
     this.showDataExtractionQueryStatus = false;
   }
 }
-
-angular.module('oppia').directive('oppiaAdminMiscTab',
-  downgradeComponent({
-    component: AdminMiscTabComponent
-  }) as angular.IDirectiveFactory);
