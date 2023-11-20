@@ -77,7 +77,7 @@ describe('Contribution and review backend API service', () => {
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
         'All',
-        'topic_name',
+        null,
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -190,7 +190,7 @@ describe('Contribution and review backend API service', () => {
         AppConstants.OPPORTUNITIES_PAGE_SIZE,
         0,
         AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        null,
+        'All',
         null,
       ).then(successHandler, failureHandler);
       flushMicrotasks();
