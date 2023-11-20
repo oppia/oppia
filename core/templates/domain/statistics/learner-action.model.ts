@@ -139,12 +139,10 @@ export class LearnerAction {
           learnerActionBackendDict.schema_version
         );
       default:
-        break;
+        throw new Error(
+          'Backend dict does not match any known action type: ' +
+            angular.toJson(learnerActionBackendDict)
+        );
     }
-    const invalidBackendDict = learnerActionBackendDict;
-    throw new Error(
-      'Backend dict does not match any known action type: ' +
-        angular.toJson(invalidBackendDict)
-    );
   }
 }

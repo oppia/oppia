@@ -153,11 +153,10 @@ export class Playthrough {
           actions
         );
       default:
-        break;
+        throw new Error(
+          'Backend dict does not match any known issue type: ' +
+            angular.toJson(playthroughBackendDict)
+        );
     }
-    const invalidBackendDict = playthroughBackendDict;
-    throw new Error(
-      'Backend dict does not match any known issue type: ' +
-      angular.toJson(invalidBackendDict));
   }
 }

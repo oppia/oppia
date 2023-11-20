@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -119,12 +119,10 @@ export class PlaythroughIssue {
           backendDict.is_valid
         );
       default:
-        break;
+        throw new Error(
+          'Backend dict does not match any known issue type: ' +
+            angular.toJson(backendDict)
+        );
     }
-    const invalidBackendDict: never = backendDict as never;
-    throw new Error(
-      'Backend dict does not match any known issue type: ' +
-        angular.toJson(invalidBackendDict)
-    );
   }
 }
