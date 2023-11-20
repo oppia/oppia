@@ -18,16 +18,20 @@
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { AppConstants } from 'app.constants';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
+import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -44,6 +48,7 @@ import { ImagePreloaderService } from './image-preloader.service';
 import { ExplorationParams, LearnerParamsService } from './learner-params.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 
  @Injectable({
    providedIn: 'root'
@@ -94,6 +99,7 @@ export class ExplorationEngineService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
+    private translateService: TranslateService,
     private urlService: UrlService
   ) {
     this.setExplorationProperties();
@@ -141,15 +147,35 @@ export class ExplorationEngineService {
     }
   }
 
-  randomFromArray<T>(arr: T[]): T {
+  randomFromArray<T>(arr: readonly T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // Evaluate feedback.
-  makeFeedback(
-      feedbackHtml: string, envs: Record<string, string>[]
+  private _getFeedback(
+      answer: string, oldStateCard: StateCard,
+      outcome: Outcome, envs: Record<string, string>[]
   ): string {
-    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
+    const oldInteractionId = oldStateCard.getInteractionId();
+    const oldInteractionArgs = oldStateCard.
+      getInteractionCustomizationArgs() as TextInputCustomizationArgs;
+    const defaultOutcome = oldStateCard.getInteraction()?.defaultOutcome;
+    const shouldCheckForMisspelling =
+      oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
+      oldInteractionArgs.catchMisspellings &&
+      angular.equals(outcome, defaultOutcome);
+
+    if (shouldCheckForMisspelling) {
+      const answerIsOnlyMisspelled = this.answerClassificationService.
+        isAnswerOnlyMisspelled(oldStateCard.getInteraction(), answer);
+      if (answerIsOnlyMisspelled) {
+        const randomResponse = this.randomFromArray(
+          ExplorationPlayerConstants.I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_IDS);
+        return this.translateService.instant(randomResponse);
+      }
+    }
+
+    return this.expressionInterpolationService.processHtml(
+      outcome.feedback.html, envs);
   }
 
   private _getRandomSuffix(): string {
@@ -466,8 +492,6 @@ export class ExplorationEngineService {
     // at oldState.interaction.default_outcome.
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
-    let newStateNameIfStuck: string | null = outcome.destIfReallyStuck;
-    let nextCardIfReallyStuck = null;
 
     if (!this._editorPreviewMode) {
       let feedbackIsUseful: boolean = (
@@ -498,8 +522,8 @@ export class ExplorationEngineService {
     // Compute the data for the next state.
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
     oldParams.answer = answer;
-    let feedbackHtml: string = this.makeFeedback(
-      outcome.feedback.html, [oldParams]);
+    let feedbackHtml: string = this._getFeedback(
+      answer, oldStateCard, classificationResult.outcome, [oldParams]);
     let feedbackContentId: string = outcome.feedback.contentId;
     let feedbackAudioTranslations: BindableVoiceovers = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
@@ -563,42 +587,8 @@ export class ExplorationEngineService {
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
 
-    if (newStateNameIfStuck !== null) {
-      let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
-      let newParamsIfStuck = (
-        newStateIfStuck ? this.makeParams(
-          oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
-
-      let questionHtmlIfStuck = this.makeQuestion(
-        newStateIfStuck, [newParamsIfStuck, {
-          answer: 'answer'
-        }]);
-
-      newParamsIfStuck.answer = answer;
-
-      this.nextStateIfStuckName = newStateNameIfStuck;
-
-      let nextInteractionIfStuckHtml = null;
-      if (this.exploration.getInteraction(this.nextStateIfStuckName).id) {
-        nextInteractionIfStuckHtml = (
-          this._getInteractionHtmlByStateName(
-            _nextFocusLabel, this.nextStateIfStuckName)
-        );
-      }
-
-      questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
-      nextInteractionIfStuckHtml = (
-        nextInteractionIfStuckHtml + this._getRandomSuffix());
-
-      nextCardIfReallyStuck = StateCard.createNewCard(
-        this.nextStateIfStuckName, questionHtmlIfStuck,
-        nextInteractionIfStuckHtml,
-        this.exploration.getInteraction(this.nextStateIfStuckName),
-        this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
-        this.exploration.getState(this.nextStateIfStuckName).content.contentId,
-        this.audioTranslationLanguageService);
-    }
-
+    const nextCardIfReallyStuck = this._getNextCardIfReallyStuck(
+      answer, outcome.destIfReallyStuck, oldParams, _nextFocusLabel);
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,
       feedbackAudioTranslations, refresherExplorationId,
@@ -606,6 +596,47 @@ export class ExplorationEngineService {
       (oldStateName === this.exploration.initStateName), isFirstHit, false,
       nextCardIfReallyStuck, _nextFocusLabel);
     return answerIsCorrect;
+  }
+
+  private _getNextCardIfReallyStuck(
+      answer: string, newStateNameIfStuck: string | null,
+      oldParams: ExplorationParams, nextFocusLabel: string): StateCard | null {
+    if (newStateNameIfStuck === null) {
+      return null;
+    }
+    let newStateIfStuck = this.exploration.getState(newStateNameIfStuck);
+    let newParamsIfStuck = (
+      newStateIfStuck ? this.makeParams(
+        oldParams, newStateIfStuck.paramChanges, [oldParams]) : oldParams);
+
+    let questionHtmlIfStuck = this.makeQuestion(
+      newStateIfStuck, [newParamsIfStuck, {
+        answer: 'answer'
+      }]);
+
+    newParamsIfStuck.answer = answer;
+
+    this.nextStateIfStuckName = newStateNameIfStuck;
+
+    let nextInteractionIfStuckHtml = null;
+    if (this.exploration.getInteraction(this.nextStateIfStuckName).id) {
+      nextInteractionIfStuckHtml = (
+        this._getInteractionHtmlByStateName(
+          nextFocusLabel, this.nextStateIfStuckName)
+      );
+    }
+
+    questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+    nextInteractionIfStuckHtml = (
+      nextInteractionIfStuckHtml + this._getRandomSuffix());
+
+    return StateCard.createNewCard(
+      this.nextStateIfStuckName, questionHtmlIfStuck,
+      nextInteractionIfStuckHtml,
+      this.exploration.getInteraction(this.nextStateIfStuckName),
+      this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
+      this.exploration.getState(this.nextStateIfStuckName).content.contentId,
+      this.audioTranslationLanguageService);
   }
 
   isAnswerBeingProcessed(): boolean {

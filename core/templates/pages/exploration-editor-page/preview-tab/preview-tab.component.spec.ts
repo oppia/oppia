@@ -21,6 +21,8 @@ import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFa
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
@@ -142,6 +144,10 @@ describe('Preview Tab Component', () => {
               init_state_name: stateName
             })
           }
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
