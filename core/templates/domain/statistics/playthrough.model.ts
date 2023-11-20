@@ -64,6 +64,8 @@ export class Playthrough {
         const stateNames = args.state_names.value;
         return stateNames[stateNames.length - 1];
       }
+      // Instance cannot exist with wrong issueType
+      // default: Never happens.
     }
   }
 

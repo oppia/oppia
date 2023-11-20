@@ -22,7 +22,7 @@ import {
   PlaythroughIssueBackendDict
 } from 'domain/statistics/playthrough-issue.model';
 
-describe('Playthrough Issue Object Factory', () => {
+describe('Playthrough Issue Model Class', () => {
   let playthroughIssueObject: PlaythroughIssue;
 
   it('should create a new exploration issue', () => {

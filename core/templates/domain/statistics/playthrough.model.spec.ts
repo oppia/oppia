@@ -24,7 +24,7 @@ import { Playthrough } from
 import {PlaythroughIssueType} from
   'domain/statistics/playthrough-issue.model';
 
-describe('Playthrough Object Factory', () => {
+describe('Playthrough Model Class', () => {
   it('should create a new playthrough', () => {
     let actions = [LearnerAction.createNewExplorationStartAction({
       state_name: {
