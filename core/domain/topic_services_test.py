@@ -2385,11 +2385,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             stories = []
             for story_reference in topic.canonical_story_references:
                 print(story_reference)
-                    logging.error(
-                        'Topic %s has canonical story references '
-                        '%s but story reference %s is not a valid story.' % (
-                            topic_id, topic.canonical_story_references,
-                            story_reference.story_id))
+                logging.error(
+                    'Topic %s has canonical story references '
+                    '%s but story reference %s is not a valid story.' % (
+                        topic_id, topic.canonical_story_references,
+                        story_reference.story_id))
 
         self.assertEqual(
             logs,
