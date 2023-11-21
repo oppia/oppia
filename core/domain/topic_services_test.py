@@ -2377,6 +2377,27 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     published_chapter_counts_for_each_story, [0, 0, 1])
 
 
+    def test_invalid_story_reference_logging(self):
+        topic_id = self.TOPIC_ID
+        topic = get_test_topic_with_invalid_reference()
+
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            stories = []
+            for story_reference in topic.canonical_story_references:
+                print(story_reference)
+                    logging.error(
+                        'Topic %s has canonical story references '
+                        '%s but story reference %s is not a valid story.' % (
+                            topic_id, topic.canonical_story_references,
+                            story_reference.story_id))
+
+        self.assertEqual(
+            logs,
+            [
+                'Topic %s has canonical story references '
+                '%s but story reference %s is not a valid story.'
+            ]
+        )
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
 class MockTopicObject(topic_domain.Topic):
