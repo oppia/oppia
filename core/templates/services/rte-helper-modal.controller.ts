@@ -328,9 +328,9 @@ export class RteHelperModalComponent {
       }
     }
     if (start === 0 && end === 0) {
-      return false;
+      return true;
     }
-    return start >= end;
+    return start < end;
   }
 
   save(): void {
