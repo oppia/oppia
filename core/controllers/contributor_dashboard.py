@@ -366,7 +366,12 @@ class ReviewableOpportunitiesHandler(
         # 2. Get the reviewable translation suggestion target IDs for the user.
         # 3. Get story exploration nodes in order, filtering for explorations
         #    that have in review translation suggestions.
-        topic_exp_ids = topic_fetchers.get_all_story_exploration_ids(topic_name)
+        # 4. Fetch all exploration opportunity summaries, order them, and then
+        #    add the pinned lesson's summary on top.
+        topic_exp_ids = topic_fetchers.get_all_story_exploration_ids(
+            topic_fetchers.get_topic_by_name(topic_name).id
+            if topic_name else None
+        )
 
         in_review_suggestions, _ = (
             suggestion_services

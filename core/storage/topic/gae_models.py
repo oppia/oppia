@@ -316,8 +316,8 @@ class TopicModel(base_models.VersionedModel):
             'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_title_fragment_for_web':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_title_fragment_for_web': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -431,7 +431,7 @@ class TopicSummaryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_story_exploration_mappings(cls) -> List[Dict[str, List[str]]]:
+    def get_all_story_exploration_mappings(cls) -> List[Dict[str, List[str]]]:
         """Gets each entity's story_exploration_mapping property.
 
         Returns:
@@ -441,26 +441,6 @@ class TopicSummaryModel(base_models.BaseModel):
         projections: Sequence[TopicSummaryModel] = cls.query(
             projection=['story_exploration_mapping']
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-        return [
-            projection.story_exploration_mapping for projection in projections
-        ]
-
-    @classmethod
-    def get_story_exploration_mappings_by_name(
-        cls, name: str
-    ) -> List[Dict[str, List[str]]]:
-        """Gets each entity's story_exploration_mapping property by topic name. 
-
-        Args:
-            name: str. The name of the topic to select entities for querying.
-
-        Returns:
-            list(dict(str, list(str))). A list of
-            story_exploration_mapping values stored in each entity.
-        """
-        projections: Sequence[TopicSummaryModel] = cls.query(
-            projection=['story_exploration_mapping']
-        ).filter(cls.name == name).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
         return [
             projection.story_exploration_mapping for projection in projections
         ]

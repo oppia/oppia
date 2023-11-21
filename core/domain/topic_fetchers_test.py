@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for topic domain objects."""
+"""Tests the methods defined in topic fetchers."""
 
 from __future__ import annotations
 
@@ -591,14 +591,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(exp_ids, story_exp_ids)
 
-    def test_get_all_story_exploration_ids_in_a_topic_by_name(
+    def test_get_all_story_exploration_ids_in_a_topic_by_its_id(
         self
     ) -> None:
-        topic_2_name = 'Name 2'
         topic_id_2 = topic_fetchers.get_new_topic_id()
         story_id_4 = 'story_4'
         self.save_new_topic(
-            topic_id_2, self.user_id, name=topic_2_name,
+            topic_id_2, self.user_id, name='Name 2',
             abbreviated_name='name2', url_fragment='name-two',
             description='Description',
             canonical_story_ids=[story_id_4], additional_story_ids=[],
@@ -615,6 +614,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             topic_id_2, story_id_4, topic_2_exp_ids[0])
 
         story_exp_ids = topic_fetchers.get_all_story_exploration_ids(
-            topic_2_name)
+            topic_id_2)
 
         self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)

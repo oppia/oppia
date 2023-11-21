@@ -183,7 +183,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_story_exploration_mappings(self) -> None:
+    def test_get_all_story_exploration_mappings(self) -> None:
         topic_id = '1'
         topic_2_id = '2'
         topic_story_exp_mapping: Dict[str, List[str]] = {
@@ -203,36 +203,9 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         self._create_stories_by_mapping(topic_2_id, topic_2_story_exp_mapping)
 
         mappings = (
-            topic_models.TopicSummaryModel.get_story_exploration_mappings())
+            topic_models.TopicSummaryModel.get_all_story_exploration_mappings())
 
         self.assertIn(topic_story_exp_mapping, mappings)
-        self.assertIn(topic_2_story_exp_mapping, mappings)
-
-    def test_get_story_exploration_mappings_by_name(self) -> None:
-        topic_id = '1'
-        topic_2_id = '2'
-        topic_2_name = 'topic2'
-        topic_story_exp_mapping: Dict[str, List[str]] = {
-            '11': [],
-            '12': ['121', '122']
-        }
-        topic_2_story_exp_mapping: Dict[str, List[str]] = {'21': ['211']}
-
-        self.save_new_topic(
-            topic_id, feconf.SYSTEM_COMMITTER_ID,
-            canonical_story_ids=['12'], additional_story_ids=['11'])
-        self.save_new_topic(
-            topic_2_id, feconf.SYSTEM_COMMITTER_ID,
-            name=topic_2_name, url_fragment='frag-two',
-            canonical_story_ids=['21'])
-        self._create_stories_by_mapping(topic_id, topic_story_exp_mapping)
-        self._create_stories_by_mapping(topic_2_id, topic_2_story_exp_mapping)
-
-        mappings = (
-            topic_models.TopicSummaryModel
-            .get_story_exploration_mappings_by_name(topic_2_name))
-
-        self.assertNotIn(topic_story_exp_mapping, mappings)
         self.assertIn(topic_2_story_exp_mapping, mappings)
 
     def _create_stories_by_mapping(

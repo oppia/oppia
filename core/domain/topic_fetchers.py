@@ -751,13 +751,13 @@ def get_canonical_story_dicts(
 
 
 def get_all_story_exploration_ids(
-    topic_name: Optional[str] = None
+    topic_id: Optional[str] = None
 ) -> List[str]:
-    """Returns a list of all exploration ids belonging to each story of the
-    topic, whose name is topic_name.
+    """Returns a list of all exploration ids belonging to each story of either
+    a topic with id topic_id if provided or all topics.
 
     Args:
-        topic_name: str|None. The name of the topic to search through. When not
+        topic_id: str|None. The id of the topic to search through. When not
             provided, all topics are searched through.
 
     Returns:
@@ -765,10 +765,10 @@ def get_all_story_exploration_ids(
         topic(s) to search through.
     """
     mappings = (
-        topic_models.TopicSummaryModel
-        .get_story_exploration_mappings_by_name(topic_name)
-        if topic_name
-        else topic_models.TopicSummaryModel.get_story_exploration_mappings())
+        [get_topic_summary_by_id(topic_id).story_exploration_mapping]
+        if topic_id
+        else topic_models.TopicSummaryModel
+            .get_all_story_exploration_mappings())
 
     story_exp_ids = set()
     for mapping in mappings:
