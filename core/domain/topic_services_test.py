@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
 from core import feconf
@@ -2375,6 +2376,69 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 chapter_counts[self.TOPIC_ID].
                     published_chapter_counts_for_each_story, [0, 0, 1])
+
+    def test_get_chapter_counts_in_topic_summaries_logs_error(self) -> None:
+        topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
+        invalid_story_reference_dict = {
+            'story_id': 'invalid_story_id',
+            'story_is_published': False
+        }
+        topic_model.canonical_story_references = [invalid_story_reference_dict]
+        topic_model.commit(self.user_id, 'reference invalid story id', [])
+
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            with self.capture_logging(min_level=logging.ERROR) as logs:
+                topic_summary = (
+                    topic_fetchers.get_topic_summary_by_id(
+                    self.TOPIC_ID).to_dict())
+                frontend_topic_summary: (
+                    topic_domain.FrontendTopicSummaryDict
+                ) = {
+                    'id': topic_summary['id'],
+                    'name': topic_summary['name'],
+                    'url_fragment': topic_summary['url_fragment'],
+                    'language_code': topic_summary['language_code'],
+                    'description': topic_summary['description'],
+                    'version': topic_summary['version'],
+                    'canonical_story_count': topic_summary[
+                        'canonical_story_count'],
+                    'additional_story_count': topic_summary[
+                        'canonical_story_count'],
+                    'uncategorized_skill_count': topic_summary[
+                        'additional_story_count'],
+                    'subtopic_count': topic_summary['subtopic_count'],
+                    'total_skill_count': topic_summary['total_skill_count'],
+                    'total_published_node_count': topic_summary[
+                        'total_published_node_count'],
+                    'thumbnail_filename': topic_summary['thumbnail_filename'],
+                    'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                    'topic_model_created_on': topic_summary[
+                        'topic_model_created_on'],
+                    'topic_model_last_updated': topic_summary[
+                        'topic_model_last_updated'],
+                    'is_published': True,
+                    'can_edit_topic': True,
+                    'classroom': None,
+                    'total_upcoming_chapters_count': 0,
+                    'total_overdue_chapters_count': 0,
+                    'total_chapter_counts_for_each_story': [],
+                    'published_chapter_counts_for_each_story': []
+                }
+                topic_services.get_chapter_counts_in_topic_summaries(
+                    [frontend_topic_summary]
+                )
+                self.assertEqual(
+                    logs,
+                    [
+                        'Topic %s has an invalid story reference ID '
+                        'invalid_story_id' % self.TOPIC_ID
+                    ]
+                )
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
