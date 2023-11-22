@@ -43,7 +43,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_feature_flag_registry = registry.Registry.feature_flag_registry
+        self.original_feature_flag_registry = (
+            registry.Registry.feature_flag_registry)
         registry.Registry.feature_flag_registry.clear()
 
         # Feature names that might be used in following tests.
@@ -55,7 +56,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def tearDown(self) -> None:
         super().tearDown()
 
-        registry.Registry.feature_flag_registry = self.original_feature_flag_registry
+        registry.Registry.feature_flag_registry = (
+            self.original_feature_flag_registry)
 
     def test_create_feature_flag(self) -> None:
         feature_flag = registry.Registry.create_feature_flag(

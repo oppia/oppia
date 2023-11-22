@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import hashlib
-import secrets
 
 from core import platform_feature_list
 from core import utils
@@ -158,8 +157,8 @@ def load_feature_flags_from_storage(
 
     for feature_model in feature_models:
         if feature_model:
-            feature_with_init_settings = registry.Registry.feature_flag_registry[
-                feature_model.id]
+            feature_with_init_settings = (
+                registry.Registry.feature_flag_registry[feature_model.id])
             last_updated = utils.convert_naive_datetime_to_string(
                 feature_model.last_updated)
             feature_name_to_feature_flag_model_dict[feature_model.id] = (

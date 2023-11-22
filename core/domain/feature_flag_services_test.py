@@ -102,11 +102,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        registry.Registry.feature_flag_registry = self.original_feature_flag_registry
+        registry.Registry.feature_flag_registry = (
+            self.original_feature_flag_registry)
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
         expected_dicts = [
-            registry.Registry.get_feature_flag(self.dev_feature_flag.name).to_dict(),
+            registry.Registry.get_feature_flag(
+                self.dev_feature_flag.name).to_dict(),
             registry.Registry.get_feature_flag(
                 self.test_feature_flag.name).to_dict(),
             registry.Registry.get_feature_flag(
@@ -340,7 +342,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         self.assertTrue(feature_services.is_feature_flag_enabled(
             self.owner_id, self.dev_feature_flag.name))
 
-    def test_feature_flag_is_enabled_for_logged_out_users_with_force_enable_prop(
+    def test_feature_flag_enabled_for_logged_out_users_with_force_enable_prop(
         self) -> None:
         self.assertTrue(feature_services.is_feature_flag_enabled(
             None, self.dev_feature_flag.name))

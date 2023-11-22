@@ -23,8 +23,8 @@ from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
-from core.domain import feature_flag_services as feature_services
 from core.domain import feature_flag_domain
+from core.domain import feature_flag_services as feature_services
 
 from typing import Dict, List, TypedDict
 
