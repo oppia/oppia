@@ -262,7 +262,7 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_model(self) -> None:
         feature_model = config_models.FeatureFlagModel.create(
-            feature_name='feature_name',
+            feature_flag_name='feature_name',
             force_enable_for_all_users=False,
             rollout_percentage=50,
             user_group_ids=['User Group 1', 'User Group 2']
