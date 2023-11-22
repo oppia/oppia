@@ -21,9 +21,9 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
+  'domain/feature-flag/feature-flag-domain.constants';
 import { FeatureFlagDummyBackendApiService } from
-  'domain/feature_flag/feature-flag-dummy-backend-api.service';
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 
 describe('FeatureFlagDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;

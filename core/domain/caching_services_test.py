@@ -921,7 +921,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {})
 
         current_time = datetime.datetime.utcnow()
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
             'feature_stage': 'dev',
@@ -936,7 +936,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
             '0',
             {
-                feature_flag_id: feature
+                feature_flag_id: feature_flag
             })
 
         feature_flags = caching_services.get_multi(
@@ -944,5 +944,5 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0', [feature_flag_id])
 
         self.assertEqual(
-            feature.to_dict(),
+            feature_flag.to_dict(),
             feature_flags[feature_flag_id].to_dict())

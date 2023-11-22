@@ -201,7 +201,7 @@ class FeatureFlag:
         """Validates the FeatureFlag object."""
         if re.match(self.FEATURE_NAME_REGEXP, self._name) is None:
             raise utils.ValidationError(
-                'Invalid feature name \'%s\', expected to match regexp '
+                'Invalid feature flag name \'%s\', expected to match regexp '
                 '%s.' % (self._name, self.FEATURE_NAME_REGEXP))
 
         if not any(
@@ -212,13 +212,19 @@ class FeatureFlag:
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
 
+        if self._rollout_percentage < 0 or self._rollout_percentage > 100:
+            raise utils.ValidationError(
+                'Feature flag rollout-percentage should be between '
+                '0 and 100 inclusive.')
+
         server_mode = get_server_mode()
         if (
             server_mode == ServerMode.TEST and
             self._feature_stage == ServerMode.DEV.value
         ):
             raise utils.ValidationError(
-                'Feature in %s stage cannot be updated in %s environment.' % (
+                'Feature flag in %s stage cannot be updated '
+                'in %s environment.' % (
                     self._feature_stage, server_mode.value
                 )
             )
@@ -227,7 +233,8 @@ class FeatureFlag:
             self._feature_stage in (ServerMode.DEV.value, ServerMode.TEST.value)
         ):
             raise utils.ValidationError(
-                'Feature in %s stage cannot be updated in %s environment.' % (
+                'Feature flag in %s stage cannot be updated '
+                'in %s environment.' % (
                     self._feature_stage, server_mode.value
                 )
             )

@@ -21,10 +21,10 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { FeatureFlagBackendApiService } from
-  'domain/feature_flag/feature-flag-backend-api.service';
+  'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
-import { FeatureStatusSummary } from 'domain/feature_flag/feature-status-summary.model';
+  'domain/feature-flag/feature-flag-domain.constants';
+import { FeatureStatusSummary } from 'domain/feature-flag/feature-status-summary.model';
 
 describe('FeatureFlagBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -61,7 +61,7 @@ describe('FeatureFlagBackendApiService', () => {
         flushMicrotasks();
 
         const url = FeatureFlagDomainConstants
-          .feature_flags_evaluation_handler_URL;
+          .FEATURE_FLAGS_EVALUATION_HANDLER_URL;
         httpTestingController.expectOne(url).flush(responseDict);
 
         flushMicrotasks();
@@ -82,7 +82,7 @@ describe('FeatureFlagBackendApiService', () => {
       flushMicrotasks();
 
       const url = FeatureFlagDomainConstants
-        .feature_flags_evaluation_handler_URL;
+        .FEATURE_FLAGS_EVALUATION_HANDLER_URL;
       httpTestingController
         .expectOne(url)
         .error(new ErrorEvent('Error'));

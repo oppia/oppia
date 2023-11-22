@@ -24,9 +24,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureService, platformFeatureInitFactory } from
   'services/platform-feature.service';
 import { FeatureFlagBackendApiService } from
-  'domain/feature_flag/feature-flag-backend-api.service';
+  'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureNames, FeatureStatusSummary } from
-  'domain/feature_flag/feature-status-summary.model';
+  'domain/feature-flag/feature-status-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 
 

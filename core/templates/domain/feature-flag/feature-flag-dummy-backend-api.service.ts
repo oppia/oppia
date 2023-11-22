@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
+  'domain/feature-flag/feature-flag-domain.constants';
 
 /**
  * Api service for the backend dummy handler that is gated by the

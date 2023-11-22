@@ -291,12 +291,12 @@ import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import { FeatureFlagDummyBackendApiService } from
-  'domain/feature_flag/feature-flag-dummy-backend-api.service';
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from
-  'domain/feature_flag/feature-flag-backend-api.service';
+  'domain/feature-flag/feature-flag-backend-api.service';
 import { PlayerCorrectnessFeedbackEnabledService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';

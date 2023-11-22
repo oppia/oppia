@@ -37,8 +37,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { FeatureStatusChecker, FeatureStatusSummary } from 'domain/feature_flag/feature-status-summary.model';
-import { FeatureFlagBackendApiService } from 'domain/feature_flag/feature-flag-backend-api.service';
+import { FeatureStatusChecker, FeatureStatusSummary } from 'domain/feature-flag/feature-status-summary.model';
+import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

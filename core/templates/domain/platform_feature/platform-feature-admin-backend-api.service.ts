@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
+  'domain/feature-flag/feature-flag-domain.constants';
 import { PlatformParameterDomainConstants } from
   'domain/platform_feature/platform-parameter-domain.constants';
 import { PlatformParameterRule, PlatformParameterValue } from
@@ -31,7 +31,7 @@ import { PlatformParameterRule, PlatformParameterValue } from
 import {
   FeatureFlag,
   FeatureFlagBackendDict
-} from 'domain/feature_flag/feature-flag.model';
+} from 'domain/feature-flag/feature-flag.model';
 
 export interface FeatureFlagsDicts {
   'feature_flags': FeatureFlagBackendDict[];

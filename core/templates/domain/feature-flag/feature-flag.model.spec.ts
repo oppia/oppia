@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for FeatureFlagModel.
  */
 
-import { FeatureFlag, FeatureStage } from 'domain/feature_flag/feature-flag.model';
+import { FeatureFlag, FeatureStage } from 'domain/feature-flag/feature-flag.model';
 
 describe('FeatureFlagModel', () => {
   it('should create an instance from a backend dict.', () => {

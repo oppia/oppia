@@ -31,7 +31,7 @@ from typing import Final, List
 
 FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),
-    'core/templates/domain/feature_flag',
+    'core/templates/domain/feature-flag',
     'feature-status-summary.model.ts')
 
 ENUM_BODY_REGEXP: Final = re.compile(
@@ -69,7 +69,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_registry.Registry.feature_registry
+                feature_flag_registry.Registry.feature_flag_registry
             ):
                 missing_names.append(feature.value)
         self.assertTrue(

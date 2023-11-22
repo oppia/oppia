@@ -23,9 +23,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryBackendDict,
-} from 'domain/feature_flag/feature-status-summary.model';
+} from 'domain/feature-flag/feature-status-summary.model';
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
+  'domain/feature-flag/feature-flag-domain.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +44,7 @@ export class FeatureFlagBackendApiService {
   async fetchFeatureFlags():
       Promise<FeatureStatusSummary> {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
-      FeatureFlagDomainConstants.feature_flags_evaluation_handler_URL
+      FeatureFlagDomainConstants.FEATURE_FLAGS_EVALUATION_HANDLER_URL
     ).toPromise();
 
     return FeatureStatusSummary.createFromBackendDict(

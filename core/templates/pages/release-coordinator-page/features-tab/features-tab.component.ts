@@ -28,9 +28,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from
-  'domain/feature_flag/feature-flag-dummy-backend-api.service';
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
+import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 

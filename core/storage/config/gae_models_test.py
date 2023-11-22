@@ -265,13 +265,13 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
             feature_name='feature_name',
             force_enable_for_all_users=False,
             rollout_percentage=50,
-            user_group_ids=['User Group 1', 'User Group 2']
+            user_group_ids='[\'User Group 1\', \'User Group 2\']'
         )
         self.assertEqual(feature_model.id, 'feature_name')
         self.assertEqual(feature_model.rollout_percentage, 50)
         self.assertEqual(
             feature_model.user_group_ids,
-            ['User Group 1', 'User Group 2'])
+            '[\'User Group 1\', \'User Group 2\']')
         self.assertEqual(feature_model.force_enable_for_all_users, False)
 
     def test_get_model_association_to_user(self) -> None:

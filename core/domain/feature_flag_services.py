@@ -63,10 +63,11 @@ def update_feature_flag(
 
     Args:
         feature_name: str. The name of the feature flag to update.
-        force_enable_for_all_users: bool. Is feature force enabled
-            for all the users.
+        force_enable_for_all_users: bool. Whether the feature flag is
+            force-enabled for all the users.
         rollout_percentage: int. The percentage of logged-in users for which
-            the feature will be enabled.
+            the feature will be enabled. This value is ignored if the
+            force_enable_for_all_users property is set to True.
         user_group_ids: List[str]. The list of ids of UserGroup objects.
 
     Raises:
@@ -98,39 +99,39 @@ def get_all_feature_flag_dicts() -> List[feature_flag_domain.FeatureFlagDict]:
         Exception. Feature flag does not exists.
     """
     feature_flags = []
-    features_to_fetch_from_storage = []
+    feature_flags_to_fetch_from_storage = []
     all_feature_flag_dicts = []
 
-    for feature_name_enum in ALL_FEATURE_FLAGS:
-        feature_from_cache = caching_services.get_multi(
+    for feature_flag_name_enum in ALL_FEATURE_FLAGS:
+        feature_flag_from_cache = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None,
-            [feature_name_enum.value]
-        ).get(feature_name_enum.value)
-        if feature_from_cache is not None:
-            feature_flags.append(feature_from_cache)
+            [feature_flag_name_enum.value]
+        ).get(feature_flag_name_enum.value)
+        if feature_flag_from_cache is not None:
+            feature_flags.append(feature_flag_from_cache)
         else:
-            features_to_fetch_from_storage.append(feature_name_enum.value)
+            feature_flags_to_fetch_from_storage.append(
+                feature_flag_name_enum.value)
 
-    features_from_storage = load_feature_flags_from_storage(
-        features_to_fetch_from_storage)
-    for feature_name, feature in features_from_storage.items():
-        if feature is not None:
-            feature_flags.append(feature)
+    feature_flags_from_storage = load_feature_flags_from_storage(
+        feature_flags_to_fetch_from_storage)
+    for feature_name, feature_flag in feature_flags_from_storage.items():
+        if feature_flag is not None:
+            feature_flags.append(feature_flag)
         elif (
-            feature is None and
-            feature_name in registry.Registry.feature_registry
+            feature_name in registry.Registry.feature_flag_registry
         ):
             feature_flags.append(
-                registry.Registry.feature_registry[feature_name])
+                registry.Registry.feature_flag_registry[feature_name])
         else:
             raise Exception('Feature flag not found: %s.' % feature_name)
 
-    for feature in feature_flags:
-        all_feature_flag_dicts.append(feature.to_dict())
+    for feature_flag_domain_obj in feature_flags:
+        all_feature_flag_dicts.append(feature_flag_domain_obj.to_dict())
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None,
             {
-                feature.name: feature,
+                feature_flag_domain_obj.name: feature_flag_domain_obj,
             })
 
     return all_feature_flag_dicts
@@ -157,7 +158,7 @@ def load_feature_flags_from_storage(
 
     for feature_model in feature_models:
         if feature_model:
-            feature_with_init_settings = registry.Registry.feature_registry[
+            feature_with_init_settings = registry.Registry.feature_flag_registry[
                 feature_model.id]
             last_updated = utils.convert_naive_datetime_to_string(
                 feature_model.last_updated)
@@ -218,8 +219,7 @@ def is_feature_flag_enabled(
     if feature_flag.force_enable_for_all_users:
         return True
     if user_id:
-        random_bytes = secrets.token_bytes(16)
-        salt = feature_name.encode('utf-8') + random_bytes
+        salt = feature_name.encode('utf-8')
         hashed_user_id = hashlib.sha256(
             user_id.encode('utf-8') + salt).hexdigest()
         hash_value = int(hashed_user_id, 16)
@@ -236,17 +236,17 @@ def evaluate_all_feature_flag_values(user_id: Optional[str]) -> Dict[str, bool]:
         user_id: str|None. The id of the user, if logged-out user then None.
 
     Returns:
-        dict. The keys are the feature names and the values are boolean
+        dict. The keys are the feature flag names and the values are boolean
         results of corresponding flags.
     """
     result_dict = {}
     feature_flag_dicts = get_all_feature_flag_dicts()
-    for feature_dict in feature_flag_dicts:
-        feature_domain_model = feature_flag_domain.FeatureFlag.from_dict(
-            feature_dict)
-        feature_status = is_feature_flag_enabled(
-            user_id, feature_domain_model.name, feature_domain_model)
+    for feature_flag_dict in feature_flag_dicts:
+        feature_flag_domain_obj = feature_flag_domain.FeatureFlag.from_dict(
+            feature_flag_dict)
+        feature_flag_status = is_feature_flag_enabled(
+            user_id, feature_flag_domain_obj.name, feature_flag_domain_obj)
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(feature_status, bool)
-        result_dict[feature_domain_model.name] = feature_status
+        assert isinstance(feature_flag_status, bool)
+        result_dict[feature_flag_domain_obj.name] = feature_flag_status
     return result_dict

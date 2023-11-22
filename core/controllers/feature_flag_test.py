@@ -43,10 +43,10 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.original_registry = registry.Registry.feature_registry
+        self.original_registry = registry.Registry.feature_flag_registry
         self.original_feature_list = feature_services.ALL_FEATURE_FLAGS
         self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
-        registry.Registry.feature_registry.clear()
+        registry.Registry.feature_flag_registry.clear()
 
         feature_names = ['feature_a', 'feature_b']
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
@@ -54,13 +54,13 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None,
             feature_names)
 
-        registry.Registry.feature_registry.clear()
-        self.dev_feature = registry.Registry.create_feature_flag(
+        registry.Registry.feature_flag_registry.clear()
+        self.dev_feature_flag = registry.Registry.create_feature_flag(
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
-        self.prod_feature = registry.Registry.create_feature_flag(
+        self.prod_feature_flag = registry.Registry.create_feature_flag(
             FeatureNames.FEATURE_B, 'test', FeatureStages.PROD)
         registry.Registry.update_feature_flag(
-            self.prod_feature.name, True, 0, []
+            self.prod_feature_flag.name, True, 0, []
         )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
@@ -77,7 +77,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
-        registry.Registry.feature_registry = self.original_registry
+        registry.Registry.feature_flag_registry = self.original_registry
 
     def test_feature_evaluation_is_correct(self) -> None:
         result = self.get_json(
@@ -85,7 +85,11 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             result,
-            {self.dev_feature.name: False, self.prod_feature.name: True})
+            {
+                self.dev_feature_flag.name: False,
+                self.prod_feature_flag.name: True
+            }
+        )
 
 
 class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):

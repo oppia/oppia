@@ -32,10 +32,10 @@ class FeatureFlagTests(test_utils.GenericTestBase):
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
         current_time = datetime.datetime.utcnow()
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -43,34 +43,37 @@ class FeatureFlagTests(test_utils.GenericTestBase):
                 current_time)
         })
 
-        self.assertIsInstance(feature, feature_flag_domain.FeatureFlag)
-        self.assertEqual(feature.name, 'feature_a')
-        self.assertEqual(feature.description, 'for test')
-        self.assertEqual(feature.feature_stage, 'dev')
-        self.assertFalse(feature.force_enable_for_all_users)
-        self.assertEqual(feature.rollout_percentage, 0)
-        self.assertEqual(feature.user_group_ids, [])
-        self.assertEqual(feature.last_updated, current_time)
+        self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
+        self.assertEqual(feature_flag.name, 'feature_a')
+        self.assertEqual(feature_flag.description, 'for test')
+        self.assertEqual(
+            feature_flag.feature_stage,
+            feature_flag_domain.FeatureStages.DEV.value)
+        self.assertFalse(feature_flag.force_enable_for_all_users)
+        self.assertEqual(feature_flag.rollout_percentage, 0)
+        self.assertEqual(feature_flag.user_group_ids, [])
+        self.assertEqual(feature_flag.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
         feature_flag_dict: feature_flag_domain.FeatureFlagDict = {
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
             'last_updated': utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
         }
-        feature = feature_flag_domain.FeatureFlag.from_dict(feature_flag_dict)
-        self.assertDictEqual(feature.to_dict(), feature_flag_dict)
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict(
+            feature_flag_dict)
+        self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
 
     def test_set_object_values_correctly(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -78,35 +81,36 @@ class FeatureFlagTests(test_utils.GenericTestBase):
                 datetime.datetime.utcnow())
         })
         current_time = datetime.datetime.utcnow()
-        feature.set_force_enable_for_all_users(True)
-        feature.set_rollout_percentage(50)
-        feature.set_user_group_ids(['user_group_1', 'user_group_2'])
-        feature.set_last_updated(current_time)
+        feature_flag.set_force_enable_for_all_users(True)
+        feature_flag.set_rollout_percentage(50)
+        feature_flag.set_user_group_ids(['user_group_1', 'user_group_2'])
+        feature_flag.set_last_updated(current_time)
 
-        self.assertTrue(feature.force_enable_for_all_users)
-        self.assertEqual(feature.rollout_percentage, 50)
+        self.assertTrue(feature_flag.force_enable_for_all_users)
+        self.assertEqual(feature_flag.rollout_percentage, 50)
         self.assertEqual(
-            feature.user_group_ids, ['user_group_1', 'user_group_2'])
-        self.assertEqual(feature.last_updated, current_time)
+            feature_flag.user_group_ids, ['user_group_1', 'user_group_2'])
+        self.assertEqual(feature_flag.last_updated, current_time)
 
-    def test_validate_feature_passes_without_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+    def test_validate_feature_flag_passes_without_exception(self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
             'last_updated': utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
         })
-        feature.validate()
+        feature_flag.validate()
 
-    def test_validate_with_invalid_name_raises_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+    def test_validate_feature_flag_with_invalid_name_raises_exception(
+        self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'Invalid~Name',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -115,12 +119,13 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Invalid feature name \'%s\'' % feature.name
+            'Invalid feature flag name \'%s\'' % feature_flag.name
         ):
-            feature.validate()
+            feature_flag.validate()
 
-    def test_validate_feature_with_invalid_stage_raises_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+    def test_validate_feature_flag_with_invalid_stage_raises_exception(
+        self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
             'feature_stage': 'Invalid',
@@ -132,13 +137,51 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         })
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
-            feature.validate()
+            feature_flag.validate()
 
-    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+    def test_validate_feature_flag_with_percentage_less_than_0_raises_exception(
+        self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+            'force_enable_for_all_users': False,
+            'rollout_percentage': -1,
+            'user_group_ids': [],
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
+        })
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.'
+        ):
+            feature_flag.validate()
+
+    def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
+        self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
+            'name': 'feature_a',
+            'description': 'for test',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
+            'force_enable_for_all_users': False,
+            'rollout_percentage': 101,
+            'user_group_ids': [],
+            'last_updated': utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
+        })
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.'
+        ):
+            feature_flag.validate()
+
+    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
+            'name': 'feature_a',
+            'description': 'for test',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -149,16 +192,16 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
-                    'Feature in dev stage cannot be updated in test '
+                    'Feature flag in dev stage cannot be updated in test '
                     'environment.'
                 ):
-                    feature.validate()
+                    feature_flag.validate()
 
     def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -169,13 +212,13 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
-                    'Feature in dev stage cannot be updated in prod '
+                    'Feature flag in dev stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature.validate()
+                    feature_flag.validate()
 
     def test_validate_test_feature_for_prod_env_raises_exception(self) -> None:
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
             'feature_stage': 'test',
@@ -189,10 +232,10 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
-                    'Feature in test stage cannot be updated in prod '
+                    'Feature flag in test stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature.validate()
+                    feature_flag.validate()
 
     def test_serialize_and_deserialize_returns_unchanged_platform_parameter(
         self
@@ -200,10 +243,10 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         """Checks that serializing and then deserializing a default feature
         works as intended by leaving the feature unchanged.
         """
-        feature = feature_flag_domain.FeatureFlag.from_dict({
+        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
-            'feature_stage': 'dev',
+            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
@@ -211,6 +254,6 @@ class FeatureFlagTests(test_utils.GenericTestBase):
                 datetime.datetime.utcnow())
         })
         self.assertEqual(
-            feature.to_dict(),
+            feature_flag.to_dict(),
             feature_flag_domain.FeatureFlag.deserialize(
-                feature.serialize()).to_dict())
+                feature_flag.serialize()).to_dict())

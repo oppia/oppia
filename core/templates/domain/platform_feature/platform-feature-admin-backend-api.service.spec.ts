@@ -20,9 +20,9 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { FeatureFlag } from 'domain/feature_flag/feature-flag.model';
+import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
 import { FeatureFlagDomainConstants } from
-  'domain/feature_flag/feature-flag-domain.constants';
+  'domain/feature-flag/feature-flag-domain.constants';
 import { FeatureStage } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureAdminBackendApiService } from

@@ -24,7 +24,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
 from core.domain import feature_flag_services as feature_services
-from core.domain import platform_feature_services
+from core.domain import feature_flag_domain
 
 from typing import Dict, List, TypedDict
 
@@ -133,7 +133,7 @@ class FeatureFlagsHandler(
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
         self.render_json({
             'feature_flags': feature_flag_dicts,
-            'server_stage': platform_feature_services.get_server_mode().value
+            'server_stage': feature_flag_domain.get_server_mode().value
         })
 
     @acl_decorators.can_access_release_coordinator_page
