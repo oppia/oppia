@@ -21,7 +21,7 @@
           <div class="col-1">
             <div class="d-flex flex-column">
               <div *ngIf="featureFlag.forceEnableForAllUsers" class="mb-2" matTooltip="This value is not applied if the feature is force-enabled for all users (see below)." matTooltipPosition="right">
-                <i class="fas fa-info-circle practice-tab-info-circle"></i>
+                <i class="fas fa-info-circle practice-tab-info-circle info-button"></i>
               </div>
             </div>
           </div>
@@ -92,6 +92,11 @@
 
 
 <style>
+  .info-button {
+    margin-left: -39px;
+    margin-top: 18px;
+  }
+
   .oppia-feature-configuration-warning-icon {
     color: #827127;
   }
