@@ -116,7 +116,7 @@ def get_package_file_contents(
         ) as file:
             data = file.read()
             if '{\n' not in data:
-                file_sizes = get_file_sizes(os.path.join(package, filepath))
+                file_sizes = get_file_sizes(os.path.join(os.getcwd(), package))
                 raise Exception(
                     'Empty data:\n%s\n%s %s %s %s\n\n%s' % (
                         file_sizes, package, filepath, file.tell(), len(data),
@@ -138,7 +138,15 @@ def get_package_file_contents(
             'First error: %s %s %s' % (package, filepath, file_contents)) from e
 
 
-def get_file_sizes(directory):
+def get_file_sizes(directory: str) -> str:
+    """Retrieve the file sizes in a directory.
+
+    Args:
+        directory: str. The directory to list file sizes for.
+
+    Returns:
+        str. A list of file sizes.
+    """
     response = ''
     files = os.listdir(directory)
     for file in files:
