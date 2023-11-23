@@ -647,10 +647,13 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
                 try:
-                    proc.wait(timeout=10)
+                    proc.wait(timeout=30)
                 except psutil.TimeoutExpired:
                     # If the server fails to shut down, allow proc_context to
                     # end it by calling terminate() and/or kill().
+                    # WARNING: This might result in a failure along the lines
+                    # of "Process Portserver exited unexpectedly with exit code
+                    # 1".
                     pass
 
 
