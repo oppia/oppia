@@ -116,9 +116,11 @@ def get_package_file_contents(
         ) as file:
             data = file.read()
             if '{\n' not in data:
+                file_sizes = get_file_sizes(os.path.join(package, filepath))
                 raise Exception(
-                    'Empty data: %s %s %s %s\n\n%s' % (
-                        package, filepath, file.tell(), len(data), data))
+                    'Empty data:\n%s\n%s %s %s %s\n\n%s' % (
+                        file_sizes, package, filepath, file.tell(), len(data),
+                        data))
             return data
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
@@ -134,6 +136,17 @@ def get_package_file_contents(
             'Contents retrieved via pkgutil.get_data(): %s' % file_contents)
         raise FileNotFoundError(
             'First error: %s %s %s' % (package, filepath, file_contents)) from e
+
+
+def get_file_sizes(directory):
+    response = ''
+    files = os.listdir(directory)
+    for file in files:
+        path = os.path.join(directory, file)
+        if os.path.isfile(path):
+            size = os.path.getsize(path)
+            response += '%s: %s bytes\n' % (file, size)
+    return response
 
 
 # Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
