@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import io
 import json
 import logging
 import os
@@ -107,19 +106,19 @@ def get_package_file_contents(
     """
     try:
         if binary_mode:
-            with io.open(
+            with open(
                 os.path.join(package, filepath), 'rb', encoding=None
             ) as binary_file:
                 read_binary_mode_data: bytes = binary_file.read()
                 return read_binary_mode_data
-        with io.open(
+        with open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
             data = file.read()
             if '{\n' not in data:
                 raise Exception(
-                    'Empty data: %s %s\n\n%s' % (
-                        package, filepath, data))
+                    'Empty data: %s %s %s %s\n\n%s' % (
+                        package, filepath, file.tell(), len(data), data))
             return data
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
