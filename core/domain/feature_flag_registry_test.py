@@ -48,10 +48,10 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         registry.Registry.feature_flag_registry.clear()
 
         # Feature names that might be used in following tests.
-        feature_names = ['feature_a', 'feature_b']
+        feature_flag_names = ['feature_a', 'feature_b']
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
-            feature_names)
+            feature_flag_names)
 
     def tearDown(self) -> None:
         super().tearDown()

@@ -27,8 +27,8 @@ from core.domain import feature_flag_services
 from core.tests import test_utils
 
 
-class ParamNames(enum.Enum):
-    """Enum for parameter names."""
+class FeatureNames(enum.Enum):
+    """Enum for feature names."""
 
     TEST_FEATURE_1 = 'test_feature_1'
     TEST_FEATURE_2 = 'test_feature_2'
@@ -103,12 +103,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     def tearDown(self) -> None:
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None, [
-                ParamNames.TEST_FEATURE_1.value,
-                ParamNames.TEST_FEATURE_2.value]
+                FeatureNames.TEST_FEATURE_1.value,
+                FeatureNames.TEST_FEATURE_2.value]
         )
         return super().tearDown()
 
-    def test_without_feature_name_action_update_feature_flag_is_not_performed(
+    def test_without_feature_flag_name_update_feature_flag_is_not_performed(
         self
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
@@ -117,14 +117,14 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
-            'The \'feature_name\' must be provided when the action is '
+            'The \'feature_flag_name\' must be provided when the action is '
             'update_feature_flag.'
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': None
+                    'feature_flag_name': None
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -132,11 +132,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
+            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
-            [ParamNames.TEST_FEATURE_1])
+            [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature_flag.name]))
@@ -154,11 +154,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
+            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
-            [ParamNames.TEST_FEATURE_1])
+            [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature_flag.name]))
@@ -166,7 +166,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': feature_flag.name,
+                    'feature_flag_name': feature_flag.name,
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 50,
                     'user_group_ids': []
@@ -184,7 +184,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature_flag.name)
         self.logout()
 
-    def test_update_flag_with_unknown_feature_name_returns_400(
+    def test_update_flag_with_unknown_feature_flag_name_returns_400(
         self
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
@@ -198,7 +198,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': 'test_feature_1',
+                    'feature_flag_name': 'test_feature_1',
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 50,
                     'user_group_ids': []
@@ -217,11 +217,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            ParamNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
+            FeatureNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
-            [ParamNames.TEST_FEATURE_2])
+            [FeatureNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
             set([feature_flag.name]))
@@ -229,7 +229,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': feature_flag.name,
+                    'feature_flag_name': feature_flag.name,
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 200,
                     'user_group_ids': []
@@ -255,21 +255,21 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
-            [ParamNames.TEST_FEATURE_2])
+            [FeatureNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([ParamNames.TEST_FEATURE_2.value]))
+            set([FeatureNames.TEST_FEATURE_2.value]))
         # Here we use MyPy ignore because we are assigning a None value
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
         feature_flag_registry.Registry.feature_flag_registry[
-            ParamNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
+            FeatureNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
             response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_name': ParamNames.TEST_FEATURE_2.value,
+                    'feature_flag_name': FeatureNames.TEST_FEATURE_2.value,
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 20,
                     'user_group_ids': []
@@ -282,5 +282,5 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 '\'NoneType\' object has no attribute \'serialize\'')
 
         feature_flag_registry.Registry.feature_flag_registry.pop(
-            ParamNames.TEST_FEATURE_2.value)
+            FeatureNames.TEST_FEATURE_2.value)
         self.logout()

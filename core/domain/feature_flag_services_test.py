@@ -375,31 +375,6 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         return (user_1_id, user_2_id, user_3_id)
 
-    def _get_feature_status_for_users(
-        self, rollout_percentage: int, user_ids: List[str]
-    ) -> List[bool]:
-        """Helper function to return the feature status of the
-        feature flag as per rollout percentage for given users.
-
-        Args:
-            rollout_percentage: int. The rollout percentage.
-            user_ids: List[bool]. The user ids of the users for
-                which we want the feature status.
-
-        Returns:
-            feature_status_for_users: List[bool]. The feature status
-            for the users.
-        """
-        feature_status_for_users = []
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, rollout_percentage, [])
-            for user_id in user_ids:
-                feature_status_for_users.append(
-                    feature_services.is_feature_flag_enabled(
-                        user_id, self.dev_feature_flag.name))
-        return feature_status_for_users
-
     def test_feature_flag_value_is_same_for_user_with_every_retrieval(
         self) -> None:
         user_1_id, user_2_id, user_3_id = (

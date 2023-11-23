@@ -77,7 +77,7 @@ export class PlatformFeatureAdminBackendApiService {
       FeatureFlagDomainConstants.FEATURE_FLAGS_URL,
       {
         action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
-        feature_name: name,
+        feature_flag_name: name,
         force_enable_for_all_users: forceEnableForAllUsers,
         rollout_percentage: rolloutPercentage,
         user_group_ids: userGroupIds

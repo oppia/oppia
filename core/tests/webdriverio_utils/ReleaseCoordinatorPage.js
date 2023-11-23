@@ -144,7 +144,7 @@ var ReleaseCoordinatorPage = function() {
   this.enableFeature = async function(featureElement) {
     await waitFor.visibilityOf(
       featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
+      'Enabling force-enable property takes too long to appear'
     );
 
     await (featureElement.$(valueSelectorLocator)).selectByVisibleText('Yes');
