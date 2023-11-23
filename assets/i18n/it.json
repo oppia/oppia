@@ -195,6 +195,7 @@
 	"I18N_INTERACTIONS_GRAPH_MOVE": "Sposta",
 	"I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[Seleziona un'immagine da visualizzare]",
 	"I18N_INTERACTIONS_INPUT_NO_RESPONSE": "Inserisci una risposta per continuare",
+	"I18N_INTERACTIONS_ITEM_SELECTION_EXACT": "Seleziona esattamente {exactChoiceNumber} opzioni.",
 	"I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE": "Scegli una risposta per continuare",
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "Pulisci",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Riproduci",
@@ -443,7 +444,7 @@
 	"I18N_TOPNAV_SIGN_IN": "Accedi",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Accedi con Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Insegna con Oppia",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancella iscrizione",
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Annulla iscrizione",
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_DEVELOPMENT_WHAT_WE": "Cosa facciamo:",
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_LESSON_CREATION_WHAT_WE": "Cosa facciamo:",
 	"I18N_WARNING_MODAL_TITLE": "Attenzione!"
