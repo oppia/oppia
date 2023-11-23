@@ -127,7 +127,8 @@ def get_package_file_contents(
             'Could not read text file %s' % os.path.join(package, filepath))
         logging.error(
             'Contents retrieved via pkgutil.get_data(): %s' % file_contents)
-        return file_contents
+        raise FileNotFoundError(
+            '%s %s %s' % (package, filepath, file_contents)) from e
 
 
 # Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
