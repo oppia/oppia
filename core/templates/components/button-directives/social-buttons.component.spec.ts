@@ -29,6 +29,7 @@ describe('SocialButtonsComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SocialButtonsComponent, MockTranslatePipe],
+      providers: []
     }).compileComponents();
   }));
 

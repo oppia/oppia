@@ -21,20 +21,11 @@ import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick, flushMicrotas
 import { Router } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OppiaFooterComponent } from './oppia-footer.component';
-
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: false
-    }
-  };
-}
 
 class MockRouter {
   url = '/about';
@@ -56,9 +47,6 @@ describe('OppiaFooterComponent', () => {
       ],
       providers: [
         {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }, {
           provide: Router,
           useClass: MockRouter,
         }
@@ -87,8 +75,6 @@ describe('OppiaFooterComponent', () => {
 
   it('should return correct blog url if the blog homepage feature is enabled',
     () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
 

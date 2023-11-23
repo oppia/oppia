@@ -19,7 +19,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -59,11 +58,7 @@ export class OppiaFooterComponent {
   ) {}
 
   getOppiaBlogUrl(): string {
-    if (this.platformFeatureService.status.BlogPages.isEnabled) {
-      return '/blog';
-    } else {
-      return 'https://medium.com/oppia-org';
-    }
+    return '/blog';
   }
 
   validateEmailAddress(): boolean {
