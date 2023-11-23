@@ -654,7 +654,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                     # WARNING: This might result in a failure along the lines
                     # of "Process Portserver exited unexpectedly with exit code
                     # 1".
-                    pass
+                    logging.error(
+                        'Portserver failed to shut down after 30 seconds.')
 
 
 @contextlib.contextmanager

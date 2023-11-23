@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import os
 import pkgutil
 import re
@@ -40,9 +41,9 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
         dict. The dict representation of JSON object in the TS file.
     """
     text_without_comments = remove_comments(ts_file_contents)
-    json_start = text_without_comments.find('{\n')
+    json_start = text_without_comments.index('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
-    json_end = text_without_comments.rfind('}') + 1
+    json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
     json_dict: Dict[str, Any] = (
@@ -120,7 +121,13 @@ def get_package_file_contents(
             raise e
         if binary_mode:
             return file_data
-        return file_data.decode('utf-8')
+
+        file_contents = file_data.decode('utf-8')
+        logging.error(
+            'Could not read text file %s' % os.path.join(package, filepath))
+        logging.error(
+            'Contents retrieved via pkgutil.get_data(): %s' % file_contents)
+        return file_contents
 
 
 # Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
