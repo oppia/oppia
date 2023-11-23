@@ -26,7 +26,6 @@ import { UrlInterpolationService } from
 import { WindowRef } from
   'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './about-page.component.css';
 
@@ -53,16 +52,11 @@ export class AboutPageComponent {
     imageFilename: '/about/language_icon.svg'
   }];
 
-  androidPageIsEnabled: boolean = (
-    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
-  );
-
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
-    private platformFeatureService: PlatformFeatureService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {

@@ -21,24 +21,14 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AndroidPageRootComponent } from './android-page-root.component';
-
-class MockPlatformFeatureService {
-  status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    }
-  };
-}
 
 describe('Android Page Root', () => {
   let fixture: ComponentFixture<AndroidPageRootComponent>;
   let component: AndroidPageRootComponent;
   let pageHeadService: PageHeadService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,11 +38,7 @@ describe('Android Page Root', () => {
       ],
       imports: [HttpClientTestingModule],
       providers: [
-        PageHeadService,
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
+        PageHeadService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -69,29 +55,15 @@ describe('Android Page Root', () => {
   });
 
   it('should initialize', () => {
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     const componentInstance = (
       TestBed.createComponent(AndroidPageRootComponent).componentInstance
     );
-
-    expect(componentInstance.androidPageIsEnabled).toBeTrue();
 
     componentInstance.ngOnInit();
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
-  });
-
-  it('should show android page if it is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(AndroidPageRootComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

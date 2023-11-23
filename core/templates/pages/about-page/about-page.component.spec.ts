@@ -25,15 +25,6 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-
-class MockPlatformFeatureService {
-  status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    }
-  };
-}
 
 class MockWindowRef {
   nativeWindow = {
@@ -53,7 +44,6 @@ describe('About Page', () => {
   let component: AboutPageComponent;
   let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(async() => {
     windowRef = new MockWindowRef();
@@ -68,10 +58,6 @@ describe('About Page', () => {
         {
           provide: WindowRef,
           useValue: windowRef
-        },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
         }
       ]
     }).compileComponents();
@@ -142,16 +128,5 @@ describe('About Page', () => {
     component.onClickAccessAndroidButton();
 
     expect(windowRef.nativeWindow.location.href).toEqual('/android');
-  });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(AboutPageComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

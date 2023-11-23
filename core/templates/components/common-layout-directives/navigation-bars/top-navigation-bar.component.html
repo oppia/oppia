@@ -149,7 +149,6 @@
                 <span class="nav-item-right d-flex flex-column">
                   <a class="nav-content mb-5"
                      tabindex="0"
-                     (blur)="androidPageIsEnabled ? null : learnDropdown.close()"
                      href="/community-library"
                      (click)="navigateToClassroomPage('/community-library')">
                     <div class="nav-item-right-head">
@@ -166,7 +165,7 @@
                       <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </a>
-                  <a *ngIf="androidPageIsEnabled"
+                  <a
                      class="nav-content"
                      tabindex="0"
                      (blur)="learnDropdown.close()"
@@ -236,13 +235,13 @@
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
                  [href]="getOppiaBlogUrl()"
-                 [target]="getOppiaBlogUrl() === '/blog' ? '_self' : '_blank'"
+                 [target]="'_self'"
                  (blur)="aboutDropdown.close()"
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
+                <span class="fas fa-external-link-alt launch" ></span>
               </a>
             </li>
           </ul>

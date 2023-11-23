@@ -29,8 +29,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     """
 
     EXPECTED_PARAM_NAMES = ['always_ask_learners_for_answer_details',
-                            'android_beta_landing_page',
-                            'blog_pages',
                             'cd_admin_dashboard_new_ui',
                             'checkpoint_celebration',
                             'contributor_dashboard_accomplishments',

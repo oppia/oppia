@@ -19,27 +19,19 @@
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-android-page-root',
   templateUrl: './android-page-root.component.html'
 })
 export class AndroidPageRootComponent {
-  androidPageIsEnabled = (
-    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
-  );
-
   constructor(
     private pageHeadService: PageHeadService,
-    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
-    if (this.androidPageIsEnabled) {
-      this.pageHeadService.updateTitleAndMetaTags(
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
-    }
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
   }
 }

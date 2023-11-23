@@ -63,7 +63,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() subheaderText!: string;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
-  MEDIUM_BLOG_URL = 'https://medium.com/oppia-org';
   OPPIA_BLOG_URL = '/blog';
   url!: URL;
   currentLanguageCode!: string;
@@ -149,10 +148,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
-
-  androidPageIsEnabled: boolean = (
-    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
-  );
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -374,11 +369,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   getOppiaBlogUrl(): string {
-    if (this.platformFeatureService.status.BlogPages.isEnabled) {
-      return this.OPPIA_BLOG_URL;
-    } else {
-      return this.MEDIUM_BLOG_URL;
-    }
+    return this.OPPIA_BLOG_URL;
   }
 
   changeLanguage(languageCode: string): void {
