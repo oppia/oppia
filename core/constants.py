@@ -102,6 +102,7 @@ def get_package_file_contents(
         str. The contents of the file.
 
     Raises:
+        Exception. Test error for debugging.
         FileNotFoundError. The file does not exist.
     """
     try:
@@ -114,7 +115,12 @@ def get_package_file_contents(
         with io.open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
-            return file.read()
+            data = file.read()
+            if '{\n' not in data:
+                raise Exception(
+                    'Empty data: %s %s\n\n%s' % (
+                        package, filepath, data))
+            return data
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
         if file_data is None:
@@ -128,7 +134,7 @@ def get_package_file_contents(
         logging.error(
             'Contents retrieved via pkgutil.get_data(): %s' % file_contents)
         raise FileNotFoundError(
-            '%s %s %s' % (package, filepath, file_contents)) from e
+            'First error: %s %s %s' % (package, filepath, file_contents)) from e
 
 
 # Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
