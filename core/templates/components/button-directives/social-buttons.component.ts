@@ -18,7 +18,6 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './social-buttons.component.css';
 
@@ -29,11 +28,7 @@ import './social-buttons.component.css';
   styleUrls: ['./social-buttons.component.css']
 })
 export class SocialButtonsComponent {
-  androidAppButtonIsShown = (
-    this.platformFeatureService.status.AndroidBetaLandingPage.isEnabled
-  );
-
-  constructor(private platformFeatureService: PlatformFeatureService) {}
+  constructor() {}
 }
 
 angular.module('oppia').directive('oppiaSocialButtons',
