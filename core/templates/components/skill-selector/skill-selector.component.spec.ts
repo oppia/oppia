@@ -18,7 +18,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
-import { SkillSelectorComponent } from './skill-selector.component';
+import { SkillSelectorComponent } from './skill-selector.component'; 
 
 
 /**
@@ -432,6 +432,10 @@ describe('SkillSelectorComponent', () => {
         skill_model_last_updated: 124444
       })
     ];
+    component.skillIdsToExclude = {
+      "1": true
+    }
+
 
     expect(component.searchInUntriagedSkillSummaries(
       'skill summary 2')).toEqual([
