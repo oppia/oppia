@@ -156,8 +156,10 @@ export class ExplorationRightsService {
           response.rights.voice_artist_names, response.rights.viewer_names,
           response.rights.status, response.rights.cloned_from,
           response.rights.community_owned, response.rights.viewable_if_private);
-      }).catch((response: HttpErrorResponse) => {
-        this.alertsService.addWarning('Failed to publish an exploration: ' + response.error.error);
+      }).catch(
+      (response: HttpErrorResponse) => {
+        this.alertsService.addWarning(
+          'Failed to publish an exploration: ' + response.error.error);
         throw response;
       });
   }

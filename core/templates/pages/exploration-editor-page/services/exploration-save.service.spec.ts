@@ -382,7 +382,8 @@ describe('Exploration save service ' +
     // to suppress this error because of strict type checking. This is
     // because the function is called with null as an argument.
     // @ts-ignore
-    explorationSaveService.showPublishExplorationModal(null, null).catch(failHandler);
+    explorationSaveService.showPublishExplorationModal(null, null)
+      .catch(failHandler);
     tick();
     tick();
 
