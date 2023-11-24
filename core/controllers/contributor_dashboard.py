@@ -368,10 +368,15 @@ class ReviewableOpportunitiesHandler(
         #    that have in review translation suggestions.
         # 4. Fetch all exploration opportunity summaries, order them, and then
         #    add the pinned lesson's summary on top.
-        topic_exp_ids = topic_fetchers.get_all_story_exploration_ids(
-            topic_fetchers.get_topic_by_name(topic_name).id
-            if topic_name else None
-        )
+        if topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                raise self.InvalidInputException(
+                    'The supplied input topic: %s is not valid' % topic_name)
+            topic_exp_ids = (
+                topic_fetchers.get_all_story_exploration_ids(topic.id))
+        else:
+            topic_exp_ids = topic_fetchers.get_all_story_exploration_ids()
 
         in_review_suggestions, _ = (
             suggestion_services
