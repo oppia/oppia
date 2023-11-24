@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <rect x="38.456" y="47.014" width="134" height="1.8" style="stroke: rgb(0, 0, 0);"></rect>
+  <rect x="38.456" y="90.518" width="134" height="1.8" style="stroke: rgb(0, 0, 0);"></rect>
+  <rect x="39.456" y="130.881" width="134" height="1.8" style="stroke: rgb(0, 0, 0);"></rect>
+  <rect x="39.456" y="171.881" width="134" height="1.788" style="stroke: rgb(0, 0, 0);"></rect>
+  <ellipse style="fill: rgb(225, 114, 128); stroke: rgb(225, 114, 128);" cx="49.848" cy="49.398" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="fill: rgb(225, 114, 128); stroke: rgb(225, 114, 128);" cx="159.827" cy="49.994" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="stroke: rgb(241, 208, 115); fill: rgb(241, 208, 115);" cx="51.19" cy="92.306" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="stroke: rgb(241, 208, 115); fill: rgb(241, 208, 115);" cx="123.108" cy="91.437" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="fill: rgb(141, 179, 166); stroke: rgb(141, 179, 166);" cx="76.281" cy="132.831" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="fill: rgb(141, 179, 166); stroke: rgb(141, 179, 166);" cx="125.07" cy="132.194" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="stroke: rgb(165, 190, 250); fill: rgb(165, 190, 250);" cx="125.148" cy="173.355" rx="12.515" ry="12.515"></ellipse>
+  <ellipse style="stroke: rgb(165, 190, 250); fill: rgb(165, 190, 250);" cx="162.189" cy="172.759" rx="12.515" ry="12.515"></ellipse>
+  <path style="fill: rgba(216, 216, 216, 0); stroke: rgb(250, 240, 228); stroke-width: 14px;" d="M 30.181 208.516 L 30.761 8.874 L 180.971 8.874 L 181.551 207.359"></path>
+  <rect x="4.171" y="207.496" width="200.834" height="36.353" style="stroke: rgb(250, 240, 228); fill: rgb(250, 240, 228);"></rect>
+</svg>
