@@ -230,6 +230,7 @@ export class SkillsListComponent {
     this.skillsCategorizedByTopics;
     let untriagedSkillSummaries: SkillSummary[] = this.untriagedSkillSummaries;
     let allowSkillsFromOtherTopics: boolean = true;
+    const skillIdsToExclude = {};
 
     let modalRef: NgbModalRef = this.ngbModal.open(MergeSkillModalComponent, {
       backdrop: 'static',
@@ -243,6 +244,7 @@ export class SkillsListComponent {
     allowSkillsFromOtherTopics;
     modalRef.componentInstance.untriagedSkillSummaries =
     untriagedSkillSummaries;
+    modalRef.componentInstance.skillIdsToExclude = skillIdsToExclude;
 
     modalRef.result.then((result: MergeModalResult) => {
       let skill: AugmentedSkillSummary = result.skill;
