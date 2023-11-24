@@ -433,9 +433,8 @@ describe('SkillSelectorComponent', () => {
       })
     ];
     component.skillIdsToExclude = {
-      "1": true
+      1: true
     }
-
 
     expect(component.searchInUntriagedSkillSummaries(
       'skill summary 2')).toEqual([
