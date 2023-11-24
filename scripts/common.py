@@ -704,40 +704,6 @@ def inplace_replace_file(
         raise
 
 
-@contextlib.contextmanager
-def inplace_replace_file_context(
-    filename: str, regex_pattern: str, replacement_string: str
-) -> Generator[None, None, None]:
-    """Context manager in which the file's content is replaced according to the
-    given regex pattern. This function should only be used with files that are
-    processed line by line.
-
-    Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-
-    Yields:
-        None. Nothing.
-    """
-    backup_filename = '%s.bak' % filename
-    regex = re.compile(regex_pattern)
-
-    shutil.copyfile(filename, backup_filename)
-
-    try:
-        with utils.open_file(backup_filename, 'r') as f:
-            new_contents = [regex.sub(replacement_string, line) for line in f]
-        with utils.open_file(filename, 'w') as f:
-            f.write(''.join(new_contents))
-        yield
-    finally:
-        if os.path.isfile(filename) and os.path.isfile(backup_filename):
-            os.remove(filename)
-        if os.path.isfile(backup_filename):
-            shutil.move(backup_filename, filename)
-
-
 def wait_for_port_to_be_in_use(port_number: int) -> None:
     """Wait until the port is in use and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.

@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import pkgutil
 import re
@@ -114,47 +113,14 @@ def get_package_file_contents(
         with open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
-            data = file.read()
-            if '{\n' not in data:
-                file_sizes = get_file_sizes(os.path.join(os.getcwd(), package))
-                raise Exception(
-                    'Empty data:\n%s\n%s %s %s %s\n\n%s' % (
-                        file_sizes, package, filepath, file.tell(), len(data),
-                        data))
-            return data
+            return file.read()
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
         if file_data is None:
             raise e
         if binary_mode:
             return file_data
-
-        file_contents = file_data.decode('utf-8')
-        logging.error(
-            'Could not read text file %s' % os.path.join(package, filepath))
-        logging.error(
-            'Contents retrieved via pkgutil.get_data(): %s' % file_contents)
-        raise FileNotFoundError(
-            'First error: %s %s %s' % (package, filepath, file_contents)) from e
-
-
-def get_file_sizes(directory: str) -> str:
-    """Retrieve the file sizes in a directory.
-
-    Args:
-        directory: str. The directory to list file sizes for.
-
-    Returns:
-        str. A list of file sizes.
-    """
-    response = ''
-    files = os.listdir(directory)
-    for file in files:
-        path = os.path.join(directory, file)
-        if os.path.isfile(path):
-            size = os.path.getsize(path)
-            response += '%s: %s bytes\n' % (file, size)
-    return response
+        return file_data.decode('utf-8')
 
 
 # Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
