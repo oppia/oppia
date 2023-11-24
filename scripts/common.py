@@ -696,7 +696,7 @@ def inplace_replace_file(
                 )
             )
 
-        shutil.move(new_filename, filename)
+        os.replace(new_filename, filename)
 
     except Exception:
         # Drop the new file if there was an error.
