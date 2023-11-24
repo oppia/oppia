@@ -20,6 +20,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { AppConstants } from 'app.constants';
@@ -111,7 +113,11 @@ describe('Learner Local Nav Component ', () => {
         LoaderService,
         ReadOnlyExplorationBackendApiService,
         UserService,
-        LearnerLocalNavBackendApiService
+        LearnerLocalNavBackendApiService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

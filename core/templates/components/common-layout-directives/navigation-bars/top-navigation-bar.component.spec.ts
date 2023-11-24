@@ -46,12 +46,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 class MockPlatformFeatureService {
   status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    },
-    BlogPages: {
-      isEnabled: false
-    },
     ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false
     }
@@ -703,32 +697,6 @@ describe('TopNavigationBarComponent', () => {
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(TopNavigationBarComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
-  });
-
-  it('should return correct blog url if the blog homepage feature is enabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-
-      expect(component.getOppiaBlogUrl()).toEqual('/blog');
-    });
-
-  it('should return correct blog url if the blog homepage feature is disabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-
-      expect(component.getOppiaBlogUrl()).toEqual(
-        'https://medium.com/oppia-org');
-    });
 
   it('should return correct value for show feedback updates' +
     'in profile pic drop down menu feature flag', () => {

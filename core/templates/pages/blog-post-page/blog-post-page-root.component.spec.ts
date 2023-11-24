@@ -34,7 +34,6 @@ import { PageHeadService } from 'services/page-head.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogPostPageRootComponent } from './blog-post-page-root.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 
 class MockTranslateService {
@@ -42,14 +41,6 @@ class MockTranslateService {
   instant(key: string): string {
     return key;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
 }
 
 describe('Blog Post Page Root', () => {
@@ -63,7 +54,6 @@ describe('Blog Post Page Root', () => {
   let pageTitleService: PageTitleService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let sampleBlogPost: BlogPostData;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let userService: UserService;
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict: BlogPostBackendDict = {
@@ -97,10 +87,6 @@ describe('Blog Post Page Root', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -123,7 +109,6 @@ describe('Blog Post Page Root', () => {
     sampleBlogPost = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     userService = TestBed.inject(UserService);
-    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
     spyOn(urlService, 'getBlogPostUrlFromUrl')
       .and.returnValue('sample-post');
   });
@@ -180,56 +165,6 @@ describe('Blog Post Page Root', () => {
       expect(component.errorPageIsShown).toBeTrue();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
-
-  it('should initialize and show error page when blog project feature is' +
-  ' disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage');
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'fetchBlogPostData');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostUrlFragment).toBe('sample-post');
-    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-      .not.toHaveBeenCalled();
-    expect(component.fetchBlogPostData).not.toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeTrue();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled and user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-      .and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'fetchBlogPostData');
-
-    component.ngOnInit();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostUrlFragment).toBe('sample-post');
-
-    tick();
-
-    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-      .toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
-  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(
