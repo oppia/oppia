@@ -762,7 +762,7 @@ class ReviewableSuggestionsHandler(
     def _get_skill_ids_for_topic(
             self, topic_name: Optional[str]
     ) -> Optional[List[str]]:
-        """gets all skill ids for the provided topic.
+        """Gets all skill ids for the provided topic.
 
         Returns None to indicate that no filtering is needed.
         """
