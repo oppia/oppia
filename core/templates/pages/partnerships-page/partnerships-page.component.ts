@@ -41,6 +41,12 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   agreeIconUrl: string = '';
   serviceIconUrl: string = '';
   partneringImgUrl: string = '';
+  org1Url: string = '';
+  org2Url: string = '';
+  org3Url: string = '';
+  org4Url: string = '';
+  org5Url: string = '';
+  org6Url: string = '';
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -76,6 +82,18 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/icons/icon_service.png');
     this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnering_image.png');
+    this.org1Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org1.png');
+    this.org2Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org2.png');
+    this.org3Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org3.png');
+    this.org4Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org4.png');
+    this.org5Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org5.png');
+    this.org6Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org6.png');
   }
 
   ngOnDestroy(): void {

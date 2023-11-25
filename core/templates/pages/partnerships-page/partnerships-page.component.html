@@ -8,12 +8,12 @@
         <ul>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
             {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_1_PART_1' | translate }}
-            <span class="oppia-partnerships-emphasized">1,000,000</span>
+            <span class="oppia-partnerships-emphasized">2 million</span>
             {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_1_PART_2' | translate }}
           </li>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
             {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_2_PART_1' | translate }}
-            <span class="oppia-partnerships-emphasized">1</span>
+            <span class="oppia-partnerships-emphasized">2</span>
             {{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT_2_PART_2' | translate }}
           </li>
           <li class="oppia-partnerships-page-welcome-text-bullet-list">
@@ -88,6 +88,19 @@
              {{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}
           </a>
       </div>
+    </div>
+  </div>
+
+  <div class="oppia-partners">
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_OUR_PARTNERS' | translate }}</h3>
+    <p class="oppia-partners-content">{{ 'I18N_PARTNERSHIPS_PAGE_OUR_PARTNERS_CONTENT' | translate }}</p>
+    <div class="partners">
+      <img class="partner-logo" alt="partner logo" [src]="org1Url">
+      <img class="partner-logo" alt="partner logo" [src]="org2Url">
+      <img class="partner-logo" alt="partner logo" [src]="org3Url">
+      <img class="partner-logo" alt="partner logo" [src]="org4Url">
+      <img class="partner-logo" alt="partner logo" [src]="org5Url">
+      <img class="partner-logo" alt="partner logo" [src]="org6Url">      
     </div>
   </div>
 
@@ -290,7 +303,7 @@
   }
 
   .partering-with-oppia {
-    padding: 5em 0;
+    padding: 3em 0;
     text-align: center;
   }
 
@@ -350,6 +363,63 @@
       font-size: 0.8em;
     }
   }
+
+  .oppia-partners {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .oppia-partners-content {
+    font-size: 1.1em;
+    margin: 0 15em;
+  }
+
+  .partners {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    margin: 3em auto;
+    padding: 0 1em;
+    width: 100%;
+  }
+
+  .partner-logo {
+    height: 100px;
+    width: auto;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partners-content {
+      font-size: 0.8em;
+      margin: 0 8em;
+    }
+  
+    .partners {
+      margin: 3em auto;
+    }
+  
+    .partner-logo {
+      height: 80px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partners-content {
+      font-size: 0.8em;
+      margin: 0 4em;
+    }
+  
+    .partners {
+      margin: 3em auto;
+    }
+  
+    .partner-logo {
+      height: 60px;
+    }
+  }
+
 
 
   .oppia-partnerships-cta {
