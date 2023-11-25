@@ -31,18 +31,9 @@ class MockRouter {
   url = '/about';
 }
 
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
-}
-
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
 
@@ -57,10 +48,6 @@ describe('OppiaFooterComponent', () => {
         {
           provide: Router,
           useClass: MockRouter,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
