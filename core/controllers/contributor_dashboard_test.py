@@ -25,6 +25,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -518,16 +519,23 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         # Pin second opportunity.
-        mock_pinned_lesson_summary = {
-            'id': '0',
-            'topic_name': 'topic',
-            'story_title': 'title story_id_0',
-            'chapter_title': 'Node1',
-            'content_count': 2,
-            'translation_counts': {},
-            'translation_in_review_counts': {},
-            'is_pinned': True
-        }
+        suported_audio_langs_codes = [
+            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+        mock_pinned_lesson_summary = opportunity_domain.ExplorationOpportunitySummary(
+            exp_id='0',
+            topic_id='topic 1',
+            topic_name='topic',
+            story_id='story',
+            story_title='title story_id_0',
+            chapter_title='Node1',
+            content_count=2,
+            incomplete_translation_language_codes=suported_audio_langs_codes,
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[],
+            translation_in_review_counts={},
+            is_pinned=True
+        )
 
         # Here we use object because every type is
         # inherited from object class.
