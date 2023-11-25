@@ -76,4 +76,63 @@ describe('OppiaFooterComponent', () => {
     () => {
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
+  
+  it('should validate email address correctly', () => {
+    component.emailAddress = 'invalidEmail';
+    expect(component.validateEmailAddress()).toBeFalse();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.validateEmailAddress()).toBeTrue();
+  });
+
+  it('should add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(true));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Done!', 1000);
+    }));
+
+  it('should fail to add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
+    }));
+
+  it('should reject request to the mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
+    }));
 });
