@@ -75,6 +75,22 @@
     </div>
   </div>
 
+  <div class="partering-with-oppia">
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_HEADING' | translate }}</h3>
+    <div class="partering-with-oppia-container">
+      <img class="partering-with-oppia-image" alt="Partnerships page image" [src]="partnershipsImgUrl">
+      <div class="partering-with-oppia-content">
+        <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_CONTENT' | translate }}</p>
+        <button class="btn">
+          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+             target="_blank"
+             rel="noopener">
+             {{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}
+          </a>
+      </div>
+    </div>
+  </div>
+
   <div class="oppia-partnerships-cta">
     <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED' | translate }}</h3>
     <div class="oppia-partnerships-cta-container">
@@ -191,21 +207,26 @@
     font-size: 1.1em;
   }
 
-  @media screen and (max-width: 900px) {
+  .oppia-partnerships-emphasized {
+    font-weight: bold;
+    color: #047c74;
+  }
+
+  @media screen and (max-width: 600px) {
     .oppia-partnerships-h1 {
-      font-size: 1.7em;
+      font-size: 1.5em;
     }
-
+  
     .oppia-partnerships-h3 {
-      font-size: 1em;
+      font-size: 1.1em;
     }
-
+  
     .oppia-partnerships-h4 {
       font-size: 1em;
     }
-
+  
     .oppia-partnerships-list {
-      font-size: 0.9em;
+      font-size: 0.8em;
     }
   }
 
@@ -267,6 +288,69 @@
       width: 40px;
     }
   }
+
+  .partering-with-oppia {
+    padding: 5em 0;
+    text-align: center;
+  }
+
+  .partering-with-oppia-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: space-between;
+    margin: 3em 8em;
+  }
+
+  .partering-with-oppia-image {
+    width: 50%;
+    height: auto;
+  }
+
+  .partering-with-oppia-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 40%;
+  }
+
+  @media screen and (max-width: 900px) {  
+    .partering-with-oppia-content p {
+      font-size: 0.8em;
+    }
+  
+    .partering-with-oppia-container {
+      margin: 3em 4em;
+    }
+  
+    .partering-with-oppia-image {
+      width: 60%;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .partering-with-oppia-image {
+      width: 80%;
+    }
+
+    .partering-with-oppia-content {
+      align-items: center;
+      width: 100%;
+    }
+  
+    .partering-with-oppia-container {
+      align-items: center;
+      flex-direction: column;
+      margin: 3em 2em;
+    }
+  
+    .partering-with-oppia-content p {
+      font-size: 0.8em;
+    }
+  }
+
 
   .oppia-partnerships-cta {
     background-color: #eef5fb;
