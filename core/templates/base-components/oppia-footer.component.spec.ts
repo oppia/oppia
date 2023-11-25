@@ -19,7 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { Router } from '@angular/router';
-
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { AppConstants } from 'app.constants';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
@@ -29,6 +29,14 @@ import { OppiaFooterComponent } from './oppia-footer.component';
 
 class MockRouter {
   url = '/about';
+}
+
+class MockPlatformFeatureService {
+  status = {
+      BlogPages: {
+        isEnabled: false
+      }
+    };
 }
 
 describe('OppiaFooterComponent', () => {
@@ -49,6 +57,10 @@ describe('OppiaFooterComponent', () => {
         {
           provide: Router,
           useClass: MockRouter,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
