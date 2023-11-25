@@ -2301,7 +2301,7 @@ oppia-parameter {
 @media (max-width: 576px) {
   .skill-select-modal .modal-xl {
     margin: 1.75rem auto;
-    max-width: 500px;
+    max-width: 350px;
   }
 }
 
