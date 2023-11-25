@@ -33,10 +33,10 @@ class MockRouter {
 
 class MockPlatformFeatureService {
   status = {
-      BlogPages: {
-        isEnabled: true
-      }
-    };
+    BlogPages: {
+      isEnabled: true
+    }
+  };
 }
 
 describe('OppiaFooterComponent', () => {
