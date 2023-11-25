@@ -40,6 +40,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   peopleIconUrl: string = '';
   agreeIconUrl: string = '';
   serviceIconUrl: string = '';
+  partneringImgUrl: string = '';
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -73,6 +74,8 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/icons/icon_agree.png');
     this.serviceIconUrl = this.urlInterpolationService.getStaticImageUrl(
       '/icons/icon_service.png');
+    this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partnering_image.png');
   }
 
   ngOnDestroy(): void {
