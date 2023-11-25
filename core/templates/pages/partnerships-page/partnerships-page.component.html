@@ -1,6 +1,6 @@
 <div class="partnerships-page e2e-test-partnerships-page">
-  <div class="row oppia-partnerships-banner">
-    <div class="oppia-partnerships-banner-content flex-gt-md-55">
+  <div class="oppia-partnerships-banner">
+    <div class="oppia-partnerships-banner-content flex-gt-sm">
       <h1 class="oppia-partnerships-h1">{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE' | translate }}</h1>
 
       <div class="oppia-partnerships-list">
@@ -23,14 +23,21 @@
           </li>
         </ul>
       </div>
+      <button class="btn">
+        <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+           target="_blank"
+           rel="noopener">
+           {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
+        </a>
+      </button>
     </div>
 
     <div class="oppia-partnerships-banner-image
-                hide-xs hide-sm hide-md col-4 flex-45">
+                hide-xs hide-sm">
       <img alt="Partnerships page hero image - Desktop view"
            [src]="partnershipsImgUrl">
     </div>
-    <div class="oppia-partnerships-banner-image hide-gt-md">
+    <div class="oppia-partnerships-banner-image hide-gt-sm">
       <img alt="Partnerships page hero image - Mobile view"
            [src]="partnershipsImgUrl">
     </div>
@@ -137,11 +144,26 @@
 </div>
 
 <style>
+  .oppia-partnerships-banner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: space-between;
+    margin: 60px 40px;
+  }
+
+  .oppia-partnerships-banner-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
   .oppia-partnerships-h1 {
     color: #033e39;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 2.5em;
-    margin: 2em 1em 1em 2em;
   }
 
   .oppia-partnerships-h3 {
@@ -152,7 +174,6 @@
 
   .oppia-partnerships-list {
     font-size: 1.1em;
-    margin: 0 4em 0 4.5em;
   }
 
   @media screen and (max-width: 900px) {
@@ -232,19 +253,20 @@
     margin: 0.6em auto;
   }
 
-  .oppia-partnerships-cta button {
+  .btn {
     background-color: #00645c;
     border-radius: 4px;
     height: 40px;
-    margin: 10px auto;
+    /* margin: 10px auto; */
+    width: 300px;
   }
 
-  .oppia-partnerships-cta button:hover,
-  .oppia-partnerships-cta button:focus {
+  .btn:hover,
+  .btn:focus {
     background-color: #3d9991;
   }
 
-  .oppia-partnerships-cta button a {
+  .btn a {
     color: rgba(255, 255, 255, 1);
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1em;
