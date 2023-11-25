@@ -651,7 +651,8 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 except psutil.TimeoutExpired:
                     # If the server fails to shut down, allow proc_context to
                     # end it by calling terminate() and/or kill().
-                    pass
+                    logging.error(
+                        'Portserver failed to shut down after 10 seconds.')
 
 
 @contextlib.contextmanager

@@ -413,7 +413,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         correct_google_path = os.path.join(
             common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        def mock_is_dir(path: str) -> bool:
+        def mock_isdir(path: str) -> bool:
             directories_that_do_not_exist = {
                 os.path.join(correct_google_path, 'appengine'),
                 os.path.join(correct_google_path, 'net'),
@@ -424,11 +424,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 return False
             return True
         initialized_directories = []
-        def mock_mk_dir(path: str) -> None:
+        def mock_mkdir(path: str) -> None:
             initialized_directories.append(path)
 
         copied_src_dst_tuples = []
-        def mock_copy_tree(src: str, dst: str) -> None:
+        def mock_copytree(src: str, dst: str) -> None:
             copied_src_dst_tuples.append((src, dst))
 
         correct_copied_src_dst_tuples = [
@@ -446,9 +446,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 os.path.join(correct_google_path, 'pyglib'))
         ]
 
-        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
-        swap_mk_dir = self.swap(os, 'mkdir', mock_mk_dir)
-        swap_copy_tree = self.swap(shutil, 'copytree', mock_copy_tree)
+        swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
+        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
+        swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         install_third_party_main_swap = self.swap(
             install_third_party, 'main', mock_main_for_install_third_party)
@@ -467,7 +467,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, tweak_yarn_executable_swap:
-                        with swap_is_dir, swap_mk_dir, swap_copy_tree:
+                        with swap_isdir, swap_mkdir, swap_copytree:
                             install_third_party_libs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
