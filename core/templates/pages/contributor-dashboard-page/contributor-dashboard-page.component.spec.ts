@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for contributor dashboard page component.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ContributorDashboardPageComponent } from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
@@ -111,7 +111,6 @@ describe('Contributor dashboard page', () => {
     let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     component.onTabClick('translateTextTab');
-    tick();
     flush();
 
     expect(focusSpy).toHaveBeenCalled();
@@ -122,7 +121,6 @@ describe('Contributor dashboard page', () => {
       .and.returnValue(Promise.resolve(null));
     expect(() => {
       component.ngOnInit();
-      tick();
       flush();
     }).toThrowError();
   }));
@@ -140,7 +138,7 @@ describe('Contributor dashboard page', () => {
         Promise.resolve(userInfo as UserInfo));
 
       component.ngOnInit();
-      tick();
+      flush();
 
       expect(component.profilePicturePngDataUrl).toBe(
         urlInterpolationService.getStaticImageUrl(
@@ -162,7 +160,7 @@ describe('Contributor dashboard page', () => {
       Promise.resolve(userInfo as UserInfo));
 
     component.ngOnInit();
-    tick();
+    flush();
 
     expect(component.username).toEqual('');
     expect(component.userIsLoggedIn).toBeFalse();
@@ -180,7 +178,7 @@ describe('Contributor dashboard page', () => {
         spyOn(userService, 'getUserContributionRightsDataAsync')
           .and.returnValue(Promise.resolve(userContributionRights));
         component.ngOnInit();
-        tick();
+        flush();
 
         expect(component.topicName).toBe('Topic 1');
         expect(translationTopicService.setActiveTopicName)
@@ -202,7 +200,7 @@ describe('Contributor dashboard page', () => {
           Promise.resolve([]));
 
         component.ngOnInit();
-        tick();
+        flush();
 
         expect(component.topicName).toBeUndefined();
         expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
