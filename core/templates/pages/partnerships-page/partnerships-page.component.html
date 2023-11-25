@@ -43,18 +43,34 @@
     </div>
   </div>
 
-  <div class="oppia-partnerships-benefits">
-    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF' | translate }}</h3>
+  <div class="oppia-partnerships-process">
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS' | translate }}</h3>
 
-    <div class="row">
-      <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">1.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_1' | translate }}
+    <div class="oppia-partnerships-process-container">
+      <div class="oppia-partnerships-process-subcontainer">
+        <img class="oppia-partnerships-process-icon hide-gt-xs" alt="People Icon" [src]="peopleIconUrl">
+        <div class="oppia-partnerships-process-content">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_1_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_1' | translate }}</p>
+        </div>
+        <img class="oppia-partnerships-process-icon hide-xs" alt="People Icon" [src]="peopleIconUrl">
       </div>
-      <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">2.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_2' | translate }}
+
+      <div class="oppia-partnerships-process-subcontainer">
+        <img class="oppia-partnerships-process-icon" alt="Service Icon" [src]="serviceIconUrl">
+        <div class="oppia-partnerships-process-content">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_2_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_2' | translate }}</p>
+        </div>
       </div>
-      <div class="col col-lg-3 col-md-3 col-sm-12">
-        <span class="oppia-partnerships-emphasized">3.</span> {{ 'I18N_PARTNERSHIPS_PAGE_BENEFITS_OF_3' | translate }}
+
+      <div class="oppia-partnerships-process-subcontainer">
+        <img class="oppia-partnerships-process-icon hide-gt-xs" alt="Agree Icon" [src]="agreeIconUrl">
+        <div class="oppia-partnerships-process-content">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_3_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PROCESS_3' | translate }}</p>
+        </div>
+        <img class="oppia-partnerships-process-icon hide-xs" alt="Agree Icon" [src]="agreeIconUrl">
       </div>
     </div>
   </div>
@@ -172,6 +188,11 @@
     font-size: 1.6em;
   }
 
+  .oppia-partnerships-h4 {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
   .oppia-partnerships-list {
     font-size: 1.1em;
   }
@@ -185,43 +206,72 @@
       font-size: 1em;
     }
 
+    .oppia-partnerships-h4 {
+      font-size: 1em;
+    }
+
     .oppia-partnerships-list {
       font-size: 0.9em;
     }
   }
 
-  .oppia-partnerships-emphasized {
-    color: #047c74;
-    font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
-    font-weight: bold;
-  }
-
-  .oppia-partnerships-benefits {
-    background-color: #dcdcdc;
-    padding: 5em 0;
+  .oppia-partnerships-process {
+    background-color: #eef5fb;
+    padding: 2em 0;
     text-align: center;
   }
 
-  .oppia-partnerships-benefits .row {
+  .oppia-partnerships-process-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 0 15em;
+  }
+
+  .oppia-partnerships-process-subcontainer {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
     justify-content: center;
-    margin: 2.5em 8em;
+  }
+
+  .oppia-partnerships-process-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .oppia-partnerships-process-icon {
+    width: 100px;
+    height: auto;
+    margin: 0.6em auto;
   }
 
   @media screen and (max-width: 900px) {
-    .oppia-partnerships-benefits .row {
-      margin: 2.5em 4em;
+    .oppia-partnerships-process-container {
+      margin: 0 8em;
+    }
+  
+    .oppia-partnerships-process-subcontainer p {
+      font-size: 0.8em;
     }
   }
 
-  .oppia-partnerships-benefits .col {
-    background-color: #e8e7e3;
-    color: #383838;
-    font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
-    font-size: 1.1em;
-    margin: 1em;
-    min-height: 180px;
-    padding: 2em;
-    text-align: start;
+  @media screen and (max-width: 600px) {
+    .oppia-partnerships-process-container {
+      margin: 0 4em;
+    }
+
+    .oppia-partnerships-process-subcontainer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  
+    .oppia-partnerships-process-icon {
+      width: 60px;
+    }
   }
 
   .oppia-partnerships-cta {

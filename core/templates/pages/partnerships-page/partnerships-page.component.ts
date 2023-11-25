@@ -37,6 +37,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   formIconUrl: string = '';
   callIconUrl: string = '';
   changeIconUrl: string = '';
+  peopleIconUrl: string = '';
+  agreeIconUrl: string = '';
+  serviceIconUrl: string = '';
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -64,6 +67,12 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/icons/icon_call.png');
     this.changeIconUrl = this.urlInterpolationService.getStaticImageUrl(
       '/icons/icon_change.png');
+    this.peopleIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_people.png');
+    this.agreeIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_agree.png');
+    this.serviceIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_service.png');
   }
 
   ngOnDestroy(): void {
