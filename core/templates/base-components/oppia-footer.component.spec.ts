@@ -34,7 +34,7 @@ class MockRouter {
 class MockPlatformFeatureService {
   status = {
       BlogPages: {
-        isEnabled: false
+        isEnabled: true
       }
     };
 }
