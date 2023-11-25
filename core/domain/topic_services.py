@@ -1104,13 +1104,16 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    story_references = (
-        topic.canonical_story_references + topic.additional_story_references)
-    topic_model_story_exploration_mapping = {}
-    for story_ref in story_references:
+    all_story_references = (
+        topic.canonical_story_references +
+        topic.additional_story_references)
+    topic_model_published_story_exploration_mapping = {}
+    for story_ref in all_story_references:
+        if not story_ref.story_is_published:
+            continue
         story = story_fetchers.get_story_by_id(story_ref.story_id)
 
-        topic_model_story_exploration_mapping.update({
+        topic_model_published_story_exploration_mapping.update({
             story_ref.story_id: (
                 story.story_contents.get_all_linked_exp_ids()
                 if story else [])
@@ -1131,7 +1134,7 @@ def compute_summary_of_topic(
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
         total_skill_count, topic_model_published_node_count,
         topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
-        topic_model_story_exploration_mapping, topic.created_on,
+        topic_model_published_story_exploration_mapping, topic.created_on,
         topic.last_updated
     )
 
@@ -1652,7 +1655,8 @@ def populate_topic_summary_model_fields(
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
         'url_fragment': topic_summary.url_fragment,
-        'story_exploration_mapping': topic_summary.story_exploration_mapping
+        'published_story_exploration_mapping': (
+            topic_summary.published_story_exploration_mapping)
     }
 
     if topic_summary_model is not None:

@@ -163,29 +163,51 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_compute_summary(self) -> None:
         story_1_exp_ids = ['exp-1']
         story_2_exp_ids = ['exp-2', 'exp-3']
+
+        self._create_published_explorations(story_1_exp_ids)
+        self._create_published_explorations(story_2_exp_ids)
         self.link_explorations_to_story(
             self.TOPIC_ID, self.story_id_1, *story_1_exp_ids)
         self.link_explorations_to_story(
             self.TOPIC_ID, self.story_id_2, *story_2_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_2, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        topic_summary = topic_services.compute_summary_of_topic(self.topic)
+        topic_summary = topic_services.compute_summary_of_topic(updated_topic)
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.description, 'Description')
-        self.assertEqual(topic_summary.canonical_story_count, 0)
-        self.assertEqual(topic_summary.additional_story_count, 0)
+        self.assertEqual(topic_summary.canonical_story_count, 1)
+        self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
-        self.assertEqual(topic_summary.total_published_node_count, 0)
+        self.assertEqual(topic_summary.total_published_node_count, 2)
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
-        self.assertDictEqual(topic_summary.story_exploration_mapping, {
-            self.story_id_1: story_1_exp_ids,
-            self.story_id_2: story_2_exp_ids,
-            self.story_id_3: []
-        })
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_2: story_2_exp_ids,
+                self.story_id_3: []
+            })
+
+    def _create_published_explorations(self, exp_ids: List[str]) -> None:
+        """Creates and publishes new explorations with the given exp_ids.
+
+        Args:
+            exp_ids: list(str). The ids of the explorations to create and
+                publish.
+        """
+        for exp_id in exp_ids:
+            self.save_new_valid_exploration(
+                exp_id, self.user_id_admin, end_state_name='End',
+                correctness_feedback_enabled=True)
+            self.publish_exploration(self.user_id_admin, exp_id)
+
 
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
@@ -2176,7 +2198,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_count=0,
             subtopic_count=0,
             version=1,
-            story_exploration_mapping={
+            published_story_exploration_mapping={
                 self.story_id_1: [],
                 self.story_id_2: [],
                 self.story_id_3: []
@@ -2242,8 +2264,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_summary.url_fragment
         )
         self.assertDictEqual(
-            populated_model.story_exploration_mapping,
-            topic_summary.story_exploration_mapping)
+            populated_model.published_story_exploration_mapping,
+            topic_summary.published_story_exploration_mapping)
 
     def test_get_chapter_counts_in_topic_summaries(self) -> None:
         canonical_story_id_1 = story_services.get_new_story_id()
@@ -2372,8 +2394,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'total_published_node_count'],
                 'thumbnail_filename': topic_summary['thumbnail_filename'],
                 'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
-                'story_exploration_mapping': topic_summary[
-                    'story_exploration_mapping'],
+                'published_story_exploration_mapping': topic_summary[
+                    'published_story_exploration_mapping'],
                 'topic_model_created_on': topic_summary[
                     'topic_model_created_on'],
                 'topic_model_last_updated': topic_summary[

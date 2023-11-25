@@ -374,9 +374,9 @@ class ReviewableOpportunitiesHandler(
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topic_exp_ids = (
-                topic_fetchers.get_all_story_exploration_ids(topic.id))
+                topic_fetchers.get_published_story_exploration_ids(topic.id))
         else:
-            topic_exp_ids = topic_fetchers.get_all_story_exploration_ids()
+            topic_exp_ids = topic_fetchers.get_published_story_exploration_ids()
 
         in_review_suggestions, _ = (
             suggestion_services

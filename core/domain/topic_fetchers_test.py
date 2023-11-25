@@ -569,7 +569,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 ['invalid_topic_id'], strict=True
             )
 
-    def test_get_all_story_exploration_ids_in_all_topics(self) -> None:
+    def test_get_published_story_exploration_ids_in_all_topics(self) -> None:
         topic_id_2 = topic_fetchers.get_new_topic_id()
         story_id_4 = 'story_4'
         self.save_new_topic(
@@ -581,17 +581,18 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_story(story_id_4, self.user_id, topic_id_2)
 
         exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
-        self.link_explorations_to_story(
+        self._publish_story_with_explorations(
             self.TOPIC_ID, self.story_id_1, exp_ids[0])
-        self.link_explorations_to_story(
+        self._publish_story_with_explorations(
             self.TOPIC_ID, self.story_id_3, *exp_ids[1:3])
-        self.link_explorations_to_story(topic_id_2, story_id_4, exp_ids[3])
+        self._publish_story_with_explorations(
+            topic_id_2, story_id_4, exp_ids[3])
 
-        story_exp_ids = topic_fetchers.get_all_story_exploration_ids()
+        story_exp_ids = topic_fetchers.get_published_story_exploration_ids()
 
         self.assertItemsEqual(exp_ids, story_exp_ids)
 
-    def test_get_all_story_exploration_ids_in_a_topic_by_its_id(
+    def test_get_published_story_exploration_ids_in_a_topic_by_its_id(
         self
     ) -> None:
         topic_id_2 = topic_fetchers.get_new_topic_id()
@@ -606,14 +607,34 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         topic_1_exp_ids = ['exp_1', 'exp_2', 'exp_3']
         topic_2_exp_ids = ['exp_4']
-        self.link_explorations_to_story(
+        self._publish_story_with_explorations(
             self.TOPIC_ID, self.story_id_1, topic_1_exp_ids[0])
-        self.link_explorations_to_story(
+        self._publish_story_with_explorations(
             self.TOPIC_ID, self.story_id_3, *topic_1_exp_ids[1:3])
-        self.link_explorations_to_story(
+        self._publish_story_with_explorations(
             topic_id_2, story_id_4, topic_2_exp_ids[0])
 
-        story_exp_ids = topic_fetchers.get_all_story_exploration_ids(
+        story_exp_ids = topic_fetchers.get_published_story_exploration_ids(
             topic_id_2)
 
         self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)
+
+    def _publish_story_with_explorations(
+        self, topic_id: str, story_id: str, *exp_ids: str
+    ) -> None:
+        """Publishes the story with story_id under topic_id. Explorations using
+        the given exp_ids must be created and linked to the story beforehand.
+
+        Args:
+            topic_id: str. The id of the topic that contains the target story.
+            story_id: str. The id of the story for publishing.
+            exp_ids: str. The ids of explorations to be linked to the story.
+        """
+        for exp_id in exp_ids:
+            self.save_new_valid_exploration(
+                exp_id, self.user_id_admin, end_state_name='End',
+                correctness_feedback_enabled=True)
+            self.publish_exploration(self.user_id_admin, exp_id)
+
+        self.link_explorations_to_story(topic_id, story_id, *exp_ids)
+        topic_services.publish_story(topic_id, story_id, self.user_id_admin)

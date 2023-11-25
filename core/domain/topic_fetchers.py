@@ -536,7 +536,7 @@ def get_topic_summary_from_model(
         topic_summary_model.thumbnail_filename,
         topic_summary_model.thumbnail_bg_color,
         topic_summary_model.url_fragment,
-        topic_summary_model.story_exploration_mapping,
+        topic_summary_model.published_story_exploration_mapping,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -750,7 +750,7 @@ def get_canonical_story_dicts(
     return canonical_story_dicts
 
 
-def get_all_story_exploration_ids(
+def get_published_story_exploration_ids(
     topic_id: Optional[str] = None
 ) -> List[str]:
     """Returns a list of all exploration ids belonging to each story of either
@@ -765,10 +765,10 @@ def get_all_story_exploration_ids(
         topic(s) to search through.
     """
     mappings = (
-        [get_topic_summary_by_id(topic_id).story_exploration_mapping]
+        [get_topic_summary_by_id(topic_id).published_story_exploration_mapping]
         if topic_id
         else topic_models.TopicSummaryModel
-            .get_all_story_exploration_mappings())
+            .get_all_published_story_exploration_mappings())
 
     story_exp_ids = set()
     for mapping in mappings:

@@ -384,12 +384,13 @@ class TopicSummaryModel(base_models.BaseModel):
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
     # A mapping from each story id belonging to the topic to a list of
-    # exploration ids that are linked to the corresponding story. This mapping
-    # represents the relationships between a topic, its stories,
-    # and the explorations that are linked to each story. This field must be
-    # kept in-sync with updates made to an owned story's explorations and to
-    # the topic's ownership of said stories.
-    story_exploration_mapping = datastore_services.JsonProperty(
+    # exploration ids that are linked to the corresponding published story. This
+    # mapping represents the relationships between a topic, its published
+    # stories and the explorations that are linked to each story. This field
+    # must be kept in-sync with updates made to an owned story's explorations,
+    # to the topic's ownership of said stories, and to the publishing or
+    # unpublishing of said stories.
+    published_story_exploration_mapping = datastore_services.JsonProperty(
         required=True, indexed=True)
 
     @staticmethod
@@ -426,12 +427,14 @@ class TopicSummaryModel(base_models.BaseModel):
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_exploration_mapping':
+            'published_story_exploration_mapping':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
-    def get_all_story_exploration_mappings(cls) -> List[Dict[str, List[str]]]:
+    def get_all_published_story_exploration_mappings(
+        cls
+    ) -> List[Dict[str, List[str]]]:
         """Gets each entity's story_exploration_mapping property.
 
         Returns:
@@ -439,10 +442,11 @@ class TopicSummaryModel(base_models.BaseModel):
             story_exploration_mapping values stored in each entity.
         """
         projections: Sequence[TopicSummaryModel] = cls.query(
-            projection=['story_exploration_mapping']
+            projection=['published_story_exploration_mapping']
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
         return [
-            projection.story_exploration_mapping for projection in projections
+            projection.published_story_exploration_mapping
+            for projection in projections
         ]
 
 
