@@ -90,14 +90,6 @@ describe('OppiaFooterComponent', () => {
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
 
-  it('should return correct blog url if the blog homepage feature is disabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-
-      expect(component.getOppiaBlogUrl()).toEqual(
-        'https://medium.com/oppia-org');
-    });
-
   it('should validate email address correctly', () => {
     component.emailAddress = 'invalidEmail';
     expect(component.validateEmailAddress()).toBeFalse();
