@@ -99,21 +99,6 @@ AllowedAdminConfigPropertyValueTypes = Union[
 ]
 
 
-class AdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Admin page shown in the App Engine admin console."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_admin_page
-    def get(self) -> None:
-        """Renders the admin page."""
-
-        self.render_template('admin-page.mainpage.html')
-
-
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
@@ -1247,7 +1232,7 @@ class AdminRoleHandler(
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves information about users based on different filter
         criteria to populate the roles tab.

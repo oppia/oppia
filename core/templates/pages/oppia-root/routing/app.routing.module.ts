@@ -20,11 +20,18 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
+import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
+    loadChildren: () => import('pages/admin-page/admin-page.module')
+      .then(m => m.AdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
@@ -265,7 +272,6 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
   });
 }
 
-// Add error page for not found routes.
 // Register all routes for topic landing page.
 for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
   for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
@@ -278,14 +284,26 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
   }
 }
 
-// '**' wildcard route must be kept at the end,as it can override all other
-// routes.
-routes.push({
-  path: '**',
-  loadChildren: () => import(
-    'pages/error-pages/error-404/error-404-page.module').then(
-    m => m.Error404PageModule)
-});
+// Error routes.
+routes.push(
+  // Route to register all the custom error pages on oppia.
+  {
+    path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .ERROR.ROUTE}/:status_code`,
+    loadChildren: () => import(
+      'pages/error-pages/error-page.module').then(
+      m => m.ErrorPageModule)
+  },
+  // '**' wildcard route must be kept at the end,as it can override all other
+  // routes.
+  // Add error page for not found routes.
+  {
+    path: '**',
+    loadChildren: () => import(
+      'pages/error-pages/error-page.module').then(
+      m => m.ErrorPageModule)
+  }
+);
 
 @NgModule({
   imports: [
