@@ -27,6 +27,7 @@ import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -109,6 +110,85 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 
+  private calculateHandledAnswers(
+      ruleInputs: string[],
+      answerChoiceToIndex: Record<string, number>,
+      rule: Rule,
+      handledAnswers: boolean[]) {
+    ruleInputs.forEach((ruleInput) => {
+      var choiceIndex = answerChoiceToIndex[ruleInput];
+      if (rule.type === 'Equals') {
+        handledAnswers[choiceIndex] = true;
+      } else if (rule.type === 'IsProperSubsetOf') {
+        handledAnswers[choiceIndex] = true;
+      } else if (rule.type === 'ContainsAtLeastOneOf') {
+        handledAnswers[choiceIndex] = true;
+      } else if (rule.type ===
+        'DoesNotContainAtLeastOneOf') {
+        for (var i = 0; i < handledAnswers.length; i++) {
+          if (i !== choiceIndex) {
+            handledAnswers[i] = true;
+          }
+        }
+      }
+    });
+  }
+
+  private getWarningsWithSingleSelectionAllowedMax(
+      stateName: string,
+      customizationArgs: ItemSelectionInputCustomizationArgs,
+      answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): Warning[] {
+    var warningsList: Warning[] = [];
+
+    var areAllChoicesCovered = false;
+    var seenChoices = customizationArgs.choices.value;
+    var handledAnswers = Array(seenChoices.length).fill(false);
+
+    var answerChoiceToIndex: Record<string, number> = {};
+    seenChoices.forEach((seenChoice, choiceIndex) => {
+      const contentId = seenChoice.contentId;
+      if (contentId === null) {
+        throw new Error('ContentId of choice does not exist');
+      }
+      answerChoiceToIndex[contentId] = choiceIndex;
+    });
+
+    answerGroups.forEach((answerGroup, answerIndex) => {
+      var rules = answerGroup.rules;
+      rules.forEach((rule, ruleIndex) => {
+        var ruleInputs = rule.inputs.x as string[];
+        if (rule.type === 'Equals' && ruleInputs.length > 1) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              'In Oppia Response ' + (answerIndex + 1) + ', ' +
+              'Learner answer ' + (ruleIndex + 1) + ', ' +
+              'please select only one answer choice.')
+          });
+        }
+
+        this.calculateHandledAnswers(
+          ruleInputs, answerChoiceToIndex, rule, handledAnswers);
+      });
+    });
+    areAllChoicesCovered = handledAnswers.every((handledAnswer) => {
+      return handledAnswer;
+    });
+    if (!areAllChoicesCovered) {
+      if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Please add something for Oppia to say in the ' +
+            '\"All other answers\" response.')
+        });
+      }
+    }
+
+    return warningsList;
+  }
+
   getAllWarnings(
       stateName: string, customizationArgs:
       ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
@@ -122,73 +202,17 @@ export class ItemSelectionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    var seenChoices = customizationArgs.choices.value;
-    var handledAnswers = seenChoices.map((item) => {
-      return false;
-    });
-
     var minAllowedCount =
       customizationArgs.minAllowableSelectionCount.value;
     var maxAllowedCount =
       customizationArgs.maxAllowableSelectionCount.value;
 
-    var areAllChoicesCovered = false;
     if (maxAllowedCount === 1) {
-      var answerChoiceToIndex: Record<string, number> = {};
-      seenChoices.forEach((seenChoice, choiceIndex) => {
-        const contentId = seenChoice.contentId;
-        if (contentId === null) {
-          throw new Error('ContentId of choice does not exist');
-        }
-        answerChoiceToIndex[contentId] = choiceIndex;
-      });
+      const warnings = this.getWarningsWithSingleSelectionAllowedMax(
+        stateName, customizationArgs, answerGroups, defaultOutcome
+      );
 
-      answerGroups.forEach((answerGroup, answerIndex) => {
-        var rules = answerGroup.rules;
-        rules.forEach((rule, ruleIndex) => {
-          var ruleInputs = rule.inputs.x as string[];
-          ruleInputs.forEach((ruleInput) => {
-            var choiceIndex = answerChoiceToIndex[ruleInput];
-            if (rule.type === 'Equals') {
-              handledAnswers[choiceIndex] = true;
-              if (ruleInputs.length > 1) {
-                warningsList.push({
-                  type: AppConstants.WARNING_TYPES.ERROR,
-                  message: (
-                    'In Oppia Response ' + (answerIndex + 1) + ', ' +
-                    'Learner answer ' + (ruleIndex + 1) + ', ' +
-                    'please select only one answer choice.')
-                });
-              }
-            } else if (rule.type === 'IsProperSubsetOf') {
-              handledAnswers[choiceIndex] = true;
-            } else if (rule.type === 'ContainsAtLeastOneOf') {
-              handledAnswers[choiceIndex] = true;
-            } else if (rule.type ===
-              'DoesNotContainAtLeastOneOf') {
-              for (var i = 0; i < handledAnswers.length; i++) {
-                if (i !== choiceIndex) {
-                  handledAnswers[i] = true;
-                }
-              }
-            }
-          });
-        });
-      });
-      areAllChoicesCovered = handledAnswers.every((handledAnswer) => {
-        return handledAnswer;
-      });
-    }
-
-    if (!areAllChoicesCovered) {
-      if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
-        warningsList.push({
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Please add something for Oppia to say in the ' +
-            '\"All other answers\" response.')
-        });
-      }
+      warningsList.push(...warnings);
     }
 
     const choicesContentIds = new Set(customizationArgs.choices.value.map(
@@ -208,32 +232,32 @@ export class ItemSelectionInputValidationService {
                 'argument choices.')
             });
           }
-
-          if (rule.type === 'IsProperSubsetOf') {
-            if (ruleInputs.length < 2) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'In Oppia response ' + (answerIndex + 1) + ', ' +
-                  'learner answer ' + (ruleIndex + 1) + ', the "proper ' +
-                  'subset" learner answer must include at least 2 options.')
-              });
-            }
-          } else if (rule.type === 'Equals') {
-            if (minAllowedCount > ruleInputs.length ||
-              maxAllowedCount < ruleInputs.length) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'In Oppia response ' + (answerIndex + 1) + ', ' +
-                  'Learner answer ' + (ruleIndex + 1) + ', the number of ' +
-                  'correct options in the "Equals" learner answer should be ' +
-                  'between ' + minAllowedCount + ' and ' + maxAllowedCount +
-                  ' (the minimum and maximum allowed selection counts).')
-              });
-            }
-          }
         });
+
+        if (rule.type === 'IsProperSubsetOf') {
+          if (ruleInputs.length < 2) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'In Oppia response ' + (answerIndex + 1) + ', ' +
+                'learner answer ' + (ruleIndex + 1) + ', the "proper ' +
+                'subset" learner answer must include at least 2 options.')
+            });
+          }
+        } else if (rule.type === 'Equals') {
+          if (minAllowedCount > ruleInputs.length ||
+            maxAllowedCount < ruleInputs.length) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'In Oppia response ' + (answerIndex + 1) + ', ' +
+                'Learner answer ' + (ruleIndex + 1) + ', the number of ' +
+                'correct options in the "Equals" learner answer should be ' +
+                'between ' + minAllowedCount + ' and ' + maxAllowedCount +
+                ' (the minimum and maximum allowed selection counts).')
+            });
+          }
+        }
         if (ruleInputs.length === 0) {
           if (rule.type === 'ContainsAtLeastOneOf') {
             warningsList.push({
