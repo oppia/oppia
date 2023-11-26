@@ -135,47 +135,74 @@
 
     <mat-accordion>
       <div class="oppia-partnerships-faq-card">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel 
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
             <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_1' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
           <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_1_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
             <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_2' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
           <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_2_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
             <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
           <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_3_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
             <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
           <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_4_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
 
       <div class="oppia-partnerships-faq-card">
-        <mat-expansion-panel hideToggle>
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false"> 
           <mat-expansion-panel-header>
             <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_5' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
           <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_5_CONTENT' | translate"></p>
+        </mat-expansion-panel>
+      </div>
+
+      <div class="oppia-partnerships-faq-card">
+        <mat-expansion-panel
+          (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ 'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_6' | translate }}</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
+          <p [innerHTML]="'I18N_PARTNERSHIPS_PAGE_FREQUENTLY_ASKED_6_CONTENT' | translate"></p>
         </mat-expansion-panel>
       </div>
     </mat-accordion>
@@ -372,6 +399,7 @@
   .oppia-partners-content {
     font-size: 1.1em;
     margin: 0 15em;
+    text-align: center;
   }
 
   .partners {
@@ -419,8 +447,6 @@
       height: 60px;
     }
   }
-
-
 
   .oppia-partnerships-cta {
     background-color: #eef5fb;
@@ -485,7 +511,7 @@
   }
 
   .oppia-partnerships-faqs {
-    background-color: #dcdcdc;
+    background-color: #e8e7e3;
     padding: 5em 0;
     text-align: center;
   }
@@ -500,16 +526,32 @@
     width: 75%;
   }
 
+  .oppia-partnerships-faq-card mat-expansion-panel {
+    background-color: #e8e7e3;
+    border: none;
+    box-shadow: none;
+  }
+
+  .oppia-partnerships-faq-card mat-divider {
+    background-color: #047c74;
+    height: 2px;
+  }
+
+  .oppia-partnerships-faq-card mat-expansion-panel-header {
+    background-color: #e8e7e3; 
+  }
+
   .oppia-partnerships-faq-card mat-panel-title {
+    color: #047c74;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.3em;
-    font-weight: bold;
   }
 
   .oppia-partnerships-faq-card p {
     font-family: "Roboto", Arial, sans-serif;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: start;
+    margin: 1em auto;
   }
 
   @media screen and (max-width: 900px) {
