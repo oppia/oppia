@@ -47,6 +47,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   org4Url: string = '';
   org5Url: string = '';
   org6Url: string = '';
+  panelOpenState: boolean = false;
 
   constructor(
     private pageTitleService: PageTitleService,
