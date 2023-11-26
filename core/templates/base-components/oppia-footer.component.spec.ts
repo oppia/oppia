@@ -76,7 +76,7 @@ describe('OppiaFooterComponent', () => {
     () => {
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
-  
+
   it('should validate email address correctly', () => {
     component.emailAddress = 'invalidEmail';
     expect(component.validateEmailAddress()).toBeFalse();
