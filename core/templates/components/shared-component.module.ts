@@ -27,7 +27,7 @@ import { CustomFormsComponentsModule } from './forms/custom-forms-directives/cus
 import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
-import { ObjectComponentsModule } from 'objects/object-components.module';
+import { ObjectComponentsModule } from 'extensions/objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
