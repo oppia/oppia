@@ -31,10 +31,10 @@ import { ObjectComponentsModule } from 'extensions/objects/object-components.mod
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { RichTextComponentsModule } from 'extensions/rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
-import { BaseModule } from 'base-components/base.module';
+import { BaseModule } from 'core/templates/base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -154,12 +154,12 @@ import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
-import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
-import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
-import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
-import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
-import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
-import { CopierComponent } from 'value_generators/templates/copier.component';
+import { VisualizationSortedTilesComponent } from 'extensions/visualizations/oppia-visualization-sorted-tiles.component';
+import { OppiaVisualizationClickHexbinsComponent } from 'extensions/visualizations/oppia-visualization-click-hexbins.directive';
+import { OppiaVisualizationFrequencyTableComponent } from 'extensions/visualizations/oppia-visualization-frequency-table.directive';
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import { RandomSelectorComponent } from 'extensions/value_generators/templates/random-selector.component';
+import { CopierComponent } from 'extensions/value_generators/templates/copier.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -178,7 +178,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
-import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
+import { DynamicComponentModule } from 'extensions/value_generators/templates/dynamic-component.module';
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
 import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 import { DirectivesModule } from 'directives/directives.module';
