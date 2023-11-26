@@ -31,8 +31,6 @@ const addRoleButton = 'button.oppia-add-role-button';
 
 const contributorDashboardAdminPage = (
   testConstants.URLs.ContributorDashboardAdmin);
-const addContributionRightsButton = (
-  );
 
 module.exports = class e2eSuperAdmin extends baseUser {
   /**

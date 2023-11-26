@@ -44,7 +44,7 @@ let testConstants = {
     ReviewTranslations: 'REVIEW_TRANSLATIONS',
     ReviewQuestions: 'REVIEW_QUESTIONS',
     SubmitQuestions: 'SUBMIT_QUESTIONS',
-  }
+  },
   DEFAULT_SPEC_TIMEOUT: 300000
 };
 
