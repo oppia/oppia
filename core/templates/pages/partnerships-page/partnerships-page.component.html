@@ -82,7 +82,7 @@
       <div class="partering-with-oppia-content">
         <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_CONTENT' | translate }}</p>
         <button class="btn">
-          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+          <a href="https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing"
              target="_blank"
              rel="noopener">
              {{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}
@@ -102,6 +102,91 @@
       <img class="partner-logo" alt="partner logo" [src]="org4Url">
       <img class="partner-logo" alt="partner logo" [src]="org5Url">
       <img class="partner-logo" alt="partner logo" [src]="org6Url">
+    </div>
+  </div>
+
+  <div class="partners-stories">
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES' | translate }}</h3>
+    <div class="partners-col">
+      <div class="partner-container d-block d-md-none">
+        <ngb-carousel>
+          <ng-template ngbSlide>
+            <mat-card-content>
+              <img class="partner-logo" alt="partner logo" [src]="partner1">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+                   target="_blank"
+                   rel="noopener">
+                   {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+              </a>
+            </mat-card-content>
+          </ng-template>
+          <ng-template ngbSlide>
+            <mat-card-content>
+              <img class="partner-logo" alt="partner logo" [src]="partner2">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2' | translate }}</p>
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+                   target="_blank"
+                   rel="noopener">
+                   {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+              </a>
+            </mat-card-content>
+          </ng-template>
+          <ng-template ngbSlide>
+            <mat-card-content>
+              <img class="partner-logo" alt="partner logo" [src]="partner3">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3' | translate }}</p>
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+                   target="_blank"
+                   rel="noopener">
+                   {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+              </a>
+            </mat-card-content>
+          </ng-template>
+        </ngb-carousel>
+      </div>
+      <div class="partner-container d-none d-md-flex">
+        <mat-card-content>
+          <img alt="partner logo" [src]="partner1">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
+          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+               target="_blank"
+               rel="noopener">
+               {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+          </a>
+        </mat-card-content>
+        <mat-card-content>
+          <img alt="partner logo" [src]="partner2">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2' | translate }}</p>
+          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+               target="_blank"
+               rel="noopener">
+               {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+          </a>
+        </mat-card-content>
+        <mat-card-content>
+          <img alt="partner logo" [src]="partner3">
+          <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3_HEADING' | translate }}</h4>
+          <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3' | translate }}</p>
+          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+               target="_blank"
+               rel="noopener">
+               {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
+          </a>
+        </mat-card-content>
+      </div>
+      <button class="btn">
+        <a href="https://www.oppia.org/blog"
+           target="_blank"
+           rel="noopener">
+           {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}
+        </a>
+      </button>      
     </div>
   </div>
 
@@ -434,6 +519,114 @@
 
     .partner-logo {
       height: 60px;
+    }
+  }
+
+  .partners-stories {
+    background-color: #eef5fb;
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .partners-col {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: center;
+    margin: 0 5em;
+  }
+
+  .partner-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 55px;
+    justify-content: center;
+  }
+
+  .partner-container mat-card-content h4 {
+    color: #047c74;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .partner-container mat-card-content {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid var(--Dark-Green, #003C34);
+    border-radius: 4px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    justify-content: center;
+    padding: 3em 1em 2em;
+  }
+
+  .partner-container mat-card-content img {
+    height: 100px;
+    margin: 3em 0em 3em;
+    width: auto;
+  }
+
+  .partner-container mat-card-content p {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    padding: 0 2em;
+    text-align: center;
+  }
+
+  .partner-container mat-card-content a {
+    color: #047c74;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  ::ng-deep .carousel-control-prev-icon,
+  ::ng-deep .carousel-control-next-icon {
+      filter: invert(50%);
+      margin: 0 10px;
+  }
+
+  ::ng-deep .carousel-control-prev-icon {
+    margin-left: -5em;
+  }
+
+  ::ng-deep .carousel-control-next-icon {
+    margin-right: -5em;
+  }
+
+  @media screen and (max-width: 900px) {
+    .partner-container mat-card-content img {
+      height: 80px;
+      margin: 2em 0em 2em;
+      width: auto;
+    }
+
+    .partner-container mat-card-content p {
+      font-size: 0.8em;
+    }
+
+    .partner-container mat-card-content a {
+      font-size: 0.8em;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .partner-container mat-card-content img {
+      height: 60px;
+      margin: 2em 0em 2em;
+    }
+
+    .partner-container mat-card-content p {
+      font-size: 0.8em;
+    }
+
+    .partner-container mat-card-content a {
+      font-size: 0.8em;
     }
   }
 

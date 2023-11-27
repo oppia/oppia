@@ -16,7 +16,7 @@
  * @fileoverview Component for the partnerships page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgModule } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
 @Component({
   selector: 'partnerships-page',
   templateUrl: './partnerships-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -47,6 +47,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   org4Url: string = '';
   org5Url: string = '';
   org6Url: string = '';
+  partner1: string = '';
+  partner2: string = '';
+  partner3: string = '';
   panelOpenState: boolean = false;
 
   constructor(
@@ -95,6 +98,12 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/general/org5.png');
     this.org6Url = this.urlInterpolationService.getStaticImageUrl(
       '/general/org6.png');
+    this.partner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner1.png');
+    this.partner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner2.png');
+    this.partner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner3.png');
   }
 
   ngOnDestroy(): void {
