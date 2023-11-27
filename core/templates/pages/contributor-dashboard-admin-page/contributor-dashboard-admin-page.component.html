@@ -36,7 +36,7 @@
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="view-contributor-category-select"
                   class="form-control e2e-test-form-contribution-rights-category-select"
-                  ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
+                  ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CD_USER_RIGHTS_CATEGORIES"
                   ng-model="$ctrl.formData.viewContributionReviewers.category"
                   ng-change="$ctrl.clearResults()">
           </select>
@@ -82,26 +82,26 @@
         <table class="table text-center view-results-table e2e-test-user-review-rights-table">
           <thead>
             <tr>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION"><strong>Review Translations in languages</strong></td>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_QUESTION"><strong>Review Questions</strong></td>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.SUBMIT_QUESTION"><strong>Submit Questions</strong></td>
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.REVIEW_TRANSLATION"><strong>Review Translations in languages</strong></td>
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.REVIEW_QUESTION"><strong>Review Questions</strong></td>
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.SUBMIT_QUESTION"><strong>Submit Questions</strong></td>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION">
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.REVIEW_TRANSLATION">
                 <span ng-if="$ctrl.contributionReviewersResult.REVIEW_TRANSLATION.length === 0"><i>None</i></span>
                 <span ng-repeat="language in $ctrl.contributionReviewersResult.REVIEW_TRANSLATION"
                       class="e2e-test-translation-reviewer-language">
                   <[language]><[$last ? '' : ', ']>
                 </span>
               </td>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_QUESTION">
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.REVIEW_QUESTION">
                 <span class="e2e-test-question-reviewer">
                   <[$ctrl.contributionReviewersResult.REVIEW_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
               </td>
-              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.SUBMIT_QUESTION">
+              <td ng-if="$ctrl.CD_USER_RIGHTS_CATEGORIES.SUBMIT_QUESTION">
                 <span class="e2e-test-question-contributor">
                   <[$ctrl.contributionReviewersResult.SUBMIT_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
@@ -131,7 +131,7 @@
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="add-contribution-rights-category-select"
                   class="form-control e2e-test-form-contribution-rights-category-select"
-                  ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
+                  ng-options="value as key for (key, value) in $ctrl.CD_USER_RIGHTS_CATEGORIES"
                   ng-model="$ctrl.formData.addContributionReviewer.category">
           </select>
         </div>
@@ -181,7 +181,7 @@
         </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="remove-contribution-rights-category-select"
-                  ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
+                  ng-options="value as key for (key, value) in $ctrl.CD_USER_RIGHTS_CATEGORIES"
                   ng-model="$ctrl.formData.removeContributionReviewer.category"
                   class="form-control">
           </select>

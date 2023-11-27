@@ -94,7 +94,7 @@ class ContributionRightsHandler(
         'category': {
             'schema': {
                 'type': 'basestring',
-                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+                'choices': constants.CD_USER_RIGHTS_CATEGORIES
             }
         }
     }
@@ -157,7 +157,7 @@ class ContributionRightsHandler(
 
         language_code = self.normalized_payload.get('language_code', None)
 
-        if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+        if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
             if language_code is None:
                 raise Exception(
                     'The language_code cannot be None if the review category is'
@@ -170,7 +170,7 @@ class ContributionRightsHandler(
                     'language code %s' % (username, language_code))
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+        elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
             if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to review question.' % (
@@ -180,22 +180,22 @@ class ContributionRightsHandler(
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
             # a Bad Request error will be thrown. Hence, 'category' must be
-            # 'constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION' if this
+            # 'constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION' if this
             # branch is executed.
             assert category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
                         username))
             user_services.allow_user_to_submit_question(user_id)
 
-        if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-        ]:
-            email_manager.send_email_to_new_contribution_reviewer(
+        assert category in (
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+        )
+        email_manager.send_email_to_new_cd_user(
                 user_id, category, language_code=language_code)
         self.render_json({})
 
@@ -227,7 +227,7 @@ class ContributionRightsHandler(
         language_code = self.normalized_request.get('language_code')
 
         if (category ==
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
             if language_code is None:
                 raise Exception(
                     'The language_code cannot be None if the review category is'
@@ -241,7 +241,7 @@ class ContributionRightsHandler(
             user_services.remove_translation_review_rights_in_language(
                 user_id, language_code)
         elif category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION):
             if not user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to review question.' % (
@@ -251,24 +251,23 @@ class ContributionRightsHandler(
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
             # a Bad Request error will be thrown. Hence, 'category' must be
-            # 'constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION' if this
+            # 'constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION' if this
             # branch is executed.
             assert category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
             if not user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to submit question.' % (
                         username))
             user_services.remove_question_submit_rights(user_id)
 
-        if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-        ]:
-            email_manager.send_email_to_removed_contribution_reviewer(
+        assert category in (
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+        )
+        email_manager.send_email_to_removed_cd_user(
                 user_id, category, language_code=language_code)
-
         self.render_json({})
 
 
@@ -293,7 +292,7 @@ class ContributorUsersListHandler(
         'category': {
             'schema': {
                 'type': 'basestring',
-                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+                'choices': constants.CD_USER_RIGHTS_CATEGORIES
             }
         }
     }

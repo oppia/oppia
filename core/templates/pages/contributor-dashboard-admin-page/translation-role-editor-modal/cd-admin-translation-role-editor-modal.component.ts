@@ -64,7 +64,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.selectedLanguageId = null;
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         this.username, this.languageIdInUpdate).then(()=> {
         this.languageIdInUpdate = null;
         this.updateLanguageIdsForSelection();
@@ -86,7 +86,7 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
         this.username,
-        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         languageIdToRemove).then(() => {
         this.assignedLanguageIds.splice(languageIdIndex, 1);
         this.languageIdInUpdate = null;

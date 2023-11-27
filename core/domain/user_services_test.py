@@ -4055,7 +4055,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Expected language_code to be None'):
             user_services.get_contributor_usernames(
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
     def test_raise_error_if_no_language_code_provided_with_translation_category(
@@ -4064,25 +4064,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'The language_code cannot be None'):
             user_services.get_contributor_usernames(
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
             )
-
-    def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
-        self
-    ) -> None:
-        usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-        self.assertEqual(usernames, [])
-
-        user_services.allow_user_to_review_voiceover_in_language(
-            self.voice_artist_id, 'hi')
-
-        usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            language_code='hi')
-
-        self.assertEqual(usernames, [self.VOICE_ARTIST_USERNAME])
 
     def test_get_contributor_usernames_with_invalid_category_raises(
         self
@@ -4096,14 +4079,14 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi')
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi')
         self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
 
@@ -4111,24 +4094,24 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION)
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION)
         self.assertEqual(usernames, [self.QUESTION_REVIEWER_USERNAME])
 
     def test_get_contributor_usernames_for_submit_returns_correctly(
         self
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_submit_question(self.question_submitter_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
         self.assertEqual(usernames, [self.QUESTION_SUBMITTER_USERNAME])
 
     def test_remove_question_submit_rights(self) -> None:
