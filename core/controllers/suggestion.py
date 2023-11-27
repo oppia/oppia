@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import user_services
 
@@ -690,6 +691,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     offset: int
     sort_key: str
     exploration_id: Optional[str]
+    topic_name: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -747,9 +749,33 @@ class ReviewableSuggestionsHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
-            }
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
         }
     }
+
+    def _get_skill_ids_for_topic(
+            self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid')
+        return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -804,11 +830,13 @@ class ReviewableSuggestionsHandler(
             if limit is None:
                 raise ValueError(
                     'Limit must be provided for question suggestions.')
+            topic_name = self.normalized_request.get('topic_name')
+            skill_ids = self._get_skill_ids_for_topic(topic_name)
 
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key, skill_ids))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
