@@ -105,6 +105,17 @@ interface TopicIdToTopicNameBackendResponse {
   };
 }
 
+interface UnusedTopicsBackendDict {
+  'unused_topics': {
+    [topicId: string]: TopicBackendDict;
+  };
+}
+
+interface UnusedTopicsResponse {
+  [topicId: string]: TopicBackendDict;
+}
+
+
 export interface TopicIdToTopicNameResponse {
     [topicId: string]: string;
 }
@@ -346,6 +357,16 @@ export class EditableTopicBackendApiService {
        Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesTopicWithUrlFragmentExist(topicUrlFragment, resolve, reject);
+    });
+  }
+
+  async getUnusedTopicsAsync(): Promise<UnusedTopicsResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<UnusedTopicsBackendDict>('/unused_topics_handler').toPromise().then(response => {
+        resolve(response.unused_topics);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
