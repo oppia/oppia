@@ -24,7 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import {DonationBoxModal} from './donation-box/donation-box-modal.component';
+import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 
 interface ImpactStat {
   imageUrl: string | null;
@@ -154,7 +154,7 @@ export class DonatePageComponent implements OnInit {
   }
 
   openDonationBoxModal(): void {
-    this.ngbModal.open(DonationBoxModal, {
+    this.ngbModal.open(DonationBoxModalComponent, {
       backdrop: 'static',
       size: 'xl',
       windowClass: 'donation-box-modal'

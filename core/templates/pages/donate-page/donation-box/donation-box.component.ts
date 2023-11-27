@@ -36,7 +36,7 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
     </iframe>
   `,
 })
-export class DonationBox implements OnInit {
+export class DonationBoxComponent implements OnInit {
   constructor(private insertScriptService: InsertScriptService) {}
 
   ngOnInit(): void {

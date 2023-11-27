@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for thanks for donating modal component.
+ * @fileoverview Tests for the donation box modal component
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
+import { DonationBoxModalComponent } from './donation-box-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -32,14 +31,14 @@ class MockActiveModal {
   }
 }
 
-describe('Thanks For Donating Modal Component', () => {
-  let component: ThanksForDonatingModalComponent;
-  let fixture: ComponentFixture<ThanksForDonatingModalComponent>;
+describe('Donation box modal', () => {
+  let component: DonationBoxModalComponent;
+  let fixture: ComponentFixture<DonationBoxModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [MockTranslatePipe, ThanksForDonatingModalComponent],
+      declarations: [DonationBoxModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
@@ -47,15 +46,12 @@ describe('Thanks For Donating Modal Component', () => {
         }
       ]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ThanksForDonatingModalComponent);
+    fixture = TestBed.createComponent(DonationBoxModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-  it('should close modal', () => {
+  it('should load the script on ngOnInit', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
     component.dismiss();
