@@ -1113,10 +1113,17 @@ def compute_summary_of_topic(
             continue
         story = story_fetchers.get_story_by_id(story_ref.story_id)
 
+        exp_ids = []
+        if story:
+            for node in story.story_contents.get_ordered_nodes():
+                if node.exploration_id is None:
+                    raise Exception(
+                        'No exploration_id found for the node_id: %s'
+                        % node.id)
+                exp_ids.append(node.exploration_id)
+
         topic_model_published_story_exploration_mapping.update({
-            story_ref.story_id: (
-                story.story_contents.get_all_linked_exp_ids()
-                if story else [])
+            story_ref.story_id: exp_ids
         })
 
     total_skill_count = topic_model_uncategorized_skill_count
