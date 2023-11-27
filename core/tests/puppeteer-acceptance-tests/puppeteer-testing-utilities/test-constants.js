@@ -41,9 +41,9 @@ let testConstants = {
       __dirname, '../images/blog-post-thumbnail.svg')
   },
   ContributorRights: {
-    ReviewTranslations: 'REVIEW_TRANSLATIONS',
-    ReviewQuestions: 'REVIEW_QUESTIONS',
-    SubmitQuestions: 'SUBMIT_QUESTIONS',
+    ReviewTranslation: 'REVIEW_TRANSLATION',
+    ReviewQuestion: 'REVIEW_QUESTION',
+    SubmitQuestion: 'SUBMIT_QUESTION',
   },
   DEFAULT_SPEC_TIMEOUT: 300000
 };

@@ -42,14 +42,12 @@ describe('Practice Question Submitter', function() {
   let practiceQuestionSubmitter = null;
 
   beforeAll(async function() {
-    practiceQuestionSubmitter = (
-      await userFactory.createPracticeQuestionSubmitter('questionsubmitter'));
-
     const superAdmin = await userFactory.createNewSuperAdmin('superadmin');
     await superAdmin.assignRoleToUser('superadmin', ROLE_CURRICULUM_ADMIN);
     await superAdmin.assignRoleToUser('superadmin', ROLE_QUESTION_ADMIN);
-    await superAdmin.assignContributionRightToUser('questionsubmitter',
-      CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION);
+
+    practiceQuestionSubmitter = (
+      await userFactory.createPracticeQuestionSubmitter('questionsubmitter')); 
 
     const skill = {
       description: skillDescription,
@@ -75,7 +73,8 @@ describe('Practice Question Submitter', function() {
     await superAdmin.addTopicToClassroom(topicName, classroomName);
   });
 
-  it('should suggest questions by selecting the difficulty to a lesson in a topic', function() {
+  it('should suggest questions by selecting the difficulty to a lesson' +
+    ' in a topic', async function() {
     await practiceQuestionSubmitter.navigateToContributorDashboard();
     await practiceQuestionSubmitter.navigateToSubmitQuestions();
     await practiceQuestionSubmitter.expectSkillOpportunity({

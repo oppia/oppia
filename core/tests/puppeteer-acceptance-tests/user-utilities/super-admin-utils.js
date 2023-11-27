@@ -145,7 +145,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
         ' Ensure that the text is spelled correctly and that the user has ' +
         'the proper role to add said right.');
     }, right);
-    if (right === testConstants.ContributorRights.ReviewTranslations) {
+
+    if (right === testConstants.ContributorRights.ReviewTranslation) {
       await this.page.evaluate(async (language) => {
         const availableLanguages = document.querySelectorAll(
           `${addContributionRightsLanguageSelectDropdown} option`); 
@@ -161,6 +162,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           ' Ensure that the text is spelled correctly.');
       }, language);
     } 
+
     await this.clickOn('button#add-contribution-rights-submit-button');
     await this.page.evaluate(() => {
       const addContributionRightStatus = document.getElementsByClassName(

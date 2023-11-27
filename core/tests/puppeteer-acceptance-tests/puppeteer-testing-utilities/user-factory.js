@@ -22,6 +22,8 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 
+const testConstants = require('./test-constants.js');
+
 /**
  * Global user instances that are created and can be reused again.
  */
@@ -30,6 +32,8 @@ let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 const ROLE_TRANSLATION_ADMIN = 'translation admin';
+
+const CONTRIBUTION_RIGHT_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -135,6 +139,34 @@ let createNewTranslationAdmin = async function(username, email) {
 
   activeUsers.push(translationAdmin);
   return translationAdmin;
+};
+
+/**
+ * The function creates a new practice question submitter user and returns the
+ * instance of that user.
+ * @param {string} username - The username of the practice question submitter.
+ * @returns The practice question submitter instance created.
+ */
+const createPracticeQuestionSubmitter = async function(username, email) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+  // const practiceQuestionAdmin = createPracticeQuestionAdmin('questionAdm');
+
+  const practiceQuestionSubmitter = new e2ePracticeQuestionSubmitter();
+  await practiceQuestionSubmitter.openBrowser();
+  await practiceQuestionSubmitter.signUpNewUser(
+    username, 'questionsubmitter@example.com');
+
+  /* await practiceQuestionAdmin.assignContributionRightToUser(
+    username, testConstants.ContributorRights.SubmitQuestion); */
+  await superAdminInstance.assignContributionRightToUser(
+    username, testConstants.ContributorRights.SubmitQuestion);
+  /* await practiceQuestionAdmin.expectUserToHaveContributionRight(
+    username, testConstants.ContributorRights.SubmitQuestion); */
+
+  activeUsers.push(practiceQuestionSubmitter);
+  return practiceQuestionSubmitter;
 };
 
 /**
