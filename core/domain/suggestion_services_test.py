@@ -1860,6 +1860,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Add a few question suggestions.
         self._create_question_suggestion_with_skill_id('skill1')
         self._create_question_suggestion_with_skill_id('skill2')
+        self._create_question_suggestion_with_skill_id('skill3')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -1875,7 +1876,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.reviewer_id_1,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=['skill1', 'skill2']))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)

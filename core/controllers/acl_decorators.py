@@ -24,6 +24,7 @@ import re
 
 from core import android_validation_constants
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.controllers import base
@@ -33,6 +34,7 @@ from core.domain import classifier_services
 from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import feedback_services
+from core.domain import platform_feature_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1241,8 +1243,19 @@ def can_access_contributor_dashboard_admin_page(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
-                self.user.actions):
+        new_dashboard_enabled = platform_feature_services.is_feature_enabled(
+            platform_feature_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+
+        if new_dashboard_enabled and (
+            role_services
+            .ACTION_ACCESS_NEW_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE
+            in self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        if not new_dashboard_enabled and (
+            role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
+                self.user.actions)):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -1291,13 +1304,13 @@ def can_manage_contributors_role(
             raise self.NotLoggedInException
 
         if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION]:
             if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
                     self.user.actions):
                 return handler(self, category, **kwargs)
         elif category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
             if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
                     self.user.actions):
                 return handler(self, category, **kwargs)

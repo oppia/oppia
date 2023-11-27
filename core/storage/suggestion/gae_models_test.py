@@ -885,96 +885,143 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
-            'skill_1', self.target_version_at_submission,
+            'skill_2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, 'category1',
             suggestion_2_id, self.question_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
-            'skill_1', self.target_version_at_submission,
+            'skill_3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author1',
             'reviewer_2', self.change_cmd, 'category1',
             suggestion_3_id, self.question_language_code)
 
-        results, offset_1 = (
+        results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=limit,
                 offset=0,
                 user_id=user_id,
-                sort_key=None))
+                sort_key=None,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
         self.assertEqual(results[0].id, suggestion_1_id)
-        self.assertEqual(offset_1, 1)
+        self.assertEqual(offset, 1)
+        prev_offset = offset
 
-        results, offset_2 = (
+        results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=limit,
-                offset=offset_1,
+                offset=prev_offset,
                 user_id=user_id,
-                sort_key=None))
+                sort_key=None,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
         self.assertEqual(results[0].id, suggestion_2_id)
-        self.assertEqual(offset_2, 2)
+        self.assertEqual(offset, 2)
+        prev_offset = offset
 
-        results, offset_3 = (
+        results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=limit,
-                offset=offset_2,
+                offset=prev_offset,
                 user_id=user_id,
-                sort_key=None))
+                sort_key=None,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 0)
-        self.assertEqual(offset_3, 2)
+        self.assertEqual(offset, 2)
 
-        sorted_results, offset_4 = (
+        results, offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=limit,
+                offset=0,
+                user_id=user_id,
+                sort_key=None,
+                skill_ids=['skill_2', 'skill_3']))
+        # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, suggestion_2_id)
+
+        sorted_results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
-        self.assertEqual(offset_4, 2)
+        self.assertEqual(offset, 2)
 
-        sorted_results, offset_5 = (
+        sorted_results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
-        self.assertEqual(offset_5, 3)
+        self.assertEqual(offset, 3)
 
-        sorted_results, offset_6 = (
+        sorted_results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=None))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, suggestion_2_id)
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
-        self.assertEqual(offset_6, 3)
+        self.assertEqual(offset, 3)
+
+        sorted_results, offset = (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_question_suggestions_by_offset(
+                limit=10,
+                offset=0,
+                user_id=user_id,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=['skill_1', 'skill_3']))
+        # Ruling out the possibility of None for mypy type checking.
+        assert sorted_results is not None
+        self.assertEqual(len(sorted_results), 1)
+        self.assertEqual(sorted_results[0].id, suggestion_1_id)
+        self.assertEqual(offset, 2)
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            'skill_ids list can\'t be empty'):
+            (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_question_suggestions_by_offset(
+                    limit=10,
+                    offset=0,
+                    user_id=user_id,
+                    sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                    skill_ids=[]))
 
     def test_user_created_suggestions_by_offset(self) -> None:
         authored_translation_suggestion_id = 'exploration.exp1.thread_6'
