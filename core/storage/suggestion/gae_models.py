@@ -870,7 +870,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         limit: int,
         offset: int,
         user_id: str,
-        sort_key: Optional[str]
+        sort_key: Optional[str],
+        skill_ids: Optional[List[str]],
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -883,6 +884,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
+            skill_ids: List[str] | None. The skills for which to return
+                question suggestions. None for returning all suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -891,17 +894,29 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     one of the supplied language codes.
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
+
+        Raises:
+            RuntimeError. If skill_ids is empty.
         """
+
+        filters = [
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        ]
+
+        if skill_ids is not None:
+            # If this is not filtered here, gae throws BadQueryError.
+            if len(skill_ids) == 0:
+                raise RuntimeError('skill_ids list can\'t be empty')
+
+            filters.append(cls.target_id.IN(skill_ids))
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
             suggestion_query = cls.get_all().filter(
-                datastore_services.all_of(
-                    cls.status == STATUS_IN_REVIEW,
-                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            )).order(-cls.created_on)
+                datastore_services.all_of(*filters)).order(-cls.created_on)
 
             sorted_results: List[GeneralSuggestionModel] = []
             num_suggestions_per_fetch = 1000
@@ -924,11 +939,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 offset
             )
 
-        suggestion_query = cls.get_all().filter(datastore_services.all_of(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            cls.author_id != user_id
-        ))
+        filters.append(cls.author_id != user_id)
+        suggestion_query = cls.get_all().filter(
+            datastore_services.all_of(*filters))
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
