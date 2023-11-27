@@ -34,6 +34,10 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CookieModule } from 'ngx-cookie';
 import { ToastrModule } from 'ngx-toastr';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+// This throws "TS2307". We need to
+// suppress this error because hammer come from hammerjs
+// dependency. We can't import it directly.
+// @ts-ignore
 import * as hammer from 'hammerjs';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
