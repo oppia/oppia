@@ -16,6 +16,7 @@
  * @fileoverview Tests for the donation box modal component
  */
 
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -44,14 +45,15 @@ describe('Donation box modal', () => {
           provide: NgbActiveModal,
           useClass: MockActiveModal
         }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
     fixture = TestBed.createComponent(DonationBoxModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-  it('should load the script on ngOnInit', () => {
+  it('should dismiss the modal', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 
     component.dismiss();
