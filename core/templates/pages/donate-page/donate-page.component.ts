@@ -112,12 +112,12 @@ export class DonatePageComponent implements OnInit {
 
   highlights: Highlight[] = [
     {
-      imageUrl: '/donate/highlights-1.png',
+      imageUrl: '/donate/highlights-1',
       heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_1',
       text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_1',
     },
     {
-      imageUrl: '/donate/highlights-2.png',
+      imageUrl: '/donate/highlights-2',
       heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_2',
       text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
     },
@@ -130,7 +130,8 @@ export class DonatePageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const searchParams = new URLSearchParams(this.windowRef.nativeWindow.location.search);
+    const searchParams = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search);
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
       this.ngbModal.open(ThanksForDonatingModalComponent, {
