@@ -27,6 +27,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
+import { AddTopicToClassroomModalComponent } from './modals/add-topic-to-classroom-modal.component';
 import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
@@ -353,6 +354,21 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.topicNames = Object.values(this.topicIdsToTopicName);
         this.topicDependencyIsLoaded = true;
       }
+    });
+  }
+
+  openAddTopicModal(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      AddTopicToClassroomModalComponent, {
+        backdrop: 'static'
+      }
+    );
+    modalRef.componentInstance.topicsList = [];
+    modalRef.result.then((selectedTopicIds: string[]) => {
+      selectedTopicIds.forEach(topicId => {
+        this.addTopicId(topicId);
+      });
+    }).catch(error => {
     });
   }
 

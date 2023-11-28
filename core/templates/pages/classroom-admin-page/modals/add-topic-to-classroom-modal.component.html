@@ -1,0 +1,38 @@
+<div class="modal-header">
+    <h4 class="modal-title">Ajouter des sujets à la salle de classe</h4>
+    <button type="button" class="close" (click)="close()">
+      <span>&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form *ngIf="topicForm" [formGroup]="topicForm">
+      <div class="form-check" *ngFor="let topic of topicBackendDictList">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [id]="topic.id"
+          [formControlName]="topic.id"
+        />
+        <label class="form-check-label" [for]="topic.id">
+          {{ topic.name }}
+        </label>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="close()"
+    >
+        Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="addTopics()"
+    >
+      Add Topics
+    </button>
+  </div>
+  

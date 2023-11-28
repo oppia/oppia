@@ -211,30 +211,11 @@
             </div>
 
             <div *ngIf="classroomEditorMode">
-              <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
-                <input [(ngModel)]="newTopicId"
-                       class="form-control new-topic-input e2e-test-add-topic-to-classroom-input"
-                       (ngModelChange)="onNewTopicInputModelChange()"
-                       placeholder="Topic ID">
-                <button (click)="removeNewTopicInputField()"
-                        class="btn btn-secondary">
-                  Cancel
-                </button>
-                <button (click)="addTopicId(newTopicId)"
-                        class="btn btn-success e2e-test-submit-topic-id-to-classroom-button"
-                        [disabled]="newTopicId.length === 0">
-                  Submit
-                </button>
-              </div>
-
-              <button (click)="showNewTopicInputField()"
+              <button (click)="openAddTopicModal()"
                       *ngIf="!newTopicCanBeAdded"
                       class="btn btn-secondary add-new-topic e2e-test-add-topic-to-classroom-button">
                 Add Topic
               </button>
-              <p *ngIf="!topicWithGivenIdExists" class="oppia-warning-text" >
-                Topic with given ID does not exist.
-              </p>
             </div>
           </div>
 
