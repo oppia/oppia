@@ -118,7 +118,7 @@ describe('Full exploration editor', function() {
 
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
-        await richTextEditor.appendPlainText('How are you feeling?');
+        await richTextEditor.appendPlainText('How are you feeling today?');
       }, true);
       await action.waitForAutosave();
       await users.logout();
@@ -129,7 +129,7 @@ describe('Full exploration editor', function() {
       await users.login('user14@editor.com');
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
-        await richTextEditor.appendPlainText('You must be feeling great?');
+        await richTextEditor.appendPlainText('Are you feeling great?');
       }, true);
       await explorationEditorPage.saveChanges();
       await users.logout();
@@ -146,7 +146,7 @@ describe('Full exploration editor', function() {
       await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
-          await richTextChecker.readPlainText('You must be feeling great?');
+          await richTextChecker.readPlainText('Are you feeling great?');
         }
       );
       await users.logout();
