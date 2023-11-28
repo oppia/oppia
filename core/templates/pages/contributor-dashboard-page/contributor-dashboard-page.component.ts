@@ -113,19 +113,20 @@ export class ContributorDashboardPageComponent
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
 
-    const isReviewingQuestionSuggestions = (
+    const userIsReviewingQuestionSuggestions = (
       activeTabType === 'reviews' &&
       activeSuggestionType === 'add_question' &&
       this.activeTabName !== 'submitQuestionTab'
     );
+    const userIsReviewingTranslationSuggestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'translate_content' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
 
     return activeTabDetail.customizationOptions.includes('topic') ||
-      isReviewingQuestionSuggestions ||
-      (
-        activeTabType === 'reviews' &&
-        activeSuggestionType === 'translate_content' &&
-        this.activeTabName !== 'submitQuestionTab'
-      );
+      userIsReviewingQuestionSuggestions ||
+      userIsReviewingTranslationSuggestions;
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
