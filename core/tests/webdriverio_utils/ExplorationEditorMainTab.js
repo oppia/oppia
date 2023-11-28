@@ -516,6 +516,8 @@ var ExplorationEditorMainTab = function() {
   // possible to click on them to view their contents, as clicks instead open
   // the rich text editor.
   this.expectContentToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      stateContentDisplay, 'State content display not showing up');
     await forms.expectRichText(stateContentDisplay).toMatch(
       richTextInstructions);
   };
