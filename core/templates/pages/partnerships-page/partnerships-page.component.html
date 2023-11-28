@@ -372,8 +372,8 @@
 
   @media screen and (max-width: 600px) {
     .oppia-partnerships-banner {
-      margin: 60px 20px;
       flex-direction: column;
+      margin: 60px 20px;
     }
 
     .oppia-partnerships-banner-content {
@@ -617,9 +617,9 @@
   .partner-container mat-card-content {
     align-items: center;
     background-color: #fff;
-    border: 1px solid var(--Dark-Green, #003C34);
+    border: 1px solid var(--Dark-Green, #003c34);
     border-radius: 4px;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 10 0px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -648,24 +648,24 @@
     text-decoration: none;
   }
 
-  ::ng-deep .carousel-control-prev-icon,
-  ::ng-deep .carousel-control-next-icon {
+  :host ::ng-deep .carousel-control-prev-icon,
+  :host ::ng-deep .carousel-control-next-icon {
       filter: invert(50%);
       margin: 0 10px;
   }
 
-  ::ng-deep .carousel-control-prev-icon {
+  :host ::ng-deep .carousel-control-prev-icon {
     margin-left: -5em;
   }
 
-  ::ng-deep .carousel-control-next-icon {
+  :host ::ng-deep .carousel-control-next-icon {
     margin-right: -5em;
   }
 
   @media screen and (max-width: 900px) {
     .partner-container mat-card-content img {
       height: 80px;
-      margin: 2em 0em 2em;
+      margin: 2em 0 2em;
       width: auto;
     }
 
@@ -709,8 +709,8 @@
 
   .learners-container mat-card-content img {
     height: auto;
-    padding: 0 3em;
     max-width: 310px;
+    padding: 0 3em;
     width: 100%;
   }
 
@@ -723,7 +723,7 @@
   }
 
   .learner-content h4 {
-    color: #000000;
+    color: #000;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 1.3em;
   }
@@ -741,8 +741,8 @@
     }
 
     .learners-container mat-card-content img {
-      padding: 0 1em;
       max-width: 210px;
+      padding: 0 1em;
       width: 100%;
     }
 
@@ -762,18 +762,18 @@
 
   @media only screen and (max-width: 600px) {
     .learners-container mat-card-content {
-        flex-direction: column;
-        align-items: center;
+      align-items: center;
+      flex-direction: column;
     }
 
     .learners-container mat-card-content img {
-        padding: 0;
-        max-width: 310px;
+      max-width: 310px;
+      padding: 0;
     }
 
     .learner-content h4,
     .learner-content p {
-        text-align: center;
+      text-align: center;
     }
   }
 
