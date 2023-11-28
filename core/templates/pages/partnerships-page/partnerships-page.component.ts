@@ -50,6 +50,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   partner1: string = '';
   partner2: string = '';
   partner3: string = '';
+  learner1: string = '';
+  learner2: string = '';
+  learner3: string = '';
   panelOpenState: boolean = false;
 
   constructor(
@@ -104,6 +107,12 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/general/partner2.png');
     this.partner3 = this.urlInterpolationService.getStaticImageUrl(
       '/general/partner3.png');
+    this.learner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner1.png');
+    this.learner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner2.png');
+    this.learner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner3.png');
   }
 
   ngOnDestroy(): void {

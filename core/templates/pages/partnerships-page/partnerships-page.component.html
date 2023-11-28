@@ -162,7 +162,7 @@
           <img alt="partner logo" [src]="partner1">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+          <a href="https://www.oppia.org/blog"
                target="_blank"
                rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
@@ -172,7 +172,7 @@
           <img alt="partner logo" [src]="partner2">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2' | translate }}</p>
-          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+          <a href="https://www.oppia.org/blog"
                target="_blank"
                rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
@@ -182,7 +182,7 @@
           <img alt="partner logo" [src]="partner3">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3' | translate }}</p>
-          <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+          <a href="https://www.oppia.org/blog"
                target="_blank"
                rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
@@ -196,6 +196,41 @@
            {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}
         </a>
       </button>      
+    </div>
+  </div>
+
+  <div class="learner-stories">
+    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES' | translate }}</h3>
+    <div class="learners-container">
+      <ngb-carousel>
+        <ng-template ngbSlide>
+          <mat-card-content>
+            <img alt="learner image" [src]="learner1">
+            <div class="learner-content">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_1_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_1' | translate }}</p>
+            </div>
+          </mat-card-content>
+        </ng-template>
+        <ng-template ngbSlide>
+          <mat-card-content>
+            <img alt="learner image" [src]="learner2">
+            <div class="learner-content">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_2_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_2' | translate }}</p>
+            </div>
+          </mat-card-content>
+        </ng-template>
+        <ng-template ngbSlide>
+          <mat-card-content>
+            <img alt="learner image" [src]="learner3">
+            <div class="learner-content">
+              <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_3_HEADING' | translate }}</h4>
+              <p>{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES_3' | translate }}</p>
+            </div>
+          </mat-card-content>
+        </ng-template>
+      </ngb-carousel>
     </div>
   </div>
 
@@ -336,6 +371,17 @@
   }
 
   @media screen and (max-width: 600px) {
+    .oppia-partnerships-banner {
+      margin: 60px 20px;
+      flex-direction: column;
+    }
+
+    .oppia-partnerships-banner-content {
+      align-items: center;
+      margin: 0 auto;
+      width: 100%;
+    }
+
     .oppia-partnerships-h1 {
       font-size: 1.5em;
     }
@@ -439,21 +485,7 @@
     width: 40%;
   }
 
-  @media screen and (max-width: 900px) {
-    .partering-with-oppia-content p {
-      font-size: 0.8em;
-    }
-
-    .partering-with-oppia-container {
-      margin: 3em 4em;
-    }
-
-    .partering-with-oppia-image {
-      width: 60%;
-    }
-  }
-
-  @media screen and (max-width: 600px) {
+  @media only screen and (max-width: 768px) {
     .partering-with-oppia-image {
       width: 80%;
     }
@@ -658,6 +690,90 @@
 
     .partner-container mat-card-content a {
       font-size: 0.8em;
+    }
+  }
+
+  .learner-stories {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .learners-container mat-card-content {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    padding: 3em 1em 2em;
+  }
+
+  .learners-container mat-card-content img {
+    height: auto;
+    padding: 0 3em;
+    max-width: 310px;
+    width: 100%;
+  }
+
+  .learner-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+  }
+
+  .learner-content h4 {
+    color: #000000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .learner-content p {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    padding: 0 2em;
+    text-align: center;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .learners-container mat-card-content {
+      padding: 2em 1em;
+    }
+
+    .learners-container mat-card-content img {
+      padding: 0 1em;
+      max-width: 210px;
+      width: 100%;
+    }
+
+    .learner-content h4 {
+      font-size: 1em;
+    }
+
+    .learner-content p {
+      font-size: 0.8em;
+      padding: 1em;
+    }
+
+    .learners-container {
+      margin: 0 2em;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    .learners-container mat-card-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .learners-container mat-card-content img {
+        padding: 0;
+        max-width: 310px;
+    }
+
+    .learner-content h4,
+    .learner-content p {
+        text-align: center;
     }
   }
 
