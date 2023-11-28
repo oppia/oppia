@@ -39,6 +39,7 @@ describe('Question Admin', function() {
       await userFactory.closeBrowserForUser(reviewer);
       await questionAdmin.navigateToContributorDashboardAdminPage();
 
+      await questionAdmin.expectUserToNotBeDisplayed('reviewer');
       await questionAdmin.addReviewQuestionRights('reviewer');
 
       await questionAdmin.viewContributionRightsForUser('reviewer');

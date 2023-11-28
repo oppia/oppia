@@ -20,7 +20,7 @@ const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
-const ContributorDashboardAdminUrl =
+const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
@@ -58,7 +58,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * Function for navigating to the contributor dashboard admin page.
    */
   async navigateToContributorDashboardAdminPage() {
-    await this.goto(ContributorDashboardAdminUrl);
+    await this.goto(contributorDashboardAdminUrl);
   }
 
   /**
@@ -157,7 +157,7 @@ module.exports = class QuestionAdmin extends baseUser {
     );
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} still has the right to review question!`);
+        `${username} has the right to review question!`);
     }
   }
 };
