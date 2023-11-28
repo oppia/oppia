@@ -285,7 +285,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (results.isQuestionSubmitter) {
               this.contributorDashboardAdminBackendApiService
                 .addContributionReviewerAsync(
-                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                  AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                   username,
                   null
                 );
@@ -293,7 +293,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               this.contributorDashboardAdminBackendApiService
                 .removeContributionReviewerAsync(
                   username,
-                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+                  AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                   null
                 );
             }
@@ -302,7 +302,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (results.isQuestionReviewer) {
               this.contributorDashboardAdminBackendApiService
                 .addContributionReviewerAsync(
-                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                  AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                   username,
                   null
                 );
@@ -310,7 +310,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               this.contributorDashboardAdminBackendApiService
                 .removeContributionReviewerAsync(
                   username,
-                  AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                  AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                   null
                 );
             }
