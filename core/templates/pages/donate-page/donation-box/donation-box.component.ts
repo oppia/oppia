@@ -25,6 +25,7 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
   template: `
     <iframe
       src="https://donorbox.org/embed/test-campaign-628"
+      class='e2e-test-donate-page-iframe'
       name="donorbox"
       allow="payment"
       seamless="seamless"
