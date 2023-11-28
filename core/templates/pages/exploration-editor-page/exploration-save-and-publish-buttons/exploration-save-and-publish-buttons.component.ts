@@ -152,7 +152,7 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.explorationSaveService.showPublishExplorationModal(
       this.showLoadingDots.bind(this),
       this.hideLoadingAndUpdatePermission.bind(this))
-      .then(() => {
+      .finally(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
         this.entityTranslationsService.reset();

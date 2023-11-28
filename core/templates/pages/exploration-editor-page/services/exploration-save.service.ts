@@ -108,28 +108,22 @@ export class ExplorationSaveService {
       onStartSaveCallback: Function,
       onSaveDoneCallback: Function): Promise<void> {
     // This is resolved when modal is closed.
-    return new Promise((resolve, reject) => {
-      this.ngbModal.open(ExplorationPublishModalComponent, {
-        backdrop: 'static',
-      }).result.then(() => {
-        if (onStartSaveCallback) {
-          onStartSaveCallback();
-        }
-        this.explorationRightsService.publish().then(
-          () => {
-            if (onSaveDoneCallback) {
-              onSaveDoneCallback();
-            }
+    return this.ngbModal.open(ExplorationPublishModalComponent, {
+      backdrop: 'static',
+    }).result.then(() => {
+      if (onStartSaveCallback) {
+        onStartSaveCallback();
+      }
+      return this.explorationRightsService.publish().then(
+        () => {
+          if (onSaveDoneCallback) {
+            onSaveDoneCallback();
+          }
 
-            this.showCongratulatorySharingModal();
-            this.siteAnalyticsService.registerPublishExplorationEvent(
-              this.explorationDataService.explorationId);
-            resolve();
-          });
-      }, () => {
-        this.alertsService.clearWarnings();
-        resolve();
-      });
+          this.showCongratulatorySharingModal();
+          this.siteAnalyticsService.registerPublishExplorationEvent(
+            this.explorationDataService.explorationId);
+        });
     });
   }
 
@@ -295,64 +289,49 @@ export class ExplorationSaveService {
   showPublishExplorationModal(
       onStartLoadingCallback: Function,
       onEndLoadingCallback: Function): Promise<void> {
-    // This is resolved after publishing modals are closed,
-    // so we can remove the loading-dots.
-    return new Promise((resolve, reject) => {
-      this.siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-        this.explorationDataService.explorationId);
-      this.alertsService.clearWarnings();
+    this.siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+      this.explorationDataService.explorationId);
+    this.alertsService.clearWarnings();
 
-      // If the metadata has not yet been specified, open the pre-publication
-      // 'add exploration metadata' modal.
-      if (this.isAdditionalMetadataNeeded()) {
-        const modalInstance = this.ngbModal.open(
-          ExplorationMetadataModalComponent, {
-            backdrop: 'static',
-          });
+    // If the metadata has not yet been specified, open the pre-publication
+    // 'add exploration metadata' modal.
+    if (!this.isAdditionalMetadataNeeded()) {
+      // No further metadata is needed. Open the publish modal immediately.
+      return this.openPublishExplorationModal(
+        onStartLoadingCallback, onEndLoadingCallback);
+    }
+    const modalInstance = this.ngbModal.open(
+      ExplorationMetadataModalComponent, {
+        backdrop: 'static',
+      });
 
-        modalInstance.result.then((metadataList) => {
-          if (metadataList.length > 0) {
-            const commitMessage = (
-              'Add metadata: ' + metadataList.join(', ') + '.');
+    return modalInstance.result.then((metadataList) => {
+      if (metadataList.length > 0) {
+        const commitMessage = (
+          'Add metadata: ' + metadataList.join(', ') + '.');
 
-            if (onStartLoadingCallback) {
-              onStartLoadingCallback();
-            }
+        if (onStartLoadingCallback) {
+          onStartLoadingCallback();
+        }
 
-            this.saveDraftToBackend(commitMessage).then(() => {
-              if (onEndLoadingCallback) {
-                onEndLoadingCallback();
-              }
-              this.openPublishExplorationModal(
-                onStartLoadingCallback, onEndLoadingCallback)
-                .then(() => {
-                  resolve();
-                });
-            });
-          } else {
-            this.openPublishExplorationModal(
-              onStartLoadingCallback, onEndLoadingCallback)
-              .then(() => {
-                resolve();
-              });
+        return this.saveDraftToBackend(commitMessage).then(() => {
+          if (onEndLoadingCallback) {
+            onEndLoadingCallback();
           }
-        }, () => {
-          resolve();
-          this.explorationTitleService.restoreFromMemento();
-          this.explorationObjectiveService.restoreFromMemento();
-          this.explorationCategoryService.restoreFromMemento();
-          this.explorationLanguageCodeService.restoreFromMemento();
-          this.explorationTagsService.restoreFromMemento();
-          this.alertsService.clearWarnings();
+          return this.openPublishExplorationModal(
+            onStartLoadingCallback, onEndLoadingCallback);
         });
       } else {
-        // No further metadata is needed. Open the publish modal immediately.
-        this.openPublishExplorationModal(
-          onStartLoadingCallback, onEndLoadingCallback)
-          .then(() => {
-            resolve();
-          });
+        return this.openPublishExplorationModal(
+          onStartLoadingCallback, onEndLoadingCallback);
       }
+    }).catch((error) => {
+      this.explorationTitleService.restoreFromMemento();
+      this.explorationObjectiveService.restoreFromMemento();
+      this.explorationCategoryService.restoreFromMemento();
+      this.explorationLanguageCodeService.restoreFromMemento();
+      this.explorationTagsService.restoreFromMemento();
+      throw error;
     });
   }
 
