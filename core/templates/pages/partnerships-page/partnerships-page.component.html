@@ -92,6 +92,15 @@
     </div>
   </div>
 
+  <div class="oppia-partners-video">
+    <iframe class="oppia-partners-video-iframe"
+            src="https://drive.google.com/file/d/18KeSXp1050MT0kePmFqfKwTrdscd8uYW/preview"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+    </iframe>
+  </div>
+
   <div class="oppia-partners">
     <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_OUR_PARTNERS' | translate }}</h3>
     <p class="oppia-partners-content">{{ 'I18N_PARTNERSHIPS_PAGE_OUR_PARTNERS_CONTENT' | translate }}</p>
@@ -462,6 +471,28 @@
 
     .partering-with-oppia-content p {
       font-size: 0.8em;
+    }
+  }
+
+  .oppia-partners-video {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .oppia-partners-video-iframe {
+    height: 500px;
+    width: 80%;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partners-video-iframe {
+      height: 400px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partners-video-iframe {
+      height: 300px;
     }
   }
 
