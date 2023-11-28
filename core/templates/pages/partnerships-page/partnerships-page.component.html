@@ -124,9 +124,7 @@
               <img class="partner-logo" alt="partner logo" [src]="partner1">
               <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
               <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
-                   target="_blank"
-                   rel="noopener">
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8" target="_blank" rel="noopener">
                    {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
               </a>
             </mat-card-content>
@@ -136,9 +134,7 @@
               <img class="partner-logo" alt="partner logo" [src]="partner2">
               <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2_HEADING' | translate }}</h4>
               <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2' | translate }}</p>
-              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
-                   target="_blank"
-                   rel="noopener">
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8" target="_blank" rel="noopener">
                    {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
               </a>
             </mat-card-content>
@@ -148,9 +144,7 @@
               <img class="partner-logo" alt="partner logo" [src]="partner3">
               <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3_HEADING' | translate }}</h4>
               <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3' | translate }}</p>
-              <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
-                   target="_blank"
-                   rel="noopener">
+              <a href="https://forms.gle/Y71U8FdhQwZpicJj8" target="_blank" rel="noopener">
                    {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
               </a>
             </mat-card-content>
@@ -162,9 +156,7 @@
           <img alt="partner logo" [src]="partner1">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-          <a href="https://www.oppia.org/blog"
-               target="_blank"
-               rel="noopener">
+          <a href="https://www.oppia.org/blog" target="_blank" rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
           </a>
         </mat-card-content>
@@ -172,9 +164,7 @@
           <img alt="partner logo" [src]="partner2">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_2' | translate }}</p>
-          <a href="https://www.oppia.org/blog"
-               target="_blank"
-               rel="noopener">
+          <a href="https://www.oppia.org/blog" target="_blank" rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
           </a>
         </mat-card-content>
@@ -182,20 +172,16 @@
           <img alt="partner logo" [src]="partner3">
           <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3_HEADING' | translate }}</h4>
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_3' | translate }}</p>
-          <a href="https://www.oppia.org/blog"
-               target="_blank"
-               rel="noopener">
+          <a href="https://www.oppia.org/blog" target="_blank" rel="noopener">
                {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
           </a>
         </mat-card-content>
       </div>
       <button class="btn">
-        <a href="https://www.oppia.org/blog"
-           target="_blank"
-           rel="noopener">
+        <a href="https://www.oppia.org/blog" target="_blank" rel="noopener">
            {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}
         </a>
-      </button>      
+      </button>
     </div>
   </div>
 
@@ -619,7 +605,7 @@
     background-color: #fff;
     border: 1px solid var(--Dark-Green, #003c34);
     border-radius: 4px;
-    box-shadow: 0 0 10 0px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 10 0 rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -629,7 +615,7 @@
 
   .partner-container mat-card-content img {
     height: 100px;
-    margin: 3em 0em 3em;
+    margin: 3em 0 3em;
     width: auto;
   }
 
@@ -648,18 +634,20 @@
     text-decoration: none;
   }
 
-  :host ::ng-deep .carousel-control-prev-icon,
-  :host ::ng-deep .carousel-control-next-icon {
-      filter: invert(50%);
-      margin: 0 10px;
-  }
+  :host {
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        filter: invert(50%);
+        margin: 0 10px;
+    }
 
-  :host ::ng-deep .carousel-control-prev-icon {
-    margin-left: -5em;
-  }
+    .carousel-control-prev-icon {
+      margin-left: -5em;
+    }
 
-  :host ::ng-deep .carousel-control-next-icon {
-    margin-right: -5em;
+    .carousel-control-next-icon {
+      margin-right: -5em;
+    }
   }
 
   @media screen and (max-width: 900px) {
@@ -681,7 +669,7 @@
   @media screen and (max-width: 600px) {
     .partner-container mat-card-content img {
       height: 60px;
-      margin: 2em 0em 2em;
+      margin: 2em 0 2em;
     }
 
     .partner-container mat-card-content p {
