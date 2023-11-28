@@ -49,15 +49,88 @@ interface Highlight {
   styleUrls: [],
 })
 export class DonatePageComponent implements OnInit {
+  donationValues: DonationValue[] = [
+    {
+      amount: '10',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_1',
+    },
+    {
+      amount: '25',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_2',
+    },
+    {
+      amount: '100',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_3',
+    },
+  ];
+
+  impactStats: ImpactStat[][] = [
+    [
+      {
+        imageUrl: '/donate/content-2-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_1',
+      },
+      {
+        imageUrl: '/donate/content-2-screen.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_2',
+      },
+    ],
+    [
+      {
+        imageUrl: '/donate/content-2-phone.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_3',
+      },
+      {
+        imageUrl: '/donate/content-2-area-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_4',
+      },
+      {
+        imageUrl: '/donate/content-2-visitors.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_5',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '98%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_6',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '90%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_7',
+      },
+    ],
+  ];
+
+  highlights: Highlight[] = [
+    {
+      imageUrl: '/donate/highlights-1.png',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_1',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_1',
+    },
+    {
+      imageUrl: '/donate/highlights-2.png',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_2',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
+    },
+  ];
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
-    const searchParams = new URLSearchParams(
-      this.windowRef.nativeWindow.location.search);
+    const searchParams = new URLSearchParams(this.windowRef.nativeWindow.location.search);
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
       this.ngbModal.open(ThanksForDonatingModalComponent, {
@@ -65,88 +138,6 @@ export class DonatePageComponent implements OnInit {
         size: 'xl',
       });
     }
-  }
-
-  get donationValues(): DonationValue[] {
-    return [
-      {
-        amount: 'Your $10',
-        description: 'could provide the funds needed to educate 25 children on our platform.',
-      },
-      {
-        amount: 'Your $25',
-        description:
-          'could contribute to a program educating 20 children through a partner organization for a day.',
-      },
-      {
-        amount: 'Your $100',
-        description:
-          'could buy a phone for a child in Nigeria, allowing offline access to education.',
-      },
-    ];
-  }
-
-  get impactStats(): ImpactStat[][] {
-    return [
-      [
-        {
-          imageUrl: '/donate/content-2-graph.svg',
-          stat: null,
-          text: '60% Improved Test Results',
-        },
-        {
-          imageUrl: '/donate/content-2-screen.svg',
-          stat: null,
-          text: '10,500 Active Web Users',
-        },
-      ],
-      [
-        {
-          imageUrl: '/donate/content-2-phone.svg',
-          stat: null,
-          text: '100,000+ Downloads',
-        },
-        {
-          imageUrl: '/donate/content-2-area-graph.svg',
-          stat: null,
-          text: '6x Visitors Per Month',
-        },
-        {
-          imageUrl: '/donate/content-2-visitors.svg',
-          stat: null,
-          text: '443,000 Web Visitors',
-        },
-      ],
-      [
-        {
-          imageUrl: null,
-          stat: '98%',
-          text: 'of surveyed users said that they are encouraged to try out more lessons after using Oppia',
-        },
-      ],
-      [
-        {
-          imageUrl: null,
-          stat: '90%',
-          text: 'of surveyed users said that they would recommend Oppia to a friend',
-        },
-      ],
-    ];
-  }
-
-  get highlights(): Highlight[] {
-    return [
-      {
-        imageUrl: '/donate/highlights-1.png',
-        heading: 'Center for Youth Studies',
-        text: "This partnership provides after-school classes in Uyo, Akwa Ibom, South-South Nigeria. The program uses Oppia's resources to help primary and secondary school students.",
-      },
-      {
-        imageUrl: '/donate/highlights-2.png',
-        heading: 'The Special Youth Foundation',
-        text: "Our partnership started in 2022 to provide free maths lessons to young learners across 2 communities in Lagos, Nigeria. This partnership helped us reach over a 100 students with Oppia's maths lessons.",
-      },
-    ];
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -157,7 +148,7 @@ export class DonatePageComponent implements OnInit {
     this.ngbModal.open(DonationBoxModalComponent, {
       backdrop: 'static',
       size: 'xl',
-      windowClass: 'donation-box-modal'
+      windowClass: 'donation-box-modal',
     });
   }
 }

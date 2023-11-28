@@ -6,14 +6,12 @@
           <img [src]="getStaticImageUrl('/donate/content-1-head.png')" />
           <div class="donate-content-padding">
             <div class="donate-message-1 donate-message-1-border">
-              <p class="donate-heading-1">Oppia provides global access to quality education</p>
+              <p class="donate-heading-1">{{ 'I18N_DONATE_PAGE_CONTENT_HEADING_1' | translate }}</p>
               <p class="donate-text-1">
-                <span class="donate-font-weight-700"
-                  >Oppia's platforms help to address global education inequality, and ensure that
-                  quality education can reach everyone.</span
-                >
-                Your contribution helps us bridge gaps and empower learners from underserved
-                communities around the world.
+                <span class="donate-font-weight-700">{{
+                  'I18N_DONATE_PAGE_CONTENT_TEXT_1_BOLD' | translate
+                }}</span>
+                {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }}
               </p>
             </div>
             <div
@@ -21,10 +19,13 @@
               *ngFor="let donationValue of donationValues"
             >
               <p class="donate-heading-1 donate-font-green donate-font-weight-600">
-                {{ donationValue.amount }}
+                {{
+                  'I18N_DONATE_PAGE_CONTENT_DONATION_AMOUNT'
+                    | translate : { amount: donationValue.amount }
+                }}
               </p>
               <p class="donate-text-1">
-                {{ donationValue.description }}
+                {{ donationValue.description | translate }}
               </p>
             </div>
           </div>
@@ -33,11 +34,11 @@
           <img [src]="getStaticImageUrl('/donate/content-2-head.png')" />
           <div class="donate-content-padding">
             <div class="donate-message-1">
-              <p class="donate-heading-1 donate-font-white donate-font-weight-600">Our Impact</p>
+              <p class="donate-heading-1 donate-font-white donate-font-weight-600">
+                {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_2' | translate }}
+              </p>
               <p class="donate-text-1 donate-font-white">
-                These statistics showcase the profound impact of Oppia on individuals and
-                communities as of 2022. Your support ensures that we can continue this journey of
-                educational transformation.
+                {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_2' | translate }}
               </p>
             </div>
             <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats">
@@ -50,7 +51,7 @@
                     />
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
-                  <p>{{ impactStat.text }}</p>
+                  <p>{{ impactStat.text | translate }}</p>
                 </div>
               </div>
             </div>
@@ -58,50 +59,46 @@
         </div>
         <div class="donate-content-1 no-border">
           <div class="donate-content-padding">
-            <div class="donate-heading-1 donate-font-weight-600">Our Network</div>
+            <div class="donate-heading-1 donate-font-weight-600">
+              {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_3' | translate }}
+            </div>
             <p class="donate-text-1">
-              We're proud to highlight some of our partners who share our commitment to accessible
-              education. These partnerships are vital to our mission of securing quality education
-              for all. Additionally, we're honored to highlight some of our learners who have
-              benefited from Oppia's approach to global education.
+              {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_3' | translate }}
             </p>
             <div class="donate-highlights">
-              <p>Highlights</p>
+              <p>{{ 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS' | translate }}</p>
               <div>
                 <div class="donate-hightlights-tile" *ngFor="let highlight of highlights">
                   <img [src]="getStaticImageUrl(highlight.imageUrl)" />
                   <div>
-                    <p>{{ highlight.heading }}</p>
-                    <p>{{ highlight.text }}</p>
+                    <p>{{ highlight.heading | translate }}</p>
+                    <p>{{ highlight.text | translate }}</p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="donate-our-learners">
-              <p>Our learners</p>
+              <!--Add the learners heading and carousel here-->
+              <p></p>
               <div class="learner-carousel"></div>
             </div>
           </div>
         </div>
         <div class="donate-content-1">
           <div class="donate-content-padding donate-today-content">
-            <p>Ready to make an impact?</p>
-            <p>Donate today!</p>
-            <p>
-              Join our mission to provide global access to quality education. Every contribution
-              helps. Donate now and help us empower learners worldwide.
-            </p>
-            <p>
-              If you would like to learn more about what we're doing at Oppia or how your
-              contribution could make a specific impact, reach out to us at contact@oppia.org.
-            </p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_1' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_2' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_1' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_2' | translate }}</p>
           </div>
           <img [src]="getStaticImageUrl('/donate/donate-today.png')" />
         </div>
       </div>
     </div>
     <button class="donate-modal-button" (click)="openDonationBoxModal()">
-      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" /><span>Donate</span>
+      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" /><span>{{
+        'I18N_DONATE_PAGE_BREADCRUMB' | translate
+      }}</span>
     </button>
     <div class="donation-box-container">
       <div class="donation-box">
