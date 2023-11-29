@@ -7,38 +7,38 @@
 
 <style>
   .modal-container {
-    width: 100%;
     overflow: hidden;
+    width: 100%;
   }
 
   .close-btn {
-    float: right;
-    border: none;
     background-color: transparent;
+    border: none;
     box-shadow: none;
+    float: right;
 
     &:focus {
       outline: none;
     }
 
     > span {
-      font-family: "Helvetica Neue", sans-serif;
-      color: #ffffff;
+      color: #fff;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 40px;
       font-weight: 300;
       opacity: 1;
-      font-size: 40px;
     }
   }
 
   ::ng-deep .donation-box-modal .modal-content {
     background-color: transparent;
-    box-shadow: none;
     border: none;
+    box-shadow: none;
   }
 
   ::ng-deep .donation-box-modal .modal-dialog,
   ::ng-deep .donation-box-modal .modal-content {
-    min-width: 70px;
     max-width: 420px;
+    min-width: 70px;
   }
 </style>
