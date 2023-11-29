@@ -56,7 +56,7 @@
                     <img
                       [src]="getStaticImageUrl(impactStat.imageUrl)"
                       *ngIf="impactStat.imageUrl !== null"
-                    />
+                    >
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
                   <p>{{ impactStat.text | translate }}</p>
@@ -121,7 +121,7 @@
       </div>
     </div>
     <button class="donate-modal-button" (click)="openDonationBoxModal()">
-      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" />
+      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')">
       <span>{{ 'I18N_DONATE_PAGE_BREADCRUMB' | translate }}</span>
     </button>
     <div class="donation-box-container">
@@ -275,8 +275,8 @@
     }
 
     .donation-box {
-      max-width: 420px;
       height: 100%;
+      max-width: 420px;
       width: 85%;
     }
 
