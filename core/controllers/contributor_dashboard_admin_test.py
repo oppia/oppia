@@ -292,7 +292,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
             'At \'http://localhost/contributionrightshandler/invalid\' these '
             'errors are happening:\nSchema validation for \'category\' failed: '
             'Received invalid which is not in the allowed range of '
-            'choices: %s' % constants.CONTRIBUTION_RIGHT_CATEGORIES
+            'choices: %s' % constants.CD_USER_RIGHTS_CATEGORIES
         )
 
     def test_remove_reviewer_with_invalid_username_raise_error(self) -> None:
