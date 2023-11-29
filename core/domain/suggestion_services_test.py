@@ -1881,7 +1881,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
-        self.assertEqual(offset, 2)
+        self.assertEqual(offset, 3)
         expected_suggestion_type_list = ['skill2', 'skill1']
         actual_suggestion_type_list = [
             suggestion.change.skill_id

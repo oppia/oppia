@@ -909,8 +909,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             if len(skill_ids) == 0:
                 raise RuntimeError('skill_ids list can\'t be empty')
 
-            filters.append(cls.target_id.IN(skill_ids))
-
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
@@ -929,10 +927,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     break
                 for suggestion_model in suggestion_models:
                     offset += 1
-                    if suggestion_model.author_id != user_id:
-                        sorted_results.append(suggestion_model)
-                        if len(sorted_results) == limit:
-                            break
+                    if suggestion_model.author_id == user_id:
+                        continue
+                    if (skill_ids is not None and
+                        suggestion_model.target_id not in skill_ids):
+                        continue
+                    sorted_results.append(suggestion_model)
+                    if len(sorted_results) == limit:
+                        break
 
             return (
                 sorted_results,
