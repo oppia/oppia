@@ -53,6 +53,14 @@
   margin-right: 6px;
   padding: 5px 6px;
 }
+.oppia-footer-social .oppia-footer-social-icons .oppia-github-follow {
+  background: #fff;
+  margin-right: 6px;
+  padding: 5px 6px;
+}
+.oppia-follow-github-icon {
+  color: #000;
+}
 .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
   bottom: -7px;
   position: relative;

@@ -19,6 +19,8 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { ConceptCardManagerService } from './concept-card-manager.service';
@@ -44,7 +46,13 @@ describe('ConceptCardManager service', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ]
     });
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);

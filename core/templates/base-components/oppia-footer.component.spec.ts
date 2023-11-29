@@ -21,17 +21,8 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { OppiaFooterComponent } from './oppia-footer.component';
-
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: false
-    }
-  };
-}
 
 class MockRouter {
   url = '/about';
@@ -40,7 +31,6 @@ class MockRouter {
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -50,9 +40,6 @@ describe('OppiaFooterComponent', () => {
       ],
       providers: [
         {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }, {
           provide: Router,
           useClass: MockRouter,
         }
@@ -78,16 +65,6 @@ describe('OppiaFooterComponent', () => {
 
   it('should return correct blog url if the blog homepage feature is enabled',
     () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
-    });
-
-  it('should return correct blog url if the blog homepage feature is disabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-
-      expect(component.getOppiaBlogUrl()).toEqual(
-        'https://medium.com/oppia-org');
     });
 });

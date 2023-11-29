@@ -18,7 +18,6 @@
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminBackendApiService, HumanReadableRolesBackendResponse, RoleToActionsBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
@@ -215,8 +214,3 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive('oppiaAdminRolesTab',
-  downgradeComponent({
-    component: AdminRolesTabComponent
-  }) as angular.IDirectiveFactory);
