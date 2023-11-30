@@ -25,6 +25,7 @@ import { ExplorationDataService } from
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationRightsBackendApiService } from './exploration-rights-backend-api.service';
 import { ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -155,6 +156,11 @@ export class ExplorationRightsService {
           response.rights.voice_artist_names, response.rights.viewer_names,
           response.rights.status, response.rights.cloned_from,
           response.rights.community_owned, response.rights.viewable_if_private);
+      }).catch(
+      (response: HttpErrorResponse) => {
+        this.alertsService.addWarning(
+          'Failed to publish an exploration: ' + response.error.error);
+        throw response;
       });
   }
 
