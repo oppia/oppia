@@ -18,10 +18,7 @@
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }}
               </p>
             </div>
-            <div
-              class="donate-message-1 donate-message-1-border"
-              *ngFor="let donationValue of donationValues"
-            >
+            <div class="donate-message-1 donate-message-1-border" *ngFor="let donationValue of donationValues">
               <p class="donate-heading-1 donate-font-green donate-font-weight-600">
                 {{
                   'I18N_DONATE_PAGE_CONTENT_DONATION_AMOUNT'
@@ -53,10 +50,7 @@
               <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
                 <div>
                   <div class="donate-stat-svg-container">
-                    <img
-                      [src]="getStaticImageUrl(impactStat.imageUrl)"
-                      *ngIf="impactStat.imageUrl !== null"
-                    >
+                    <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null">
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
                   <p>{{ impactStat.text | translate }}</p>
@@ -78,18 +72,9 @@
               <div>
                 <div class="donate-hightlights-tile" *ngFor="let highlight of highlights">
                   <picture>
-                    <source
-                      type="image/webp"
-                      [src]="getStaticImageUrl(highlight.imageUrl + '.webp')"
-                    >
-                    <source
-                      type="image/png"
-                      [src]="getStaticImageUrl(highlight.imageUrl + '.png')"
-                    >
-                    <img
-                      class="highlight-tile-img"
-                      [src]="getStaticImageUrl(highlight.imageUrl + '.png')"
-                    >
+                    <source type="image/webp" [src]="getStaticImageUrl(highlight.imageUrl + '.webp')">
+                    <source type="image/png" [src]="getStaticImageUrl(highlight.imageUrl + '.png')">
+                    <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')">
                   </picture>
                   <div>
                     <p>{{ highlight.heading | translate }}</p>
