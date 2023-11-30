@@ -27,7 +27,7 @@ describe('Donation box', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [],
+      declarations: [DonationBoxComponent],
       providers: [InsertScriptService],
     }).compileComponents();
     fixture = TestBed.createComponent(DonationBoxComponent);

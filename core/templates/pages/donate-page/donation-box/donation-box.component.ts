@@ -32,8 +32,7 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
       frameborder="0"
       scrolling="yes"
       width="100%"
-      title="donorbox"
-    >
+      title="donorbox">
     </iframe>
   `,
 })
