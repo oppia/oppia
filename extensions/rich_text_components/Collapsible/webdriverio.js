@@ -30,13 +30,16 @@ var customizeComponent = async function(modal, heading, contentInstructions) {
 
 var expectComponentDetailsToMatch = async function(
     elem, heading, contentInstructions) {
-  var headerElement = elem.$(
-    '.e2e-test-collapsible-heading');
+  var headerElement = elem.$('.e2e-test-collapsible-heading');
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
-  const collapsibleElem = elem.$(
-    '.e2e-test-collapsible-content');
+  const collapsibleElem = elem.$('.e2e-test-collapsible-content');
+  // The collapsible element has a built-in animation which takes time to
+  // complete (even though the element exists on the page), so we need to build
+  // in an explicit waiting time here.
+  // eslint-disable-next-line oppia/e2e-practices
+  await browser.pause(1000);
   await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);
 };
 
