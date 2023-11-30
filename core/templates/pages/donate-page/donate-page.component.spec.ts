@@ -53,6 +53,7 @@ describe('Donate page', () => {
   let component: DonatePageComponent;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -73,15 +74,17 @@ describe('Donate page', () => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
     component = donatePageComponent.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ngbModal, 'open');
   });
 
   it('should get image path', () => {
-    spyOn(component, 'getStaticImageUrl');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
 
     component.getStaticImageUrl('abc.webp');
 
-    expect(component.getStaticImageUrl).toHaveBeenCalledWith('abc.webp');
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'abc.webp');
   });
 
   it('should show thank you modal on query parameters change', () => {
