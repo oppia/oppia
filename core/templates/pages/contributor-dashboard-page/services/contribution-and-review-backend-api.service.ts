@@ -101,7 +101,8 @@ export class ContributionAndReviewBackendApiService {
       limit: number | null,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId: string | null,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -113,7 +114,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit || 0, offset, sortKey);
+        'skill', 'add_question', limit || 0, offset, sortKey, null, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
@@ -122,7 +123,8 @@ export class ContributionAndReviewBackendApiService {
         limit,
         offset,
         sortKey,
-        explorationId);
+        explorationId,
+        null);
     }
     throw new Error('Invalid fetch type');
   }
@@ -154,7 +156,8 @@ export class ContributionAndReviewBackendApiService {
       limit: number | null,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId: string | null,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -167,6 +170,7 @@ export class ContributionAndReviewBackendApiService {
       offset: string;
       sort_key: string;
       exploration_id?: string;
+      topic_name?: string;
     } = {
       offset: offset.toString(),
       sort_key: sortKey
@@ -176,6 +180,9 @@ export class ContributionAndReviewBackendApiService {
     }
     if (explorationId) {
       params.exploration_id = explorationId;
+    }
+    if (topicName) {
+      params.topic_name = topicName;
     }
     return this.http.get<FetchSuggestionsResponse>(
       url,

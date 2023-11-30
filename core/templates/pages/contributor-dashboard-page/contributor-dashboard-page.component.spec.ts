@@ -20,6 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angu
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ContributorDashboardPageComponent } from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
+import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -48,6 +49,7 @@ describe('Contributor dashboard page', () => {
   let getTranslatableTopicNamesAsyncSpy: jasmine.Spy;
   let getUserInfoAsyncSpy: jasmine.Spy;
   let urlInterpolationService: UrlInterpolationService;
+  let contributionAndReviewService: ContributionAndReviewService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -60,7 +62,8 @@ describe('Contributor dashboard page', () => {
         UserService,
         TranslationLanguageService,
         TranslationTopicService,
-        ContributionOpportunitiesService
+        ContributionOpportunitiesService,
+        ContributionAndReviewService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -70,6 +73,7 @@ describe('Contributor dashboard page', () => {
     fixture = TestBed.createComponent(ContributorDashboardPageComponent);
     component = fixture.componentInstance;
 
+    contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     contributionOpportunitiesService =
       TestBed.inject(ContributionOpportunitiesService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -285,6 +289,20 @@ describe('Contributor dashboard page', () => {
 
       expect(component.activeTabName).toBe('myContributionTab');
       expect(component.showLanguageSelector()).toBe(false);
+
+      component.onTabClick(changedTab);
+      expect(component.activeTabName).toBe(changedTab);
+      expect(component.showTopicSelector()).toBe(true);
+    });
+
+    it('should show topic selector for questions reviews', () => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
+      spyOn(contributionAndReviewService, 'getActiveSuggestionType')
+        .and.returnValue('add_question');
+      spyOn(contributionAndReviewService, 'getActiveTabType')
+        .and.returnValue('reviews');
+      let changedTab = 'myContributionTab';
 
       component.onTabClick(changedTab);
       expect(component.activeTabName).toBe(changedTab);

@@ -308,13 +308,23 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getReviewableQuestionSuggestionsAsync(true, 'sort_key')
+        cars.getReviewableQuestionSuggestionsAsync(
+          true,
+          'sort_key',
+          'topicName')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
           });
 
-        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
+        expect(fetchSuggestionsAsyncSpy).toHaveBeenCalledWith(
+          'REVIEWABLE_QUESTION_SUGGESTIONS',
+          20,
+          0,
+          'sort_key',
+          null,
+          'topicName',
+        );
       });
   });
 
