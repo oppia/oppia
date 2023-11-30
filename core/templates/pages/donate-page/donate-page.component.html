@@ -6,7 +6,7 @@
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/donate/content-1-head.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/donate/content-1-head.png')">
-            <img [src]="getStaticImageUrl('/donate/content-1-head.png')">
+            <img [src]="getStaticImageUrl('/donate/content-1-head.png')" alt="Photo of a classroom with children">
           </picture>
           <div class="donate-content-padding">
             <div class="donate-message-1 donate-message-1-border">
@@ -35,7 +35,7 @@
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/donate/content-2-head.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/donate/content-2-head.png')">
-            <img [src]="getStaticImageUrl('/donate/content-2-head.png')">
+            <img [src]="getStaticImageUrl('/donate/content-2-head.png')" alt="Photo of a classroom with children">
           </picture>
           <div class="donate-content-padding">
             <div class="donate-message-1">
@@ -50,7 +50,7 @@
               <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
                 <div>
                   <div class="donate-stat-svg-container">
-                    <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null">
+                    <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null" loading="lazy" alt="Graphic for the statistic">
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
                   <p>{{ impactStat.text | translate }}</p>
@@ -74,7 +74,7 @@
                   <picture>
                     <source type="image/webp" [srcset]="getStaticImageUrl(highlight.imageUrl + '.webp')">
                     <source type="image/png" [srcset]="getStaticImageUrl(highlight.imageUrl + '.png')">
-                    <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')">
+                    <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')" loading="lazy" alt="Photo of the hightlight's partners">
                   </picture>
                   <div>
                     <p>{{ highlight.heading | translate }}</p>
@@ -100,13 +100,13 @@
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/donate/donate-today.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/donate/donate-today.png')">
-            <img [src]="getStaticImageUrl('/donate/donate-today.png')">
+            <img [src]="getStaticImageUrl('/donate/donate-today.png')" alt="Photo of Oppia's learners" loading="lazy">
           </picture>
         </div>
       </div>
     </div>
     <button class="donate-modal-button" (click)="openDonationBoxModal()">
-      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')">
+      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" alt="Graphic of a white heart">
       <span>{{ 'I18N_DONATE_PAGE_BREADCRUMB' | translate }}</span>
     </button>
     <div class="donation-box-container">
