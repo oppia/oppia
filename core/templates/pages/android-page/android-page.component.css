@@ -220,7 +220,7 @@
 }
 
 .oppia-android-google-play-logo {
-  display: block;
+  display: inline-block;
   margin-top: 50px;
 }
 

@@ -88,8 +88,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
-    FeatureNames.ANDROID_BETA_LANDING_PAGE,
-    FeatureNames.BLOG_PAGES,
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
@@ -100,6 +98,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
 DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
+    FeatureNames.ANDROID_BETA_LANDING_PAGE,
+    FeatureNames.BLOG_PAGES,
 ]
 
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[params.ParamNames] = [
