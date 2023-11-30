@@ -169,7 +169,7 @@
 	"I18N_FOOTER_PRIVACY_POLICY": "Informativa sulla privacy",
 	"I18N_FOOTER_TEACH": "Insegna con Oppia",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "INSEGNA/IMPARA",
-	"I18N_FOOTER_TERMS_OF_SERVICE": "Termini del Servizio",
+	"I18N_FOOTER_TERMS_OF_SERVICE": "Condizioni del servizio",
 	"I18N_FORMS_TYPE_NUMBER": "Digita un numero",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Per favore digita un numero che sia almeno <[minValue]>.",
 	"I18N_FORMS_TYPE_NUMBER_AT_MOST": "Per favore digita un numero che sia al massimo <[maxValue]>.",
