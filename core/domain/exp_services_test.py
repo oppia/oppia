@@ -1352,7 +1352,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'Expected all explorations in a story to '
             'have correctness feedback '
             'enabled. Invalid exploration: %s' % exploration.id)
-        errors = exp_services.validate_exploration_for_story(exploration, True)
+        errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
         with self.assertRaisesRegex(utils.ValidationError, error_string):
