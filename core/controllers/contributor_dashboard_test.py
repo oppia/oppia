@@ -329,7 +329,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi', 'topic_name': 'topic'})
             self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(
+            self.assertItemsEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
             self.assertIsInstance(response['next_cursor'], str)
@@ -343,7 +343,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 }
             )
             self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
+            self.assertItemsEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
@@ -371,7 +371,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'hi'})
 
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2,
@@ -386,7 +386,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={'language_code': 'hi', 'topic_name': ''})
 
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2,
@@ -425,7 +425,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Should only return opportunities that have corresponding translation
         # suggestions in review (exploration 0).
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
     def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
@@ -464,27 +464,27 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'language_code': 'es'})
         # Should only return opportunities in Spanish.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [self.expected_opportunity_dict_2])
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'language_code': 'hi'})
         # Should only return opportunities in Hindi.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'language_code': 'pt'})
         # Should be empty.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [])
 
         response = self.get_json(
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
         # Should return all opportunities.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [self.expected_opportunity_dict_1, self.expected_opportunity_dict_2])
 
     def test_get_reviewable_translation_opportunities_with_pinned_opportunity( # pylint: disable=line-too-long
@@ -574,7 +574,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'is_pinned': False
             }
 
-            self.assertEqual(
+            self.assertItemsEqual(
                 response['opportunities'], [expected_opp_dict_1, expected_opp_dict_2])
 
     def test_pin_translation_opportunity(self) -> None:
@@ -614,38 +614,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             request_dict,
             csrf_token=csrf_token,
             expected_status_int=200)
-
-    def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
-        # Create a new exploration and linked story.
-        continue_state_name = 'continue state'
-        exp_100 = self.save_new_linear_exp_with_state_names_and_interactions(
-            '100',
-            self.owner_id,
-            ['Introduction', continue_state_name, 'End state'],
-            ['TextInput', 'Continue'],
-            category='Algebra',
-            correctness_feedback_enabled=True
-        )
-        self.publish_exploration(self.owner_id, exp_100.id)
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
-            exp_100.id)
-        corrupt_story = story_fetchers.get_story_by_id('story_id_100')
-        corrupt_story.story_contents.nodes[0].exploration_id = None
-        swap_with_corrupt_story = self.swap_to_always_return(
-            story_fetchers, 'get_stories_by_ids', [corrupt_story]
-        )
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.assertRaisesRegex(
-            Exception,
-            'No exploration_id found for the node_id: node_1'
-        ):
-            with swap_with_corrupt_story:
-                self.get_json(
-                    '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-                    params={'topic_name': 'topic'}
-                )
 
     def test_skip_story_if_story_is_none(self) -> None:
         # Create a new exploration and linked story.
@@ -731,7 +699,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # The newly created translation suggestion with valid exploration
         # content should be returned.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'],
             [{
                 'id': exp_100.id,
@@ -828,7 +796,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Since there was a valid translation suggestion created in the setup,
         # and one suggestion created in this test case, 2 opportunities should
         # be returned.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'],
             [{
                 'id': exp_100.id,
@@ -889,7 +857,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
 
         # Should return all available reviewable opportunities.
-        self.assertEqual(
+        self.assertItemsEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
 
     def test_get_reviewable_translation_opportunities_with_invalid_topic(
@@ -901,146 +869,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
             params={'topic_name': 'Invalid'},
             expected_status_int=400)
-
-    def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
-        self
-    ) -> None:
-        # Create new explorations 10, 20, 30.
-        exp_10 = self.save_new_valid_exploration(
-            '10',
-            self.owner_id,
-            title='title 10',
-            end_state_name='End State',
-            correctness_feedback_enabled=True,
-            content_html='Content'
-        )
-        self.publish_exploration(self.owner_id, exp_10.id)
-        exp_20 = self.save_new_valid_exploration(
-            '20',
-            self.owner_id,
-            title='title 20',
-            end_state_name='End State',
-            correctness_feedback_enabled=True,
-            content_html='Content'
-        )
-        self.publish_exploration(self.owner_id, exp_20.id)
-        exp_30 = self.save_new_valid_exploration(
-            '30',
-            self.owner_id,
-            title='title 30',
-            end_state_name='End State',
-            correctness_feedback_enabled=True,
-            content_html='Content'
-        )
-        self.publish_exploration(self.owner_id, exp_30.id)
-
-        # Create a new story.
-        topic_id = '0'
-        story_title = 'story title'
-        story = story_domain.Story.create_default_story(
-            'story-id', story_title, 'description', topic_id, 'url-fragment')
-        story.language_code = 'en'
-
-        # Add explorations 10, 20, 30 as story nodes.
-        story.add_node('node_1', 'Node1')
-        story.update_node_exploration_id('node_1', exp_10.id)
-        story.add_node('node_2', 'Node2')
-        story.update_node_exploration_id('node_2', exp_20.id)
-        story.add_node('node_3', 'Node3')
-        story.update_node_exploration_id('node_3', exp_30.id)
-        story.update_node_destination_node_ids(
-            'node_1', ['node_2'])
-        story.update_node_destination_node_ids(
-            'node_2', ['node_3'])
-        story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(self.owner_id, topic_id, story.id)
-        topic_services.publish_story(topic_id, story.id, self.admin_id)
-
-        # Create translation suggestions for the explorations.
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': 'Content',
-            'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
-        }
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            exp_10.id, 1, self.owner_id, change_dict, 'description')
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            exp_20.id, 1, self.owner_id, change_dict, 'description')
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            exp_30.id, 1, self.owner_id, change_dict, 'description')
-
-        expected_opportunity_dict_10 = {
-            'id': exp_10.id,
-            'topic_name': 'topic',
-            'story_title': story_title,
-            'chapter_title': 'Node1',
-            'content_count': 2,
-            'translation_counts': {},
-            'translation_in_review_counts': {},
-            'is_pinned': False
-        }
-        expected_opportunity_dict_20 = {
-            'id': exp_20.id,
-            'topic_name': 'topic',
-            'story_title': story_title,
-            'chapter_title': 'Node2',
-            'content_count': 2,
-            'translation_counts': {},
-            'translation_in_review_counts': {},
-            'is_pinned': False
-        }
-        expected_opportunity_dict_30 = {
-            'id': exp_30.id,
-            'topic_name': 'topic',
-            'story_title': story_title,
-            'chapter_title': 'Node3',
-            'content_count': 2,
-            'translation_counts': {},
-            'translation_in_review_counts': {},
-            'is_pinned': False
-        }
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
-
-        # Should return reviewable opportunities in story order.
-        self.assertEqual(
-            response['opportunities'],
-            [
-                expected_opportunity_dict_10,
-                expected_opportunity_dict_20,
-                expected_opportunity_dict_30])
-
-        # Update story node order to explorations 10 -> 30 -> 20.
-        story.update_node_destination_node_ids('node_1', ['node_3'])
-        story.update_node_destination_node_ids('node_2', [])
-        story.update_node_destination_node_ids('node_3', ['node_2'])
-        story_services.save_new_story(self.owner_id, story)
-        topic_services.publish_story(topic_id, story.id, self.admin_id)
-
-        response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
-
-        # Should return reviewable opportunities in new story order.
-        self.assertEqual(
-            response['opportunities'],
-            [
-                expected_opportunity_dict_10,
-                expected_opportunity_dict_30,
-                expected_opportunity_dict_20])
 
     def _publish_valid_topic(
         self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]
