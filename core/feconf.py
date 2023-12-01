@@ -652,8 +652,8 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
-EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
-EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
+EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
+EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
