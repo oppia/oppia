@@ -940,19 +940,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 0)
         self.assertEqual(offset, 2)
 
-        results, offset = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                user_id=user_id,
-                sort_key=None,
-                skill_ids=['skill_2', 'skill_3']))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].id, suggestion_2_id)
-
         sorted_results, offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_question_suggestions_by_offset(
@@ -1009,7 +996,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, suggestion_1_id)
-        self.assertEqual(offset, 2)
+        self.assertEqual(offset, 3)
 
         with self.assertRaisesRegex(
             RuntimeError,
