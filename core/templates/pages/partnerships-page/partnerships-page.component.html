@@ -124,7 +124,7 @@
               <img class="partner-logo" alt="partner logo" [src]="partner1">
               <h4 class="oppia-partnerships-h4">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1_HEADING' | translate }}</h4>
               <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_1' | translate }}</p>
-              <a href=" https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwc" target="_blank" rel="noopener">
+              <a href=" https://www.oppia.org/blog/teaching-a-chapter-of-expressions-equations-in-summer-school-0q6r28fzsrwcg" target="_blank" rel="noopener">
                    {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BLOG_POST' | translate }}
               </a>
             </mat-card-content>
@@ -609,6 +609,7 @@
     display: flex;
     flex-direction: column;
     gap: 25px;
+    height: 500px;
     justify-content: center;
     padding: 3em 1em 2em;
   }
@@ -622,6 +623,7 @@
   .partner-container mat-card-content p {
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.1em;
+    max-width: 500px;
     padding: 0 2em;
     text-align: center;
   }
@@ -657,8 +659,14 @@
       width: auto;
     }
 
+    .partner-container mat-card-content {
+      height: 400px;
+      padding: 2em 1em;
+    }
+
     .partner-container mat-card-content p {
       font-size: 0.8em;
+      max-width: 400px;
     }
 
     .partner-container mat-card-content a {
@@ -672,8 +680,14 @@
       margin: 2em 0 2em;
     }
 
+    .partner-container mat-card-content {
+      height: 300px;
+      padding: 2em 1em;
+    }
+
     .partner-container mat-card-content p {
       font-size: 0.8em;
+      max-width: 300px;
     }
 
     .partner-container mat-card-content a {
