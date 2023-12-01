@@ -25,8 +25,8 @@ const contributorDashboardAdminUrl =
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const reviewQuestionRightValue = 'question';
-const submitQuestionRightValue = 'submit_question';
+const reviewQuestionRightValue = 'string:question';
+const submitQuestionRightValue = 'string:submit_question';
 const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
@@ -42,7 +42,9 @@ const viewContributorSubmitButton =
 
 const viewContributorReviewQuestionsResult =
   '.e2e-test-question-reviewer';
-const viewReviewQuestionRoleUserResult =
+const viewContributorSubmitQuestionResult = 
+  '.e2e-test-question-contributor';
+const viewRoleUserResult =
   '.e2e-test-reviewer-roles-result';
 
 // "Add Contribution Rights" form elements.
@@ -52,6 +54,14 @@ const addContributonRightsCategorySelect =
   'select#add-contribution-rights-category-select';
 const addContributionRightsSubmitButton =
    'button#add-contribution-rights-submit-button';
+
+// "Remove Contribution Rights" form elements.
+const removeContributorUsernameInput =
+  'input#remove-contribution-rights-user-input';
+const removeContributonRightsCategorySelect =
+  'select#remove-contribution-rights-category-select';
+const removeContributionRightsSubmitButton =
+  'button#remove-contribution-rights-submit-button';
 
 module.exports = class QuestionAdmin extends baseUser {
   /**
@@ -88,55 +98,193 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display contribution rights by user.
-   * @param {string} username - the username of the user to view.
+   * Function for removng a right of reviewing questions to a user.
+   * @param {string} username - the username of the user.
    */
-  async viewContributionRightsForUser(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
+  async removeReviewQuestionRights(username) {
+    await this.type(removeContributorUsernameInput, username);
+    await this.select(
+      removeContributonRightsCategorySelect, reviewQuestionRightValue);
+    await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
   }
 
   /**
-   * Function to display reviewing questions rights by role.
+   * Function for removing a right of reviewing questions to a user.
+   * @param {string} username - the username of the user.
    */
-  async viewContributorReviewQuestionRightsByRole() {
+    async removeSubmitQuestionRights(username) {
+      await this.type(removeContributorUsernameInput, username);
+      await this.select(
+        removeContributonRightsCategorySelect, submitQuestionRightValue);
+      await this.clickOn(removeContributionRightsSubmitButton);
+  
+      await this.page.waitForNetworkIdle();
+    }
+
+  /**
+   * Function to display reviewing questions rights by role 
+   * and check if the user is not displayed as a question reviewer
+   * @param {string} usename - the user expected to not be displayed.
+   */
+  async verifyQuestionReviewersExcludeUser(username) {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
-  }
 
-  /**
-   * Function to check if the username is displayed as one of the users
-   * with rights of reviewing question.
-   * @param {string} username - the username of the user to check.
-   */
-  async expectDisplayedUsersToContainReviewQuestionRights(username) {
-    await this.page.waitForSelector(viewContributorReviewQuestionsResult);
-    const displayedUsername = await this.page.$eval(
-      viewContributorReviewQuestionsResult,
-      element => element.innerText);
-    if (displayedUsername.includes('Not-allowed')) {
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have rights for reviewing questions!`);
-    } else {
-      showMessage(
-        `${username} has rights for reviewing questions!`);
+        `${username} has the right to review question!`);
     }
   }
 
   /**
-   * Function to check if the user is displayed as a question reviewer.
+   * Function to display reviewing questions rights by role 
+   * and check if the user is not displayed as a question submitter
+   * @param {string} usename - the user expected to not be displayed.
+   */
+  async verifyQuestionSubmittersExcludeUser(username) {
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
+    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
+    await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    if (displayedUsers.includes(username)) {
+      throw new Error(
+        `${username} has the right to submit question!`);
+    }
+  }
+
+  /**
+   * Function to display contribution rights by user 
+   * and check if the user has the right to review questions
+   * @param {string} username - the username of the user to view.
+   */
+    async verifyUserCanReviewQuestions(username) {
+      await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+      await this.type(viewContributerUsernameInput, username);
+      await this.clickOn(viewContributorSubmitButton);
+  
+      await this.page.waitForNetworkIdle();
+
+      await this.page.waitForSelector(viewContributorReviewQuestionsResult);
+      const displayedUsername = await this.page.$eval(
+        viewContributorReviewQuestionsResult,
+        element => element.innerText);
+      if (displayedUsername.includes('Not-allowed')) {
+        throw new Error(
+          `${username} does not have rights for reviewing questions!`);
+      } else {
+        showMessage(
+          `${username} has rights for reviewing questions.`);
+      }
+    }
+
+  /**
+   * Function to display contribution rights by user 
+   * and check if the user has the right to submit questions
+   * @param {string} username - the username of the user to view.
+   */
+    async verifyUserCanSubmitQuestions(username) {
+      await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+      await this.type(viewContributerUsernameInput, username);
+      await this.clickOn(viewContributorSubmitButton);
+  
+      await this.page.waitForNetworkIdle();
+
+      await this.page.waitForSelector(viewContributorSubmitQuestionResult);
+      const displayedUsername = await this.page.$eval(
+        viewContributorSubmitQuestionResult,
+        element => element.innerText);
+      if (displayedUsername.includes('Not-allowed')) {
+        throw new Error(
+          `${username} does not have rights for submitting questions!`);
+      } else {
+        showMessage(
+          `${username} has rights for submitting questions.`);
+      }
+    }
+
+
+  /**
+   * Function to display contribution rights by user 
+   * and check if the user doesn't have the right to review questions
+   * @param {string} username - the username of the user to view.
+   */
+    async verifyUserCannotReviewQuestions(username) {
+      await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+      await this.type(viewContributerUsernameInput, username);
+      await this.clickOn(viewContributorSubmitButton);
+  
+      await this.page.waitForNetworkIdle();
+
+      await this.page.waitForSelector(viewContributorReviewQuestionsResult);
+      const displayedUsername = await this.page.$eval(
+        viewContributorReviewQuestionsResult,
+        element => element.innerText);
+      if (!displayedUsername.includes('Not-allowed')) {
+        throw new Error(
+          `${username} has rights for reviewing questions!`);
+      } else {
+        showMessage(
+          `${username} doesn't have rights for reviewing questions.`);
+      }
+    }
+
+  /**
+   * Function to display contribution rights by user 
+   * and check if the user doesn't have the right to submit questions
+   * @param {string} username - the username of the user to view.
+   */
+    async verifyUserCannotSubmitQuestions(username) {
+      await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+      await this.type(viewContributerUsernameInput, username);
+      await this.clickOn(viewContributorSubmitButton);
+  
+      await this.page.waitForNetworkIdle();
+
+      await this.page.waitForSelector(viewContributorSubmitQuestionResult);
+      const displayedUsername = await this.page.$eval(
+        viewContributorSubmitQuestionResult,
+        element => element.innerText);
+      if (!displayedUsername.includes('Not-allowed')) {
+        throw new Error(
+          `${username} has rights for submitting questions!`);
+      } else {
+        showMessage(
+          `${username} doesn't have rights for submitting questions.`);
+      }
+    }
+
+  /**
+   * Function to display reviewing questions rights by role 
+   * and check if the user is displayed as a question reviewer
    * @param {string} username - the user expected to be displayed.
    */
-  async expectUserToBeDisplayed(username) {
-    await this.page.waitForSelector(viewReviewQuestionRoleUserResult);
+  async verifyQuestionReviewersIncludeUser(username) {
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
+    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
+    await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
-      viewReviewQuestionRoleUserResult,
+      viewRoleUserResult,
       element => element.innerText
     );
     if (!displayedUsers.includes(username)) {
@@ -144,20 +292,28 @@ module.exports = class QuestionAdmin extends baseUser {
         `${username} does not have rights for reviewing questions!`);
     }
   }
-
+  
+  
   /**
-   * Function to check that there are no question reviewer.
-   * @param {string} usename - the user expected to not be displayed.
+   * Function to display reviewing questions rights by role 
+   * and check if the user is displayed as a question submitter
+   * @param {string} username - the user expected to be displayed.
    */
-  async expectUserToNotBeDisplayed(username) {
-    await this.page.waitForSelector(viewReviewQuestionRoleUserResult);
+  async verifyQuestionSubmittersIncludeUser(username) {
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
+    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
+    await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
-      viewReviewQuestionRoleUserResult,
+      viewRoleUserResult,
       element => element.innerText
     );
-    if (displayedUsers.includes(username)) {
+    if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} has the right to review question!`);
+        `${username} does not have rights for submitting questions!`);
     }
   }
 };
