@@ -37,7 +37,6 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ServicesConstants } from 'services/services.constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { ImageClickInputRulesService } from './image-click-input-rules.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 
 interface RectangleRegion extends ImagePoint {
   height: number;
@@ -74,14 +73,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   imageContainerStyle: { height: string; width?: string };
   loadingIndicatorStyle: { height: string; width?: string };
   allRegions: LabeledRegion[];
-  dotCursorCoordinateX: number = 0;
-  dotCursorCoordinateY: number = 0;
-  usingMobileDevice: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
-    private deviceInfoService: DeviceInfoService,
     private el: ElementRef,
     private imageClickInputRulesService: ImageClickInputRulesService,
     private imagePreloaderService: ImagePreloaderService,
@@ -197,7 +192,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       this.mouseY = this.lastAnswer.clickPosition[1];
       this.updateCurrentlyHoveredRegions();
     }
-    this.usingMobileDevice = !!this.deviceInfoService.isMobileDevice();
 
     this.currentInteractionService.registerCurrentInteraction(null, null);
   }
@@ -281,43 +275,17 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return dotLocation;
   }
 
-  updateDotPosition(event: MouseEvent | KeyboardEvent): void {
-    const images = this.el.nativeElement.querySelectorAll(
-      '.oppia-image-click-img');
-    const image: HTMLImageElement = images[0];
-    const imageRect = image.getBoundingClientRect();
-    const imageStyles = window.getComputedStyle(image);
-    if (this.usingMobileDevice && event instanceof MouseEvent) {
-      this.mouseX = (
-        (event.clientX - image.getBoundingClientRect().left) / image.width);
-      this.mouseY = (
-        (event.clientY - image.getBoundingClientRect().top) / image.height);
-      return;
-    }
-    const dot = document.querySelector(
-      '.oppia-select-image-region-cursor') as HTMLDivElement;
-
-    if (event instanceof MouseEvent) {
-      this.dotCursorCoordinateX =
-       event.clientX - imageRect.left + parseFloat(imageStyles.marginLeft) + 8;
-      this.dotCursorCoordinateY =
-       event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
-    }
-
-    dot.style.top = this.dotCursorCoordinateY + 'px';
-    dot.style.left = this.dotCursorCoordinateX + 'px';
-    const dotRect = dot.getBoundingClientRect();
-    this.mouseX = (
-      (dotRect.left - image.getBoundingClientRect().left) / image.width);
-    this.mouseY = (
-      (dotRect.top - image.getBoundingClientRect().top) / image.height);
-  }
-
   onMousemoveImage(event: MouseEvent): void {
     if (!this.interactionIsActive) {
       return;
     }
-    this.updateDotPosition(event);
+    const images = this.el.nativeElement.querySelectorAll(
+      '.oppia-image-click-img');
+    const image: HTMLImageElement = images[0];
+    this.mouseX = (
+      (event.clientX - image.getBoundingClientRect().left) / image.width);
+    this.mouseY = (
+      (event.clientY - image.getBoundingClientRect().top) / image.height);
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
@@ -330,33 +298,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     this.currentInteractionService.onSubmit(
       answer, this.imageClickInputRulesService);
   }
-
-  handleKeyDown = (event: KeyboardEvent): void => {
-    const stepSizeInPx = 10;
-
-    switch (event.key) {
-      case 'ArrowLeft':
-        this.dotCursorCoordinateX -= stepSizeInPx;
-        break;
-      case 'ArrowUp':
-        this.dotCursorCoordinateY -= stepSizeInPx;
-        break;
-      case 'ArrowRight':
-        this.dotCursorCoordinateX += stepSizeInPx;
-        break;
-      case 'ArrowDown':
-        this.dotCursorCoordinateY += stepSizeInPx;
-        break;
-      case 'Enter':
-        this.onClickImage();
-        break;
-    }
-    this.updateDotPosition(event);
-
-    this.currentlyHoveredRegions = [];
-    this.updateCurrentlyHoveredRegions();
-    event.preventDefault();
-  };
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
