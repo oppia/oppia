@@ -23,6 +23,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 @Injectable({
   providedIn: 'root'
 })
+
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
@@ -38,7 +39,8 @@ export class HtmlLengthService {
       return 0;
     }
 
-    const sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, htmlString) as string;
+    const sanitizedHtml = this.sanitizer.sanitize(
+      SecurityContext.HTML, htmlString) as string;
     let totalWords = this.calculateBaselineLength(sanitizedHtml, false);
 
     const customTags = this.extractCustomTags(htmlString);
@@ -55,7 +57,8 @@ export class HtmlLengthService {
       return 0;
     }
 
-    const sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, htmlString) as string;
+    const sanitizedHtml = this.sanitizer.sanitize(
+      SecurityContext.HTML, htmlString) as string;
     let totalCharacters = this.calculateBaselineLength(sanitizedHtml, true);
 
     const customTags = this.extractCustomTags(htmlString);
@@ -66,7 +69,8 @@ export class HtmlLengthService {
     return totalCharacters;
   }
 
-  private calculateBaselineLength(sanitizedHtml: string, countCharacters: boolean = false): number {
+  private calculateBaselineLength(
+      sanitizedHtml: string, countCharacters: boolean = false): number {
     const domparser = new DOMParser();
     const dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
@@ -75,19 +79,23 @@ export class HtmlLengthService {
       const ltag = tag.tagName.toLowerCase();
 
       if (this.textTags.includes(ltag)) {
-        totalWeight += this.getWeightForTextNodes(tag as HTMLElement, countCharacters);
+        totalWeight += this.getWeightForTextNodes(
+          tag as HTMLElement, countCharacters);
       }
     }
 
     return totalWeight;
   }
 
-  private getWeightForTextNodes(textNode: HTMLElement, countCharacters: boolean): number {
+  private getWeightForTextNodes(
+      textNode: HTMLElement, countCharacters: boolean): number {
     const textContent = textNode.textContent || '';
-    return countCharacters ? textContent.length : textContent.trim().split(' ').length;
+    return countCharacters ? textContent.length :
+      textContent.trim().split(' ').length;
   }
 
-  private getWeightForNonTextNodes(nonTextNode: string, countCharacters: boolean): number {
+  private getWeightForNonTextNodes(
+      nonTextNode: string, countCharacters: boolean): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return countCharacters ? 1 : 0;
     }
@@ -96,7 +104,8 @@ export class HtmlLengthService {
     const altText = altTextMatch && altTextMatch[1] ? altTextMatch[1] : '';
     const words = altText.trim().split(' ');
 
-    return countCharacters ? altText.length : words.length + 2; // +2 as a bonus for images with text.
+    return countCharacters ? altText.length :
+      words.length + 2; // +2 as a bonus for images with text.
   }
 
   private extractCustomTags(htmlString: string): string[] {
