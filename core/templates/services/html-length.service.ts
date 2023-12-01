@@ -27,20 +27,9 @@ export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
-  /**
-    * ['oppia-noninteractive-image', 'oppia-noninteractive-math']
-    * The above tags constitutes for non text nodes.
-    */
   nonTextTags = ['oppia-noninteractive-math', 'oppia-noninteractive-image'];
-
-  /**
-    * ['li','blockquote','em','strong', 'p', 'a']
-    * The above tags serve as the tags for text content. Blockquote,
-    * em, a, strong occur as descendants of p tag. li tags are
-    * descendants of ol/ul tags.
-    */
   textTags = ['p', 'ul', 'ol'];
 
   computeHtmlLengthInWords(htmlString: string): number {
@@ -48,53 +37,77 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
-    const sanitizedHtml = this.sanitizer.sanitize(
-      SecurityContext.HTML, htmlString) as string;
-    let totalWeight = this.calculateBaselineLength(sanitizedHtml);
 
-    // Identify custom tags using regex on the original HTML string.
-    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
-    const customTags = htmlString.match(customTagRegex);
+    const sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, htmlString) as string;
+    let totalWords = this.calculateBaselineLength(sanitizedHtml, false);
 
-    if (customTags) {
-      for (const customTag of customTags) {
-        totalWeight += this.getWeightForNonTextNodes(customTag);
-      }
+    const customTags = this.extractCustomTags(htmlString);
+    for (const customTag of customTags) {
+      totalWords += this.getWeightForNonTextNodes(customTag, false);
     }
-    return totalWeight;
+
+    return totalWords;
   }
 
-  private calculateBaselineLength(sanitizedHtml: string): number {
-    let domparser = new DOMParser();
-    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+  computeHtmlLengthInCharacters(htmlString: string): number {
+    if (!htmlString) {
+      this.loggerService.error('Empty string was passed to compute length');
+      return 0;
+    }
+
+    const sanitizedHtml = this.sanitizer.sanitize(SecurityContext.HTML, htmlString) as string;
+    let totalCharacters = this.calculateBaselineLength(sanitizedHtml, true);
+
+    const customTags = this.extractCustomTags(htmlString);
+    for (const customTag of customTags) {
+      totalCharacters += this.getWeightForNonTextNodes(customTag, true);
+    }
+
+    return totalCharacters;
+  }
+
+  private calculateBaselineLength(sanitizedHtml: string, countCharacters: boolean = false): number {
+    const domparser = new DOMParser();
+    const dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
-    for (let tag of Array.from(dom.body.children)) {
+
+    for (const tag of Array.from(dom.body.children)) {
       const ltag = tag.tagName.toLowerCase();
+
       if (this.textTags.includes(ltag)) {
-        totalWeight += this.getWeightForTextNodes(tag as HTMLElement);
+        totalWeight += this.getWeightForTextNodes(tag as HTMLElement, countCharacters);
       }
     }
+
     return totalWeight;
   }
 
-  private getWeightForTextNodes(textNode: HTMLElement): number {
+  private getWeightForTextNodes(textNode: HTMLElement, countCharacters: boolean): number {
     const textContent = textNode.textContent || '';
-    const words = textContent.trim().split(' ');
-    const wordCount = words.length;
-
-    return wordCount;
+    return countCharacters ? textContent.length : textContent.trim().split(' ').length;
   }
 
-  private getWeightForNonTextNodes(nonTextNode: string): number {
+  private getWeightForNonTextNodes(nonTextNode: string, countCharacters: boolean): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
-      return 1;
+      return countCharacters ? 1 : 0;
     }
+
     const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
-    let words = [];
-    if (altTextMatch && altTextMatch[1]) {
-      const altText = altTextMatch[1];
-      words = altText.trim().split(' ');
+    const altText = altTextMatch && altTextMatch[1] ? altTextMatch[1] : '';
+    const words = altText.trim().split(' ');
+
+    return countCharacters ? altText.length : words.length + 2; // +2 as a bonus for images with text.
+  }
+
+  private extractCustomTags(htmlString: string): string[] {
+    const domparser = new DOMParser();
+    const dom = domparser.parseFromString(htmlString, 'text/html');
+    const customTags: string[] = [];
+
+    for (const tag of Array.from(dom.querySelectorAll('[data-oppiatag]'))) {
+      customTags.push(tag.outerHTML);
     }
-    return words.length + 2; // +2 as a bonus for images with text.
+
+    return customTags;
   }
 }

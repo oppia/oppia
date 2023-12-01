@@ -25,6 +25,8 @@ import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Hint } from 'domain/exploration/hint-object.model';
+import { HtmlLengthService } from 'services/html-length.service';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
 interface HintFormSchema {
   type: string;
@@ -53,7 +55,8 @@ export class HintEditorComponent implements OnInit, OnDestroy {
     private contextService: ContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
-  ) {}
+    private htmlLengthService: HtmlLengthService,
+  ) { }
 
   getSchema(): HintFormSchema {
     return this.HINT_FORM_SCHEMA;
@@ -71,7 +74,10 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   }
 
   isHintLengthExceeded(): boolean {
-    return (this.hint.hintContent._html.length > 500);
+    return Boolean(
+      this.htmlLengthService.computeHtmlLengthInCharacters(
+        this.hint.hintContent._html) >
+      ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 
   saveThisHint(): void {
@@ -112,4 +118,4 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive('oppiaHintEditor',
-  downgradeComponent({component: HintEditorComponent}));
+  downgradeComponent({ component: HintEditorComponent }));
