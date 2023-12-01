@@ -83,6 +83,10 @@ var checkForConsoleErrors = async function(
   }
 
   var browserLogs = await browser.getLogs('browser');
+  // eslint-disable-next-line no-console
+  console.log('Errors to ignore:', errorsToIgnore);
+  // eslint-disable-next-line no-console
+  console.log('Browser errors', browserErrors);
   var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));

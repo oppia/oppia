@@ -87,6 +87,7 @@ export class StateSolutionEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.error('this error should be caught!');
     this.solutionCardIsShown = true;
     this.inlineSolutionEditorIsActive = false;
     this.SOLUTION_EDITOR_FOCUS_LABEL = (
