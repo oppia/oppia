@@ -37,20 +37,19 @@ describe('Question Admin', function() {
       let contributor = await userFactory.createNewGuestUser(
         'contributor', 'contributor@example.com');
       await userFactory.closeBrowserForUser(contributor);
-      
+
       await questionAdmin.navigateToContributorDashboardAdminPage();
-      await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');   // this checks the list of question reviewers
-      await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');   // this checks the list of question submitters
+      await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
+      await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
 
       await questionAdmin.addSubmitQuestionRights('contributor');
       await questionAdmin.addReviewQuestionRights('contributor');
 
-/*      await questionAdmin.verifyUserCanReviewQuestions('contributor');   // this checks the user's roles
-      await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');  // this checks the list of question reviewers
+      await questionAdmin.verifyUserCanReviewQuestions('contributor');
+      await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
+      await questionAdmin.verifyUserCanSubmitQuestions('contributor');
+      await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
 
-      await questionAdmin.verifyUserCanSubmitQuestions('contributor');   // this checks the user's roles
-      await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');  // this checks the list of question submitters
-*/
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

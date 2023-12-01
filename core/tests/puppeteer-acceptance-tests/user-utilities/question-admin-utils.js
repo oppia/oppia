@@ -219,7 +219,6 @@ module.exports = class QuestionAdmin extends baseUser {
       }
     }
 
-
   /**
    * Function to display contribution rights by user 
    * and check if the user doesn't have the right to review questions
@@ -292,7 +291,6 @@ module.exports = class QuestionAdmin extends baseUser {
         `${username} does not have rights for reviewing questions!`);
     }
   }
-  
   
   /**
    * Function to display reviewing questions rights by role 

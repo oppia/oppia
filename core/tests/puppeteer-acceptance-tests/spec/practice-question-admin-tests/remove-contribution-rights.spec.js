@@ -41,19 +41,17 @@ const userFactory = require(
         await questionAdmin.navigateToContributorDashboardAdminPage(); 
         await questionAdmin.addSubmitQuestionRights('contributor');
         await questionAdmin.addReviewQuestionRights('contributor');
-  
-        await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');  // this checks the list of question reviewers
-        await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');  // this checks the list of question submitters
-  
+
+        await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
+        await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
+
         await questionAdmin.removeSubmitQuestionRights('contributor');
         await questionAdmin.removeReviewQuestionRights('contributor');
 
-        await questionAdmin.verifyUserCannotReviewQuestions('contributor');   // this checks the user's roles
-        await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');   // this checks the list of question reviewers
-        
-        await questionAdmin.verifyUserCannotSubmitQuestions('contributor');   // this checks the user's roles
-        await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');   // this checks the list of question submitters
-  
+        await questionAdmin.verifyUserCannotReviewQuestions('contributor');
+        await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
+        await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
+        await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
 
       }, DEFAULT_SPEC_TIMEOUT);
   
