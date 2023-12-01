@@ -179,7 +179,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSummaryModel class."""
 
     def setUp(self) -> None:
-        super().setUp() 
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
@@ -230,7 +230,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
                 a list of exploration ids. This will create stories under the
                 topic_id and will link each of the given exploration ids to that
                 story.
-        """ 
+        """
         for story_id, exp_ids in story_exp_mapping.items():
             self.save_new_story(
                 story_id, feconf.SYSTEM_COMMITTER_ID,
@@ -242,7 +242,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
                     correctness_feedback_enabled=True)
                 self.publish_exploration(self.user_id_admin, exp_id)
 
-            self.link_explorations_to_story(topic_id, story_id, *exp_ids)
+            self.link_explorations_to_story(topic_id, story_id, exp_ids)
             topic_services.publish_story(
                 topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
 

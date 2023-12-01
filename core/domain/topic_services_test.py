@@ -167,9 +167,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self._create_published_explorations(story_1_exp_ids)
         self._create_published_explorations(story_2_exp_ids)
         self.link_explorations_to_story(
-            self.TOPIC_ID, self.story_id_1, *story_1_exp_ids)
+            self.TOPIC_ID, self.story_id_1, story_1_exp_ids)
         self.link_explorations_to_story(
-            self.TOPIC_ID, self.story_id_2, *story_2_exp_ids)
+            self.TOPIC_ID, self.story_id_2, story_2_exp_ids)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_2, self.user_id_admin)
         topic_services.publish_story(
@@ -207,7 +207,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 exp_id, self.user_id_admin, end_state_name='End',
                 correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_admin, exp_id)
-
 
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
@@ -2462,6 +2461,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'total_published_node_count'],
                     'thumbnail_filename': topic_summary['thumbnail_filename'],
                     'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                    'published_story_exploration_mapping': topic_summary[
+                        'published_story_exploration_mapping'],
                     'topic_model_created_on': topic_summary[
                         'topic_model_created_on'],
                     'topic_model_last_updated': topic_summary[

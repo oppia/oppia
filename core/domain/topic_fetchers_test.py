@@ -582,11 +582,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
         self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_1, exp_ids[0])
+            self.TOPIC_ID, self.story_id_1, exp_ids[:1])
         self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_3, *exp_ids[1:3])
+            self.TOPIC_ID, self.story_id_3, exp_ids[1:3])
         self._publish_story_with_explorations(
-            topic_id_2, story_id_4, exp_ids[3])
+            topic_id_2, story_id_4, exp_ids[3:])
 
         story_exp_ids = topic_fetchers.get_published_story_exploration_ids()
 
@@ -608,11 +608,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_1_exp_ids = ['exp_1', 'exp_2', 'exp_3']
         topic_2_exp_ids = ['exp_4']
         self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_1, topic_1_exp_ids[0])
+            self.TOPIC_ID, self.story_id_1, topic_1_exp_ids[:1])
         self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_3, *topic_1_exp_ids[1:3])
+            self.TOPIC_ID, self.story_id_3, topic_1_exp_ids[1:])
         self._publish_story_with_explorations(
-            topic_id_2, story_id_4, topic_2_exp_ids[0])
+            topic_id_2, story_id_4, topic_2_exp_ids)
 
         story_exp_ids = topic_fetchers.get_published_story_exploration_ids(
             topic_id_2)
@@ -620,7 +620,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)
 
     def _publish_story_with_explorations(
-        self, topic_id: str, story_id: str, *exp_ids: str
+        self, topic_id: str, story_id: str, exp_ids: List[str]
     ) -> None:
         """Publishes the story with story_id under topic_id. Explorations using
         the given exp_ids must be created and linked to the story beforehand.
@@ -628,7 +628,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         Args:
             topic_id: str. The id of the topic that contains the target story.
             story_id: str. The id of the story for publishing.
-            exp_ids: str. The ids of explorations to be linked to the story.
+            exp_ids: list(str). The ids of explorations to be linked to the
+                story.
         """
         for exp_id in exp_ids:
             self.save_new_valid_exploration(
@@ -636,5 +637,5 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_admin, exp_id)
 
-        self.link_explorations_to_story(topic_id, story_id, *exp_ids)
+        self.link_explorations_to_story(topic_id, story_id, exp_ids)
         topic_services.publish_story(topic_id, story_id, self.user_id_admin)

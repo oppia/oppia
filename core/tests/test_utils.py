@@ -3526,7 +3526,7 @@ version: 1
         rights_manager.publish_collection(committer, collection_id)
 
     def link_explorations_to_story(
-        self, topic_id: str, story_id: str, *exp_ids: str
+        self, topic_id: str, story_id: str, exp_ids: List[str]
     ) -> None:
         """Appends a story node for each exploration id given in exp_ids to the
         story with story_id.
@@ -3534,7 +3534,7 @@ version: 1
         Args:
             topic_id: str. ID of the topic that contains the story.
             story_id: str. ID of the story containing the new node.
-            *exp_ids: str. IDs of the exploration.
+            exp_ids: list(str). IDs of the exploration.
         """
         for exp_id in exp_ids:
             story = story_fetchers.get_story_by_id(story_id)
