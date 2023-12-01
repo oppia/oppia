@@ -18,45 +18,44 @@
  */
 
 const userFactory = require(
-    '../../puppeteer-testing-utilities/user-factory.js');
-  const testConstants = require(
-    '../../puppeteer-testing-utilities/test-constants.js');
-  
-  const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-  
-  describe('Question Admin', function() {
-    let questionAdmin = null;
-  
-    beforeAll(async function() {
-      questionAdmin =
-        await userFactory.createNewQuestionAdmin('questionAdm');
-    }, DEFAULT_SPEC_TIMEOUT);
-  
-    it('should be able to provide rights to review and submit questions to user.',
-      async function() {
-        let contributor = await userFactory.createNewGuestUser(
-          'contributor', 'contributor@example.com');
-        await userFactory.closeBrowserForUser(contributor);
-        
-        await questionAdmin.navigateToContributorDashboardAdminPage(); 
-        await questionAdmin.addSubmitQuestionRights('contributor');
-        await questionAdmin.addReviewQuestionRights('contributor');
+  '../../puppeteer-testing-utilities/user-factory.js');
+const testConstants = require(
+  '../../puppeteer-testing-utilities/test-constants.js');
 
-        await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
-        await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
+const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-        await questionAdmin.removeSubmitQuestionRights('contributor');
-        await questionAdmin.removeReviewQuestionRights('contributor');
+describe('Question Admin', function() {
+  let questionAdmin = null;
 
-        await questionAdmin.verifyUserCannotReviewQuestions('contributor');
-        await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
-        await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
-        await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
+  beforeAll(async function() {
+  questionAdmin =
+      await userFactory.createNewQuestionAdmin('questionAdm');
+  }, DEFAULT_SPEC_TIMEOUT);
 
-      }, DEFAULT_SPEC_TIMEOUT);
-  
-    afterAll(async function() {
-      await userFactory.closeAllBrowsers();
-    });
+  it('should be able to provide rights to review and submit questions to user.',
+  async function() {
+      let contributor = await userFactory.createNewGuestUser(
+      'contributor', 'contributor@example.com');
+      await userFactory.closeBrowserForUser(contributor);
+      
+      await questionAdmin.navigateToContributorDashboardAdminPage(); 
+      await questionAdmin.addSubmitQuestionRights('contributor');
+      await questionAdmin.addReviewQuestionRights('contributor');
+
+      await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
+      await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
+
+      await questionAdmin.removeSubmitQuestionRights('contributor');
+      await questionAdmin.removeReviewQuestionRights('contributor');
+
+      await questionAdmin.verifyUserCannotReviewQuestions('contributor');
+      await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
+      await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
+      await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
+
+  }, DEFAULT_SPEC_TIMEOUT);
+
+  afterAll(async function() {
+  await userFactory.closeAllBrowsers();
   });
-  
+});
