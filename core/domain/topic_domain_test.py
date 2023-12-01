@@ -1798,15 +1798,15 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'total_published_node_count': 1,
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
-            'story_exploration_mapping': {},
+            'published_story_exploration_mapping': {'story': ['exp']},
             'topic_model_created_on': time_in_millisecs,
             'topic_model_last_updated': time_in_millisecs,
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', {},
-            current_time, current_time)
+            1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
+            {'story': ['exp']}, current_time, current_time)
 
     # Here we use MyPy ignore because we override the definition of the function
     # from the parent class, but that is fine as _assert_validation_error is
