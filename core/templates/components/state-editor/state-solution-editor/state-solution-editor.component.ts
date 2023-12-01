@@ -160,6 +160,7 @@ export class StateSolutionEditorComponent implements OnInit {
   }
 
   openAddOrUpdateSolutionModal(): void {
+    console.error('This should be caught');
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
     this.inlineSolutionEditorIsActive = false;
