@@ -38,7 +38,7 @@ describe('Question Admin', function() {
         'contributor', 'contributor@example.com');
       await userFactory.closeBrowserForUser(contributor);
 
-      await questionAdmin.navigateToContributorDashboardAdminPage(); 
+      await questionAdmin.navigateToContributorDashboardAdminPage();
       await questionAdmin.addSubmitQuestionRights('contributor');
       await questionAdmin.addReviewQuestionRights('contributor');
 
@@ -52,7 +52,7 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
       await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
-  }, DEFAULT_SPEC_TIMEOUT);
+    }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
     await userFactory.closeAllBrowsers();
