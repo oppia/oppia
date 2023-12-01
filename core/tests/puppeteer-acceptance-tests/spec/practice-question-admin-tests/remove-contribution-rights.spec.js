@@ -28,16 +28,16 @@ describe('Question Admin', function() {
   let questionAdmin = null;
 
   beforeAll(async function() {
-  questionAdmin =
+    questionAdmin =
       await userFactory.createNewQuestionAdmin('questionAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide rights to review and submit questions to user.',
-  async function() {
+    async function() {
       let contributor = await userFactory.createNewGuestUser(
-      'contributor', 'contributor@example.com');
+        'contributor', 'contributor@example.com');
       await userFactory.closeBrowserForUser(contributor);
-      
+
       await questionAdmin.navigateToContributorDashboardAdminPage(); 
       await questionAdmin.addSubmitQuestionRights('contributor');
       await questionAdmin.addReviewQuestionRights('contributor');
@@ -52,10 +52,9 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
       await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
-
   }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-  await userFactory.closeAllBrowsers();
+    await userFactory.closeAllBrowsers();
   });
 });

@@ -49,7 +49,6 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
       await questionAdmin.verifyUserCanSubmitQuestions('contributor');
       await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
-
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
