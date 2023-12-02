@@ -20,7 +20,7 @@
 
 .oppia-footer-terms-privacy a,
 .oppia-footer-terms-privacy > small {
-  color: white;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
 }
@@ -57,7 +57,7 @@
 }
 
 .oppia-footer-container hr {
-  border: 1px solid white;
+  border: 1px solid #fff;
   display: none;
   width: 100%;
 }
@@ -86,7 +86,7 @@
 }
 
 .oppia-newsletter-content > h2 {
-  color: white;
+  color: #fff;
   font-size: 24px;
   font-weight: 700;
   line-height: 28px;
@@ -119,7 +119,7 @@
 }
 
 .oppia-newsletter-input > input {
-  background-color: white;
+  background-color: #fff;
   border: 1px solid transparent;
   border-radius: 4px;
   font-size: 18px;
@@ -131,9 +131,9 @@
 
 .oppia-newsletter-input > button {
   background-color: #004d45;
-  border: 2px solid white;
+  border: 2px solid #fff;
   border-radius: 4px;
-  color: white;
+  color: #fff;
   font-size: 14px;
   font-weight: 600;
   height: 44px;

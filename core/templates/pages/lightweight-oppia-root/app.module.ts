@@ -56,7 +56,7 @@ export const toastrConfig = {
   titleClass: 'toast-title'
 };
 
-export class MyHammerConfig extends HammerGestureConfig {
+export class HammerConfig extends HammerGestureConfig {
   overrides = {
     swipe: { direction: hammer.DIRECTION_HORIZONTAL },
     pinch: { enable: false },
@@ -100,7 +100,7 @@ export class MyHammerConfig extends HammerGestureConfig {
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
+      useClass: HammerConfig
     }
   ],
   bootstrap: [LightweightOppiaRootComponent]
