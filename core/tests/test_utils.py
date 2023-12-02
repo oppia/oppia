@@ -3535,28 +3535,29 @@ version: 1
             topic_id: str. ID of the topic that contains the story.
             story_id: str. ID of the story containing the new node.
             exp_ids: list(str). IDs of the exploration.
-        """
+        """        
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = []
         for exp_id in exp_ids:
-            story = story_fetchers.get_story_by_id(story_id)
             node_id = story.story_contents.next_node_id
-
-            topic_services.update_story_and_topic_summary(
-                feconf.SYSTEM_COMMITTER_ID,
-                story_id,
-                [story_domain.StoryChange({
+            change_list.extend([
+                story_domain.StoryChange({
                     'cmd': story_domain.CMD_ADD_STORY_NODE,
                     'node_id': node_id,
                     'title': node_id
-                }), story_domain.StoryChange({
+                }),
+                story_domain.StoryChange({
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'property_name':
                         story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
                     'node_id': node_id,
                     'old_value': None,
                     'new_value': exp_id
-                })],
-                'Add exploration ' + exp_id + ' to story ' + story_id,
-                topic_id)
+                })])
+
+        topic_services.update_story_and_topic_summary(
+            feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
+            'Linked explorations to story ' + story_id, topic_id)
 
     def create_story_for_translation_opportunity(
         self,
