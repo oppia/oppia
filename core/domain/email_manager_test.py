@@ -442,64 +442,6 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].body, expected_email_text_body)
 
-    def test_correct_rights_are_written_in_voice_artist_role_email_body(
-        self
-    ) -> None:
-        expected_email_html_body = (
-            'Hi newuser,<br>'
-            '<br>'
-            '<b>editor</b> has granted you voice artist rights to their '
-            'exploration, '
-            '"<a href="https://www.oppia.org/create/A">Title</a>"'
-            ', on Oppia.org.<br>'
-            '<br>'
-            'This allows you to:<br>'
-            '<ul>'
-            '<li>Voiceover the exploration</li><br>'
-            '<li>View and playtest the exploration</li><br>'
-            '</ul>'
-            'You can find the exploration '
-            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
-            '<br>'
-            'Thanks, and happy collaborating!<br>'
-            '<br>'
-            'Best wishes,<br>'
-            'The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
-
-        expected_email_text_body = (
-            'Hi newuser,\n'
-            '\n'
-            'editor has granted you voice artist rights to their '
-            'exploration, "Title", on Oppia.org.\n'
-            '\n'
-            'This allows you to:\n'
-            '- Voiceover the exploration\n'
-            '- View and playtest the exploration\n'
-            'You can find the exploration here.\n'
-            '\n'
-            'Thanks, and happy collaborating!\n'
-            '\n'
-            'Best wishes,\n'
-            'The Oppia Team\n'
-            '\n'
-            'You can change your email preferences via the Preferences page.')
-
-        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
-            # Check that correct email content is sent for Voice Artist.
-            email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id,
-                rights_domain.ROLE_VOICE_ARTIST, self.exploration.id,
-                self.exploration.title)
-
-            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
-            self.assertEqual(len(messages), 1)
-
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].body, expected_email_text_body)
-
     def test_correct_rights_are_written_in_playtester_role_email_body(
         self
     ) -> None:
@@ -2165,7 +2107,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
 
 class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
@@ -6249,32 +6192,32 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
 
 
-class ContributionReviewerEmailTest(test_utils.EmailTestBase):
+class CDUserEmailTest(test_utils.EmailTestBase):
     """Test for assignment and removal of contribution reviewers."""
 
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
-    VOICEOVER_REVIEWER_EMAIL: Final = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
+    QUESTION_SUBMITTER_EMAIL: Final = 'questionsubmitter@example.com'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
-        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+        self.signup(self.QUESTION_SUBMITTER_EMAIL, 'questionSuggestor')
 
         self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.translation_reviewer_id, True, False, False, False)
-        self.voiceover_reviewer_id = self.get_user_id_from_email(
-            self.VOICEOVER_REVIEWER_EMAIL)
-        user_services.update_email_preferences(
-            self.voiceover_reviewer_id, True, False, False, False)
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
+        self.question_submitter_id = self.get_user_id_from_email(
+            self.QUESTION_SUBMITTER_EMAIL)
+        user_services.update_email_preferences(
+            self.question_submitter_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -6285,9 +6228,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self
     ) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
@@ -6302,9 +6245,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_new_contribution_reviewer(
+                email_manager.send_email_to_new_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
                 )
 
     def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
@@ -6315,32 +6258,38 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The language_code cannot be None'
         ):
             with self.can_not_send_emails_ctx:
-                email_manager.send_email_to_removed_contribution_reviewer(
+                email_manager.send_email_to_removed_cd_user(
                     self.translation_reviewer_id,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
 
-    def test_assign_translation_reviewer_email_for_invalid_review_category(
+    def test_assign_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_new_contribution_reviewer(
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
-    def test_schema_of_new_reviewer_email_data_constant(self) -> None:
-        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA.keys()), [
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
-        for category_details in email_manager.NEW_REVIEWER_EMAIL_DATA.values():
-            self.assertEqual(len(category_details), 4)
+    def test_schema_of_new_cd_user_email_data_constant(self) -> None:
+        self.assertEqual(
+            sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
+            [
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+            ])
+        for category_details in (
+            email_manager.NEW_CD_USER_EMAIL_DATA.values()
+        ):
+            self.assertEqual(len(category_details), 5)
             self.assertTrue(
                 'description' in category_details or (
                     'description_template' in category_details))
-            self.assertTrue('review_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('to_check' in category_details)
+            self.assertTrue('to_review' in category_details or (
+                    'to_submit' in category_details))
 
     def test_send_assigned_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6359,9 +6308,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6388,55 +6337,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
-
-    def test_send_assigned_voiceover_reviewer_email(self) -> None:
-        expected_email_subject = (
-            'You have been invited to review Oppia voiceovers')
-        expected_email_html_body = (
-            'Hi voiceartist,<br><br>'
-            'This is to let you know that the Oppia team has added you as a '
-            'reviewer for हिन्दी (hindi) language voiceovers. This allows you '
-            'to review voiceover applications made by contributors in the '
-            'हिन्दी (hindi) language.<br><br>'
-            'You can check the voiceover applications waiting for review in '
-            'the <a href="https://www.oppia.org/contributor-dashboard">'
-            'Contributor Dashboard</a>.<br><br>'
-            'Thanks, and happy contributing!<br><br>'
-            'Best wishes,<br>'
-            'The Oppia Community')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
-                self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                language_code='hi')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.voiceover_reviewer_id)
-            self.assertEqual(
-                sent_email_model.recipient_email,
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_send_assigned_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6454,9 +6356,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_reviewer(
+            email_manager.send_email_to_new_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6482,43 +6384,92 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
+
+    def test_send_assigned_question_submitter_email(self) -> None:
+        expected_email_subject = (
+            'You have been invited to submit Oppia questions')
+        expected_email_html_body = (
+            'Hi questionSuggestor,<br><br>'
+            'This is to let you know that the Oppia team has added you as a '
+            'contributor to submit question suggestions ' 
+            'for use in lessons.<br><br>'
+            'You can now start to submit questions in the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_new_cd_user(
+                self.question_submitter_id,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                language_code='hi')
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.SentEmailModel
+            ] = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.question_submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_CD_USER)
 
     def test_email_is_not_sent_can_send_emails_is_false(self) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_remove_translation_reviewer_email_for_invalid_review_category(
+    def test_remove_translation_reviewer_email_for_invalid_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
-            email_manager.send_email_to_removed_contribution_reviewer(
+        with self.assertRaisesRegex(Exception, 'Invalid category'):
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id, 'invalid_category')
 
     def test_schema_of_removed_reviewer_email_data_constant(self) -> None:
         self.assertEqual(
-            sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA.keys()), [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
+            sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()),
+                [
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                    constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+                ])
         for category_details in (
-                email_manager.REMOVED_REVIEWER_EMAIL_DATA.values()):
-            self.assertEqual(len(category_details), 4)
+                email_manager.REMOVED_CD_USER_EMAIL_DATA.values()):
+            self.assertEqual(len(category_details), 3)
             self.assertTrue(
                 'role_description' in category_details or (
                     'role_description_template' in category_details))
-            self.assertTrue('review_category' in category_details)
+            self.assertTrue('category' in category_details)
             self.assertTrue(
                 'rights_message' in category_details or (
                     'rights_message_template' in category_details))
-            self.assertTrue('contribution_allowed' in category_details)
 
     def test_send_removed_translation_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6536,9 +6487,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6565,53 +6516,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
-
-    def test_send_removed_voiceover_reviewer_email(self) -> None:
-        expected_email_subject = (
-            'You have been unassigned as a voiceover reviewer')
-        expected_email_html_body = (
-            'Hi voiceartist,<br><br>'
-            'The Oppia team has removed you from the voiceover reviewer role '
-            'in the हिन्दी (hindi) language. You won\'t be able to review '
-            'voiceover applications made by contributors in the हिन्दी (hindi)'
-            ' language any more, but you can still contribute voiceovers '
-            'through the <a href="https://www.oppia.org/contributor-dashboard">'
-            'Contributor Dashboard</a>.<br><br>'
-            'Thanks, and happy contributing!<br><br>'
-            'Best wishes,<br>'
-            'The Oppia Community')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
-                self.voiceover_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                language_code='hi')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.voiceover_reviewer_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.VOICEOVER_REVIEWER_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
     def test_send_removed_question_reviewer_email(self) -> None:
         expected_email_subject = (
@@ -6628,9 +6533,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'The Oppia Community')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_removed_contribution_reviewer(
+            email_manager.send_email_to_removed_cd_user(
                 self.question_reviewer_id,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.
@@ -6656,7 +6561,52 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
-                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_REVIEWER)
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
+
+    def test_send_removed_question_submitter_email(self) -> None:
+        expected_email_subject = (
+            'You have been unassigned as a question submitter')
+        expected_email_html_body = (
+            'Hi questionSuggestor,<br><br>'
+            'The Oppia team has removed you from the question submitter role. '
+            'You won\'t be able to submit question suggestions '
+            'any more, but you can still contribute questions '
+            'through the <a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_removed_cd_user(
+                self.question_submitter_id,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                language_code='hi')
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.SentEmailModel
+            ] = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.question_submitter_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.QUESTION_SUBMITTER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent, feconf.EMAIL_INTENT_REMOVE_CD_USER)
 
 
 class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
