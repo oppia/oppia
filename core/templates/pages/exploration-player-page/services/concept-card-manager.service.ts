@@ -23,7 +23,6 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { ExplorationEngineService } from './exploration-engine.service';
-import { HintsAndSolutionManagerService } from './hints-and-solution-manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -57,8 +56,7 @@ export class ConceptCardManagerService {
   conceptCardDiscovered: boolean = false;
 
   constructor(
-    private playerPositionService: PlayerPositionService,
-    private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+      playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -115,7 +113,7 @@ export class ConceptCardManagerService {
       ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
-  reset(): void {
+  reset(newCard: StateCard): void {
     if (this.hintsAvailable) {
       return;
     }
@@ -131,15 +129,16 @@ export class ConceptCardManagerService {
       this.tooltipTimeout = null;
     }
 
-    if (this.conceptCardForStateExists()) {
+    if (this.conceptCardForStateExists(newCard)) {
       this.enqueueTimeout(
         this.releaseConceptCard,
         ExplorationPlayerConstants.WAIT_FOR_CONCEPT_CARD_MSEC);
     }
   }
 
-  conceptCardForStateExists(): boolean {
-    let state = this.explorationEngineService.getState();
+  conceptCardForStateExists(newCard: StateCard): boolean {
+    let state = this.explorationEngineService.getStateFromStateName(
+      newCard.getStateName());
     return state.linkedSkillId !== null;
   }
 
