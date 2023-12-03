@@ -65,6 +65,7 @@ const removeContributionRightsSubmitButton =
 
 /**
  * Function to display the list of question reviewers
+ * @param {object} user - the class object of the user.
  */
 let getDisplayedListOfQuestionReviewers = async function(user) {
   await user.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -76,6 +77,7 @@ let getDisplayedListOfQuestionReviewers = async function(user) {
 
 /**
  * Function to display the list of question reviewers
+ * @param {object} user - the class object of the user.
  */
 let getDisplayedListOfQuestionSubmitters = async function(user) {
   await user.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -85,8 +87,10 @@ let getDisplayedListOfQuestionSubmitters = async function(user) {
   await user.page.waitForNetworkIdle();
 };
 
-/**questionReviewStatusForUser
- * Function to display the 
+/**
+ * Function to display the contribution rights status for the user.
+ * @param {object} user - the class object of the user.
+ * @param {string} username - the username of the user.
  */
 let contributionStatusForUser = async function(user, username) {
   await user.select(viewContributorFilterMethodSelect, usernameMethodValue);
@@ -94,8 +98,8 @@ let contributionStatusForUser = async function(user, username) {
   await user.clickOn(viewContributorSubmitButton);
 
   await user.page.waitForNetworkIdle();
-}
-  
+};
+
 module.exports = class QuestionAdmin extends baseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
@@ -157,46 +161,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display reviewing questions rights by role
-   * and check if the user is not displayed as a question reviewer
-   * @param {string} username - the user expected to not be displayed.
-   */
-  async verifyQuestionReviewersExcludeUser(username) {
-    await getDisplayedListOfQuestionReviewers(this);
-
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
-    if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to review question!`);
-    }
-  }
-
-  /**
-   * Function to display reviewing questions rights by role
-   * and check if the user is not displayed as a question submitter
-   * @param {string} username - the user expected to not be displayed.
-   */
-  async verifyQuestionSubmittersExcludeUser(username) {
-    await getDisplayedListOfQuestionSubmitters(this);
-
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
-    if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to submit question!`);
-    }
-  }
-
-  /**
-   * Function to display contribution rights by user
-   * and check if the user has the right to review questions
+   * Function to check if the user has the right to review questions
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanReviewQuestions(username) {
@@ -216,8 +181,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display contribution rights by user
-   * and check if the user has the right to submit questions
+   * Function to check if the user has the right to submit questions
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanSubmitQuestions(username) {
@@ -237,8 +201,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display contribution rights by user
-   * and check if the user doesn't have the right to review questions
+   * Function to check if the user doesn't have the right to review questions
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotReviewQuestions(username) {
@@ -258,8 +221,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display contribution rights by user
-   * and check if the user doesn't have the right to submit questions
+   * Function to check if the user doesn't have the right to submit questions
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotSubmitQuestions(username) {
@@ -279,8 +241,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display reviewing questions rights by role
-   * and check if the user is displayed as a question reviewer
+   * Function to check if the user is displayed as a question reviewer
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionReviewersIncludeUser(username) {
@@ -298,8 +259,7 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display reviewing questions rights by role
-   * and check if the user is displayed as a question submitter
+   * Function to check if the user is displayed as a question submitter
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionSubmittersIncludeUser(username) {
@@ -313,6 +273,42 @@ module.exports = class QuestionAdmin extends baseUser {
     if (!displayedUsers.includes(username)) {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
+    }
+  }
+  
+  /**
+   * Function check if the user is not displayed as a question reviewer
+   * @param {string} username - the user expected to not be displayed.
+   */
+  async verifyQuestionReviewersExcludeUser(username) {
+    await getDisplayedListOfQuestionReviewers(this);
+
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    if (displayedUsers.includes(username)) {
+      throw new Error(
+        `${username} has the right to review question!`);
+    }
+  }
+
+  /**
+   * Function to check if the user is not displayed as a question submitter
+   * @param {string} username - the user expected to not be displayed.
+   */
+  async verifyQuestionSubmittersExcludeUser(username) {
+    await getDisplayedListOfQuestionSubmitters(this);
+
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    if (displayedUsers.includes(username)) {
+      throw new Error(
+        `${username} has the right to submit question!`);
     }
   }
 };

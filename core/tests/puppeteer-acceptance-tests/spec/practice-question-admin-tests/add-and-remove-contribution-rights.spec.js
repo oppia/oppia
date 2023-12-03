@@ -59,7 +59,6 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
-
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
