@@ -109,29 +109,6 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Private function to display the list of question reviewers
-   */
-  async #getDisplayedListOfQuestionSubmitters() {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
-  }
-
-  /**
-   * Private function to display the contribution rights status for the user.
-   * @param {string} username - the username of the user.
-   */
-  async #contributionStatusForUser(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
-  }
-
-  /**
    * Function for removng a right of reviewing questions to a user.
    * @param {string} username - the username of the user.
    */
@@ -153,6 +130,29 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.select(
       removeContributonRightsCategorySelect, submitQuestionRightValue);
     await this.clickOn(removeContributionRightsSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+  }
+
+  /**
+   * Private function to display the list of question reviewers
+   */
+  async #getDisplayedListOfQuestionSubmitters() {
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
+    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
+    await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+  }
+
+  /**
+   * Private function to display the contribution rights status for the user.
+   * @param {string} username - the username of the user.
+   */
+  async #contributionStatusForUser(username) {
+    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+    await this.type(viewContributerUsernameInput, username);
+    await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
   }
