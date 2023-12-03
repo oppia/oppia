@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for question admins to remove reviewing
- * question rights to users.
+ * @fileoverview Acceptance Test for question admins to add and remove
+ * reviewing question rights to users.
  */
 
 const userFactory = require(
@@ -34,24 +34,32 @@ describe('Question Admin', function() {
 
   it('should be able to provide rights to review and submit questions to user.',
     async function() {
-      let contributor = await userFactory.createNewGuestUser(
-        'contributor', 'contributor@example.com');
-      await userFactory.closeBrowserForUser(contributor);
+      let Tester = await userFactory.createNewGuestUser(
+        'Tester', 'admin.tester@example.com');
+      await userFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
-      await questionAdmin.addSubmitQuestionRights('contributor');
-      await questionAdmin.addReviewQuestionRights('contributor');
+      await questionAdmin.verifyUserCannotReviewQuestions('Tester');
+      await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
+      await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
+      await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
 
-      await questionAdmin.verifyQuestionReviewersIncludeUser('contributor');
-      await questionAdmin.verifyQuestionSubmittersIncludeUser('contributor');
+      await questionAdmin.addSubmitQuestionRights('Tester');
+      await questionAdmin.addReviewQuestionRights('Tester');
 
-      await questionAdmin.removeSubmitQuestionRights('contributor');
-      await questionAdmin.removeReviewQuestionRights('contributor');
+      await questionAdmin.verifyUserCanReviewQuestions('Tester');
+      await questionAdmin.verifyQuestionReviewersIncludeUser('Tester');
+      await questionAdmin.verifyUserCanSubmitQuestions('Tester');
+      await questionAdmin.verifyQuestionSubmittersIncludeUser('Tester');
 
-      await questionAdmin.verifyUserCannotReviewQuestions('contributor');
-      await questionAdmin.verifyQuestionReviewersExcludeUser('contributor');
-      await questionAdmin.verifyUserCannotSubmitQuestions('contributor');
-      await questionAdmin.verifyQuestionSubmittersExcludeUser('contributor');
+      await questionAdmin.removeSubmitQuestionRights('Tester');
+      await questionAdmin.removeReviewQuestionRights('Tester');
+
+      await questionAdmin.verifyUserCannotReviewQuestions('Tester');
+      await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
+      await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
+      await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
+
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

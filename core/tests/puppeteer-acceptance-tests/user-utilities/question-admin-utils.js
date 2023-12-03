@@ -63,6 +63,39 @@ const removeContributonRightsCategorySelect =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
+/**
+ * Function to display the list of question reviewers
+ */
+let getDisplayedListOfQuestionReviewers = async function(user) {
+  await user.select(viewContributorFilterMethodSelect, roleMethodValue);
+  await user.select(viewContributorCategorySelect, reviewQuestionRightValue);
+  await user.clickOn(viewContributorSubmitButton);
+
+  await user.page.waitForNetworkIdle();
+};
+
+/**
+ * Function to display the list of question reviewers
+ */
+let getDisplayedListOfQuestionSubmitters = async function(user) {
+  await user.select(viewContributorFilterMethodSelect, roleMethodValue);
+  await user.select(viewContributorCategorySelect, submitQuestionRightValue);
+  await user.clickOn(viewContributorSubmitButton);
+
+  await user.page.waitForNetworkIdle();
+};
+
+/**questionReviewStatusForUser
+ * Function to display the 
+ */
+let contributionStatusForUser = async function(user, username) {
+  await user.select(viewContributorFilterMethodSelect, usernameMethodValue);
+  await user.type(viewContributerUsernameInput, username);
+  await user.clickOn(viewContributorSubmitButton);
+
+  await user.page.waitForNetworkIdle();
+}
+  
 module.exports = class QuestionAdmin extends baseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
@@ -129,11 +162,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionReviewersExcludeUser(username) {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await getDisplayedListOfQuestionReviewers(this);
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -152,11 +181,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionSubmittersExcludeUser(username) {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await getDisplayedListOfQuestionSubmitters(this);
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -175,17 +200,13 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanReviewQuestions(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await contributionStatusForUser(this, username);
 
     await this.page.waitForSelector(viewContributorReviewQuestionsResult);
-    const displayedUsername = await this.page.$eval(
+    const questionReviewStatusForUser = await this.page.$eval(
       viewContributorReviewQuestionsResult,
       element => element.innerText);
-    if (displayedUsername.includes('Not-allowed')) {
+    if (questionReviewStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} does not have rights for reviewing questions!`);
     } else {
@@ -200,17 +221,13 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanSubmitQuestions(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await contributionStatusForUser(this, username);
 
     await this.page.waitForSelector(viewContributorSubmitQuestionResult);
-    const displayedUsername = await this.page.$eval(
+    const questionSubmitStatusForUser = await this.page.$eval(
       viewContributorSubmitQuestionResult,
       element => element.innerText);
-    if (displayedUsername.includes('Not-allowed')) {
+    if (questionSubmitStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
     } else {
@@ -225,17 +242,13 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotReviewQuestions(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await contributionStatusForUser(this, username);
 
     await this.page.waitForSelector(viewContributorReviewQuestionsResult);
-    const displayedUsername = await this.page.$eval(
+    const questionReviewStatusForUser = await this.page.$eval(
       viewContributorReviewQuestionsResult,
       element => element.innerText);
-    if (!displayedUsername.includes('Not-allowed')) {
+    if (!questionReviewStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} has rights for reviewing questions!`);
     } else {
@@ -250,17 +263,13 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotSubmitQuestions(username) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await contributionStatusForUser(this, username);
 
     await this.page.waitForSelector(viewContributorSubmitQuestionResult);
-    const displayedUsername = await this.page.$eval(
+    const questionSubmitStatusForUser = await this.page.$eval(
       viewContributorSubmitQuestionResult,
       element => element.innerText);
-    if (!displayedUsername.includes('Not-allowed')) {
+    if (!questionSubmitStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} has rights for submitting questions!`);
     } else {
@@ -275,11 +284,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionReviewersIncludeUser(username) {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await getDisplayedListOfQuestionReviewers(this);
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -298,11 +303,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionSubmittersIncludeUser(username) {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
+    await getDisplayedListOfQuestionSubmitters(this);
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
