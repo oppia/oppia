@@ -1622,7 +1622,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         raise utils.ValidationError(
                             f'Selected wrong number of choices in rule '
                             f'\'{rule_spec_index}\' '
-                            f'of answer group \'{ans_group_index}\'.'
+                            f'of answer group \'{ans_group_index}\'. '
                             f'{selected_choices_count} were selected, it is '
                             f'either less than {min_value} '
                             f'or greater than {max_value} '
