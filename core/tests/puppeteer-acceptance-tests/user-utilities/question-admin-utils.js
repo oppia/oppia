@@ -106,7 +106,7 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
-  };
+  }
 
   /**
    * Private function to display the list of question reviewers
@@ -117,7 +117,7 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
-  };
+  }
 
   /**
    * Private function to display the contribution rights status for the user.
@@ -129,7 +129,7 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
-  };
+  }
 
   /**
    * Function for removng a right of reviewing questions to a user.
