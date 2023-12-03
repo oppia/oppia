@@ -92,7 +92,7 @@ export class HtmlLengthService {
 
 
   private getWeightForTextNodes(
-      textNode: HTMLElement, countCharacters: boolean): number {
+      textNode: HTMLElement | Text, countCharacters: boolean): number {
     const textContent = textNode.textContent || '';
     return countCharacters ? textContent.length :
       textContent.trim().split(' ').length;
