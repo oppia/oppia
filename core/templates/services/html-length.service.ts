@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -23,7 +23,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 @Injectable({
   providedIn: 'root'
 })
-
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
@@ -41,7 +40,7 @@ export class HtmlLengthService {
 
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
-    let totalWords = this.calculateBaselineLength(sanitizedHtml, false);
+    let totalWords = this.calculateBaselineLength(sanitizedHtml);
 
     const customTags = this.extractCustomTags(htmlString);
     for (const customTag of customTags) {
@@ -70,34 +69,39 @@ export class HtmlLengthService {
   }
 
   private calculateBaselineLength(
-      sanitizedHtml: string, countCharacters: boolean = false): number {
+    sanitizedHtml: string, countCharacters: boolean = false): number {
     const domparser = new DOMParser();
     const dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
 
-    for (const tag of Array.from(dom.body.children)) {
-      const ltag = tag.tagName.toLowerCase();
-
-      if (this.textTags.includes(ltag)) {
+    for (const node of Array.from(dom.body.childNodes)) {
+      if (node.nodeType === Node.TEXT_NODE) {
         totalWeight += this.getWeightForTextNodes(
-          tag as HTMLElement, countCharacters);
+          node as Text, countCharacters);
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const ltag = (node as HTMLElement).tagName.toLowerCase();
+        if (this.textTags.includes(ltag)) {
+          totalWeight += this.getWeightForTextNodes(
+            node as HTMLElement, countCharacters);
+        }
       }
     }
 
     return totalWeight;
   }
 
+
   private getWeightForTextNodes(
-      textNode: HTMLElement, countCharacters: boolean): number {
+    textNode: HTMLElement, countCharacters: boolean): number {
     const textContent = textNode.textContent || '';
     return countCharacters ? textContent.length :
       textContent.trim().split(' ').length;
   }
 
   private getWeightForNonTextNodes(
-      nonTextNode: string, countCharacters: boolean): number {
+    nonTextNode: string, countCharacters: boolean): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
-      return countCharacters ? 1 : 0;
+      return 1;
     }
 
     const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
@@ -113,8 +117,10 @@ export class HtmlLengthService {
     const dom = domparser.parseFromString(htmlString, 'text/html');
     const customTags: string[] = [];
 
-    for (const tag of Array.from(dom.querySelectorAll('[data-oppiatag]'))) {
-      customTags.push(tag.outerHTML);
+    for (const tag of Array.from(
+      dom.querySelectorAll(this.nonTextTags.join(',')))) {
+      const sanitizedTag = tag.outerHTML.replace(/"/g, "'");
+      customTags.push(sanitizedTag);
     }
 
     return customTags;
