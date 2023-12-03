@@ -275,7 +275,7 @@ module.exports = class QuestionAdmin extends baseUser {
         `${username} does not have rights for submitting questions!`);
     }
   }
-  
+
   /**
    * Function check if the user is not displayed as a question reviewer
    * @param {string} username - the user expected to not be displayed.
