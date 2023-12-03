@@ -3535,7 +3535,7 @@ version: 1
             topic_id: str. ID of the topic that contains the story.
             story_id: str. ID of the story containing the new node.
             exp_ids: list(str). IDs of the exploration.
-        """        
+        """
         story = story_fetchers.get_story_by_id(story_id)
         change_list = []
         for exp_id in exp_ids:
