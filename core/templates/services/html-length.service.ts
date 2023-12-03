@@ -69,7 +69,7 @@ export class HtmlLengthService {
   }
 
   private calculateBaselineLength(
-    sanitizedHtml: string, countCharacters: boolean = false): number {
+      sanitizedHtml: string, countCharacters: boolean = false): number {
     const domparser = new DOMParser();
     const dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
@@ -92,14 +92,14 @@ export class HtmlLengthService {
 
 
   private getWeightForTextNodes(
-    textNode: HTMLElement, countCharacters: boolean): number {
+      textNode: HTMLElement, countCharacters: boolean): number {
     const textContent = textNode.textContent || '';
     return countCharacters ? textContent.length :
       textContent.trim().split(' ').length;
   }
 
   private getWeightForNonTextNodes(
-    nonTextNode: string, countCharacters: boolean): number {
+      nonTextNode: string, countCharacters: boolean): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;
     }
