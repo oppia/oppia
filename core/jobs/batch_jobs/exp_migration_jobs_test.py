@@ -446,8 +446,7 @@ class MigrateExplorationJobTests(
                 'hi': 0,
                 'bn': 0
             },
-            'translation_in_review_counts': {},
-            'is_pinned': False}
+            'translation_in_review_counts': {}}
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
@@ -860,8 +859,7 @@ class AuditExplorationMigrationJobTests(
             'translation_counts': {
                 'hi': 0
             },
-            'translation_in_review_counts': {},
-            'is_pinned': False
+            'translation_in_review_counts': {}
         }
 
         self.assertEqual(
