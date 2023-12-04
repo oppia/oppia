@@ -68,7 +68,7 @@ describe('ConceptCardManager service', () => {
       AudioTranslationLanguageService);
   }));
 
-  beforeEach(fakeAsync(() => {
+  beforeEach(() => {
     stateCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
@@ -125,7 +125,7 @@ describe('ConceptCardManager service', () => {
       }),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
-  }));
+  });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
     // Case when no hints exist.
