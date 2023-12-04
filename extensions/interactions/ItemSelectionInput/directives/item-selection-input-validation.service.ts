@@ -116,7 +116,7 @@ export class ItemSelectionInputValidationService {
       rule: Rule,
       handledAnswers: boolean[]) {
     ruleInputs.forEach((ruleInput) => {
-      var choiceIndex = answerChoiceToIndex[ruleInput];
+      let choiceIndex = answerChoiceToIndex[ruleInput];
       if (rule.type === 'Equals') {
         handledAnswers[choiceIndex] = true;
       } else if (rule.type === 'IsProperSubsetOf') {
@@ -125,7 +125,7 @@ export class ItemSelectionInputValidationService {
         handledAnswers[choiceIndex] = true;
       } else if (rule.type ===
         'DoesNotContainAtLeastOneOf') {
-        for (var i = 0; i < handledAnswers.length; i++) {
+        for (let i = 0; i < handledAnswers.length; i++) {
           if (i !== choiceIndex) {
             handledAnswers[i] = true;
           }
@@ -193,7 +193,7 @@ export class ItemSelectionInputValidationService {
       stateName: string, customizationArgs:
       ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {
-    var warningsList: Warning[] = [];
+    let warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -202,9 +202,9 @@ export class ItemSelectionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    var minAllowedCount =
+    let minAllowedCount =
       customizationArgs.minAllowableSelectionCount.value;
-    var maxAllowedCount =
+    let maxAllowedCount =
       customizationArgs.maxAllowableSelectionCount.value;
 
     if (maxAllowedCount === 1) {

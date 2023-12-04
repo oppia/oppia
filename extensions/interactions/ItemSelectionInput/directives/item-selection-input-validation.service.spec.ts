@@ -332,7 +332,7 @@ describe('ItemSelectionInputValidationService', () => {
     'and minimum allowed selections when the "Equals" rule is used and ' +
     'there is no selected answer in the rule.',
     () => {
-      var warnings = validatorService.getAllWarnings(
+      let warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, NoInputAnswerGroupsWithEqualsRule,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
