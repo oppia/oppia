@@ -122,7 +122,7 @@ module.exports = class QuestionAdmin extends baseUser {
 
     await this.page.waitForNetworkIdle();
   }
-  
+
   /**
    * Function to display the list of question reviewers
    */
