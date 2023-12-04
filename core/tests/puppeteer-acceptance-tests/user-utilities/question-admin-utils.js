@@ -98,17 +98,6 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Private function to display the list of question reviewers
-   */
-  async #getDisplayedListOfQuestionReviewers() {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
-    await this.clickOn(viewContributorSubmitButton);
-
-    await this.page.waitForNetworkIdle();
-  }
-
-  /**
    * Function for removng a right of reviewing questions to a user.
    * @param {string} username - the username of the user.
    */
@@ -133,11 +122,22 @@ module.exports = class QuestionAdmin extends baseUser {
 
     await this.page.waitForNetworkIdle();
   }
+  
+  /**
+   * Function to display the list of question reviewers
+   */
+  async getDisplayedListOfQuestionReviewers() {
+    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
+    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
+    await this.clickOn(viewContributorSubmitButton);
+
+    await this.page.waitForNetworkIdle();
+  }
 
   /**
-   * Private function to display the list of question reviewers
+   * Function to display the list of question reviewers
    */
-  async #getDisplayedListOfQuestionSubmitters() {
+  async getDisplayedListOfQuestionSubmitters() {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, submitQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
@@ -146,10 +146,10 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Private function to display the contribution rights status for the user.
+   * Function to display the contribution rights status for the user.
    * @param {string} username - the username of the user.
    */
-  async #contributionStatusForUser(username) {
+  async contributionStatusForUser(username) {
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
@@ -162,7 +162,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanReviewQuestions(username) {
-    await this.#contributionStatusForUser(username);
+    await this.contributionStatusForUser(username);
 
     await this.page.waitForSelector(viewContributorReviewQuestionsResult);
     const questionReviewStatusForUser = await this.page.$eval(
@@ -182,7 +182,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanSubmitQuestions(username) {
-    await this.#contributionStatusForUser(username);
+    await this.contributionStatusForUser(username);
 
     await this.page.waitForSelector(viewContributorSubmitQuestionResult);
     const questionSubmitStatusForUser = await this.page.$eval(
@@ -202,7 +202,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotReviewQuestions(username) {
-    await this.#contributionStatusForUser(username);
+    await this.contributionStatusForUser(username);
 
     await this.page.waitForSelector(viewContributorReviewQuestionsResult);
     const questionReviewStatusForUser = await this.page.$eval(
@@ -222,7 +222,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotSubmitQuestions(username) {
-    await this.#contributionStatusForUser(username);
+    await this.contributionStatusForUser(username);
 
     await this.page.waitForSelector(viewContributorSubmitQuestionResult);
     const questionSubmitStatusForUser = await this.page.$eval(
@@ -242,7 +242,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionReviewersIncludeUser(username) {
-    await this.#getDisplayedListOfQuestionReviewers();
+    await this.getDisplayedListOfQuestionReviewers();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -260,7 +260,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionSubmittersIncludeUser(username) {
-    await this.#getDisplayedListOfQuestionSubmitters();
+    await this.getDisplayedListOfQuestionSubmitters();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -278,7 +278,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionReviewersExcludeUser(username) {
-    await this.#getDisplayedListOfQuestionReviewers();
+    await this.getDisplayedListOfQuestionReviewers();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
@@ -296,7 +296,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionSubmittersExcludeUser(username) {
-    await this.#getDisplayedListOfQuestionSubmitters();
+    await this.getDisplayedListOfQuestionSubmitters();
 
     await this.page.waitForSelector(viewRoleUserResult);
     const displayedUsers = await this.page.$eval(
