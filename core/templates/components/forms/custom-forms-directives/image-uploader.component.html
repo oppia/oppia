@@ -8,9 +8,12 @@
     {{ errorMessage }}
   </span>
   <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader" tabindex="0">
-    Before uploading images, please ensure that they are<br>
-    compatible with the <a tabindex="0" class="license-term-link" href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
-    Please do not upload watermarked images.
+    Before uploading, please ensure that your image:<br>
+    <ul class="image-upload-instructions">
+      <li>Is in .svg, .png or .jpg format</li>
+      <li>Has a size smaller than 100 KB</li>
+      <li>Has no watermarks and is compatible with the <a tabindex="0" class="license-term-link" href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site</li>
+    </ul>
   </span>
   <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
   <!-- The onclick="this.imageInputRef.nativeElement.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
@@ -54,7 +57,7 @@
     background: #eee;
     color: black;
     font-size: 16px;
-    height: 220px;
+    height: 260px;
     padding-top: 74px;
     position: relative;
     text-align: center;
@@ -167,6 +170,14 @@
 
   .image-uploader-no-thumbnail-icon {
     font-size: 30px;
+  }
+
+  .image-upload-instructions {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+    padding-left: 18px;
+    width: 100%;
   }
 
   @media(max-width:768px) {
