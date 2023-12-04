@@ -334,8 +334,14 @@ class ReviewableOpportunitiesHandler(
                 self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
             )):
+                # Here we use MyPy ignore because the method returns
+                # dictionary for the case of pinned opportunity.
+                # only handles str.
                 if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                    if isinstance(opp, dict):
+                        opportunity_dicts.append(opp) # type: ignore[arg-type]
+                    else:
+                        opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -434,7 +440,9 @@ class ReviewableOpportunitiesHandler(
         # add it to the list of opportunities at the top.
         ordered_exp_opp_summaries = OrderedDict()
         if pinned_opportunity_summary:
-            pinned_opportunity_id = pinned_opportunity_summary.id
+            # Here we use MyPy ignore because the latest schema of
+            # dict is indexable.
+            pinned_opportunity_id = pinned_opportunity_summary['id'] # type: ignore[index]
             exp_opp_summaries.pop(pinned_opportunity_id, None)
             ordered_exp_opp_summaries[
                 pinned_opportunity_id] = pinned_opportunity_summary
