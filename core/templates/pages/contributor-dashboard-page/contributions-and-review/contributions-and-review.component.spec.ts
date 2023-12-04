@@ -1523,12 +1523,15 @@ describe('Contributions and review component', () => {
         component.languageCode = 'en';
         const topicName = 'Dummy Topic 1';
 
-        component.unpinReviewableTranslationOpportunity(topicName);
+        component.unpinReviewableTranslationOpportunity({
+          topic_name: topicName,
+          exploration_id: '1'
+        });
         tick();
 
         expect(
           unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
-          'Dummy Topic 1', component.languageCode);
+          'Dummy Topic 1', component.languageCode, '1');
       }));
 
     it('should open snackbar and handle action', fakeAsync(() => {

@@ -291,7 +291,10 @@ describe('Opportunities List Item Component', () => {
       };
       component.unpinOpportunity();
 
-      expect(spy).toHaveBeenCalledWith(expectedTopicName);
+      expect(spy).toHaveBeenCalledWith({
+        topic_name: expectedTopicName,
+        exploration_id: '1'
+      });
     });
   });
 });

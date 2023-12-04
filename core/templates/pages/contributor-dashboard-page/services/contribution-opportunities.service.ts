@@ -47,9 +47,15 @@ export class ContributionOpportunitiesService {
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
+  pinnedOpportunitiesChanged: EventEmitter<
+    Record<string, string>> = new EventEmitter();
+
+  unpinnedOpportunitiesChanged: EventEmitter<
+    Record<string, string>> = new EventEmitter();
   // These properties are initialized using async methods
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
   private _skillOpportunitiesCursor!: string;
   private _translationOpportunitiesCursor!: string;
   private _voiceoverOpportunitiesCursor!: string;
@@ -150,6 +156,8 @@ export class ContributionOpportunitiesService {
       languageCode: string,
       explorationId?: string):
     Promise<void> {
+    this.pinnedOpportunitiesChanged.emit(
+      {topicName, languageCode, explorationId});
     return this.contributionOpportunitiesBackendApiService
       .pinTranslationOpportunity(
         languageCode,
@@ -159,8 +167,11 @@ export class ContributionOpportunitiesService {
 
   async unpinReviewableTranslationOpportunityAsync(
       topicName: string,
-      languageCode: string):
-    Promise<void> {
+      languageCode: string,
+      explorationId: string):
+  Promise<void> {
+    this.unpinnedOpportunitiesChanged.emit(
+      {topicName, languageCode, explorationId});
     return this.contributionOpportunitiesBackendApiService
       .unpinTranslationOpportunity(
         languageCode,

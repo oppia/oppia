@@ -85,8 +85,11 @@ export class OpportunitiesListItemComponent {
   }> = (
       new EventEmitter());
 
-  @Output() clickUnpinButton: EventEmitter<string> = (
-    new EventEmitter());
+  @Output() clickUnpinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
 
   pinOpportunity(): void {
     this.clickPinButton.emit({
@@ -96,8 +99,10 @@ export class OpportunitiesListItemComponent {
   }
 
   unpinOpportunity(): void {
-    this.clickUnpinButton.emit(
-      this.opportunity.topicName);
+    this.clickUnpinButton.emit({
+      topic_name: this.opportunity.topicName,
+      exploration_id: this.opportunity.id
+    });
   }
 
   opportunityDataIsLoading: boolean = true;

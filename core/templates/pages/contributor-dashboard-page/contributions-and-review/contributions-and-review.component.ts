@@ -518,22 +518,16 @@ export class ContributionsAndReview
     } else {
       this.contributionOpportunitiesService.
         pinReviewableTranslationOpportunityAsync(
-          topicName, this.languageCode, explorationId).then(() => {
-          this.contributionOpportunitiesService
-            .reloadOpportunitiesEventEmitter.emit();
-        });
+          topicName, this.languageCode, explorationId);
     }
   }
 
   unpinReviewableTranslationOpportunity(
-      topicName: string
+      dict: Record<string, string>
   ): void {
     this.contributionOpportunitiesService.
       unpinReviewableTranslationOpportunityAsync(
-        topicName, this.languageCode).then(() => {
-        this.contributionOpportunitiesService
-          .reloadOpportunitiesEventEmitter.emit();
-      });
+        dict.topic_name, this.languageCode, dict.exploration_id);
   }
 
   onClickReviewableTranslations(explorationId: string): void {
@@ -776,11 +770,7 @@ export class ContributionsAndReview
           topicName,
           this.languageCode,
           explorationId
-        )
-        .then(() => {
-          this.contributionOpportunitiesService.
-            reloadOpportunitiesEventEmitter.emit();
-        });
+        );
     });
   }
 
