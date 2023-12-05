@@ -781,7 +781,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-    def test_install_npm_library_pegjs(self) -> None:
+    def test_install_npm_library_moment(self) -> None:
         """Add a package (moment) and then remove it"""
         common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
         subprocess.check_call([
