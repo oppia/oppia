@@ -2292,7 +2292,7 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en

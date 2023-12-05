@@ -233,7 +233,7 @@ class ExplorationModel(base_models.VersionedModel):
     # A boolean indicating whether correctness feedback is enabled in this
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=False, indexed=True)
+        default=True, indexed=True)
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
         required=True, default=0, indexed=True)

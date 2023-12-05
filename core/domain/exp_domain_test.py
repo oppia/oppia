@@ -4755,7 +4755,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -4995,7 +4995,7 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5140,7 +5140,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5285,7 +5285,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5430,7 +5430,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5577,7 +5577,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5727,7 +5727,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5877,7 +5877,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6027,7 +6027,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6177,7 +6177,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6316,7 +6316,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6454,7 +6454,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6599,7 +6599,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6746,7 +6746,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6897,7 +6897,7 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7016,7 +7016,7 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7136,7 +7136,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7265,7 +7265,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7394,7 +7394,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7485,7 +7485,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
