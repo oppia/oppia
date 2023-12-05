@@ -3306,7 +3306,7 @@ version: 1
             init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
+        exploration.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
