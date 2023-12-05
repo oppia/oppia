@@ -39,6 +39,7 @@ describe('ConceptCardManager service', () => {
   let mockNewCardAvailableEmitter = new EventEmitter();
   let interactionObjectFactory: InteractionObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let stateCard: StateCard;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
@@ -67,117 +68,8 @@ describe('ConceptCardManager service', () => {
       AudioTranslationLanguageService);
   }));
 
-  it('should show concept card icon at the right time', fakeAsync(() => {
-    // Case when no hints exist.
-    spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
-    ccms.hintsAvailable = 0;
-    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
-    expect(ccms.isConceptCardViewable()).toBe(false);
-    expect(ccms.isConceptCardConsumed()).toBe(false);
-
-    ccms.reset();
-
-    // Time delay before concept card is released.
-    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // Time delay before tooltip for the concept card is shown.
-    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-    expect(ccms.isConceptCardTooltipOpen()).toBe(true);
-    expect(ccms.isConceptCardViewable()).toBe(true);
-    expect(ccms.isConceptCardConsumed()).toBe(false);
-  }));
-
-  it('should not show concept card when hints exist', fakeAsync(() => {
-    // Case when hints exist.
-    ccms.hintsAvailable = 1;
-    spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
-    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
-    expect(ccms.isConceptCardViewable()).toBe(false);
-    expect(ccms.isConceptCardConsumed()).toBe(false);
-
-    ccms.reset();
-
-    // Time delay before concept card is released.
-    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // Time delay before tooltip for the concept card is shown.
-    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
-    expect(ccms.isConceptCardViewable()).toBe(false);
-    expect(ccms.isConceptCardConsumed()).toBe(false);
-  }));
-
-  it('should reset the service when timeouts was called before',
-    fakeAsync(() => {
-      // Initialize the service with two hints and a solution.
-      spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
-      ccms.reset();
-
-      // Set timeout.
-      tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-      // Set tooltipTimeout.
-      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-      // Reset service to 0 solutions so releaseHint timeout won't be called.
-      ccms.reset();
-
-      // There is no timeout to flush. timeout and tooltipTimeout variables
-      // were cleaned.
-      expect(flush()).toBe(60000);
-    }));
-
-  it('should return if concept card for the state exists', fakeAsync(() => {
-    const endState = {
-      classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {}
-        }
-      },
-      solicit_answer_details: false,
-      interaction: {
-        solution: null,
-        confirmed_unclassified_answers: [],
-        id: 'EndExploration',
-        hints: [],
-        customization_args: {
-          recommendedExplorationIds: {
-            value: ['recommendedExplorationId']
-          }
-        },
-        answer_groups: [],
-        default_outcome: null
-      },
-      param_changes: [],
-      next_content_id_index: 0,
-      card_is_checkpoint: false,
-      linked_skill_id: 'Id',
-      content: {
-        content_id: 'content',
-        html: 'Congratulations, you have finished!'
-      }
-    };
-    spyOn(ees, 'getState')
-      .and.returnValue(
-        stateObjectFactory.createFromBackendDict('End', endState));
-
-    ccms.hintsAvailable = 0;
-    ccms.reset();
-
-    // Time delay before concept card is released.
-    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-    // Time delay before tooltip for the concept card is shown.
-    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
-
-    expect(ccms.isConceptCardTooltipOpen()).toBe(true);
-    expect(ccms.isConceptCardViewable()).toBe(true);
-    expect(ccms.isConceptCardConsumed()).toBe(false);
-  }));
-
-  it('should set the number of hints available', fakeAsync(() => {
-    spyOn(pps.onNewCardOpened, 'subscribe');
-    // A StateCard which supports hints.
-    let newCard = StateCard.createNewCard(
+  beforeEach(() => {
+    stateCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
         id: 'TextInput',
@@ -233,8 +125,119 @@ describe('ConceptCardManager service', () => {
       }),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
+  });
 
-    pps.onNewCardOpened.emit(newCard);
+  it('should show concept card icon at the right time', fakeAsync(() => {
+    // Case when no hints exist.
+    spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
+    ccms.hintsAvailable = 0;
+    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
+    expect(ccms.isConceptCardViewable()).toBe(false);
+    expect(ccms.isConceptCardConsumed()).toBe(false);
+
+    ccms.reset(stateCard);
+
+    // Time delay before concept card is released.
+    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+    // Time delay before tooltip for the concept card is shown.
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+
+    expect(ccms.isConceptCardTooltipOpen()).toBe(true);
+    expect(ccms.isConceptCardViewable()).toBe(true);
+    expect(ccms.isConceptCardConsumed()).toBe(false);
+  }));
+
+  it('should not show concept card when hints exist', fakeAsync(() => {
+    // Case when hints exist.
+    ccms.hintsAvailable = 1;
+    spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
+    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
+    expect(ccms.isConceptCardViewable()).toBe(false);
+    expect(ccms.isConceptCardConsumed()).toBe(false);
+
+    ccms.reset(stateCard);
+
+    // Time delay before concept card is released.
+    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+    // Time delay before tooltip for the concept card is shown.
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+
+    expect(ccms.isConceptCardTooltipOpen()).toBe(false);
+    expect(ccms.isConceptCardViewable()).toBe(false);
+    expect(ccms.isConceptCardConsumed()).toBe(false);
+  }));
+
+  it('should reset the service when timeouts was called before',
+    fakeAsync(() => {
+      // Initialize the service with two hints and a solution.
+      spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
+      ccms.reset(stateCard);
+
+      // Set timeout.
+      tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+      // Set tooltipTimeout.
+      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+
+      // Reset service to 0 solutions so releaseHint timeout won't be called.
+      ccms.reset(stateCard);
+
+      // There is no timeout to flush. timeout and tooltipTimeout variables
+      // were cleaned.
+      expect(flush()).toBe(60000);
+    }));
+
+  it('should return if concept card for the state with the new name exists',
+    fakeAsync(() => {
+      const endState = {
+        classifier_model_id: null,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
+        },
+        solicit_answer_details: false,
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'EndExploration',
+          hints: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: ['recommendedExplorationId']
+            }
+          },
+          answer_groups: [],
+          default_outcome: null
+        },
+        param_changes: [],
+        next_content_id_index: 0,
+        card_is_checkpoint: false,
+        linked_skill_id: 'Id',
+        content: {
+          content_id: 'content',
+          html: 'Congratulations, you have finished!'
+        }
+      };
+      spyOn(ees, 'getStateFromStateName').withArgs('State 2')
+        .and.returnValue(
+          stateObjectFactory.createFromBackendDict('End', endState));
+
+      ccms.hintsAvailable = 0;
+      ccms.reset(stateCard);
+
+      // Time delay before concept card is released.
+      tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+      // Time delay before tooltip for the concept card is shown.
+      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+
+      expect(ccms.isConceptCardTooltipOpen()).toBe(true);
+      expect(ccms.isConceptCardViewable()).toBe(true);
+      expect(ccms.isConceptCardConsumed()).toBe(false);
+    }));
+
+  it('should set the number of hints available', fakeAsync(() => {
+    spyOn(pps.onNewCardOpened, 'subscribe');
+    pps.onNewCardOpened.emit(stateCard);
     expect(ccms.hintsAvailable).toEqual(0);
   }));
 
@@ -259,7 +262,7 @@ describe('ConceptCardManager service', () => {
   it('should record the wrong answer twice', fakeAsync(() => {
     // Initialize the service with two hints and a solution.
     spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
-    ccms.reset();
+    ccms.reset(stateCard);
 
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
     expect(ccms.isConceptCardViewable()).toBe(false);
