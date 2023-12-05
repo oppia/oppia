@@ -30,6 +30,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ServicesConstants } from 'services/services.constants';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
@@ -99,6 +100,13 @@ type CustomizationArgsNameAndValueArray = {
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
 
+// CustomizationComponentId extracts the frontend_id array from
+// the component in ComponentSpecsType.
+export type CustomizationComponentId = {
+  [K in keyof ComponentSpecsType]:
+  ComponentSpecsType[K]['frontend_id'];
+}[keyof ComponentSpecsType];
+
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
@@ -106,13 +114,17 @@ type CustomizationArgsNameAndValueArray = {
 export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
+  @Input() componentId: CustomizationComponentId;
   modalIsLoading: boolean = true;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
+  currentRteIsVideoEditor: boolean = false;
+  isSaveButtonDisabled: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
+  formValueChangesSubscription: Subscription | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -123,11 +135,11 @@ export class RteHelperModalComponent {
     private contextService: ContextService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imageUploadHelperService: ImageUploadHelperService
+    private imageUploadHelperService: ImageUploadHelperService,
   ) {}
 
   ngOnInit(): void {
-    this.focusManagerService.setFocus('tmpFocusPoint');
+    this.focusManagerService.setFocus('tmpFocusPoint');    
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
@@ -197,7 +209,7 @@ export class RteHelperModalComponent {
     ) {
       this.currentRteIsLinkEditor = true;
     }
-
+  
     // The 'defaultRTEComponent' variable controls whether the delete button
     // needs to be shown. If the RTE component has default values, there is no
     // need for a delete button as the 'Cancel' button would have
@@ -221,7 +233,10 @@ export class RteHelperModalComponent {
     });
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
-
+    
+    if (this.componentId === 'video') {
+      this.currentRteIsVideoEditor = true;
+    }
     setTimeout(() => {
       this.modalIsLoading = false;
     });
@@ -311,26 +326,21 @@ export class RteHelperModalComponent {
     return url !== text;
   }
 
-  isVideoStartTimeValid(): boolean {
-    const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
-      CustomizationArgsNameAndValueArray[number],
-      {
-        name: 'video_id' | 'start' | 'end' | 'autoplay';
+  disableSaveButtonForVideoRte(): void {
+    // Disables the save button for video RTE if start time
+    // is greater than end time.
+    this.formValueChangesSubscription = this.customizationArgsForm.valueChanges.subscribe(
+      (value) => {
+        let start: number = value[1];
+        let end: number = value[2];
+        if (start === 0 && end === 0) {
+          this.isSaveButtonDisabled = false;
+        } else {
+          this.isSaveButtonDisabled = start >= end;
+          return start >= end;
+        }
       }
-    >[];
-    let start: number = 0;
-    let end: number = 0;
-    for (const arg of tmpCustomizationArgs) {
-      if (arg.name === 'start') {
-        start = arg.value as number;
-      } else if (arg.name === 'end') {
-        end = arg.value as number;
-      }
-    }
-    if (start === 0 && end === 0) {
-      return true;
-    }
-    return start < end;
+    );
   }
 
   save(): void {
@@ -442,10 +452,6 @@ export class RteHelperModalComponent {
           customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
-          const isVideoStartTimeValid = this.isVideoStartTimeValid();
-          if (!isVideoStartTimeValid) {
-            return;
-          }
         } else if (caName === 'text' && this.currentRteIsLinkEditor) {
           // Set the link `text` to the link `url` if the `text` is empty.
           (

@@ -21,8 +21,8 @@
       It seems like clicking on this link will lead the user to a different URL
       than the text specifies. Please change the text.
     </div>
-    <div *ngIf="!isVideoStartTimeValid()" class="link-error-message">
-      Please ensure that the start time of the video is earlier than the end.
+    <div *ngIf="isSaveButtonDisabled" class="link-error-message">
+      Please ensure that the start time of the video is earlier than the end time.
     </div>
   </div>
 
@@ -35,7 +35,7 @@
     <input class="btn btn-secondary e2e-test-cancel-rich-text-editor"
            value="Cancel"
            (click)="cancel()">
-    <input *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
+    <input *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor && !currentRteIsVideoEditor"
            class="btn btn-success e2e-test-close-rich-text-component-editor"
            value="Done"
            (click)="save()"
@@ -50,6 +50,11 @@
            value="Done"
            (click)="save()"
            [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
+    <input *ngIf="currentRteIsVideoEditor"
+           class="btn btn-success e2e-test-close-rich-text-component-editor"
+           value="Done"
+           (click)="save()"
+           [disabled]="!customizationArgsForm.valid || disableSaveButtonForVideoRte() || isSaveButtonDisabled">
   </div>
 </div>
 <style>

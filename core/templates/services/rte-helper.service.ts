@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ServicesConstants } from 'services/services.constants';
-import { CustomizationArgsForRteType, CustomizationArgsSpecsType, RteHelperModalComponent } from './rte-helper-modal.controller';
+import { CustomizationArgsForRteType, CustomizationArgsSpecsType, RteHelperModalComponent, CustomizationComponentId } from './rte-helper-modal.controller';
 import cloneDeep from 'lodash/cloneDeep';
 
 const RTE_COMPONENT_SPECS = ServicesConstants.RTE_COMPONENT_SPECS;
@@ -61,6 +61,7 @@ export class RteHelperService {
   openCustomizationModal(
       customizationArgSpecs: CustomizationArgsSpecsType,
       attrsCustomizationArgsDict: CustomizationArgsForRteType,
+      componentId: CustomizationComponentId,
       onSubmitCallback?: (arg0: unknown) => void,
       onDismissCallback?: (
         reason: boolean | 'cancel') => void): void {
@@ -69,6 +70,7 @@ export class RteHelperService {
       backdrop: 'static'
     });
     modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
+    modalRef.componentInstance.componentId = componentId;
     modalRef.componentInstance.attrsCustomizationArgsDict = (
       attrsCustomizationArgsDict);
     modalRef.result.then(

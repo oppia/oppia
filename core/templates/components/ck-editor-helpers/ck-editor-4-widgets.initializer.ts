@@ -39,7 +39,7 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+    customizationArgSpecs, attrsCustomizationArgsDict, componentId, onSubmitCallback,
     onDismissCallback
   ) => void;
 }
@@ -71,6 +71,7 @@ export class CkEditorInitializerService {
         var tagName = 'oppia-noninteractive-ckeditor-' + componentDefn.id;
         var customizationArgSpecs = componentDefn.customizationArgSpecs;
         var isInline = rteHelperService.isInlineComponent(componentDefn.id);
+        var componentId = componentDefn.id;
 
         // Inline components will be wrapped in a span, while block components
         // will be wrapped in a div.
@@ -114,6 +115,7 @@ export class CkEditorInitializerService {
                 rteHelperService.openCustomizationModal(
                   customizationArgSpecs,
                   customizationArgs,
+                  componentId,
                   function(customizationArgsDict) {
                     that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
