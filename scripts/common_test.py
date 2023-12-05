@@ -758,9 +758,8 @@ class CommonTests(test_utils.GenericTestBase):
     def test_install_npm_library(self) -> None:
 
         def _mock_subprocess_check_call(unused_command: str) -> None:
-            """Mocks subprocess.check_call() to create a temporary file instead
-            of the actual npm library.
-            """
+            '''Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.'''
             temp_file = tempfile.NamedTemporaryFile()
             # Here MyPy assumes that the 'name' attribute is read-only.
             # In order to silence the MyPy complaints `setattr` is used to set
