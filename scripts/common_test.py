@@ -804,9 +804,6 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
             common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
-        subprocess.check_call([
-            'yarn', 'remove', 'pegjs'])
-
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
             return 'Y'
