@@ -787,10 +787,11 @@ class CommonTests(test_utils.GenericTestBase):
             return False
 
         with self.swap(os.path, 'exists', mock_exists):
-            common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+            common.install_npm_library(
+                'moment', '2.29.4', common.OPPIA_TOOLS_DIR)
         subprocess.check_call([
                     'yarn', 'remove', 'moment'])
-        
+
         self.assertFalse(os.path.exists('temp_file'))
 
     def test_ask_user_to_confirm(self) -> None:
