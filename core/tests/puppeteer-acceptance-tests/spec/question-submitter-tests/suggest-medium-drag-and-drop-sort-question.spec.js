@@ -77,22 +77,17 @@ describe('Practice Question Submitter', function() {
     ' in a topic', async function() {
     await practiceQuestionSubmitter.navigateToContributorDashboard();
     await practiceQuestionSubmitter.navigateToSubmitQuestions();
-    await practiceQuestionSubmitter.expectSkillOpportunity({
-      topicName,
-      skillDescription,
-      suggestable: true
+    await practiceQuestionSubmitter.expectSkillOpportunityToExist({
+      topicName, skillDescription, suggestable: true
     });
 
     await practiceQuestionSubmitter.suggestQuestionForSkillOpportunity(
       { topicName, skillDescription });
-    await practiceQuestionSubmitter.expectQuestionDifficultyChoicePrompt();
-    await practiceQuestionSubmitter.expectDifficultyWithRubric(
-      DIFFICULTY_MEDIUM, mediumDifficultyRubric);
-    await practiceQuestionSubmitter.expectDifficultyWithRubric(
-      DIFFICULTY_HARD, hardDifficultyRubric);
+    await practiceQuestionSubmitter.expectQuestionDifficultyChoices(
+      { difficulty: DIFFICULTY_MEDIUM, rubric: mediumDifficultyRubric },
+      { difficulty: DIFFICULTY_HARD, rubric: hardDifficultyRubric });
     
     await practiceQuestionSubmitter.chooseDifficulty(DIFFICULTY_MEDIUM);
-    await practiceQuestionSubmitter.continueToQuestionEditor();
     await practiceQuestionSubmitter.expectChosenDifficultyToBe(
       DIFFICULTY_MEDIUM);
     await practiceQuestionSubmitter.expectSkillRubricToBe(
@@ -100,81 +95,70 @@ describe('Practice Question Submitter', function() {
     await practiceQuestionSubmitter.expectQuestionTextSection();
 
     await practiceQuestionSubmitter.writeQuestionText(questionText);
-    await practiceQuestionSubmitter.saveQuestionText();
     await practiceQuestionSubmitter.expectQuestionTextToBe(questionText);
+
     await practiceQuestionSubmitter.addInteraction();
     await practiceQuestionSubmitter.expectInteractionChoices();
     await practiceQuestionSubmitter.navigateToCommonInteractions();
-    await practiceQuestionSubmitter.chooseInteraction(INTERACTION_DRAG_AND_DROP_SORT);
+    await practiceQuestionSubmitter.chooseInteraction(
+      INTERACTION_DRAG_AND_DROP_SORT);
     await practiceQuestionSubmitter.expectDragAndDropSortInteractionEditor();
-    await practiceQuestionSubmitter.expectUnmetRequirementOfMinimumDragAndDropSortItemCount();
-    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBeExactly(1);
+    (
+      await practiceQuestionSubmitter
+      .expectUnmetMinimumDragAndDropSortItemCount());
+    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBe(1);
 
-    await practiceQuestionSubmitter.writeDragAndDropSortItem(firstItem, '1');
-    await practiceQuestionSubmitter.addDragAndDropSortItem();
-    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBeExactly(2);
-    await practiceQuestionSubmitter.writeDragAndDropSortItem(secondItem, '2');
-    await practiceQuestionSubmitter.addDragAndDropSortItem();
-    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBeExactly(3);
-    await practiceQuestionSubmitter.writeDragAndDropSortItem(thirdItem, '3');
+    await practiceQuestionSubmitter.writeDragAndDropSortItems(['3', '1', '2']);
+    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBe(3);
     await practiceQuestionSubmitter.allowMultipleSortItemsInSamePosition();
     await practiceQuestionSubmitter.saveInteraction();
-    await practiceQuestionSubmitter.expectDragAndDropSortInteractionResponseEditor();
+    await practiceQuestionSubmitter.expectResponseEditor();
 
-    await practiceQuestionSubmitter.chooseResponseAssertion(RESPONSE_EQUAL_TO_ORDERING);
+    await practiceQuestionSubmitter.chooseResponseAssertion(
+      RESPONSE_EQUAL_TO_ORDERING);
     await practiceQuestionSubmitter.writeResponseFeedback(correctAnswer);
     await practiceQuestionSubmitter.saveResponseAndAddAnother();
-    await practiceQuestionSubmitter.expectDragAndDropSortInteractionResponseEditor();
+    await practiceQuestionSubmitter.expectResponseEditor();
     await practiceQuestionSubmitter.chooseResponseAssertion(
       RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION);
-    await practiceQuestionSubmitter.tagResponseWithMisconception(misconception);
+    await practiceQuestionSubmitter.tagResponseWithMisconception(
+      misconception);
     await practiceQuestionSubmitter.saveResponse();
-    await practiceQuestionSubmitter.expectResponse({
+    await practiceQuestionSubmitter.expectResponseToExist({
       assertion: RESPONSE_EQUAL_TO_ORDERING,
       feedback: correctAnswer
     });
-    await practiceQuestionSubmitter.expectResponse({
-      assertion: RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION, 
+    await practiceQuestionSubmitter.expectResponseToExist({
+      assertion: RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION,
       feedback: misconception.feedback
     });
-    await practiceQuestionSubmitter.expectResponse({
+    await practiceQuestionSubmitter.expectResponseToExist({
       assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG,
       feedback: ''
     });
-    await practiceQuestionSubmitter.addHint();
-    await practiceQuestionSubmitter.expectHintEditor();
-
-    await practiceQuestionSubmitter.writeHint(hintText);
-    await practiceQuestionSubmitter.saveHint();
-    await practiceQuestionSubmitter.expectHint(hintText);
-    await practiceQuestionSubmitter.expectUnmetRequirementOfMinimumSolutionCount();
-    await practiceQuestionSubmitter.addSolution();
-    await practiceQuestionSubmitter.expectSolutionEditor();
-
-    await practiceQuestionSubmitter.chooseSolutionQuantity(SOLUTION_QUANTITY_ONLY_ONE);
-    await practiceQuestionSubmitter.writeDragAndDropSortSolution(solution);
-    await practiceQuestionSubmitter.navigateToSolutionExplanation();
-    await practiceQuestionSubmitter.writeSolutionExplanation(explanation);
-    await practiceQuestionSubmitter.saveSolution();
-    await practiceQuestionSubmitter.expectSolution({ solution, explanation });
-    await practiceQuestionSubmitter.expectUnmetRequirementOfDefaultOutcomeToHaveFeedback();
-
-    await practiceQuestionSubmitter.viewResponseDetails({
-      assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG
+    await practiceQuestionSubmitter.addHint(hint);
+    await practiceQuestionSubmitter.expectHint(hint);
+    await practiceQuestionSubmitter.expectMissingSolution();
+    await practiceQuestionSubmitter.addSolution({
+      quantity: SOLUTION_QUANTITY_ONLY_ONE, solution, explanation
     });
-    await practiceQuestionSubmitter.editResponseDetailFeedback(incorrectAnswer);
-    await practiceQuestionSubmitter.saveResponse();
-    await practiceQuestionSubmitter.expectResponse({
+    await practiceQuestionSubmitter.expectSolutionToExist({
+      solution, explanation });
+    await practiceQuestionSubmitter.expectDefaultOutcomeWithNoFeedback();
+
+    await practiceQuestionSubmitter.editResponse(
+      { assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG, feedback: '' },
+      { feedback: incorrectAnswer });
+    await practiceQuestionSubmitter.expectResponseToExist({
       assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG,
       feedback: incorrectAnswer
     });
     await practiceQuestionSubmitter.suggestQuestion();
-    await practiceQuestionSubmitter.expectQuestionToBeSuccessfullySubmittedForReview();
+    await practiceQuestionSubmitter.expectSuggestionSubmittedForReview();
     // TODO #19075: After solving the aforementioned issue, change the following
     // expectation so that expected progressbar reflects said changes 
-    await practiceQuestionSubmitter.expectSkillOpportunity({
-      topicName,
-      skillDescription,
+    await practiceQuestionSubmitter.expectSkillOpportunityToExist({
+      topicName, skillDescription,
       progress: { acceptedQuestionsPercentage }
     });
   }, DEFAULT_SPEC_TIMEOUT);
