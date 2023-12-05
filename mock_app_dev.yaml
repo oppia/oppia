@@ -1,0 +1,6 @@
+export = {
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true,
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
+};
