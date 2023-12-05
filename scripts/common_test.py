@@ -416,8 +416,8 @@ class CommonTests(test_utils.GenericTestBase):
                 subprocess, 'check_call', mock_check_call)
             input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
-                # Make it so the program asks the user to 
-                # Open the link in their browser
+                # Make it so the program asks the user to
+                # Open the link in their browser.
                 common.USER_PREFERENCES['open_new_tab_in_browser'] = 'no'
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -782,7 +782,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.exists('temp_file'))
 
     def test_install_npm_library_moment(self) -> None:
-        """Add a package (moment) and then remove it"""
+        """Add a package (moment) and then remove it."""
         common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
         subprocess.check_call([
                     'yarn', 'remove', 'moment'])
@@ -1088,9 +1088,9 @@ class CommonTests(test_utils.GenericTestBase):
         try:
             self.assertFalse(os.path.isfile(backup_file))
         except AssertionError:
-            # The backup file will exist so erase it
+            # The backup file will exist so erase it.
             os.remove(backup_file)
-        # Revert the original file
+        # Revert the original file.
         with utils.open_file(file, 'w') as f:
             f.writelines(
                 ['{\n',
