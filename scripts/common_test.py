@@ -33,6 +33,7 @@ import sys
 import tempfile
 import time
 from urllib import request as urlrequest
+import typing
 
 from core import constants
 from core import feconf
@@ -381,6 +382,43 @@ class CommonTests(test_utils.GenericTestBase):
                 subprocess, 'check_call', mock_check_call)
             input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+
+    def test_open_new_tab_in_browser_if_possible_with_open_new_tab_in_browser_equals_no(
+        self
+    ) -> None:
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
+                return 0
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+                check_function_calls['check_call_gets_called'] = True
+
+            def mock_input() -> str:
+                check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
+                return 'no'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(builtins, 'input', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                # Make it so the program asks the user to open the link in their browser
+                common.USER_PREFERENCES['open_new_tab_in_browser'] = "no"
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
@@ -744,11 +782,55 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
+    def test_install_npm_library_pegjs(self) -> None:
+
+        def _mock_subprocess_check_call(unused_command: str) -> None:
+            """Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.
+            """
+            temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(temp_file, 'name', 'temp_file')
+            with utils.open_file('temp_file', 'w') as f:
+                f.write('content')
+
+            self.assertTrue(os.path.exists('temp_file'))
+            temp_file.close()
+            if os.path.isfile('temp_file'):
+                # Occasionally this temp file is not deleted.
+                os.remove('temp_file')
+
+        self.assertFalse(os.path.exists('temp_file'))
+
+        with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
+            common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
+
+        self.assertFalse(os.path.exists('temp_file'))
+
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
+
+    def test_ask_user_to_confirm_N_then_Y(self) -> None:
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+            }
+
+            def mock_input() -> str:
+                check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 1:
+                    return 'N'
+                return 'Y'
+        finally:
+            with self.swap(builtins, 'input', mock_input):
+                common.ask_user_to_confirm('Testing')
+       
+        
 
     def test_get_personal_access_token_with_valid_token(self) -> None:
         def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
@@ -996,6 +1078,52 @@ class CommonTests(test_utils.GenericTestBase):
             # Just in case the implementation is wrong, erase the file.
             os.remove(backup_file_path)
             raise
+
+    def test_inplace_replace_file_context_into_finally(self) -> None:
+        file = (
+            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
+        backup_file = '%s.bak' % file
+
+        with utils.open_file(file, 'r') as f:
+            self.assertEqual(f.readlines(), [
+                '{\n',
+                '    "RANDMON1" : "randomValue1",\n',
+                '    "312RANDOM" : "ValueRanDom2",\n',
+                '    "DEV_MODE": false,\n',
+                '    "RAN213DOM" : "raNdoVaLue3"\n',
+                '}\n',
+            ])
+
+        def mock_isfile(file):
+            return False
+        swap_isfile = self.swap(os.path, 'isfile', mock_isfile)
+
+        with swap_isfile:
+            replace_file_context = common.inplace_replace_file_context(
+                file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+            with replace_file_context, utils.open_file(file, 'r') as f:
+                self.assertEqual(f.readlines(), [
+                    '{\n',
+                    '    "RANDMON1" : "randomValue1",\n',
+                    '    "312RANDOM" : "ValueRanDom2",\n',
+                    '    "DEV_MODE": true,\n',
+                    '    "RAN213DOM" : "raNdoVaLue3"\n',
+                    '}\n',
+                ])
+
+        try:
+            self.assertFalse(os.path.isfile(backup_file))
+        except AssertionError:
+            # The backup file will exist. Erase it
+            os.remove(backup_file)
+        # revert the original file
+        with utils.open_file(file, 'w') as f:
+            f.writelines(['{\n',
+            '    "RANDMON1" : "randomValue1",\n',
+            '    "312RANDOM" : "ValueRanDom2",\n',
+            '    "DEV_MODE": false,\n',
+            '    "RAN213DOM" : "raNdoVaLue3"\n',
+            '}\n'])
 
     def test_convert_to_posixpath_on_windows(self) -> None:
         def mock_is_windows() -> Literal[True]:
