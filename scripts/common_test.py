@@ -782,27 +782,10 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.exists('temp_file'))
 
     def test_install_npm_library_pegjs(self) -> None:
-
-        def _mock_subprocess_check_call(unused_command: str) -> None:
-            """Mocks subprocess.check_call() to create a temporary file instead
-            of the actual npm library.
-            """
-            temp_file = tempfile.NamedTemporaryFile()
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used to set
-            # the attribute.
-            setattr(temp_file, 'name', 'temp_file')
-            with utils.open_file('temp_file', 'w') as f:
-                f.write('content')
-
-            self.assertTrue(os.path.exists('temp_file'))
-            temp_file.close()
-            if os.path.isfile('temp_file'):
-                # Occasionally this temp file is not deleted.
-                os.remove('temp_file')
-
-        with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
-            common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
+        """Add a package (moment) and then remove it"""
+        common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+        subprocess.check_call([
+                    'yarn', 'remove', 'moment'])
 
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
