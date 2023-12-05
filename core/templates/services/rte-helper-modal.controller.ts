@@ -124,7 +124,7 @@ export class RteHelperModalComponent {
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
-  formValueChangesSubscription: Subscription | undefined;
+  formValueChangesSub: Subscription | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -209,7 +209,6 @@ export class RteHelperModalComponent {
     ) {
       this.currentRteIsLinkEditor = true;
     }
-  
     // The 'defaultRTEComponent' variable controls whether the delete button
     // needs to be shown. If the RTE component has default values, there is no
     // need for a delete button as the 'Cancel' button would have
@@ -233,7 +232,6 @@ export class RteHelperModalComponent {
     });
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
-    
     if (this.componentId === 'video') {
       this.currentRteIsVideoEditor = true;
     }
@@ -329,7 +327,7 @@ export class RteHelperModalComponent {
   disableSaveButtonForVideoRte(): void {
     // Disables the save button for video RTE if start time
     // is greater than end time.
-    this.formValueChangesSubscription = this.customizationArgsForm.valueChanges.subscribe(
+    this.formValueChangesSub = this.customizationArgsForm.valueChanges.subscribe(
       (value) => {
         let start: number = value[1];
         let end: number = value[2];

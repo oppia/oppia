@@ -39,8 +39,8 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    customizationArgSpecs, attrsCustomizationArgsDict, componentId, onSubmitCallback,
-    onDismissCallback
+    customizationArgSpecs, attrsCustomizationArgsDict, componentId, 
+    onSubmitCallback, onDismissCallback
   ) => void;
 }
 
