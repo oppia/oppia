@@ -154,6 +154,12 @@ oppia-search-bar .oppia-input-group {
   }
 }
 
+@media (max-width: 982px) {
+  .oppia-classroom-search-bar-container {
+    width: 590px;
+  }
+}
+
 @media (max-width: 767px) {
   .btn-text {
     color: #fff;
