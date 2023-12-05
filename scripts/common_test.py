@@ -1068,7 +1068,7 @@ class CommonTests(test_utils.GenericTestBase):
                 '}\n',
             ])
 
-        def mock_isfile(unused_file) -> bool:
+        def mock_isfile(unused_file: str) -> bool:
             return False
         swap_isfile = self.swap(os.path, 'isfile', mock_isfile)
 
