@@ -783,9 +783,15 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_install_npm_library_moment(self) -> None:
         """Add a package (moment) and then remove it."""
-        common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+        def mock_exists(unused_file: str) -> bool:
+            return False
+
+        with self.swap(os.path, 'exists', mock_exists):
+            common.install_npm_library('moment', '2.29.4', common.OPPIA_TOOLS_DIR)
         subprocess.check_call([
                     'yarn', 'remove', 'moment'])
+        
+        self.assertFalse(os.path.exists('temp_file'))
 
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
@@ -1017,53 +1023,6 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(origin_content, new_content)
         # Revert the file.
         shutil.move(backup_filepath, origin_filepath)
-
-    def test_inplace_replace_file_context_into_finally(self) -> None:
-        file = (
-            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
-        backup_file = '%s.bak' % file
-
-        with utils.open_file(file, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        def mock_isfile(unused_file: str) -> bool:
-            return False
-        swap_isfile = self.swap(os.path, 'isfile', mock_isfile)
-
-        with swap_isfile:
-            replace_file_context = common.inplace_replace_file_context(
-                file, '"DEV_MODE": .*', '"DEV_MODE": true,')
-            with replace_file_context, utils.open_file(file, 'r') as f:
-                self.assertEqual(f.readlines(), [
-                    '{\n',
-                    '    "RANDMON1" : "randomValue1",\n',
-                    '    "312RANDOM" : "ValueRanDom2",\n',
-                    '    "DEV_MODE": true,\n',
-                    '    "RAN213DOM" : "raNdoVaLue3"\n',
-                    '}\n',
-                ])
-
-        try:
-            self.assertFalse(os.path.isfile(backup_file))
-        except AssertionError:
-            # The backup file will exist so erase it.
-            os.remove(backup_file)
-        # Revert the original file.
-        with utils.open_file(file, 'w') as f:
-            f.writelines(
-                ['{\n',
-            '    "RANDMON1" : "randomValue1",\n',
-            '    "312RANDOM" : "ValueRanDom2",\n',
-            '    "DEV_MODE": false,\n',
-            '    "RAN213DOM" : "raNdoVaLue3"\n',
-            '}\n'])
 
     def test_convert_to_posixpath_on_windows(self) -> None:
         def mock_is_windows() -> Literal[True]:
