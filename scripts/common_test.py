@@ -33,7 +33,6 @@ import sys
 import tempfile
 import time
 from urllib import request as urlrequest
-import typing
 
 from core import constants
 from core import feconf
@@ -388,7 +387,7 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
-    def test_open_new_tab_in_browser_if_possible_with_open_new_tab_in_browser_equals_no(
+    def test_open_new_tab_in_browser_if_possible_no_new_tab(
         self
     ) -> None:
         try:
@@ -417,8 +416,9 @@ class CommonTests(test_utils.GenericTestBase):
                 subprocess, 'check_call', mock_check_call)
             input_swap = self.swap(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
-                # Make it so the program asks the user to open the link in their browser
-                common.USER_PREFERENCES['open_new_tab_in_browser'] = "no"
+                # Make it so the program asks the user to 
+                # Open the link in their browser
+                common.USER_PREFERENCES['open_new_tab_in_browser'] = 'no'
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
@@ -756,10 +756,10 @@ class CommonTests(test_utils.GenericTestBase):
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
     def test_install_npm_library(self) -> None:
-
         def _mock_subprocess_check_call(unused_command: str) -> None:
-            '''Mocks subprocess.check_call() to create a temporary file instead
-            of the actual npm library.'''
+            """Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.
+            """
             temp_file = tempfile.NamedTemporaryFile()
             # Here MyPy assumes that the 'name' attribute is read-only.
             # In order to silence the MyPy complaints `setattr` is used to set
@@ -810,22 +810,18 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
-    def test_ask_user_to_confirm_N_then_Y(self) -> None:
-        try:
-            check_function_calls = {
-                'input_gets_called': 0,
-            }
+    def test_ask_user_to_confirm_n_then_y(self) -> None:
+        check_function_calls = {
+            'input_gets_called': 0,
+        }
 
-            def mock_input() -> str:
-                check_function_calls['input_gets_called'] += 1
-                if check_function_calls['input_gets_called'] == 1:
-                    return 'N'
-                return 'Y'
-        finally:
-            with self.swap(builtins, 'input', mock_input):
-                common.ask_user_to_confirm('Testing')
-       
-        
+        def mock_input() -> str:
+            check_function_calls['input_gets_called'] += 1
+            if check_function_calls['input_gets_called'] == 1:
+                return 'N'
+            return 'Y'
+        with self.swap(builtins, 'input', mock_input):
+            common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self) -> None:
         def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
@@ -1089,7 +1085,7 @@ class CommonTests(test_utils.GenericTestBase):
                 '}\n',
             ])
 
-        def mock_isfile(file):
+        def mock_isfile(unused_file):
             return False
         swap_isfile = self.swap(os.path, 'isfile', mock_isfile)
 
@@ -1109,11 +1105,12 @@ class CommonTests(test_utils.GenericTestBase):
         try:
             self.assertFalse(os.path.isfile(backup_file))
         except AssertionError:
-            # The backup file will exist. Erase it
+            # The backup file will exist so erase it
             os.remove(backup_file)
-        # revert the original file
+        # Revert the original file
         with utils.open_file(file, 'w') as f:
-            f.writelines(['{\n',
+            f.writelines(
+                ['{\n',
             '    "RANDMON1" : "randomValue1",\n',
             '    "312RANDOM" : "ValueRanDom2",\n',
             '    "DEV_MODE": false,\n',
