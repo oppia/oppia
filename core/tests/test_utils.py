@@ -3538,8 +3538,9 @@ version: 1
         """
         story = story_fetchers.get_story_by_id(story_id)
         change_list = []
+
+        node_id = story.story_contents.next_node_id
         for exp_id in exp_ids:
-            node_id = story.story_contents.next_node_id
             change_list.extend([
                 story_domain.StoryChange({
                     'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -3554,6 +3555,7 @@ version: 1
                     'old_value': None,
                     'new_value': exp_id
                 })])
+            node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
 
         topic_services.update_story_and_topic_summary(
             feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
