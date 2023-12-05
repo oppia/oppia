@@ -187,7 +187,7 @@ export class ExplorationFooterComponent {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
-          this.conceptCardManagerService.reset();
+          this.conceptCardManagerService.reset(newCard);
         }
       )
     );
