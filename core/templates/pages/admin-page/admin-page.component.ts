@@ -17,7 +17,6 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminRouterService } from './services/admin-router.service';
@@ -71,8 +70,3 @@ export class AdminPageComponent {
     this.changeDetectorRef.detectChanges();
   }
 }
-
-angular.module('oppia').directive('oppiaAdminPage',
-  downgradeComponent({
-    component: AdminPageComponent
-  }) as angular.IDirectiveFactory);

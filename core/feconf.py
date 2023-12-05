@@ -652,8 +652,8 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
-EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
-EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
+EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
+EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
@@ -1091,6 +1091,7 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
+UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
