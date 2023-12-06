@@ -73,10 +73,8 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
         (newCard: StateCard) => {
           this.displayedCard = newCard;
           const solution = newCard.getSolution();
-          if (solution) {
-            this.hintsAndSolutionManagerService.reset(
-              newCard.getHints(), solution);
-          }
+          this.hintsAndSolutionManagerService.reset(
+            newCard.getHints(), solution);
           this.resetLocalHintsArray();
         }
       )
