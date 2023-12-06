@@ -126,7 +126,7 @@ module.exports = class QuestionAdmin extends baseUser {
   /**
    * Function to display reviewing questions rights by role
    * and check if the user is not displayed as a question reviewer
-   * @param {string} usename - the user expected to not be displayed.
+   * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionReviewersExcludeUser(username) {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -149,7 +149,7 @@ module.exports = class QuestionAdmin extends baseUser {
   /**
    * Function to display reviewing questions rights by role
    * and check if the user is not displayed as a question submitter
-   * @param {string} usename - the user expected to not be displayed.
+   * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionSubmittersExcludeUser(username) {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
