@@ -175,4 +175,39 @@ module.exports = class e2eSuperAdmin extends baseUser {
       }
     });
   }
+
+  async createSkill({ description, reviewMaterial, misconception }) {
+    await this.goto('http://localhost:8181/topics-and-skills-dashboard');
+
+    await this.clickOn(
+      'div.create-buttons > button[contains(., "Create Skill")]');
+    await this.type(
+      'input.e2e-test-new-skill-description-field', description);
+    await this.clickOn('.e2e-test-concept-card-text');
+    await this.type('', reviewMaterial);
+    await this.clickOn('button.e2e-test-confirm-skill-creation-button');
+
+    if (misconception) {
+      await this.clickOn('button.e2e-test-add-misconception-modal-button');
+      await this.type(
+        'input.e2e-test-misconception-name-field', misconception.name);
+      await this.type(
+        '.e2e-test-feedback-textarea div.e2e-test-rte', misconception.feedback);
+      if (!misconception.mustBeTaggedToQuestion) {
+        await this.clickOn('input.e2e-test-enforce-all-questions-checkbox');
+      }
+    }
+
+    for (const [difficulty, { rubricNotes }] of Object.entries(difficulties)) {
+      await this.select('select.e2e-test-select-rubric-difficulty',
+        difficulty == DIFFICULTY_MEDIUM ? '1' :
+        difficulty == DIFFICULTY_HARD ? '2' : '0');
+
+      for (const note of rubricNotes) {
+        this.page.evaluate(async (note) => {
+          // Add manual inputs for difficulty rubric notes here...
+	}, note);
+      }
+    }
+  }
 };

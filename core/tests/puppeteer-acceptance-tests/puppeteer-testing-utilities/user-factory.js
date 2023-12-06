@@ -21,6 +21,8 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
+let e2ePracticeQuestionSubmitter = require(
+  '../user-utilities/question-submitter-utils.js');
 
 const testConstants = require('./test-constants.js');
 
@@ -147,7 +149,7 @@ let createNewTranslationAdmin = async function(username, email) {
  * @param {string} username - The username of the practice question submitter.
  * @returns The practice question submitter instance created.
  */
-const createPracticeQuestionSubmitter = async function(username, email) {
+const createNewPracticeQuestionSubmitter = async function(username, email) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }

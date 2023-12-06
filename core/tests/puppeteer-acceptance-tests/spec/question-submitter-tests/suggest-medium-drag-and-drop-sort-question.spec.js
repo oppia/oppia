@@ -28,13 +28,15 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 describe('Practice Question Submitter', function() {
   const topicName = 'Test Topic';
   const skillDescription = 'Counting';
-  const mediumDifficultyRubric = '';
-  const hardDifficultyRubric = '';
+  const mediumDifficultyRubricNotes = [''];
+  const hardDifficultyRubricNotes = [''];
   const questionText = 'Question 1: Test Question';
   const correctAnswer = 'Correct';
   const incorrectAnswer = 'Incorrect answer'
   const misconception = {
-    feedback: ''
+    name: '',
+    feedback: '',
+    shouldEnforceResponseOnAllQuestions: false
   };
   const hintText = 'Sort by number';
   const acceptedQuestionsPercentage = 30;
@@ -51,9 +53,10 @@ describe('Practice Question Submitter', function() {
 
     const skill = {
       description: skillDescription,
+      reviewMaterial: 'how to perform skill',
       difficulties: {
-        medium: { rubric: mediumDifficultyRubric },
-        hard: { rubric: hardDifficultyRubric }
+        [DIFFICULTY_MEDIUM]: { rubric: mediumDifficultyRubricNotes },
+        [DIFFICULTY_HARD]: { rubric: hardDifficultyRubricNotes }
       },
       misconception,
       questions: await superAdmin.createDummyQuestionsOfQuantity(3),
@@ -61,16 +64,25 @@ describe('Practice Question Submitter', function() {
     await superAdmin.createSkill(skill);
     await superAdmin.createTopic({
       name: topicName,
+      urlFragment: 'test-topic',
+      webTitleFragment: 'Between "topic name |" and "| Oppia"',
+      description: 'describe the topic',
+      thumbnail: '',
       metaContent: 'test',
       assignedSkills: [skill],
       subtopics: [{
+        title: 'Brief & understandable description for subtopic',
+        urlFragment: 'test-subtopic',
+        explanation: 'Detailed explanation of subtopic',
+        thumbnail: '',
         assignedSkills: [skill]
       }],
-      diagnosticSkill: skill
+      diagnosticTestSkills: [skill],
+      isPublished: true
     });
+    const topicId = await superAdmin.getTopicId();
 
-    const classroomName = 'Math';
-    await superAdmin.addTopicToClassroom(topicName, classroomName);
+    await superAdmin.editClassroom({ name: 'math' }, { topics: [topicId] });
   });
 
   it('should suggest questions by selecting the difficulty to a lesson' +
@@ -84,14 +96,14 @@ describe('Practice Question Submitter', function() {
     await practiceQuestionSubmitter.suggestQuestionForSkillOpportunity(
       { topicName, skillDescription });
     await practiceQuestionSubmitter.expectQuestionDifficultyChoices(
-      { difficulty: DIFFICULTY_MEDIUM, rubric: mediumDifficultyRubric },
-      { difficulty: DIFFICULTY_HARD, rubric: hardDifficultyRubric });
+      { difficulty: DIFFICULTY_MEDIUM, rubric: mediumDifficultyRubricNotes },
+      { difficulty: DIFFICULTY_HARD, rubric: hardDifficultyRubricNotes });
     
     await practiceQuestionSubmitter.chooseDifficulty(DIFFICULTY_MEDIUM);
     await practiceQuestionSubmitter.expectChosenDifficultyToBe(
       DIFFICULTY_MEDIUM);
-    await practiceQuestionSubmitter.expectSkillRubricToBe(
-      mediumDifficultyRubric);
+    await practiceQuestionSubmitter.expectSkillRubricNotesToHave(
+      mediumDifficultyRubricNotes);
     await practiceQuestionSubmitter.expectQuestionTextSection();
 
     await practiceQuestionSubmitter.writeQuestionText(questionText);
