@@ -32,29 +32,29 @@
            value="Delete"
            *ngIf="!defaultRTEComponent"
            (click)="delete()">
-    <input class="btn btn-secondary e2e-test-cancel-rich-text-editor"
+    <input class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
            value="Cancel"
            (click)="cancel()">
     <input *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor && !currentRteIsVideoEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor"
+           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
            [disabled]="!customizationArgsForm.valid">
     <input *ngIf="currentRteIsLinkEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor"
+           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
            [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
     <input *ngIf="currentRteIsMathExpressionEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor"
+           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
            [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
     <input *ngIf="currentRteIsVideoEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor"
+           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForVideoRte() || isSaveButtonDisabled">
+           [disabled]="!customizationArgsForm.valid || disableSaveButtonForVideoRte() || isSaveButtonDisabled">
   </div>
 </div>
 <style>
@@ -73,5 +73,8 @@
   }
   .oppia-customization-arg-editor-modal {
     z-index: 1;
+  }
+  input.oppia-save-btn, input.oppia-cancel-btn {
+    max-width: 100px
   }
 </style>

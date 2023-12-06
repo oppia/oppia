@@ -124,7 +124,7 @@ export class RteHelperModalComponent {
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
-  formValueChangesSub: Subscription | undefined;
+  formValChangesSub: Subscription | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -139,7 +139,7 @@ export class RteHelperModalComponent {
   ) {}
 
   ngOnInit(): void {
-    this.focusManagerService.setFocus('tmpFocusPoint');    
+    this.focusManagerService.setFocus('tmpFocusPoint');
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
@@ -327,7 +327,7 @@ export class RteHelperModalComponent {
   disableSaveButtonForVideoRte(): void {
     // Disables the save button for video RTE if start time
     // is greater than end time.
-    this.formValueChangesSub = this.customizationArgsForm.valueChanges.subscribe(
+    this.formValChangesSub = this.customizationArgsForm.valueChanges.subscribe(
       (value) => {
         let start: number = value[1];
         let end: number = value[2];
