@@ -18,7 +18,7 @@
 
 import 'pages/common-imports';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { OldErrorPageModule } from './old-error-page.module';
+import { ErrorPageModule } from './error-page.module';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -29,7 +29,7 @@ if (!AppConstants.DEV_MODE) {
 
 const loggerService = new LoggerService();
 
-platformBrowserDynamic().bootstrapModule(OldErrorPageModule).catch(
+platformBrowserDynamic().bootstrapModule(ErrorPageModule).catch(
   (err) => loggerService.error(err)
 );
 
