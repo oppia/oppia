@@ -81,9 +81,9 @@ implements OnInit {
     const skillIdsToExclude = {
       [this.skill.getId()]: true
     };
-    for (let idx in this.skill.getPrerequisiteSkillIds()) {
-      skillIdsToExclude[this.skill.getPrerequisiteSkillIds()[idx]] = true;
-    }
+    this.skill.getPrerequisiteSkillIds().forEach(prerequisiteSkillId => {
+      skillIdsToExclude[prerequisiteSkillId] = true;
+    });
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent, {
