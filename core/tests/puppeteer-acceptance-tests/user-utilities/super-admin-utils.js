@@ -176,6 +176,118 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
   }
 
+  async createTopic({
+    name, urlFragment, webTitleFragment, description, thumbnail, metaContent,
+    assignedSkills, subtopics, diagnosticTestSkills, isPublished }) {
+    await this.goto('http://localhost:8181/topics-and-skills-dashboard');
+
+    await this.clickOn('a.e2e-test-topics-tab');
+    await this.clickOn('div.e2e-test-create-topic-button');
+
+    await this.type('input.e2e-test-new-topic-name-field', name);
+    await this.type('input.e2e-test-new-topic-url-fragment-field', urlFragment);
+    await this.type(
+      'input.e2e-test-new-page-title-fragm-field', webTitleFragment);  
+    await this.type(
+      'textarea.e2e-test-new-topic-description-field', description);
+
+    await this.clickOn('div.e2e-test-photo-button');
+    await this.clickOn('label.image-uploader-upload-label-button');
+    await this.uploadFile(thumbnail);
+    await this.clickOn('button.e2e-test-photo-upload-submit');
+
+    await this.clickOn('button.e2e-test-confirm-topic-creation-button');
+
+    await this.type(
+      'textarea.e2e-test-topic-meta-tag-content-field', metaContent);
+
+    await this.clickOn('button.e2e-test-save-topic-button');
+    await this.type('textarea.e2e-test-commit-message-input', 'Init');
+    await this.onClick('button.e2e-test-close-save-modal-button');
+
+    const topicEditorUrl = await this.page.url();
+    // Assign skills
+    await this.goto('http://localhost:8181/topics-and-skills-dashboard');
+    await this.onClick('.e2e-test-assign-skill-to-topic-button');
+    await this.page.evaluate(async (name) => {
+      const topicNames = document.getElementsByClassName(
+        'e2e-test-topic-name-in-topic-select-modal');
+      for (let i = 0; i < topicNames.length; i++) {
+        if (topicName === name) {
+          await this.onClick(`.e2e-test-topics-list-item:nth-child(${i + 1})`);
+          return;
+	}
+      }
+    }, name);
+    await this.onClick('.e2e-test-confirm-move-button');
+    await this.goto(topicEditorUrl);
+ 
+    // Add subtopics
+    await this.onClick('.puppeteer-test-add-subtopic-button');
+    await this.type('.e2e-test-new-subtopic-title-field', subtopics[0].title);
+    await this.type(
+      '.e2e-test-new-subtopic-url-fragment-field', subtopics[0].urlFragment);
+    await this.onClick('.e2e-test-show-schema-editor');
+    await this.type('.e2e-test-rte', subtopics[0].description);
+
+    await this.clickOn('div.e2e-test-photo-button');
+    await this.clickOn('label.image-uploader-upload-label-button');
+    await this.uploadFile(subtopics[0].thumbnail);
+    await this.clickOn('button.e2e-test-photo-upload-submit');
+
+    await this.clickOn('button.e2e-test-confirm-subtopic-creation-button');
+    
+    await this.goto(topicEditorUrl);
+    await this.clickOn('.e2e-test-skill-item-edit-btn');
+    await this.clickOn('.e2e-test-assign-subtopic');
+    await this.clickOn('#mat-radio-2');
+    await this.clickOn('.e2e-test-skill-assign-subtopic-confirm');
+
+    await this.clickOn('button.e2e-test-save-topic-button');
+    await this.type(
+      'textarea.e2e-test-commit-message-input', 'Create subtopic');
+    await this.onClick('button.e2e-test-close-save-modal-button');
+
+    // Assign diagnostic test skills
+    // Reload page is needed which is a bug to fix
+    await this.reloadPage();
+    await this.clickOn('button.e2e-test-add-diagnostic-test-skill');
+    await this.select(
+      '.e2e-test-diagnostic-test-skill-selector',
+      diagnosticTestSkills[0].skillDescription);
+
+    await this.clickOn('button.e2e-test-save-topic-button');
+    await this.type(
+      'textarea.e2e-test-commit-message-input', 'Diagnostic test skills');
+    await this.onClick('button.e2e-test-close-save-modal-button');
+
+    if (isPublished) {
+      await this.onClick('button.e2e-test-publish-topic-button');
+    }
+  }
+
+  async getTopicIdBy({ name }) {
+    await this.goto('http://localhost:8181/topics-and-skills-dashboard');
+    await this.clickOn('a.e2e-test-topics-tab');
+
+    await this.page.evaluate(async (name) => {
+      const topicNames = document.getElementsByClassName(
+        'e2e-test-topic-name');
+      for (let i = 0; i < topicNames.length; i++) {
+        if (topicNames[i] === name) {
+          await this.clickOn(`a.e2e-test-topic-name:nth-child(${i + 1})`);
+          return;
+	}
+      }
+    }, name);
+
+    const topicEditorUrl = await this.page.url();
+
+    const topicIdMatcher = /\/\w+\#/;
+    const topicIdMatch = topicEditorUrl.match(topicIdMatcher)[0];
+    return topicIdMatch.substring(1, topicIdMatch.length - 1);
+  }
+
   async createSkill({ description, reviewMaterial, misconception }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
