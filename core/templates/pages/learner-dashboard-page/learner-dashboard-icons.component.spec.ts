@@ -841,7 +841,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     const learnerPlaylistSpy =
       spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
-        .and.returnValue(true);
+        .and.returnValue(Promise.resolve(true));
 
     component.addToLearnerPlaylist(
       activityId, activityType);
@@ -876,7 +876,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     const learnerPlaylistSpy =
       spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
-        .and.returnValue(true);
+        .and.returnValue(Promise.resolve(true));
 
     component.addToLearnerPlaylist(
       activityId, activityType);
@@ -911,7 +911,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     const learnerPlaylistSpy =
       spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
-        .and.returnValue(false);
+        .and.returnValue(Promise.resolve(true));
 
     component.addToLearnerPlaylist(
       activityId, activityType);
@@ -946,7 +946,7 @@ describe('Learner Dashboard Icons Component', () => {
 
     const learnerPlaylistSpy =
       spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
-        .and.returnValue(false);
+        .and.returnValue(Promise.resolve(true));
 
     component.addToLearnerPlaylist(
       activityId, activityType);

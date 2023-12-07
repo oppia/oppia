@@ -63,7 +63,8 @@ export class LearnerDashboardActivityBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  async addToLearnerPlaylist(activityId: string, activityType: string): Promise<boolean> {
+  async addToLearnerPlaylist(
+      activityId: string, activityType: string): Promise<boolean> {
     this.successfullyAdded = true;
     this.addToLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
