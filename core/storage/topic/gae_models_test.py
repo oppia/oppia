@@ -178,73 +178,10 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSummaryModel class."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-    def test_get_all_published_story_exploration_mappings(self) -> None:
-        topic_id = '1'
-        topic_2_id = '2'
-        topic_story_exp_mapping: Dict[str, List[str]] = {
-            '11': ['121', '122'], 
-            '12': [],
-        }
-        topic_2_story_exp_mapping: Dict[str, List[str]] = {'21': ['211']}
-
-        self.save_new_topic(
-            topic_id, feconf.SYSTEM_COMMITTER_ID,
-            canonical_story_ids=['11'], additional_story_ids=['12'])
-        self.save_new_topic(
-            topic_2_id, feconf.SYSTEM_COMMITTER_ID,
-            name='topic2', url_fragment='frag-two',
-            canonical_story_ids=['21', '22'])
-        self._create_published_stories_by_mapping(
-            topic_id, topic_story_exp_mapping)
-        self._create_published_stories_by_mapping(
-            topic_2_id, topic_2_story_exp_mapping)
-
-        mappings = (
-            topic_models.TopicSummaryModel
-            .get_all_published_story_exploration_mappings())
-
-        self.assertIn(topic_story_exp_mapping, mappings)
-        self.assertIn(topic_2_story_exp_mapping, mappings)
-
-    def _create_published_stories_by_mapping(
-        self, topic_id: str, story_exp_mapping: Dict[str, List[str]]
-    ) -> None:
-        """Creates published stories using the story ids in story_exp_mapping
-        and links the mapped list of exp ids to the corresponding story. All
-        stories are created under the given topic_id.
-
-        Args:
-            topic_id: str. The id of the corresponding topic of its stories.
-            story_exp_mapping: dict(str, list(str)). A mapping of story ids to
-                a list of exploration ids. This will create stories under the
-                topic_id and will link each of the given exploration ids to that
-                story.
-        """
-        for story_id, exp_ids in story_exp_mapping.items():
-            self.save_new_story(
-                story_id, feconf.SYSTEM_COMMITTER_ID,
-                corresponding_topic_id=topic_id)
-
-            for exp_id in exp_ids:
-                self.save_new_valid_exploration(
-                    exp_id, self.user_id_admin, end_state_name='End',
-                    correctness_feedback_enabled=True)
-                self.publish_exploration(self.user_id_admin, exp_id)
-
-            self.link_explorations_to_story(topic_id, story_id, exp_ids)
-            topic_services.publish_story(
-                topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
 
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):

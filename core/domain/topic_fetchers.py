@@ -764,11 +764,12 @@ def get_published_story_exploration_ids(
         list(str). A list of all exploration ids belonging to the stories in the
         topic(s) to search through.
     """
-    mappings = (
-        [get_topic_summary_by_id(topic_id).published_story_exploration_mapping]
-        if topic_id
-        else topic_models.TopicSummaryModel
-            .get_all_published_story_exploration_mappings())
+    mappings = ([
+        summary.published_story_exploration_mapping
+        for summary in (
+            [get_topic_summary_by_id(topic_id)]
+            if topic_id else get_all_topic_summaries())
+    ])
 
     story_exp_ids = set()
     for mapping in mappings:

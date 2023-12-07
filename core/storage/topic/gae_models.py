@@ -391,7 +391,7 @@ class TopicSummaryModel(base_models.BaseModel):
     # to the topic's ownership of said stories, and to the publishing or
     # unpublishing of said stories.
     published_story_exploration_mapping = datastore_services.JsonProperty(
-        required=True, indexed=True)
+        required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -430,24 +430,6 @@ class TopicSummaryModel(base_models.BaseModel):
             'published_story_exploration_mapping':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def get_all_published_story_exploration_mappings(
-        cls
-    ) -> List[Dict[str, List[str]]]:
-        """Gets each entity's story_exploration_mapping property.
-
-        Returns:
-            list(dict(str, list(str))). A list of
-            story_exploration_mapping values stored in each entity.
-        """
-        projections: Sequence[TopicSummaryModel] = cls.query(
-            projection=['published_story_exploration_mapping']
-        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
-        return [
-            projection.published_story_exploration_mapping
-            for projection in projections
-        ]
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
