@@ -203,11 +203,25 @@ module.exports = class e2eSuperAdmin extends baseUser {
         difficulty == DIFFICULTY_MEDIUM ? '1' :
         difficulty == DIFFICULTY_HARD ? '2' : '0');
 
-      for (const note of rubricNotes) {
-        this.page.evaluate(async (note) => {
-          // Add manual inputs for difficulty rubric notes here...
-	}, note);
-      }
+      await this.page.evaluate(async (rubricNotes) => {
+        const noteCount = document.getElementsByClassName(
+          `e2e-test-edit-rubric-explanation-${difficulty}`).length;
+        for (let i = 0; i < rubricNotes.length; i++) {
+          await this.onClick(
+	    i < noteCount ?
+            `i.e2e-test-edit-rubric-explanation-${difficulty}` +
+               `:nth-child(${i + 1})` :
+            `button.e2e-test-add-explanation-button-${difficulty}`);
+          await this.type(
+            '.e2e-test-rubric-explanation-text div.e2e-test-rte',
+            rubricNotes[i]);
+	  await this.onClick('button.e2e-test-save-rubric-explanation-button');
+	}
+      }, rubricNotes); 
     }
+
+    await this.onClick('button.e2e-test-save-or-publish-skill');
+    await this.type('textarea.e2e-test-commit-message-input', 'test');
+    await this.onClick('button.e2e-test-close-save-modal-button');
   }
 };
