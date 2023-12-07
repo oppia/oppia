@@ -3274,7 +3274,7 @@ version: 1
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
-        correctness_feedback_enabled: bool = False,
+        correctness_feedback_enabled: bool = True,
         content_html: str = '',
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
@@ -3306,7 +3306,7 @@ version: 1
             init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
+        exploration.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:

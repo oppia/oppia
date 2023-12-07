@@ -1333,7 +1333,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         param_changes_list: List[param_domain.ParamChangeDict],
         version: int,
         auto_tts_enabled: bool,
-        correctness_feedback_enabled: bool,
+        correctness_feedback_enabled: bool, # pylint: disable=unused-argument
         next_content_id_index: int,
         edits_allowed: bool,
         created_on: Optional[datetime.datetime] = None,
@@ -1401,7 +1401,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
         self.next_content_id_index = next_content_id_index
         self.edits_allowed = edits_allowed
 
@@ -1474,7 +1474,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, # pylint: disable=line-too-long
             content_id_generator.next_content_id_index, True)
 
     @classmethod
@@ -2352,7 +2352,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
 
     def update_correctness_feedback_enabled(
-        self, correctness_feedback_enabled: bool
+        self, correctness_feedback_enabled: bool # pylint: disable=unused-argument
     ) -> None:
         """Update whether correctness feedback is enabled.
 
@@ -2360,7 +2360,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             correctness_feedback_enabled: bool. Whether correctness feedback
                 is enabled or not.
         """
-        self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
 
     def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
@@ -6536,7 +6536,7 @@ class ExplorationMetadata:
         param_specs: Dict[str, param_domain.ParamSpec],
         param_changes: List[param_domain.ParamChange],
         auto_tts_enabled: bool,
-        correctness_feedback_enabled: bool,
+        correctness_feedback_enabled: bool, # pylint: disable=unused-argument
         edits_allowed: bool
     ) -> None:
         """Initializes an ExplorationMetadata domain object.
@@ -6575,7 +6575,7 @@ class ExplorationMetadata:
         self.param_specs = param_specs
         self.param_changes = param_changes
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
         self.edits_allowed = edits_allowed
 
     def to_dict(self) -> ExplorationMetadataDict:

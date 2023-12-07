@@ -916,8 +916,7 @@ def populate_exp_model_fields(
     exp_model.param_specs = exploration.param_specs_dict
     exp_model.param_changes = exploration.param_change_dicts
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exp_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
+    exp_model.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
     exp_model.edits_allowed = exploration.edits_allowed
     exp_model.next_content_id_index = exploration.next_content_id_index
 
