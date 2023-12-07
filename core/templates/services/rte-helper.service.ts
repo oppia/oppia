@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ServicesConstants } from 'services/services.constants';
-import { CustomizationArgsForRteType, CustomizationArgsSpecsType, RteHelperModalComponent, CustomizationComponentId } from './rte-helper-modal.controller';
+import { CustomizationArgsForRteType, CustomizationArgsSpecsType, RteHelperModalComponent, RteComponentId } from './rte-helper-modal.controller';
 import cloneDeep from 'lodash/cloneDeep';
 
 const RTE_COMPONENT_SPECS = ServicesConstants.RTE_COMPONENT_SPECS;
@@ -59,9 +59,9 @@ export class RteHelperService {
   // after exiting the modal, and moves the cursor back to where it was
   // before the modal was opened.
   openCustomizationModal(
+      componentId: RteComponentId,
       customizationArgSpecs: CustomizationArgsSpecsType,
       attrsCustomizationArgsDict: CustomizationArgsForRteType,
-      componentId: CustomizationComponentId,
       onSubmitCallback?: (arg0: unknown) => void,
       onDismissCallback?: (
         reason: boolean | 'cancel') => void): void {
@@ -69,8 +69,8 @@ export class RteHelperService {
     const modalRef = this.modalService.open(RteHelperModalComponent, {
       backdrop: 'static'
     });
-    modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.componentId = componentId;
+    modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.attrsCustomizationArgsDict = (
       attrsCustomizationArgsDict);
     modalRef.result.then(

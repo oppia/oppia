@@ -21,7 +21,7 @@
       It seems like clicking on this link will lead the user to a different URL
       than the text specifies. Please change the text.
     </div>
-    <div *ngIf="isSaveButtonDisabled" class="link-error-message">
+    <div *ngIf="saveButtonIsDisabled" class="link-error-message">
       Please ensure that the start time of the video is earlier than the end time.
     </div>
   </div>
@@ -54,7 +54,7 @@
            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForVideoRte() || isSaveButtonDisabled">
+           [disabled]="!customizationArgsForm.valid || disableSaveButtonForVideoRte() || saveButtonIsDisabled">
   </div>
 </div>
 <style>

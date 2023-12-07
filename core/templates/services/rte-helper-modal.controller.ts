@@ -100,9 +100,9 @@ type CustomizationArgsNameAndValueArray = {
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
 
-// CustomizationComponentId extracts the frontend_id array from
+// RteComponentId extracts the frontend_id array from
 // the component in ComponentSpecsType.
-export type CustomizationComponentId = {
+export type RteComponentId = {
   [K in keyof ComponentSpecsType]:
   ComponentSpecsType[K]['frontend_id'];
 }[keyof ComponentSpecsType];
@@ -112,19 +112,19 @@ export type CustomizationComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
+  @Input() componentId: RteComponentId;
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentId: CustomizationComponentId;
   modalIsLoading: boolean = true;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
   currentRteIsVideoEditor: boolean = false;
-  isSaveButtonDisabled: boolean = false;
+  saveButtonIsDisabled: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
-  formValChangesSub: Subscription | undefined;
+  formSubscription: Subscription | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -135,7 +135,7 @@ export class RteHelperModalComponent {
     private contextService: ContextService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imageUploadHelperService: ImageUploadHelperService,
+    private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
   ngOnInit(): void {
@@ -327,14 +327,14 @@ export class RteHelperModalComponent {
   disableSaveButtonForVideoRte(): void {
     // Disables the save button for video RTE if start time
     // is greater than end time.
-    this.formValChangesSub = this.customizationArgsForm.valueChanges.subscribe(
+    this.formSubscription = this.customizationArgsForm.valueChanges.subscribe(
       (value) => {
         let start: number = value[1];
         let end: number = value[2];
         if (start === 0 && end === 0) {
-          this.isSaveButtonDisabled = false;
+          this.saveButtonIsDisabled = false;
         } else {
-          this.isSaveButtonDisabled = start >= end;
+          this.saveButtonIsDisabled = start >= end;
           return start >= end;
         }
       }

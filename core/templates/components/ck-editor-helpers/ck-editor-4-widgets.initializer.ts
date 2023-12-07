@@ -39,7 +39,7 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    customizationArgSpecs, attrsCustomizationArgsDict, componentId,
+    componentId, customizationArgSpecs, attrsCustomizationArgsDict,
     onSubmitCallback, onDismissCallback
   ) => void;
 }
@@ -113,9 +113,9 @@ export class CkEditorInitializerService {
                 });
 
                 rteHelperService.openCustomizationModal(
+                  componentId,
                   customizationArgSpecs,
                   customizationArgs,
-                  componentId,
                   function(customizationArgsDict) {
                     that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
