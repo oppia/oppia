@@ -22,6 +22,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { CookieModule, CookieService } from 'ngx-cookie';
 import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { angularServices } from 'services/angular-services.index';
 
@@ -34,6 +35,7 @@ export const importAllAngularServices = (): void => {
       imports: [
         HttpClientTestingModule,
         CookieModule.forRoot(),
+        RouterTestingModule,
       ],
       providers: [
         CookieService,
