@@ -846,6 +846,8 @@ describe('Learner Dashboard Icons Component', () => {
     component.addToLearnerPlaylist(
       activityId, activityType);
 
+    tick();
+
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -880,6 +882,8 @@ describe('Learner Dashboard Icons Component', () => {
 
     component.addToLearnerPlaylist(
       activityId, activityType);
+
+    tick();
 
     fixture.detectChanges();
 
