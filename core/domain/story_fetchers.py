@@ -206,19 +206,18 @@ def get_story_by_id(
 
     if cached_story is not None:
         return cached_story
-    try:
+    else:
         story_model = story_models.StoryModel.get(
             story_id, strict=strict, version=version)
-        if story_model is None:
+        if story_model:
+            story = get_story_from_model(story_model)
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_STORY,
+                sub_namespace,
+                {story_id: story})
+            return story
+        else:
             return None
-        story = get_story_from_model(story_model)
-        caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_STORY,
-            sub_namespace,
-            {story_id: story})
-        return story
-    except story_models.StoryModel.EntityNotFoundError:
-        return None
 
 
 def get_story_by_url_fragment(
