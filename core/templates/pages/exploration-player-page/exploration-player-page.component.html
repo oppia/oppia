@@ -1,6 +1,6 @@
 <div>
   <div *ngIf="isLoadingExploration" class="loader-container">
-    <oppia-loading-message [message]="'Loagding...'"></oppia-loading-message>
+    <oppia-loading-message [message]="'Loading...'"></oppia-loading-message>
   </div>
   <background-banner *ngIf="!isLoadingExploration"></background-banner>
   <div class="embedded-body" *ngIf="pageIsIframed">
