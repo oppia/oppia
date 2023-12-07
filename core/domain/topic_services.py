@@ -1111,9 +1111,9 @@ def compute_summary_of_topic(
     for story_ref in all_story_references:
         if not story_ref.story_is_published:
             continue
-        FAIL_SILENTLY = False
+        fail_silently = False
         story = story_fetchers.get_story_by_id(
-            story_ref.story_id, FAIL_SILENTLY)
+            story_ref.story_id, fail_silently)
 
         topic_model_published_story_exploration_mapping.update({
             story_ref.story_id: story.story_contents.get_all_linked_exp_ids()
