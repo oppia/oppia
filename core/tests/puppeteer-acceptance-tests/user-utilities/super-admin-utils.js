@@ -176,6 +176,16 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
   }
 
+  async editClassroom({ topics }) {
+    await this.goto('http://localhost:8181/admin#/config');
+
+    for (const topicId of topics) {
+      await this.onClick('button.e2e-test-add-list-entry');
+      await this.type('input.e2e-test-topic-id-field', topicId);
+    }
+    await this.clickOn('button.e2e-test-save-all-configs');
+  }
+
   async createTopic({
     name, urlFragment, webTitleFragment, description, thumbnail, metaContent,
     assignedSkills, subtopics, diagnosticTestSkills, isPublished }) {

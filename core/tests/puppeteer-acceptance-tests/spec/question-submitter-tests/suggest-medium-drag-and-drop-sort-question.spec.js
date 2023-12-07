@@ -73,7 +73,7 @@ describe('Practice Question Submitter', function() {
       subtopics: [{
         title: 'Brief & understandable description for subtopic',
         urlFragment: 'test-subtopic',
-        explanation: 'Detailed explanation of subtopic',
+        description: 'Detailed explanation of subtopic',
         thumbnail: '',
         assignedSkills: [skill]
       }],
@@ -82,7 +82,7 @@ describe('Practice Question Submitter', function() {
     });
     const topicId = await superAdmin.getTopicId();
 
-    await superAdmin.editClassroom({ name: 'math' }, { topics: [topicId] });
+    await superAdmin.editClassroom({ topics: [topicId] });
   });
 
   it('should suggest questions by selecting the difficulty to a lesson' +
