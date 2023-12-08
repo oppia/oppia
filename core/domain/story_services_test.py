@@ -1785,28 +1785,28 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         first: Final = 0
         second: Final = 1
 
-        change_add_story_node = [story_domain.StoryChange({
+        change_add_story_node = story_domain.StoryChange({
             'cmd': story_domain.CMD_ADD_STORY_NODE,
             'node_id': self.NODE_ID_2,
             'title': 'Title 2'
-        })]
+        })
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_add_story_node,
+            self.USER_ID, self.STORY_ID, [change_add_story_node],
             'Added story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_1)
         self.assertEqual(story.story_contents.nodes[second].id, self.NODE_ID_2)
 
-        change_rearrange_story_node = [story_domain.StoryChange({
+        change_rearrange_story_node = story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
             'property_name': story_domain.NODE,
             'old_value': second,
             'new_value': first
-        })]
+        })
 
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_rearrange_story_node,
+            self.USER_ID, self.STORY_ID, [change_rearrange_story_node],
             'Rearranged story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
