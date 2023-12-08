@@ -155,7 +155,7 @@ export class CurrentInteractionService {
   }
 
   updateCurrentAnswer(answer: InteractionAnswer | null): void {
-    this.getDisplayedCard().updateCurrentAnswer(answer);
+    this.getDisplayedCard()?.updateCurrentAnswer(answer);
   }
 
   showNoResponseError(): boolean {
