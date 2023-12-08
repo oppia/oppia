@@ -37,21 +37,6 @@ class FeatureNames(enum.Enum):
 FeatureStages = feature_flag_domain.FeatureStages
 
 
-class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
-    """Test for release coordinator pages."""
-
-    def setUp(self) -> None:
-        """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
-        super().setUp()
-        self.signup(
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
-        self.add_user_role(
-            self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR)
-
-
 class MemoryCacheHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheHandler."""
 
@@ -102,7 +87,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG, None, [
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None, [
                 FeatureNames.TEST_FEATURE_1.value,
                 FeatureNames.TEST_FEATURE_2.value]
         )
@@ -139,14 +124,14 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
+            set([feature_flag.feature_flag_value.name]))
         with feature_list_ctx, feature_set_ctx:
             response_dict = self.get_json(feconf.FEATURE_FLAGS_URL)
             self.assertEqual(
                 response_dict['feature_flags'], [feature_flag.to_dict()])
 
-        feature_flag_registry.Registry.feature_flag_registry.pop(
-            feature_flag.name)
+        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
+            feature_flag.feature_flag_value.name)
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self) -> None:
@@ -161,12 +146,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
+            set([feature_flag.feature_flag_value.name]))
         with feature_list_ctx, feature_set_ctx:
             self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_flag_name': feature_flag.name,
+                    'feature_flag_name': feature_flag.feature_flag_value.name,
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 50,
                     'user_group_ids': []
@@ -174,14 +159,19 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
             updated_feature_flag = (
                 feature_flag_registry.Registry.get_feature_flag(
-                    feature_flag.name))
+                    feature_flag.feature_flag_value.name))
             self.assertEqual(
-                updated_feature_flag.force_enable_for_all_users, False)
-            self.assertEqual(updated_feature_flag.rollout_percentage, 50)
-            self.assertEqual(updated_feature_flag.user_group_ids, [])
+                updated_feature_flag.feature_flag_value.
+                force_enable_for_all_users,
+                False
+            )
+            self.assertEqual(
+                updated_feature_flag.feature_flag_value.rollout_percentage, 50)
+            self.assertEqual(
+                updated_feature_flag.feature_flag_value.user_group_ids, [])
 
-        feature_flag_registry.Registry.feature_flag_registry.pop(
-            feature_flag.name)
+        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
+            feature_flag.feature_flag_value.name)
         self.logout()
 
     def test_update_flag_with_unknown_feature_flag_name_returns_400(
@@ -224,12 +214,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             [FeatureNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
+            set([feature_flag.feature_flag_value.name]))
         with feature_list_ctx, feature_set_ctx:
             response = self.put_json(
                 feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag',
-                    'feature_flag_name': feature_flag.name,
+                    'feature_flag_name': feature_flag.feature_flag_value.name,
                     'force_enable_for_all_users': False,
                     'rollout_percentage': 200,
                     'user_group_ids': []
@@ -243,11 +233,11 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 'Validation failed: is_at_most ({\'max_value\': 100}) '
                 'for object 200')
 
-        feature_flag_registry.Registry.feature_flag_registry.pop(
-            feature_flag.name)
+        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
+            feature_flag.feature_flag_value.name)
         self.logout()
 
-    def test_update_flag_rules_with_unexpected_exception_returns_500(
+    def test_update_feature_flag_with_unexpected_exception_returns_500(
         self
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
@@ -263,7 +253,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        feature_flag_registry.Registry.feature_flag_registry[
+        feature_flag_registry.Registry.feature_flag_spec_registry[
             FeatureNames.TEST_FEATURE_2.value] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
             response = self.put_json(
@@ -279,8 +269,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                '\'NoneType\' object has no attribute \'serialize\'')
+                '\'NoneType\' object has no attribute \'description\'')
 
-        feature_flag_registry.Registry.feature_flag_registry.pop(
+        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
             FeatureNames.TEST_FEATURE_2.value)
         self.logout()

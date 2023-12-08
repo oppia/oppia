@@ -915,7 +915,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+                caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE,
                 '0',
                 [feature_flag_id]),
             {})
@@ -933,16 +933,16 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         })
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE,
             '0',
             {
-                feature_flag_id: feature_flag
+                feature_flag_id: feature_flag.feature_flag_value
             })
 
         feature_flags = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG,
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE,
             '0', [feature_flag_id])
 
         self.assertEqual(
-            feature_flag.to_dict(),
+            feature_flag.feature_flag_value.to_dict(),
             feature_flags[feature_flag_id].to_dict())

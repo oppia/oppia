@@ -130,9 +130,12 @@ class FeatureFlagsHandler(
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
-        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+        feature_flags = feature_services.get_all_feature_flags()
+        feature_flags_dict = []
+        for feature_flag in feature_flags:
+            feature_flags_dict.append(feature_flag.to_dict())
         self.render_json({
-            'feature_flags': feature_flag_dicts,
+            'feature_flags': feature_flags_dict,
             'server_stage': feature_flag_domain.get_server_mode().value
         })
 

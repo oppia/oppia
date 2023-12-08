@@ -43,27 +43,26 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.original_feature_flag_registry = (
-            registry.Registry.feature_flag_registry)
-        registry.Registry.feature_flag_registry.clear()
+        self.original_feature_flag_spec_registry = (
+            registry.Registry.feature_flag_spec_registry)
+        registry.Registry.feature_flag_spec_registry.clear()
 
         # Feature names that might be used in following tests.
         feature_flag_names = ['feature_a', 'feature_b']
         caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
             feature_flag_names)
 
     def tearDown(self) -> None:
         super().tearDown()
 
-        registry.Registry.feature_flag_registry = (
-            self.original_feature_flag_registry)
+        registry.Registry.feature_flag_spec_registry = (
+            self.original_feature_flag_spec_registry)
 
     def test_create_feature_flag(self) -> None:
         feature_flag = registry.Registry.create_feature_flag(
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
-        feature_flag.validate()
 
     def test_create_feature_flag_with_the_same_name_failure(self) -> None:
         registry.Registry.create_feature_flag(
@@ -103,13 +102,15 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # instead of storage model or registry variable.
         feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
-        memcache_feature_flag = (
+        memcache_feature_flag_value = (
             registry.Registry.load_feature_flag_from_memcache(
                 FeatureNames.FEATURE_A.value))
         # Ruling out the possibility of any other type for mypy type checking.
-        assert memcache_feature_flag is not None
+        assert memcache_feature_flag_value is not None
         self.assertEqual(
-            feature_flag.to_dict(), memcache_feature_flag.to_dict())
+            feature_flag.feature_flag_value.to_dict(),
+            memcache_feature_flag_value.to_dict()
+        )
 
     def test_existing_feature_gets_updated(self) -> None:
         registry.Registry.create_feature_flag(
@@ -135,10 +136,12 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
         updated_feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
-        self.assertTrue(updated_feature_flag.force_enable_for_all_users)
-        self.assertEqual(updated_feature_flag.rollout_percentage, 100)
+        self.assertTrue(
+            updated_feature_flag.feature_flag_value.force_enable_for_all_users)
         self.assertEqual(
-            updated_feature_flag.user_group_ids,
+            updated_feature_flag.feature_flag_value.rollout_percentage, 100)
+        self.assertEqual(
+            updated_feature_flag.feature_flag_value.user_group_ids,
             ['user_group_1', 'user_group_2', 'user_group_3']
         )
 
@@ -155,10 +158,12 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
         updated_feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
-        self.assertTrue(updated_feature_flag.force_enable_for_all_users)
-        self.assertEqual(updated_feature_flag.rollout_percentage, 50)
+        self.assertTrue(
+            updated_feature_flag.feature_flag_value.force_enable_for_all_users)
         self.assertEqual(
-            updated_feature_flag.user_group_ids,
+            updated_feature_flag.feature_flag_value.rollout_percentage, 50)
+        self.assertEqual(
+            updated_feature_flag.feature_flag_value.user_group_ids,
             ['user_group_1', 'user_group_2']
         )
 
@@ -187,7 +192,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in test '
                     'environment.'
                 ):
-                    feature_flag.validate()
+                    feature_flag.feature_flag_value.validate(
+                        feature_flag_domain.ServerMode.DEV)
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
         feature_flag = registry.Registry.create_feature_flag(
@@ -199,7 +205,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature_flag.validate()
+                    feature_flag.feature_flag_value.validate(
+                        feature_flag_domain.ServerMode.DEV)
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
         feature_flag = registry.Registry.create_feature_flag(
@@ -211,7 +218,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in test stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature_flag.validate()
+                    feature_flag.feature_flag_value.validate(
+                        feature_flag_domain.ServerMode.TEST)
 
     def test_updated_feature_is_saved_in_storage(self) -> None:
         registry.Registry.create_feature_flag(

@@ -52,7 +52,7 @@ if MYPY: # pragma: no cover
         story_domain.Story,
         topic_domain.Topic,
         platform_parameter_domain.PlatformParameter,
-        feature_flag_domain.FeatureFlag
+        feature_flag_domain.FeatureFlagValue
     ]
 
 memory_cache_services = models.Registry.import_cache_services()
@@ -97,7 +97,7 @@ CACHE_NAMESPACE_TOPIC: Final = 'topic'
 CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a Feature Flag. This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_FEATURE_FLAG: Final = 'feature'
+CACHE_NAMESPACE_FEATURE_FLAG_VALUE: Final = 'feature'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
 # object). This namespace does not support sub-namespaces.
@@ -117,7 +117,7 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
-    feature: Callable[[str], feature_flag_domain.FeatureFlag]
+    feature: Callable[[str], feature_flag_domain.FeatureFlagValue]
     config: Callable[[str], config_domain.AllowedDefaultValueTypes]
     default: Callable[[str], str]
 
@@ -131,7 +131,7 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
-    feature: Callable[[feature_flag_domain.FeatureFlag], str]
+    feature: Callable[[feature_flag_domain.FeatureFlagValue], str]
     config: Callable[[config_domain.AllowedDefaultValueTypes], str]
     default: Callable[[str], str]
 
@@ -159,8 +159,8 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_FEATURE_FLAG: (
-        feature_flag_domain.FeatureFlag.deserialize),
+    CACHE_NAMESPACE_FEATURE_FLAG_VALUE: (
+        feature_flag_domain.FeatureFlagValue.deserialize),
     CACHE_NAMESPACE_CONFIG: json.loads,
     CACHE_NAMESPACE_DEFAULT: json.loads
 }
@@ -173,7 +173,7 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
-    CACHE_NAMESPACE_FEATURE_FLAG: lambda x: x.serialize(),
+    CACHE_NAMESPACE_FEATURE_FLAG_VALUE: lambda x: x.serialize(),
     CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
 }
@@ -271,7 +271,7 @@ def get_multi(
     namespace: Literal['feature'],
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, feature_flag_domain.FeatureFlag]: ...
+) -> Dict[str, feature_flag_domain.FeatureFlagValue]: ...
 
 
 @overload
@@ -393,7 +393,7 @@ def set_multi(
     sub_namespace: str | None,
     id_value_mapping: Dict[
         str,
-        feature_flag_domain.FeatureFlag
+        feature_flag_domain.FeatureFlagValue
     ]
 ) -> bool: ...
 
