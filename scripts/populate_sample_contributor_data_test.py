@@ -210,7 +210,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
                 ],
                 0)
         )
-        self.assertEqual(len(questions), 3)
+        self.assertEqual(len(questions), 5)
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', '', None))
