@@ -132,11 +132,16 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
             feature_flag_spec = (
                 registry.Registry.feature_flag_spec_registry[
                     feature_flag.feature_flag_value.name])
+            # Rulling out the possibility of last_updated to be None as we
+            # are getting the feature flag value from the storage.
+            assert feature_flag.feature_flag_value.last_updated is not None
+            last_updated = utils.convert_naive_datetime_to_string(
+                feature_flag.feature_flag_value.last_updated)
             feature_flag = feature_flag_domain.FeatureFlag.from_dict({
                 'name': feature_flag.feature_flag_value.name,
                 'description': feature_flag_spec.description,
                 'feature_stage': feature_flag_spec.feature_stage.value,
-                'last_updated': feature_flag.feature_flag_value.last_updated,
+                'last_updated': last_updated,
                 'force_enable_for_all_users': (
                     feature_flag.feature_flag_value.force_enable_for_all_users),
                 'rollout_percentage': (

@@ -378,7 +378,7 @@ class FeatureFlagValue:
                 )
             )
 
-    def to_dict(self) -> FeatureFlagSpecDict:
+    def to_dict(self) -> FeatureFlagValueDict:
         """Returns a dict representation of the FeatureFlagValue domain object.
 
         Returns:
@@ -396,7 +396,7 @@ class FeatureFlagValue:
 
     @classmethod
     def from_dict(
-        cls, feature_flag_value_dict: FeatureFlagSpecDict
+        cls, feature_flag_value_dict: FeatureFlagValueDict
     ) -> FeatureFlagValue:
         """Returns an FeatureFlagValue object from dictionary.
 

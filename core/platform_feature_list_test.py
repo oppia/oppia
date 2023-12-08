@@ -69,7 +69,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_registry.Registry.feature_flag_registry
+                feature_flag_registry.Registry.feature_flag_spec_registry
             ):
                 missing_names.append(feature.value)
         self.assertTrue(
@@ -119,8 +119,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         for feature in platform_feature_list.DEV_FEATURES_LIST:
             feature_flag = (
                 feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_stage !=
-                    feature_flag_domain.FeatureStages.DEV.value):
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.DEV):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -133,8 +133,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         for feature in platform_feature_list.TEST_FEATURES_LIST:
             feature_flag = (
                 feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_stage !=
-                    feature_flag_domain.FeatureStages.TEST.value):
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.TEST):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -147,8 +147,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         for feature in platform_feature_list.PROD_FEATURES_LIST:
             feature_flag = (
                 feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_stage !=
-                    feature_flag_domain.FeatureStages.PROD.value):
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.PROD):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
