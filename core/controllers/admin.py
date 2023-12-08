@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import logging
+import operator
 import random
 
 from core import feconf
@@ -2094,7 +2095,10 @@ class RegenerateTopicSummariesHandler(
     def put(self) -> None:
         """Regenerates all topic summary models."""
 
-        for topic in topic_fetchers.get_all_topics():
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        for topic in topics:
             topic_services.generate_topic_summary(topic.id)
 
         self.render_json({})

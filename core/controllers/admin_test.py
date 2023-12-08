@@ -1761,7 +1761,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
 
 class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
-    """Tests for PopulateTopicsWithExplorationIdsHandler."""
+    """Tests for RegenerateTopicSummariesHandler."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -1770,8 +1770,16 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
     def test_regenerate_topic_summaries(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', url_fragment='url-fragment',
+            topic_id, self.admin_id, name='Topic 1',
+            abbreviated_name='T1', url_fragment='url-frag-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2, self.admin_id, name='Topic 2',
+            abbreviated_name='T2', url_fragment='url-frag-two',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -1779,15 +1787,13 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap_with_call_counter(
-                topic_services, 'generate_topic_summary') as (
-                    generate_topic_summary):
+        with self.swap_with_checks(
+                topic_services, 'generate_topic_summary',
+                topic_services.generate_topic_summary,
+                expected_args=[(topic_id,), (topic_id_2,)]):
             self.put_json(
                 feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
                 csrf_token=csrf_token, expected_status_int=200)
-
-            self.assertGreaterEqual(
-                generate_topic_summary.times_called, 1)
 
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
