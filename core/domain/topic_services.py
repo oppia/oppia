@@ -1717,7 +1717,7 @@ def get_chapter_counts_in_topic_summaries(
 
     Returns:
         Dict[str, TopicChapterCounts]. Dict of topic id and topic chapter
-        counts domain obj8b8UbvPbEVOWect.
+        counts domain object.
     """
 
     topic_summary_id_mapping: Dict[
