@@ -1388,8 +1388,7 @@ class Topic:
         """Removes a story from the canonical_story_references list.
 
         Args:
-            story_id: str. The story id to remove from the list and from the
-                mapping.
+            story_id: str. The story id to remove from the list.
 
         Raises:
             Exception. The story_id is not present in the canonical stories
@@ -1439,7 +1438,7 @@ class Topic:
         """Adds a story to the canonical_story_references list.
 
         Args:
-            story_id: str. The story id to add to the list and to the mapping.
+            story_id: str. The story id to add to the list.
 
         Raises:
             Exception. The story ID is already present in the canonical
@@ -1458,7 +1457,7 @@ class Topic:
         """Adds a story to the additional_story_references list.
 
         Args:
-            story_id: str. The story id to add to the list and to the mapping.
+            story_id: str. The story id to add to the list.
 
         Raises:
             Exception. The story ID is already present in the additional
@@ -1477,8 +1476,7 @@ class Topic:
         """Removes a story from the additional_story_references list.
 
         Args:
-            story_id: str. The story id to remove from the list and from the
-                mapping.
+            story_id: str. The story id to remove from the list.
 
         Raises:
             Exception. The story ID is not present in the additional stories
