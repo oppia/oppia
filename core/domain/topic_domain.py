@@ -2312,8 +2312,9 @@ class TopicSummary:
                 the thumbnail.
             url_fragment: str. The url fragment of the topic.
             published_story_exploration_mapping: dict(str, list(str)). The
-                relationship between the topic, its stories' ids, and the
-                explorations' ids that are linked to said stories.
+                mappings' keys are the ids of published stories owned by the
+                topic and each key maps to a list of the story's linked
+                exploration ids.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
