@@ -1104,20 +1104,19 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    all_story_references = (
-        topic.canonical_story_references +
-        topic.additional_story_references)
-    topic_model_published_story_exploration_mapping = {}
-    for story_ref in all_story_references:
-        if not story_ref.story_is_published:
-            continue
-        story = story_fetchers.get_story_by_id(
-            story_ref.story_id, strict=False)
-
-        topic_model_published_story_exploration_mapping.update({
-            story_ref.story_id: story.story_contents.get_all_linked_exp_ids()
-                if story else []
-        })
+    published_story_references = [
+        story_ref for story_ref in topic.canonical_story_references +
+            topic.additional_story_references
+        if story_ref.story_is_published]
+    stories = story_fetchers.get_stories_by_ids([
+        story_ref.story_id for story_ref in published_story_references],
+        strict=False)
+    topic_model_published_story_exploration_mapping = {
+        published_story_references[i].story_id:
+            stories[i].story_contents.get_all_linked_exp_ids()
+            if stories[i] else []
+        for i in range(len(stories))
+    }
 
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
