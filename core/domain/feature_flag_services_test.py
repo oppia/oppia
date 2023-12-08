@@ -137,7 +137,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         feature_flag_three = registry.Registry.create_feature_flag(
             FeatureNames.FEATURE_THREE, 'feature flag three',
             FeatureStages.DEV)
- 
+
         expected_feature_flags_dict = [
             feature_flag_one.to_dict(),
             feature_flag_two.to_dict(),

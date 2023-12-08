@@ -29,7 +29,7 @@ from core.tests import test_utils
 
 
 class MockServerMode(enum.Enum):
-    Random = 'random'
+    RANDOM = 'random'
 
 
 class FeatureFlagSpecTests(test_utils.GenericTestBase):
@@ -68,7 +68,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         self.assertEqual(
             feature_flag_spec.feature_stage,
             feature_flag_domain.FeatureStages.PROD)
- 
+
     def test_from_dict_raises_error_when_invalid_feature_stage(self) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -94,13 +94,13 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         self) -> None:
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'for test',
-            MockServerMode.Random
+            MockServerMode.RANDOM
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid feature stage, got %s, '
             'expected one of \\[\'dev\', \'test\', \'prod\'].'
-            % (MockServerMode.Random)
+            % (MockServerMode.RANDOM)
         ):
             feature_flag_spec.validate()
 
@@ -145,7 +145,7 @@ class FeatureFlagValueTests(test_utils.GenericTestBase):
             feature_flag_value_dict)
         self.assertDictEqual(
             feature_flag_value.to_dict(), feature_flag_value_dict)
-        
+
     def test_set_object_values_correctly(self) -> None:
         feature_flag_value = feature_flag_domain.FeatureFlagValue.from_dict({
             'name': 'feature_a',
@@ -285,7 +285,7 @@ class FeatureFlagValueTests(test_utils.GenericTestBase):
                 ):
                     feature_flag_value.validate(
                         feature_flag_domain.ServerMode.TEST)
-    
+
     def test_serialize_and_deserialize_returns_unchanged_feature_flag_value(
         self
     ) -> None:

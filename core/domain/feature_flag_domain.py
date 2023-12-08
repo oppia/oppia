@@ -89,7 +89,7 @@ class FeatureFlag:
     def feature_flag_spec(self) -> FeatureFlagSpec:
         """The FeatureFlagSpec property of FeatureFlag."""
         return self._feature_flag_spec
-    
+
     @property
     def feature_flag_value(self) -> FeatureFlagValue:
         """The FeatureFlagValue property of FeatureFlag."""
@@ -212,6 +212,9 @@ class FeatureFlagSpec:
 
         Returns:
             FeatureFlagSpec. The corresponding FeatureFlagSpec domain object.
+
+        Raises:
+            Exception. Invalid feature stage.
         """
         if feature_dict['feature_stage'] == 'dev':
             feature_stage = ServerMode.DEV
