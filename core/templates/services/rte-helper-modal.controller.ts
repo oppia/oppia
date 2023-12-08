@@ -116,15 +116,20 @@ export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   modalIsLoading: boolean = true;
-  currentRteIsMathExpressionEditor: boolean = false;
-  currentRteIsLinkEditor: boolean = false;
-  currentRteIsVideoEditor: boolean = false;
+  urlSuffixIsInvalid: boolean = true;
   saveButtonIsDisabled: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
-  formSubscription: Subscription | undefined;
+  rteFieldValues: Subscription | undefined;
+  COMPONENT_ID_COLLAPSIBLE = 'collapsible';
+  COMPONENT_ID_IMAGE = 'image';
+  COMPONENT_ID_LINK = 'link';
+  COMPONENT_ID_MATH = 'math';
+  COMPONENT_ID_SKILLREVIEW = 'skillreview';
+  COMPONENT_ID_TABS = 'tabs';
+  COMPONENT_ID_VIDEO = 'video';
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -143,7 +148,6 @@ export class RteHelperModalComponent {
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
-        this.currentRteIsMathExpressionEditor = true;
         // Typescript is not able to infer the correct type of mathValueDict.
         // Hence we manually typecast it to the correct type. When we use
         // typeof caName, it returns a string literal type which is
@@ -196,19 +200,7 @@ export class RteHelperModalComponent {
         ).push(tmpCustomizationArg);
       }
     }
-    // Infer that the RTE component is a Link if it contains the `url` and
-    // `text` customization arg names
-    // TODO(#18219): Remove the typecast once Typescript is able to infer
-    // the correct type..
-    const customizationArgNames = (
-      this.customizationArgSpecs as { name: string }[]
-    ).map((x) => x.name);
-    if (
-      customizationArgNames.includes('url') &&
-      customizationArgNames.includes('text')
-    ) {
-      this.currentRteIsLinkEditor = true;
-    }
+
     // The 'defaultRTEComponent' variable controls whether the delete button
     // needs to be shown. If the RTE component has default values, there is no
     // need for a delete button as the 'Cancel' button would have
@@ -232,9 +224,14 @@ export class RteHelperModalComponent {
     });
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
-    if (this.componentId === 'video') {
-      this.currentRteIsVideoEditor = true;
+
+    if (this.componentId === this.COMPONENT_ID_MATH ||
+      this.componentId === this.COMPONENT_ID_VIDEO ||
+      this.componentId === this.COMPONENT_ID_LINK
+    ) {
+      this.subscribeToRteFieldChanges();
     }
+
     setTimeout(() => {
       this.modalIsLoading = false;
     });
@@ -258,87 +255,72 @@ export class RteHelperModalComponent {
       }
     }
     this.ngbActiveModal.dismiss(true);
+    if (this.rteFieldValues) {
+      this.rteFieldValues.unsubscribe();
+    }
   }
 
   delete(): void {
     this.ngbActiveModal.dismiss(true);
-  }
-
-  disableSaveButtonForMathRte(): boolean {
-    // This method disables the save button when the Math SVG has not yet
-    // been generated but being processed.
-    if (!this.currentRteIsMathExpressionEditor) {
-      return false;
-    } else {
-      // We know that this is a math rich text component. Hence we can make the
-      // the type more specific.
-      const { value } = this.tmpCustomizationArgs[0] as Extract<
-        CustomizationArgsNameAndValueArray[number],
-        { name: 'math_content' }
-      >;
-      return value.mathExpressionSvgIsBeingProcessed || value.raw_latex === '';
+    if (this.rteFieldValues) {
+      this.rteFieldValues.unsubscribe();
     }
   }
 
-  disableSaveButtonForLinkRte(): boolean {
-    // This method disables the save button when the `text` field for the
-    // Link RTE looks like a URL but it does not match the `url`. Otherwise,
-    // creators can make the `url` a malicious website and make the `text`
-    // a safe website.
-    if (!this.currentRteIsLinkEditor) {
-      return false;
-    }
-    // We know that this is a link rich text component. Hence we can make the
-    // the type more specific.
-    const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
-      CustomizationArgsNameAndValueArray[number],
-      { name: 'url' | 'text' }
-    >[];
-    let url: string = tmpCustomizationArgs[0].value;
-    let text: string = tmpCustomizationArgs[1].value;
-
-    // First check if the `text` looks like a URL.
-    const suffixes = ['.com', '.org', '.edu', '.gov'];
-    let textLooksLikeUrl = false;
-    for (const suffix of suffixes) {
-      if (text.endsWith(suffix)) {
-        textLooksLikeUrl = true;
-      }
-    }
-    if (!textLooksLikeUrl) {
-      return false;
-    }
-    // If the text looks like a URL, strip the leading 'http://' or
-    // 'https://' or 'www.'.
-    const prefixes = ['https://', 'http://', 'www.'];
-    for (const prefix of prefixes) {
-      if (url.startsWith(prefix)) {
-        url = url.substring(prefix.length);
-      }
-      if (text.startsWith(prefix)) {
-        text = text.substring(prefix.length);
-      }
-    }
-    // After the cleanup, if the strings are not equal, then we do not
-    // allow the lesson creator to save it.
-    return url !== text;
-  }
-
-  disableSaveButtonForVideoRte(): void {
-    // Disables the save button for video RTE if start time
-    // is greater than end time.
-    this.formSubscription = this.customizationArgsForm.valueChanges.subscribe(
+  subscribeToRteFieldChanges(): void {
+    this.rteFieldValues = this.customizationArgsForm.valueChanges.subscribe(
       (value) => {
-        let start: number = value[1];
-        let end: number = value[2];
-        if (start === 0 && end === 0) {
-          this.saveButtonIsDisabled = false;
-        } else {
-          this.saveButtonIsDisabled = start >= end;
-          return start >= end;
+        this.updateRteSaveButtonState(value);
+      });
+  }
+
+  updateRteSaveButtonState(value: number | string | boolean): void {
+    if (this.componentId === this.COMPONENT_ID_MATH) {
+      let rawLatex: string = value[0].raw_latex;
+      let mathExpressionSvgIsBeingProcessed:
+      boolean = value[0].mathExpressionSvgIsBeingProcessed;
+      this.saveButtonIsDisabled = mathExpressionSvgIsBeingProcessed ||
+      rawLatex === '';
+    } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
+      let start: number = value[1];
+      let end: number = value[2];
+      if (start === 0 && end === 0) {
+        this.saveButtonIsDisabled = false;
+      } else {
+        this.saveButtonIsDisabled = start >= end;
+      }
+    } else if (this.componentId === this.COMPONENT_ID_LINK) {
+      let url: string = value[0];
+      let text: string = value[1];
+      // First check if the `text` looks like a URL.
+      const suffixes = ['.com', '.org', '.edu', '.gov'];
+      for (const suffix of suffixes) {
+        if (url.endsWith(suffix)) {
+          this.urlSuffixIsInvalid = false;
         }
       }
-    );
+      if (!this.urlSuffixIsInvalid) {
+        // The link text. If left blank, the link URL will be used.
+        if (text === '') {
+          text = url;
+          this.saveButtonIsDisabled = false;
+        }
+        // If the text looks like a URL, strip the leading 'http://' or
+        // 'https://' or 'www.'.
+        const prefixes = ['https://', 'http://', 'www.'];
+        for (const prefix of prefixes) {
+          if (url.startsWith(prefix)) {
+            url = url.substring(prefix.length);
+          }
+          if (text.startsWith(prefix)) {
+            text = text.substring(prefix.length);
+          }
+        }
+        // After the cleanup, if the strings are not equal, then we do not
+        // allow the lesson creator to save it.
+        this.saveButtonIsDisabled = url !== text;
+      }
+    }
   }
 
   save(): void {
@@ -359,7 +341,7 @@ export class RteHelperModalComponent {
     // The saving of SVGs to the backend cannot be done in the math RTE editor
     // because the control is passed to this function as soon as the user
     // clicks on the save button.
-    if (this.currentRteIsMathExpressionEditor) {
+    if (this.componentId === this.COMPONENT_ID_MATH) {
       // The tmpCustomizationArgs is guaranteed to have only one element for
       // the case of math rich text component.
       // We know that this is a math rich text component. Hence we can make the
@@ -450,7 +432,8 @@ export class RteHelperModalComponent {
           customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
-        } else if (caName === 'text' && this.currentRteIsLinkEditor) {
+        } else if (caName === 'text' &&
+        this.componentId === this.COMPONENT_ID_LINK) {
           // Set the link `text` to the link `url` if the `text` is empty.
           (
             customizationArgsDict as {
@@ -470,6 +453,9 @@ export class RteHelperModalComponent {
         }
       }
       this.ngbActiveModal.close(customizationArgsDict);
+    }
+    if (this.rteFieldValues) {
+      this.rteFieldValues.unsubscribe();
     }
   }
 

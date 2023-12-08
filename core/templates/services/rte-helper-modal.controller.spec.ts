@@ -119,7 +119,7 @@ describe('RteHelperModalComponent', () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
-      expect(component.disableSaveButtonForMathRte()).toBe(false);
+      expect(component.saveButtonIsDisabled).toBe(false);
       component.save();
       flush();
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();

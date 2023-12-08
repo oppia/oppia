@@ -277,7 +277,7 @@ describe('Rte Helper Service', () => {
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
-      '', [], {}, submitCallBackSpy, dismissCallBackSpy);
+      'video', [], {}, submitCallBackSpy, dismissCallBackSpy);
 
     expect(ngbModalSpy).toHaveBeenCalled();
   });
@@ -290,7 +290,7 @@ describe('Rte Helper Service', () => {
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
-      '', [], {}, submitCallBackSpy, dismissCallBackSpy);
+      'video', [], {}, submitCallBackSpy, dismissCallBackSpy);
     tick();
 
     expect(submitCallBackSpy).toHaveBeenCalled();
@@ -304,7 +304,7 @@ describe('Rte Helper Service', () => {
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
-      '', [], {}, submitCallBackSpy, dismissCallBackSpy);
+      'video', [], {}, submitCallBackSpy, dismissCallBackSpy);
     tick();
 
     expect(dismissCallBackSpy).toHaveBeenCalled();
