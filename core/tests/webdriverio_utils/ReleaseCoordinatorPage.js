@@ -164,28 +164,29 @@ var ReleaseCoordinatorPage = function() {
   };
 
   this.setRolloutPercentageForFeatureFlag = async function(
-    featureFlagElement, rolloutPercentage) {
-      await waitFor.visibilityOf(
-        featureFlagElement.$(featureFlagRolloutPercentageInput),
-        'Setting rollout-percentage property takes too long to appear'
-      );
-      await (
-        featureFlagElement.$(featureFlagRolloutPercentageInput)).setValue(
-          rolloutPercentage);
-      await this.saveChangeOfFeature(featureElement);
+      featureFlagElement, rolloutPercentage) {
+    await waitFor.visibilityOf(
+      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      'Setting rollout-percentage property takes too long to appear'
+    );
+    await action.setValue(
+      'rolloutPercentage',
+      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      rolloutPercentage);
+    await this.saveChangeOfFeature(featureElement);
   };
 
   this.expectRolloutPercentageToMatch = async function(
-    featureFlagElement, rolloutPercentage) {
-      await waitFor.visibilityOf(
-        featureFlagElement.$(featureFlagRolloutPercentageInput),
-        'Rollout-percentage property takes too long to appear'
-      );
-      var value = await action.getValue(
-        'rolloutPercentage',
-        featureFlagRolloutPercentageInput
-      );
-      expect(value).toMatch(rolloutPercentage);
+      featureFlagElement, rolloutPercentage) {
+    await waitFor.visibilityOf(
+      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      'Rollout-percentage property takes too long to appear'
+    );
+    var value = await action.getValue(
+      'rolloutPercentage',
+      featureFlagRolloutPercentageInput
+    );
+    expect(value).toMatch(rolloutPercentage);
   };
 
   this.saveChangeOfFeature = async function(featureElement) {

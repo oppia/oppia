@@ -466,8 +466,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     user_id_to_feature_flag_status_for_5_perc[
                         user_id] = feature_flag_status
             self.assertTrue(
-                count_feature_flag_enabled_for_5_perc in [
-                    count for count in range(40, 61)])
+                count_feature_flag_enabled_for_5_perc in list(range(40, 61)))
 
             feature_services.update_feature_flag(
                 self.dev_feature_flag.feature_flag_value.name, False, 10, [])
@@ -481,10 +480,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     user_id_to_feature_flag_status_for_10_perc[
                         user_id] = feature_flag_status
             self.assertTrue(
-                count_feature_flag_enabled_for_10_perc in [
-                    count for count in range(90, 111)])
+                count_feature_flag_enabled_for_10_perc in list(range(90, 111)))
 
-            for user_id in user_id_to_feature_flag_status_for_5_perc.keys():
+            for user_id in user_id_to_feature_flag_status_for_5_perc:
                 self.assertIn(
                     user_id, user_id_to_feature_flag_status_for_10_perc)
 
