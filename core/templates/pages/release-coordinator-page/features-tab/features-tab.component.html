@@ -15,7 +15,10 @@
       <div class="col-10">
         <div class="row">
           <div class="col-3">
-            <schema-based-editor [disabled]="featureFlag.forceEnableForAllUsers" [schema]="getSchema()" [(ngModel)]="featureFlag.rolloutPercentage">
+            <schema-based-editor [disabled]="featureFlag.forceEnableForAllUsers"
+                                 [schema]="getSchema()"
+                                 [(ngModel)]="featureFlag.rolloutPercentage"
+                                 class="e2e-test-rollout-percentage">
             </schema-based-editor>
           </div>
           <div class="col-1">
