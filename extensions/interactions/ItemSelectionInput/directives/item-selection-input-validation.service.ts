@@ -116,7 +116,7 @@ export class ItemSelectionInputValidationService {
       rule: Rule,
       handledAnswers: boolean[]) {
     ruleInputs.forEach((ruleInput) => {
-      let choiceIndex = answerChoiceToIndex[ruleInput];
+      const choiceIndex = answerChoiceToIndex[ruleInput];
       if (rule.type === 'Equals') {
         handledAnswers[choiceIndex] = true;
       } else if (rule.type === 'IsProperSubsetOf') {
@@ -139,13 +139,13 @@ export class ItemSelectionInputValidationService {
       customizationArgs: ItemSelectionInputCustomizationArgs,
       answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {
-    var warningsList: Warning[] = [];
+    let warningsList: Warning[] = [];
 
-    var areAllChoicesCovered = false;
-    var seenChoices = customizationArgs.choices.value;
-    var handledAnswers = Array(seenChoices.length).fill(false);
+    let areAllChoicesCovered = false;
+    const seenChoices = customizationArgs.choices.value;
+    let handledAnswers = Array(seenChoices.length).fill(false);
 
-    var answerChoiceToIndex: Record<string, number> = {};
+    let answerChoiceToIndex: Record<string, number> = {};
     seenChoices.forEach((seenChoice, choiceIndex) => {
       const contentId = seenChoice.contentId;
       if (contentId === null) {
@@ -155,7 +155,7 @@ export class ItemSelectionInputValidationService {
     });
 
     answerGroups.forEach((answerGroup, answerIndex) => {
-      var rules = answerGroup.rules;
+      const rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
         var ruleInputs = rule.inputs.x as string[];
         if (rule.type === 'Equals' && ruleInputs.length > 1) {
