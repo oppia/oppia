@@ -679,8 +679,8 @@ class TranslatableTextHandler(
             matching state_name and content_id, False otherwise.
         """
         return any(
-            s.change.state_name == state_name and
-            s.change.content_id == content_id for s in suggestions)
+            s.change_cmd.state_name == state_name and
+            s.change_cmd.content_id == content_id for s in suggestions)
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):

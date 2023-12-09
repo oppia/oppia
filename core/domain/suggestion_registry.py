@@ -67,7 +67,7 @@ class BaseSuggestionDict(TypedDict):
     status: str
     author_name: str
     final_reviewer_id: Optional[str]
-    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    change_cmd: Dict[str, change_domain.AcceptableChangeDictTypes]
     score_category: str
     language_code: str
     last_updated: float
@@ -89,7 +89,7 @@ class BaseSuggestion:
         author_id: str. The ID of the user who submitted the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change: Change. The details of the suggestion. This should be an
+        change_cmd: Change. The details of the suggestion. This should be an
             object of type ExplorationChange, TopicChange, etc.
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
@@ -115,7 +115,7 @@ class BaseSuggestion:
     target_id: str
     target_version_at_submission: int
     author_id: str
-    change: change_domain.BaseChange
+    change_cmd: change_domain.BaseChange
     score_category: str
     last_updated: datetime.datetime
     created_on: datetime.datetime
@@ -143,7 +143,7 @@ class BaseSuggestion:
             'status': self.status,
             'author_name': self.get_author_name(),
             'final_reviewer_id': self.final_reviewer_id,
-            'change': self.change.to_dict(),
+            'change_cmd': self.change_cmd.to_dict(),
             'score_category': self.score_category,
             'language_code': self.language_code,
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
@@ -403,7 +403,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         status: str,
         author_id: str,
         final_reviewer_id: Optional[str],
-        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: Optional[str],
         edited_by_reviewer: bool,
@@ -422,8 +422,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: exp_domain.EditExpStatePropertyContentCmd = (
-            exp_domain.EditExpStatePropertyContentCmd(change)
+        self.change_cmd: exp_domain.EditExpStatePropertyContentCmd = (
+            exp_domain.EditExpStatePropertyContentCmd(change_cmd)
         )
         self.score_category = score_category
         # Here we use MyPy ignore because in BaseSuggestion, language_code
@@ -466,10 +466,10 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super().validate()
 
-        if not isinstance(self.change, exp_domain.ExplorationChange):
+        if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
             raise utils.ValidationError(
                 'Expected change to be an ExplorationChange, received %s'
-                % type(self.change))
+                % type(self.change_cmd))
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
@@ -478,17 +478,17 @@ class SuggestionEditStateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_CONTENT,
                     self.get_score_type()))
 
-        if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+        if self.change_cmd.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change.cmd))
+                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd.cmd))
 
-        if (self.change.property_name !=
+        if (self.change_cmd.property_name !=
                 exp_domain.STATE_PROPERTY_CONTENT):
             raise utils.ValidationError(
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
-                    self.change.property_name))
+                    self.change_cmd.property_name))
 
         # Suggestions of this type do not have an associated language code,
         # since they are not translation-related.
@@ -503,10 +503,10 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         self.validate()
         states = exp_fetchers.get_exploration_by_id(self.target_id).states
-        if self.change.state_name not in states:
+        if self.change_cmd.state_name not in states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
-                self.change.state_name)
+                self.change_cmd.state_name)
 
     def _get_change_list_for_accepting_edit_state_content_suggestion(
         self
@@ -517,10 +517,10 @@ class SuggestionEditStateContent(BaseSuggestion):
             list(ExplorationChange). The change_list corresponding to the
             suggestion.
         """
-        change = self.change
+        change = self.change_cmd
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
+            exploration.states[self.change_cmd.state_name].content.to_dict())
 
         change.old_value = old_content
         change.new_value['content_id'] = old_content['content_id']
@@ -530,15 +530,15 @@ class SuggestionEditStateContent(BaseSuggestion):
     def populate_old_value_of_change(self) -> None:
         """Populates old value of the change."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if self.change.state_name not in exploration.states:
+        if self.change_cmd.state_name not in exploration.states:
             # As the state doesn't exist now, we cannot find the content of the
             # state to populate the old_value field. So we set it as None.
             old_content = None
         else:
             old_content = (
-                exploration.states[self.change.state_name].content.to_dict())
+                exploration.states[self.change_cmd.state_name].content.to_dict())
 
-        self.change.old_value = old_content
+        self.change_cmd.old_value = old_content
 
     def accept(self, commit_message: str) -> None:
         """Accepts the suggestion.
@@ -557,7 +557,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             commit_message)
 
     def pre_update_validate(
-        self, change: exp_domain.EditExpStatePropertyContentCmd
+        self, change_cmd: exp_domain.EditExpStatePropertyContentCmd
     ) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -568,19 +568,19 @@ class SuggestionEditStateContent(BaseSuggestion):
         Raises:
             ValidationError. Invalid new change.
         """
-        if self.change.cmd != change.cmd:
+        if self.change_cmd.cmd != change_cmd.cmd:
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
-                self.change.cmd)
-        if self.change.property_name != change.property_name:
+                self.change_cmd.cmd)
+        if self.change_cmd.property_name != change_cmd.property_name:
             raise utils.ValidationError(
                 'The new change property_name must be equal to %s' %
-                self.change.property_name)
-        if self.change.state_name != change.state_name:
+                self.change_cmd.property_name)
+        if self.change_cmd.state_name != change_cmd.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
-                self.change.state_name)
-        if self.change.new_value['html'] == change.new_value['html']:
+                self.change_cmd.state_name)
+        if self.change_cmd.new_value['html'] == change_cmd.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
@@ -590,9 +590,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        html_string_list = [self.change.new_value['html']]
-        if self.change.old_value is not None:
-            html_string_list.append(self.change.old_value['html'])
+        html_string_list = [self.change_cmd.new_value['html']]
+        if self.change_cmd.old_value is not None:
+            html_string_list.append(self.change_cmd.old_value['html'])
         return html_string_list
 
     def get_target_entity_html_strings(self) -> List[str]:
@@ -603,8 +603,8 @@ class SuggestionEditStateContent(BaseSuggestion):
             list(str). The list of html content strings from target entity used
             in the suggestion.
         """
-        if self.change.old_value is not None:
-            return [self.change.old_value['html']]
+        if self.change_cmd.old_value is not None:
+            return [self.change_cmd.old_value['html']]
 
         return []
 
@@ -618,11 +618,11 @@ class SuggestionEditStateContent(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        if self.change.old_value is not None:
-            self.change.old_value['html'] = (
-                conversion_fn(self.change.old_value['html']))
-        self.change.new_value['html'] = (
-            conversion_fn(self.change.new_value['html']))
+        if self.change_cmd.old_value is not None:
+            self.change_cmd.old_value['html'] = (
+                conversion_fn(self.change_cmd.old_value['html']))
+        self.change_cmd.new_value['html'] = (
+            conversion_fn(self.change_cmd.new_value['html']))
 
 
 class SuggestionTranslateContent(BaseSuggestion):
@@ -638,7 +638,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         status: str,
         author_id: str,
         final_reviewer_id: Optional[str],
-        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
@@ -657,8 +657,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: exp_domain.AddWrittenTranslationCmd = (
-            exp_domain.AddWrittenTranslationCmd(change)
+        self.change_cmd: exp_domain.AddWrittenTranslationCmd = (
+            exp_domain.AddWrittenTranslationCmd(change_cmd)
         )
         self.score_category = score_category
         self.language_code = language_code
@@ -690,10 +690,10 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         super().validate()
 
-        if not isinstance(self.change, exp_domain.ExplorationChange):
+        if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
             raise utils.ValidationError(
                 'Expected change to be an ExplorationChange, received %s'
-                % type(self.change))
+                % type(self.change_cmd))
         # The score sub_type needs to match the validation for exploration
         # category, i.e the second part of the score_category should match
         # the target exploration's category and we have a prod validation
@@ -714,26 +714,26 @@ class SuggestionTranslateContent(BaseSuggestion):
             exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             exp_domain.CMD_ADD_WRITTEN_TRANSLATION
         ]
-        if self.change.cmd not in accepted_cmds:
+        if self.change_cmd.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change.cmd))
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change_cmd.cmd))
 
         if not utils.is_supported_audio_language_code(
-                self.change.language_code):
+                self.change_cmd.language_code):
             raise utils.ValidationError(
-                'Invalid language_code: %s' % self.change.language_code)
+                'Invalid language_code: %s' % self.change_cmd.language_code)
 
-        if isinstance(self.change.translation_html, str):
-            html_cleaner.validate_rte_tags(self.change.translation_html)
+        if isinstance(self.change_cmd.translation_html, str):
+            html_cleaner.validate_rte_tags(self.change_cmd.translation_html)
 
         if self.language_code is None:
             raise utils.ValidationError('language_code cannot be None')
 
-        if self.language_code != self.change.language_code:
+        if self.language_code != self.change_cmd.language_code:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s' % (
-                    self.change.language_code, self.language_code))
+                    self.change_cmd.language_code, self.language_code))
 
     def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
@@ -745,22 +745,22 @@ class SuggestionTranslateContent(BaseSuggestion):
         Raises:
             ValidationError. Invalid new change.
         """
-        if self.change.cmd != change.cmd:
+        if self.change_cmd.cmd != change.cmd:
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
-                self.change.cmd)
-        if self.change.state_name != change.state_name:
+                self.change_cmd.cmd)
+        if self.change_cmd.state_name != change.state_name:
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
-                self.change.state_name)
-        if self.change.content_html != change.content_html:
+                self.change_cmd.state_name)
+        if self.change_cmd.content_html != change.content_html:
             raise utils.ValidationError(
                 'The new change content_html must be equal to %s' %
-                self.change.content_html)
-        if self.change.language_code != change.language_code:
+                self.change_cmd.content_html)
+        if self.change_cmd.language_code != change.language_code:
             raise utils.ValidationError(
                 'The language code must be equal to %s' %
-                self.change.language_code)
+                self.change_cmd.language_code)
 
     def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
@@ -768,16 +768,16 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         self.validate()
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        if self.change.state_name not in exploration.states:
+        if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' % self.change.state_name)
+                'Expected %s to be a valid state name' % self.change_cmd.state_name)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
         translated_content = translation_domain.TranslatedContent(
-            self.change.translation_html,
+            self.change_cmd.translation_html,
             translation_domain.TranslatableContentFormat(
-                self.change.data_format),
+                self.change_cmd.data_format),
             needs_update=False
         )
 
@@ -786,7 +786,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             self.target_id,
             self.target_version_at_submission,
             self.language_code,
-            self.change.content_id,
+            self.change_cmd.content_id,
             translated_content)
 
         (
@@ -801,9 +801,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
         if (
-            hasattr(self.change, 'data_format') and
+            hasattr(self.change_cmd, 'data_format') and
             translation_domain.TranslatableContentFormat.is_data_format_list(
-                self.change.data_format)
+                self.change_cmd.data_format)
         ):
             return
 
@@ -816,14 +816,14 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings.
         """
         content_strings = []
-        if isinstance(self.change.translation_html, list):
-            content_strings.extend(self.change.translation_html)
+        if isinstance(self.change_cmd.translation_html, list):
+            content_strings.extend(self.change_cmd.translation_html)
         else:
-            content_strings.append(self.change.translation_html)
-        if isinstance(self.change.content_html, list):
-            content_strings.extend(self.change.content_html)
+            content_strings.append(self.change_cmd.translation_html)
+        if isinstance(self.change_cmd.content_html, list):
+            content_strings.extend(self.change_cmd.content_html)
         else:
-            content_strings.append(self.change.content_html)
+            content_strings.append(self.change_cmd.content_html)
         return content_strings
 
     def get_target_entity_html_strings(self) -> List[str]:
@@ -834,7 +834,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings from target entity used
             in the suggestion.
         """
-        return [self.change.content_html]
+        return [self.change_cmd.content_html]
 
     def convert_html_in_suggestion_change(
         self, conversion_fn: Callable[[str], str]
@@ -846,10 +846,10 @@ class SuggestionTranslateContent(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        self.change.content_html = (
-            conversion_fn(self.change.content_html))
-        self.change.translation_html = (
-            conversion_fn(self.change.translation_html))
+        self.change_cmd.content_html = (
+            conversion_fn(self.change_cmd.content_html))
+        self.change_cmd.translation_html = (
+            conversion_fn(self.change_cmd.translation_html))
 
 
 class SuggestionAddQuestion(BaseSuggestion):
@@ -885,7 +885,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         status: str,
         author_id: str,
         final_reviewer_id: Optional[str],
-        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
@@ -902,8 +902,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
-            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change)
+        self.change_cmd: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
+            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change_cmd)
         )
         self.score_category = score_category
         self.language_code = language_code
@@ -936,7 +936,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             Exception. The state_schema_version of suggestion cannot be
                 processed.
         """
-        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
 
         state_schema_version = question_dict[
             'question_state_data_schema_version']
@@ -959,9 +959,9 @@ class SuggestionAddQuestion(BaseSuggestion):
                 versioned_question_state, state_schema_version)
             state_schema_version += 1
 
-        self.change.question_dict['question_state_data'] = (
+        self.change_cmd.question_dict['question_state_data'] = (
             versioned_question_state['state'])
-        self.change.question_dict['question_state_data_schema_version'] = (
+        self.change_cmd.question_dict['question_state_data_schema_version'] = (
             state_schema_version)
 
     def validate(self) -> None:
@@ -980,25 +980,25 @@ class SuggestionAddQuestion(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
         if not isinstance(
-                self.change, question_domain.QuestionSuggestionChange):
+                self.change_cmd, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
                 'Expected change to be an instance of QuestionSuggestionChange')
 
-        if not self.change.cmd:
+        if not self.change_cmd.cmd:
             raise utils.ValidationError('Expected change to contain cmd')
 
         if (
-                self.change.cmd !=
+                self.change_cmd.cmd !=
                 question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
             raise utils.ValidationError('Expected cmd to be %s, obtained %s' % (
                 question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-                self.change.cmd))
+                self.change_cmd.cmd))
 
-        if not self.change.question_dict:
+        if not self.change_cmd.question_dict:
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
 
         if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
             raise utils.ValidationError(
@@ -1012,7 +1012,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                     question_dict['language_code'],
                     self.language_code))
 
-        if not self.change.skill_difficulty:
+        if not self.change_cmd.skill_difficulty:
             raise utils.ValidationError(
                 'Expected change to contain skill_difficulty')
 
@@ -1030,18 +1030,18 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question(
             None, # type: ignore[arg-type]
             state_domain.State.from_dict(
-                self.change.question_dict['question_state_data']
+                self.change_cmd.question_dict['question_state_data']
             ),
-            self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'],
+            self.change_cmd.question_dict['question_state_data_schema_version'],
+            self.change_cmd.question_dict['language_code'],
             # Here we use MyPy ignore because here we are building Question
             # domain object only for validation purpose, so 'version' is
             # provided as None which causes MyPy to throw 'invalid argument
             # type' error. Thus, to avoid the error, we use ignore here.
             None,  # type: ignore[arg-type]
-            self.change.question_dict['linked_skill_ids'],
-            self.change.question_dict['inapplicable_skill_misconception_ids'],
-            self.change.question_dict['next_content_id_index'])
+            self.change_cmd.question_dict['linked_skill_ids'],
+            self.change_cmd.question_dict['inapplicable_skill_misconception_ids'],
+            self.change_cmd.question_dict['next_content_id_index'])
         question_state_data_schema_version = (
             question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
@@ -1057,13 +1057,13 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
-        if self.change.skill_id is None:
+        if self.change_cmd.skill_id is None:
             raise utils.ValidationError('Expected change to contain skill_id')
         self.validate()
 
-        skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
+        skill_domain.Skill.require_valid_skill_id(self.change_cmd.skill_id)
         skill = skill_fetchers.get_skill_by_id(
-            self.change.skill_id, strict=False)
+            self.change_cmd.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
@@ -1076,11 +1076,11 @@ class SuggestionAddQuestion(BaseSuggestion):
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
-        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
-        question_dict['linked_skill_ids'] = [self.change.skill_id]
+        question_dict['linked_skill_ids'] = [self.change_cmd.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
 
@@ -1113,12 +1113,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_services.add_question(self.author_id, question)
 
         skill = skill_fetchers.get_skill_by_id(
-            self.change.skill_id, strict=False)
+            self.change_cmd.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
-            self.author_id, question_dict['id'], self.change.skill_id,
+            self.author_id, question_dict['id'], self.change_cmd.skill_id,
             self._get_skill_difficulty())
 
     def populate_old_value_of_change(self) -> None:
@@ -1141,24 +1141,24 @@ class SuggestionAddQuestion(BaseSuggestion):
         Raises:
             ValidationError. Invalid new change.
         """
-        if self.change.cmd != change.cmd:
+        if self.change_cmd.cmd != change.cmd:
             raise utils.ValidationError(
                 'The new change cmd must be equal to %s' %
-                self.change.cmd)
-        if self.change.skill_id != change.skill_id:
+                self.change_cmd.cmd)
+        if self.change_cmd.skill_id != change.skill_id:
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
-                self.change.skill_id)
+                self.change_cmd.skill_id)
 
-        if (self.change.skill_difficulty == change.skill_difficulty) and (
-                self.change.question_dict == change.question_dict):
+        if (self.change_cmd.skill_difficulty == change.skill_difficulty) and (
+                self.change_cmd.question_dict == change.question_dict):
             raise utils.ValidationError(
                 'At least one of the new skill_difficulty or question_dict '
                 'should be changed.')
 
     def _get_skill_difficulty(self) -> float:
         """Returns the suggestion's skill difficulty."""
-        return self.change.skill_difficulty
+        return self.change_cmd.skill_difficulty
 
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
@@ -1166,7 +1166,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
         state_object = (
             state_domain.State.from_dict(
                 question_dict['question_state_data']))
@@ -1189,7 +1189,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
         question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
                 question_dict['question_state_data'],

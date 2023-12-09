@@ -80,7 +80,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     target_id_2: str = 'exp2'
     target_id_3: str = 'exp3'
     target_version_at_submission: int = 1
-    change: Dict[str, Union[str, Dict[str, str]]] = {
+    change_cmd: Dict[str, Union[str, Dict[str, str]]] = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
@@ -163,7 +163,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     feconf.ENTITY_TYPE_EXPLORATION,
                     target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+                    self.author_id, self.change_cmd, 'test description')
 
     def mock_generate_new_thread_id(
         self, entity_type: str, exp_id: str
@@ -220,7 +220,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'target_version_at_submission': self.target_version_at_submission,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': 'author',
-            'change': {
+            'change_cmd': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
@@ -248,7 +248,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_suggestion_type',
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, self.change, 'test description')
+                self.author_id, self.change_cmd, 'test description')
 
     def test_cannot_create_suggestion_with_invalid_author_id(self) -> None:
         with self.assertRaisesRegex(
@@ -257,7 +257,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                'invalid author ID', self.change, 'test description')
+                'invalid author ID', self.change_cmd, 'test description')
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(  # pylint: disable=line-too-long
         self
@@ -286,12 +286,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, '')
+            self.author_id, self.change_cmd, '')
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test_description')
+            self.author_id, self.change_cmd, 'test_description')
         suggestions = suggestion_services.get_submitted_suggestions(
             self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.assertEqual(len(suggestions), 2)
@@ -303,7 +303,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
+            self.author_id, self.change_cmd, 'test description')
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
@@ -332,7 +332,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
+            self.author_id, self.change_cmd, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -772,7 +772,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # The suggestion's change should be updated.
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
-        new_value = suggestion.change.new_value
+        new_value = suggestion.change_cmd.new_value
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(new_value, dict)
         self.assertEqual(new_value['html'], resubmit_change_content['html'])
@@ -908,7 +908,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id)
 
         self.assertEqual(
-            updated_suggestion.change.translation_html,
+            updated_suggestion.change_cmd.translation_html,
             '<p>Updated translation</p>')
 
     def test_update_question_suggestion_to_change_question_state(self) -> None:
@@ -965,18 +965,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             state.recorded_voiceovers.to_dict())
 
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(suggestion.change.skill_difficulty, float)
+        assert isinstance(suggestion.change_cmd.skill_difficulty, float)
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,
-            suggestion.change.skill_difficulty,
+            suggestion.change_cmd.skill_difficulty,
             question_state_data,
             content_id_generator.next_content_id_index)
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(updated_suggestion.change.question_dict, dict)
+        assert isinstance(updated_suggestion.change_cmd.question_dict, dict)
         question_dict: question_domain.QuestionDict = (
-            updated_suggestion.change.question_dict
+            updated_suggestion.change_cmd.question_dict
         )
         new_question_state_data = question_dict[
             'question_state_data']
@@ -1137,7 +1137,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, suggestion_change, 'test description')
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(suggestion.change.question_dict, dict)
-        change_question_dict = suggestion.change.question_dict
+        change_question_dict = suggestion.change_cmd.question_dict
         question_state_data = change_question_dict[
             'question_state_data']
 
@@ -1150,7 +1150,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id)
 
         self.assertEqual(
-            updated_suggestion.change.skill_difficulty,
+            updated_suggestion.change_cmd.skill_difficulty,
             0.6)
 
 
@@ -1163,7 +1163,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     target_id_2: str = 'exp2'
     target_id_3: str = 'exp3'
     target_version_at_submission: int = 1
-    change: Dict[str, str] = {
+    change_cmd: Dict[str, str] = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
@@ -1317,31 +1317,31 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description')
+                self.author_id_1, self.change_cmd, 'test description')
 
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description')
+                self.author_id_1, self.change_cmd, 'test description')
 
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description')
+                self.author_id_1, self.change_cmd, 'test description')
 
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description')
+                self.author_id_2, self.change_cmd, 'test description')
 
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_2, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description')
+                self.author_id_2, self.change_cmd, 'test description')
 
     def test_get_by_author(self) -> None:
         queries = [('author_id', self.author_id_1)]
@@ -1677,7 +1677,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 3)
         self.assertEqual(offset, 3)
         actual_language_code_list = [
-            suggestion.change.language_code
+            suggestion.change_cmd.language_code
             for suggestion in suggestions
         ]
         expected_language_code_list = ['hi', 'hi', 'pt']
@@ -1775,7 +1775,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 3)
         self.assertEqual(offset, 3)
         actual_language_code_list = [
-            suggestion.change.language_code
+            suggestion.change_cmd.language_code
             for suggestion in suggestions
         ]
         expected_language_code_list = ['hi', 'hi', 'pt']
@@ -1830,8 +1830,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
         self.assertEqual(len(suggestions), 2)
-        self.assertEqual(suggestions[0].change.language_code, 'hi')
-        self.assertEqual(suggestions[1].change.language_code, 'hi')
+        self.assertEqual(suggestions[0].change_cmd.language_code, 'hi')
+        self.assertEqual(suggestions[1].change_cmd.language_code, 'hi')
 
         # Get reviewable translation suggestions in Spanish (there are none).
         language_to_filter = 'es'
@@ -1845,7 +1845,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # user has rights to review.
         self.assertEqual(len(suggestions), 0)
         actual_language_code_list = [
-            suggestion.change.language_code
+            suggestion.change_cmd.language_code
             for suggestion in suggestions
         ]
         expected_language_code_list: List[str] = []
@@ -1884,7 +1884,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 3)
         expected_suggestion_type_list = ['skill2', 'skill1']
         actual_suggestion_type_list = [
-            suggestion.change.skill_id
+            suggestion.change_cmd.skill_id
             for suggestion in suggestions
         ]
         self.assertEqual(
@@ -1966,7 +1966,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Change the question_dict of the question suggestion that got rejected
         # so we can resubmit the suggestion for review.
-        resubmit_question_change = suggestion_1.change
+        resubmit_question_change = suggestion_1.change_cmd
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(resubmit_question_change.question_dict, dict)
         resubmit_question_change.question_dict['linked_skill_ids'] = ['skill1']
@@ -2034,19 +2034,19 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category1',
+            'reviewer_2', self.change_cmd, 'category1',
             'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2',
+            'reviewer_2', self.change_cmd, 'category2',
             'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category3',
+            'reviewer_2', self.change_cmd, 'category3',
             'exploration.exp1.thread_3', None)
         # This suggestion does not count as a suggestion that can be reviewed
         # by a user because it has already been rejected.
@@ -2054,13 +2054,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change, 'category1',
+            'reviewer_2', self.change_cmd, 'category1',
             'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2',
+            'reviewer_2', self.change_cmd, 'category2',
             'exploration.exp1.thread_5', None)
 
         self.assertEqual(len(
@@ -2163,7 +2163,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.new_content = state_domain.SubtitledHtml(
             'content', '<p>new content</p>').to_dict()
 
-        self.change: Dict[
+        self.change_cmd: Dict[
             str, Union[str, state_domain.SubtitledHtmlDict]
         ] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2253,7 +2253,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description')
+                self.author_id, self.change_cmd, 'test description')
 
         suggestion_id = self.THREAD_ID
 
@@ -4324,7 +4324,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description')
+                self.author_id, self.change_cmd, 'test description')
 
         suggestion_id = self.THREAD_ID
 
@@ -4351,7 +4351,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description')
+                self.author_id, self.change_cmd, 'test description')
 
         suggestion_id = self.THREAD_ID
 
@@ -6191,7 +6191,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         # Change the new_value of the html of the suggestion that got rejected
         # so we can resubmit the suggestion for review.
-        resubmit_suggestion_change = edit_state_content_suggestion.change
+        resubmit_suggestion_change = edit_state_content_suggestion.change_cmd
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(resubmit_suggestion_change.new_value, dict)
         resubmit_suggestion_change.new_value['html'] = 'new html to resubmit'
@@ -6311,7 +6311,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self._assert_community_contribution_stats_is_in_default_state()
         # Change the question_dict of the question suggestion that got rejected
         # so we can resubmit the suggestion for review.
-        resubmit_question_change = question_suggestion.change
+        resubmit_question_change = question_suggestion.change_cmd
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(resubmit_question_change.question_dict, dict)
         resubmit_question_change.question_dict['linked_skill_ids'] = ['skill1']
