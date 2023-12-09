@@ -748,31 +748,3 @@ def get_canonical_story_dicts(
         canonical_story_dicts.append(story_summary_dict)
 
     return canonical_story_dicts
-
-
-def get_published_story_exploration_ids(
-    topic_id: Optional[str] = None
-) -> List[str]:
-    """Returns a list of all exploration ids linked to published stories within
-    a topic. If no topic_id is provided, all topics will be fetched.
-
-    Args:
-        topic_id: str|None. The id of the topic to fetch. When not
-            provided, all topics are fetched.
-
-    Returns:
-        list(str). A list of all exploration ids linked to all the topic(s)
-        published stories.
-    """
-    mappings = ([
-        summary.published_story_exploration_mapping
-        for summary in (
-            [get_topic_summary_by_id(topic_id)]
-            if topic_id else get_all_topic_summaries())
-    ])
-
-    story_exp_ids = set()
-    for mapping in mappings:
-        for exp_ids in mapping.values():
-            story_exp_ids.update(exp_ids)
-    return list(story_exp_ids)

@@ -1780,3 +1780,31 @@ def get_chapter_counts_in_topic_summaries(
         })
 
     return topic_chapter_counts_dict
+
+
+def get_published_story_exploration_ids(
+    topic_id: Optional[str] = None
+) -> List[str]:
+    """Returns a list of all exploration ids linked to published stories within
+    a topic. If no topic_id is provided, all topics will be fetched.
+
+    Args:
+        topic_id: str|None. The id of the topic to fetch. When not
+            provided, all topics are fetched.
+
+    Returns:
+        list(str). A list of all exploration ids linked to all the topic(s)
+        published stories.
+    """
+    mappings = ([
+        summary.published_story_exploration_mapping
+        for summary in (
+            [topic_fetchers.get_topic_summary_by_id(topic_id)]
+            if topic_id else topic_fetchers.get_all_topic_summaries())
+    ])
+
+    story_exp_ids = set()
+    for mapping in mappings:
+        for exp_ids in mapping.values():
+            story_exp_ids.update(exp_ids)
+    return list(story_exp_ids)
