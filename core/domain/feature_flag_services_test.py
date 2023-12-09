@@ -443,6 +443,51 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     )
                 )
 
+    def test_feature_flag_enabled_for_users_in_5_perc_when_increased_to_10_perc(
+        self) -> None:
+        user_ids_list = []
+        user_id_to_feature_flag_status_for_5_perc = {}
+        count_feature_flag_enabled_for_5_perc = 0
+        user_id_to_feature_flag_status_for_10_perc = {}
+        count_feature_flag_enabled_for_10_perc = 0
+        for count in range(1, 1001):
+            user_ids_list.append('userid' + str(count))
+
+        with self.swap_all_feature_names_set:
+            feature_services.update_feature_flag(
+                self.dev_feature_flag.feature_flag_value.name, False, 5, [])
+            for user_id in user_ids_list:
+                feature_flag_status = feature_services.is_feature_flag_enabled(
+                    user_id,
+                    self.dev_feature_flag.feature_flag_value.name
+                )
+                if feature_flag_status:
+                    count_feature_flag_enabled_for_5_perc += 1
+                    user_id_to_feature_flag_status_for_5_perc[
+                        user_id] = feature_flag_status
+            self.assertTrue(
+                count_feature_flag_enabled_for_5_perc in [
+                    count for count in range(40, 61)])
+
+            feature_services.update_feature_flag(
+                self.dev_feature_flag.feature_flag_value.name, False, 10, [])
+            for user_id in user_ids_list:
+                feature_flag_status = feature_services.is_feature_flag_enabled(
+                    user_id,
+                    self.dev_feature_flag.feature_flag_value.name
+                )
+                if feature_flag_status:
+                    count_feature_flag_enabled_for_10_perc += 1
+                    user_id_to_feature_flag_status_for_10_perc[
+                        user_id] = feature_flag_status
+            self.assertTrue(
+                count_feature_flag_enabled_for_10_perc in [
+                    count for count in range(90, 111)])
+
+            for user_id in user_id_to_feature_flag_status_for_5_perc.keys():
+                self.assertIn(
+                    user_id, user_id_to_feature_flag_status_for_10_perc)
+
     def test_feature_flag_flag_not_enabled_for_all_users(self) -> None:
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())
