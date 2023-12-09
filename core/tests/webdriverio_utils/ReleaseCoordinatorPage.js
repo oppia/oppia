@@ -159,8 +159,9 @@ var ReleaseCoordinatorPage = function() {
       'Disabling force-enable property takes too long to appear'
     );
 
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText('No');
-    await this.saveChangeOfFeature(featureElement);
+    await (
+      featureFlagElement.$(valueSelectorLocator)).selectByVisibleText('No');
+    await this.saveChangeOfFeature(featureFlagElement);
   };
 
   this.setRolloutPercentageForFeatureFlag = async function(
