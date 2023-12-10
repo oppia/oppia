@@ -77,11 +77,11 @@ MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
 SUGGESTION_TRANSLATE_CONTENT_HTML: Callable[
     [suggestion_registry.SuggestionTranslateContent], str
-] = lambda suggestion: suggestion.change.translation_html
+] = lambda suggestion: suggestion.change_cmd.translation_html
 
 SUGGESTION_ADD_QUESTION_HTML: Callable[
     [suggestion_registry.SuggestionAddQuestion], str
-] = lambda suggestion: suggestion.change.question_dict[
+] = lambda suggestion: suggestion.change_cmd.question_dict[
     'question_state_data']['content']['html']
 
 # A dictionary that maps the suggestion type to a lambda function, which is

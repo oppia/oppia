@@ -757,7 +757,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
                 'new_value': resubmit_change_content,
-                'old_value': self.change['new_value']
+                'old_value': self.change_cmd['new_value']
             }
         )
 

@@ -1376,7 +1376,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        suggestion.change = {}  # type: ignore[assignment]
+        suggestion.change_cmd = {}  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to be an ExplorationChange'
         ):
@@ -1456,7 +1456,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
         expected_language_code = (
-            expected_suggestion_dict['change']['language_code']
+            expected_suggestion_dict['change_cmd']['language_code']
         )
         suggestion.validate()
 

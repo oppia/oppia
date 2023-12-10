@@ -482,7 +482,7 @@ class ResubmitSuggestionHandler(
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         new_change = self.normalized_payload['change_cmd']
-        change_cls = type(suggestion.change)
+        change_cls = type(suggestion.change_cmd)
         change_object = change_cls(new_change)
         summary_message = self.normalized_payload['summary_message']
         suggestion_services.resubmit_rejected_suggestion(
