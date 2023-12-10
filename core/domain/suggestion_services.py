@@ -243,7 +243,7 @@ def create_suggestion(
         add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
         suggestion = suggestion_registry.SuggestionAddQuestion(
             thread_id, target_id, target_version_at_submission, status,
-            author_id, None, change_cmd, score_category, 
+            author_id, None, change_cmd, score_category,
             add_question_language_code, False
         )
     else:
