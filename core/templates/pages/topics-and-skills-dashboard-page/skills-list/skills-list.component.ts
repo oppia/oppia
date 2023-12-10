@@ -240,10 +240,10 @@ export class SkillsListComponent {
     modalRef.componentInstance.skillSummaries = skillSummaries;
     modalRef.componentInstance.skill = skill;
     modalRef.componentInstance.categorizedSkills = categorizedSkills;
-    modalRef.componentInstance.allowSkillsFromOtherTopics =
-    allowSkillsFromOtherTopics;
-    modalRef.componentInstance.untriagedSkillSummaries =
-    untriagedSkillSummaries;
+    modalRef.componentInstance.allowSkillsFromOtherTopics = (
+      allowSkillsFromOtherTopics);
+    modalRef.componentInstance.untriagedSkillSummaries = (
+      untriagedSkillSummaries);
     modalRef.componentInstance.skillIdsToExclude = skillIdsToExclude;
 
     modalRef.result.then((result: MergeModalResult) => {

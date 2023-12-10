@@ -451,9 +451,8 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
-  it('should shearch in untriaged skill summaries and not' +
-    ' return already added prerequisite skills or selected' +
-    ' skill', () => {
+  it('should search in untriaged skill summaries and not return already' +
+    ' added prerequisite skills or selected skill', () => {
     component.untriagedSkillSummaries = [
       SkillSummary.createFromBackendDict({
         id: '1',
