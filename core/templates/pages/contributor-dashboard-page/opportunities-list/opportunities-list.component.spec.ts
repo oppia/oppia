@@ -38,6 +38,8 @@ describe('Opportunities List Component', () => {
   const mockActiveTopicEventEmitter = new EventEmitter();
   const mockReloadOpportunitiesEventEmitter = new EventEmitter();
   const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
+  const mockPinOpportunitiesEventEmitter = new EventEmitter();
+  const mockUnpinOpportunitiesEventEmitter = new EventEmitter();
 
   const explorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
     id: 'id1',
@@ -344,10 +346,93 @@ describe('Opportunities List Component', () => {
     spyOnProperty(
       contributionOpportunitiesService, 'removeOpportunitiesEventEmitter')
       .and.returnValue(mockRemoveOpportunitiesEventEmitter);
+    spyOnProperty(
+      contributionOpportunitiesService, 'pinnedOpportunitiesChanged')
+      .and.returnValue(mockPinOpportunitiesEventEmitter);
+    spyOnProperty(
+      contributionOpportunitiesService, 'unpinnedOpportunitiesChanged')
+      .and.returnValue(mockUnpinOpportunitiesEventEmitter);
   });
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  describe('when clicking on pin-unpin icon', () => {
+    it('should pin an opportunity', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      mockActiveLanguageEventEmitter.emit();
+      tick();
+      mockActiveTopicEventEmitter.emit();
+      tick();
+      mockReloadOpportunitiesEventEmitter.emit();
+      tick();
+      const updatedData = { explorationId: 'id1', topicName: 'Topic 1' };
+      component.pinOpportunity(updatedData);
+
+      expect(component.opportunities[0].isPinned).toBe(true);
+      // Ensure the pinned opportunity is at the top of the list.
+      expect(component.opportunities[0].id).toBe('id1');
+      expect(component.opportunities[0].topicName).toBe('Topic 1');
+
+      component.pinOpportunity({explorationId: 'id2', topicName: 'Topic 1'});
+    }));
+
+    it('should unpin an opportunity', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      mockActiveLanguageEventEmitter.emit();
+      tick();
+      mockActiveTopicEventEmitter.emit();
+      tick();
+      mockReloadOpportunitiesEventEmitter.emit();
+      tick();
+      const updatedData = { explorationId: 'id1', topicName: 'Topic 1' };
+      component.pinOpportunity(updatedData);
+
+      expect(component.opportunities[0].isPinned).toBe(true);
+      component.unpinOpportunity(updatedData);
+      // Ensure the unpinned opportunity is at the end of the list.
+      expect(component.opportunities[
+        component.opportunities.length - 1].id).toBe('id1');
+      expect(component.opportunities[
+        component.opportunities.length - 1].topicName).toBe('Topic 1');
+    }));
+
+    it('should subscribe to pinnedOpportunitiesChanged and call' +
+    'pinOpportunity', () => {
+      const updatedData = {
+        explorationId: 'id1',
+        topicName: 'topic'
+      };
+      spyOn(component, 'pinOpportunity').and.callThrough();
+
+      component.subscribeToPinnedOpportunities();
+      contributionOpportunitiesService.pinnedOpportunitiesChanged.emit(
+        updatedData);
+
+      expect(component.pinOpportunity).toHaveBeenCalledWith(updatedData);
+    });
+
+    it('should subscribe to unpinnedOpportunitiesChanged and call' +
+    'unpinOpportunity', () => {
+      const updatedData = {
+        explorationId: 'id1',
+        topicName: 'topic'
+      };
+      spyOn(component, 'unpinOpportunity').and.callThrough();
+
+      component.subscribeToPinnedOpportunities();
+      contributionOpportunitiesService.unpinnedOpportunitiesChanged.emit(
+        updatedData);
+
+      expect(component.unpinOpportunity).toHaveBeenCalledWith(updatedData);
+    });
   });
 
   describe('when clicking on page number ', () => {
@@ -817,52 +902,5 @@ describe('Opportunities List Component', () => {
         expect(component.opportunities.length).toEqual(19);
         expect(component.activePageNumber).toBe(2);
       }));
-  });
-
-  describe('when clicking on pin-unpin icon', () => {
-    it('should pin an opportunity', fakeAsync(() => {
-      component.init();
-      component.onChangeLanguage('en');
-      tick();
-
-      mockActiveLanguageEventEmitter.emit();
-      tick();
-      mockActiveTopicEventEmitter.emit();
-      tick();
-      mockReloadOpportunitiesEventEmitter.emit();
-      tick();
-      const updatedData = { explorationId: 'id1', topicName: 'Topic 1' };
-      component.pinOpportunity(updatedData);
-
-      expect(component.opportunities[0].isPinned).toBe(true);
-      // Ensure the pinned opportunity is at the top of the list.
-      expect(component.opportunities[0].id).toBe('id1');
-      expect(component.opportunities[0].topicName).toBe('Topic 1');
-
-      component.pinOpportunity({explorationId: 'id2', topicName: 'Topic 1'});
-    }));
-
-    it('should unpin an opportunity', fakeAsync(() => {
-      component.init();
-      component.onChangeLanguage('en');
-      tick();
-
-      mockActiveLanguageEventEmitter.emit();
-      tick();
-      mockActiveTopicEventEmitter.emit();
-      tick();
-      mockReloadOpportunitiesEventEmitter.emit();
-      tick();
-      const updatedData = { explorationId: 'id1', topicName: 'Topic 1' };
-      expect(component.opportunities[0].isPinned).toBe(true);
-
-      component.unpinOpportunity(updatedData);
-
-      // Ensure the unpinned opportunity is at the end of the list.
-      expect(component.opportunities[
-        component.opportunities.length - 1].id).toBe('id1');
-      expect(component.opportunities[
-        component.opportunities.length - 1].topicName).toBe('Topic 1');
-    }));
   });
 });

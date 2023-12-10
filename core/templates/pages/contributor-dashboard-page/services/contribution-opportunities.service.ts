@@ -47,10 +47,10 @@ export class ContributionOpportunitiesService {
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
-  pinnedOpportunitiesChanged: EventEmitter<
+  private _pinnedOpportunitiesChanged: EventEmitter<
     Record<string, string>> = new EventEmitter();
 
-  unpinnedOpportunitiesChanged: EventEmitter<
+  private _unpinnedOpportunitiesChanged: EventEmitter<
     Record<string, string>> = new EventEmitter();
   // These properties are initialized using async methods
   // and we need to do non-null assertion. For more information, see
@@ -180,6 +180,16 @@ export class ContributionOpportunitiesService {
 
   get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
     return this._removeOpportunitiesEventEmitter;
+  }
+
+  get pinnedOpportunitiesChanged(): EventEmitter<
+  Record<string, string>> {
+    return this._pinnedOpportunitiesChanged;
+  }
+
+  get unpinnedOpportunitiesChanged(): EventEmitter<
+  Record<string, string>> {
+    return this._unpinnedOpportunitiesChanged;
   }
 }
 
