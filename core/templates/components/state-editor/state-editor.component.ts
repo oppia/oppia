@@ -90,7 +90,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   servicesInitialized: boolean = false;
   currentInteractionCanHaveSolution: boolean = false;
   conceptCardIsShown: boolean = true;
-  shouldBeSticky: boolean = false;
 
   constructor(
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
