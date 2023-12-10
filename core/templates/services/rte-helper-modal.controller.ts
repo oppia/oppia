@@ -116,8 +116,8 @@ export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   modalIsLoading: boolean = true;
-  urlSuffixIsInvalid: boolean = true;
   saveButtonIsDisabled: boolean = false;
+  errorMessage: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
@@ -225,12 +225,10 @@ export class RteHelperModalComponent {
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
 
-    if (this.componentId === this.COMPONENT_ID_MATH ||
-      this.componentId === this.COMPONENT_ID_VIDEO ||
-      this.componentId === this.COMPONENT_ID_LINK
-    ) {
-      this.subscribeToRteFieldChanges();
-    }
+    this.rteFieldValues = this.customizationArgsForm.valueChanges.subscribe(
+      (value) => {
+        this.updateRteSaveButtonState(value);
+      });
 
     setTimeout(() => {
       this.modalIsLoading = false;
@@ -255,32 +253,21 @@ export class RteHelperModalComponent {
       }
     }
     this.ngbActiveModal.dismiss(true);
-    if (this.rteFieldValues) {
-      this.rteFieldValues.unsubscribe();
-    }
+    this.rteFieldValues.unsubscribe();
   }
 
   delete(): void {
     this.ngbActiveModal.dismiss(true);
-    if (this.rteFieldValues) {
-      this.rteFieldValues.unsubscribe();
-    }
-  }
-
-  subscribeToRteFieldChanges(): void {
-    this.rteFieldValues = this.customizationArgsForm.valueChanges.subscribe(
-      (value) => {
-        this.updateRteSaveButtonState(value);
-      });
+    this.rteFieldValues.unsubscribe();
   }
 
   updateRteSaveButtonState(value: number | string | boolean): void {
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed:
-      boolean = value[0].mathExpressionSvgIsBeingProcessed;
-      this.saveButtonIsDisabled = mathExpressionSvgIsBeingProcessed ||
-      rawLatex === '';
+      let mathExpressionSvgIsBeingProcessed: boolean = (
+        value[0].mathExpressionSvgIsBeingProcessed);
+      this.saveButtonIsDisabled = (
+        mathExpressionSvgIsBeingProcessed || rawLatex === '');
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
       let start: number = value[1];
       let end: number = value[2];
@@ -289,17 +276,24 @@ export class RteHelperModalComponent {
       } else {
         this.saveButtonIsDisabled = start >= end;
       }
+      this.updateRteErrorMessage();
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
       // First check if the `text` looks like a URL.
       const suffixes = ['.com', '.org', '.edu', '.gov'];
+      let urlSuffixIsValid = false;
+
       for (const suffix of suffixes) {
-        if (url.endsWith(suffix)) {
-          this.urlSuffixIsInvalid = false;
+        if (url !== '' && url.endsWith(suffix)) {
+          urlSuffixIsValid = true;
+          break;
+        } else {
+          urlSuffixIsValid = false;
+          this.saveButtonIsDisabled = true;
         }
       }
-      if (!this.urlSuffixIsInvalid) {
+      if (urlSuffixIsValid) {
         // The link text. If left blank, the link URL will be used.
         if (text === '') {
           text = url;
@@ -319,7 +313,25 @@ export class RteHelperModalComponent {
         // After the cleanup, if the strings are not equal, then we do not
         // allow the lesson creator to save it.
         this.saveButtonIsDisabled = url !== text;
+        this.updateRteErrorMessage();
       }
+    }
+  }
+
+  updateRteErrorMessage(): void {
+    if (this.saveButtonIsDisabled) {
+      if (this.componentId === this.COMPONENT_ID_VIDEO) {
+        this.errorMessage = (
+          'Please ensure that the start time of the video is earlier than ' +
+          'the end time.');
+      } else if (this.componentId === this.COMPONENT_ID_LINK) {
+        this.errorMessage = (
+          'It seems like clicking on this link will lead the user to a ' +
+          'different URL than the text specifies. Please change the text.'
+        );
+      }
+    } else {
+      this.errorMessage = '';
     }
   }
 
@@ -424,7 +436,7 @@ export class RteHelperModalComponent {
             this.ngbActiveModal.dismiss('cancel');
           }
         );
-    } else {
+    } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
         if (caName === 'video_id') {
@@ -432,17 +444,6 @@ export class RteHelperModalComponent {
           customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
-        } else if (caName === 'text' &&
-        this.componentId === this.COMPONENT_ID_LINK) {
-          // Set the link `text` to the link `url` if the `text` is empty.
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-                CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] =
-            this.tmpCustomizationArgs[i].value ||
-            this.tmpCustomizationArgs[i - 1].value;
         } else {
           (
             customizationArgsDict as {
@@ -453,10 +454,42 @@ export class RteHelperModalComponent {
         }
       }
       this.ngbActiveModal.close(customizationArgsDict);
+    } else if (this.componentId === this.COMPONENT_ID_LINK) {
+      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
+        const caName = this.tmpCustomizationArgs[i].name;
+        if (caName === 'text') {
+        // Set the link `text` to the link `url` if the `text` is empty.
+          (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+              CustomizationArgsNameAndValueArray[number]['value'];
+          }
+          )[caName] =
+          this.tmpCustomizationArgs[i].value ||
+          this.tmpCustomizationArgs[i - 1].value;
+        } else {
+          (
+            customizationArgsDict as {
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+                CustomizationArgsNameAndValueArray[number]['value'];
+            }
+          )[caName] = this.tmpCustomizationArgs[i].value;
+        }
+      }
+      this.ngbActiveModal.close(customizationArgsDict);
+    } else {
+      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
+        const caName = this.tmpCustomizationArgs[i].name;
+        (
+        customizationArgsDict as {
+          [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+            CustomizationArgsNameAndValueArray[number]['value'];
+        }
+        )[caName] = this.tmpCustomizationArgs[i].value;
+      }
+      this.ngbActiveModal.close(customizationArgsDict);
     }
-    if (this.rteFieldValues) {
-      this.rteFieldValues.unsubscribe();
-    }
+    this.rteFieldValues.unsubscribe();
   }
 
   extractVideoIdFromVideoUrl(url: string): string {
