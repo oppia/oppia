@@ -129,7 +129,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       },
       errorResponse => {
         let errorCodes = AppConstants.FATAL_ERROR_CODES;
-        if (errorCodes.indexOf(errorResponse.status) !== -1) {
+        if (errorResponse && errorCodes.indexOf(errorResponse.status) !== -1) {
           this.alertsService.addWarning('Failed to get dashboard data');
         }
       }
