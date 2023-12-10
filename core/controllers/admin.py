@@ -141,7 +141,6 @@ class AdminHandler(
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
                         'generate_dummy_classroom',
-                        'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -298,10 +297,6 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             InvalidInputException. Generate count cannot be less than publish
                 count.
-            Exception. The new_config_property_values must be provided
-                when the action is save_config_properties.
-            Exception. The config_property_id must be provided when the
-                action is revert_config_property.
             Exception. The data must be provided when the action is
                 upload_topic_similarities.
             Exception. The topic_id must be provided when the action is
@@ -369,32 +364,6 @@ class AdminHandler(
                 self._generate_dummy_skill_and_questions()
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
-            elif action == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
-                    'new_config_property_values')
-                if new_config_property_values is None:
-                    raise Exception(
-                        'The \'new_config_property_values\' must be provided'
-                        ' when the action is save_config_properties.'
-                    )
-                logging.info(
-                    '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
-            elif action == 'revert_config_property':
-                config_property_id = self.normalized_payload.get(
-                    'config_property_id')
-                if config_property_id is None:
-                    raise Exception(
-                        'The \'config_property_id\' must be provided'
-                        ' when the action is revert_config_property.'
-                    )
-                logging.info(
-                    '[ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
-                config_services.revert_property(
-                    self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:

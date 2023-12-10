@@ -109,15 +109,6 @@ describe('Admin backend api service', () => {
     }]
   };
   let adminDataObject: AdminPageData;
-  let configPropertyValues = {
-    classroom_pages_data: {
-      course_details: 'fds',
-      name: 'mathfas',
-      topic_ids: [],
-      topic_list_intro: 'fsd',
-      url_fragment: 'mathfsad',
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -1058,114 +1049,6 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('User does not exist.');
-  }
-  ));
-
-  // Test cases for Admin Config Tab.
-  it('should revert specified config property to default' +
-    'value given the config property ID when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'classroom_pages_data';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
-
-    abas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to revert specified config property to default' +
-    'value when given config property ID is invalid when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'InvalidId';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
-
-    abas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'Config property does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
-  }
-  ));
-
-  it('should save the new config properties given the new' +
-    'config property when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
-    let payload = {
-      action: action,
-      new_config_property_values: configPropertyValues
-    };
-
-    abas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to save the new config properties when given new' +
-    'config property is invalid when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
-    let payload = {
-      action: action,
-      new_config_property_values: configPropertyValues
-    };
-    abas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'Config property does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
   }
   ));
 

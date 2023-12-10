@@ -446,28 +446,6 @@ export class AdminBackendApiService {
     });
   }
 
-  // Admin Config Tab Services.
-  async revertConfigPropertyAsync(configPropertyId: string):
-  Promise<void> {
-    let action = 'revert_config_property';
-    let payload = {
-      config_property_id: configPropertyId
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
-  async saveConfigPropertiesAsync(
-      newConfigPropertyValues: NewConfigPropertyValues):
-      Promise<void> {
-    let action = 'save_config_properties';
-    let payload = {
-      new_config_property_values: newConfigPropertyValues
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
   // Admin Dev Mode Activities Tab Services.
   async generateDummyExplorationsAsync(
       numDummyExpsToGenerate: number,
