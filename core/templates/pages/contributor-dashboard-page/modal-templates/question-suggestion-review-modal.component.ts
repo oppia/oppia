@@ -106,6 +106,7 @@ export class QuestionSuggestionReviewModalComponent
   @Input() reviewable!: boolean;
   @Input() suggestionId!: string;
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
+  @Input() isInSuggestionReview: boolean = false;
   reviewMessage!: string;
   reviewer!: string;
   questionStateData!: State;
@@ -133,6 +134,7 @@ export class QuestionSuggestionReviewModalComponent
   questionId: string | null = null;
   isFirstItem: boolean = true;
   isLastItem: boolean = true;
+  isSticky: boolean = true;
 
   constructor(
     private contextService: ContextService,

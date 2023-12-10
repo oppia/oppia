@@ -23,7 +23,7 @@
   </p>
 </ng-template>
 
-<mat-card class="oppia-editor-card-with-avatar oppia-editor-card-with-avatar-sticky">
+<mat-card class="oppia-editor-card-with-avatar" [ngClass]="{'oppia-editor-card-with-avatar-sticky': isSticky}"> <!-- here is where we want the sticky !!!!!!! oppia-editor-card-with-avatar-sticky -->
   <div class="state-content-header-container" (click)="toggleConceptCard()">
     <div class="state-content-header oppia-mobile-collapsible-card-header">
       <h3 class="oppia-exp-content-card-header">Content</h3>
@@ -39,8 +39,8 @@
   </div>
   <div class="oppia-mobile-collapsible-card-content" *ngIf="conceptCardIsShown"  joyrideStep="editorTabTourContentEditorTab" [stepContent]="ContentEditorTab">
     <div class="oppia-editor-card-body oppia-editor-concept-container">
-      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar" [ngClass]="{'oppia-editor-card-avatar-sticky': isSticky}">
-      <div id="tutorialStateContent" class="oppia-editor-card-section" [ngClass]="{'state-content-editor-parent-container': !isSticky}">
+      <img *ngIf="!windowIsNarrow" [src]="oppiaBlackImgUrl" alt="" class="oppia-editor-card-avatar" [ngClass]="{'oppia-editor-card-avatar-sticky': isSticky}"> <!-- add a image next to the question  -->
+      <div id="tutorialStateContent" class="oppia-editor-card-section" [ngClass]="{'state-content-editor-parent-container': !isSticky}"> <!--add some width and height, this and above seems not to be usefull for us -->
         <oppia-state-content-editor class="e2e-test-state-content-editor"
                                     (saveStateContent)="sendOnSaveStateContent($event)"
                                     [stateContentPlaceholder]="stateContentPlaceholder"
@@ -95,9 +95,11 @@
 <style>
   .oppia-editor-card-with-avatar-sticky {
     position: sticky;
-    z-index: 1;
     top: 82px;
+    z-index: 1;
   }
+
+
   .state-content-header-container {
     display: none;
     padding: 0 30px;

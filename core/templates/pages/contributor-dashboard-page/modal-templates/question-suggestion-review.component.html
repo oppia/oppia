@@ -41,6 +41,7 @@
   </div>
   <div *ngIf="showQuestion">
     <oppia-question-editor [questionId]="questionId"
+                           [isSticky] ="isSticky"
                            [misconceptionsBySkill]="misconceptionsBySkill"
                            [questionStateData]="questionStateData"
                            [question]="question"
@@ -132,11 +133,8 @@
 
   .oppia-editor-card-with-avatar-sticky {
     position: sticky;
-    top: 0;
+    top: 82px;
     z-index: 1;
-  }
-  .oppia-editor-card-avatar-sticky {
-    top: 15px;
   }
 
   /*Doest not seems to do anything */
