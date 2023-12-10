@@ -52,12 +52,12 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Input() question!: Question;
   @Input() questionId!: string;
   @Input() questionStateData!: State;
+  @Input() isSticky: boolean = false;
   interactionIsShown!: boolean;
   oppiaBlackImgUrl!: string;
   stateEditorIsInitialized!: boolean;
   nextContentIdIndexMemento!: number;
   nextContentIdIndexDisplayedValue!: number;
-
   componentSubscriptions = new Subscription();
 
   constructor(

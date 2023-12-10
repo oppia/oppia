@@ -19,9 +19,11 @@
   </button>
 </div>
 
+<h1>2320</h1>
+
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-details questionSuggestionDiv" tabindex="0">
+  <div class="oppia-question-details questionSuggestionDiv" (scroll)="handleScroll($event)" tabindex="0">
     <div class="oppia-question-suggestion">
       <strong class="oppia-difficulty-title">
         Selected Difficulty: {{skillDifficultyLabel}}
@@ -41,6 +43,7 @@
   </div>
   <div *ngIf="showQuestion">
     <oppia-question-editor [questionId]="questionId"
+                           [isSticky] ="isSticky"
                            [misconceptionsBySkill]="misconceptionsBySkill"
                            [questionStateData]="questionStateData"
                            [question]="question"
@@ -114,12 +117,11 @@
 </div>
 
 <style>
-  /*This one makes it sticky */
   .modal-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: white; /* To ensure content doesn't show behind the header */
+    background-color: white;
   }
   .oppia-suggestion-review-container {
     height: 1300px;
@@ -228,6 +230,9 @@
     .oppia-mobile-question-header {
       display: block;
       font-size: 20px;
+    }
+    .modal-header {
+      padding-bottom: 0;
     }
     .oppia-question-header {
       display: none;
