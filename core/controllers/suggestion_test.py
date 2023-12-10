@@ -817,7 +817,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.change_cmd.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
         self.assertEqual(
-            suggestion.change_cmd.property_name, exp_domain.STATE_PROPERTY_CONTENT)
+            suggestion.change_cmd.property_name, exp_domain.STATE_PROPERTY_CONTENT) # pylint: disable=line-too-long
         self.assertEqual(
             suggestion.change_cmd.state_name, 'State 1')
         self.logout()

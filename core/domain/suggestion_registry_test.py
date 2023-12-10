@@ -1702,7 +1702,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
-        expected_outcome_list = [self.suggestion_dict['change_cmd']['content_html']]
+        expected_outcome_list = [self.suggestion_dict['change_cmd']['content_html']] # pylint: disable=line-too-long
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:

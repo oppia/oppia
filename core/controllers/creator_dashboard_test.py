@@ -504,7 +504,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0]['change_cmd'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions[0]['change_cmd']['old_value']['content_id'], 'content_0')
+            suggestions[0]['change_cmd']['old_value']['content_id'], 'content_0') # pylint: disable=line-too-long
 
         self.logout()
 

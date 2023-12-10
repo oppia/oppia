@@ -536,7 +536,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             old_content = None
         else:
             old_content = (
-                exploration.states[self.change_cmd.state_name].content.to_dict())
+                exploration.states[self.change_cmd.state_name].content.to_dict()) # pylint: disable=line-too-long
 
         self.change_cmd.old_value = old_content
 
@@ -563,7 +563,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: ExplorationChange. The new change.
+            change_cmd: ExplorationChange. The new change.
 
         Raises:
             ValidationError. Invalid new change.
@@ -717,7 +717,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change_cmd.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change_cmd.cmd))
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change_cmd.cmd)) # pylint: disable=line-too-long
 
         if not utils.is_supported_audio_language_code(
                 self.change_cmd.language_code):
@@ -770,7 +770,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' % self.change_cmd.state_name)
+                'Expected %s to be a valid state name' % self.change_cmd.state_name) # pylint: disable=line-too-long
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
@@ -903,7 +903,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
         self.change_cmd: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
-            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change_cmd)
+            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change_cmd) # pylint: disable=line-too-long
         )
         self.score_category = score_category
         self.language_code = language_code
@@ -936,7 +936,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             Exception. The state_schema_version of suggestion cannot be
                 processed.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
 
         state_schema_version = question_dict[
             'question_state_data_schema_version']
@@ -998,7 +998,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
 
         if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
             raise utils.ValidationError(
@@ -1040,7 +1040,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             # type' error. Thus, to avoid the error, we use ignore here.
             None,  # type: ignore[arg-type]
             self.change_cmd.question_dict['linked_skill_ids'],
-            self.change_cmd.question_dict['inapplicable_skill_misconception_ids'],
+            self.change_cmd.question_dict['inapplicable_skill_misconception_ids'], # pylint: disable=line-too-long
             self.change_cmd.question_dict['next_content_id_index'])
         question_state_data_schema_version = (
             question_dict['question_state_data_schema_version'])
@@ -1076,7 +1076,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
@@ -1166,7 +1166,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
         state_object = (
             state_domain.State.from_dict(
                 question_dict['question_state_data']))
@@ -1189,7 +1189,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict
+        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
         question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
                 question_dict['question_state_data'],
