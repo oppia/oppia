@@ -1136,7 +1136,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(suggestion.change.question_dict, dict)
+        assert isinstance(suggestion.change_cmd.question_dict, dict)
         change_question_dict = suggestion.change_cmd.question_dict
         question_state_data = change_question_dict[
             'question_state_data']

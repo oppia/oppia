@@ -617,7 +617,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.state_name = 'invalid_state_name'
+        suggestion.change_cmd.state_name = 'invalid_state_name'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
@@ -685,7 +685,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
-            'state_name': suggestion.change.state_name,
+            'state_name': suggestion.change_cmd.state_name,
             'new_value': 'new suggestion content',
             'old_value': None
         }
@@ -2879,7 +2879,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.author_id, 'test_reviewer', change, score_category, 'en',
             False, self.fake_date)
         # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(suggestion.change.question_dict, dict)
+        assert isinstance(suggestion.change_cmd.question_dict, dict)
         self.assertEqual(
             suggestion.change_cmd.question_dict[
                 'question_state_data_schema_version'],
