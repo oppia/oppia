@@ -185,7 +185,7 @@ var ReleaseCoordinatorPage = function() {
     );
     var value = await action.getValue(
       'rolloutPercentage',
-      featureFlagRolloutPercentageInput
+      featureFlagElement.$(featureFlagRolloutPercentageInput)
     );
     expect(value).toMatch(rolloutPercentage);
   };
