@@ -159,4 +159,69 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+  describe('when there are validation errors in link form control', function() {
+    var customizationArgSpecs = [{
+      url: 'oppia.org',
+      text: 'oppia',
+    }];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      component.componentId = 'link',
+      component.attrsCustomizationArgsDict = {
+        heading: 'This value is not default.'
+      };
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    fit('should disable save button and display error message', 
+      fakeAsync(() => {
+          component.ngOnInit();
+          flush();
+          component.customizationArgsForm.value[0] = 'oppia.org';
+          component.customizationArgsForm.value[1] = 'oppia';
+          component.onCustomizationArgsFormChange(component.customizationArgsForm.value);
+          expect(component.saveButtonIsDisabled).toBe(true);
+          expect(component.errorMessage).toBe(
+            'It seems like clicking on this link will lead the user to a ' +
+            'different URL than the text specifies. Please change the text.'
+          );
+          flush();
+        }));
+  });
+  describe('when there are validation errors in video form control',
+    function() {
+      var customizationArgSpecs = [{
+        name: 'heading',
+        default_value: 'default value'
+      }, {
+        name: 'video_id',
+        default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      }];
+
+      beforeEach(() => {
+        fixture = TestBed.createComponent(RteHelperModalComponent);
+        component = fixture.componentInstance;
+        component.componentId = 'video',
+        component.attrsCustomizationArgsDict = {
+          heading: 'This value is not default.',
+        };
+        component.customizationArgSpecs = customizationArgSpecs;
+      });
+
+      fit('should disable save button and display error message', 
+        fakeAsync(() => {
+            component.ngOnInit();
+            flush();
+            component.customizationArgsForm.value[1] = 10;
+            component.customizationArgsForm.value[2] = 0;
+            component.onCustomizationArgsFormChange(component.customizationArgsForm.value);
+            expect(component.saveButtonIsDisabled).toBe(true);
+            expect(component.errorMessage).toBe(
+              'Please ensure that the start time of the video is earlier than ' +
+              'the end time.');
+            flush();
+          }));
+    });
 });

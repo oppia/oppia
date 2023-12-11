@@ -100,7 +100,7 @@ type CustomizationArgsNameAndValueArray = {
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
 
-// RteComponentId extracts the frontend_id array from
+// RteComponentId extracts the frontend_id string from
 // the component in ComponentSpecsType.
 export type RteComponentId = {
   [K in keyof ComponentSpecsType]:
@@ -122,7 +122,7 @@ export class RteHelperModalComponent {
   @ViewChild('schemaForm') schemaForm!: NgForm;
   defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
-  rteFieldValues: Subscription | undefined;
+  customizationArgsFormSubscription: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_IMAGE = 'image';
   COMPONENT_ID_LINK = 'link';
@@ -225,9 +225,9 @@ export class RteHelperModalComponent {
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
 
-    this.rteFieldValues = this.customizationArgsForm.valueChanges.subscribe(
-      (value) => {
-        this.updateRteSaveButtonState(value);
+    this.customizationArgsFormSubscription = this.customizationArgsForm
+      .valueChanges.subscribe((value) => {
+        this.onCustomizationArgsFormChange(value);
       });
 
     setTimeout(() => {
@@ -253,15 +253,15 @@ export class RteHelperModalComponent {
       }
     }
     this.ngbActiveModal.dismiss(true);
-    this.rteFieldValues.unsubscribe();
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
   delete(): void {
     this.ngbActiveModal.dismiss(true);
-    this.rteFieldValues.unsubscribe();
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  updateRteSaveButtonState(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: number | string | boolean): void {
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
       let mathExpressionSvgIsBeingProcessed: boolean = (
@@ -274,25 +274,30 @@ export class RteHelperModalComponent {
       if (start === 0 && end === 0) {
         this.saveButtonIsDisabled = false;
       } else {
-        this.saveButtonIsDisabled = start >= end;
+        this.saveButtonIsDisabled = (start >= end);
       }
-      this.updateRteErrorMessage();
+      if (this.saveButtonIsDisabled) {
+        this.errorMessage = (
+          'Please ensure that the start time of the video is earlier than ' +
+          'the end time.');
+      } else {
+        this.errorMessage = '';
+      }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
       // First check if the `text` looks like a URL.
       const suffixes = ['.com', '.org', '.edu', '.gov'];
-      let urlSuffixIsValid = false;
 
-      for (const suffix of suffixes) {
+      let urlSuffixIsValid = suffixes.some(suffix => {
         if (url !== '' && url.endsWith(suffix)) {
-          urlSuffixIsValid = true;
-          break;
+          return true;
         } else {
-          urlSuffixIsValid = false;
           this.saveButtonIsDisabled = true;
+          return false;
         }
-      }
+      });
+
       if (urlSuffixIsValid) {
         // The link text. If left blank, the link URL will be used.
         if (text === '') {
@@ -312,27 +317,21 @@ export class RteHelperModalComponent {
         }
         // After the cleanup, if the strings are not equal, then we do not
         // allow the lesson creator to save it.
-        this.saveButtonIsDisabled = url !== text;
-        this.updateRteErrorMessage();
+        this.saveButtonIsDisabled = (url !== text);
+        if (this.saveButtonIsDisabled) {
+          this.updateRteErrorMessage(
+            'It seems like clicking on this link will lead the user to a ' +
+            'different URL than the text specifies. Please change the text.'
+          );
+        } else {
+          this.updateRteErrorMessage('');
+        }
       }
     }
   }
 
-  updateRteErrorMessage(): void {
-    if (this.saveButtonIsDisabled) {
-      if (this.componentId === this.COMPONENT_ID_VIDEO) {
-        this.errorMessage = (
-          'Please ensure that the start time of the video is earlier than ' +
-          'the end time.');
-      } else if (this.componentId === this.COMPONENT_ID_LINK) {
-        this.errorMessage = (
-          'It seems like clicking on this link will lead the user to a ' +
-          'different URL than the text specifies. Please change the text.'
-        );
-      }
-    } else {
-      this.errorMessage = '';
-    }
+  updateRteErrorMessage(errorMessage: string): void {
+    this.errorMessage = errorMessage;
   }
 
   save(): void {
@@ -465,8 +464,8 @@ export class RteHelperModalComponent {
               CustomizationArgsNameAndValueArray[number]['value'];
           }
           )[caName] =
-          this.tmpCustomizationArgs[i].value ||
-          this.tmpCustomizationArgs[i - 1].value;
+            this.tmpCustomizationArgs[i].value ||
+            this.tmpCustomizationArgs[i - 1].value;
         } else {
           (
             customizationArgsDict as {
@@ -489,7 +488,7 @@ export class RteHelperModalComponent {
       }
       this.ngbActiveModal.close(customizationArgsDict);
     }
-    this.rteFieldValues.unsubscribe();
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
   extractVideoIdFromVideoUrl(url: string): string {
