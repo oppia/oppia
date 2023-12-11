@@ -830,16 +830,6 @@ def apply_change_list(
                     exploration.update_auto_tts_enabled(
                         edit_auto_tts_enabled_cmd.new_value
                     )
-                elif change.property_name == 'correctness_feedback_enabled':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
-                    edit_correctness_feedback_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
-                        change
-                    )
-                    exploration.update_correctness_feedback_enabled(
-                        edit_correctness_feedback_enabled_cmd.new_value)
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

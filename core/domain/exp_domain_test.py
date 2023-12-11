@@ -16484,10 +16484,6 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'auto_tts_enabled',
             'new_value': False
         }), exp_domain.ExplorationChange({
-            'cmd': 'edit_exploration_property',
-            'property_name': 'correctness_feedback_enabled',
-            'new_value': True
-        }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'confirmed_unclassified_answers',
             'state_name': 'Introduction',
@@ -18440,7 +18436,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             exploration.author_notes, exploration.states_schema_version,
             exploration.init_state_name, exploration.param_specs,
             exploration.param_changes, exploration.auto_tts_enabled,
-            exploration.correctness_feedback_enabled, exploration.edits_allowed
+            exploration.edits_allowed
         ).to_dict()
         expected_metadata_dict = {
             'title': exploration.title,
