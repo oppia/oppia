@@ -30,6 +30,7 @@ from core.domain import opportunity_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
@@ -373,10 +374,10 @@ class ReviewableOpportunitiesHandler(
             if topic is None:
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
-            topic_exp_ids = (
-                topic_fetchers.get_published_story_exploration_ids(topic.id))
+            topic_exp_ids = topic_services.get_published_story_exploration_ids(
+                topic_id=topic.id)
         else:
-            topic_exp_ids = topic_fetchers.get_published_story_exploration_ids()
+            topic_exp_ids = topic_services.get_published_story_exploration_ids()
 
         in_review_suggestions, _ = (
             suggestion_services
