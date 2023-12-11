@@ -35,10 +35,12 @@ import { StatsReportingService } from 'pages/exploration-player-page/services/st
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ContextService } from "services/context.service";
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
+  let contextService: ContextService;
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
   let interactionObjectFactory: InteractionObjectFactory;
@@ -59,7 +61,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        }
+        }, contextService
       ]
     }).compileComponents();
   }));
@@ -67,6 +69,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HintAndSolutionButtonsComponent);
     component = fixture.componentInstance;
+    contextService = TestBed.inject(ContextService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     hintsAndSolutionManagerService = TestBed
       .inject(HintsAndSolutionManagerService);
@@ -151,6 +154,18 @@ describe('HintAndSolutionButtonsComponent', () => {
       }),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
+  });
+
+  it('should set _editorPreviewMode to the result', () => {
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
+    component.ngOnInit();
+    expect(component['_editorPreviewMode']).toBe(true);
+  });
+
+  it('should call resetLocalHintsArray during ngOnInit lifecycle', () => {
+    const resetLocalHintsArraySpy = spyOn(component, 'resetLocalHintsArray');
+    component.ngOnInit();
+    expect(resetLocalHintsArraySpy).toHaveBeenCalled();
   });
 
   it('should subscribe to events on initialization', () => {
