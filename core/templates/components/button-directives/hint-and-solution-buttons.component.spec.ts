@@ -156,10 +156,10 @@ describe('HintAndSolutionButtonsComponent', () => {
       'content', audioTranslationLanguageService);
   });
 
-  it('should set _editorPreviewMode to the result', () => {
+  it('should set .editorPreviewMode to the result', () => {
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
     component.ngOnInit();
-    expect(component['_editorPreviewMode']).toBe(true);
+    expect(component['.editorPreviewMode']).toBe(true);
   });
 
   it('should call resetLocalHintsArray during ngOnInit lifecycle', () => {
