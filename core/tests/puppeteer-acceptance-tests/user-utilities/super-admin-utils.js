@@ -298,17 +298,20 @@ module.exports = class e2eSuperAdmin extends baseUser {
     return topicIdMatch.substring(1, topicIdMatch.length - 1);
   }
 
-  async createSkill({ description, reviewMaterial, misconception }) {
+  async createSkill({ description, reviewMaterial, misconception, questionCount }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
+    // await this.page.waitForSelector('.e2e-test-create-first-skill-button');
 
     await this.clickOn(
-      'div.create-buttons > button[contains(., "Create Skill")]');
+      '.e2e-test-create-first-skill-button');
+    await this.page.waitForSelector('.e2e-test-new-skill-description-field');
     await this.type(
       'input.e2e-test-new-skill-description-field', description);
     await this.clickOn('.e2e-test-concept-card-text');
     await this.type('', reviewMaterial);
     await this.clickOn('button.e2e-test-confirm-skill-creation-button');
 
+    await this.page.waitForSelector('.e2e-test-select-rubric-difficulty');
     if (misconception) {
       await this.clickOn('button.e2e-test-add-misconception-modal-button');
       await this.type(
@@ -334,6 +337,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
             `i.e2e-test-edit-rubric-explanation-${difficulty}` +
                `:nth-child(${i + 1})` :
             `button.e2e-test-add-explanation-button-${difficulty}`);
+          await this.page.waitForSelector(
+            '.e2e-test-rubric-explanation-text .e2e-test-rte'); 
           await this.type(
             '.e2e-test-rubric-explanation-text div.e2e-test-rte',
             rubricNotes[i]);
@@ -343,7 +348,61 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }
 
     await this.onClick('button.e2e-test-save-or-publish-skill');
+    await this.page.waitForSelector('.e2e-test-commit-message-input');
     await this.type('textarea.e2e-test-commit-message-input', 'test');
     await this.onClick('button.e2e-test-close-save-modal-button');
+
+    // Create questions under the skill
+    await this.onClick('.e2e-test-questions-tab');
+    for (let i = 0; i < questionCount; i++) {
+      await this.page.waitForSelector('.e2e-test-create-question-button');
+      await this.onClick('.e2e-test-create-question-button');
+      await this.onClick('.e2e-test-skill-difficulty-medium');
+
+      await this.onClick('.e2e-test-state-edit-content');
+      await this.page.waitForSelector('.e2e-test-rte');
+      await this.type(
+        '.e2e-test-rte', 'Question created by Skill Owner');
+      await this.onClick('.e2e-test-save-state-content');
+
+      await this.onClick('.e2e-test-open-add-interaction-modal');
+      await this.onClick('.e2e-test-interaction-tile-TextInput button');
+      await this.page.waitForSelector('.e2e-test-save-interaction');
+      await this.onClick('.e2e-test-save-interaction');
+
+      await this.onClick('.e2e-test-add-list-entry');
+      await this.page.waitForSelector(
+        '.e2e-test-schema-based-list-editor-table-data input');
+      await this.type(
+        '.e2e-test-schema-based-list-editor-table-data input', 't');
+      await this.onClick('.e2e-test-open-feedback-editor');
+      await this.type('.e2e-test-rte', 'Correct!');
+      await this.onClick('input.e2e-test-editor-correctness-toggle');
+      await this.onClick('.e2e-test-add-new-response');
+
+      await this.onClick('.e2e-test-default-response-tab');
+      await this.page.waitForSelector(
+        '.e2e-test-open-outcome-feedback-editor');
+      await this.onClick('.e2e-test-open-outcome-feedback-editor');
+      await this.type('.e2e-test-rte', 'Incorrect!');
+      await this.onClick('.e2e-test-save-outcome-feedback');
+
+      await this.onClick('.e2e-test-oppia-add-hint-button');
+      await this.waitForSelector('.e2e-test-rte');
+      await this.type('.e2e-test-rte', 'hint text');
+      await this.onClick('.e2e-test-save-hint');
+
+      await this.page.waitForSelector('.e2e-test-oppia-add-solution-button');
+      await this.onClick('.e2e-test-oppia-add-solution-button');
+      await this.page.waitForSelector('.e2e-test-description-box');
+      await this.type('.e2e-test-description-box', 't');
+      await this.onClick('.e2e-test-submit-answer-button');
+      await this.page.waitForSelector('.e2e-test-rte');
+      await this.type('.e2e-test-rte', 'Explain');
+      await this.onClick('.e2e-test-submit-solution-button');
+
+      await this.page.waitForSelector('.e2e-test-save-question-button');
+      await this.onClick('.e2e-test-save-question-button');
+    }
   }
 };

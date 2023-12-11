@@ -149,7 +149,7 @@ let createNewTranslationAdmin = async function(username, email) {
  * @param {string} username - The username of the practice question submitter.
  * @returns The practice question submitter instance created.
  */
-const createNewPracticeQuestionSubmitter = async function(username, email) {
+const createNewPracticeQuestionSubmitter = async function(username) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }

@@ -42,14 +42,20 @@ describe('Practice Question Submitter', function() {
   const acceptedQuestionsPercentage = 30;
 
   let practiceQuestionSubmitter = null;
+  const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
+  const ROLE_QUESTION_ADMIN = 'question admin';
+  const DIFFICULTY_MEDIUM = 'Medium';
+  const DIFFICULTY_HARD = 'Hard';
+  const RESPONSE_EQUAL_TO_ORDERING = 'is equal to ordering';
+  const RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION = (
+    'is equal to ordering with one item at incorrect position');
+  const RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG = 'all other answers are wrong';
+  const SOLUTION_QUANTITY_ONLY_ONE = 'Only';
 
   beforeAll(async function() {
-    const superAdmin = await userFactory.createNewSuperAdmin('superadmin');
-    await superAdmin.assignRoleToUser('superadmin', ROLE_CURRICULUM_ADMIN);
-    await superAdmin.assignRoleToUser('superadmin', ROLE_QUESTION_ADMIN);
-
-    practiceQuestionSubmitter = (
-      await userFactory.createPracticeQuestionSubmitter('questionsubmitter')); 
+    const superAdmin = await userFactory.createNewSuperAdmin('superadm');
+    await superAdmin.assignRoleToUser('superadm', ROLE_CURRICULUM_ADMIN);
+    await superAdmin.assignRoleToUser('superadm', ROLE_QUESTION_ADMIN);
 
     const skill = {
       description: skillDescription,
@@ -59,7 +65,7 @@ describe('Practice Question Submitter', function() {
         [DIFFICULTY_HARD]: { rubric: hardDifficultyRubricNotes }
       },
       misconception,
-      questions: await superAdmin.createDummyQuestionsOfQuantity(3),
+      questionCount: 3,
     };
     await superAdmin.createSkill(skill);
     await superAdmin.createTopic({
@@ -83,7 +89,10 @@ describe('Practice Question Submitter', function() {
     const topicId = await superAdmin.getTopicId();
 
     await superAdmin.editClassroom({ topics: [topicId] });
-  });
+ 
+    practiceQuestionSubmitter = (
+      await userFactory.createNewPracticeQuestionSubmitter('questionsubmitter')); 
+  }, DEFAULT_SPEC_TIMEOUT);
 
   it('should suggest questions by selecting the difficulty to a lesson' +
     ' in a topic', async function() {
