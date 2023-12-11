@@ -139,13 +139,13 @@ export class ItemSelectionInputValidationService {
       customizationArgs: ItemSelectionInputCustomizationArgs,
       answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {
-    let warningsList: Warning[] = [];
+    const warningsList: Warning[] = [];
 
     let areAllChoicesCovered = false;
     const seenChoices = customizationArgs.choices.value;
-    let handledAnswers = Array(seenChoices.length).fill(false);
+    const handledAnswers = Array(seenChoices.length).fill(false);
 
-    let answerChoiceToIndex: Record<string, number> = {};
+    const answerChoiceToIndex: Record<string, number> = {};
     seenChoices.forEach((seenChoice, choiceIndex) => {
       const contentId = seenChoice.contentId;
       if (contentId === null) {
