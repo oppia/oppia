@@ -99,8 +99,8 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
 
-    This class should only be imported by the topic services file, the topic
-    fetchers file, and the topic model test file.
+    This class should only be imported by the topic services file and the topic
+    model test file.
     """
 
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
