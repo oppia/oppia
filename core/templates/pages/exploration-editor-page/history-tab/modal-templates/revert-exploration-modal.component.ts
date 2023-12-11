@@ -16,7 +16,7 @@
  * @fileoverview Component for revert exploration modal.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -32,6 +32,7 @@ export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() version!: string;
+  @ViewChild('revertExploration') revertExplorationHeadingRef!: ElementRef;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -45,5 +46,9 @@ export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
       '/explore/' + this.explorationDataService.explorationId +
       '?v=' + version
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.revertExplorationHeadingRef?.nativeElement.focus();
   }
 }
