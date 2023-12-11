@@ -83,7 +83,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         ) for i in range(3)]
 
@@ -624,7 +623,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -656,7 +654,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -689,7 +686,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
@@ -785,7 +781,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
@@ -911,7 +906,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 10',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_10.id)
@@ -920,7 +914,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 20',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_20.id)
@@ -929,7 +922,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 30',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_30.id)
@@ -1104,7 +1096,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         ) for i in range(2)]
 
