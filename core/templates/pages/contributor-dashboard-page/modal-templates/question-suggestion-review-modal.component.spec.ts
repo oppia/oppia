@@ -202,7 +202,7 @@ describe('Question Suggestion Review Modal component', () => {
         last_updated_msecs: null,
         status: 'rejected',
         author_name: authorName,
-        change: {
+        change_cmd: {
           data_format: null,
           language_code: null,
           state_name: null,
@@ -493,7 +493,7 @@ describe('Question Suggestion Review Modal component', () => {
       const newSkillDifficulty = 1;
 
       const suggestionChange = (
-        component.suggestionIdToContribution[suggestionId].suggestion.change_cmd);
+    component.suggestionIdToContribution[suggestionId].suggestion.change_cmd);
       const newQuestionDict = cloneDeep(suggestionChange.question_dict);
       newQuestionDict.question_state_data.content.html = newContentHtml;
 
