@@ -1120,11 +1120,16 @@ class StoryContents:
 
         Returns:
             list(str). A list of exploration ids.
+
+        Raises:
+            Exception. There's a node without a linked exploration.
         """
         exp_ids = []
         for node in self.nodes:
-            if node.exploration_id is not None:
-                exp_ids.append(node.exploration_id)
+            if node.exploration_id is None:
+                raise Exception('No exploration_id found for the node_id %s' %
+                    node.id)
+            exp_ids.append(node.exploration_id)
         return exp_ids
 
     def get_node_with_corresponding_exp_id(self, exp_id: str) -> StoryNode:
