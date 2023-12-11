@@ -101,6 +101,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_1', self.topic_id, '1')
+        topic_services.generate_topic_summary(self.topic_id)
 
         self.topic_id_1 = '1'
         topic = topic_domain.Topic.create_default_topic(
@@ -110,6 +111,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_2', self.topic_id_1, '2')
+        topic_services.generate_topic_summary(self.topic_id_1)
 
         # Add skill opportunity topic to a classroom.
         config_services.set_property(
@@ -664,6 +666,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
+        topic_services.generate_topic_summary(self.topic_id)
 
         # Create a translation suggestion for continue text.
         continue_state = exp_100.states['continue state']
@@ -760,6 +763,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_100', self.topic_id,
             exp_100.id)
+        topic_services.generate_topic_summary(self.topic_id)
 
         # Create a translation suggestion for the continue text.
         continue_state = exp_100.states['continue state']

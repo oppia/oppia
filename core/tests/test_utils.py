@@ -3593,7 +3593,7 @@ version: 1
             owner_id, topic_id, story.id)
         topic_services.publish_story(
             topic_id, story.id, admin_id)
-        topic_services.update_story_and_topic_summary(
+        story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
@@ -3604,7 +3604,7 @@ version: 1
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': exploration_id
-            })], 'Changes.', topic_id)
+            })], 'Changes.')
 
     def save_new_story(
         self,
