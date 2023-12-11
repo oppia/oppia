@@ -43,7 +43,7 @@ import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 export interface Suggestion {
-  change: {
+  change_cmd: {
     skill_id: string;
     content_html: string;
     translation_html: string | string[];
@@ -202,7 +202,7 @@ export class ContributionsAndReview
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          suggestion.change.question_dict.question_state_data.content.html),
+          suggestion.change_cmd.question_dict.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -250,7 +250,7 @@ export class ContributionsAndReview
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
             this.htmlLengthService.computeHtmlLengthInWords(
-              suggestion.change.content_html)) : undefined
+              suggestion.change_cmd.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -259,7 +259,7 @@ export class ContributionsAndReview
   }
 
   getTranslationSuggestionHeading(suggestion: Suggestion): string {
-    const changeTranslation = suggestion.change.translation_html;
+    const changeTranslation = suggestion.change_cmd.translation_html;
 
     return this.htmlEscaperService.escapedStrToUnescapedStr(
       this.formatRtePreviewPipe.transform(
@@ -284,7 +284,7 @@ export class ContributionsAndReview
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion = (
       question || this.questionObjectFactory.createFromBackendDict(
-        suggestion.change.question_dict));
+        suggestion.change_cmd.question_dict));
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent, {
@@ -382,7 +382,7 @@ export class ContributionsAndReview
       var contribution = this.contributions[suggestionId];
       suggestionIdToContribution[suggestionId] = contribution;
     }
-    const skillId = suggestion.change.skill_id;
+    const skillId = suggestion.change_cmd.skill_id;
 
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
