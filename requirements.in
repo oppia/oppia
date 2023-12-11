@@ -25,7 +25,7 @@ gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-Pillow==9.5.0
+Pillow==10.1.0
 pylatexenc==2.10
 pytest==6.2.5
 PyYAML==6.0
