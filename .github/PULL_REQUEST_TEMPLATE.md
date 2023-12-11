@@ -1,7 +1,7 @@
 ## Overview
 <!--
 READ ME FIRST:
-Please answer *both* questions below and check off every point from the Essential Checklist!
+Please answer *all* questions below and check off every point from the Essential Checklist!
 If there is no corresponding issue number, fill in N/A where it says [fill_in_number_here] below in 1.
 -->
 
@@ -12,15 +12,11 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 ## Essential Checklist
 
-- [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...",
-followed by a short, clear summary of the changes.
+- [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.
 - [ ] I have followed the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
-- [ ] The linter/Karma presubmit checks have passed on my local machine.
+- [ ] I have assigned the correct reviewers to this PR (or will leave a comment with the phrase "@{{reviewer_username}} PTAL" if I don't have permissions to assign reviewers directly).
+- [ ] The linter/Karma presubmit checks pass on my local machine, and my PR follows the [coding style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide)).
 - [ ] "Allow edits from maintainers" is checked. (See [here](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for instructions on how to enable it.)
-- [ ] My PR follows the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide).
-- [ ] I have assigned the correct reviewers to this PR (or will leave a
-comment with the phrase "@{{reviewer_username}} PTAL" if I don't have
-permissions to assign reviewers directly).
 
 ## Testing doc (for PRs with Beam jobs that modify production server data)
 

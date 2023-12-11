@@ -20,21 +20,21 @@ body:
   - type: input
     attributes:
       label: URL of the page where the issue is observed.
-      description: The URL of the specific page where you are experiencing the issue.
+      description: The URL of the specific page where you are experiencing the issue (or N/A if not applicable).
     validations:
-      required: false 
+      required: true
   - type: textarea
     attributes:
       label: Steps To Reproduce
       description: Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
     validations:
-      required: false
+      required: true
   - type: textarea
     attributes:
       label: Expected Behavior
       description: A clear and concise description of what you expected to happen. **Example:** "I expect to be redirected to the login page."
     validations:
-      required: false
+      required: true
   - type: textarea
     attributes:
       label: Screenshots/Videos
@@ -52,6 +52,8 @@ body:
       options:
         - Desktop
         - Mobile
+    validations:
+      required: true
   - type: dropdown
     attributes:
       label: Operating System
@@ -64,6 +66,8 @@ body:
         - Android
         - IOS
         - Other
+    validations:
+      required: true
   - type: dropdown
     attributes:
       label: What browsers are you seeing the problem on?
