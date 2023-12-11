@@ -17,7 +17,7 @@
         </div>
       </div>
     </form>
-    <div *ngIf="errorMessage" class="link-error-message">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </div>
 
   <div class="modal-footer">
@@ -29,8 +29,7 @@
     <input class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
            value="Cancel"
            (click)="cancel()">
-    <input *ngIf="componentId"
-           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
+    <input class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
            [disabled]="!customizationArgsForm.valid || saveButtonIsDisabled">
@@ -45,7 +44,7 @@
     .oppia-customization-arg-editor-inner {
     margin-top: 15px;
   }
-  .oppia-customization-arg-form-container .link-error-message {
+  .oppia-customization-arg-form-container .error-message {
     color: #f00;
     display: block;
     font-size: 0.8em;
