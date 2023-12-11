@@ -157,7 +157,7 @@ export class ItemSelectionInputValidationService {
     answerGroups.forEach((answerGroup, answerIndex) => {
       const rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = rule.inputs.x as string[];
+        const ruleInputs = rule.inputs.x as string[];
         if (rule.type === 'Equals' && ruleInputs.length > 1) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
@@ -202,9 +202,9 @@ export class ItemSelectionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
         answerGroups, stateName));
 
-    let minAllowedCount =
+    const minAllowedCount =
       customizationArgs.minAllowableSelectionCount.value;
-    let maxAllowedCount =
+    const maxAllowedCount =
       customizationArgs.maxAllowableSelectionCount.value;
 
     if (maxAllowedCount === 1) {
