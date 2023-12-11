@@ -35,7 +35,7 @@ import { StatsReportingService } from 'pages/exploration-player-page/services/st
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ContextService } from "services/context.service";
+import { ContextService } from 'services/context.service';
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
