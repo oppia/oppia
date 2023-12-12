@@ -38,6 +38,7 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
   pageIsIframed: boolean = false;
   explorationTitle!: string;
+  isLoadingExploration: boolean = true;
 
   constructor(
     private contextService: ContextService,
@@ -84,7 +85,10 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
           content: response.exploration.objective
         }
       ]);
-    });
+    }).finally(() => {
+      this.isLoadingExploration = false;
+    }
+    );
 
     this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();

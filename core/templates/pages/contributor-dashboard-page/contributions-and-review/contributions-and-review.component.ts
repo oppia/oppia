@@ -655,7 +655,10 @@ export class ContributionsAndReview
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(
       this.translationTopicService.onActiveTopicChanged.subscribe(
-        () => this.activeExplorationId = null));
+        () => {
+          this.activeExplorationId = null;
+          this.loadOpportunities();
+        }));
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
@@ -723,7 +726,9 @@ export class ContributionsAndReview
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
-              shouldResetOffset, this.reviewableQuestionsSortKey);
+              shouldResetOffset,
+              this.reviewableQuestionsSortKey,
+              this.translationTopicService.getActiveTopicName());
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {

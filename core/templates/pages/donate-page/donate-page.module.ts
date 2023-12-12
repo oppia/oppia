@@ -19,25 +19,35 @@
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DonatePageComponent } from './donate-page.component';
+import { DonationBoxComponent } from './donation-box/donation-box.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { DonatePageRootComponent } from './donate-page-root.component';
 import { CommonModule } from '@angular/common';
-import { DonatePageRoutingModule } from './donate-page-routing.module';
+import { RouterModule } from '@angular/router';
+import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    DonatePageRoutingModule,
-    NgbModule
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DonatePageRootComponent,
+      },
+    ]),
+    NgbModule,
   ],
   declarations: [
     DonatePageComponent,
     DonatePageRootComponent,
+    DonationBoxComponent,
+    DonationBoxModalComponent,
   ],
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-  ]
+    DonationBoxModalComponent
+  ],
 })
 export class DonatePageModule {}
