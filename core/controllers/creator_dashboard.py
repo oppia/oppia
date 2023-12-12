@@ -220,8 +220,6 @@ class CreatorDashboardHandler(
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
-                # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
-                # in summary_services, instead of replicating it like this.
                 collection_summary_dicts.append({
                     'id': collection_summary.id,
                     'title': collection_summary.title,

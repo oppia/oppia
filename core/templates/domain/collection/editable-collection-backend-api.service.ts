@@ -34,18 +34,6 @@ interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;
 }
 
-// TODO(bhenning): I think that this might be better merged with the
-// CollectionBackendApiService. However, that violates the principle of a
-// backend API service being available for exactly one URL. To fix this, the
-// backend controller could support both get and put and be pulled out of the
-// collection learner and moved into its own controller. This is a new pattern
-// for the backend, but it makes sense based on the usage of the get HTTP
-// request by both the learner and editor views. This would result in one
-// backend controller (file and class) for handling retrieving and changing
-// collection data, as well as one frontend service for interfacing with it.
-// Discuss and decide whether this is a good approach and then remove this TODO
-// after deciding and acting upon the decision (which would mean implementing
-// it if it's agreed upon).
 @Injectable({
   providedIn: 'root'
 })

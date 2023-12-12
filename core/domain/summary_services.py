@@ -236,9 +236,7 @@ def get_learner_collection_dict_by_id(
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
     }
-
-    # TODO(bhenning): Users should not be recommended explorations they have
-    # completed outside the context of a collection (see #1461).
+    
     next_exploration_id = None
     completed_exp_ids = []
     if user.user_id:

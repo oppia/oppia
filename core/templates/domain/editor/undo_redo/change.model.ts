@@ -18,9 +18,6 @@
  * and ExplorationChange backend domain objects.
  */
 
-// TODO(bhenning): Consolidate the backend ExplorationChange and
-// CollectionChange domain objects.
-
 import cloneDeep from 'lodash/cloneDeep';
 
 import { MisconceptionBackendDict } from
