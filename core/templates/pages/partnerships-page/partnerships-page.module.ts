@@ -23,12 +23,14 @@ import { PartnershipsPageRootComponent } from
   './partnerships-page-root.component';
 import { CommonModule } from '@angular/common';
 import { PartnershipsPageRoutingModule } from './partnerships-page-routing.module';
+import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    PartnershipsPageRoutingModule
+    PartnershipsPageRoutingModule,
+    NgbCarouselModule
   ],
   declarations: [
     PartnershipsPageComponent,
