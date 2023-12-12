@@ -16,18 +16,18 @@
     border: none;
     box-shadow: none;
     float: right;
+  }
 
-    &:focus {
-      outline: none;
-    }
+  .close-btn:focus {
+    outline: none;
+  }
 
-    > span {
-      color: #fff;
-      font-family: 'Helvetica Neue', sans-serif;
-      font-size: 40px;
-      font-weight: 300;
-      opacity: 1;
-    }
+  .close-btn > span {
+    color: #fff;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 40px;
+    font-weight: 300;
+    opacity: 1;
   }
 
   /* :ng-deep is used to style the inner elements of the modal.*/
@@ -40,7 +40,8 @@
 
   /* :ng-deep is used to style the inner elements of the modal.*/
   /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-  ::ng-deep .donation-box-modal .modal-dialog, ::ng-deep .donation-box-modal .modal-content {
+  ::ng-deep .donation-box-modal .modal-dialog,
+  ::ng-deep .donation-box-modal .modal-content {
     max-width: 420px;
     min-width: 70px;
   }

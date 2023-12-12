@@ -151,33 +151,29 @@
       padding: 0 16px 25px 16px;
     }
 
-    .donate-highlights {
-      .donate-hightlights-tile {
-        .highlight-tile-img {
-          height: 96px;
-          max-width: fit-content;
-          width: auto;
-        }
+    .highlight-tile-img {
+      height: 96px;
+      max-width: fit-content;
+      width: auto;
+    }
 
-        > div {
-          padding: 8px 7px;
+    .donate-hightlights-tile > div {
+      padding: 8px 7px;
+    }
 
-          > p:first-child {
-            color: #00645c;
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 16px;
-            margin-bottom: 5px;
-          }
+    .donate-hightlights-tile > div > p:first-child {
+      color: #00645c;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 16px;
+      margin-bottom: 5px;
+    }
 
-          > p:last-child {
-            color: #333;
-            font-size: 11px;
-            font-weight: 400;
-            line-height: 12px;
-          }
-        }
-      }
+    .donate-hightlights-tile > div > p:last-child {
+      color: #333;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 12px;
     }
 
     .donate-modal-button {
@@ -191,14 +187,14 @@
       position: fixed;
       transform: translateX(-50%);
       width: fit-content;
+    }
 
-      > span {
-        color: #fff;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 19px;
-        padding-left: 10px;
-      }
+    .donate-modal-button > span {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 19px;
+      padding-left: 10px;
     }
 
     .donation-box-container {
@@ -219,33 +215,29 @@
       padding: 0 32px 25px 32px;
     }
 
-    .donate-highlights {
-      .donate-hightlights-tile {
-        .highlight-tile-img {
-          height: 128px;
-          max-width: fit-content;
-          width: auto;
-        }
+    .highlight-tile-img {
+      height: 128px;
+      max-width: fit-content;
+      width: auto;
+    }
 
-        > div {
-          padding: 8px 18px;
+    .donate-hightlights-tile > div {
+      padding: 8px 18px;
+    }
 
-          > p:first-child {
-            color: #00645c;
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 23px;
-            margin-bottom: 8px;
-          }
+    .donate-hightlights-tile > div > p:first-child {
+      color: #00645c;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 23px;
+      margin-bottom: 8px;
+    }
 
-          > p:last-child {
-            color: #333;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 16px;
-          }
-        }
-      }
+    .donate-hightlights-tile > div > p:last-child {
+      color: #333;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 16px;
     }
 
     .donate-modal-button {
@@ -275,10 +267,10 @@
 
   .donate-content-1 {
     border: 4px solid #eee;
+  }
 
-    &:not(:last-child) {
-      margin-bottom: 25px;
-    }
+  .donate-content-1:not(:last-child) {
+    margin-bottom: 25px;
   }
 
   .donate-message-1 {
@@ -326,10 +318,10 @@
     background-color: #003c34;
     box-shadow: 0 4px 4px 0 #00000040;
     margin-bottom: 25px;
+  }
 
-    .donate-message-1 {
-      padding-left: 8px;
-    }
+  .donate-content-2 .donate-message-1 {
+    padding-left: 8px;
   }
 
   .donate-stats-container {
@@ -337,43 +329,43 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+  }
 
-    .donate-stat {
-      flex-basis: 0;
-      flex-grow: 1;
-      padding: 8px;
+  .donate-stat {
+    flex-basis: 0;
+    flex-grow: 1;
+    padding: 8px;
+  }
 
-      > div {
-        align-items: center;
-        background-color: #fff;
-        box-shadow: 0 4px 4px 0 #0000001a;
-        color: #333;
-        display: flex;
-        font-size: 16px;
-        font-weight: 400;
-        height: 100%;
-        line-height: 19px;
-        width: 100%;
+  .donate-stat > div {
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 4px 4px 0 #0000001a;
+    color: #333;
+    display: flex;
+    font-size: 16px;
+    font-weight: 400;
+    height: 100%;
+    line-height: 19px;
+    width: 100%;
+  }
 
-        .donate-stat-svg-container {
-          align-items: center;
-          display: flex;
-          flex: 0 0 auto;
-          height: 64px;
-          justify-content: center;
-          width: 48px;
+  .donate-stat > p {
+    padding: 4px;
+  }
 
-          > div {
-            font-size: 20px;
-            font-weight: 700;
-          }
-        }
+  .donate-stat-svg-container {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    height: 64px;
+    justify-content: center;
+    width: 48px;
+  }
 
-        > p {
-          padding: 4px;
-        }
-      }
-    }
+  .donate-stat-svg-container > div {
+    font-size: 20px;
+    font-weight: 700;
   }
 
   .no-border {
@@ -388,45 +380,41 @@
     margin-bottom: 16px;
   }
 
-  .donate-highlights {
-    .donate-hightlights-tile {
-      background-color: #eee;
-      display: flex;
+  .donate-hightlights-tile {
+    background-color: #eee;
+    display: flex;
+  }
 
-      &:not(:last-child) {
-        margin-bottom: 8px;
-      }
-    }
+  .donate-hightlights-tile:not(:last-child) {
+    margin-bottom: 8px;
   }
 
   .donate-our-learners {
     display: none;
   }
 
-  .donate-today-content {
-    > p:first-child {
-      font-size: 20px;
-      font-weight: 400;
-      line-height: 23px;
-      margin-bottom: 0;
-      margin-top: 25px;
-    }
+  .donate-today-content > p:first-child {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23px;
+    margin-bottom: 0;
+    margin-top: 25px;
+  }
 
-    > P:nth-child(2) {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 23px;
-    }
+  .donate-today-content > P:nth-child(2) {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 23px;
+  }
 
-    > p:nth-child(3),
-    > p:nth-child(4) {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-    }
+  .donate-today-content > p:nth-child(3),
+  .donate-today-content > p:nth-child(4) {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
 
-    > p:nth-child(3) {
-      margin-bottom: 16px;
-    }
+  .donate-today-content > p:nth-child(3) {
+    margin-bottom: 16px;
   }
 </style>
