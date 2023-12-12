@@ -493,7 +493,8 @@ describe('Question Suggestion Review Modal component', () => {
       const newSkillDifficulty = 1;
 
       const suggestionChange = (
-    component.suggestionIdToContribution[suggestionId].suggestion.change_cmd);
+        component.suggestionIdToContribution[suggestionId].suggestion.
+          change_cmd);
       const newQuestionDict = cloneDeep(suggestionChange.question_dict);
       newQuestionDict.question_state_data.content.html = newContentHtml;
 
