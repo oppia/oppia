@@ -3,7 +3,7 @@
 #    python -m scripts.install_python_dev_dependencies
 #
 # to update `requirements_dev.txt` and your current Python environment.
-Pillow==9.5.0
+Pillow==10.1.0
 PyGithub==1.58.1
 certifi==2022.12.7
 coverage==7.2.3
