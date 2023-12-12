@@ -53,6 +53,7 @@ DEV_FEATURES_LIST = [
 TEST_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
 ]
 
@@ -63,7 +64,6 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.END_CHAPTER_CELEBRATION,
     params.ParamNames.CHECKPOINT_CELEBRATION,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
 ]

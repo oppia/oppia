@@ -412,7 +412,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
-    platform_parameter_domain.FeatureStages.PROD)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
