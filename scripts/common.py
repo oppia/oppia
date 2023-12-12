@@ -56,9 +56,6 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Versions of libraries used in backend.
-PILLOW_VERSION = '10.1.0'
-
 # Buf version.
 BUF_VERSION = '0.29.0'
 
