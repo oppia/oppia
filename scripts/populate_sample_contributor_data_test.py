@@ -221,13 +221,15 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
         classroom_dict = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, classroom_name))
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_summary_dicts_from_classroom = classroom_dict['topic_summary_dicts']
-        for index in range(len(topic_summaries)):
-            topic_summary = topic_summaries[index]
+        topic_summary_dicts_from_classroom = classroom_dict[
+            'topic_summary_dicts']
+        for index, topic_summary in enumerate(topic_summaries):
             topic_summary_dict = dict(topic_summary.to_dict())
-            topic_summary_dict_from_classroom = topic_summary_dicts_from_classroom[index]
-            topic_summary_dict['is_published'] = topic_summary_dict_from_classroom['is_published']
-            assert(topic_summary_dict, topic_summary_dict_from_classroom)
+            topic_summary_dict_from_classroom = (
+                topic_summary_dicts_from_classroom[index])
+            topic_summary_dict['is_published'] = (
+                topic_summary_dict_from_classroom['is_published'])
+            assert topic_summary_dict, topic_summary_dict_from_classroom
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
         """Asserts that the function _mock_firebase_auth_create_user() is called
