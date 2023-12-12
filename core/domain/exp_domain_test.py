@@ -2262,9 +2262,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.interaction.customization_args[
             'maxAllowableSelectionCount'].value = 2
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Selected choices of rule \'0\' of answer '
-            'group \'0\' either less than min_selection_value or greater than '
-            'max_selection_value in ItemSelectionInput interaction.'
+            utils.ValidationError, 'Selected wrong number of choices in rule '
+            '\'0\' of answer group \'0\'. 3 were selected, it is either less '
+            'than 1 or greater than 2 in ItemSelectionInput interaction.'
         ):
             self.new_exploration.validate(strict=True)
 

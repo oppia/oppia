@@ -1610,19 +1610,22 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 rule_spec_till_now.append(rule_spec.to_dict())
 
                 # `Equals` should have between min and max number of selections.
+                selected_choices_count = len(rule_spec.inputs['x'])
                 if rule_spec.rule_type == 'Equals':
                     if (
                         strict and
                         (
-                            len(rule_spec.inputs['x']) < min_value or
-                            len(rule_spec.inputs['x']) > max_value
+                            selected_choices_count < min_value or
+                            selected_choices_count > max_value
                         )
                     ):
                         raise utils.ValidationError(
-                            f'Selected choices of rule \'{rule_spec_index}\' '
-                            f'of answer group \'{ans_group_index}\' '
-                            f'either less than min_selection_value '
-                            f'or greater than max_selection_value '
+                            f'Selected wrong number of choices in rule '
+                            f'\'{rule_spec_index}\' '
+                            f'of answer group \'{ans_group_index}\'. '
+                            f'{selected_choices_count} were selected, it is '
+                            f'either less than {min_value} '
+                            f'or greater than {max_value} '
                             f'in ItemSelectionInput interaction.'
                         )
 
