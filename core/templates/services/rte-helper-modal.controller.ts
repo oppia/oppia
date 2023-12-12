@@ -286,46 +286,31 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
-      // First check if the `text` looks like a URL.
-      const suffixes = ['.com', '.org', '.edu', '.gov'];
-
-      let urlSuffixIsValid = suffixes.some(suffix => {
-        if (url !== '' && url.endsWith(suffix)) {
-          return true;
-        } else {
-          this.saveButtonIsDisabled = true;
-          return false;
+      if (text === '') {
+        text = url;
+        this.saveButtonIsDisabled = false;
+      }
+      // If the text looks like a URL, strip the leading 'http://' or
+      // 'https://' or 'www.'.
+      const prefixes = ['https://', 'http://', 'www.'];
+      for (const prefix of prefixes) {
+        if (url.startsWith(prefix)) {
+          url = url.substring(prefix.length);
         }
-      });
-
-      if (urlSuffixIsValid) {
-        // The link text. If left blank, the link URL will be used.
-        if (text === '') {
-          text = url;
-          this.saveButtonIsDisabled = false;
+        if (text.startsWith(prefix)) {
+          text = text.substring(prefix.length);
         }
-        // If the text looks like a URL, strip the leading 'http://' or
-        // 'https://' or 'www.'.
-        const prefixes = ['https://', 'http://', 'www.'];
-        for (const prefix of prefixes) {
-          if (url.startsWith(prefix)) {
-            url = url.substring(prefix.length);
-          }
-          if (text.startsWith(prefix)) {
-            text = text.substring(prefix.length);
-          }
-        }
-        // After the cleanup, if the strings are not equal, then we do not
-        // allow the lesson creator to save it.
-        this.saveButtonIsDisabled = (url !== text);
-        if (this.saveButtonIsDisabled) {
-          this.updateRteErrorMessage(
-            'It seems like clicking on this link will lead the user to a ' +
-            'different URL than the text specifies. Please change the text.'
-          );
-        } else {
-          this.updateRteErrorMessage('');
-        }
+      }
+      // After the cleanup, if the strings are not equal, then we do not
+      // allow the lesson creator to save it.
+      this.saveButtonIsDisabled = (url !== text);
+      if (this.saveButtonIsDisabled) {
+        this.updateRteErrorMessage(
+          'It seems like clicking on this link will lead the user to a ' +
+          'different URL than the text specifies. Please change the text.'
+        );
+      } else {
+        this.updateRteErrorMessage('');
       }
     }
   }
