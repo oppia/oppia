@@ -42,8 +42,6 @@
 	"I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Tổng số vở",
 	"I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS": "Người đăng ký",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Kéo bức hình tới đây",
-	"I18N_DONATE_PAGE_TITLE": "Quyên góp cho Oppia Foundation",
-	"I18N_DONATE_PAGE_VIDEO_SUBTITLE": "Lắng nghe từ cộng đồng Oppia của chúng tôi",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Vô hiệu hóa cuộc hành trình",
 	"I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Xin lỗi bạn, nhưng cuộc hành trình này đang bị khóa. Hãy thử lại sau ít phút nữa.",
 	"I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Vô hiệu hóa cuộc hành trình này - Oppia",

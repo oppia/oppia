@@ -19,20 +19,15 @@
 import { Component } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-donate-page-root',
   templateUrl: './donate-page-root.component.html'
 })
-export class DonatePageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
-
-  ngOnInit(): void {
-    this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
-  }
+export class DonatePageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE;
+  meta: MetaTagData[] =
+  AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META as
+    unknown as Readonly<MetaTagData>[];
 }

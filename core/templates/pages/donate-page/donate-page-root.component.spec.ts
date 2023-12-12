@@ -16,54 +16,36 @@
  * @fileoverview Unit tests for the donate page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageHeadService } from 'services/page-head.service';
-import { PageTitleService } from 'services/page-title.service';
-
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { DonatePageRootComponent } from './donate-page-root.component';
 
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
   let component: DonatePageRootComponent;
-  let pageHeadService: PageHeadService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         DonatePageRootComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
       providers: [
-        PageTitleService,
-        MetaTagCustomizationService
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(DonatePageRootComponent);
     component = fixture.componentInstance;
-    pageHeadService = TestBed.inject(PageHeadService);
-  });
+  }));
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
-
-  it('should initialize', () => {
-    spyOn(pageHeadService, 'updateTitleAndMetaTags');
-
-    component.ngOnInit();
-
-    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE,
+  it('should be defined', () => {
+    expect(component).toBeDefined();
+    expect(component.title).toEqual(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE);
+    expect(component.meta).toEqual(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
   });
 });
