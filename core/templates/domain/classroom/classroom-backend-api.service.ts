@@ -127,7 +127,7 @@ export class ClassroomBackendApiService {
       }
     }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error.error);
+        errorCallback(errorResponse?.error?.error);
       }
     });
   }
@@ -150,7 +150,7 @@ export class ClassroomBackendApiService {
         '/new_classroom_id_handler').toPromise().then(response => {
         resolve(response.classroom_id);
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse?.error?.error);
       });
     });
   }
@@ -178,7 +178,7 @@ export class ClassroomBackendApiService {
           }
         });
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse?.error?.error);
       });
     });
   }
@@ -197,7 +197,7 @@ export class ClassroomBackendApiService {
           response => {
             resolve(response);
           }, errorResponse => {
-            reject(errorResponse.error.error);
+            reject(errorResponse?.error?.error);
           });
     });
   }
@@ -213,7 +213,7 @@ export class ClassroomBackendApiService {
         response => {
           resolve(response);
         }, errorResponse => {
-          reject(errorResponse.error.error);
+          reject(errorResponse?.error?.error);
         }
       );
     });
@@ -226,7 +226,7 @@ export class ClassroomBackendApiService {
         '/classroom_admin_data_handler').toPromise().then(response => {
         resolve(response.classroom_id_to_classroom_name);
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse?.error?.error);
       });
     });
   }
@@ -269,7 +269,7 @@ export class ClassroomBackendApiService {
         classroomIdUrl).toPromise().then(response => {
         resolve(response.classroom_id);
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse?.error?.error);
       });
     });
   }
