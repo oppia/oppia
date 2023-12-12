@@ -591,7 +591,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
         )
         collapsible_content = json.loads(
             collapsible_content_json).replace('\\"', '')
-        if is_html_empty(collapsible_content):
+        if not collapsible_content or collapsible_content.isspace():
             raise utils.ValidationError(
                 'No collapsible content is present inside the tag.'
             )
