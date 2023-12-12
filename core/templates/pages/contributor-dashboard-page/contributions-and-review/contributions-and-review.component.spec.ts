@@ -208,7 +208,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -238,7 +238,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
