@@ -22,9 +22,9 @@ var waitFor = require('./waitFor.js');
 var users = require('./users.js');
 
 var ContributorDashboardAdminPage = function() {
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'REVIEW_QUESTION';
+  var CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
+  var CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
+  var CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION = 'REVIEW_QUESTION';
   var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
   var addContributionRightsForm = $('.e2e-test-add-contribution-rights-form');
@@ -122,11 +122,11 @@ var ContributorDashboardAdminPage = function() {
       statusMessage, 'Success',
       'Could not view contribution rights successfully');
 
-    if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {
+    if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION) {
       return $$(userTranslationReviewerLanguageCss);
-    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER) {
+    } else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER) {
       return $$(userVoiceoverReviewerLanguageCss);
-    } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION) {
+    } else if (category === CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION) {
       return $(userQuestionReviewerCss);
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
       return $(userQuestionContributorCss);
@@ -168,20 +168,20 @@ var ContributorDashboardAdminPage = function() {
       username, languageDescription) {
     await _assignContributionRights(
       username,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
       languageDescription);
   };
 
   this.assignVoiceoverReviewer = async function(username, languageDescription) {
     await _assignContributionRights(
       username,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+      CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER,
       languageDescription);
   };
 
   this.assignQuestionReviewer = async function(username) {
     await _assignContributionRights(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
+      username, CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION);
   };
 
   this.assignQuestionContributor = async function(username) {
@@ -201,7 +201,7 @@ var ContributorDashboardAdminPage = function() {
   this.expectUserToBeTranslationReviewer = async function(
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION);
+      username, CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION);
     var languageList = await Promise.all(
       contributionRights.map(function(languageElem) {
         return languageElem.getText();
@@ -212,7 +212,7 @@ var ContributorDashboardAdminPage = function() {
   this.expectUserToBeVoiceoverReviewer = async function(
       username, languageDescription) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
+      username, CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER);
     var languageList = await Promise.all(contributionRights.map(
       function(languageElem) {
         return languageElem.getText();
@@ -222,7 +222,7 @@ var ContributorDashboardAdminPage = function() {
 
   this.expectUserToBeQuestionReviewer = async function(username) {
     var contributionRights = await _getUserContributionRightsElement(
-      username, CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION);
+      username, CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION);
     await waitFor.visibilityOf(
       contributionRights,
       'Review Question Right Element taking too long to appear');
