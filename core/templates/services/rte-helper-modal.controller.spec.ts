@@ -175,20 +175,21 @@ describe('RteHelperModalComponent', () => {
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
-    fit('should disable save button and display error message', 
+    it('should disable save button and display error message',
       fakeAsync(() => {
-          component.ngOnInit();
-          flush();
-          component.customizationArgsForm.value[0] = 'oppia.org';
-          component.customizationArgsForm.value[1] = 'oppia';
-          component.onCustomizationArgsFormChange(component.customizationArgsForm.value);
-          expect(component.saveButtonIsDisabled).toBe(true);
-          expect(component.errorMessage).toBe(
-            'It seems like clicking on this link will lead the user to a ' +
-            'different URL than the text specifies. Please change the text.'
-          );
-          flush();
-        }));
+        component.ngOnInit();
+        flush();
+        component.customizationArgsForm.value[0] = 'oppia.org';
+        component.customizationArgsForm.value[1] = 'oppia';
+        component.onCustomizationArgsFormChange(
+          component.customizationArgsForm.value);
+        expect(component.saveButtonIsDisabled).toBe(true);
+        expect(component.errorMessage).toBe(
+          'It seems like clicking on this link will lead the user to a ' +
+          'different URL than the text specifies. Please change the text.'
+        );
+        flush();
+      }));
   });
   describe('when there are validation errors in video form control',
     function() {
@@ -210,18 +211,19 @@ describe('RteHelperModalComponent', () => {
         component.customizationArgSpecs = customizationArgSpecs;
       });
 
-      fit('should disable save button and display error message', 
+      it('should disable save button and display error message',
         fakeAsync(() => {
-            component.ngOnInit();
-            flush();
-            component.customizationArgsForm.value[1] = 10;
-            component.customizationArgsForm.value[2] = 0;
-            component.onCustomizationArgsFormChange(component.customizationArgsForm.value);
-            expect(component.saveButtonIsDisabled).toBe(true);
-            expect(component.errorMessage).toBe(
-              'Please ensure that the start time of the video is earlier than ' +
-              'the end time.');
-            flush();
-          }));
+          component.ngOnInit();
+          flush();
+          component.customizationArgsForm.value[1] = 10;
+          component.customizationArgsForm.value[2] = 0;
+          component.onCustomizationArgsFormChange(
+            component.customizationArgsForm.value);
+          expect(component.saveButtonIsDisabled).toBe(true);
+          expect(component.errorMessage).toBe(
+            'Please ensure that the start time of the video is earlier than ' +
+            'the end time.');
+          flush();
+        }));
     });
 });
