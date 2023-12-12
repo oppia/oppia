@@ -44,7 +44,8 @@ describe('ItemSelectionInputValidationService', () => {
     agof: AnswerGroupObjectFactory;
   let ThreeInputsAnswerGroups: AnswerGroup[],
     OneInputAnswerGroups: AnswerGroup[],
-    NoInputAnswerGroups: AnswerGroup[];
+    NoInputAnswerGroups: AnswerGroup[],
+    NoInputAnswerGroupsWithEqualsRule: AnswerGroup[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -137,6 +138,17 @@ describe('ItemSelectionInputValidationService', () => {
     NoInputAnswerGroups = [agof.createNew(
       [Rule.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
+        inputs: {
+          x: []
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+    NoInputAnswerGroupsWithEqualsRule = [agof.createNew(
+      [Rule.createFromBackendDict({
+        rule_type: 'Equals',
         inputs: {
           x: []
         }
@@ -316,6 +328,23 @@ describe('ItemSelectionInputValidationService', () => {
     });
 
   it(
+    'should expect number of correct options to be in between the maximum ' +
+    'and minimum allowed selections when the "Equals" rule is used and ' +
+    'there is no selected answer in the rule.',
+    () => {
+      const warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, NoInputAnswerGroupsWithEqualsRule,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In Oppia response 1, Learner answer 1, the number of correct ' +
+          'options in the "Equals" learner answer should be between 1 and 2 ' +
+          '(the minimum and maximum allowed selection counts).')
+      }]);
+    });
+
+  it(
     'should expect at least one option when ' +
     '"ContainsAtLeastOneOf" rule is used.',
     () => {
@@ -371,19 +400,6 @@ describe('ItemSelectionInputValidationService', () => {
       message: (
         'In Oppia Response 1, Learner answer 1, ' +
         'please select only one answer choice.')
-    }, {
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'In Oppia Response 1, Learner answer 1, ' +
-        'please select only one answer choice.')
-    }, {
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'In Oppia response 1, ' +
-        'Learner answer 1, the number of correct ' +
-        'options in the "Equals" learner answer should be between ' +
-        '0 and 1' +
-        ' (the minimum and maximum allowed selection counts).')
     }, {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
