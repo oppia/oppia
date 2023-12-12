@@ -1567,6 +1567,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             # Raise a ValueError if min or max values are None.
             raise ValueError('Either min or max value is None')
 
+        rule_spec_till_now: List[RuleSpecDict] = []
+
         # Here we use cast because we are narrowing down the type from
         # various allowed cust. arg types to 'List[SubtitledHtml]',
         # and here we are sure that the type is always going to be
