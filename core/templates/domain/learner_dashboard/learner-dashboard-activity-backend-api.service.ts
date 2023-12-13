@@ -72,7 +72,7 @@ export class LearnerDashboardActivityBackendApiService {
           activityType: activityType,
           activityId: activityId
         }));
-    var response = await this.http.post<LearnerPlaylistResponseObject>(
+    let response = await this.http.post<LearnerPlaylistResponseObject>(
       this.addToLearnerPlaylistUrl, {}).toPromise();
     if (response.belongs_to_completed_or_incomplete_list) {
       this.successfullyAdded = false;
