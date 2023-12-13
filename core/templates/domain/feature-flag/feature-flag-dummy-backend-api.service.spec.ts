@@ -52,7 +52,7 @@ describe('FeatureFlagDummyBackendApiService', () => {
 
       httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush({ msg: 'ok' });
+        .flush({ msg: 'ok', is_enabled: true });
 
       flushMicrotasks();
 
@@ -69,7 +69,7 @@ describe('FeatureFlagDummyBackendApiService', () => {
 
       httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush({ msg: 'ok' });
+        .flush({ msg: 'ok', is_enabled: false });
 
       flushMicrotasks();
 
