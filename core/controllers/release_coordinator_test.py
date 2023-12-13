@@ -107,7 +107,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+        # Here we use arg-type ignore to test the functionalities with dummy
+        # feature flags. create_feature_flag accepts feature-flag name to be
+        # of type platform_feature_list.FeatureNames.
+        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
@@ -129,7 +132,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+        # Here we use arg-type ignore to test the functionalities with dummy
+        # feature flags. create_feature_flag accepts feature-flag name to be
+        # of type platform_feature_list.FeatureNames.
+        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(
@@ -197,7 +203,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+        # Here we use arg-type ignore to test the functionalities with dummy
+        # feature flags. create_feature_flag accepts feature-flag name to be
+        # of type platform_feature_list.FeatureNames.
+        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
 
         feature_list_ctx = self.swap(

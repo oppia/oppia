@@ -50,10 +50,13 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_names = ['feature_a', 'feature_b']
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
 
+        # Here we use arg-type ignore to test the functionalities with dummy
+        # feature flags. create_feature_flag accepts feature-flag name to be
+        # of type platform_feature_list.FeatureNames.
         registry.Registry.feature_flag_spec_registry.clear()
-        self.dev_feature_flag = registry.Registry.create_feature_flag(
+        self.dev_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
-        self.prod_feature_flag = registry.Registry.create_feature_flag(
+        self.prod_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_B, 'test', FeatureStages.PROD)
         registry.Registry.update_feature_flag(
             self.prod_feature_flag.name, True, 0, []

@@ -53,21 +53,24 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             self.original_feature_flag_spec_registry)
 
     def test_create_feature_flag(self) -> None:
-        feature_flag = registry.Registry.create_feature_flag(
+        # Here we use arg-type ignore to test the functionalities with dummy
+        # feature flags. create_feature_flag accepts feature-flag name to be
+        # of type platform_feature_list.FeatureNames.
+        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
 
     def test_create_feature_flag_with_the_same_name_failure(self) -> None:
-        registry.Registry.create_feature_flag(
+        registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         with self.assertRaisesRegex(
             Exception, 'Feature flag with name feature_a already exists'
         ):
-            registry.Registry.create_feature_flag(
+            registry.Registry.create_feature_flag( # type: ignore[arg-type]
                 FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
 
     def test_get_feature_flag(self) -> None:
-        registry.Registry.create_feature_flag(
+        registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
@@ -81,7 +84,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             registry.Registry.get_feature_flag('feature_d')
 
     def test_existing_feature_gets_updated(self) -> None:
-        registry.Registry.create_feature_flag(
+        registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         self.assertIsNone(
             registry.Registry.load_feature_flag_from_storage(
@@ -114,7 +117,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
 
     def test_update_feature_flag(self) -> None:
-        registry.Registry.create_feature_flag(
+        registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
 
         registry.Registry.update_feature_flag(
@@ -136,7 +139,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         )
 
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
-        feature_flag = registry.Registry.create_feature_flag(
+        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
@@ -149,7 +152,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         feature_flag_domain.ServerMode.DEV)
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
-        feature_flag = registry.Registry.create_feature_flag(
+        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -162,7 +165,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         feature_flag_domain.ServerMode.DEV)
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
-        feature_flag = registry.Registry.create_feature_flag(
+        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.TEST)
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -175,7 +178,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         feature_flag_domain.ServerMode.TEST)
 
     def test_updated_feature_is_saved_in_storage(self) -> None:
-        registry.Registry.create_feature_flag(
+        registry.Registry.create_feature_flag( # type: ignore[arg-type]
             FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
         self.assertIsNone(
             registry.Registry.load_feature_flag_from_storage(
