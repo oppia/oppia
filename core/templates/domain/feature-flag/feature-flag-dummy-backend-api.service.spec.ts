@@ -67,12 +67,9 @@ describe('FeatureFlagDummyBackendApiService', () => {
       apiService.isHandlerEnabled()
         .then(successHandler, failHandler);
 
-      httpTestingController
+        httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush('Mock 404 Error', {
-          status: 404,
-          statusText: 'Not Found'
-        });
+        .flush({ msg: 'ok' });
 
       flushMicrotasks();
 
@@ -80,7 +77,7 @@ describe('FeatureFlagDummyBackendApiService', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should throw if the exception is not caused by a 404', fakeAsync(() => {
+    it('should throw exception in case of error', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 

@@ -47,12 +47,6 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             registry.Registry.feature_flag_spec_registry)
         registry.Registry.feature_flag_spec_registry.clear()
 
-        # Feature names that might be used in following tests.
-        feature_flag_names = ['feature_a', 'feature_b']
-        caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
-            feature_flag_names)
-
     def tearDown(self) -> None:
         super().tearDown()
 
@@ -86,31 +80,6 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             Exception, 'Feature flag not found: feature_d'
         ):
             registry.Registry.get_feature_flag('feature_d')
-
-    def test_memcache_is_set_after_get_request_for_feature(self) -> None:
-        registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
-
-        self.assertIsNone(
-            registry.Registry.load_feature_flag_from_memcache(
-                FeatureNames.FEATURE_A.value))
-        registry.Registry.get_feature_flag(FeatureNames.FEATURE_A.value)
-        self.assertIsNotNone(
-            registry.Registry.load_feature_flag_from_memcache(
-                FeatureNames.FEATURE_A.value))
-        # Here we are verify that the feature now gets call from the memcache
-        # instead of storage model or registry variable.
-        feature_flag = registry.Registry.get_feature_flag(
-            FeatureNames.FEATURE_A.value)
-        memcache_feature_flag_value = (
-            registry.Registry.load_feature_flag_from_memcache(
-                FeatureNames.FEATURE_A.value))
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert memcache_feature_flag_value is not None
-        self.assertEqual(
-            feature_flag.feature_flag_value.to_dict(),
-            memcache_feature_flag_value.to_dict()
-        )
 
     def test_existing_feature_gets_updated(self) -> None:
         registry.Registry.create_feature_flag(
@@ -166,21 +135,6 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             updated_feature_flag.feature_flag_value.user_group_ids,
             ['user_group_1', 'user_group_2']
         )
-
-    def test_cached_value_is_invalidated_after_update(self) -> None:
-        registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
-
-        registry.Registry.update_feature_flag(
-            FeatureNames.FEATURE_A.value,
-            True,
-            50,
-            ['user_group_1', 'user_group_2']
-        )
-
-        self.assertIsNone(
-            registry.Registry.load_feature_flag_from_memcache(
-                FeatureNames.FEATURE_A.value))
 
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
         feature_flag = registry.Registry.create_feature_flag(

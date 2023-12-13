@@ -50,9 +50,6 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         feature_names = ['feature_a', 'feature_b']
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
-        caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
-            feature_names)
 
         registry.Registry.feature_flag_spec_registry.clear()
         self.dev_feature_flag = registry.Registry.create_feature_flag(
@@ -60,7 +57,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         self.prod_feature_flag = registry.Registry.create_feature_flag(
             FeatureNames.FEATURE_B, 'test', FeatureStages.PROD)
         registry.Registry.update_feature_flag(
-            self.prod_feature_flag.feature_flag_value.name, True, 0, []
+            self.prod_feature_flag.name, True, 0, []
         )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
@@ -86,8 +83,8 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             result,
             {
-                self.dev_feature_flag.feature_flag_value.name: False,
-                self.prod_feature_flag.feature_flag_value.name: True
+                self.dev_feature_flag.name: False,
+                self.prod_feature_flag.name: True
             }
         )
 
@@ -117,23 +114,14 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
             []
         )
 
-    def test_get_with_dummy_feature_flag_enabled_returns_ok(self) -> None:
-        self.get_json(
-            '/feature_flag_dummy_handler',
-            expected_status_int=404
-        )
-
+    def test_get_with_dummy_feature_flag_enabled_returns_true(self) -> None:
         self._set_dummy_feature_flag_status(True)
         result = self.get_json(
             '/feature_flag_dummy_handler',
         )
-        self.assertEqual(result, {'msg': 'ok'})
+        self.assertEqual(result, {'msg': 'ok', 'is_enabled': True})
 
-    def test_get_with_dummy_feature_flag_disabled_raises_404(self) -> None:
-        self.get_json(
-            '/feature_flag_dummy_handler',
-            expected_status_int=404
-        )
+    def test_get_with_dummy_feature_flag_disabled_returns_false(self) -> None:
         self._set_dummy_feature_flag_status(True)
         self.get_json(
             '/feature_flag_dummy_handler',
@@ -141,7 +129,7 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
         )
 
         self._set_dummy_feature_flag_status(False)
-        self.get_json(
-            '/feature_flag_dummy_handler',
-            expected_status_int=404
+        result = self.get_json(
+            '/feature_flag_dummy_handler'
         )
+        self.assertEqual(result, {'msg': 'ok', 'is_enabled': False})

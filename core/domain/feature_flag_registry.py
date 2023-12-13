@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import enum
-
 from core import platform_feature_list
 from core import utils
 from core.domain import caching_services
@@ -49,7 +47,7 @@ class Registry:
     @classmethod
     def create_feature_flag(
         cls,
-        name: enum.Enum,
+        name: FeatureNames,
         description: str,
         feature_stage: feature_flag_domain.FeatureStages,
     ) -> feature_flag_domain.FeatureFlag:
@@ -79,7 +77,6 @@ class Registry:
         )
         feature_flag_value_domain = (
             feature_flag_domain.FeatureFlagValue.from_dict({
-                'name': name.value,
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,
                 'user_group_ids': [],
@@ -90,6 +87,7 @@ class Registry:
         cls.feature_flag_spec_registry[name.value] = feature_flag_spec_domain
 
         return feature_flag_domain.FeatureFlag(
+            name.value,
             feature_flag_spec_domain,
             feature_flag_value_domain
         )
@@ -107,16 +105,6 @@ class Registry:
         Raises:
             Exception. The given name of the feature flag doesn't exist.
         """
-        feature_flag_value_from_cache = cls.load_feature_flag_from_memcache(
-            name)
-        if feature_flag_value_from_cache is not None:
-            feature_flag_spec = cls.feature_flag_spec_registry[
-                feature_flag_value_from_cache.name]
-            return feature_flag_domain.FeatureFlag(
-                feature_flag_spec,
-                feature_flag_value_from_cache
-            )
-
         feature_flag_from_storage = cls.load_feature_flag_from_storage(name)
         if feature_flag_from_storage is not None:
             feature_flag = feature_flag_from_storage
@@ -133,12 +121,6 @@ class Registry:
             })
         else:
             raise Exception('Feature flag not found: %s.' % name)
-
-        caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
-            {
-                name: feature_flag.feature_flag_value,
-            })
 
         return feature_flag
 
@@ -169,9 +151,6 @@ class Registry:
         feature_flag.feature_flag_value.set_user_group_ids(user_group_ids)
 
         cls._update_feature_flag_storage_model(feature_flag)
-
-        caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None, [name])
 
     @classmethod
     def load_feature_flag_from_storage(
@@ -208,24 +187,6 @@ class Registry:
             return None
 
     @classmethod
-    def load_feature_flag_from_memcache(
-        cls, name: str
-    ) -> Optional[feature_flag_domain.FeatureFlagValue]:
-        """Loads cached feature flag value from memcache.
-
-        Args:
-            name: str. The name of the feature flag.
-
-        Returns:
-            FeatureFlagValue|None. The loaded instance, None if it's not found
-            in cache.
-        """
-        cached_feature_flag = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None, [name]
-        ).get(name)
-        return cached_feature_flag
-
-    @classmethod
     def _update_feature_flag_storage_model(
         cls, feature_flag: feature_flag_domain.FeatureFlag
     ) -> None:
@@ -238,10 +199,10 @@ class Registry:
             feature_flag.feature_flag_spec.feature_stage)
 
         model_instance = config_models.FeatureFlagModel.get(
-            feature_flag.feature_flag_value.name, strict=False)
+            feature_flag.name, strict=False)
         if model_instance is None:
             model_instance = config_models.FeatureFlagModel.create(
-                feature_flag.feature_flag_value.name,
+                feature_flag.name,
                 feature_flag.feature_flag_value.force_enable_for_all_users,
                 feature_flag.feature_flag_value.rollout_percentage,
                 feature_flag.feature_flag_value.user_group_ids

@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 import enum
-import json
 import re
 
 from core import feconf
@@ -39,12 +38,6 @@ class ServerMode(enum.Enum):
 
 
 FeatureStages = ServerMode
-
-ALLOWED_FEATURE_STAGES: Final = [
-    FeatureStages.DEV.value,
-    FeatureStages.TEST.value,
-    FeatureStages.PROD.value
-]
 
 
 def get_server_mode() -> ServerMode:
@@ -77,13 +70,26 @@ class FeatureFlagDict(TypedDict):
 class FeatureFlag:
     """FeatureFlag domain object."""
 
+    FEATURE_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
+
     def __init__(
         self,
+        name: str,
         feature_flag_spec: FeatureFlagSpec,
         feature_flag_value: FeatureFlagValue
     ):
+        self._name = name
         self._feature_flag_spec = feature_flag_spec
         self._feature_flag_value = feature_flag_value
+
+    @property
+    def name(self) -> str:
+        """Returns the name of the feature flag.
+
+        Returns:
+            str. The name of the feature flag.
+        """
+        return self._name
 
     @property
     def feature_flag_spec(self) -> FeatureFlagSpec:
@@ -95,6 +101,13 @@ class FeatureFlag:
         """The FeatureFlagValue property of FeatureFlag."""
         return self._feature_flag_value
 
+    def validate(self) -> None:
+        """Validates the FeatureFlag object."""
+        if re.match(self.FEATURE_NAME_REGEXP, self._name) is None:
+            raise utils.ValidationError(
+                'Invalid feature flag name \'%s\', expected to match regexp '
+                '%s.' % (self._name, self.FEATURE_NAME_REGEXP))
+
     def to_dict(self) -> FeatureFlagDict:
         """Returns a dict representation of the FeatureFlag domain object.
 
@@ -105,7 +118,7 @@ class FeatureFlag:
             self._feature_flag_value.last_updated
         ) if self._feature_flag_value.last_updated else None
         return {
-            'name': self._feature_flag_value.name,
+            'name': self._name,
             'description': self._feature_flag_spec.description,
             'feature_stage': self._feature_flag_spec.feature_stage.value,
             'force_enable_for_all_users': (
@@ -131,7 +144,6 @@ class FeatureFlag:
             'feature_stage': feature_dict['feature_stage']
         })
         feature_flag_value = FeatureFlagValue.from_dict({
-            'name': feature_dict['name'],
             'force_enable_for_all_users': feature_dict[
                 'force_enable_for_all_users'],
             'rollout_percentage': feature_dict['rollout_percentage'],
@@ -140,6 +152,7 @@ class FeatureFlag:
         })
 
         return cls(
+            feature_dict['name'],
             feature_flag_spec,
             feature_flag_value
         )
@@ -180,16 +193,6 @@ class FeatureFlagSpec:
             ServerMode. The feature_stage of the feature flag.
         """
         return self._feature_stage
-
-    def validate(self) -> None:
-        """Validates the FeatureFlagSpec object."""
-        if not any(
-            self._feature_stage.value == feature_stage
-            for feature_stage in ALLOWED_FEATURE_STAGES
-        ):
-            raise utils.ValidationError(
-                'Invalid feature stage, got %s, expected one of %s.' % (
-                    self._feature_stage, ALLOWED_FEATURE_STAGES))
 
     def to_dict(self) -> FeatureFlagSpecDict:
         """Returns a dict representation of the FeatureFlagSpec domain object.
@@ -236,7 +239,6 @@ class FeatureFlagSpec:
 class FeatureFlagValueDict(TypedDict):
     """Dictionary representing FeatureFlagValue object."""
 
-    name: str
     force_enable_for_all_users: bool
     rollout_percentage: int
     user_group_ids: List[str]
@@ -246,30 +248,17 @@ class FeatureFlagValueDict(TypedDict):
 class FeatureFlagValue:
     """The FeatureFlagValue domain object."""
 
-    FEATURE_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
-
     def __init__(
         self,
-        name: str,
         force_enable_for_all_users: bool,
         rollout_percentage: int,
         user_group_ids: List[str],
         last_updated: Optional[datetime.datetime] = None
     ) -> None:
-        self._name = name
         self._force_enable_for_all_users = force_enable_for_all_users
         self._rollout_percentage = rollout_percentage
         self._user_group_ids = user_group_ids
         self._last_updated = last_updated
-
-    @property
-    def name(self) -> str:
-        """Returns the name of the feature flag.
-
-        Returns:
-            str. The name of the feature flag.
-        """
-        return self._name
 
     @property
     def force_enable_for_all_users(self) -> bool:
@@ -345,12 +334,7 @@ class FeatureFlagValue:
         self._last_updated = last_updated
 
     def validate(self, feature_stage: ServerMode) -> None:
-        """Validates the FeatureFlag object."""
-        if re.match(self.FEATURE_NAME_REGEXP, self._name) is None:
-            raise utils.ValidationError(
-                'Invalid feature flag name \'%s\', expected to match regexp '
-                '%s.' % (self._name, self.FEATURE_NAME_REGEXP))
-
+        """Validates the FeatureFlagValue object."""
         if self._rollout_percentage < 0 or self._rollout_percentage > 100:
             raise utils.ValidationError(
                 'Feature flag rollout-percentage should be between '
@@ -387,7 +371,6 @@ class FeatureFlagValue:
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.last_updated else None
         return {
-            'name': self._name,
             'force_enable_for_all_users': self._force_enable_for_all_users,
             'rollout_percentage': self._rollout_percentage,
             'user_group_ids': self._user_group_ids,
@@ -411,35 +394,8 @@ class FeatureFlagValue:
             feature_flag_value_dict['last_updated']
         ) if isinstance(feature_flag_value_dict['last_updated'], str) else None
         return cls(
-            feature_flag_value_dict['name'],
             feature_flag_value_dict['force_enable_for_all_users'],
             feature_flag_value_dict['rollout_percentage'],
             feature_flag_value_dict['user_group_ids'],
             last_updated
         )
-
-    def serialize(self) -> str:
-        """Returns the object serialized as a JSON string.
-
-        Returns:
-            str. JSON-encoded string encoding all of the information composing
-            the object.
-        """
-        feature_flag_value_dict = self.to_dict()
-        return json.dumps(feature_flag_value_dict)
-
-    @classmethod
-    def deserialize(cls, json_string: str) -> FeatureFlagValue:
-        """Returns a FeatureFlagValue domain object decoded from a JSON string.
-
-        Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a FeatureFlagValue.
-                Only call on strings that were created using serialize().
-
-        Returns:
-            FeatureFlagValue. The corresponding FeatureFlagValue domain object.
-        """
-        feature_flag_value_dict = json.loads(json_string)
-        feature_flag_value = cls.from_dict(feature_flag_value_dict)
-        return feature_flag_value

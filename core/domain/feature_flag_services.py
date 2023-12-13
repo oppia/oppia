@@ -106,21 +106,8 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
             raise Exception(
                 'Feature flag not found: %s.' % feature_flag_name_enum.value)
 
-        feature_flag_value_from_cache = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
-            [feature_flag_name_enum.value]
-        ).get(feature_flag_name_enum.value)
-        if feature_flag_value_from_cache is not None:
-            feature_flag_spec = registry.Registry.feature_flag_spec_registry[
-                feature_flag_value_from_cache.name
-            ]
-            feature_flags.append(feature_flag_domain.FeatureFlag(
-                feature_flag_spec,
-                feature_flag_value_from_cache
-            ))
-        else:
-            feature_flags_to_fetch_from_storage.append(
-                feature_flag_name_enum.value)
+        feature_flags_to_fetch_from_storage.append(
+            feature_flag_name_enum.value)
 
     feature_flags_from_storage = load_feature_flags_from_storage(
         feature_flags_to_fetch_from_storage)
@@ -131,14 +118,14 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
         if feature_flag is not None:
             feature_flag_spec = (
                 registry.Registry.feature_flag_spec_registry[
-                    feature_flag.feature_flag_value.name])
+                    feature_flag.name])
             # Rulling out the possibility of last_updated to be None as we
             # are getting the feature flag value from the storage.
             assert feature_flag.feature_flag_value.last_updated is not None
             last_updated = utils.convert_naive_datetime_to_string(
                 feature_flag.feature_flag_value.last_updated)
             feature_flag = feature_flag_domain.FeatureFlag.from_dict({
-                'name': feature_flag.feature_flag_value.name,
+                'name': feature_flag.name,
                 'description': feature_flag_spec.description,
                 'feature_stage': feature_flag_spec.feature_stage.value,
                 'last_updated': last_updated,
@@ -162,14 +149,6 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
                 'user_group_ids': []
             })
             feature_flags.append(feature_flag)
-
-    for feature_flag_domain_obj in feature_flags:
-        caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_FEATURE_FLAG_VALUE, None,
-            {
-                feature_flag_domain_obj.feature_flag_value.name: (
-                    feature_flag_domain_obj.feature_flag_value),
-            })
 
     return feature_flags
 
@@ -293,8 +272,8 @@ def evaluate_all_feature_flag_values(user_id: Optional[str]) -> Dict[str, bool]:
     feature_flags = get_all_feature_flags()
     for feature_flag in feature_flags:
         feature_flag_status = is_feature_flag_enabled(
-            user_id, feature_flag.feature_flag_value.name, feature_flag)
+            user_id, feature_flag.name, feature_flag)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_flag_status, bool)
-        result_dict[feature_flag.feature_flag_value.name] = feature_flag_status
+        result_dict[feature_flag.name] = feature_flag_status
     return result_dict
