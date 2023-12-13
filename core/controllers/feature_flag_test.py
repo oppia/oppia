@@ -19,7 +19,6 @@ from __future__ import annotations
 import enum
 
 from core import platform_feature_list
-from core.domain import caching_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services

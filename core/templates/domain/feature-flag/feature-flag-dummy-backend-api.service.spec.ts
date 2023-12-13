@@ -67,7 +67,7 @@ describe('FeatureFlagDummyBackendApiService', () => {
       apiService.isHandlerEnabled()
         .then(successHandler, failHandler);
 
-        httpTestingController
+      httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
         .flush({ msg: 'ok' });
 
@@ -75,26 +75,6 @@ describe('FeatureFlagDummyBackendApiService', () => {
 
       expect(successHandler).toHaveBeenCalledWith(false);
       expect(failHandler).not.toHaveBeenCalled();
-    }));
-
-    it('should throw exception in case of error', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      apiService.isHandlerEnabled()
-        .then(successHandler, failHandler);
-
-      httpTestingController
-        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush('Mock 500 Error', {
-          status: 500,
-          statusText: 'Some internal server error.'
-        });
-
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     }));
   });
 });

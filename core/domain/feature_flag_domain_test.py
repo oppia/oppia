@@ -263,7 +263,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         })
 
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
-        self.assertEqual(feature_flag._name, 'feature_a')
+        self.assertEqual(feature_flag.name, 'feature_a')
         self.assertEqual(feature_flag.feature_flag_spec.description, 'for test')
         self.assertEqual(
             feature_flag.feature_flag_spec.feature_stage,

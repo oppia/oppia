@@ -18,17 +18,14 @@
 
 from __future__ import annotations
 
-import datetime
 import json
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_domain
-from core.domain import feature_flag_domain
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import skill_domain
 from core.domain import story_domain

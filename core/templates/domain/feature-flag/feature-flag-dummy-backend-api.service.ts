@@ -16,7 +16,7 @@
  * @fileoverview Service to check the status of dummy handler in backend.
  */
 
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -44,22 +44,11 @@ export class FeatureFlagDummyBackendApiService {
    * to the dummy handler succeeded without error.
    */
   async isHandlerEnabled(): Promise<boolean> {
-    try {
-      var response = await this.http.get(
-        FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise();
-      if (response['is_enabled'] === true) {
-        return true;
-      } else {
-        return false;
-      }
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
-    } catch (err: unknown) {
-      throw err;
-    }
+    const response = await this.http.get(
+      FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise();
+    return response['is_enabled'] === true;
   }
+  
 }
 
 angular.module('oppia').factory(
