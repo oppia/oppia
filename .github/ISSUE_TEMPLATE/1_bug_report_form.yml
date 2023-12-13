@@ -103,7 +103,7 @@ body:
       label: Tips for developers
       description: Please leave this section as-is.
       value: |
-        Before tackling the bug, please use `git bisect` (see https://git-scm.com/docs/git-bisect) to investigate which PR caused it (you only need to go back as far as commit https://github.com/oppia/oppia/commits/9a334e9). If you find the PR, leave a comment on this issue pointing to it, or just say that it happened before commit 9a334e9 if you could reproduce it there. This will help us fix the issue by reverting the faulty PR.
+        Before tackling the bug, please use `git bisect` (see https://git-scm.com/docs/git-bisect) to investigate which PR caused it. If the issue occurred before commit https://github.com/oppia/oppia/commit/c7db0fe, the most effective approach is to utilize the [Python setup](https://github.com/oppia/oppia/wiki/Installing-Oppia/718fd4d0d9ba801142c02e98a499db26ed852c54) for conducting a `git bisect` (You only need to go back as far as commit https://github.com/oppia/oppia/commits/9a334e9). If you need to perform a `git bisect` for any commit beyond that commit, the Docker setup will be suitable. If you find the PR, leave a comment on this issue pointing to it, or just say that it happened before commit 9a334e9 if you could reproduce it there. This will help us fix the issue by reverting the faulty PR.
 
         Also, if this is your first issue, please make sure to follow https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#choosing-a-good-first-issue and https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up before claiming it. Thanks!
     validations:
