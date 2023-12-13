@@ -1343,10 +1343,10 @@ describe('Translation Suggestion Review Modal Component', function() {
       const deprecatedCmd = 'add_translation';
       const validCmd = 'add_written_translation';
 
-      component.activeSuggestion.change.cmd = validCmd;
+      component.activeSuggestion.change_cmd.cmd = validCmd;
       expect(component.isDeprecatedTranslationSuggestionCommand()).toBeFalse();
 
-      component.activeSuggestion.change.cmd = deprecatedCmd;
+      component.activeSuggestion.change_cmd.cmd = deprecatedCmd;
       expect(component.isDeprecatedTranslationSuggestionCommand()).toBeTrue();
     });
 
