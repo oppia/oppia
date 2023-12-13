@@ -825,7 +825,7 @@ describe('Opportunities List Component', () => {
         tick();
 
         expect(component.activePageNumber).toBe(1);
-    }));
+      }));
   });
 
   describe('when clicking on pin-unpin icon', () => {
@@ -852,7 +852,6 @@ describe('Opportunities List Component', () => {
     }));
 
     it('should unpin an opportunity', fakeAsync(() => {
-
       component.init();
       component.onChangeLanguage('en');
       tick();

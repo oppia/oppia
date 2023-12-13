@@ -147,10 +147,9 @@ export class OpportunitiesListComponent {
         });
   }
 
-  pinOpportunity(updatedData: {
-      explorationId: string;
-      topicName: string;
-    }): void {
+  pinOpportunity(
+    updatedData: Record<string, string>
+  ): void {
     const indexToModify = this.opportunities.findIndex(
       opportunity => opportunity.id === updatedData.
         explorationId && opportunity.topicName === updatedData.topicName
@@ -188,10 +187,9 @@ export class OpportunitiesListComponent {
     }
   }
 
-  unpinOpportunity(updatedData: {
-      explorationId: string;
-      topicName: string;
-    }): void {
+  unpinOpportunity(
+    updatedData: Record<string, string>
+  ): void {
     const indexToModify = this.opportunities.findIndex(
       opportunity => opportunity.id === updatedData.
         explorationId && opportunity.topicName === updatedData.topicName
