@@ -43,8 +43,6 @@ ParamNames = params.ParamNames
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     params.ParamNames.SHOW_TRANSLATION_SIZE
@@ -53,7 +51,10 @@ DEV_FEATURES_LIST = [
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST: List[ParamNames] = [
-    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI
+    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    params.ParamNames.DIAGNOSTIC_TEST,
+    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -62,10 +63,7 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     params.ParamNames.END_CHAPTER_CELEBRATION,
     params.ParamNames.CHECKPOINT_CELEBRATION,
-    params.ParamNames.ANDROID_BETA_LANDING_PAGE,
-    params.ParamNames.BLOG_PAGES,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
 ]
@@ -74,6 +72,8 @@ PROD_FEATURES_LIST: List[ParamNames] = [
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
 DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
+    params.ParamNames.ANDROID_BETA_LANDING_PAGE,
+    params.ParamNames.BLOG_PAGES,
 ]
 
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [

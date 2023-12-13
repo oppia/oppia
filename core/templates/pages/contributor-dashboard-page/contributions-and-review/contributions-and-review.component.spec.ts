@@ -1499,6 +1499,8 @@ describe('Contributions and review component', () => {
     });
 
     it('should load more opportunities correctly', () => {
+      spyOn(translationTopicService, 'getActiveTopicName')
+        .and.returnValue('activeTopicName');
       component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
         expect(opportunitiesDicts).toEqual([{
@@ -1511,6 +1513,11 @@ describe('Contributions and review component', () => {
         }]);
         expect(more).toEqual(false);
       });
+      expect(getReviewableQuestionSuggestionsAsyncSpy).toHaveBeenCalledWith(
+        false,
+        'Date',
+        'activeTopicName'
+      );
 
       getReviewableQuestionSuggestionsAsyncSpy
         .and.returnValue(Promise.resolve({}));

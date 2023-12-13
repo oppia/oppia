@@ -442,6 +442,17 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
+    it('should skip to main content', () => {
+      const mockElement = document.createElement('div');
+      mockElement.classList.add('exploration-editor-content');
+      document.body.appendChild(mockElement);
+
+      component.skipEditorNavbar();
+
+      const focusedElement = document.activeElement as HTMLElement;
+      expect(focusedElement.tabIndex).toBe(-1);
+    });
+
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
@@ -582,6 +593,23 @@ describe('Exploration editor page component', () => {
       component.setFocusOnActiveTab('feedback');
 
       expect(focusSpy).toHaveBeenCalled();
+    });
+
+    it('should generate the aria label correctly', () => {
+      const mockWarnings = [
+        { message: 'Warning 1' },
+        { message: 'Warning 2' },
+        { message: 'Warning 3' },
+      ];
+
+      spyOn(component, 'getWarnings').and.returnValue(mockWarnings);
+      spyOn(component, 'countWarnings').and.returnValue(mockWarnings.length);
+
+      const ariaLabel = component.generateAriaLabelForWarnings();
+
+      expect(ariaLabel).toBe(
+        'Total warnings: 3. Warning 1: Warning 1. Warning 2: ' +
+        'Warning 2. Warning 3: Warning 3');
     });
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {

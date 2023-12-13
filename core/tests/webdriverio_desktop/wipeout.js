@@ -58,7 +58,7 @@ describe('When account is deleted it', function() {
       pendingAccountDeletionHeading,
       'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+      'http://localhost:8181/pending-account-deletion');
   });
 
   it('should delete private exploration', async function() {

@@ -37,7 +37,7 @@ module.exports = {
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
+          'matchingUrlPattern': '^http://localhost:8181/blog-dashboard$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
         {
