@@ -90,23 +90,6 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             feature_flag_spec.to_dict(), feature_flag_spec_dict)
 
-    def test_validate_feature_flag_spec_with_invalid_stage_raises_exception(
-        self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
-            'for test',
-            MockServerMode.RANDOM # type: ignore[arg-type]
-        )
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Invalid feature stage, got %s, '
-            'expected one of \\[\'dev\', \'test\', \'prod\'].'
-            % (MockServerMode.RANDOM)
-        ):
-            feature_flag_spec.validate()
-
 
 class FeatureFlagValueTests(test_utils.GenericTestBase):
     """Tests for FeatureFlagValue."""

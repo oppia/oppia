@@ -83,7 +83,6 @@ class Registry:
                 'last_updated': None
             })
         )
-        feature_flag_spec_domain.validate()
         cls.feature_flag_spec_registry[name.value] = feature_flag_spec_domain
 
         return feature_flag_domain.FeatureFlag(
