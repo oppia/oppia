@@ -680,6 +680,28 @@ describe('Classroom Admin Page component ', () => {
       expect(component.topicNameToPrerequisiteTopicNames).toEqual(
         topicNameToPrerequisiteTopicNames);
     }));
+  
+  it('should open AddTopicToClassroomModalComponent and add selected topics', () => {
+    const mockModalRef: NgbModalRef = {
+      componentInstance: {
+        topicsList: [],
+      },
+      result: Promise.resolve(['topicId1', 'topicId2']),
+    } as NgbModalRef;
+
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+    
+    spyOn(component, 'addTopicId');
+
+    component.openAddTopicModal();
+    
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(mockModalRef.componentInstance.topicsList).toBeDefined();
+
+    mockModalRef.result.then(() => {
+      expect(component.addTopicId).toHaveBeenCalledWith('topicId1');
+      expect(component.addTopicId).toHaveBeenCalledWith('topicId2');
+    });
 
   it(
     'should be able to add new topic ID to classroom', fakeAsync(() => {
