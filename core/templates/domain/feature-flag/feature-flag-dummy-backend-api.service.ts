@@ -23,6 +23,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { FeatureFlagDomainConstants } from
   'domain/feature-flag/feature-flag-domain.constants';
 
+interface Response {
+  is_enabled: boolean;
+  msg: string;
+}
+
 /**
  * Api service for the backend dummy handler that is gated by the
  * dummy_feature_flag_for_e2e_tests. This api is used for testing the
@@ -45,10 +50,9 @@ export class FeatureFlagDummyBackendApiService {
    */
   async isHandlerEnabled(): Promise<boolean> {
     const response = await this.http.get(
-      FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise();
-    return response['is_enabled'] === true;
+      FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise() as Response;
+    return response.is_enabled === true;
   }
-  
 }
 
 angular.module('oppia').factory(
