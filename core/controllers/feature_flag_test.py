@@ -54,13 +54,13 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        self.dev_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        self.dev_feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        self.prod_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_B, 'test', FeatureStages.PROD)
+        self.prod_feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_B, 'test', FeatureStages.PROD) # type: ignore[arg-type]
         registry.Registry.update_feature_flag(
             self.prod_feature_flag.name, True, 0, []
         )

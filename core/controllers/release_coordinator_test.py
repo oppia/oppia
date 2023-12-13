@@ -110,8 +110,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
+        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
@@ -135,8 +135,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
+        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
@@ -206,8 +206,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV)
+        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+            FeatureNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',

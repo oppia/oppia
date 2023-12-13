@@ -56,31 +56,31 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
 
     def test_create_feature_flag_with_the_same_name_failure(self) -> None:
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         with self.assertRaisesRegex(
             Exception, 'Feature flag with name feature_a already exists'
         ):
             # Here we use MyPy ignore because to test the functionalities with
             # dummy feature flags. create_feature_flag accepts feature-flag name
             #  to be of type platform_feature_list.FeatureNames.
-            registry.Registry.create_feature_flag( # type: ignore[arg-type]
-                FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+            registry.Registry.create_feature_flag(
+                FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
 
     def test_get_feature_flag(self) -> None:
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
         self.assertIsNotNone(feature_flag)
@@ -96,8 +96,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         self.assertIsNone(
             registry.Registry.load_feature_flag_from_storage(
                 FeatureNames.FEATURE_A.value))
@@ -132,8 +132,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
 
         registry.Registry.update_feature_flag(
             FeatureNames.FEATURE_A.value,
@@ -157,8 +157,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
@@ -173,8 +173,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
@@ -189,8 +189,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.TEST)
+        feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.TEST) # type: ignore[arg-type]
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
@@ -205,8 +205,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV)
+        registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
         self.assertIsNone(
             registry.Registry.load_feature_flag_from_storage(
                 FeatureNames.FEATURE_A.value))

@@ -80,20 +80,20 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        self.dev_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_A, 'a feature in dev stage',
+        self.dev_feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_A, 'a feature in dev stage', # type: ignore[arg-type]
             FeatureStages.DEV)
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        self.test_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_B, 'a feature in test stage',
+        self.test_feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_B, 'a feature in test stage', # type: ignore[arg-type]
             FeatureStages.TEST)
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        self.prod_feature_flag = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_C, 'a feature in prod stage',
+        self.prod_feature_flag = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_C, 'a feature in prod stage', # type: ignore[arg-type]
             FeatureStages.PROD)
 
         with self.swap(
@@ -136,20 +136,20 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag_one = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_ONE, 'feature flag one',
+        feature_flag_one = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_ONE, 'feature flag one', # type: ignore[arg-type]
             FeatureStages.DEV)
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag_two = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_TWO, 'feature flag two',
+        feature_flag_two = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_TWO, 'feature flag two', # type: ignore[arg-type]
             FeatureStages.DEV)
         # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
-        feature_flag_three = registry.Registry.create_feature_flag( # type: ignore[arg-type]
-            FeatureNames.FEATURE_THREE, 'feature flag three',
+        feature_flag_three = registry.Registry.create_feature_flag(
+            FeatureNames.FEATURE_THREE, 'feature flag three', # type: ignore[arg-type]
             FeatureStages.DEV)
 
         expected_feature_flags_dict = [
