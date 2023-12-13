@@ -107,7 +107,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        # Here we use arg-type ignore to test the functionalities with dummy
+        # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
         feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
@@ -132,7 +132,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Here we use arg-type ignore to test the functionalities with dummy
+        # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
         feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
@@ -203,7 +203,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Here we use arg-type ignore to test the functionalities with dummy
+        # Here we use MyPy ignore because to test the functionalities with dummy
         # feature flags. create_feature_flag accepts feature-flag name to be
         # of type platform_feature_list.FeatureNames.
         feature_flag = feature_flag_registry.Registry.create_feature_flag( # type: ignore[arg-type]
