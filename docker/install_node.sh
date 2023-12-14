@@ -17,6 +17,8 @@
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
+rm -rf oppia_tools/
+
 if [ "$OS_NAME" = "Windows" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
