@@ -20,7 +20,7 @@ This service provides different interfaces to access the feature flag values
 for clients and the backend respectively as they have different context for
 evaluation of feature flag values.
 
-For clients, please use 'evaluate_all_feature_flag_values_for_client' from
+For clients, please use 'evaluate_all_feature_flag_configs_for_client' from
 request handlers with client context.
 
 For the backend, please directly call 'is_feature_enabled' with the name of
@@ -130,7 +130,7 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     ]
 
 
-def evaluate_all_feature_flag_values_for_client(
+def evaluate_all_feature_flag_configs_for_client(
     context: platform_parameter_domain.EvaluationContext
 ) -> Dict[str, bool]:
     """Evaluates and returns the values for all feature flags.
@@ -142,7 +142,7 @@ def evaluate_all_feature_flag_values_for_client(
         dict. The keys are the feature names and the values are boolean
         results of corresponding flags.
     """
-    return _evaluate_feature_flag_values_for_context(
+    return _evaluate_feature_flag_configs_for_context(
         ALL_FEATURES_NAMES_SET, context)
 
 
@@ -157,7 +157,7 @@ def is_feature_enabled(feature_name: str) -> bool:
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    return _evaluate_feature_flag_value_for_server(feature_name)
+    return _evaluate_feature_flag_config_for_server(feature_name)
 
 
 def update_feature_flag(
@@ -245,7 +245,7 @@ def _create_evaluation_context_for_server() -> (
     )
 
 
-def _evaluate_feature_flag_values_for_context(
+def _evaluate_feature_flag_configs_for_context(
     feature_names_set: Set[str],
     context: platform_parameter_domain.EvaluationContext
 ) -> Dict[str, bool]:
@@ -280,7 +280,7 @@ def _evaluate_feature_flag_values_for_context(
     return result_dict
 
 
-def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
+def _evaluate_feature_flag_config_for_server(feature_name: str) -> bool:
     """Evaluates and returns the values of the feature flag, using context
     from the server only.
 
@@ -292,7 +292,7 @@ def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
         bool. The value of the feature flag, True if it's enabled.
     """
     context = _create_evaluation_context_for_server()
-    values_dict = _evaluate_feature_flag_values_for_context(
+    values_dict = _evaluate_feature_flag_configs_for_context(
         set([feature_name]), context)
     return values_dict[feature_name]
 

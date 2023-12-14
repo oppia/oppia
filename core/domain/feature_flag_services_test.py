@@ -200,7 +200,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             ):
                 feature_services.get_all_feature_flags()
 
-    def test_get_feature_flag_values_with_unknown_name_raises_error(
+    def test_get_feature_flag_configs_with_unknown_name_raises_error(
         self
     ) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
@@ -222,13 +222,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 []
             )
 
-    def test_get_all_feature_flag_values_in_dev_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_dev_returns_correct_values(
         self
     ) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with self.swap(constants, 'DEV_MODE', True):
                 self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_values(
+                    feature_services.evaluate_all_feature_flag_configs(
                         self.owner_id),
                     {
                         self.dev_feature_flag.name: True,
@@ -236,7 +236,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         self.prod_feature_flag.name: True,
                     })
 
-    def test_get_all_feature_flag_values_in_test_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_test_returns_correct_values(
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
@@ -245,7 +245,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with constants_swap, env_swap:
                 self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_values(
+                    feature_services.evaluate_all_feature_flag_configs(
                         self.owner_id),
                     {
                         self.dev_feature_flag.name: False,
@@ -253,7 +253,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         self.prod_feature_flag.name: True,
                     })
 
-    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_prod_returns_correct_values(
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
@@ -261,7 +261,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with constants_swap, env_swap:
                 self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_values(
+                    feature_services.evaluate_all_feature_flag_configs(
                         self.owner_id),
                     {
                         self.dev_feature_flag.name: False,
@@ -419,7 +419,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         return (user_1_id, user_2_id, user_3_id)
 
-    def test_feature_flag_value_is_same_for_user_with_every_retrieval(
+    def test_feature_flag_config_is_same_for_user_with_every_retrieval(
         self) -> None:
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())

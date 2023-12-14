@@ -158,14 +158,14 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 feature_flag_registry.Registry.get_feature_flag(
                     feature_flag.name))
             self.assertEqual(
-                updated_feature_flag.feature_flag_value.
+                updated_feature_flag.feature_flag_config.
                 force_enable_for_all_users,
                 False
             )
             self.assertEqual(
-                updated_feature_flag.feature_flag_value.rollout_percentage, 50)
+                updated_feature_flag.feature_flag_config.rollout_percentage, 50)
             self.assertEqual(
-                updated_feature_flag.feature_flag_value.user_group_ids, [])
+                updated_feature_flag.feature_flag_config.user_group_ids, [])
 
         feature_flag_registry.Registry.feature_flag_spec_registry.pop(
             feature_flag.name)

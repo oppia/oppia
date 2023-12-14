@@ -120,11 +120,11 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         updated_feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
         self.assertTrue(
-            updated_feature_flag.feature_flag_value.force_enable_for_all_users)
+            updated_feature_flag.feature_flag_config.force_enable_for_all_users)
         self.assertEqual(
-            updated_feature_flag.feature_flag_value.rollout_percentage, 100)
+            updated_feature_flag.feature_flag_config.rollout_percentage, 100)
         self.assertEqual(
-            updated_feature_flag.feature_flag_value.user_group_ids,
+            updated_feature_flag.feature_flag_config.user_group_ids,
             ['user_group_1', 'user_group_2', 'user_group_3']
         )
 
@@ -145,11 +145,11 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         updated_feature_flag = registry.Registry.get_feature_flag(
             FeatureNames.FEATURE_A.value)
         self.assertTrue(
-            updated_feature_flag.feature_flag_value.force_enable_for_all_users)
+            updated_feature_flag.feature_flag_config.force_enable_for_all_users)
         self.assertEqual(
-            updated_feature_flag.feature_flag_value.rollout_percentage, 50)
+            updated_feature_flag.feature_flag_config.rollout_percentage, 50)
         self.assertEqual(
-            updated_feature_flag.feature_flag_value.user_group_ids,
+            updated_feature_flag.feature_flag_config.user_group_ids,
             ['user_group_1', 'user_group_2']
         )
 
@@ -166,7 +166,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in test '
                     'environment.'
                 ):
-                    feature_flag.feature_flag_value.validate(
+                    feature_flag.feature_flag_config.validate(
                         feature_flag_domain.ServerMode.DEV)
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
@@ -182,7 +182,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in dev stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature_flag.feature_flag_value.validate(
+                    feature_flag.feature_flag_config.validate(
                         feature_flag_domain.ServerMode.DEV)
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
@@ -198,7 +198,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                     'Feature flag in test stage cannot be updated in prod '
                     'environment.'
                 ):
-                    feature_flag.feature_flag_value.validate(
+                    feature_flag.feature_flag_config.validate(
                         feature_flag_domain.ServerMode.TEST)
 
     def test_updated_feature_is_saved_in_storage(self) -> None:

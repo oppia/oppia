@@ -74,8 +74,8 @@ class Registry:
                 'feature_stage': feature_stage.value
             })
         )
-        feature_flag_value_domain = (
-            feature_flag_domain.FeatureFlagValue.from_dict({
+        feature_flag_config_domain = (
+            feature_flag_domain.FeatureFlagConfig.from_dict({
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,
                 'user_group_ids': [],
@@ -87,7 +87,7 @@ class Registry:
         return feature_flag_domain.FeatureFlag(
             name.value,
             feature_flag_spec_domain,
-            feature_flag_value_domain
+            feature_flag_config_domain
         )
 
     @classmethod
@@ -142,11 +142,11 @@ class Registry:
         """
         feature_flag = cls.get_feature_flag(name)
 
-        feature_flag.feature_flag_value.set_force_enable_for_all_users(
+        feature_flag.feature_flag_config.set_force_enable_for_all_users(
             force_enable_for_all_users)
-        feature_flag.feature_flag_value.set_rollout_percentage(
+        feature_flag.feature_flag_config.set_rollout_percentage(
             rollout_percentage)
-        feature_flag.feature_flag_value.set_user_group_ids(user_group_ids)
+        feature_flag.feature_flag_config.set_user_group_ids(user_group_ids)
 
         cls._update_feature_flag_storage_model(feature_flag)
 
@@ -163,22 +163,22 @@ class Registry:
             FeatureFlag|None. The loaded instance, None if it's not found
             in storage.
         """
-        feature_flag_value_model = config_models.FeatureFlagModel.get(
+        feature_flag_config_model = config_models.FeatureFlagModel.get(
             name, strict=False)
 
-        if feature_flag_value_model is not None:
+        if feature_flag_config_model is not None:
             last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag_value_model.last_updated)
+                feature_flag_config_model.last_updated)
             feature_flag_spec = cls.feature_flag_spec_registry[name]
             return feature_flag_domain.FeatureFlag.from_dict({
-                'name': feature_flag_value_model.id,
+                'name': feature_flag_config_model.id,
                 'description': feature_flag_spec.description,
                 'feature_stage': feature_flag_spec.feature_stage.value,
                 'force_enable_for_all_users': (
-                    feature_flag_value_model.force_enable_for_all_users),
+                    feature_flag_config_model.force_enable_for_all_users),
                 'rollout_percentage': (
-                    feature_flag_value_model.rollout_percentage),
-                'user_group_ids': feature_flag_value_model.user_group_ids,
+                    feature_flag_config_model.rollout_percentage),
+                'user_group_ids': feature_flag_config_model.user_group_ids,
                 'last_updated': last_updated
             })
         else:
@@ -193,7 +193,7 @@ class Registry:
         Args:
             feature_flag: FeatureFlag. The feature flag domain object.
         """
-        feature_flag.feature_flag_value.validate(
+        feature_flag.feature_flag_config.validate(
             feature_flag.feature_flag_spec.feature_stage)
 
         model_instance = config_models.FeatureFlagModel.get(
@@ -201,18 +201,18 @@ class Registry:
         if model_instance is None:
             model_instance = config_models.FeatureFlagModel.create(
                 feature_flag.name,
-                feature_flag.feature_flag_value.force_enable_for_all_users,
-                feature_flag.feature_flag_value.rollout_percentage,
-                feature_flag.feature_flag_value.user_group_ids
+                feature_flag.feature_flag_config.force_enable_for_all_users,
+                feature_flag.feature_flag_config.rollout_percentage,
+                feature_flag.feature_flag_config.user_group_ids
             )
             return
 
         model_instance.force_enable_for_all_users = (
-            feature_flag.feature_flag_value.force_enable_for_all_users)
+            feature_flag.feature_flag_config.force_enable_for_all_users)
         model_instance.rollout_percentage = (
-            feature_flag.feature_flag_value.rollout_percentage)
+            feature_flag.feature_flag_config.rollout_percentage)
         model_instance.user_group_ids = (
-            feature_flag.feature_flag_value.user_group_ids)
+            feature_flag.feature_flag_config.user_group_ids)
         model_instance.update_timestamps()
         model_instance.put()
 

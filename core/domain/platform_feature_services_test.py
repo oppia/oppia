@@ -205,7 +205,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 feature_services.get_all_feature_flag_dicts(),
                 expected_dicts)
 
-    def test_get_all_feature_flag_values_in_dev_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_dev_returns_correct_values(
         self
     ) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
@@ -218,14 +218,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 )
                 self.assertEqual(
                     feature_services.
-                    evaluate_all_feature_flag_values_for_client(context),
+                    evaluate_all_feature_flag_configs_for_client(context),
                     {
                         self.dev_feature.name: True,
                         self.test_feature.name: True,
                         self.prod_feature.name: True,
                     })
 
-    def test_get_all_feature_flag_values_in_test_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_test_returns_correct_values(
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
@@ -241,14 +241,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 )
                 self.assertEqual(
                     feature_services.
-                    evaluate_all_feature_flag_values_for_client(context),
+                    evaluate_all_feature_flag_configs_for_client(context),
                     {
                         self.dev_feature.name: False,
                         self.test_feature.name: True,
                         self.prod_feature.name: True,
                     })
 
-    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+    def test_get_all_feature_flag_configs_in_prod_returns_correct_values(
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
@@ -263,7 +263,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 )
                 self.assertEqual(
                     feature_services.
-                    evaluate_all_feature_flag_values_for_client(context),
+                    evaluate_all_feature_flag_configs_for_client(context),
                     {
                         self.dev_feature.name: False,
                         self.test_feature.name: False,
@@ -412,7 +412,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         feature_services.is_feature_enabled(
                             self.prod_feature.name))
 
-    def test_get_feature_flag_values_with_unknown_name_raises_error(
+    def test_get_feature_flag_configs_with_unknown_name_raises_error(
         self
     ) -> None:
         with self.assertRaisesRegex(

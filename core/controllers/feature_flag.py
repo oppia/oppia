@@ -38,7 +38,7 @@ class FeatureFlagsEvaluationHandler(
     def get(self) -> None:
         """Handles GET requests. Evaluates and returns all feature flags."""
         result_dict = (
-            feature_flag_services.evaluate_all_feature_flag_values(
+            feature_flag_services.evaluate_all_feature_flag_configs(
                 self.user_id)
         )
 

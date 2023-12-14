@@ -76,11 +76,11 @@ class FeatureFlag:
         self,
         name: str,
         feature_flag_spec: FeatureFlagSpec,
-        feature_flag_value: FeatureFlagValue
+        feature_flag_config: FeatureFlagConfig
     ):
         self._name = name
         self._feature_flag_spec = feature_flag_spec
-        self._feature_flag_value = feature_flag_value
+        self._feature_flag_config = feature_flag_config
 
     @property
     def name(self) -> str:
@@ -97,9 +97,9 @@ class FeatureFlag:
         return self._feature_flag_spec
 
     @property
-    def feature_flag_value(self) -> FeatureFlagValue:
-        """The FeatureFlagValue property of FeatureFlag."""
-        return self._feature_flag_value
+    def feature_flag_config(self) -> FeatureFlagConfig:
+        """The FeatureFlagConfig property of FeatureFlag."""
+        return self._feature_flag_config
 
     def validate(self) -> None:
         """Validates the FeatureFlag object."""
@@ -115,16 +115,16 @@ class FeatureFlag:
             dict. A dict mapping of all fields of FeatureFlag object.
         """
         last_updated = utils.convert_naive_datetime_to_string(
-            self._feature_flag_value.last_updated
-        ) if self._feature_flag_value.last_updated else None
+            self._feature_flag_config.last_updated
+        ) if self._feature_flag_config.last_updated else None
         return {
             'name': self._name,
             'description': self._feature_flag_spec.description,
             'feature_stage': self._feature_flag_spec.feature_stage.value,
             'force_enable_for_all_users': (
-                self._feature_flag_value.force_enable_for_all_users),
-            'rollout_percentage': self._feature_flag_value.rollout_percentage,
-            'user_group_ids': self._feature_flag_value.user_group_ids,
+                self._feature_flag_config.force_enable_for_all_users),
+            'rollout_percentage': self._feature_flag_config.rollout_percentage,
+            'user_group_ids': self._feature_flag_config.user_group_ids,
             'last_updated': last_updated
         }
 
@@ -143,7 +143,7 @@ class FeatureFlag:
             'description': feature_dict['description'],
             'feature_stage': feature_dict['feature_stage']
         })
-        feature_flag_value = FeatureFlagValue.from_dict({
+        feature_flag_config = FeatureFlagConfig.from_dict({
             'force_enable_for_all_users': feature_dict[
                 'force_enable_for_all_users'],
             'rollout_percentage': feature_dict['rollout_percentage'],
@@ -154,7 +154,7 @@ class FeatureFlag:
         return cls(
             feature_dict['name'],
             feature_flag_spec,
-            feature_flag_value
+            feature_flag_config
         )
 
 
@@ -236,8 +236,8 @@ class FeatureFlagSpec:
         )
 
 
-class FeatureFlagValueDict(TypedDict):
-    """Dictionary representing FeatureFlagValue object."""
+class FeatureFlagConfigDict(TypedDict):
+    """Dictionary representing FeatureFlagConfig object."""
 
     force_enable_for_all_users: bool
     rollout_percentage: int
@@ -245,8 +245,8 @@ class FeatureFlagValueDict(TypedDict):
     last_updated: Optional[str]
 
 
-class FeatureFlagValue:
-    """The FeatureFlagValue domain object."""
+class FeatureFlagConfig:
+    """The FeatureFlagConfig domain object."""
 
     def __init__(
         self,
@@ -272,7 +272,7 @@ class FeatureFlagValue:
     def set_force_enable_for_all_users(
         self, force_enable_for_all_users: bool
     ) -> None:
-        """Sets the force_enable_for_all_users of FeatureFlagValue.
+        """Sets the force_enable_for_all_users of FeatureFlagConfig.
 
         Args:
             force_enable_for_all_users: bool. The new value of
@@ -290,7 +290,7 @@ class FeatureFlagValue:
         return self._rollout_percentage
 
     def set_rollout_percentage(self, rollout_percentage: int) -> None:
-        """Sets the rollout_percentage of FeatureFlagValue.
+        """Sets the rollout_percentage of FeatureFlagConfig.
 
         Args:
             rollout_percentage: int. The new value of rollout_percentage.
@@ -307,7 +307,7 @@ class FeatureFlagValue:
         return self._user_group_ids
 
     def set_user_group_ids(self, user_group_ids: List[str]) -> None:
-        """Sets the user_group_ids of FeatureFlagValue.
+        """Sets the user_group_ids of FeatureFlagConfig.
 
         Args:
             user_group_ids: List[str]. The new value of user_group_ids.
@@ -326,7 +326,7 @@ class FeatureFlagValue:
         return self._last_updated
 
     def set_last_updated(self, last_updated: datetime.datetime) -> None:
-        """Sets the last_updated field of the FeatureFlagValue.
+        """Sets the last_updated field of the FeatureFlagConfig.
 
         Args:
             last_updated: datetime.datetime. The new value of last_updated.
@@ -334,7 +334,7 @@ class FeatureFlagValue:
         self._last_updated = last_updated
 
     def validate(self, feature_stage: ServerMode) -> None:
-        """Validates the FeatureFlagValue object."""
+        """Validates the FeatureFlagConfig object."""
         if self._rollout_percentage < 0 or self._rollout_percentage > 100:
             raise utils.ValidationError(
                 'Feature flag rollout-percentage should be between '
@@ -362,11 +362,11 @@ class FeatureFlagValue:
                 )
             )
 
-    def to_dict(self) -> FeatureFlagValueDict:
-        """Returns a dict representation of the FeatureFlagValue domain object.
+    def to_dict(self) -> FeatureFlagConfigDict:
+        """Returns a dict representation of the FeatureFlagConfig domain object.
 
         Returns:
-            dict. A dict mapping of all fields of FeatureFlagValue object.
+            dict. A dict mapping of all fields of FeatureFlagConfig object.
         """
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.last_updated else None
@@ -379,23 +379,23 @@ class FeatureFlagValue:
 
     @classmethod
     def from_dict(
-        cls, feature_flag_value_dict: FeatureFlagValueDict
-    ) -> FeatureFlagValue:
-        """Returns an FeatureFlagValue object from dictionary.
+        cls, feature_flag_config_dict: FeatureFlagConfigDict
+    ) -> FeatureFlagConfig:
+        """Returns an FeatureFlagConfig object from dictionary.
 
         Args:
-            feature_flag_value_dict: dict. A dict mapping of all fields of
-                FeatureFlagValue object.
+            feature_flag_config_dict: dict. A dict mapping of all fields of
+                FeatureFlagConfig object.
 
         Returns:
-            FeatureFlagValue. The corresponding FeatureFlagValue domain object.
+            FeatureFlagConfig. The corresponding FeatureFlagConfig domain object.
         """
         last_updated = utils.convert_string_to_naive_datetime_object(
-            feature_flag_value_dict['last_updated']
-        ) if isinstance(feature_flag_value_dict['last_updated'], str) else None
+            feature_flag_config_dict['last_updated']
+        ) if isinstance(feature_flag_config_dict['last_updated'], str) else None
         return cls(
-            feature_flag_value_dict['force_enable_for_all_users'],
-            feature_flag_value_dict['rollout_percentage'],
-            feature_flag_value_dict['user_group_ids'],
+            feature_flag_config_dict['force_enable_for_all_users'],
+            feature_flag_config_dict['rollout_percentage'],
+            feature_flag_config_dict['user_group_ids'],
             last_updated
         )

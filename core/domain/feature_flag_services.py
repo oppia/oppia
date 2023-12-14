@@ -120,19 +120,19 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
                     feature_flag.name])
             # Rulling out the possibility of last_updated to be None as we
             # are getting the feature flag value from the storage.
-            assert feature_flag.feature_flag_value.last_updated is not None
+            assert feature_flag.feature_flag_config.last_updated is not None
             last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag.feature_flag_value.last_updated)
+                feature_flag.feature_flag_config.last_updated)
             feature_flag = feature_flag_domain.FeatureFlag.from_dict({
                 'name': feature_flag.name,
                 'description': feature_flag_spec.description,
                 'feature_stage': feature_flag_spec.feature_stage.value,
                 'last_updated': last_updated,
                 'force_enable_for_all_users': (
-                    feature_flag.feature_flag_value.force_enable_for_all_users),
+                    feature_flag.feature_flag_config.force_enable_for_all_users),
                 'rollout_percentage': (
-                    feature_flag.feature_flag_value.rollout_percentage),
-                'user_group_ids': feature_flag.feature_flag_value.user_group_ids
+                    feature_flag.feature_flag_config.rollout_percentage),
+                'user_group_ids': feature_flag.feature_flag_config.user_group_ids
             })
             feature_flags.append(feature_flag)
         else:
@@ -169,30 +169,30 @@ def load_feature_flags_from_storage(
     """
     feature_flag_name_to_feature_flag_model_dict: Dict[str, Optional[
         feature_flag_domain.FeatureFlag]] = {}
-    feature_flag_value_models = config_models.FeatureFlagModel.get_multi(
+    feature_flag_config_models = config_models.FeatureFlagModel.get_multi(
         feature_flag_names_list)
 
-    for feature_flag_value_model in feature_flag_value_models:
-        if feature_flag_value_model:
+    for feature_flag_config_model in feature_flag_config_models:
+        if feature_flag_config_model:
             feature_flag_spec = (
                 registry.Registry.feature_flag_spec_registry[
-                    feature_flag_value_model.id])
+                    feature_flag_config_model.id])
             last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag_value_model.last_updated)
+                feature_flag_config_model.last_updated)
 
             feature_flag_name_to_feature_flag_model_dict[
-                feature_flag_value_model.id] = (
+                feature_flag_config_model.id] = (
                     feature_flag_domain.FeatureFlag.from_dict({
-                        'name': feature_flag_value_model.id,
+                        'name': feature_flag_config_model.id,
                         'description': feature_flag_spec.description,
                         'feature_stage': feature_flag_spec.feature_stage.value,
                         'force_enable_for_all_users': (
-                            feature_flag_value_model.force_enable_for_all_users
+                            feature_flag_config_model.force_enable_for_all_users
                         ),
                         'rollout_percentage': (
-                            feature_flag_value_model.rollout_percentage),
+                            feature_flag_config_model.rollout_percentage),
                         'user_group_ids': (
-                            feature_flag_value_model.user_group_ids),
+                            feature_flag_config_model.user_group_ids),
                         'last_updated': last_updated
                     })
                 )
@@ -243,7 +243,7 @@ def is_feature_flag_enabled(
     ):
         return False
 
-    if feature_flag.feature_flag_value.force_enable_for_all_users:
+    if feature_flag.feature_flag_config.force_enable_for_all_users:
         return True
     if user_id:
         salt = feature_flag_name.encode('utf-8')
@@ -252,12 +252,12 @@ def is_feature_flag_enabled(
         hash_value = int(hashed_user_id, 16)
         mod_result = hash_value % 1000
         threshold = (
-            feature_flag.feature_flag_value.rollout_percentage / 100) * 1000
+            feature_flag.feature_flag_config.rollout_percentage / 100) * 1000
         return bool(mod_result < threshold)
     return False
 
 
-def evaluate_all_feature_flag_values(user_id: Optional[str]) -> Dict[str, bool]:
+def evaluate_all_feature_flag_configs(user_id: Optional[str]) -> Dict[str, bool]:
     """Evaluates and returns the value of feature flags.
 
     Args:
