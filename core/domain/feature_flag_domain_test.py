@@ -290,6 +290,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         }
         feature_flag = feature_flag_domain.FeatureFlag.from_dict(
             feature_flag_dict)
+        feature_flag.validate()
         self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
 
     def test_validate_feature_flag_with_invalid_name_raises_exception(
