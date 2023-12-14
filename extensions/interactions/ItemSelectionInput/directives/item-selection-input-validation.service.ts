@@ -194,8 +194,8 @@ export class ItemSelectionInputValidationService {
       choicesContentIds: Set<string | null>,
       ruleIndex: number,
       answerIndex: number) {
-    let warningsList: Warning[] = [];
-    let ruleInputs = rule.inputs.x as string[];
+    const warningsList: Warning[] = [];
+    const ruleInputs = rule.inputs.x as string[];
     ruleInputs.forEach((ruleInput) => {
       if (!choicesContentIds.has(ruleInput)) {
         warningsList.push({
@@ -213,8 +213,8 @@ export class ItemSelectionInputValidationService {
   private getWarningsForRulesDuplicates(
       rules: Rule[],
       answerGroupIndex: number): Warning[] {
-    let warningsList: Warning[] = [];
-    let rulesSet = new Set<string>();
+    const warningsList: Warning[] = [];
+    const rulesSet = new Set<string>();
     rules.forEach((rule, ruleIndex) => {
       const ruleStr = JSON.stringify(rule.toBackendDict());
       if (rulesSet.has(ruleStr)) {
@@ -266,7 +266,7 @@ export class ItemSelectionInputValidationService {
         this.getWarningsForRulesDuplicates(rules, answerIndex));
 
       rules.forEach((rule, ruleIndex) => {
-        let ruleInputs = rule.inputs.x as string[];
+        const ruleInputs = rule.inputs.x as string[];
         warningsList = warningsList.concat(
           this.getWarningsForRulesInputs(
             rule, choicesContentIds, ruleIndex, answerIndex));
