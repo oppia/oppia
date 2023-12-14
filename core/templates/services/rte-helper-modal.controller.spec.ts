@@ -186,7 +186,7 @@ describe('RteHelperModalComponent', () => {
         component.ngOnInit();
         flush();
         component.customizationArgsForm.value[0] = 'oppia.org';
-        component.customizationArgsForm.value[1] = 'oppia';
+        component.customizationArgsForm.value[1] = 'oppia.com';
         component.onCustomizationArgsFormChange(
           component.customizationArgsForm.value);
         expect(component.saveButtonIsDisabled).toBe(true);
