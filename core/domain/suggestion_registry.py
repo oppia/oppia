@@ -717,7 +717,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         if self.change_cmd.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change_cmd.cmd)) # pylint: disable=line-too-long
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    self.change_cmd.cmd))
 
         if not utils.is_supported_audio_language_code(
                 self.change_cmd.language_code):
@@ -770,7 +771,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' % self.change_cmd.state_name) # pylint: disable=line-too-long
+                'Expected %s to be a valid state name'
+                % self.change_cmd.state_name)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
