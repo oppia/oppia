@@ -292,12 +292,8 @@ export class RteHelperModalComponent {
       }
       // First check if the `text` looks like a URL.
       const suffixes = ['.com', '.org', '.edu', '.gov'];
-      let textLooksLikeUrl = false;
-      for (const suffix of suffixes) {
-        if (text.endsWith(suffix)) {
-          textLooksLikeUrl = true;
-        }
-      }
+      let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
+
       if (!textLooksLikeUrl) {
         this.saveButtonIsDisabled = false;
       } else {
