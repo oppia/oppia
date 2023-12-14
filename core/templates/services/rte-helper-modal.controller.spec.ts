@@ -130,6 +130,7 @@ describe('RteHelperModalComponent', () => {
       });
     }));
   });
+
   describe('when there are validation errors in any form control', function() {
     var customizationArgSpecs = [{
       name: 'alt',
@@ -159,10 +160,14 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+
   describe('when there are validation errors in link form control', function() {
     var customizationArgSpecs = [{
-      url: 'oppia.org',
-      text: 'oppia',
+      name: 'url',
+      default_value: 'oppia.org',
+    }, {
+      name: 'text',
+      default_value: 'oppia',
     }];
 
     beforeEach(() => {
@@ -170,7 +175,8 @@ describe('RteHelperModalComponent', () => {
       component = fixture.componentInstance;
       component.componentId = 'link',
       component.attrsCustomizationArgsDict = {
-        heading: 'This value is not default.'
+        url: 'oppia.org',
+        text: 'oppia',
       };
       component.customizationArgSpecs = customizationArgSpecs;
     });
@@ -191,14 +197,21 @@ describe('RteHelperModalComponent', () => {
         flush();
       }));
   });
+
   describe('when there are validation errors in video form control',
     function() {
       var customizationArgSpecs = [{
-        name: 'heading',
-        default_value: 'default value'
-      }, {
         name: 'video_id',
         default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      }, {
+        name: 'start',
+        default_value: 0,
+      }, {
+        name: 'end',
+        default_value: 0,
+      }, {
+        name: 'autoplay',
+        default_value: false,
       }];
 
       beforeEach(() => {
@@ -206,7 +219,10 @@ describe('RteHelperModalComponent', () => {
         component = fixture.componentInstance;
         component.componentId = 'video',
         component.attrsCustomizationArgsDict = {
-          heading: 'This value is not default.',
+          video_id: 'Ntcw0H0hwPU',
+          start: 0,
+          end: 0,
+          autoplay: false,
         };
         component.customizationArgSpecs = customizationArgSpecs;
       });

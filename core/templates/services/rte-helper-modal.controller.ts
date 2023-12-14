@@ -277,11 +277,11 @@ export class RteHelperModalComponent {
         this.saveButtonIsDisabled = (start >= end);
       }
       if (this.saveButtonIsDisabled) {
-        this.errorMessage = (
+        this.updateRteErrorMessage(
           'Please ensure that the start time of the video is earlier than ' +
           'the end time.');
       } else {
-        this.errorMessage = '';
+        this.updateRteErrorMessage('');
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
@@ -290,20 +290,32 @@ export class RteHelperModalComponent {
         text = url;
         this.saveButtonIsDisabled = false;
       }
-      // If the text looks like a URL, strip the leading 'http://' or
-      // 'https://' or 'www.'.
-      const prefixes = ['https://', 'http://', 'www.'];
-      for (const prefix of prefixes) {
-        if (url.startsWith(prefix)) {
-          url = url.substring(prefix.length);
-        }
-        if (text.startsWith(prefix)) {
-          text = text.substring(prefix.length);
+      // First check if the `text` looks like a URL.
+      const suffixes = ['.com', '.org', '.edu', '.gov'];
+      let textLooksLikeUrl = false;
+      for (const suffix of suffixes) {
+        if (text.endsWith(suffix)) {
+          textLooksLikeUrl = true;
         }
       }
-      // After the cleanup, if the strings are not equal, then we do not
-      // allow the lesson creator to save it.
-      this.saveButtonIsDisabled = (url !== text);
+      if (!textLooksLikeUrl) {
+        this.saveButtonIsDisabled = false;
+      } else {
+      // If the text looks like a URL, strip the leading 'http://' or
+      // 'https://' or 'www.'.
+        const prefixes = ['https://', 'http://', 'www.'];
+        for (const prefix of prefixes) {
+          if (url.startsWith(prefix)) {
+            url = url.substring(prefix.length);
+          }
+          if (text.startsWith(prefix)) {
+            text = text.substring(prefix.length);
+          }
+        }
+        // After the cleanup, if the strings are not equal, then we do not
+        // allow the lesson creator to save it.
+        this.saveButtonIsDisabled = (url !== text);
+      }
       if (this.saveButtonIsDisabled) {
         this.updateRteErrorMessage(
           'It seems like clicking on this link will lead the user to a ' +
@@ -424,20 +436,11 @@ export class RteHelperModalComponent {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
         if (caName === 'video_id') {
-          const temp = this.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
-            temp.toString()
+          this.tmpCustomizationArgs[i].value = this.extractVideoIdFromVideoUrl(
+            this.tmpCustomizationArgs[i].value.toString()
           );
-        } else {
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-                CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] = this.tmpCustomizationArgs[i].value;
         }
       }
-      this.ngbActiveModal.close(customizationArgsDict);
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
@@ -451,28 +454,19 @@ export class RteHelperModalComponent {
           )[caName] =
             this.tmpCustomizationArgs[i].value ||
             this.tmpCustomizationArgs[i - 1].value;
-        } else {
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-                CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] = this.tmpCustomizationArgs[i].value;
         }
       }
-      this.ngbActiveModal.close(customizationArgsDict);
-    } else {
-      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
-        const caName = this.tmpCustomizationArgs[i].name;
-        (
-        customizationArgsDict as {
-          [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-            CustomizationArgsNameAndValueArray[number]['value'];
-        }
-        )[caName] = this.tmpCustomizationArgs[i].value;
-      }
-      this.ngbActiveModal.close(customizationArgsDict);
     }
+    for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
+      const caName = this.tmpCustomizationArgs[i].name;
+      (
+      customizationArgsDict as {
+        [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+          CustomizationArgsNameAndValueArray[number]['value'];
+      }
+      )[caName] = this.tmpCustomizationArgs[i].value;
+    }
+    this.ngbActiveModal.close(customizationArgsDict);
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
