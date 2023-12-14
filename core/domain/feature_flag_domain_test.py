@@ -145,7 +145,9 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         self.assertTrue(feature_flag_config.force_enable_for_all_users)
         self.assertEqual(feature_flag_config.rollout_percentage, 50)
         self.assertEqual(
-            feature_flag_config.user_group_ids, ['user_group_1', 'user_group_2'])
+            feature_flag_config.user_group_ids,
+            ['user_group_1', 'user_group_2']
+        )
         self.assertEqual(feature_flag_config.last_updated, current_time)
 
     def test_validate_feature_flag_config_passes_without_exception(

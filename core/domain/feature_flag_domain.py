@@ -388,7 +388,8 @@ class FeatureFlagConfig:
                 FeatureFlagConfig object.
 
         Returns:
-            FeatureFlagConfig. The corresponding FeatureFlagConfig domain object.
+            FeatureFlagConfig. The corresponding FeatureFlagConfig domain
+            object.
         """
         last_updated = utils.convert_string_to_naive_datetime_object(
             feature_flag_config_dict['last_updated']

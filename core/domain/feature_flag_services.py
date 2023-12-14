@@ -129,10 +129,12 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
                 'feature_stage': feature_flag_spec.feature_stage.value,
                 'last_updated': last_updated,
                 'force_enable_for_all_users': (
-                    feature_flag.feature_flag_config.force_enable_for_all_users),
+                    feature_flag.feature_flag_config.force_enable_for_all_users
+                ),
                 'rollout_percentage': (
                     feature_flag.feature_flag_config.rollout_percentage),
-                'user_group_ids': feature_flag.feature_flag_config.user_group_ids
+                'user_group_ids': (
+                    feature_flag.feature_flag_config.user_group_ids)
             })
             feature_flags.append(feature_flag)
         else:
@@ -257,7 +259,9 @@ def is_feature_flag_enabled(
     return False
 
 
-def evaluate_all_feature_flag_configs(user_id: Optional[str]) -> Dict[str, bool]:
+def evaluate_all_feature_flag_configs(
+    user_id: Optional[str]
+) -> Dict[str, bool]:
     """Evaluates and returns the value of feature flags.
 
     Args:
