@@ -2875,7 +2875,9 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+                
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                     return 'hi' #@
                 """
@@ -3415,6 +3417,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
+                # TODO(#sll): Here we use object because stubs of protobuf
+                # are not available yet. So, instead of Any we used object
+                # here.
                 def foo(exp_id: object) -> object:
                     return 'hi' #@
                 """
