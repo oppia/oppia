@@ -187,11 +187,11 @@ describe('Diagnostic test player component', () => {
     let cData1: CreatorTopicSummary = new CreatorTopicSummary(
       'dummy', 'addition', 3, 3, 3, 3, 1,
       'en', 'dummy', 1, 1, 1, 1, true,
-      true, 'math', 'public/img.webp', 'red', 'add');
+      true, 'math', 'public/img.webp', 'red', 'add', 1, 1, [5, 4], [3, 4]);
     let cData2: CreatorTopicSummary = new CreatorTopicSummary(
       'dummy2', 'division', 2, 2, 3, 3, 0,
       'es', 'dummy2', 1, 1, 1, 1, true,
-      true, 'math', 'public/img1.png', 'green', 'div');
+      true, 'math', 'public/img1.png', 'green', 'div', 1, 1, [5, 4], [3, 4]);
 
     let array: CreatorTopicSummary[] = [cData1, cData2];
     let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');

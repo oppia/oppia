@@ -112,12 +112,21 @@ export class ContributorDashboardPageComponent
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
+
+    const userIsReviewingQuestionSuggestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'add_question' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
+    const userIsReviewingTranslationSuggestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'translate_content' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
+
     return activeTabDetail.customizationOptions.includes('topic') ||
-      (
-        activeTabType === 'reviews' &&
-        activeSuggestionType === 'translate_content' &&
-        this.activeTabName !== 'submitQuestionTab'
-      );
+      userIsReviewingQuestionSuggestions ||
+      userIsReviewingTranslationSuggestions;
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
@@ -197,6 +206,8 @@ export class ContributorDashboardPageComponent
       .then((topicNames) => {
         // TODO(#15710): Set default active topic to 'All'.
         if (topicNames.length <= 0) {
+          this.translationTopicService.setActiveTopicName(
+            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
           return;
         }
         this.topicName = topicNames[0];

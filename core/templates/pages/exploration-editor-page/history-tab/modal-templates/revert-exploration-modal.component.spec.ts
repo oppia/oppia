@@ -17,7 +17,7 @@
  * @fileoverview Unit tests for the RevertExplorationModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -74,5 +74,17 @@ describe('Revert Exploration Modal Component', function() {
   it('should get exploration url when exploration id is provided', () => {
     expect(component.getExplorationUrl('0')).toBe('/explore/exp1?v=0');
     expect(component.getExplorationUrl('1')).toBe('/explore/exp1?v=1');
+  });
+
+  it('should focus on modal header when the modal is finished loading', () => {
+    const mockElementRef = new ElementRef(document.createElement('h3'));
+    component.revertExplorationHeadingRef = mockElementRef;
+    spyOn(component.revertExplorationHeadingRef.nativeElement, 'focus');
+
+    component.ngAfterViewInit();
+
+    expect(
+      component.revertExplorationHeadingRef.nativeElement.focus
+    ).toHaveBeenCalled();
   });
 });

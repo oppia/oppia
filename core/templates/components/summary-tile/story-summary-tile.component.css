@@ -147,6 +147,44 @@ oppia-story-summary-tile .oppia-chapters-count {
   padding-left: 10px;
 }
 
+oppia-story-summary-tile .chapters-list {
+  margin-bottom: 20px;
+}
+
+oppia-story-summary-tile .coming-soon-chapters {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+oppia-story-summary-tile .chapters-heading {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10%;
+}
+
+oppia-story-summary-tile .heading-separator {
+  background-color: #525252;
+  height: 1px;
+  margin-top: 0;
+  width: 85%;
+}
+
+oppia-story-summary-tile .heading-label {
+  font-size: 1.2em;
+  font-weight: 1000;
+}
+
+oppia-story-summary-tile .chapters-count {
+  color: #959595;
+  font-size: 1.1em;
+  font-weight: 1000;
+}
+
+oppia-story-summary-tile .tablet-view {
+  padding: 0;
+  width: 100%;
+}
+
 @media (max-width: 800px) {
   oppia-story-summary-tile .oppia-story-title {
     padding-top: 0;
@@ -319,4 +357,8 @@ oppia-story-summary-tile .down-caret-position {
 
 oppia-story-summary-tile .up-caret-position {
   width: 24px;
+}
+
+:lang(ar) .oppia-story-summary-tile .story-progress-svg {
+  transform: rotate(270deg);
 }

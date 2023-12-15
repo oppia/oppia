@@ -8,12 +8,14 @@
           [attr.dropdown]="getTotalWarningsCount()"
           class="nav-item icon nav-list-item"
           ngbDropdown
+          role="menu"
           (click)="selectMainTab()">
         <a ngbTooltip="Main Editor"
            placement="bottom"
            class="nav-link navbar-tab"
            tabindex="0"
            aria-label="Main Editor"
+           role="menuitem"
            (keydown.enter)="selectMainTab()">
           <i class="fas fa-pen navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected() }">
@@ -25,6 +27,8 @@
              (mouseover)="warningsAreShown=true"
              (mouseleave)="hideWarnings()"
              (click)="selectMainTab()"
+             (focus)="warningsAreShown=true"
+             role="menuitem"
              tabindex="0"
              [attr.aria-label]="getTotalWarningsCount() + ' Warnings'">
           <span class="oppia-editor-warnings-count">
@@ -32,6 +36,8 @@
           </span>
           <ul ngbDropdownMenu
               *ngIf="warningsAreShown"
+              tabindex="0"
+              (blur)="hideWarnings()"
               class="dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text oppia-editor-wrapped-warning-text"
@@ -51,11 +57,13 @@
       <li *ngIf="isInTopicEditorTabs()"
           [ngClass]="{'navbar-tab-active': getActiveTabName() === 'questions'}"
           class="nav-item icon nav-list-item"
+          role="menu"
           (click)="selectQuestionsTab()">
         <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
            ngbTooltip="Questions Editor"
            placement="bottom"
            aria-label="Question editor"
+           role="menuitem"
            tabindex="0"
            (keydown.enter)="selectQuestionsTab()">
           <i class="fas fa-book-open navbar-tab-icon"
@@ -66,12 +74,14 @@
 
       <li [ngClass]="{'navbar-tab-active': isInPreviewTab()}"
           class="nav-item icon nav-list-item"
+          role="menu"
           (click)="openTopicViewer()">
         <a class="nav-link navbar-tab"
            ngbTooltip="Preview"
            placement="bottom"
            tabindex="0"
            aria-label="Preview button"
+           role="menuitem"
            (keydown.enter)="openTopicViewer()">
           <i class="fas fa-play navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">

@@ -619,8 +619,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + (datetime_obj.microsecond / 1000.0)
+    return datetime_obj.timestamp() * 1000.0
 
 
 def convert_millisecs_time_to_datetime_object(
@@ -673,7 +672,9 @@ def get_current_time_in_millisecs() -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    return get_time_in_millisecs(datetime.datetime.utcnow())
+    return get_time_in_millisecs(
+        datetime.datetime.now(datetime.timezone.utc)
+    )
 
 
 def get_human_readable_time_string(time_msec: float) -> str:

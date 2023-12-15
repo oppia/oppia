@@ -56,9 +56,6 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Versions of libraries used in backend.
-PILLOW_VERSION = '9.0.1'
-
 # Buf version.
 BUF_VERSION = '0.29.0'
 
@@ -89,8 +86,10 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
+GOOGLE_CLOUD_SDK_HOME = (
+    '/google-cloud-sdk' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk'
+    ))
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -101,7 +100,8 @@ NG_BIN_PATH = (
 DEV_APPSERVER_PATH = (
     os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+NODE_PATH = '/usr' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+    OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -215,10 +215,13 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
-    'duplicate-blog-post.spec.js'
+    'duplicate-blog-post.spec.js',
+    'translation-admin-tests/add-translation-rights.spec.js',
+    'translation-admin-tests/remove-translation-rights.spec.js'
+
 ]
 
-GAE_PORT_FOR_E2E_TESTING: Final = 9001
+GAE_PORT_FOR_E2E_TESTING: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
     GAE_PORT_FOR_E2E_TESTING,
@@ -644,7 +647,8 @@ def inplace_replace_file(
     expected_number_of_replacements: Optional[int] = None
 ) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
-    to replace the file's content line by line.
+    to replace the file's content line by line. The old file is kept as-is until
+    it is replaced.
 
     Note:
         This function should only be used with files that are processed line by
@@ -661,26 +665,26 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    backup_filename = '%s.bak' % filename
-    shutil.copyfile(filename, backup_filename)
+    new_filename = '%s.new' % filename
+    shutil.copyfile(filename, new_filename)
     new_contents = []
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(backup_filename, 'r') as f:
-            for line in f:
+        with utils.open_file(filename, 'r') as old_file:
+            for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(filename, 'w') as f:
+        with utils.open_file(new_filename, 'w') as new_file:
             for line in new_contents:
-                f.write(line)
+                new_file.write(line)
 
         if (
-                expected_number_of_replacements is not None and
-                total_number_of_replacements != expected_number_of_replacements
+            expected_number_of_replacements is not None and
+            total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
                 'Wrong number of replacements. Expected %s. Performed %s.' % (
@@ -689,47 +693,12 @@ def inplace_replace_file(
                 )
             )
 
-        os.remove(backup_filename)
+        os.replace(new_filename, filename)
 
     except Exception:
-        # Restore the content if there was en error.
-        os.remove(filename)
-        shutil.move(backup_filename, filename)
+        # Drop the new file if there was an error.
+        os.remove(new_filename)
         raise
-
-
-@contextlib.contextmanager
-def inplace_replace_file_context(
-    filename: str, regex_pattern: str, replacement_string: str
-) -> Generator[None, None, None]:
-    """Context manager in which the file's content is replaced according to the
-    given regex pattern. This function should only be used with files that are
-    processed line by line.
-
-    Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-
-    Yields:
-        None. Nothing.
-    """
-    backup_filename = '%s.bak' % filename
-    regex = re.compile(regex_pattern)
-
-    shutil.copyfile(filename, backup_filename)
-
-    try:
-        with utils.open_file(backup_filename, 'r') as f:
-            new_contents = [regex.sub(replacement_string, line) for line in f]
-        with utils.open_file(filename, 'w') as f:
-            f.write(''.join(new_contents))
-        yield
-    finally:
-        if os.path.isfile(filename) and os.path.isfile(backup_filename):
-            os.remove(filename)
-        if os.path.isfile(backup_filename):
-            shutil.move(backup_filename, filename)
 
 
 def wait_for_port_to_be_in_use(port_number: int) -> None:
@@ -881,7 +850,8 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+            urlerror.URLError, ssl.SSLError,
+            client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
@@ -982,39 +952,40 @@ def modify_constants(
     if feconf.OPPIA_IS_DOCKERIZED:
         return
 
-    branch_name_variable = (
-        '"BRANCH_NAME": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
+    if prod_env or version_info_must_be_set is False:
+        branch_name_variable = (
+            '"BRANCH_NAME": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
         )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"BRANCH_NAME": ".*"',
-        branch_name_variable,
-        expected_number_of_replacements=1
-    )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"BRANCH_NAME": ".*"',
+            branch_name_variable,
+            expected_number_of_replacements=1
+        )
 
-    short_commit_hash_variable = (
-        '"SHORT_COMMIT_HASH": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--short', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
+        short_commit_hash_variable = (
+            '"SHORT_COMMIT_HASH": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--short', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
         )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"SHORT_COMMIT_HASH": ".*"',
-        short_commit_hash_variable,
-        expected_number_of_replacements=1
-    )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"SHORT_COMMIT_HASH": ".*"',
+            short_commit_hash_variable,
+            expected_number_of_replacements=1
+        )
 
 
 def is_oppia_server_already_running() -> bool:

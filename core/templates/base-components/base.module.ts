@@ -20,6 +20,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CookieModule } from 'ngx-cookie';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -56,6 +57,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    NgbModule,
     NgBootstrapModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.

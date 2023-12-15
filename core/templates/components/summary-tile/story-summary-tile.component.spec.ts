@@ -23,12 +23,21 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
 
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -37,6 +46,12 @@ describe('StorySummaryTileComponent', () => {
       declarations: [
         StorySummaryTileComponent,
         MockTranslatePipe
+      ],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        }
       ]
     }).compileComponents();
   }));
@@ -49,6 +64,14 @@ describe('StorySummaryTileComponent', () => {
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
+  });
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
   it('should set properties on initialization', () => {
@@ -74,10 +97,44 @@ describe('StorySummaryTileComponent', () => {
           acquired_skill_ids: [],
           outline: '',
           outline_is_finalized: true,
-          exploration_id: null,
+          exploration_id: 'exp-1',
           thumbnail_bg_color: null,
           thumbnail_filename: null,
-          status: 'Draft',
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_2',
+          title: 'node2',
+          description: 'This is node 2',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: 'exp-2',
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_3',
+          title: 'node3',
+          description: 'This is node 3',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: 'exp-3',
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Ready To Publish',
           planned_publication_date_msecs: null,
           last_modified_msecs: null,
           first_publication_date_msecs: null,
@@ -99,13 +156,17 @@ describe('StorySummaryTileComponent', () => {
 
     expect(component.nodeCount).toBe(3);
     expect(component.completedStoriesCount).toBe(1);
-    expect(component.storyProgress).toBe(33);
+    expect(component.storyProgress).toBe(50);
     expect(component.storyLink).toBe('#');
     expect(component.storyTitle).toBe('Story Title');
     expect(component.storyTitleTranslationKey).toEqual(
       'I18N_STORY_storyId_TITLE');
     expect(component.nodeTitlesTranslationKeys).toEqual(
-      ['I18N_EXPLORATION_explId_TITLE']);
+      [
+        'I18N_EXPLORATION_explId_TITLE',
+        'I18N_EXPLORATION_explId_TITLE',
+        'I18N_EXPLORATION_explId_TITLE'
+      ]);
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
     let hackyStoryTitleTranslationIsDisplayed =
@@ -115,18 +176,20 @@ describe('StorySummaryTileComponent', () => {
       component.isHackyNodeTitleTranslationDisplayed(0);
     expect(hackyNodeTitleTranslationIsDisplayed).toBe(true);
     // Here the value is calculated by the formula -> (circumference -
-    // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3
-    // = 36.88790204786391. Along with this value, gapLength (5) is also
-    // concatenated to the string.
-    expect(component.strokeDashArrayValues).toBe('36.88790204786391 5');
+    // (availableNodeCount * gapLength))/availableNodeCount =
+    // (2 * 20 * Math.PI - (2*5)) / 2 = 57.83185307179586. Along with this
+    // value, gapLength (5) is also concatenated to the string.
+    expect(component.strokeDashArrayValues).toBe('57.83185307179586 5');
 
     // Here the value for completed node is calculated with the same formula,
     // and the last node's value is the difference of (2 * 20 * Math.PI) and the
     // first value.
     expect(component.completedStrokeDashArrayValues).toBe(
-      '36.88790204786391 88.7758040957278');
+      '57.83185307179586 67.83185307179586');
     expect(component.thumbnailBgColor).toBe('#FF9933');
     expect(component.nodeTitles).toEqual(['node1', 'node2', 'node3']);
+    expect(component.availableNodeCount).toBe(2);
+    expect(component.comingSoonNodeCount).toBe(1);
   });
 
   it('should not show thumbnail if thumbnail filename is not given', () => {
@@ -324,7 +387,26 @@ describe('StorySummaryTileComponent', () => {
       story_is_published: true,
       completed_node_titles: [],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }
+      ]
     });
     let circumference = (2 * 20 * Math.PI).toString();
 
@@ -344,7 +426,26 @@ describe('StorySummaryTileComponent', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }
+      ]
     });
 
     component.ngOnInit();
@@ -363,7 +464,94 @@ describe('StorySummaryTileComponent', () => {
       story_is_published: true,
       completed_node_titles: ['node1', 'node2', 'node3'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_2',
+          title: 'node2',
+          description: 'This is node 2',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_3',
+          title: 'node3',
+          description: 'This is node 3',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_4',
+          title: 'node4',
+          description: 'This is node 4',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }, {
+          id: 'node_5',
+          title: 'node5',
+          description: 'This is node 5',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null,
+          status: 'Published',
+          planned_publication_date_msecs: null,
+          last_modified_msecs: null,
+          first_publication_date_msecs: null,
+          unpublishing_reason: null
+        }
+      ]
     });
 
     component.ngOnInit();

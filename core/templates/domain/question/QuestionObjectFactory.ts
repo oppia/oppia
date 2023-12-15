@@ -23,7 +23,6 @@ import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
 import { AppConstants } from 'app.constants';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 /* Null in ID denotes a new question whose ID is yet
   to be set, this ID is later set in backend API service. */
@@ -113,47 +112,6 @@ export class Question {
 
   setNextContentIdIndex(nextContentIdIndex: number): void {
     this._nextContentIdIndex = nextContentIdIndex;
-  }
-
-  // Returns 'null' when the message is valid.
-  getValidationErrorMessage(): string | null {
-    var interaction = this._stateData.interaction;
-    var interactionId = interaction.id as InteractionSpecsKey;
-    var questionContent = this._stateData.content._html;
-    if (questionContent.length === 0) {
-      return 'Please enter a question.';
-    }
-    if (interaction.id === null) {
-      return 'An interaction must be specified';
-    }
-    if (
-      interaction.defaultOutcome?.feedback._html.length === 0
-    ) {
-      return 'Please enter a feedback for the default outcome.';
-    }
-    if (interaction.hints.length === 0) {
-      return 'At least 1 hint should be specified';
-    }
-    if (
-      !interaction.solution &&
-      InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId
-      ].can_have_solution
-    ) {
-      return 'A solution must be specified';
-    }
-    var answerGroups = this._stateData.interaction.answerGroups;
-    var atLeastOneAnswerCorrect = false;
-    for (var i = 0; i < answerGroups.length; i++) {
-      if (answerGroups[i].outcome.labelledAsCorrect) {
-        atLeastOneAnswerCorrect = true;
-        continue;
-      }
-    }
-    if (!atLeastOneAnswerCorrect) {
-      return 'At least one answer should be marked correct';
-    }
-    return null;
   }
 
   getUnaddressedMisconceptionNames(

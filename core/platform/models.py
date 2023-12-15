@@ -114,6 +114,10 @@ class _Gae(Platform):
             elif name == Names.BLOG:
                 from core.storage.blog import gae_models as blog_models
                 returned_models.append(blog_models)
+            elif name == Names.BLOG_STATISTICS:
+                from core.storage.blog_statistics import (
+                    gae_models as blog_stats_models)
+                returned_models.append(blog_stats_models)
             elif name == Names.CLASSIFIER:
                 from core.storage.classifier import (
                     gae_models as classifier_models)

@@ -1936,3 +1936,18 @@ class TopicRightsTests(test_utils.GenericTestBase):
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
         self.assertFalse(self.topic_summary.is_manager(self.user_id_b))
+
+
+class TopicChapterCountsTests(test_utils.GenericTestBase):
+    """Tests for Topic Chapter Counts domain object."""
+
+    def test_topic_chapter_counts_object_is_created(self) -> None:
+        topic_chapter_counts = topic_domain.TopicChapterCounts(
+            2, 3, [4, 5], [2, 2])
+        self.assertEqual(topic_chapter_counts.total_upcoming_chapters_count, 2)
+        self.assertEqual(topic_chapter_counts.total_overdue_chapters_count, 3)
+        self.assertEqual(
+            topic_chapter_counts.total_chapter_counts_for_each_story, [4, 5])
+        self.assertEqual(
+            topic_chapter_counts.published_chapter_counts_for_each_story,
+            [2, 2])

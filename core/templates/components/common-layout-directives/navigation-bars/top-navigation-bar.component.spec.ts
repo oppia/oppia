@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -35,13 +36,9 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
 import { CookieService } from 'ngx-cookie';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { AppConstants } from 'app.constants';
@@ -49,12 +46,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 class MockPlatformFeatureService {
   status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    },
-    BlogPages: {
-      isEnabled: false
-    },
     ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false
     }
@@ -94,7 +85,6 @@ class MockWindowRef {
 }
 
 describe('TopNavigationBarComponent', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -109,7 +99,6 @@ describe('TopNavigationBarComponent', () => {
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
@@ -157,7 +146,8 @@ describe('TopNavigationBarComponent', () => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        NgbModule,
       ],
       declarations: [
         TopNavigationBarComponent,
@@ -209,12 +199,9 @@ describe('TopNavigationBarComponent', () => {
     feedbackUpdatesBackendApiService =
         TestBed.inject(FeedbackUpdatesBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    accessValidationBackendApiService = TestBed
-      .inject(AccessValidationBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(searchService, 'onSearchBarLoaded')
@@ -697,36 +684,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.donateMenuOffset).toBe(-10);
   }));
 
-  it('should fetch classroom data', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
-
-    let cData1: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy', 'addition', 3, 3, 3, 3, 1,
-      'en', 'dummy', 1, 1, 1, 1, true,
-      true, 'math', 'public/img.webp', 'red', 'add');
-    let cData2: CreatorTopicSummary = new CreatorTopicSummary(
-      'dummy2', 'division', 2, 2, 3, 3, 0,
-      'es', 'dummy2', 1, 1, 1, 1, true,
-      true, 'math', 'public/img1.png', 'green', 'div');
-
-    let array: CreatorTopicSummary[] = [cData1, cData2];
-    let classroomData = new ClassroomData('test', array, 'dummy', 'dummy');
-    let topicTitlesTranslationKeys: string[] =
-      ['I18N_TOPIC_dummy_TITLE', 'I18N_TOPIC_dummy2_TITLE'];
-    spyOn(
-      classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.resolveTo(classroomData);
-
-    component.ngOnInit();
-
-    tick();
-
-    expect(component.classroomData).toEqual(array);
-    expect(component.topicTitlesTranslationKeys).toEqual(
-      topicTitlesTranslationKeys);
-  }));
-
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(false, true);
@@ -740,32 +697,6 @@ describe('TopNavigationBarComponent', () => {
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(TopNavigationBarComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
-  });
-
-  it('should return correct blog url if the blog homepage feature is enabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-
-      expect(component.getOppiaBlogUrl()).toEqual('/blog');
-    });
-
-  it('should return correct blog url if the blog homepage feature is disabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-
-      expect(component.getOppiaBlogUrl()).toEqual(
-        'https://medium.com/oppia-org');
-    });
 
   it('should return correct value for show feedback updates' +
     'in profile pic drop down menu feature flag', () => {

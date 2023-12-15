@@ -20,8 +20,7 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 4
 # The current version of story contents dict in the story schema.
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
-INCOMING_EMAILS_DOMAIN_NAME = ''
-ADMIN_EMAIL_ADDRESS = 'adm@example.com'
+ADMIN_EMAIL_ADDRESS = ''
 SYSTEM_EMAIL_ADDRESS = 'sys@example.com'
 NOREPLY_EMAIL_ADDRESS = 'norep@example.com'
 

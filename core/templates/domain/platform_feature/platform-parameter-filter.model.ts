@@ -19,16 +19,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export enum PlatformParameterFilterType {
-  ServerMode = 'server_mode',
   PlatformType = 'platform_type',
   AppVersion = 'app_version',
   AppVersionFlavor = 'app_version_flavor'
-}
-
-export enum ServerMode {
-  Dev = 'dev',
-  Test = 'test',
-  Prod = 'prod',
 }
 
 /**

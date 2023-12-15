@@ -33,7 +33,6 @@ import { StateInteractionIdService } from '../state-editor-properties-services/s
 import { AppConstants } from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
 import { AlertsService } from 'services/alerts.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -42,12 +41,10 @@ import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-descr
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 
 @Component({
@@ -93,7 +90,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   constructor(
     private stateEditorService: StateEditorService,
     private responsesService: ResponsesService,
-    private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
     private externalSaveService: ExternalSaveService,
     private stateInteractionIdService: StateInteractionIdService,
@@ -137,86 +133,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  suppressDefaultAnswerGroup(): boolean {
-    let interactionId = this.getCurrentInteractionId();
-    let answerGroups = this.responsesService.getAnswerGroups();
-    // This array contains the text of each of the possible answers
-    // for the interaction.
-    let answerChoices = [];
-    let customizationArgs = (
-      this.stateCustomizationArgsService.savedMemento);
-    let handledAnswersArray: InteractionRuleInputs[] = [];
-
-    if (interactionId === 'MultipleChoiceInput') {
-      let numChoices = this.getAnswerChoices().length;
-      let choiceIndices = [];
-      // Collect all answers which have been handled by at least one
-      // answer group.
-      for (let i = 0; i < answerGroups.length; i++) {
-        for (let j = 0; j < answerGroups[i].rules.length; j++) {
-          handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
-        }
-      }
-      for (let i = 0; i < numChoices; i++) {
-        choiceIndices.push(i);
-      }
-      // We only suppress the default warning if each choice index has
-      // been handled by at least one answer group.
-      return choiceIndices.every((choiceIndex) => {
-        return handledAnswersArray.indexOf(choiceIndex) !== -1;
-      });
-    } else if (interactionId === 'ItemSelectionInput') {
-      let maxSelectionCount = (
-        (customizationArgs as ItemSelectionInputCustomizationArgs)
-          .maxAllowableSelectionCount.value);
-      if (maxSelectionCount === 1) {
-        let numChoices = this.getAnswerChoices().length;
-        // This array contains a list of booleans, one for each answer
-        // choice. Each boolean is true if the corresponding answer has
-        // been covered by at least one rule, and false otherwise.
-        handledAnswersArray = [];
-        for (let i = 0; i < numChoices; i++) {
-          handledAnswersArray.push(false);
-          answerChoices.push(this.getAnswerChoices()[i].val);
-        }
-
-        let answerChoiceToIndex:
-         Record<string, number> = {};
-        answerChoices.forEach((answerChoice, choiceIndex) => {
-          answerChoiceToIndex[answerChoice as string] = choiceIndex;
-        });
-
-        answerGroups.forEach((answerGroup) => {
-          let rules = answerGroup.rules;
-          rules.forEach((rule) => {
-            let ruleInputs = rule.inputs.x;
-            Object.keys(ruleInputs).forEach((ruleInput) => {
-              let choiceIndex = answerChoiceToIndex[ruleInput];
-              if (rule.type === 'Equals' ||
-                  rule.type === 'ContainsAtLeastOneOf') {
-                handledAnswersArray[choiceIndex] = true;
-              } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
-                for (let i = 0; i < handledAnswersArray.length; i++) {
-                  if (i !== choiceIndex) {
-                    handledAnswersArray[i] = true;
-                  }
-                }
-              }
-            });
-          });
-        });
-
-        let areAllChoicesCovered = handledAnswersArray.every(
-          (handledAnswer) => {
-            return handledAnswer;
-          });
-        // We only suppress the default warning if each choice text has
-        // been handled by at least one answer group, based on rule
-        // type.
-        return areAllChoicesCovered;
-      }
-    }
-    return false;
+  shouldHideDefaultAnswerGroup(): boolean {
+    return this.responsesService.shouldHideDefaultAnswerGroup();
   }
 
   onChangeSolicitAnswerDetails(): void {

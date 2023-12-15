@@ -19,7 +19,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { AppConstants } from 'app.constants';
 import './oppia-footer.component.css';
@@ -39,19 +38,15 @@ export class OppiaFooterComponent {
 
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
-  versionInformationIsShown: boolean = this.router.url === '/about';
+  versionInformationIsShown: boolean = (
+    this.router.url === '/about' && !AppConstants.DEV_MODE);
 
   constructor(
-    private platformFeatureService: PlatformFeatureService,
     private router: Router
   ) {}
 
   getOppiaBlogUrl(): string {
-    if (this.platformFeatureService.status.BlogPages.isEnabled) {
-      return '/blog';
-    } else {
-      return 'https://medium.com/oppia-org';
-    }
+    return '/blog';
   }
 }
 

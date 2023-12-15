@@ -49,6 +49,7 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
+import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled': boolean;
@@ -228,6 +229,35 @@ export class ExplorationObjectFactory {
       explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
       this.logger, this.urlInterpolationService);
+  }
+
+  createFromExplorationBackendResponse(
+      explorationBackendResponse: FetchExplorationBackendResponse):
+        Exploration {
+    const explorationBackendDict: ExplorationBackendDict = {
+      auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
+      correctness_feedback_enabled: explorationBackendResponse.
+        correctness_feedback_enabled,
+      draft_changes: [],
+      init_state_name: explorationBackendResponse.exploration.
+        init_state_name,
+      states: explorationBackendResponse.exploration.states,
+      param_changes: explorationBackendResponse.exploration.
+        param_changes,
+      param_specs: explorationBackendResponse.exploration.
+        param_specs,
+      title: explorationBackendResponse.exploration.title,
+      language_code: explorationBackendResponse.exploration.
+        language_code,
+      next_content_id_index: explorationBackendResponse.
+        exploration.next_content_id_index,
+      exploration_metadata: explorationBackendResponse.
+        exploration_metadata,
+      is_version_of_draft_valid: false,
+      draft_change_list_id: explorationBackendResponse.
+        draft_change_list_id
+    };
+    return this.createFromBackendDict(explorationBackendDict);
   }
 }
 

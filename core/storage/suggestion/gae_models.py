@@ -155,6 +155,8 @@ class SortChoices(enum.Enum):
     SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS = 'DecreasingReviewedTranslations'
     SORT_KEY_INCREASING_REVIEWED_QUESTIONS = 'IncreasingReviewedQuestions'
     SORT_KEY_DECREASING_REVIEWED_QUESTIONS = 'DecreasingReviewedQuestions'
+    SORT_KEY_INCREASING_COORDINATOR_COUNTS = 'IncreasingCoordinatorCounts'
+    SORT_KEY_DECREASING_COORDINATOR_COUNTS = 'DecreasingCoordinatorCounts'
 
 
 class GeneralSuggestionExportDataDict(TypedDict):
@@ -666,6 +668,62 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_reviewable_translation_suggestions(
+        cls,
+        user_id: str,
+        language_code: str,
+        exp_id: str
+    ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
+        """Fetches reviewable translation suggestions for a single exploration.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                Suggestions authored by this user will be excluded from
+                the results.
+            language_code: str. The language code to get results for.
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            Tuple of (results, next_offset). Where:
+                results: list(SuggestionModel). A list of all suggestions
+                    that are in-review, not authored by the supplied user,
+                    matching the supplied language code, and correspond
+                    to the given exploration ID.
+                    The suggestions are ordered by descending creation
+                    date.
+                next_offset: int. The number of results
+                    returned by the current query.
+        """
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # author_id can not be used here.
+        suggestion_query = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.language_code == language_code,
+            cls.target_id == exp_id
+        )).order(-cls.created_on)
+
+        sorted_results: List[GeneralSuggestionModel] = []
+        offset = 0
+        suggestion_models: Sequence[GeneralSuggestionModel] = (
+            suggestion_query.fetch(offset=offset))
+        for suggestion_model in suggestion_models:
+            offset += 1
+            if suggestion_model.author_id != user_id:
+                sorted_results.append(suggestion_model)
+
+        return (
+            sorted_results,
+            offset
+        )
+
+    # TODO(#18745): Transition all callsites to use the new method
+    # get_reviewable_translation_suggestions_for_single_exploration instead
+    # for the case of a single exploration without a limit. Deprecate the
+    # no-limit behavior of this method to avoid future issues.
+    @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
         limit: Optional[int],
@@ -812,7 +870,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         limit: int,
         offset: int,
         user_id: str,
-        sort_key: Optional[str]
+        sort_key: Optional[str],
+        skill_ids: Optional[List[str]],
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -825,6 +884,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
+            skill_ids: List[str] | None. The skills for which to return
+                question suggestions. None for returning all suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -833,17 +894,27 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     one of the supplied language codes.
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
+
+        Raises:
+            RuntimeError. If skill_ids is empty.
         """
+
+        filters = [
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        ]
+
+        if skill_ids is not None:
+            # If this is not filtered here, gae throws BadQueryError.
+            if len(skill_ids) == 0:
+                raise RuntimeError('skill_ids list can\'t be empty')
 
         if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
             suggestion_query = cls.get_all().filter(
-                datastore_services.all_of(
-                    cls.status == STATUS_IN_REVIEW,
-                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            )).order(-cls.created_on)
+                datastore_services.all_of(*filters)).order(-cls.created_on)
 
             sorted_results: List[GeneralSuggestionModel] = []
             num_suggestions_per_fetch = 1000
@@ -856,21 +927,23 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     break
                 for suggestion_model in suggestion_models:
                     offset += 1
-                    if suggestion_model.author_id != user_id:
-                        sorted_results.append(suggestion_model)
-                        if len(sorted_results) == limit:
-                            break
+                    if suggestion_model.author_id == user_id:
+                        continue
+                    if (skill_ids is not None and
+                        suggestion_model.target_id not in skill_ids):
+                        continue
+                    sorted_results.append(suggestion_model)
+                    if len(sorted_results) == limit:
+                        break
 
             return (
                 sorted_results,
                 offset
             )
 
-        suggestion_query = cls.get_all().filter(datastore_services.all_of(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            cls.author_id != user_id
-        ))
+        filters.append(cls.author_id != user_id)
+        suggestion_query = cls.get_all().filter(
+            datastore_services.all_of(*filters))
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
@@ -3427,3 +3500,110 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     model.last_contribution_date.isoformat())
             }
         return user_data
+
+
+class TranslationCoordinatorsModel(base_models.BaseModel):
+    """Storage model for rights related to translation coordinator.
+
+    The id of each instance is the id of the corresponding language (the
+    ISO 639-1 language code).
+    """
+
+    # The user_ids of the coordinators of this language.
+    coordinator_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    # The number of coordinators of this language. This property is added to
+    # enable the sorting of datastore query results. It is equal to the
+    # length of the coordinator_ids field.
+    # TODO(#18762): Add a validate method in domain layer to verify that the
+    # coordinators_count equals the length of coordinator_ids.
+    coordinators_count = datastore_services.IntegerProperty(
+        indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: coordinator_ids field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationCoordinatorsModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.coordinator_ids == user_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance shared across users since multiple
+        users can coordinate a single language.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'coordinator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'coordinators_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'coordinator_ids': 'coordinated_language_ids'
+        }
+
+    @classmethod
+    def export_data(cls, user_id: str) -> Dict[str, List[str]]:
+        """(Takeout) Export user-relevant properties of
+        TranslationCoordinatorsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of TranslationCoordinatorsModel
+            in a dict format. In this case, we are returning all the ids of the
+            languages this user coordinates.
+        """
+        coordinated_languages = cls.get_all().filter(
+            cls.coordinator_ids == user_id)
+        coordinated_language_ids = [
+            language.id for language in coordinated_languages]
+
+        return {
+            'coordinated_language_ids': coordinated_language_ids
+        }
+
+    @classmethod
+    def get_by_user(cls, user_id: str) -> Sequence[
+        TranslationCoordinatorsModel
+    ]:
+        """Retrieves the rights object for all languages assigned to given user
+
+        Args:
+            user_id: str. ID of user.
+
+        Returns:
+            list(TranslationCoordinatorsModel). The list of
+            TranslationCoordinatorsModel objects in which the given user is a
+            coordinator.
+        """
+        return cls.query(cls.coordinator_ids == user_id).fetch()

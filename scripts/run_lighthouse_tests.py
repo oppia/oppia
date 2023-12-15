@@ -69,16 +69,37 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
     required=True, choices=['1', '2'])
+
 _PARSER.add_argument(
     '--skip_build', help='Sets whether to skip webpack build',
     action='store_true')
 
+_PARSER.add_argument(
+    '--record_screen', help='Sets whether LHCI Puppeteer script is recorded',
+    action='store_true')
 
-def run_lighthouse_puppeteer_script() -> None:
-    """Runs puppeteer script to collect dynamic urls."""
+
+def run_lighthouse_puppeteer_script(record: bool = False) -> None:
+    """Runs puppeteer script to collect dynamic urls.
+
+    Args:
+        record: bool. Set to True to record the LHCI puppeteer script
+            via puppeteer-screen-recorder and False to not. Note that
+            puppeteer-screen-recorder must be separately installed to record.
+    """
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    if record:
+        # Add arguments to lighthouse_setup that enable video recording.
+        bash_command.append('-record')
+        dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, 'video.mp4')
+        bash_command.append(video_path)
+        print('Starting LHCI Puppeteer script with recording.')
+        print('Video Path:' + video_path)
 
     process = subprocess.Popen(
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -90,6 +111,8 @@ def run_lighthouse_puppeteer_script() -> None:
             # print it.
             export_url(line.decode('utf-8'))
         print('Puppeteer script completed successfully.')
+        if record:
+            print('Resulting puppeteer video saved at %s' % video_path)
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
@@ -101,6 +124,8 @@ def run_lighthouse_puppeteer_script() -> None:
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
+        if record:
+            print('Resulting puppeteer video saved at %s' % video_path)
         sys.exit(1)
 
 
@@ -226,7 +251,7 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True,
             env=env))
 
-        run_lighthouse_puppeteer_script()
+        run_lighthouse_puppeteer_script(parsed_args.record_screen)
         run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 

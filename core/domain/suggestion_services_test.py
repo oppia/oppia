@@ -1683,6 +1683,48 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         expected_language_code_list = ['hi', 'hi', 'pt']
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
+    def test_get_reviewable_translation_suggestions_for_single_exploration( # pylint: disable=line-too-long
+        self
+    ) -> None:
+         # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.update_preferred_translation_language_code(
+            self.reviewer_id_1, 'hi')
+       # Get all reviewable translation suggestions.
+        opportunity_summary_id = self.opportunity_summary_ids[0]
+        suggestions, _ = suggestion_services.get_reviewable_translation_suggestions_for_single_exp( # pylint: disable=line-too-long
+            self.reviewer_id_1, opportunity_summary_id, 'hi')
+        self.assertEqual(len(suggestions), 2)
+
+    def test_get_reviewable_translation_suggestions_for_single_exploration__with_no_reviewable_languages( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+
+        # Get all reviewable translation suggestions.
+        opportunity_summary_id = self.opportunity_summary_ids[0]
+        suggestions, _ = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_for_single_exp(
+                self.reviewer_id_1, opportunity_summary_id, 'hi'))
+
+        # The user does not have rights to review any languages, so expect an
+        # empty result.
+        self.assertEqual(len(suggestions), 0)
+
     def test_get_reviewable_translation_suggestions_with_empty_exp_ids( # pylint: disable=line-too-long
         self
     ) -> None:
@@ -1818,6 +1860,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Add a few question suggestions.
         self._create_question_suggestion_with_skill_id('skill1')
         self._create_question_suggestion_with_skill_id('skill2')
+        self._create_question_suggestion_with_skill_id('skill3')
         # Provide the user permission to review suggestions in particular
         # languages.
         user_services.allow_user_to_review_translation_in_language(
@@ -1833,11 +1876,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.reviewer_id_1,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                skill_ids=['skill1', 'skill2']))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
-        self.assertEqual(offset, 2)
+        self.assertEqual(offset, 3)
         expected_suggestion_type_list = ['skill2', 'skill1']
         actual_suggestion_type_list = [
             suggestion.change.skill_id

@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
 @Component({
   selector: 'partnerships-page',
   templateUrl: './partnerships-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -37,6 +37,23 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   formIconUrl: string = '';
   callIconUrl: string = '';
   changeIconUrl: string = '';
+  peopleIconUrl: string = '';
+  agreeIconUrl: string = '';
+  serviceIconUrl: string = '';
+  partneringImgUrl: string = '';
+  org1Url: string = '';
+  org2Url: string = '';
+  org3Url: string = '';
+  org4Url: string = '';
+  org5Url: string = '';
+  org6Url: string = '';
+  partner1: string = '';
+  partner2: string = '';
+  partner3: string = '';
+  learner1: string = '';
+  learner2: string = '';
+  learner3: string = '';
+  panelOpenState: boolean = false;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -64,6 +81,38 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       '/icons/icon_call.png');
     this.changeIconUrl = this.urlInterpolationService.getStaticImageUrl(
       '/icons/icon_change.png');
+    this.peopleIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_people.png');
+    this.agreeIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_agree.png');
+    this.serviceIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_service.png');
+    this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partnering_image.png');
+    this.org1Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org1.png');
+    this.org2Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org2.png');
+    this.org3Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org3.png');
+    this.org4Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org4.png');
+    this.org5Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org5.png');
+    this.org6Url = this.urlInterpolationService.getStaticImageUrl(
+      '/general/org6.png');
+    this.partner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner1.png');
+    this.partner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner2.png');
+    this.partner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner3.png');
+    this.learner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner1.png');
+    this.learner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner2.png');
+    this.learner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner3.png');
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,6 @@
 <mat-card layout="row" class="list-view-item">
-  <table class="dashboard-table e2e-test-topics-table">
+  <table *ngIf="!isSerialChapterLaunchFeatureEnabled()"
+         class="dashboard-table e2e-test-topics-table">
     <colgroup>
       <col class="dashboard-table-index-column">
       <col class="dashboard-table-name-column">
@@ -84,7 +85,128 @@
       </td>
     </tr>
   </table>
-  <div class="topics-list-mobile e2e-test-mobile-topic-table">
+  <table *ngIf="isSerialChapterLaunchFeatureEnabled()"
+         class="dashboard-table e2e-test-topics-table">
+    <colgroup>
+      <col class="dashboard-table-index-col">
+      <col class="dashboard-table-name-col">
+      <col class="dashboard-table-added-stories-col">
+      <col class="dashboard-table-published-stories-col">
+      <col class="dashboard-table-notifications-col">
+      <col class="dashboard-table-subtopic-col">
+      <col class="dashboard-table-skill-col">
+      <col class="dashboard-table-status-col">
+    </colgroup>
+    <tr>
+      <th *ngFor="let key of TOPIC_HEADINGS"
+          class="dashboard-table-headings">
+        <p *ngIf="key === 'index'"></p>
+        <p *ngIf="key === 'name'" id="dashboard-table-headings-details">Details</p>
+        <p *ngIf="key === 'added_stories_count'">Added Stories</p>
+        <p *ngIf="key === 'published_stories_count'">Published Stories (Partially/Fully)</p>
+        <p *ngIf="key === 'notifications'">Chapter Publication Notifications</p>
+        <p *ngIf="key === 'subtopic_count'">Subtopics</p>
+        <p *ngIf="key === 'skill_count'" class="text-center">Skills</p>
+        <p *ngIf="key === 'topic_status'" class="text-center">Topic Status</p>
+      </th>
+    </tr>
+    <tr *ngFor="let topic of topicSummaries; index as idx" class="list-item">
+      <td>
+        {{ getSerialNumberForTopic(idx) }}.
+      </td>
+      <td>
+        <div class="topic-primary-information-container">
+          <div class="list-summary list-summary-name e2e-test-topics-list-item">
+            <div>
+              <a class="topic-name e2e-test-topic-name"
+                 [href]="getTopicEditorUrl(topic.id)">
+                {{ topic.name }}
+              </a>
+            </div>
+            <div>
+              <span class="topic-classroom e2e-test-topic-classroom">
+                <span *ngIf="topic.classroom">{{ topic.classroom }}</span>
+                <span ngbTooltip="Assign this topic to a classroom from the admin page" placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
+              </span>
+            </div>
+            <div><span class="topic-description e2e-test-topic-description">{{ topic.description }}</span></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <p class="text-center list-summary">
+          <span> {{ topic.getTotalChaptersCounts().length }} </span>
+        </p>
+      </td>
+      <td>
+        <div class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-left': 'text-center'">
+          <div *ngIf="partiallyPublishedStoriesCounts[idx]">
+            {{ partiallyPublishedStoriesCounts[idx] }} Partial ({{ publishedChaptersInPartiallyPublishedStories[idx] }}/{{ totalChaptersInPartiallyPublishedStories[idx] }} chapters)
+          </div>
+          <div *ngIf="fullyPublishedStoriesCounts[idx]">
+            {{ fullyPublishedStoriesCounts[idx] }} Full
+          </div>
+          <div *ngIf="!partiallyPublishedStoriesCounts[idx] && !fullyPublishedStoriesCounts[idx]"
+               class="text-center">
+            --
+          </div>
+        </div>
+      </td>
+      <td>
+        <p class="list-summary" [ngClass]="topic.getTotalUpcomingChaptersCount() || topic.getTotalOverdueChaptersCount() ? 'text-left': 'text-center'">
+          <span *ngIf="topic.getTotalUpcomingChaptersCount()"> {{ getUpcomingChapterNotificationsText(topic) }}</span>
+          <span *ngIf="topic.getTotalOverdueChaptersCount()"> {{ getOverdueChapterNotificationsText(topic) }}</span>
+          <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
+        </p>
+      </td>
+      <td>
+        <p class="text-center list-summary">
+          <span> {{ topic.subtopicCount }} </span>
+        </p>
+      </td>
+      <td>
+        <p class="list-summary text-center">
+          <span> {{ topic.totalSkillCount }} </span>
+          <span [hidden]="!topic.uncategorized_skill_count"
+                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
+                ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{ topic.uncategorizedSkillCount > 1 ? 's' : '' }}."
+                placement="bottom">
+            <span class="oppia-editor-warnings-count">
+              &nbsp;!
+            </span>
+          </span>
+        </p>
+      </td>
+      <td class="text-center topic-list-status topic-status">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
+          Fully Published
+        </span>
+        <span class="topic-list-status-text" *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
+          Partially Published
+        </span>
+        <span class="topic-list-status-text" *ngIf="!topic.isPublished">
+          Not Published
+        </span>
+      </td>
+      <td>
+        <button class="fas fa-ellipsis-v  topic-edit-box-icon e2e-test-topic-edit-box" role="button" (click)="changeEditOptions(topic.id)" aria-label="Topic edit"></button>
+        <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
+          <a class="topic-edit-options-edit e2e-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
+            <i class="fa fa-pen"></i>
+            <span>Edit</span>
+          </a>
+          <div *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+            <a>
+              <i class="fas fa-trash-alt e2e-test-delete-topic-button"></i>
+              <span>Delete</span>
+            </a>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div *ngIf="!isSerialChapterLaunchFeatureEnabled()"
+       class="topics-list-mobile e2e-test-mobile-topic-table">
     <div *ngFor="let topic of topicSummaries; index as idx">
       <div class="topic-item">
         <div class="topic-item-header">
@@ -152,6 +274,87 @@
       </div>
     </div>
   </div>
+  <div *ngIf="isSerialChapterLaunchFeatureEnabled()"
+       class="topics-list-mobile e2e-test-mobile-topic-table">
+    <div *ngFor="let topic of topicSummaries; index as idx">
+      <div class="topic-item">
+        <div class="topic-item-header">
+          <div class="topic-item-name-box">
+            <div class="topic-item-name e2e-test-mobile-topic-name">
+              <span>
+                {{ getSerialNumberForTopic(idx) }}.
+              </span>
+              <a [href]="getTopicEditorUrl(topic.id)">
+                {{ topic.name }}
+              </a>
+              <span>({{ topic.getTotalChaptersCounts().length }} stories, {{ topic.subtopicCount }} subtopics, {{ topic.totalSkillCount }} skills)</span>
+            </div>
+            <div class="topic-item-classroom">
+              <span class="topic-item-classroom-header">Classroom: </span>
+              <span *ngIf="topic.classroom">{{ topic.classroom }}</span>
+              <span *ngIf="!topic.classroom">Unassigned</span>
+            </div>
+          </div>
+          <div class="topic-item-options">
+            <button class="fas fa-ellipsis-v topic-edit-box-icon" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
+            <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
+              <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
+                <i class="fa fa-pen"></i>
+                <span>Edit</span>
+              </a>
+              <a *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+                <i class="fas fa-trash-alt"></i>
+                <span>Delete</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="topic-item-topic-status">
+          <span class="topic-item-topic-status-header">Status</span>
+          <span *ngIf="topic.isPublished && areTopicChaptersFullyPublished(topic)">
+            Fully Published
+          </span>
+          <span *ngIf="topic.isPublished && !areTopicChaptersFullyPublished(topic)">
+            Partially Published
+          </span>
+          <span *ngIf="!topic.isPublished">
+            Not Published
+          </span>
+        </div>
+        <div class="topic-item-topic-description">
+          <span class="topic-item-description-header">Description: </span>
+          <span>{{ topic.description }}</span>
+        </div>
+        <div class="topic-item-entities">
+          <div class="topic-item-topic-entity published-stories-entity">
+            <div class="topic-item-topic-entity-header">
+              Published Stories
+            </div>
+            <span *ngIf="partiallyPublishedStoriesCounts[idx]">
+              {{ partiallyPublishedStoriesCounts[idx] }} Partial
+              <div>({{ publishedChaptersInPartiallyPublishedStories[idx] }} published</div>
+              <div>{{ totalChaptersInPartiallyPublishedStories[idx] }} total)</div>
+            </span>
+            <span *ngIf="fullyPublishedStoriesCounts[idx]">
+              {{ fullyPublishedStoriesCounts[idx] }} Full
+            </span>
+            <span *ngIf="!partiallyPublishedStoriesCounts[idx] && !fullyPublishedStoriesCounts[idx]"
+                  class="text-center">
+              --
+            </span>
+          </div>
+          <div class="topic-item-topic-entity">
+            <div class="topic-item-topic-entity-header">
+              Chapter Publication Notifications
+            </div>
+            <span *ngIf="topic.getTotalUpcomingChaptersCount()"> {{ getUpcomingChapterNotificationsText(topic) }}</span>
+            <span *ngIf="topic.getTotalOverdueChaptersCount()"> {{ getOverdueChapterNotificationsText(topic) }}</span>
+            <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </mat-card>
 
 <style>
@@ -163,7 +366,7 @@
   .topics-list-mobile {
     display: none;
   }
-  .dashboard-table-index-column {
+  .dashboard-table-index-column, .dashboard-table-index-col {
     width: 5%;
   }
   .dashboard-table-name-column {
@@ -172,14 +375,26 @@
   .dashboard-table-story-column {
     width: 10%;
   }
-  .dashboard-table-subtopic-column {
+  .dashboard-table-subtopic-column, .dashboard-table-subtopic-col {
     width: 10%;
   }
-  .dashboard-table-skill-column {
+  .dashboard-table-skill-column, .dashboard-table-skill-col {
     width: 10%;
   }
   .dashboard-table-status-column {
     width: 8%;
+  }
+  .dashboard-table-name-col {
+    width: 20%;
+  }
+  .dashboard-table-added-stories-col {
+    width: 12%;
+  }
+  .dashboard-table-published-stories-col, .dashboard-table-notifications-col {
+    width: 17%;
+  }
+  .dashboard-table-status-col {
+    width: 10%;
   }
   .dashboard-table {
     font-size: 15px;
@@ -191,9 +406,12 @@
     justify-content: space-between;
     position: relative;
   }
+  .topic-status {
+    margin-right: 15px;
+  }
   .topic-edit-box-icon {
     cursor: pointer;
-    margin: 0;
+    margin: 0 10%;
   }
   .topic-edit-options {
     background-color: #fff;
@@ -300,7 +518,6 @@
   }
 
   .list-summary span {
-    display: inline-block;
     line-height: normal;
     vertical-align: middle;
     word-break: break-word;
@@ -335,14 +552,37 @@
     .topic-item-classroom span {
       color: #707070;
     }
+    .topic-item-classroom-header {
+      color: inherit;
+      font-weight: bold;
+    }
     .topic-item-description {
       margin: 10px 0;
+    }
+    .topic-item-topic-description {
+      margin-bottom: 20px;
+    }
+    .topic-item-description-header {
+      color: inherit;
+      font-weight: bold;
+    }
+    .topic-item-topic-status {
+      margin-top: 10px;
+    }
+    .topic-item-topic-status-header {
+      color: inherit;
+      font-weight: bold;
     }
     .topic-item-entities {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       text-align: center;
+    }
+    .topic-item-topic-entity-header {
+      color: inherit;
+      font-weight: bold;
+      margin-bottom: 15px;
     }
     .topic-item-options {
       position: relative;
@@ -357,11 +597,21 @@
       display: inline-block;
       width: 25%;
     }
+    .topic-item-topic-entity {
+      display: inline-block;
+      width: 50%;
+    }
+    .published-stories-entity {
+      border-right: 2px solid #0844aa;
+    }
     .topic-item-status {
       align-items: center;
       border-right: none;
       display: flex;
       justify-content: center;
+    }
+    .topic-item-name-box {
+      max-width: 90%;
     }
     .topic-edit-options {
       left: auto;

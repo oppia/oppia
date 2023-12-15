@@ -22,7 +22,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import classroom_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 
@@ -68,14 +67,14 @@ class ClassroomDataHandler(
         Args:
             classroom_url_fragment: str. THe classroom URL fragment.
         """
-        classroom = classroom_services.get_classroom_by_url_fragment(
+        classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
         # Here we are asserting that classroom can never be none, because
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = classroom.topic_ids
+        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []
@@ -169,6 +168,34 @@ class ClassroomAdminDataHandler(
 
         self.values.update({
             'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+        })
+        self.render_json(self.values)
+
+
+class UnusedTopicsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for fetching topics not associated with any classroom."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_classroom_admin_page
+    def get(self) -> None:
+        """Retrieves topics not associated with any classroom."""
+        all_topics = topic_fetchers.get_all_topics()
+        all_classrooms = classroom_config_services.get_all_classrooms()
+
+        topics_not_in_classroom = [
+            topic.to_dict() for topic in all_topics
+            if not any(
+                topic.id in classroom.topic_id_to_prerequisite_topic_ids
+                for classroom in all_classrooms
+            )
+        ]
+        self.values.update({
+            'unused_topics': topics_not_in_classroom
         })
         self.render_json(self.values)
 

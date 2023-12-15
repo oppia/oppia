@@ -40,3 +40,6 @@ require('base-components/oppia-root.directive.ts');
 require(
   'pages/contributor-dashboard-admin-page/' +
   'contributor-dashboard-admin-page.component.ts');
+require(
+  'pages/contributor-dashboard-admin-page/' +
+  'contributor-admin-dashboard-page.component.ts');

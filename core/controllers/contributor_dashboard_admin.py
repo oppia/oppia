@@ -15,6 +15,7 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import annotations
+import datetime
 
 from core import feconf
 from core import utils
@@ -26,6 +27,7 @@ from core.domain import email_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import user_domain
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict, Union
@@ -92,7 +94,7 @@ class ContributionRightsHandler(
         'category': {
             'schema': {
                 'type': 'basestring',
-                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+                'choices': constants.CD_USER_RIGHTS_CATEGORIES
             }
         }
     }
@@ -155,7 +157,7 @@ class ContributionRightsHandler(
 
         language_code = self.normalized_payload.get('language_code', None)
 
-        if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+        if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
             if language_code is None:
                 raise Exception(
                     'The language_code cannot be None if the review category is'
@@ -168,7 +170,7 @@ class ContributionRightsHandler(
                     'language code %s' % (username, language_code))
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+        elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
             if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to review question.' % (
@@ -178,22 +180,22 @@ class ContributionRightsHandler(
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
             # a Bad Request error will be thrown. Hence, 'category' must be
-            # 'constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION' if this
+            # 'constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION' if this
             # branch is executed.
             assert category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
             if user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to submit question.' % (
                         username))
             user_services.allow_user_to_submit_question(user_id)
 
-        if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-        ]:
-            email_manager.send_email_to_new_contribution_reviewer(
+        assert category in (
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+        )
+        email_manager.send_email_to_new_cd_user(
                 user_id, category, language_code=language_code)
         self.render_json({})
 
@@ -225,7 +227,7 @@ class ContributionRightsHandler(
         language_code = self.normalized_request.get('language_code')
 
         if (category ==
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
             if language_code is None:
                 raise Exception(
                     'The language_code cannot be None if the review category is'
@@ -239,7 +241,7 @@ class ContributionRightsHandler(
             user_services.remove_translation_review_rights_in_language(
                 user_id, language_code)
         elif category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION):
             if not user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to review question.' % (
@@ -249,24 +251,23 @@ class ContributionRightsHandler(
             # The handler schema defines the possible values of 'category'.
             # If 'category' has a value other than those defined in the schema,
             # a Bad Request error will be thrown. Hence, 'category' must be
-            # 'constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION' if this
+            # 'constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION' if this
             # branch is executed.
             assert category == (
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION)
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION)
             if not user_services.can_submit_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     '%s does not have rights to submit question.' % (
                         username))
             user_services.remove_question_submit_rights(user_id)
 
-        if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-        ]:
-            email_manager.send_email_to_removed_contribution_reviewer(
+        assert category in (
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+        )
+        email_manager.send_email_to_removed_cd_user(
                 user_id, category, language_code=language_code)
-
         self.render_json({})
 
 
@@ -291,7 +292,7 @@ class ContributorUsersListHandler(
         'category': {
             'schema': {
                 'type': 'basestring',
-                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+                'choices': constants.CD_USER_RIGHTS_CATEGORIES
             }
         }
     }
@@ -367,12 +368,14 @@ class ContributionRightsDataHandler(
         user_rights = (
             user_services.get_user_contribution_rights(user_id))
         response: Dict[str, Union[List[str], bool]] = {}
-        if feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles or
+            feconf.ROLE_ID_TRANSLATION_COORDINATOR in self.roles):
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes)
             }
-        if feconf.ROLE_ID_QUESTION_ADMIN in self.roles:
+        if (feconf.ROLE_ID_QUESTION_ADMIN in self.roles or
+            feconf.ROLE_ID_QUESTION_COORDINATOR in self.roles):
             response.update({
                 'can_review_questions': user_rights.can_review_questions,
                 'can_submit_questions': user_rights.can_submit_questions
@@ -555,7 +558,8 @@ class ContributorDashboardAdminStatsHandler(
             },
             'choices': [
                 feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
-                feconf.CONTRIBUTION_SUBTYPE_REVIEW
+                feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+                feconf.CONTRIBUTION_SUBTYPE_COORDINATE,
             ]
         }
     }
@@ -658,7 +662,7 @@ class ContributorDashboardAdminStatsHandler(
                     'more': more
                 }
 
-            else:
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 # Asserting here because even though we are validating through
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
@@ -679,6 +683,18 @@ class ContributorDashboardAdminStatsHandler(
                     'stats': translation_reviewer_frontend_dicts,
                     'next_offset': next_offset,
                     'more': more
+                }
+
+            else:
+                assert sort_by is not None
+                translation_coordinator_dicts = (
+                    contribution_stats_services
+                    .get_all_translation_coordinator_stats(sort_by))
+                translation_coordinator_frontend_dicts = (
+                    get_translation_coordinator_frontend_dict(
+                    translation_coordinator_dicts))
+                response = {
+                    'stats': translation_coordinator_frontend_dicts
                 }
 
         else:
@@ -704,7 +720,7 @@ class ContributorDashboardAdminStatsHandler(
                     'more': more
                 }
 
-            else:
+            elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 # Asserting here because even though we are validating through
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
@@ -725,4 +741,137 @@ class ContributorDashboardAdminStatsHandler(
                     'more': more
                 }
 
+            else:
+                question_coordinators = (
+                    user_services
+                    .get_user_ids_by_role(feconf.ROLE_ID_QUESTION_COORDINATOR))
+                question_coordinators.sort()
+                question_coordinator_frontend_dicts = (
+                    get_question_coordinator_frontend_dict(
+                    question_coordinators))
+                response = {
+                    'stats': question_coordinator_frontend_dicts
+                }
+
         self.render_json(response)
+
+
+class CommunityContributionStatsHandler(
+    base.BaseHandler[
+        Dict[str, str],
+        Dict[str, str]
+    ]
+):
+    """Handler to get Community Stats for contributor admin dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_contributor_dashboard_admin_page
+    def get(self) -> None:
+        """Fetches community contribution stats data.
+
+        Raises:
+            InvalidInputException. Invalid username.
+        """
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        response = {
+            'translation_reviewers_count': (
+                community_stats.translation_reviewer_counts_by_lang_code),
+            'question_reviewers_count': community_stats.question_reviewer_count
+        }
+        self.render_json(response)
+
+
+def get_translation_coordinator_frontend_dict(
+    backend_stats: List[user_domain.TranslationCoordinatorStats]
+) -> List[user_domain.TranslationCoordinatorStatsDict]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        backend_stats: list. TranslationCoordinatorStats domain object.
+
+    Returns:
+        list. Dict representations of TranslationCoordinatorStats
+        domain objects with additional keys:
+            translators_count: int.
+            reviewers_count: int.
+    """
+    stats_dicts = [
+        stats.to_dict() for stats in backend_stats
+    ]
+
+    for stats_dict in stats_dicts:
+        coordinator_activity_list = []
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['translators_count'] = ( # type: ignore[misc]
+            contribution_stats_services.get_translator_counts(
+                stats_dict['language_id']))
+
+        community_stats = suggestion_services.get_community_contribution_stats()
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['reviewers_count'] = ( # type: ignore[misc]
+            community_stats.translation_reviewer_counts_by_lang_code[
+                stats_dict['language_id']])
+
+        for coordinator_id in stats_dict['coordinator_ids']:
+            user_setting = user_services.get_user_settings(coordinator_id)
+            assert user_setting.last_logged_in is not None
+            last_activity = user_setting.last_logged_in
+            last_activity_days = int(
+                (datetime.datetime.today() - last_activity).days
+            )
+
+            coordinator_activity_list.append({
+                'translation_coordinator': user_setting.username,
+                'last_activity_days': last_activity_days
+            })
+
+        # Here we use MyPy ignore because MyPy doesn't allow key addition
+        # to TypedDict.
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[misc]
+
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
+        del stats_dict['coordinator_ids']  # type: ignore[misc]
+
+    return stats_dicts
+
+
+def get_question_coordinator_frontend_dict(
+    question_coordinators: List[str]
+) -> List[Dict[str, Union[str, int]]]:
+    """Returns corresponding stats dicts with all the necessary
+    information for the frontend.
+
+    Args:
+        question_coordinators: list[str]. List of question coordinators.
+
+    Returns:
+        list[Dict[str, str]]. List of dict representing question coordinator
+        stats:
+        question_coordinator: str.
+        last_activity: int.
+    """
+    stats: List[Dict[str, Union[str, int]]] = []
+    for coordinator in question_coordinators:
+        user_setting = user_services.get_user_settings(coordinator)
+        assert user_setting.last_logged_in is not None
+        assert user_setting.username is not None
+
+        last_activity = user_setting.last_logged_in
+        last_activity_days = int(
+            (datetime.datetime.today() - last_activity).days)
+
+        stats.append({
+            'question_coordinator': user_setting.username,
+            'last_activity': last_activity_days
+        })
+
+    return stats

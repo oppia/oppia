@@ -37,7 +37,9 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
+from core.domain import user_services
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -206,7 +208,12 @@ class SuggestionHandler(
 
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Raises:
+            InvalidInputException. The suggestion type is 'edit_state_content',
+                as content suggestion submissions are no longer supported.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
@@ -556,6 +563,10 @@ class SuggestionToSkillActionHandler(
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
+
+        Raises:
+            InvalidInputException. The suggestion is not for skills
+                or the provided skill ID is invalid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -676,10 +687,11 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    limit: int
+    limit: Optional[int]
     offset: int
     sort_key: str
     exploration_id: Optional[str]
+    topic_name: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -714,7 +726,8 @@ class ReviewableSuggestionsHandler(
                         'id': 'is_at_least',
                         'min_value': 1
                     }]
-                }
+                },
+                'default_value': None
             },
             'offset': {
                 'schema': {
@@ -736,9 +749,33 @@ class ReviewableSuggestionsHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
-            }
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
         }
     }
+
+    def _get_skill_ids_for_topic(
+            self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid')
+        return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -747,33 +784,59 @@ class ReviewableSuggestionsHandler(
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            ValueError. If limit is None for question suggestions.
         """
         assert self.user_id is not None
         assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        limit = self.normalized_request['limit']
+        limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
-
+        user_settings = user_services.get_user_settings(self.user_id)
+        # User_settings.preferred_translation_language_code is the language
+        # selected by user in language filter of contributor dashboard.
+        language_code_to_filter_by = (
+            user_settings.preferred_translation_language_code)
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            reviewable_suggestions, next_offset = (
-                suggestion_services
-                .get_reviewable_translation_suggestions_by_offset(
-                    self.user_id, exp_ids, limit, offset, sort_key))
+            reviewable_suggestions: List[
+                suggestion_registry.SuggestionTranslateContent] = []
+            if (exp_ids and len(exp_ids) == 1 and language_code_to_filter_by):
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_for_single_exp(
+                        self.user_id, exp_ids[0],
+                        language_code_to_filter_by))
+            else:
+                # TODO(#18745): Deprecate the
+                # get_reviewable_translation_suggestions_by_offset method
+                # as its limit is unbounded and it can be given an
+                # unlimited number of exp_ids.
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_by_offset(
+                        self.user_id, exp_ids, limit, offset, sort_key))
             suggestions = (
                 suggestion_services
                 .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            if limit is None:
+                raise ValueError(
+                    'Limit must be provided for question suggestions.')
+            topic_name = self.normalized_request.get('topic_name')
+            skill_ids = self._get_skill_ids_for_topic(topic_name)
+
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key, skill_ids))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -1058,7 +1121,7 @@ class UpdateQuestionSuggestionHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_state_dict
+                        domain_objects_validator.validate_question_state_dict
                     )
                 }
             },
@@ -1177,6 +1240,9 @@ def _construct_exploration_suggestions(
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
         exploration's current content.
+
+    Raises:
+        ValueError. Exploration content is unavailable.
     """
     suggestion_dicts: List[FrontendBaseSuggestionDict] = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}

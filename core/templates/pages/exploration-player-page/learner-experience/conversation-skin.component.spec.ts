@@ -19,6 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -1603,13 +1605,16 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should submit answer from progress nav', () => {
+  it('should submit answer from progress nav and toggle submit clicked', () => {
+    componentInstance.displayedCard = displayedCard;
+    spyOn(displayedCard, 'toggleSubmitClicked');
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(currentInteractionService, 'submitAnswer');
 
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
   });
 
   it('should show learn again button', () => {
@@ -1956,12 +1961,15 @@ describe('Conversation skin component', () => {
     componentInstance.showUpcomingCard();
   });
 
-  it('should submit answer', fakeAsync(() => {
+  it('should submit answer and reset current answer state', fakeAsync(() => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    componentInstance.displayedCard = displayedCard;
     componentInstance.answerIsBeingProcessed = true;
+
     componentInstance.submitAnswer('', null);
 
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(null);
     componentInstance.answerIsBeingProcessed = false;
-    componentInstance.displayedCard = displayedCard;
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true);
@@ -2182,14 +2190,6 @@ describe('Conversation skin component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-  });
-
-  it('should get feedback when answer is misspelled', () => {
-    spyOn(Math, 'random').and.returnValue(0.45);
-    spyOn(translateService, 'instant').and.callThrough();
-    expect(
-      componentInstance.getFeedbackHtmlWhenAnswerMisspelled())
-      .toEqual('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1');
   });
 
   it('should check if current card was completed in a previous session',

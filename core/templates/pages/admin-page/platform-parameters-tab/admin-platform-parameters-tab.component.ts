@@ -44,6 +44,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 interface PlatformSchema {
   'type': string;
+  'ui_config'?: { 'rows': number };
 }
 
 type FilterType = keyof typeof PlatformParameterFilterType;
@@ -71,11 +72,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-      [PlatformParameterFilterType.ServerMode]: {
-        displayName: 'Server Mode',
-        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['=']
-      },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
@@ -96,7 +92,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.ServerMode,
+      type: PlatformParameterFilterType.PlatformType,
       conditions: []
     })
   );
@@ -109,6 +105,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   platformParametersAreFetched: boolean = false;
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
+  platformParameterNameToRulesReadonlyData: Map<string, string[]> = new Map();
+  platformParametersInEditMode!: Map<string, boolean>;
+  warningsAreShown: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -124,6 +123,11 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     this.platformParameters = data.platformParameters;
     this.platformParameterNameToBackupMap = new Map(
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
+    this.platformParametersInEditMode = new Map(
+      this.platformParameters.map(param => [param.name, false]));
+    for (const platformParameter of this.platformParameters) {
+      this.updateFilterValuesForDisplay(platformParameter);
+    }
     this.loaderService.hideLoadingScreen();
   }
 
@@ -134,21 +138,65 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     });
   }
 
-  getPlatformParamSchema(dataType: string): PlatformSchema {
+  getPlatformParamSchema(dataType: string, name: string): PlatformSchema {
     if (dataType === 'string') {
+      if (name === 'email_footer') {
+        return {type: 'unicode', ui_config: {rows: 5}};
+      } else if (
+        name === 'signup_email_body_content' ||
+        name === 'unpublish_exploration_email_html_body'
+      ) {
+        return {type: 'unicode', ui_config: {rows: 20}};
+      }
       return {type: 'unicode'};
     } else if (dataType === 'number') {
       return {type: 'float'};
+    } else if (dataType === 'bool') {
+      return {type: 'bool'};
     }
-    return {type: dataType};
+    throw new Error(
+      'Unexpected data type value, must be one of string, number or bool.');
   }
 
-  addNewRuleToTop(param: PlatformParameter): void {
-    param.rules.unshift(cloneDeep(this.getdefaultNewRule(param)));
+  getReadonlyFilterValues(rule: PlatformParameterRule): string {
+    let resultantString: string = '';
+    const filters: PlatformParameterFilter[] = rule.filters;
+    for (let filterIdx = 0; filterIdx < filters.length; filterIdx++) {
+      const filterName: string = (
+        this.filterTypeToContext[filters[filterIdx].type].displayName);
+      if (filters[filterIdx].conditions.length === 0) {
+        resultantString += `${filterName} in [ ]`;
+      } else {
+        let conditions: string = '';
+        for (let idx = 0; idx < filters[filterIdx].conditions.length; idx++) {
+          if (idx === filters[filterIdx].conditions.length - 1) {
+            conditions += filters[filterIdx].conditions[idx][1];
+          } else {
+            conditions += filters[filterIdx].conditions[idx][1] + ', ';
+          }
+        }
+        if (filterIdx === filters.length - 1) {
+          resultantString += `${filterName} in [${conditions}]`;
+        } else {
+          resultantString += `${filterName} in [${conditions}]; `;
+        }
+      }
+    }
+    return resultantString;
+  }
+
+  updateFilterValuesForDisplay(platformParameter: PlatformParameter): void {
+    const ruleReadOnlyValue: string[] = [];
+    for (const parameterRule of platformParameter.rules) {
+      ruleReadOnlyValue.push(this.getReadonlyFilterValues(parameterRule));
+    }
+    this.platformParameterNameToRulesReadonlyData.set(
+      platformParameter.name, ruleReadOnlyValue);
   }
 
   addNewRuleToBottom(param: PlatformParameter): void {
     param.rules.push(cloneDeep(this.getdefaultNewRule(param)));
+    this.updateFilterValuesForDisplay(param);
   }
 
   addNewFilter(rule: PlatformParameterRule): void {
@@ -180,12 +228,22 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     const rule = param.rules[ruleIndex];
     this.removeRule(param, ruleIndex);
     param.rules.splice(ruleIndex - 1, 0, rule);
+    this.updateFilterValuesForDisplay(param);
   }
 
   moveRuleDown(param: PlatformParameter, ruleIndex: number): void {
     const rule = param.rules[ruleIndex];
     this.removeRule(param, ruleIndex);
     param.rules.splice(ruleIndex + 1, 0, rule);
+    this.updateFilterValuesForDisplay(param);
+  }
+
+  shiftToEditMode(param: PlatformParameter): void {
+    this.platformParametersInEditMode.set(param.name, true);
+  }
+
+  shiftToReadMode(param: PlatformParameter): void {
+    this.platformParametersInEditMode.set(param.name, false);
   }
 
   async saveDefaultValueToStorage(): Promise<void> {
@@ -193,8 +251,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       'This action is irreversible.')) {
       return;
     }
-    for (let param of this.platformParameters) {
-      let commitMessage = `Update default value for '${param.name}'.`;
+    for (const param of this.platformParameters) {
+      const commitMessage = `Update default value for '${param.name}'.`;
       await this.updatePlatformParameter(param, commitMessage);
     }
   }
@@ -208,6 +266,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         param.name, commitMessage, param.rules, param.defaultValue);
 
       this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
+      this.updateFilterValuesForDisplay(param);
 
       this.setStatusMessage.emit('Saved successfully.');
     // We use unknown type because we are unsure of the type of error
@@ -252,17 +311,16 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   clearChanges(param: PlatformParameter): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This will revert all changes you made. Are you sure?')) {
-      return;
-    }
-    const backup = this.platformParameterNameToBackupMap.get(
-      param.name
-    );
-
-    if (backup) {
-      param.rules = cloneDeep(backup.rules);
-      param.defaultValue = backup.defaultValue;
+    if (this.isPlatformParamChanged(param)) {
+      if (!this.windowRef.nativeWindow.confirm(
+        'This will revert all changes you made. Are you sure?')) {
+        return;
+      }
+      const backup = this.platformParameterNameToBackupMap.get(param.name);
+      if (backup) {
+        param.rules = cloneDeep(backup.rules);
+        param.defaultValue = backup.defaultValue;
+      }
     }
   }
 
@@ -300,8 +358,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         seenRule => isEqual(seenRule, rule));
       if (sameRuleIndex !== -1) {
         issues.push(
-          `The ${sameRuleIndex + 1}-th & ${ruleIndex + 1}-th rules are` +
-          ' identical.');
+          `Rules ${sameRuleIndex + 1} & ${ruleIndex + 1} are identical.`);
         continue;
       }
       seenRules.push(rule);
@@ -312,11 +369,18 @@ export class AdminPlatformParametersTabComponent implements OnInit {
           seenFilter => isEqual(seenFilter, filter));
         if (sameFilterIndex !== -1) {
           issues.push(
-            `In the ${ruleIndex + 1}-th rule: the ${sameFilterIndex + 1}-th` +
-            ` & ${filterIndex + 1}-th filters are identical.`);
+            `In rule ${ruleIndex + 1}, filters ${sameFilterIndex + 1}` +
+            ` & ${filterIndex + 1} are identical.`);
           continue;
         }
         seenFilters.push(filter);
+
+        if (filter.conditions.length === 0) {
+          issues.push(
+            `In rule ${ruleIndex + 1}, filter ${filterIndex + 1} ` +
+            'should have at least one condition.');
+          continue;
+        }
 
         const seenConditions: [string, string][] = [];
         for (const [conditionIndex, condition] of filter.conditions
@@ -325,17 +389,42 @@ export class AdminPlatformParametersTabComponent implements OnInit {
             seenCond => isEqual(seenCond, condition));
           if (sameCondIndex !== -1) {
             issues.push(
-              `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th` +
-              ` filter: the ${sameCondIndex + 1}-th & ` +
-              `${conditionIndex + 1}-th conditions are identical.`);
+              `In rule ${ruleIndex + 1}, filter ${filterIndex + 1},` +
+              ` conditions ${sameCondIndex + 1} & ` +
+              `${conditionIndex + 1} are identical.`);
             continue;
+          }
+
+          if (filter.type === PlatformParameterFilterType.AppVersion) {
+            if (condition[1] === '') {
+              issues.push(
+                `In rule ${ruleIndex + 1}, filter ${filterIndex + 1}, ` +
+                `condition ${conditionIndex + 1}, the app version is empty.`
+              );
+              continue;
+            }
           }
 
           seenConditions.push(condition);
         }
       }
+
+      if (rule.filters.length === 0) {
+        issues.push(
+          `In rule ${ruleIndex + 1}, there should be at least ` +
+          'one filter.');
+        continue;
+      }
     }
     return issues;
+  }
+
+  getWarnings(param: PlatformParameter): string[] {
+    return AdminPlatformParametersTabComponent.validatePlatformParam(param);
+  }
+
+  setWarningsAreShown(value: boolean): void {
+    this.warningsAreShown = value;
   }
 
   ngOnInit(): void {

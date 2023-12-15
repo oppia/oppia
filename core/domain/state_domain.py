@@ -896,7 +896,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         Args:
             require_valid_component_names: function. Function to check
-                whether the RTE tags in the html string are whitelisted.
+                whether the RTE tags in the html string are allowed.
 
         Returns:
             bool. Whether the RTE content is valid.
@@ -1610,19 +1610,22 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 rule_spec_till_now.append(rule_spec.to_dict())
 
                 # `Equals` should have between min and max number of selections.
+                selected_choices_count = len(rule_spec.inputs['x'])
                 if rule_spec.rule_type == 'Equals':
                     if (
                         strict and
                         (
-                            len(rule_spec.inputs['x']) < min_value or
-                            len(rule_spec.inputs['x']) > max_value
+                            selected_choices_count < min_value or
+                            selected_choices_count > max_value
                         )
                     ):
                         raise utils.ValidationError(
-                            f'Selected choices of rule \'{rule_spec_index}\' '
-                            f'of answer group \'{ans_group_index}\' '
-                            f'either less than min_selection_value '
-                            f'or greater than max_selection_value '
+                            f'Selected wrong number of choices in rule '
+                            f'\'{rule_spec_index}\' '
+                            f'of answer group \'{ans_group_index}\'. '
+                            f'{selected_choices_count} were selected, it is '
+                            f'either less than {min_value} '
+                            f'or greater than {max_value} '
                             f'in ItemSelectionInput interaction.'
                         )
 
@@ -3773,14 +3776,14 @@ class State(translation_domain.BaseTranslatableObject):
             bool. Whether the RTE components in the state is valid.
         """
         def require_valid_component_names(html: str) -> bool:
-            """Checks if the provided html string contains only whitelisted
+            """Checks if the provided html string contains only allowed
             RTE tags.
 
             Args:
                 html: str. The html string.
 
             Returns:
-                bool. Whether all RTE tags in the html are whitelisted.
+                bool. Whether all RTE tags in the html are allowed.
             """
             component_name_prefix = 'oppia-noninteractive-'
             component_names = set(

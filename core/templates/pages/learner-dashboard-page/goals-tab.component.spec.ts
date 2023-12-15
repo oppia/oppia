@@ -312,6 +312,20 @@ describe('Goals tab Component', () => {
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
   });
+  it('should remove topic from learner goals if already present', () => {
+    component.topicIdsInCurrentGoals = ['1', '2', '3'];
+
+    const learnerGoalsSpy = spyOn(
+      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
+      .and.returnValue(Promise.resolve(true));
+    const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
+
+    component.addToLearnerGoals(component.editGoals[0], '2', 1);
+    fixture.detectChanges();
+
+    expect(removeTopicSpy).toHaveBeenCalled();
+    expect(learnerGoalsSpy).not.toHaveBeenCalled();
+  });
 
   it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)

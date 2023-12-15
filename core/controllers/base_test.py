@@ -743,11 +743,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, 'new_token'))
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new/token'))
-
-    def test_non_default_csrf_secret_is_used(self) -> None:
-        base.CsrfTokenManager.create_csrf_token('uid')
-        self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'a/new/token'))
 
     def test_token_expiry(self) -> None:
         # This can be any value.
@@ -942,6 +938,13 @@ class I18nDictsTests(test_utils.GenericTestBase):
             bracket_level, 0,
             msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
         return sorted(result)
+
+    def test_i18n_keys_format(self) -> None:
+        """Tests that the keys are correctly formatted."""
+        valid_key_pattern = re.compile(r'^I18N_[0-9A-Za-z-_&/]+$')
+        key_list = self._extract_keys_from_json_file('en.json')
+        for key in key_list:
+            self.assertTrue((valid_key_pattern.match(key)), key)
 
     def test_i18n_keys(self) -> None:
         """Tests that the keys in all JSON files are a subset of those in

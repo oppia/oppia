@@ -25,6 +25,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('Exploration rights service', () => {
   let ers: ExplorationRightsService;
@@ -428,7 +429,12 @@ describe('Exploration rights service', () => {
       spyOn(
         explorationRightsBackendApiService,
         'publishPutData').and.returnValue(
-        Promise.reject());
+        Promise.reject(new HttpErrorResponse({
+          error: {
+            error: 'error_message'
+          }
+        })));
+      spyOn(als, 'addWarning');
 
       ers.publish().then(successHandler, failHandler);
       tick();
@@ -436,6 +442,9 @@ describe('Exploration rights service', () => {
       expect(clearWarningsSpy).not.toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
+      expect(als.addWarning).toHaveBeenCalledWith(
+        'Failed to publish an exploration: error_message'
+      );
     }));
 
   it('should save moderator change to backend', fakeAsync(() => {

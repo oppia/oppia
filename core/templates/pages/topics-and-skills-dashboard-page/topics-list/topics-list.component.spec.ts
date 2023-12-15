@@ -27,6 +27,19 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
 import { TopicsListComponent } from './topics-list.component';
+import { PlatformFeatureService } from
+  '../../../services/platform-feature.service';
+import { CreatorTopicSummary } from
+  'domain/topic/creator-topic-summary.model';
+import constants from 'assets/constants';
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Topics List Component', () => {
   let fixture: ComponentFixture<TopicsListComponent>;
@@ -36,6 +49,7 @@ describe('Topics List Component', () => {
   let editableTopicBackendApiService: MockEditableBackendApiService;
   let topicsAndSkillsDashboardBackendApiService:
   TopicsAndSkillsDashboardBackendApiService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockNgbModal: MockNgbModal;
   const topicId: string = 'topicId';
   const topicName: string = 'topic_name';
@@ -110,6 +124,10 @@ describe('Topics List Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         }
       ]
     }).compileComponents();
@@ -134,6 +152,41 @@ describe('Topics List Component', () => {
     topicsAndSkillsDashboardBackendApiService = (
       topicsAndSkillsDashboardBackendApiService as unknown) as
       jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>;
+  });
+
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).
+      toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).
+      toEqual(true);
+  });
+
+  it('should get correct headings list based on feature flag', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.TOPIC_HEADINGS.length).toBe(8);
+    expect(componentInstance.TOPIC_HEADINGS).toEqual([
+      'index', 'name', 'added_stories_count', 'published_stories_count',
+      'notifications', 'subtopic_count', 'skill_count', 'topic_status'
+    ]);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    componentInstance.ngOnInit();
+
+    expect(componentInstance.TOPIC_HEADINGS.length).toBe(6);
+    expect(componentInstance.TOPIC_HEADINGS).toEqual([
+      'index', 'name', 'canonical_story_count', 'subtopic_count',
+      'skill_count', 'topic_status'
+    ]);
   });
 
   it('should create', () => {
@@ -211,5 +264,168 @@ describe('Topics List Component', () => {
     spyOn(alertsService, 'addWarning');
     componentInstance.deleteTopic(topicId, topicName);
     expect(alertsService.addWarning).toHaveBeenCalledWith('error_message');
+  });
+
+  it('should update the chapter counts upon changing the input topic ' +
+    'summaries', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: 'wbL5aAyTWfOH1',
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: 'Alpha',
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
+    });
+    componentInstance.topicSummaries = [topic];
+
+    componentInstance.ngOnChanges();
+
+    expect(
+      componentInstance.fullyPublishedStoriesCounts.length).toBe(1);
+    expect(componentInstance.fullyPublishedStoriesCounts[0]).toBe(1);
+    expect(
+      componentInstance.partiallyPublishedStoriesCounts.length).toBe(1);
+    expect(
+      componentInstance.partiallyPublishedStoriesCounts[0]).toBe(1);
+    expect(
+      componentInstance.
+        totalChaptersInPartiallyPublishedStories.length).toBe(1);
+    expect(
+      componentInstance.totalChaptersInPartiallyPublishedStories[0]).toBe(5);
+    expect(
+      componentInstance.
+        publishedChaptersInPartiallyPublishedStories.length).toBe(1);
+    expect(
+      componentInstance.
+        publishedChaptersInPartiallyPublishedStories[0]).toBe(3);
+  });
+
+  it('should get text for upcoming chapter notifications', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: 'wbL5aAyTWfOH1',
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: 'Alpha',
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
+    });
+    expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
+      '1 upcoming launch in the next ' +
+      constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
+
+    topic.totalUpcomingChaptersCount = 2;
+    expect(componentInstance.getUpcomingChapterNotificationsText(topic)).toBe(
+      '2 upcoming launches in the next ' + constants.
+        CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS + ' days');
+  });
+
+  it('should get text for upcoming chapter notifications', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: 'wbL5aAyTWfOH1',
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: 'Alpha',
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4]
+    });
+    expect(componentInstance.getOverdueChapterNotificationsText(topic)).toBe(
+      '1 launch behind schedule');
+
+    topic.totalOverdueChaptersCount = 2;
+    expect(componentInstance.getOverdueChapterNotificationsText(topic)).toBe(
+      '2 launches behind schedule');
+  });
+
+  it('should return if all topic chapters are published', () => {
+    let topic = CreatorTopicSummary.createFromBackendDict({
+      topic_model_created_on: 1581839432987.596,
+      uncategorized_skill_count: 0,
+      canonical_story_count: 1,
+      id: 'wbL5aAyTWfOH1',
+      is_published: true,
+      total_skill_count: 10,
+      total_published_node_count: 6,
+      can_edit_topic: true,
+      topic_model_last_updated: 1581839492500.852,
+      additional_story_count: 0,
+      name: 'Alpha',
+      classroom: 'Math',
+      version: 1,
+      description: 'Alpha description',
+      subtopic_count: 0,
+      language_code: 'en',
+      url_fragment: 'alpha',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [5, 4]
+    });
+    componentInstance.topicSummaries = [topic];
+    componentInstance.ngOnChanges();
+
+    expect(componentInstance.areTopicChaptersFullyPublished(
+      topic, 0)).toBeTrue();
+
+    topic.totalChaptersCounts = [];
+    topic.publishedChaptersCounts = [];
+
+    componentInstance.topicSummaries = [topic];
+    componentInstance.ngOnChanges();
+
+    expect(componentInstance.areTopicChaptersFullyPublished(
+      topic, 0)).toBeFalse();
   });
 });

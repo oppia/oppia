@@ -35,8 +35,9 @@ from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
-
+from typing import (
+    Dict, List, Optional, OrderedDict, Sequence, Tuple,
+    TypedDict, Union)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -70,6 +71,7 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests and renders the contributor dashboard page."""
         self.render_template('contributor-dashboard-page.mainpage.html')
 
 
@@ -126,7 +128,18 @@ class ContributionOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            opportunity_type: str. The opportunity type.
+
+        Raises:
+            PageNotFoundException. The opportunity type is invalid.
+            InvalidInputException. The language_code is invalid.
+                This happens when the opportunity type is of type
+                constant.OPPORTUNITY_TYPE_TRANSLATION and the
+                language_code is set to None by normalized_request.
+        """
         assert self.normalized_request is not None
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
@@ -315,11 +328,12 @@ class ReviewableOpportunitiesHandler(
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
+            ] = []
         if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
+            for opp in (
+                self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
-            ):
+            )):
                 if opp is not None:
                     opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -371,10 +385,12 @@ class ReviewableOpportunitiesHandler(
                 for reference in topic.get_all_story_references()
                 if reference.story_is_published
             ],
-            strict=True
+            strict=False
         )
         topic_exp_ids = []
         for story in topic_stories:
+            if story is None:
+                continue
             for node in story.story_contents.get_ordered_nodes():
                 if node.exploration_id is None:
                     raise Exception(
@@ -399,9 +415,92 @@ class ReviewableOpportunitiesHandler(
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        return list(
+        pinned_opportunity_summary = None
+        if topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if language and self.user_id:
+                pinned_opportunity_summary = (
+                    opportunity_services.get_pinned_lesson(
+                        self.user_id,
+                        language,
+                        topic.id
+                    ))
+
+        exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids).values())
+                exp_ids
+            )
+        )
+
+        # If there is a pinned opportunity summary,
+        # add it to the list of opportunities at the top.
+        ordered_exp_opp_summaries = OrderedDict()
+        if pinned_opportunity_summary:
+            pinned_opportunity_id = pinned_opportunity_summary.id
+            exp_opp_summaries.pop(pinned_opportunity_id, None)
+            ordered_exp_opp_summaries[
+                pinned_opportunity_id] = pinned_opportunity_summary
+
+        for item in exp_opp_summaries.values():
+            if item is not None:
+                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
+        return list(ordered_exp_opp_summaries.values())
+
+
+class LessonsPinningHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of ReviewableOpportunitiesHandler's
+    normalized_request dictionary.
+    """
+
+    language_code: str
+    topic_id: str
+    opportunity_id: Optional[str]
+
+
+class LessonsPinningHandler(
+    base.BaseHandler[
+        LessonsPinningHandlerNormalizedRequestDict,
+        Dict[str, str],
+    ]
+):
+    """Handler for pinning & unpinning lessons."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'opportunity_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
+    }
+
+    @acl_decorators.open_access
+    def put(self) -> None:
+        """Handles pinning/unpinning lessons."""
+        assert self.normalized_payload is not None
+        assert self.user_id is not None
+        topic_id = self.normalized_payload.get('topic_id')
+        language_code = self.normalized_payload.get('language_code')
+        opportunity_id = self.normalized_payload.get('opportunity_id')
+
+        if language_code and topic_id:
+            opportunity_services.update_pinned_opportunity_model(
+                self.user_id, language_code, topic_id, opportunity_id
+            )
+        self.render_json(self.values)
 
 
 class TranslatableTextHandlerNormalizedRequestDict(TypedDict):
@@ -442,7 +541,11 @@ class TranslatableTextHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Raises:
+            InvalidInputException. The exploration ID is invalid.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request['language_code']
         exp_id = self.normalized_request['exp_id']
@@ -882,7 +985,28 @@ class ContributorStatsSummariesHandler(
         contribution_subtype: str,
         username: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            contribution_type: str. The type of contribution to retrieve
+                statistics for. This should be one of the following constants:
+                - feconf.CONTRIBUTION_TYPE_TRANSLATION: For translation
+                  contributions.
+                - feconf.CONTRIBUTION_TYPE_QUESTION: For question
+                  contributions.
+            contribution_subtype: str. The subtype of contribution to retrieve
+                statistics for. This should be one of the following constants:
+                - feconf.CONTRIBUTION_SUBTYPE_SUBMISSION: For contributions made
+                  as submissions.
+                - feconf.CONTRIBUTION_SUBTYPE_REVIEW: For contributions made as
+                  reviews.
+            username: str. The username of the contributor whose statistics are
+                to be fetched.
+
+        Raises:
+            InvalidInputException. The contribution type or the contribution
+                subtype is invalid.
+        """
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
             feconf.CONTRIBUTION_TYPE_QUESTION
