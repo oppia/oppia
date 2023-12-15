@@ -30,7 +30,7 @@ pylatexenc==2.10
 pytest==6.2.5
 PyYAML==6.0
 redis==3.5.3
-requests==2.26.0
+requests==2.31.0
 requests-mock==1.9.3
 requests-toolbelt==0.9.1
 result==0.6.0
