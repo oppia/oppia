@@ -771,8 +771,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name'
-                % self.change_cmd.state_name)
+                'Expected %s to be a valid state name' % self.change_cmd.state_name) # pylint: disable=line-too-long
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
