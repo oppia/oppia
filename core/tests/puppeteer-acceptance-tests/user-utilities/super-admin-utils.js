@@ -300,24 +300,22 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
   async createSkill({ description, reviewMaterial, misconception, questionCount }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
-    // await this.page.waitForSelector('.e2e-test-create-first-skill-button');
 
-    await this.clickOn(
-      '.e2e-test-create-first-skill-button');
-    await this.page.waitForSelector('.e2e-test-new-skill-description-field');
+    await this.clickOn('button.e2e-test-create-skill-button');
     await this.type(
       'input.e2e-test-new-skill-description-field', description);
-    await this.clickOn('.e2e-test-concept-card-text');
-    await this.type('', reviewMaterial);
+    await this.clickOn('.e2e-test-open-concept-card');
+    await this.page.waitForSelector('.e2e-test-rte', { visible: true });
+    await this.page.type('.e2e-test-rte', reviewMaterial);
     await this.clickOn('button.e2e-test-confirm-skill-creation-button');
+    await this.page.waitForNetworkIdle();
 
-    await this.page.waitForSelector('.e2e-test-select-rubric-difficulty');
     if (misconception) {
-      await this.clickOn('button.e2e-test-add-misconception-modal-button');
+      await this.clickOn('.e2e-test-add-misconception-modal-button');
       await this.type(
         'input.e2e-test-misconception-name-field', misconception.name);
       await this.type(
-        '.e2e-test-feedback-textarea div.e2e-test-rte', misconception.feedback);
+        '.e2e-test-feedback-textarea .e2e-test-rte', misconception.feedback);
       if (!misconception.mustBeTaggedToQuestion) {
         await this.clickOn('input.e2e-test-enforce-all-questions-checkbox');
       }
@@ -337,10 +335,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
             `i.e2e-test-edit-rubric-explanation-${difficulty}` +
                `:nth-child(${i + 1})` :
             `button.e2e-test-add-explanation-button-${difficulty}`);
-          await this.page.waitForSelector(
-            '.e2e-test-rubric-explanation-text .e2e-test-rte'); 
           await this.type(
-            '.e2e-test-rubric-explanation-text div.e2e-test-rte',
+            '.e2e-test-rubric-explanation-text .e2e-test-rte',
             rubricNotes[i]);
 	  await this.onClick('button.e2e-test-save-rubric-explanation-button');
 	}
@@ -348,7 +344,6 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }
 
     await this.onClick('button.e2e-test-save-or-publish-skill');
-    await this.page.waitForSelector('.e2e-test-commit-message-input');
     await this.type('textarea.e2e-test-commit-message-input', 'test');
     await this.onClick('button.e2e-test-close-save-modal-button');
 
