@@ -39,6 +39,6 @@ simplejson==3.17.5
 six==1.16.0
 soupsieve==2.3.1
 typing-extensions==4.5.0
-urllib3==1.26.7
+urllib3==1.26.18
 webapp2==3.0.0b1
 webencodings==0.5.1
