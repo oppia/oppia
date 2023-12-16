@@ -651,7 +651,7 @@ describe('Version history service', () => {
     const explorationMetadata = new ExplorationMetadata(
       'title', 'category', 'objective', 'en',
       [], '', '', 55, 'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+      new ParamSpecs({}, paramSpecObjectFactory), [], false, true
     );
     versionHistoryService.insertMetadataVersionHistoryData(
       3, explorationMetadata, '');
