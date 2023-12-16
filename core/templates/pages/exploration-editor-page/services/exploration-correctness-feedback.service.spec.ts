@@ -24,7 +24,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { ExplorationDataService } from './exploration-data.service';
 
 describe('Exploration Correctness Feedback Service', () => {
-  let ecfs: ExplorationCorrectnessFeedbackService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
