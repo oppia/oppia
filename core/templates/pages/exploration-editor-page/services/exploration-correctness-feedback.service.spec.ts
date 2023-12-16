@@ -43,7 +43,6 @@ describe('Exploration Correctness Feedback Service', () => {
       ]
     });
     httpTestingController = TestBed.inject(HttpTestingController);
-    ecfs = TestBed.inject(ExplorationCorrectnessFeedbackService);
   });
 
   afterEach(() => {
