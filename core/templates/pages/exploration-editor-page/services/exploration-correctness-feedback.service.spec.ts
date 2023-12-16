@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ExplorationCorrectnessFeedbackService } from './exploration-correctness-feedback.service';
 import { ExplorationPropertyService } from './exploration-property.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
