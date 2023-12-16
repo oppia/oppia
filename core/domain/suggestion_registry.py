@@ -771,7 +771,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' % self.change_cmd.state_name) # pylint: disable=line-too-long
+                'Expected %s to be a valid state name'
+                % self.change_cmd.state_name)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
@@ -937,7 +938,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             Exception. The state_schema_version of suggestion cannot be
                 processed.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
+        question_dict: question_domain.QuestionDict = (
+            self.change_cmd.question_dict)
 
         state_schema_version = question_dict[
             'question_state_data_schema_version']
@@ -999,7 +1001,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
+        question_dict: question_domain.QuestionDict = (
+            self.change_cmd.question_dict)
 
         if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
             raise utils.ValidationError(
@@ -1077,7 +1080,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
+        question_dict: question_domain.QuestionDict = (
+            self.change_cmd.question_dict)
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
@@ -1167,7 +1171,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
+        question_dict: question_domain.QuestionDict = (
+            self.change_cmd.question_dict)
         state_object = (
             state_domain.State.from_dict(
                 question_dict['question_state_data']))
@@ -1190,7 +1195,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        question_dict: question_domain.QuestionDict = self.change_cmd.question_dict # pylint: disable=line-too-long
+        question_dict: question_domain.QuestionDict = (
+            self.change_cmd.question_dict)
         question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
                 question_dict['question_state_data'],
