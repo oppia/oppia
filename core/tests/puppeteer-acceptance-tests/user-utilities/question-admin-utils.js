@@ -124,7 +124,8 @@ module.exports = class QuestionAdmin extends baseUser {
   }
 
   /**
-   * Function to display the list of question reviewers
+   * Function to return the list of question reviewers
+   * @returns {object} displayedUsers - an element contains the list
    */
   async getDisplayedListOfQuestionReviewers() {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -132,10 +133,18 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    return displayedUsers;
   }
 
   /**
-   * Function to display the list of question reviewers
+   * Function to return the list of question reviewers
+   * @returns {object} displayedUsers - an element contains the list
    */
   async getDisplayedListOfQuestionSubmitters() {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -143,18 +152,34 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(viewRoleUserResult);
+    const displayedUsers = await this.page.$eval(
+      viewRoleUserResult,
+      element => element.innerText
+    );
+    return displayedUsers;
   }
 
   /**
-   * Function to display the contribution rights status for the user.
+   * Function to return the contribution rights status for the user.
    * @param {string} username - the username of the user.
+   * @param {string} contribution - the css element of
+   * the result of contribution status to check
+   * @returns {object} contributionStatusForUser - the value of the result
    */
-  async contributionStatusForUser(username) {
+  async getContributionStatusForUser(username, contribution) {
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
+
+    await this.page.waitForSelector(contribution);
+    const contributionStatusForUser = await this.page.$eval(
+      contribution,
+      element => element.innerText);
+    return contributionStatusForUser;
   }
 
   /**
@@ -162,12 +187,10 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanReviewQuestions(username) {
-    await this.contributionStatusForUser(username);
+    const questionReviewStatusForUser = await
+    this.getContributionStatusForUser(
+      username, viewContributorReviewQuestionsResult);
 
-    await this.page.waitForSelector(viewContributorReviewQuestionsResult);
-    const questionReviewStatusForUser = await this.page.$eval(
-      viewContributorReviewQuestionsResult,
-      element => element.innerText);
     if (questionReviewStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} does not have rights for reviewing questions!`);
@@ -182,12 +205,10 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCanSubmitQuestions(username) {
-    await this.contributionStatusForUser(username);
+    const questionSubmitStatusForUser = await
+    this.getContributionStatusForUser(
+      username, viewContributorSubmitQuestionResult);
 
-    await this.page.waitForSelector(viewContributorSubmitQuestionResult);
-    const questionSubmitStatusForUser = await this.page.$eval(
-      viewContributorSubmitQuestionResult,
-      element => element.innerText);
     if (questionSubmitStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
@@ -202,12 +223,10 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotReviewQuestions(username) {
-    await this.contributionStatusForUser(username);
+    const questionReviewStatusForUser = await
+    this.getContributionStatusForUser(
+      username, viewContributorReviewQuestionsResult);
 
-    await this.page.waitForSelector(viewContributorReviewQuestionsResult);
-    const questionReviewStatusForUser = await this.page.$eval(
-      viewContributorReviewQuestionsResult,
-      element => element.innerText);
     if (!questionReviewStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} has rights for reviewing questions!`);
@@ -222,12 +241,10 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user to view.
    */
   async verifyUserCannotSubmitQuestions(username) {
-    await this.contributionStatusForUser(username);
+    const questionSubmitStatusForUser = await
+    this.getContributionStatusForUser(
+      username, viewContributorSubmitQuestionResult);
 
-    await this.page.waitForSelector(viewContributorSubmitQuestionResult);
-    const questionSubmitStatusForUser = await this.page.$eval(
-      viewContributorSubmitQuestionResult,
-      element => element.innerText);
     if (!questionSubmitStatusForUser.includes('Not-allowed')) {
       throw new Error(
         `${username} has rights for submitting questions!`);
@@ -242,13 +259,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionReviewersIncludeUser(username) {
-    await this.getDisplayedListOfQuestionReviewers();
+    const displayedUsers = await this.getDisplayedListOfQuestionReviewers();
 
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
     if (!displayedUsers.includes(username)) {
       throw new Error(
         `${username} does not have rights for reviewing questions!`);
@@ -260,13 +272,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to be displayed.
    */
   async verifyQuestionSubmittersIncludeUser(username) {
-    await this.getDisplayedListOfQuestionSubmitters();
+    const displayedUsers = await this.getDisplayedListOfQuestionSubmitters();
 
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
     if (!displayedUsers.includes(username)) {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
@@ -278,13 +285,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionReviewersExcludeUser(username) {
-    await this.getDisplayedListOfQuestionReviewers();
+    const displayedUsers = await this.getDisplayedListOfQuestionReviewers();
 
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
     if (displayedUsers.includes(username)) {
       throw new Error(
         `${username} has the right to review question!`);
@@ -296,13 +298,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the user expected to not be displayed.
    */
   async verifyQuestionSubmittersExcludeUser(username) {
-    await this.getDisplayedListOfQuestionSubmitters();
+    const displayedUsers = await this.getDisplayedListOfQuestionSubmitters();
 
-    await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
-      viewRoleUserResult,
-      element => element.innerText
-    );
     if (displayedUsers.includes(username)) {
       throw new Error(
         `${username} has the right to submit question!`);
