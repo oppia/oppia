@@ -216,6 +216,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({
@@ -327,6 +328,7 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({
