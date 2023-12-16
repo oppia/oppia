@@ -289,27 +289,28 @@ export class RteHelperModalComponent {
       if (text === '') {
         text = url;
         this.saveButtonIsDisabled = false;
-      }
-      // First check if the `text` looks like a URL.
-      const suffixes = ['.com', '.org', '.edu', '.gov'];
-      let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
-      if (!textLooksLikeUrl) {
-        this.saveButtonIsDisabled = false;
       } else {
-      // If the text looks like a URL, strip the leading 'http://' or
-      // 'https://' or 'www.'.
-        const prefixes = ['https://', 'http://', 'www.'];
-        if (prefixes.some(prefix => url.startsWith(prefix))) {
-          const urlPrefix = prefixes.find(prefix => url.startsWith(prefix));
-          url = url.substring(urlPrefix.length);
+        // First check if the `text` looks like a URL.
+        const suffixes = ['.com', '.org', '.edu', '.gov'];
+        let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
+        if (!textLooksLikeUrl) {
+          this.saveButtonIsDisabled = false;
+        } else {
+          // If the text looks like a URL, strip the leading 'http://' or
+          // 'https://' or 'www.'.
+          const prefixes = ['https://', 'http://', 'www.'];
+          if (prefixes.some(prefix => url.startsWith(prefix))) {
+            const urlPrefix = prefixes.find(prefix => url.startsWith(prefix));
+            url = url.substring(urlPrefix.length);
+          }
+          if (prefixes.some(prefix => text.startsWith(prefix))) {
+            const textPrefix = prefixes.find(prefix => text.startsWith(prefix));
+            text = text.substring(textPrefix.length);
+          }
+          // After the cleanup, if the strings are not equal, then we do not
+          // allow the lesson creator to save it.
+          this.saveButtonIsDisabled = (url !== text);
         }
-        if (prefixes.some(prefix => text.startsWith(prefix))) {
-          const textPrefix = prefixes.find(prefix => text.startsWith(prefix));
-          text = text.substring(textPrefix.length);
-        }
-        // After the cleanup, if the strings are not equal, then we do not
-        // allow the lesson creator to save it.
-        this.saveButtonIsDisabled = (url !== text);
       }
       if (this.saveButtonIsDisabled) {
         this.updateRteErrorMessage(
@@ -440,7 +441,7 @@ export class RteHelperModalComponent {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
         if (caName === 'text') {
-        // Set the link `text` to the link `url` if the `text` is empty.
+          // Set the link `text` to the link `url` if the `text` is empty.
           (
           customizationArgsDict as {
             [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
@@ -452,6 +453,7 @@ export class RteHelperModalComponent {
         }
       }
     }
+
     for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
       const caName = this.tmpCustomizationArgs[i].name;
       (
