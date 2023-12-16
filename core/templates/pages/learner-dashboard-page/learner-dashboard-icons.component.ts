@@ -143,9 +143,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  addToLearnerPlaylist(activityId: string, activityType: string): void {
+  async addToLearnerPlaylist(
+      activityId: string, activityType: string): Promise<void> {
     var isSuccessfullyAdded = (
-      this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
+      await this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
     if (isSuccessfullyAdded) {
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
