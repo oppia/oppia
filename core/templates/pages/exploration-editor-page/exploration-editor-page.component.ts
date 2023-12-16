@@ -255,8 +255,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           explorationData.param_changes));
       this.explorationAutomaticTextToSpeechService.init(
         explorationData.auto_tts_enabled);
-      this.explorationCorrectnessFeedbackService.init(
-        explorationData.correctness_feedback_enabled);
+      this.explorationCorrectnessFeedbackService.init(true);
       this.explorationNextContentIdIndexService.init(
         explorationData.next_content_id_index);
       if (explorationData.edits_allowed) {

@@ -149,7 +149,6 @@ describe('Settings Tab Component', () => {
               states: {},
               title: 'Test Exploration',
               language_code: 'en',
-              correctness_feedback_enabled: false,
               exploration_metadata: {
                 title: 'Exploration',
                 category: 'Algebra',
@@ -163,7 +162,6 @@ describe('Settings Tab Component', () => {
                 param_specs: {},
                 param_changes: [],
                 auto_tts_enabled: false,
-                correctness_feedback_enabled: true,
                 edits_allowed: true
               }
             }),

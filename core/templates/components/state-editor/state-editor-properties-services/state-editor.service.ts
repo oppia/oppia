@@ -85,7 +85,7 @@ export class StateEditorService {
   interaction!: Interaction;
   linkedSkillId!: string;
   stateNames: string[] = [];
-  correctnessFeedbackEnabled: boolean = false;
+  correctnessFeedbackEnabled: boolean = true;
   inQuestionMode: boolean = false;
   misconceptionsBySkill: {} = {};
   explorationIsCurated: boolean = false;

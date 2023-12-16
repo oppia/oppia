@@ -152,8 +152,7 @@ export class PreviewTabComponent
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });
-        this.playerCorrectnessFeedbackEnabledService.init(
-          returnDict.correctness_feedback_enabled);
+        this.playerCorrectnessFeedbackEnabledService.init(true);
         this.numberAttemptsService.reset();
       });
     }, 200);

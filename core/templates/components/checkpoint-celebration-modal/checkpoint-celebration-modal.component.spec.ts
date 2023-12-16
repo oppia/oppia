@@ -161,7 +161,6 @@ const dummyExplorationBackendDict = {
   title: 'Dummy Title',
   language_code: 'en',
   objective: 'Dummy Objective',
-  correctness_feedback_enabled: true,
   next_content_id_index: 4
 };
 
@@ -178,7 +177,6 @@ const dummyExplorationMetadata = {
   param_specs: {},
   param_changes: [],
   auto_tts_enabled: false,
-  correctness_feedback_enabled: true,
   edits_allowed: true,
 };
 
@@ -193,7 +191,6 @@ const dummyExplorationBackendResponse = {
   preferred_audio_language_code: 'en',
   preferred_language_codes: ['en'],
   auto_tts_enabled: false,
-  correctness_feedback_enabled: true,
   record_playthrough_probability: 1.0,
   draft_change_list_id: 1,
   has_viewed_lesson_info_modal_once: false,

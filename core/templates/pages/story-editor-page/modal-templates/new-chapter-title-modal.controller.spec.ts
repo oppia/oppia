@@ -199,8 +199,6 @@ describe('Create New Chapter Modal Component', () => {
       spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
       spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
-      spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-        .and.resolveTo(true);
       spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
         .and.resolveTo(true);
       spyOn(
@@ -276,30 +274,12 @@ describe('Create New Chapter Modal Component', () => {
     ).and.resolveTo([]);
     spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.returnValue(false);
-    const correctnessFeedbackSpy = spyOn(
-      curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy = spyOn(
       curatedExplorationValidationService, 'isDefaultCategoryAsync');
     component.saveAsync();
     flushMicrotasks();
     expect(component.invalidExpId).toEqual(true);
-    expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
     expect(categorySpy).not.toHaveBeenCalled();
-  }));
-
-  it('should prevent exploration from being added if its correctness ' +
-  'feedback is disabled', fakeAsync(() => {
-    component.title = 'dummy_title';
-    spyOn(
-      editableStoryBackendApiService, 'validateExplorationsAsync'
-    ).and.resolveTo([]);
-    spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
-      .and.resolveTo(false);
-    component.saveAsync();
-    flushMicrotasks();
-    expect(component.correctnessFeedbackDisabled).toBe(true);
   }));
 
   it('should prevent exploration from being added if its category ' +
@@ -310,8 +290,6 @@ describe('Create New Chapter Modal Component', () => {
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
     spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(true);
     spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(false);
@@ -331,8 +309,6 @@ describe('Create New Chapter Modal Component', () => {
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
     spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(true);
     spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(true);
@@ -355,8 +331,6 @@ describe('Create New Chapter Modal Component', () => {
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
     spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
-      .and.resolveTo(true);
-    spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(true);
     spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(true);
@@ -381,9 +355,6 @@ describe('Create New Chapter Modal Component', () => {
       ).and.resolveTo([]);
       spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
-      spyOn(
-        curatedExplorationValidationService,
-        'isCorrectnessFeedbackEnabled').and.resolveTo(true);
       spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
         .and.resolveTo(true);
       spyOn(

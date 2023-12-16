@@ -381,7 +381,6 @@ describe('Conversation skin component', () => {
     is_version_of_draft_valid: null,
     title: 'Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: true,
     init_state_name: 'Start',
     param_changes: [],
     next_content_id_index: 4,
@@ -400,7 +399,6 @@ describe('Conversation skin component', () => {
       param_specs: null,
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       states: explorationDict.states,
       next_content_id_index: explorationDict.next_content_id_index
@@ -418,7 +416,6 @@ describe('Conversation skin component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 2,
@@ -426,7 +423,6 @@ describe('Conversation skin component', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,
@@ -447,7 +443,6 @@ describe('Conversation skin component', () => {
       param_specs: null,
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       states: explorationDict.states,
       next_content_id_index: explorationDict.next_content_id_index
@@ -465,7 +460,6 @@ describe('Conversation skin component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 2,
@@ -473,7 +467,6 @@ describe('Conversation skin component', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,

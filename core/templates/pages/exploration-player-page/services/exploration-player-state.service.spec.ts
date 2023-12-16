@@ -81,7 +81,6 @@ describe('Exploration Player State Service', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false,
       next_content_id_index: 0
     },
     exploration_metadata: {
@@ -97,7 +96,6 @@ describe('Exploration Player State Service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
       edits_allowed: true
     },
     exploration_id: 'test_id',
@@ -107,7 +105,6 @@ describe('Exploration Player State Service', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: false,
-    correctness_feedback_enabled: true,
     displayable_language_codes: [],
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
@@ -455,7 +452,6 @@ describe('Exploration Player State Service', () => {
       editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
       .and.returnValue(Promise.resolve({
         auto_tts_enabled: false,
-        correctness_feedback_enabled: false,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: '',
@@ -479,7 +475,6 @@ describe('Exploration Player State Service', () => {
           param_specs: {},
           param_changes: [],
           auto_tts_enabled: false,
-          correctness_feedback_enabled: true,
           edits_allowed: true
         }
       } as ExplorationBackendDict));

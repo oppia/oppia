@@ -168,13 +168,6 @@ export class NewChapterTitleModalComponent implements OnInit {
     }
 
     this.invalidExpId = false;
-    const correctnessFeedbackIsEnabled = (
-      await this.curatedExplorationValidationService
-        .isCorrectnessFeedbackEnabled(this.explorationId));
-    if (!correctnessFeedbackIsEnabled) {
-      this.correctnessFeedbackDisabled = true;
-      return;
-    }
     this.correctnessFeedbackDisabled = false;
 
     const categoryIsDefault = (

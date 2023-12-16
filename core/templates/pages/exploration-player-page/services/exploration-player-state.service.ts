@@ -164,7 +164,6 @@ export class ExplorationPlayerStateService {
     this.explorationEngineService.init(
       {
         auto_tts_enabled: returnDict.auto_tts_enabled,
-        correctness_feedback_enabled: true,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: returnDict.exploration.init_state_name,
