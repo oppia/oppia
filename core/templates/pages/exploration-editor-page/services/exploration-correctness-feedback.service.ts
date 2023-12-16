@@ -44,12 +44,11 @@ export class ExplorationCorrectnessFeedbackService extends
   }
 
   isEnabled(): string | boolean {
-    return this.savedMemento;
+    return true;
   }
 
   toggleCorrectnessFeedback(): void {
-    this.displayed = !this.displayed;
-    this.saveDisplayedValue();
+
   }
 }
 

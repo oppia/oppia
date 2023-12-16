@@ -183,6 +183,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   ) { }
 
   setDocumentTitle(): void {
+    console.log(this.explorationCorrectnessFeedbackService.isEnabled());
     if (this.explorationTitleService.savedMemento) {
       this.pageTitleService.setDocumentTitle(
         this.explorationTitleService.savedMemento + ' - Oppia Editor');

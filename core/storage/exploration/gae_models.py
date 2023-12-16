@@ -230,11 +230,6 @@ class ExplorationModel(base_models.VersionedModel):
     # this exploration.
     auto_tts_enabled = (
         datastore_services.BooleanProperty(default=True, indexed=True))
-    # A boolean indicating whether correctness feedback is enabled in this
-    # exploration.
-    # DEPRECATED: Enable correctness feedback for all lessons.
-    correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=True, indexed=True)
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
         required=True, default=0, indexed=True)
@@ -242,6 +237,11 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     edits_allowed = datastore_services.BooleanProperty(
         default=True, indexed=True)
+    # A boolean indicating whether correctness feedback is enabled in this
+    # exploration.
+    # DEPRECATED. Do not use.
+    correctness_feedback_enabled = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

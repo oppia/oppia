@@ -1239,7 +1239,6 @@ class ExplorationDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
     next_content_id_index: int
     version: int
@@ -1261,7 +1260,6 @@ class ExplorationPlayerDict(TypedDict):
     title: str
     objective: str
     language_code: str
-    correctness_feedback_enabled: bool
     next_content_id_index: int
 
 
@@ -1387,7 +1385,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
         self.next_content_id_index = next_content_id_index
         self.edits_allowed = edits_allowed
 
@@ -1500,7 +1497,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
-        exploration.correctness_feedback_enabled = True
         exploration.next_content_id_index = exploration_dict[
             'next_content_id_index']
         exploration.edits_allowed = exploration_dict['edits_allowed']
@@ -1750,11 +1746,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
-
-        if not isinstance(self.correctness_feedback_enabled, bool):
-            raise utils.ValidationError(
-                'Expected correctness_feedback_enabled to be a bool, received '
-                '%s' % self.correctness_feedback_enabled)
 
         if not isinstance(self.next_content_id_index, int):
             raise utils.ValidationError(
@@ -5687,7 +5678,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
@@ -5780,8 +5770,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 - title: str. The exploration title.
                 - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
-                - correctness_feedback_enabled: bool. Whether to show
-                    correctness feedback.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -5794,7 +5782,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'title': self.title,
             'objective': self.objective,
             'language_code': self.language_code,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -6488,7 +6475,6 @@ class ExplorationMetadataDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
 
 
@@ -6545,7 +6531,6 @@ class ExplorationMetadata:
         self.param_specs = param_specs
         self.param_changes = param_changes
         self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED # pylint: disable=line-too-long
         self.edits_allowed = edits_allowed
 
     def to_dict(self) -> ExplorationMetadataDict:
@@ -6573,7 +6558,6 @@ class ExplorationMetadata:
                 p_change.to_dict() for p_change in self.param_changes
             ],
             'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
 

@@ -161,7 +161,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             language_code=constants.DEFAULT_LANGUAGE_CODE
         )
         exploration.objective = 'An objective'
-        exploration.correctness_feedback_enabled = True
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
@@ -1340,23 +1339,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
-    def test_validate_exploration_for_correctness_feedback_not_enabled(
-        self
-    ) -> None:
-        exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, category='Algebra')
-        exploration.correctness_feedback_enabled = False
-        error_string = (
-            'Expected all explorations in a story to '
-            'have correctness feedback '
-            'enabled. Invalid exploration: %s' % exploration.id)
-        errors = exp_services.validate_exploration_for_story(exploration, False)
-        self.assertEqual(len(errors), 1)
-        if len(errors) > 0:
-            self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):
-            exp_services.validate_exploration_for_story(exploration, True)
-
     def test_validate_exploration_for_default_category(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, category='Test')
@@ -1876,7 +1858,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -2143,7 +2124,7 @@ title: Title
         auto_tts_enabled: true
         blurb: ''
         category: Category
-        correctness_feedback_enabled: true
+    
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
@@ -2519,7 +2500,6 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -2624,7 +2604,6 @@ version: 2
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -6471,7 +6450,6 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %r
 language_code: en
@@ -7061,28 +7039,6 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.auto_tts_enabled, True)
-
-    def test_update_exploration_correctness_feedback_enabled(self) -> None:
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.correctness_feedback_enabled, True)
-
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.correctness_feedback_enabled, True)
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add change to upgrade the version.
-        exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'new title'
-            })], 'Changed title.')
-
-        # Assert that final version consists all the changes.
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.correctness_feedback_enabled, True)
 
     def test_update_exploration_with_mark_translation_needs_update_changes(
         self
@@ -8641,7 +8597,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8994,7 +8949,6 @@ author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
