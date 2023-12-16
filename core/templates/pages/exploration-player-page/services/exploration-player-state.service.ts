@@ -160,12 +160,11 @@ export class ExplorationPlayerStateService {
     this.playthroughService.initSession(
       this.explorationId, returnDict.version,
       returnDict.record_playthrough_probability);
-    this.playerCorrectnessFeedbackEnabledService.init(
-      returnDict.correctness_feedback_enabled);
+    this.playerCorrectnessFeedbackEnabledService.init(true);
     this.explorationEngineService.init(
       {
         auto_tts_enabled: returnDict.auto_tts_enabled,
-        correctness_feedback_enabled: returnDict.correctness_feedback_enabled,
+        correctness_feedback_enabled: true,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: returnDict.exploration.init_state_name,
@@ -257,8 +256,7 @@ export class ExplorationPlayerStateService {
       }, featuresData);
       this.explorationEngineService.init(
         explorationData, null, null, null, null, [], callback);
-      this.playerCorrectnessFeedbackEnabledService.init(
-        explorationData.correctness_feedback_enabled);
+      this.playerCorrectnessFeedbackEnabledService.init(true);
       this.numberAttemptsService.reset();
     });
   }

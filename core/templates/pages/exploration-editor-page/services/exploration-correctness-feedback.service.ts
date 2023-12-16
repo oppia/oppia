@@ -46,10 +46,6 @@ export class ExplorationCorrectnessFeedbackService extends
   isEnabled(): string | boolean {
     return true;
   }
-
-  toggleCorrectnessFeedback(): void {
-
-  }
 }
 
 angular.module('oppia').factory('ExplorationCorrectnessFeedbackService',
