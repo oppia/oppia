@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Routing module for donate page.
+ * @fileoverview Controller for the donation box modal.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { DonatePageRootComponent } from './donate-page-root.component';
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-const routes: Route[] = [
-  {
-    path: '',
-    component: DonatePageRootComponent
-  }
-];
-
-@NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+@Component({
+  selector: 'donation-box-modal',
+  templateUrl: './donation-box-modal.component.html',
 })
+export class DonationBoxModalComponent {
+  constructor(private activeModal: NgbActiveModal) {}
 
-export class DonatePageRoutingModule {}
+  dismiss(): void {
+    this.activeModal.dismiss();
+  }
+}

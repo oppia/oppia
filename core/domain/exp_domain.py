@@ -2098,8 +2098,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
-            unseen_states = list(
-                set(self.states.keys()) - set(processed_queue))
+            unseen_states = sorted(list(
+                set(self.states.keys()) - set(processed_queue)))
             raise utils.ValidationError(
                 'The following states are not reachable from the initial '
                 'state: %s' % ', '.join(unseen_states))
