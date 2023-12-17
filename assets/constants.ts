@@ -6678,7 +6678,7 @@ export default {
     },
     "DONATE": {
       "ROUTE": "donate",
-      "TITLE": "Donate | Oppia",
+      "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
