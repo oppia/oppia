@@ -365,7 +365,7 @@ export class EditableTopicBackendApiService {
       this.http.get<UnusedTopicsBackendDict>('/unused_topics').toPromise().then(response => {
         resolve(response.unused_topics);
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse.error.error.error);
       });
     });
   }
