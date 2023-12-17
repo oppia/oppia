@@ -32,7 +32,7 @@
     <input class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid || saveButtonIsDisabled">
+           [disabled]="!customizationArgsForm.valid || isErrorMessageNonEmpty()">
   </div>
 </div>
 <style>

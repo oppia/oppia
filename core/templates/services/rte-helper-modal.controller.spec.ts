@@ -189,7 +189,7 @@ describe('RteHelperModalComponent', () => {
         component.customizationArgsForm.value[1] = 'oppia.com';
         component.onCustomizationArgsFormChange(
           component.customizationArgsForm.value);
-        expect(component.saveButtonIsDisabled).toBe(true);
+        expect(component.isErrorMessageNonEmpty()).toBe(true);
         expect(component.errorMessage).toBe(
           'It seems like clicking on this link will lead the user to a ' +
           'different URL than the text specifies. Please change the text.'
@@ -235,7 +235,7 @@ describe('RteHelperModalComponent', () => {
           component.customizationArgsForm.value[2] = 0;
           component.onCustomizationArgsFormChange(
             component.customizationArgsForm.value);
-          expect(component.saveButtonIsDisabled).toBe(true);
+          expect(component.isErrorMessageNonEmpty()).toBe(true);
           expect(component.errorMessage).toBe(
             'Please ensure that the start time of the video is earlier than ' +
             'the end time.');

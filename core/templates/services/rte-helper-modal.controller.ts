@@ -116,7 +116,6 @@ export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   modalIsLoading: boolean = true;
-  saveButtonIsDisabled: boolean = false;
   errorMessage: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
@@ -266,61 +265,66 @@ export class RteHelperModalComponent {
       let rawLatex: string = value[0].raw_latex;
       let mathExpressionSvgIsBeingProcessed: boolean = (
         value[0].mathExpressionSvgIsBeingProcessed);
-      this.saveButtonIsDisabled = (
-        mathExpressionSvgIsBeingProcessed || rawLatex === '');
+      if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
+        this.updateRteErrorMessage(' ');
+      } else {
+        this.updateRteErrorMessage('');
+      }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
       let start: number = value[1];
       let end: number = value[2];
       if (start === 0 && end === 0) {
-        this.saveButtonIsDisabled = false;
-      } else {
-        this.saveButtonIsDisabled = (start >= end);
-      }
-      if (this.saveButtonIsDisabled) {
-        this.updateRteErrorMessage(
-          'Please ensure that the start time of the video is earlier than ' +
-          'the end time.');
-      } else {
         this.updateRteErrorMessage('');
+      } else {
+        if (start >= end) {
+          this.updateRteErrorMessage(
+            'Please ensure that the start time of the video is earlier than ' +
+            'the end time.');
+        } else {
+          this.updateRteErrorMessage('');
+        }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
       if (text === '') {
         text = url;
-        this.saveButtonIsDisabled = false;
+        this.updateRteErrorMessage('');
       } else {
         // First check if the `text` looks like a URL.
         const suffixes = ['.com', '.org', '.edu', '.gov'];
         let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
         if (!textLooksLikeUrl) {
-          this.saveButtonIsDisabled = false;
+          this.updateRteErrorMessage('');
         } else {
           // If the text looks like a URL, strip the leading 'http://' or
           // 'https://' or 'www.'.
           const prefixes = ['https://', 'http://', 'www.'];
-          if (prefixes.some(prefix => url.startsWith(prefix))) {
-            const urlPrefix = prefixes.find(prefix => url.startsWith(prefix));
-            url = url.substring(urlPrefix.length);
-          }
-          if (prefixes.some(prefix => text.startsWith(prefix))) {
-            const textPrefix = prefixes.find(prefix => text.startsWith(prefix));
-            text = text.substring(textPrefix.length);
+          for (const prefix of prefixes) {
+            if (url.startsWith(prefix)) {
+              url = url.substring(prefix.length);
+            }
+            if (text.startsWith(prefix)) {
+              text = text.substring(prefix.length);
+            }
           }
           // After the cleanup, if the strings are not equal, then we do not
           // allow the lesson creator to save it.
-          this.saveButtonIsDisabled = (url !== text);
+          if (url !== text) {
+            this.updateRteErrorMessage(
+              'It seems like clicking on this link will lead the user to a ' +
+              'different URL than the text specifies. Please change the text.'
+            );
+          } else {
+            this.updateRteErrorMessage('');
+          }
         }
       }
-      if (this.saveButtonIsDisabled) {
-        this.updateRteErrorMessage(
-          'It seems like clicking on this link will lead the user to a ' +
-          'different URL than the text specifies. Please change the text.'
-        );
-      } else {
-        this.updateRteErrorMessage('');
-      }
     }
+  }
+
+  isErrorMessageNonEmpty(): boolean {
+    return this.errorMessage !== '';
   }
 
   updateRteErrorMessage(errorMessage: string): void {
