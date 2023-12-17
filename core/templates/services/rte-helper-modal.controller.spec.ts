@@ -120,6 +120,8 @@ describe('RteHelperModalComponent', () => {
       spyOn(contextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
+      component.onCustomizationArgsFormChange(
+        component.attrsCustomizationArgsDict.heading);
       expect(component.isErrorMessageNonEmpty()).toBe(false);
       component.save();
       flush();
