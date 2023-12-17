@@ -24,6 +24,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { AddTopicToClassroomModalComponent } from './add-topic-to-classroom-modal.component';
+import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+
 
 describe('AddTopicToClassroomModalComponent', () => {
   let fixture: ComponentFixture<AddTopicToClassroomModalComponent>;
@@ -34,7 +36,8 @@ describe('AddTopicToClassroomModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AddTopicToClassroomModalComponent],
+      declarations: [AddTopicToClassroomModalComponent,
+      LoadingDotsComponent],
       providers: [
         NgbActiveModal,
         FormBuilder,
