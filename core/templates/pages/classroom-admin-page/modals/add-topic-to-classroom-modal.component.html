@@ -1,10 +1,11 @@
 <div class="modal-header">
-    <h4 class="modal-title">Ajouter des sujets à la salle de classe</h4>
+    <h4 class="modal-title">Add topics to classroom</h4>
     <button type="button" class="close" (click)="close()">
       <span>&times;</span>
     </button>
   </div>
   <div class="modal-body">
+    <p *ngIf="!topicForm" class="loading-message">Loading unused topics <loading-dots></loading-dots></p>
     <form *ngIf="topicForm" [formGroup]="topicForm">
       <div class="form-check" *ngFor="let topic of topicBackendDictList">
         <input
@@ -35,4 +36,21 @@
       Add Topics
     </button>
   </div>
+
+  <style>
+    .loading-message{
+      font-size: 30px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      max-height: 300px;
+    }
+
+    .form-check-label {
+      margin-left: 5px;
+    }
+  </style>
   

@@ -22,6 +22,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { LoadingMessageComponent } from 'base-components/loading-message.component';
+import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 
 
 function convertToTopic(topicBackendDict: TopicBackendDict): Topic {
@@ -46,7 +48,7 @@ export class AddTopicToClassroomModalComponent
 
   topicBackendDictList: TopicBackendDict[] = [];
   topicForm: FormGroup;
-
+  message: string = "Loading unused topics";
   ngOnInit(): void {
     this.loadUnusedTopics();
   }
