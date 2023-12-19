@@ -68,9 +68,8 @@ export class OppiaFooterComponent {
   }
 
   subscribeToMailingList(): void {
-    // Convert null or empty string to null for consistency
+    // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
-    
     this.mailingListBackendApiService.subscribeUserToMailingList(
       String(this.emailAddress),
       this.userName,
