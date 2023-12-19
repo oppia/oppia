@@ -346,12 +346,6 @@ describe('Opportunities List Component', () => {
     spyOnProperty(
       contributionOpportunitiesService, 'removeOpportunitiesEventEmitter')
       .and.returnValue(mockRemoveOpportunitiesEventEmitter);
-    spyOnProperty(
-      contributionOpportunitiesService, 'pinnedOpportunitiesChanged')
-      .and.returnValue(mockPinOpportunitiesEventEmitter);
-    spyOnProperty(
-      contributionOpportunitiesService, 'unpinnedOpportunitiesChanged')
-      .and.returnValue(mockUnpinOpportunitiesEventEmitter);
   });
 
   afterEach(() => {
@@ -829,6 +823,15 @@ describe('Opportunities List Component', () => {
   });
 
   describe('when clicking on pin-unpin icon', () => {
+    beforeEach(() => {
+      spyOnProperty(
+        contributionOpportunitiesService, 'pinnedOpportunitiesChanged')
+        .and.returnValue(mockPinOpportunitiesEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService, 'unpinnedOpportunitiesChanged')
+        .and.returnValue(mockUnpinOpportunitiesEventEmitter);
+    });
+
     it('should pin an opportunity', fakeAsync(() => {
       component.init();
       component.onChangeLanguage('en');
