@@ -16,27 +16,40 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { PageTitleService } from 'services/page-title.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
+
+interface ImpactStat {
+  imageUrl: string | null;
+  stat: string | null;
+  text: string;
+}
+
+interface DonationValue {
+  amount: string;
+  description: string;
+}
+
+interface Highlight {
+  imageUrl: string;
+  heading: string;
+  text: string;
+}
+
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
+
 export class DonatePageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   windowIsNarrow: boolean = false;
@@ -44,46 +57,100 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
   );
+export class DonatePageComponent implements OnInit {
+  donationValues: DonationValue[] = [
+    {
+      amount: '10',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_1',
+    },
+    {
+      amount: '25',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_2',
+    },
+    {
+      amount: '100',
+      description: 'I18N_DONATE_PAGE_CONTENT_DONATION_DESCRIPTION_3',
+    },
+  ];
+
+  impactStats: ImpactStat[][] = [
+    [
+      {
+        imageUrl: '/donate/content-2-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_1',
+      },
+      {
+        imageUrl: '/donate/content-2-screen.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_2',
+      },
+    ],
+    [
+      {
+        imageUrl: '/donate/content-2-phone.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_3',
+      },
+      {
+        imageUrl: '/donate/content-2-area-graph.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_4',
+      },
+      {
+        imageUrl: '/donate/content-2-visitors.svg',
+        stat: null,
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_5',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '98%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_6',
+      },
+    ],
+    [
+      {
+        imageUrl: null,
+        stat: '90%',
+        text: 'I18N_DONATE_PAGE_CONTENT_STAT_7',
+      },
+    ],
+  ];
+
+  highlights: Highlight[] = [
+    {
+      imageUrl: '/donate/highlights-1',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_1',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_1',
+    },
+    {
+      imageUrl: '/donate/highlights-2',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_2',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
+    },
+  ];
 
   constructor(
-    private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private translateService: TranslateService,
     private ngbModal: NgbModal,
     private insertScriptService: InsertScriptService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
-    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
-    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-    this.donateImgUrl = this.getStaticImageUrl('/general/opp_donate_text.svg');
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-
     const searchParams = new URLSearchParams(
       this.windowRef.nativeWindow.location.search);
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
-      // Show the "thanks for donating" modal.
-      this.ngbModal.open(
-        ThanksForDonatingModalComponent,
-        {
-          backdrop: 'static',
-          size: 'xl'
-        }
-      );
+      this.ngbModal.open(ThanksForDonatingModalComponent, {
+        backdrop: 'static',
+        size: 'xl',
+      });
     }
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
-    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -100,8 +167,11 @@ export class DonatePageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  openDonationBoxModal(): void {
+    this.ngbModal.open(DonationBoxModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal',
+    });
   }
 }
-
-angular.module('oppia').directive(
-  'donatePage', downgradeComponent({component: DonatePageComponent}));

@@ -19,18 +19,17 @@
 import { TestBed } from '@angular/core/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 
 import { DonatePageComponent } from './donate-page.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PageTitleService } from 'services/page-title.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
+import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 
 class MockWindowRef {
   _window = {
@@ -54,53 +53,26 @@ class MockWindowRef {
   }
 }
 
-class MockTranslateService {
-  onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string, interpolateParams?: Object): string {
-    return key;
-  }
-}
-
 describe('Donate page', () => {
-  const siteAnalyticsServiceStub = new SiteAnalyticsService(
-    new WindowRef());
-  let translateService: TranslateService;
-  let pageTitleService: PageTitleService;
+  let component: DonatePageComponent;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
+  let urlInterpolationService: UrlInterpolationService;
 
-  beforeEach(async() => {
+  beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [
         DonatePageComponent,
         MockTranslatePipe
       ],
       providers: [
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
-        {
-          provide: WindowDimensionsService,
-          useValue: {
-            isWindowNarrow: () => true
-          }
-        },
-        {
-          provide: WindowRef,
-          useValue: windowRef
-        },
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
-        },
-        PageTitleService
+        { provide: WindowRef, useValue: windowRef },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });
-
-  let component: DonatePageComponent;
 
   beforeEach(() => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
@@ -108,54 +80,13 @@ describe('Donate page', () => {
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     ngbModal = TestBed.inject(NgbModal);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ngbModal, 'open');
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should get image path', () => {
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
 
-  it('should set component properties when ngOnInit() is called', () => {
-    spyOn(translateService.onLangChange, 'subscribe');
-    component.ngOnInit();
-
-    expect(component.windowIsNarrow).toBe(true);
-    expect(component.donateImgUrl).toBe(
-      '/assets/images/general/opp_donate_text.svg');
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-  });
-
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
-    component.ngOnInit();
-    spyOn(component, 'setPageTitle');
-    translateService.onLangChange.emit();
-
-    expect(component.setPageTitle).toHaveBeenCalled();
-  });
-
-  it('should set new page title', () => {
-    spyOn(translateService, 'instant').and.callThrough();
-    spyOn(pageTitleService, 'setDocumentTitle');
-    component.setPageTitle();
-
-    expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_DONATE_PAGE_BROWSER_TAB_TITLE');
-  });
-
-  it('should unsubscribe on component destruction', () => {
-    component.directiveSubscriptions.add(
-      translateService.onLangChange.subscribe(() => {
-        component.setPageTitle();
-      })
-    );
-    component.ngOnDestroy();
-
-    expect(component.directiveSubscriptions.closed).toBe(true);
-  });
 
   it('should get image set', () => {
     spyOn(component, 'getStaticImageUrl');
@@ -163,6 +94,10 @@ describe('Donate page', () => {
     component.getImageSet('abc', 'png');
 
     expect(component.getStaticImageUrl).toHaveBeenCalled();
+    component.getStaticImageUrl('abc.webp');
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'abc.webp');
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -176,6 +111,24 @@ describe('Donate page', () => {
 
     windowRef.nativeWindow.location.search = '?thanks';
     component.ngOnInit();
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ThanksForDonatingModalComponent,
+      {
+        backdrop: 'static',
+        size: 'xl',
+      }
+    );
+  });
+
+  it('should open donation box modal', () => {
+    component.openDonationBoxModal();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      DonationBoxModalComponent, {
+        backdrop: 'static',
+        size: 'xl',
+        windowClass: 'donation-box-modal',
+      }
+    );
   });
 });
