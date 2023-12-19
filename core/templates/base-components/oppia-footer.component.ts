@@ -72,7 +72,7 @@ export class OppiaFooterComponent {
     const userName = this.name ? String(this.name) : null;
     this.mailingListBackendApiService.subscribeUserToMailingList(
       String(this.emailAddress),
-      this.userName,
+      userName,
       AppConstants.MAILING_LIST_WEB_TAG
     ).then((status) => {
       if (status) {
