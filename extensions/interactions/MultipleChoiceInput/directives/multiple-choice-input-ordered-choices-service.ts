@@ -29,7 +29,7 @@ export interface ChoiceWithIndex {
   providedIn: 'root'
 })
 export class MultipleChoiceInputOrderedChoicesService {
-  private choices: ChoiceWithIndex[];
+  private choices: ChoiceWithIndex[] = [];
   store(choices: ChoiceWithIndex[]): void {
     this.choices = choices;
   }
