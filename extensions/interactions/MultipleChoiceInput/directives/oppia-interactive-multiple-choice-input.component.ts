@@ -43,7 +43,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
   @Input() choicesWithValue: string;
   @Input() showChoicesInShuffledOrderWithValue: string;
-  choices!: ChoiceWithIndex[];
+  choices: ChoiceWithIndex[];
   answer;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
