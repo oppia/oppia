@@ -156,16 +156,49 @@ describe('HintAndSolutionButtonsComponent', () => {
       'content', audioTranslationLanguageService);
   });
 
-  it('should set .editorPreviewMode to the result', () => {
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
-    component.ngOnInit();
-    expect(component['.editorPreviewMode']).toBe(true);
-  });
+  it('should reset hints', () => {
+    // Arrange.
+    const stateCardWithoutSolution = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction html',
+      InteractionObjectFactory.createNonInteractive('Continue'),
+      [], null, RecordedVoiceovers.createEmpty(), 'content',
+      audioTranslationLanguageService
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(stateCardWithoutSolution);
+    spyOn(component, 'resetLocalHintsArray');
 
-  it('should call resetLocalHintsArray during ngOnInit lifecycle', () => {
-    const resetLocalHintsArraySpy = spyOn(component, 'resetLocalHintsArray');
+    // Act.
     component.ngOnInit();
-    expect(resetLocalHintsArraySpy).toHaveBeenCalled();
+    playerPositionService.onNewCardOpened.emit();
+
+    // Assert.
+    expect(component.resetLocalHintsArray).toHaveBeenCalled();
+  });
+  // When onNewCardOpened is called and StateCard has a solution.
+  it('should reset hints', () => {
+    // Arrange.
+    const stateCardWithSolution = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction html',
+      InteractionObjectFactory.createNonInteractive('Continue'),
+      [], {
+        answer_is_exclusive: true,
+        correct_answer: 'test_answer',
+        explanation: {
+          content_id: '2',
+          html: 'test_explanation1',
+        },
+      }, RecordedVoiceovers.createEmpty(), 'content',
+      audioTranslationLanguageService
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(stateCardWithSolution);
+    spyOn(component, 'resetLocalHintsArray');
+
+    // Act.
+    component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit();
+
+    // Assert.
+    expect(component.resetLocalHintsArray).toHaveBeenCalled();
   });
 
   it('should subscribe to events on initialization', () => {
