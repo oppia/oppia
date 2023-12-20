@@ -25,7 +25,7 @@ import 'popper.js';
 import 'bootstrap';
 import { TranslateService } from '@ngx-translate/core';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import { InsertScriptService } from 'services/insert-script.service';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 
 interface ImpactStat {
@@ -169,7 +169,7 @@ export class DonatePageComponent implements OnInit {
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
-  
+
   openDonationBoxModal(): void {
     this.ngbModal.open(DonationBoxModalComponent, {
       backdrop: 'static',
