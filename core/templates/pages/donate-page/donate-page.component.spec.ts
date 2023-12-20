@@ -58,7 +58,6 @@ describe('Donate page', () => {
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
   let urlInterpolationService: UrlInterpolationService;
-}
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -88,6 +87,11 @@ describe('Donate page', () => {
   it('should get image path', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl');
 
+    component.getStaticImageUrl('abc.webp');
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'abc.webp');
+  });
 
   it('should get image set', () => {
     spyOn(component, 'getStaticImageUrl');
