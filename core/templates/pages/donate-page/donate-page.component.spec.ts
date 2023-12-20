@@ -56,6 +56,8 @@ describe('Donate page', () => {
   let component: DonatePageComponent;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
+  let pageTitleService: PageTitleService;
+  let translateService: TranslateService;
   let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(() => {
