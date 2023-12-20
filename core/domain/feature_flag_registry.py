@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import platform_feature_list
-from core import utils
 from core.domain import feature_flag_domain
 from core.platform import models
 

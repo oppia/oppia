@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-import enum
 
 from core import feconf
 from core import utils
