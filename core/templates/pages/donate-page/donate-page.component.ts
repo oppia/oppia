@@ -16,9 +16,9 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Subscription } from 'rxjs';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
@@ -58,8 +58,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
   );
-}
-export class DonatePageComponent implements OnInit {
   donationValues: DonationValue[] = [
     {
       amount: '10',
