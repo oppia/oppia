@@ -167,6 +167,8 @@ export class DonatePageComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+  
   openDonationBoxModal(): void {
     this.ngbModal.open(DonationBoxModalComponent, {
       backdrop: 'static',
@@ -174,4 +176,3 @@ export class DonatePageComponent implements OnInit {
       windowClass: 'donation-box-modal',
     });
   }
-}
