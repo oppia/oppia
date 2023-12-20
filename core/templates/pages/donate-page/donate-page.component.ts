@@ -177,3 +177,4 @@ export class DonatePageComponent implements OnInit {
       windowClass: 'donation-box-modal',
     });
   }
+}
