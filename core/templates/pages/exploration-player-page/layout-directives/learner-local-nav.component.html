@@ -1,7 +1,7 @@
 <ng-template #popContent>
   <oppia-feedback-popup (closePopover)="closePopover()"></oppia-feedback-popup>
 </ng-template>
-<ul class="nav navbar-nav oppia-navbar-nav float-right mr-0">
+<ul class="nav navbar-nav oppia-navbar-nav float-right mr-0 d-lg-inline-flex d-none">
   <li class="nav-item">
     <span tabindex="0"
           class="nav-link"
@@ -50,10 +50,37 @@
     </div>
   </li>
 </ul>
+<div ngbDropdown class="dropdown d-lg-none d-flex justify-content-end">
+  <button type="button" class="mobile-option-btn btn btn-sm border border-white text-white" id="dropdownBasic1" ngbDropdownToggle>
+    <i class="fas fa-ellipsis-v exploration-player-navbar-icons"></i>
+  </button>
+  <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
+    <span ngbDropdownItem tabindex="0" placement="bottom" (click)="toggleAttributionModal()" (keydown.enter)="toggleAttributionModal()">
+      <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">Share</span>
+    </span>
+    <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" tabindex="0" #feedbackPopOver="ngbPopover" [autoClose]="false">
+      <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
+    </span>
+    <a ngbDropdownItem *ngIf="canEdit" href="/create/{{explorationId}}" tabindex="0" target="_blank" rel="noopener">
+      <i class="fas fa-pen exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</span>
+    </a>
+    <div ngbDropdownItem *ngIf="username" tabindex="0" (click)="showFlagExplorationModal()" (keydown.enter)="showFlagExplorationModal()">
+      <i class="fas fa-flag exploration-player-navbar-icons"></i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
+    </div>
+  </div>
+</div>
 
 <style>
   .exploration-player-navbar-icons {
     font-size: 21px;
     margin: 3px;
+  }
+
+  .mobile-option-btn {
+    margin: .7em 0;
   }
 </style>

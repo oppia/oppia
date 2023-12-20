@@ -24,6 +24,7 @@ import { UserService } from 'services/user.service';
 import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { AppConstants } from 'app.constants';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-feedback-popup',
@@ -49,7 +50,8 @@ export class FeedbackPopupComponent {
     private playerPositionService: PlayerPositionService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private feedbackPopupBackendApiService: FeedbackPopupBackendApiService
+    private feedbackPopupBackendApiService: FeedbackPopupBackendApiService,
+    private modalInstance: NgbActiveModal
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +88,7 @@ export class FeedbackPopupComponent {
   }
 
   close(): void {
-    this.closePopover.emit();
+    this.modalInstance.close();
   }
 
   ngOnDestroy(): void {
