@@ -148,7 +148,7 @@ export class OpportunitiesListComponent {
   }
 
   pinOpportunity(
-    updatedData: Record<string, string>
+      updatedData: Record<string, string>
   ): void {
     const indexToModify = this.opportunities.findIndex(
       opportunity => opportunity.id === updatedData.
@@ -188,7 +188,7 @@ export class OpportunitiesListComponent {
   }
 
   unpinOpportunity(
-    updatedData: Record<string, string>
+      updatedData: Record<string, string>
   ): void {
     const indexToModify = this.opportunities.findIndex(
       opportunity => opportunity.id === updatedData.
