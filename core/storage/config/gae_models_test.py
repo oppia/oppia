@@ -252,16 +252,16 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
-    """Test FeatureFlagModel class."""
+class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
+    """Test FeatureFlagConfigModel class."""
 
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
-            config_models.FeatureFlagModel.get_deletion_policy(),
+            config_models.FeatureFlagConfigModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_model(self) -> None:
-        feature_model = config_models.FeatureFlagModel.create(
+        feature_model = config_models.FeatureFlagConfigModel.create(
             feature_flag_name='feature_name',
             force_enable_for_all_users=False,
             rollout_percentage=50,
@@ -276,7 +276,7 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            config_models.FeatureFlagModel.get_model_association_to_user(), # pylint: disable=line-too-long
+            config_models.FeatureFlagConfigModel.get_model_association_to_user(), # pylint: disable=line-too-long
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -291,6 +291,6 @@ class FeatureFlagModelUnitTests(test_utils.GenericTestBase):
             'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            config_models.FeatureFlagModel.get_export_policy(),
+            config_models.FeatureFlagConfigModel.get_export_policy(),
             expected_export_policy_dict
         )

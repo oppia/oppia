@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The services file for the feature flag."""
+"""The services file for the feature flags."""
 
 from __future__ import annotations
 
@@ -115,40 +115,21 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
         feature_flags_from_storage.items()
     ):
         if feature_flag is not None:
-            feature_flag_spec = (
-                registry.Registry.feature_flag_spec_registry[
-                    feature_flag.name])
-            # Rulling out the possibility of last_updated to be None as we
-            # are getting the feature flag value from the storage.
-            assert feature_flag.feature_flag_config.last_updated is not None
-            last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag.feature_flag_config.last_updated)
-            feature_flag = feature_flag_domain.FeatureFlag.from_dict({
-                'name': feature_flag.name,
-                'description': feature_flag_spec.description,
-                'feature_stage': feature_flag_spec.feature_stage.value,
-                'last_updated': last_updated,
-                'force_enable_for_all_users': (
-                    feature_flag.feature_flag_config.force_enable_for_all_users
-                ),
-                'rollout_percentage': (
-                    feature_flag.feature_flag_config.rollout_percentage),
-                'user_group_ids': (
-                    feature_flag.feature_flag_config.user_group_ids)
-            })
             feature_flags.append(feature_flag)
         else:
             feature_flag_spec = registry.Registry.feature_flag_spec_registry[
                 feature_flag_name]
-            feature_flag = feature_flag_domain.FeatureFlag.from_dict({
-                'name': feature_flag_name,
-                'description': feature_flag_spec.description,
-                'feature_stage': feature_flag_spec.feature_stage.value,
-                'last_updated': None,
-                'force_enable_for_all_users': False,
-                'rollout_percentage': 0,
-                'user_group_ids': []
-            })
+            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
+            feature_flag = feature_flag_domain.FeatureFlag(
+                feature_flag_name,
+                feature_flag_spec,
+                feature_flag_config
+            )
             feature_flags.append(feature_flag)
 
     return feature_flags
@@ -164,14 +145,14 @@ def load_feature_flags_from_storage(
             that needs to be fetched from the storage layer.
 
     Returns:
-        feature_flag_name_to_feature_flag_model_dict: Dict[
+        feature_flag_name_to_feature_flag_dict: Dict[
         str, FeatureFlag|None]. Dictionary having key as the feature name
         and value as the feature flag domain model if present in the storage
         layer otherwise None.
     """
-    feature_flag_name_to_feature_flag_model_dict: Dict[str, Optional[
+    feature_flag_name_to_feature_flag_dict: Dict[str, Optional[
         feature_flag_domain.FeatureFlag]] = {}
-    feature_flag_config_models = config_models.FeatureFlagModel.get_multi(
+    feature_flag_config_models = config_models.FeatureFlagConfigModel.get_multi(
         feature_flag_names_list)
 
     for feature_flag_config_model in feature_flag_config_models:
@@ -179,34 +160,30 @@ def load_feature_flags_from_storage(
             feature_flag_spec = (
                 registry.Registry.feature_flag_spec_registry[
                     feature_flag_config_model.id])
-            last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag_config_model.last_updated)
+            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+                feature_flag_config_model.force_enable_for_all_users,
+                feature_flag_config_model.rollout_percentage,
+                feature_flag_config_model.user_group_ids,
+                feature_flag_config_model.last_updated
+            )
 
-            feature_flag_name_to_feature_flag_model_dict[
+            feature_flag_name_to_feature_flag_dict[
                 feature_flag_config_model.id] = (
-                    feature_flag_domain.FeatureFlag.from_dict({
-                        'name': feature_flag_config_model.id,
-                        'description': feature_flag_spec.description,
-                        'feature_stage': feature_flag_spec.feature_stage.value,
-                        'force_enable_for_all_users': (
-                            feature_flag_config_model.force_enable_for_all_users
-                        ),
-                        'rollout_percentage': (
-                            feature_flag_config_model.rollout_percentage),
-                        'user_group_ids': (
-                            feature_flag_config_model.user_group_ids),
-                        'last_updated': last_updated
-                    })
+                    feature_flag_domain.FeatureFlag(
+                        feature_flag_config_model.id,
+                        feature_flag_spec,
+                        feature_flag_config
+                    )
                 )
 
         for feature_flag_name in feature_flag_names_list:
             if feature_flag_name not in (
-                feature_flag_name_to_feature_flag_model_dict
+                feature_flag_name_to_feature_flag_dict
             ):
-                feature_flag_name_to_feature_flag_model_dict[
+                feature_flag_name_to_feature_flag_dict[
                     feature_flag_name] = None
 
-    return feature_flag_name_to_feature_flag_model_dict
+    return feature_flag_name_to_feature_flag_dict
 
 
 def is_feature_flag_enabled(
@@ -247,7 +224,7 @@ def is_feature_flag_enabled(
 
     if feature_flag.feature_flag_config.force_enable_for_all_users:
         return True
-    if user_id:
+    if user_id is not None:
         salt = feature_flag_name.encode('utf-8')
         hashed_user_id = hashlib.sha256(
             user_id.encode('utf-8') + salt).hexdigest()

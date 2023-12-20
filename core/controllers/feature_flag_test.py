@@ -37,6 +37,19 @@ class FeatureNames(enum.Enum):
 class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagsEvaluationHandler."""
 
+    def _create_dummy_feature_flag(
+        self, feature_name: FeatureNames,
+        feature_stage: FeatureStages
+    ) -> feature_flag_domain.FeatureFlag:
+        """Creates dummy feature flag."""
+        # Here we use MyPy ignore because create_feature_flag accepts feature
+        # flag name to be of type platform_feature_list.FeatureNames and we
+        # plan to create dummy feature flags to conduct testing. To avoid
+        # mypy type check we have to add ignore[arg-type].
+        feature_flag = registry.Registry.create_feature_flag(
+            feature_name, 'test', feature_stage) # type: ignore[arg-type]
+        return feature_flag
+
     def setUp(self) -> None:
         super().setUp()
 
@@ -51,16 +64,15 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
 
         registry.Registry.feature_flag_spec_registry.clear()
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        self.dev_feature_flag = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_A, 'test', FeatureStages.DEV) # type: ignore[arg-type]
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        self.prod_feature_flag = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_B, 'test', FeatureStages.PROD) # type: ignore[arg-type]
+
+        self.dev_feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_A,
+            FeatureStages.DEV
+        )
+        self.prod_feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_B,
+            FeatureStages.PROD
+        )
         registry.Registry.update_feature_flag(
             self.prod_feature_flag.name, True, 0, []
         )

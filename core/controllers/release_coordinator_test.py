@@ -74,6 +74,18 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
 class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     """Tests FeatureFlagsHandler."""
 
+    def _create_dummy_feature_flag(
+        self, feature_name: FeatureNames
+    ) -> feature_flag_domain.FeatureFlag:
+        """Creates dummy feature flag."""
+        # Here we use MyPy ignore because create_feature_flag accepts feature
+        # flag name to be of type platform_feature_list.FeatureNames and we
+        # plan to create dummy feature flags to conduct testing. To avoid
+        # mypy type check we have to add ignore[arg-type].
+        feature_flag = feature_flag_registry.Registry.create_feature_flag(
+            feature_name, 'test', FeatureStages.DEV) # type: ignore[arg-type]
+        return feature_flag
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -107,11 +119,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
+        feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.TEST_FEATURE_1)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
@@ -132,11 +141,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            FeatureNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
+        feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.TEST_FEATURE_1)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
@@ -203,11 +209,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            FeatureNames.TEST_FEATURE_2, 'feature for test.', FeatureStages.DEV) # type: ignore[arg-type]
+        feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.TEST_FEATURE_2)
 
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',

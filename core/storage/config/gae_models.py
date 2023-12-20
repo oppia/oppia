@@ -182,7 +182,7 @@ class PlatformParameterModel(base_models.VersionedModel):
             default_value=default_value)
 
 
-class FeatureFlagModel(base_models.BaseModel):
+class FeatureFlagConfigModel(base_models.BaseModel):
     """A class that represents named dynamic feature-flag.
     This model only stores fields that can be updated in run time.
 
@@ -197,7 +197,7 @@ class FeatureFlagModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """FeatureFlagModel is not related to users."""
+        """FeatureFlagConfigModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -223,8 +223,8 @@ class FeatureFlagModel(base_models.BaseModel):
         force_enable_for_all_users: bool,
         rollout_percentage: int,
         user_group_ids: List[str]
-    ) -> FeatureFlagModel:
-        """Creates FeatureFlagModel instance.
+    ) -> FeatureFlagConfigModel:
+        """Creates FeatureFlagConfigModel instance.
 
         Args:
             feature_flag_name: str. The name of the feature-flag.
@@ -235,7 +235,7 @@ class FeatureFlagModel(base_models.BaseModel):
             user_group_ids: List[str]. The list of ids of UserGroup objects.
 
         Returns:
-            FeatureFlagModel. The created FeatureFlagModel instance.
+            FeatureFlagConfigModel. The created FeatureFlagConfigModel instance.
         """
         feature_flag_entity = cls(
             id=feature_flag_name,

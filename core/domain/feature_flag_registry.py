@@ -68,26 +68,26 @@ class Registry:
             raise Exception(
                 'Feature flag with name %s already exists.' % name.value)
 
-        feature_flag_spec_domain = (
-            feature_flag_domain.FeatureFlagSpec.from_dict({
-                'description': description,
-                'feature_stage': feature_stage.value
-            })
+        feature_flag_spec = (
+            feature_flag_domain.FeatureFlagSpec(
+                description,
+                feature_stage
+            )
         )
-        feature_flag_config_domain = (
-            feature_flag_domain.FeatureFlagConfig.from_dict({
-                'force_enable_for_all_users': False,
-                'rollout_percentage': 0,
-                'user_group_ids': [],
-                'last_updated': None
-            })
+        feature_flag_config = (
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
         )
-        cls.feature_flag_spec_registry[name.value] = feature_flag_spec_domain
+        cls.feature_flag_spec_registry[name.value] = feature_flag_spec
 
         return feature_flag_domain.FeatureFlag(
             name.value,
-            feature_flag_spec_domain,
-            feature_flag_config_domain
+            feature_flag_spec,
+            feature_flag_config
         )
 
     @classmethod
@@ -103,24 +103,31 @@ class Registry:
         Raises:
             Exception. The given name of the feature flag doesn't exist.
         """
-        feature_flag_from_storage = cls.load_feature_flag_from_storage(name)
-        if feature_flag_from_storage is not None:
-            feature_flag = feature_flag_from_storage
+        feature_flag_config_from_storage = (
+            cls.load_feature_flag_config_from_storage(name))
+
+        if feature_flag_config_from_storage is not None:
+            feature_flag_spec = cls.feature_flag_spec_registry[name]
+            return feature_flag_domain.FeatureFlag(
+                name,
+                feature_flag_spec,
+                feature_flag_config_from_storage
+            )
         elif name in cls.feature_flag_spec_registry:
             feature_flag_spec = cls.feature_flag_spec_registry[name]
-            feature_flag = feature_flag_domain.FeatureFlag.from_dict({
-                'name': name,
-                'description': feature_flag_spec.description,
-                'feature_stage': feature_flag_spec.feature_stage.value,
-                'last_updated': None,
-                'force_enable_for_all_users': False,
-                'rollout_percentage': 0,
-                'user_group_ids': []
-            })
+            feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+                None,
+                False,
+                0,
+                []
+            )
+            return feature_flag_domain.FeatureFlag(
+                name,
+                feature_flag_spec,
+                feature_flag_config
+            )
         else:
             raise Exception('Feature flag not found: %s.' % name)
-
-        return feature_flag
 
     @classmethod
     def update_feature_flag(
@@ -151,36 +158,28 @@ class Registry:
         cls._update_feature_flag_storage_model(feature_flag)
 
     @classmethod
-    def load_feature_flag_from_storage(
+    def load_feature_flag_config_from_storage(
         cls, name: str
-    ) -> Optional[feature_flag_domain.FeatureFlag]:
-        """Loads feature flag from storage, if not present returns None.
+    ) -> Optional[feature_flag_domain.FeatureFlagConfig]:
+        """Loads feature flag config from storage, if not present returns None.
 
         Args:
             name: str. The name of the feature flag.
 
         Returns:
-            FeatureFlag|None. The loaded instance, None if it's not found
+            FeatureFlagConfig|None. The loaded instance, None if it's not found
             in storage.
         """
-        feature_flag_config_model = config_models.FeatureFlagModel.get(
+        feature_flag_config_model = config_models.FeatureFlagConfigModel.get(
             name, strict=False)
 
         if feature_flag_config_model is not None:
-            last_updated = utils.convert_naive_datetime_to_string(
-                feature_flag_config_model.last_updated)
-            feature_flag_spec = cls.feature_flag_spec_registry[name]
-            return feature_flag_domain.FeatureFlag.from_dict({
-                'name': feature_flag_config_model.id,
-                'description': feature_flag_spec.description,
-                'feature_stage': feature_flag_spec.feature_stage.value,
-                'force_enable_for_all_users': (
-                    feature_flag_config_model.force_enable_for_all_users),
-                'rollout_percentage': (
-                    feature_flag_config_model.rollout_percentage),
-                'user_group_ids': feature_flag_config_model.user_group_ids,
-                'last_updated': last_updated
-            })
+            return feature_flag_domain.FeatureFlagConfig(
+                feature_flag_config_model.force_enable_for_all_users,
+                feature_flag_config_model.rollout_percentage,
+                feature_flag_config_model.user_group_ids,
+                feature_flag_config_model.last_updated
+            )
         else:
             return None
 
@@ -196,10 +195,10 @@ class Registry:
         feature_flag.feature_flag_config.validate(
             feature_flag.feature_flag_spec.feature_stage)
 
-        model_instance = config_models.FeatureFlagModel.get(
+        model_instance = config_models.FeatureFlagConfigModel.get(
             feature_flag.name, strict=False)
         if model_instance is None:
-            model_instance = config_models.FeatureFlagModel.create(
+            model_instance = config_models.FeatureFlagConfigModel.create(
                 feature_flag.name,
                 feature_flag.feature_flag_config.force_enable_for_all_users,
                 feature_flag.feature_flag_config.rollout_percentage,
@@ -230,13 +229,6 @@ feature_flag_name_enum_to_description = {
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS: (
         'This flag enables showing per-contributor accomplishments on the '
         'contributor dashboard.'
-    ),
-    FeatureNames.ANDROID_BETA_LANDING_PAGE: (
-        'This flag is for Android beta promo landing page.'
-    ),
-    FeatureNames.BLOG_PAGES: (
-        'This flag is for blog home page, blog author profile page and blog '
-        'post page.'
     ),
     FeatureNames.DIAGNOSTIC_TEST: (
         'This flag is for the diagnostic test functionality.'

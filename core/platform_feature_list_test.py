@@ -25,6 +25,7 @@ from core import platform_feature_list
 from core import utils
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
+from core.domain import platform_parameter_list
 from core.tests import test_utils
 
 from typing import Final, List

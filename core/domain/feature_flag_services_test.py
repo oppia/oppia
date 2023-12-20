@@ -48,6 +48,20 @@ FeatureStages = feature_flag_domain.FeatureStages
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
+    def _create_dummy_feature_flag(
+        self, feature_name: FeatureNames,
+        description: str,
+        feature_stage: FeatureStages
+    ) -> feature_flag_domain.FeatureFlag:
+        """Creates dummy feature flag."""
+        # Here we use MyPy ignore because create_feature_flag accepts feature
+        # flag name to be of type platform_feature_list.FeatureNames and we
+        # plan to create dummy feature flags to conduct testing. To avoid
+        # mypy type check we have to add ignore[arg-type].
+        feature_flag = registry.Registry.create_feature_flag(
+            feature_name, description, feature_stage) # type: ignore[arg-type]
+        return feature_flag
+
     def setUp(self) -> None:
         super().setUp()
 
@@ -77,24 +91,21 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             set(self.feature_names)
         )
 
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        self.dev_feature_flag = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_A, 'a feature in dev stage', # type: ignore[arg-type]
-            FeatureStages.DEV)
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        self.test_feature_flag = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_B, 'a feature in test stage', # type: ignore[arg-type]
-            FeatureStages.TEST)
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        self.prod_feature_flag = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_C, 'a feature in prod stage', # type: ignore[arg-type]
-            FeatureStages.PROD)
+        self.dev_feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_A,
+            'a feature in dev stage',
+            FeatureStages.DEV
+        )
+        self.test_feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_B,
+            'a feature in test stage',
+            FeatureStages.TEST
+        )
+        self.prod_feature_flag = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_C,
+            'a feature in prod stage',
+            FeatureStages.PROD
+        )
 
         with self.swap(
             feature_services,
@@ -133,24 +144,21 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
     def test_feature_flag_is_correctly_fetched_when_not_present_in_storage(
         self) -> None:
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag_one = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_ONE, 'feature flag one', # type: ignore[arg-type]
-            FeatureStages.DEV)
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag_two = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_TWO, 'feature flag two', # type: ignore[arg-type]
-            FeatureStages.DEV)
-        # Here we use MyPy ignore because to test the functionalities with dummy
-        # feature flags. create_feature_flag accepts feature-flag name to be
-        # of type platform_feature_list.FeatureNames.
-        feature_flag_three = registry.Registry.create_feature_flag(
-            FeatureNames.FEATURE_THREE, 'feature flag three', # type: ignore[arg-type]
-            FeatureStages.DEV)
+        feature_flag_one = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_ONE,
+            'feature flag one',
+            FeatureStages.DEV
+        )
+        feature_flag_two = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_TWO,
+            'feature flag two',
+            FeatureStages.DEV
+        )
+        feature_flag_three = self._create_dummy_feature_flag(
+            FeatureNames.FEATURE_THREE,
+            'feature flag three',
+            FeatureStages.DEV
+        )
 
         expected_feature_flags_dict = [
             feature_flag_one.to_dict(),
@@ -386,7 +394,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         self.assertTrue(feature_services.is_feature_flag_enabled(
             self.owner_id, self.dev_feature_flag.name))
 
-    def test_feature_flag_enabled_for_logged_out_users_with_force_enable_prop(
+    def test_feature_flag_enable_for_logged_out_user_with_force_enable_property(
         self) -> None:
         self.assertTrue(feature_services.is_feature_flag_enabled(
             None, self.dev_feature_flag.name))
@@ -460,9 +468,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_feature_flag_enabled_for_users_in_5_perc_when_increased_to_10_perc(
         self) -> None:
         user_ids_list = []
-        user_id_to_feature_flag_status_for_5_perc = {}
+        user_ids_for_which_feature_flag_enabled_for_5_perc = set()
         count_feature_flag_enabled_for_5_perc = 0
-        user_id_to_feature_flag_status_for_10_perc = {}
+        user_ids_for_which_feature_flag_enabled_for_10_perc = set()
         count_feature_flag_enabled_for_10_perc = 0
         for count in range(1, 1001):
             user_ids_list.append('userid' + str(count))
@@ -471,36 +479,36 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             feature_services.update_feature_flag(
                 self.dev_feature_flag.name, False, 5, [])
             for user_id in user_ids_list:
-                feature_flag_status = feature_services.is_feature_flag_enabled(
+                feature_is_enabled = feature_services.is_feature_flag_enabled(
                     user_id,
                     self.dev_feature_flag.name
                 )
-                if feature_flag_status:
+                if feature_is_enabled:
                     count_feature_flag_enabled_for_5_perc += 1
-                    user_id_to_feature_flag_status_for_5_perc[
-                        user_id] = feature_flag_status
+                    user_ids_for_which_feature_flag_enabled_for_5_perc.add(
+                        user_id)
             self.assertTrue(
                 count_feature_flag_enabled_for_5_perc in list(range(40, 61)))
 
             feature_services.update_feature_flag(
                 self.dev_feature_flag.name, False, 10, [])
             for user_id in user_ids_list:
-                feature_flag_status = feature_services.is_feature_flag_enabled(
+                feature_is_enabled = feature_services.is_feature_flag_enabled(
                     user_id,
                     self.dev_feature_flag.name
                 )
-                if feature_flag_status:
+                if feature_is_enabled:
                     count_feature_flag_enabled_for_10_perc += 1
-                    user_id_to_feature_flag_status_for_10_perc[
-                        user_id] = feature_flag_status
+                    user_ids_for_which_feature_flag_enabled_for_10_perc.add(
+                        user_id)
             self.assertTrue(
                 count_feature_flag_enabled_for_10_perc in list(range(90, 111)))
 
-            for user_id in user_id_to_feature_flag_status_for_5_perc:
-                self.assertIn(
-                    user_id, user_id_to_feature_flag_status_for_10_perc)
+            self.assertTrue(
+                user_ids_for_which_feature_flag_enabled_for_5_perc.issubset(
+                    user_ids_for_which_feature_flag_enabled_for_10_perc))
 
-    def test_feature_flag_flag_not_enabled_for_all_users(self) -> None:
+    def test_feature_flag_not_enabled_for_all_users(self) -> None:
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
@@ -513,14 +521,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     feature_services.is_feature_flag_enabled(
                         user_id, self.dev_feature_flag.name))
 
-        total_count_of_users_having_feature_enabled = 0
         for feature_status in feature_status_for_users:
-            if feature_status is True:
-                total_count_of_users_having_feature_enabled += 1
+            self.assertFalse(feature_status)
 
-        self.assertEqual(total_count_of_users_having_feature_enabled, 0)
-
-    def test_feature_flag_flag_enabled_for_100_perc_logged_in_users(
+    def test_feature_flag_enabled_for_100_perc_logged_in_users(
         self) -> None:
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())
@@ -534,9 +538,5 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     feature_services.is_feature_flag_enabled(
                         user_id, self.dev_feature_flag.name))
 
-        total_count_of_users_having_feature_enabled = 0
         for feature_status in feature_status_for_users:
-            if feature_status is True:
-                total_count_of_users_having_feature_enabled += 1
-
-        self.assertEqual(total_count_of_users_having_feature_enabled, 4)
+            self.assertTrue(feature_status)

@@ -28,10 +28,6 @@ from core.domain import feature_flag_domain
 from core.tests import test_utils
 
 
-class MockServerMode(enum.Enum):
-    RANDOM = 'random'
-
-
 class FeatureFlagSpecTests(test_utils.GenericTestBase):
     """Tests for FeatureFlagSpec."""
 
@@ -85,8 +81,9 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             'description': 'for test',
             'feature_stage': feature_flag_domain.FeatureStages.DEV.value
         }
-        feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
-            feature_flag_spec_dict)
+        feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+            'for test',
+            feature_flag_domain.FeatureStages.DEV)
         self.assertDictEqual(
             feature_flag_spec.to_dict(), feature_flag_spec_dict)
 
@@ -116,26 +113,30 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             feature_flag_config.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
+        current_time = datetime.datetime.utcnow()
         feature_flag_config_dict: feature_flag_domain.FeatureFlagConfigDict = {
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
             'user_group_ids': [],
             'last_updated': utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+                current_time)
         }
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict(
-            feature_flag_config_dict)
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            current_time)
         self.assertDictEqual(
             feature_flag_config.to_dict(), feature_flag_config_dict)
 
     def test_set_object_values_correctly(self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         current_time = datetime.datetime.utcnow()
         feature_flag_config.set_force_enable_for_all_users(True)
         feature_flag_config.set_rollout_percentage(50)
@@ -152,24 +153,24 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_feature_flag_config_passes_without_exception(
         self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         feature_flag_config.validate(feature_flag_domain.ServerMode.DEV)
 
     def test_validate_feature_flag_with_percentage_less_than_0_raises_exception(
         self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': -1,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            -1,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature flag rollout-percentage should be between '
@@ -179,13 +180,13 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
 
     def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
         self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 101,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            101,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Feature flag rollout-percentage should be between '
@@ -194,13 +195,13 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             feature_flag_config.validate(feature_flag_domain.ServerMode.DEV)
 
     def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
@@ -212,13 +213,13 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                         feature_flag_domain.ServerMode.DEV)
 
     def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
@@ -230,13 +231,13 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
                         feature_flag_domain.ServerMode.DEV)
 
     def test_validate_test_feature_for_prod_env_raises_exception(self) -> None:
-        feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
                 datetime.datetime.utcnow())
-        })
+        )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
@@ -281,6 +282,16 @@ class FeatureFlagTests(test_utils.GenericTestBase):
 
     def test_to_dict_returns_correct_dict(self) -> None:
         current_time = datetime.datetime.utcnow()
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            current_time
+        )
+        feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+            'for test',
+            feature_flag_domain.FeatureStages.DEV
+        )
         feature_flag_dict: feature_flag_domain.FeatureFlagDict = {
             'name': 'feature_a',
             'description': 'for test',
@@ -290,23 +301,32 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'user_group_ids': [],
             'last_updated': utils.convert_naive_datetime_to_string(current_time)
         }
-        feature_flag = feature_flag_domain.FeatureFlag.from_dict(
-            feature_flag_dict)
+        feature_flag = feature_flag_domain.FeatureFlag(
+            'feature_a',
+            feature_flag_spec,
+            feature_flag_config
+        )
         feature_flag.validate()
         self.assertDictEqual(feature_flag.to_dict(), feature_flag_dict)
 
     def test_validate_feature_flag_with_invalid_name_raises_exception(
         self) -> None:
-        current_time = datetime.datetime.utcnow()
-        feature_flag = feature_flag_domain.FeatureFlag.from_dict({
-            'name': 'Invalid~Name',
-            'description': 'for test',
-            'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
-            'force_enable_for_all_users': False,
-            'rollout_percentage': 0,
-            'user_group_ids': [],
-            'last_updated': utils.convert_naive_datetime_to_string(current_time)
-        })
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            0,
+            [],
+            utils.convert_naive_datetime_to_string(
+                datetime.datetime.utcnow())
+        )
+        feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+            'for test',
+            feature_flag_domain.FeatureStages.DEV
+        )
+        feature_flag = feature_flag_domain.FeatureFlag(
+            'Invalid~Name',
+            feature_flag_spec,
+            feature_flag_config
+        )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid feature flag name \'%s\'' % feature_flag.name
