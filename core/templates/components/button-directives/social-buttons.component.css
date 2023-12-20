@@ -37,7 +37,11 @@
   font-size: 24px;
   position: relative;
 }
-
+.oppia-footer-social .oppia-footer-social-icons .oppia-instagram-follow {
+  background: linear-gradient(45deg, #FCAF45, #F77737,#F56040, #FD1D1D, #E1306C, #C13584, #833AB4, #5851DB, #405DE6);
+  margin-right: 6px;
+  padding: 5px 6px;
+}
 .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
   background: #cd201f;
   margin-right: 6px;
