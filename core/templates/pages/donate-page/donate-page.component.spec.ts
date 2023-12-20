@@ -58,6 +58,7 @@ describe('Donate page', () => {
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
   let urlInterpolationService: UrlInterpolationService;
+}
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
