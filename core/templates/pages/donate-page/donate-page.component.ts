@@ -23,6 +23,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
+import { TranslateService } from '@ngx-translate/core';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
@@ -57,6 +58,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
   );
+}
 export class DonatePageComponent implements OnInit {
   donationValues: DonationValue[] = [
     {
@@ -138,7 +140,6 @@ export class DonatePageComponent implements OnInit {
     private translateService: TranslateService,
     private ngbModal: NgbModal,
     private insertScriptService: InsertScriptService,
-    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
