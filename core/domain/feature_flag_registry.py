@@ -115,10 +115,10 @@ class Registry:
         elif name in cls.feature_flag_spec_registry:
             feature_flag_spec = cls.feature_flag_spec_registry[name]
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
-                None,
                 False,
                 0,
-                []
+                [],
+                None
             )
             return feature_flag_domain.FeatureFlag(
                 name,

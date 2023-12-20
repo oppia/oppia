@@ -133,8 +133,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         current_time = datetime.datetime.utcnow()
         feature_flag_config.set_force_enable_for_all_users(True)
@@ -156,8 +155,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         feature_flag_config.validate(feature_flag_domain.ServerMode.DEV)
 
@@ -167,8 +165,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             -1,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -183,8 +180,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             101,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -198,8 +194,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
@@ -216,8 +211,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -234,8 +228,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -314,8 +307,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            utils.convert_naive_datetime_to_string(
-                datetime.datetime.utcnow())
+            datetime.datetime.utcnow()
         )
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'for test',
