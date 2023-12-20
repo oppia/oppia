@@ -156,6 +156,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       'content', audioTranslationLanguageService);
   });
 
+  // when onNewCardOpened is called and StateCard has no solution.
   it('should reset hints', () => {
     // Arrange.
     const stateCardWithoutSolution = StateCard.createNewCard(
