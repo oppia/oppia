@@ -125,7 +125,7 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function to return the list of question reviewers
-   * @returns {object} displayedUsers - an element contains the list
+   * @returns {string[]} displayedUsers - list of strings of all username
    */
   async getDisplayedListOfQuestionReviewers() {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -144,7 +144,7 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function to return the list of question reviewers
-   * @returns {object} displayedUsers - an element contains the list
+   * @returns {string[]} displayedUsers - list of strings of all username
    */
   async getDisplayedListOfQuestionSubmitters() {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
@@ -166,7 +166,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @param {string} username - the username of the user.
    * @param {string} contribution - the css element of
    * the result of contribution status to check
-   * @returns {object} contributionStatusForUser - the value of the result
+   * @returns {string} contributionStatusForUser - the string of the result
    */
   async getContributionStatusForUser(username, contribution) {
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
@@ -191,7 +191,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorReviewQuestionsResult);
 
-    if (questionReviewStatusForUser.includes('Not-allowed')) {
+    if (questionReviewStatusForUser == 'Not-allowed') {
       throw new Error(
         `${username} does not have rights for reviewing questions!`);
     } else {
@@ -209,7 +209,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorSubmitQuestionResult);
 
-    if (questionSubmitStatusForUser.includes('Not-allowed')) {
+    if (questionSubmitStatusForUser == 'Not-allowed') {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
     } else {
@@ -227,7 +227,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorReviewQuestionsResult);
 
-    if (!questionReviewStatusForUser.includes('Not-allowed')) {
+    if (questionReviewStatusForUser == 'Allowed') {
       throw new Error(
         `${username} has rights for reviewing questions!`);
     } else {
@@ -245,7 +245,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorSubmitQuestionResult);
 
-    if (!questionSubmitStatusForUser.includes('Not-allowed')) {
+    if (questionSubmitStatusForUser == 'Allowed') {
       throw new Error(
         `${username} has rights for submitting questions!`);
     } else {
@@ -289,7 +289,7 @@ module.exports = class QuestionAdmin extends baseUser {
 
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} has the right to review question!`);
+        `${username} has the right to review questions!`);
     }
   }
 
@@ -302,7 +302,7 @@ module.exports = class QuestionAdmin extends baseUser {
 
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} has the right to submit question!`);
+        `${username} has the right to submit questions!`);
     }
   }
 };
