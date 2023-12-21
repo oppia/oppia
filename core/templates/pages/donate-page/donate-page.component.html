@@ -14,7 +14,8 @@
               <p class="donate-text-1">
                 <span class="donate-font-weight-700">{{
                   'I18N_DONATE_PAGE_CONTENT_TEXT_1_BOLD' | translate
-                  }}</span>
+                  }}
+                </span>
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }}
               </p>
             </div>
@@ -51,7 +52,8 @@
                 <div>
                   <div class="donate-stat-svg-container">
                     <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null"
-                      loading="lazy" alt="Graphic for the statistic">
+                      loading="lazy" alt="Graphic for the statistic"
+                    >
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
                   <p>{{ impactStat.text | translate }}</p>
@@ -76,7 +78,8 @@
                     <source type="image/webp" [srcset]="getStaticImageUrl(highlight.imageUrl + '.webp')">
                     <source type="image/png" [srcset]="getStaticImageUrl(highlight.imageUrl + '.png')">
                     <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')"
-                      loading="lazy" alt="Photo of the hightlight's partners">
+                      loading="lazy" alt="Photo of the hightlight's partners"
+                    >
                   </picture>
                   <div>
                     <p>{{ highlight.heading | translate }}</p>
