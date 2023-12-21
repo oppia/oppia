@@ -162,7 +162,9 @@ describe('HintAndSolutionButtonsComponent', () => {
       [], null, RecordedVoiceovers.createEmpty(), 'content',
       audioTranslationLanguageService
     );
-    spyOn(playerTranscriptService, 'getCard').and.returnValue(stateCardWithoutSolution);
+    spyOn(playerTranscriptService, 'getCard').
+      and.
+      returnValue(stateCardWithoutSolution);
     spyOn(component, 'resetLocalHintsArray');
 
     // Act.
@@ -189,7 +191,9 @@ describe('HintAndSolutionButtonsComponent', () => {
       }, RecordedVoiceovers.createEmpty(), 'content',
       audioTranslationLanguageService
     );
-    spyOn(playerTranscriptService, 'getCard').and.returnValue(stateCardWithSolution);
+    spyOn(playerTranscriptService, 'getCard').
+      and.
+      returnValue(stateCardWithSolution);
     spyOn(component, 'resetLocalHintsArray');
 
     // Act.
