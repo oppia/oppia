@@ -191,7 +191,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorReviewQuestionsResult);
 
-    if (questionReviewStatusForUser == 'Not-allowed') {
+    if (questionReviewStatusForUser === 'Not-allowed') {
       throw new Error(
         `${username} does not have rights for reviewing questions!`);
     } else {
@@ -209,7 +209,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorSubmitQuestionResult);
 
-    if (questionSubmitStatusForUser == 'Not-allowed') {
+    if (questionSubmitStatusForUser === 'Not-allowed') {
       throw new Error(
         `${username} does not have rights for submitting questions!`);
     } else {
@@ -227,7 +227,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorReviewQuestionsResult);
 
-    if (questionReviewStatusForUser == 'Allowed') {
+    if (questionReviewStatusForUser === 'Allowed') {
       throw new Error(
         `${username} has rights for reviewing questions!`);
     } else {
@@ -245,7 +245,7 @@ module.exports = class QuestionAdmin extends baseUser {
     this.getContributionStatusForUser(
       username, viewContributorSubmitQuestionResult);
 
-    if (questionSubmitStatusForUser == 'Allowed') {
+    if (questionSubmitStatusForUser === 'Allowed') {
       throw new Error(
         `${username} has rights for submitting questions!`);
     } else {
