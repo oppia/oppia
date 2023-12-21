@@ -129,7 +129,8 @@ module.exports = class QuestionAdmin extends baseUser {
    */
   async getDisplayedListOfQuestionReviewers() {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
-    await this.select(viewContributorCategorySelector, reviewQuestionRightValue);
+    await this.select(
+      viewContributorCategorySelector, reviewQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -148,7 +149,8 @@ module.exports = class QuestionAdmin extends baseUser {
    */
   async getDisplayedListOfQuestionSubmitters() {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
-    await this.select(viewContributorCategorySelector, submitQuestionRightValue);
+    await this.select(
+      viewContributorCategorySelector, submitQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
