@@ -31,6 +31,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
 import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
+import isEqual from 'lodash/isEqual';
 
 export interface LanguageChoice {
   id: string;
@@ -117,76 +118,72 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           this.translationReviewersCountByLanguage = (
             response.translation_reviewers_count);
           this.questionReviewersCount = response.question_reviewers_count;
+
+          this.languageChoices = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
+            languageItem => {
+              return {
+                id: languageItem.id,
+                language: languageItem.description
+              };
+            }
+          );
+
+          this.selectedLastActivity = 0;
+
+          this.userService.getUserInfoAsync().then(userInfo => {
+            const username = userInfo.getUsername();
+
+            if (username === null) {
+              return;
+            }
+            this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+            this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+
+            if (this.isTranslationCoordinator) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_TRANSLATION_SUBMITTER,
+                this.TAB_NAME_TRANSLATION_REVIEWER);
+
+              this.contributorDashboardAdminStatsBackendApiService
+                .fetchAssignedLanguageIds(username).then(
+                  response => {
+                    this.languageChoices = this.languageChoices.filter((
+                        languageItem) =>
+                      response.includes(languageItem.id));
+                    this.selectedLanguage = this.languageChoices[0];
+                    if (!this.selectedLanguage) {
+                      throw new Error(
+                        'No languages are assigned to user.');
+                    }
+                    this.translationReviewersCount = (
+                      this.translationReviewersCountByLanguage[
+                        this.selectedLanguage.id]);
+                  });
+            }
+            if (this.isQuestionCoordinator) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_QUESTION_SUBMITTER,
+                this.TAB_NAME_QUESTION_REVIEWER);
+            }
+
+            this.createFilter();
+
+            this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+
+            this.loadingMessage = '';
+            this.changeDetectorRef.detectChanges();
+            this.lastActivity = [0, 7, 30, 90];
+
+            this.contributorDashboardAdminStatsBackendApiService
+              .fetchTopicChoices().then(
+                response => {
+                  this.topics = response;
+                  this.allTopicNames = response.map(topic => topic.topic);
+                  this.applyTopicFilter();
+                }
+              );
+          });
         });
-
-    this.languageChoices = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
-      languageItem => {
-        return {
-          id: languageItem.id,
-          language: languageItem.description
-        };
-      }
-    );
-
-    this.selectedLastActivity = 0;
-
-    this.userService.getUserInfoAsync().then(userInfo => {
-      const username = userInfo.getUsername();
-      if (username === null) {
-        return;
-      }
-      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
-      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
-
-      if (this.isTranslationCoordinator) {
-        this.CONTRIBUTION_TYPES.push(
-          this.TAB_NAME_TRANSLATION_SUBMITTER,
-          this.TAB_NAME_TRANSLATION_REVIEWER);
-
-        this.contributorDashboardAdminStatsBackendApiService
-          .fetchAssignedLanguageIds(username).then(
-            response => {
-              this.languageChoices = this.languageChoices.filter((
-                  languageItem) =>
-                response.includes(languageItem.id));
-              this.selectedLanguage = this.languageChoices[0];
-              if (!this.selectedLanguage) {
-                throw new Error(
-                  'No languages are assigned to user.');
-              }
-              this.translationReviewersCount = (
-                this.translationReviewersCountByLanguage[
-                  this.selectedLanguage.id]);
-            });
-      }
-      if (this.isQuestionCoordinator) {
-        this.CONTRIBUTION_TYPES.push(
-          this.TAB_NAME_QUESTION_SUBMITTER,
-          this.TAB_NAME_QUESTION_REVIEWER);
-      }
-
-      this.filter = new ContributorAdminDashboardFilter(
-        [],
-        this.selectedLanguage.id,
-        null,
-        this.selectedLastActivity);
-
-      this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-
-      this.loadingMessage = '';
-      this.changeDetectorRef.detectChanges();
-    });
-
-    this.lastActivity = [0, 7, 30, 90];
-
-    this.contributorDashboardAdminStatsBackendApiService
-      .fetchTopicChoices().then(
-        response => {
-          this.topics = response;
-          this.allTopicNames = response.map(topic => topic.topic);
-          this.applyTopicFilter();
-        }
-      );
   }
 
   toggleLanguageDropdown(): void {
@@ -195,6 +192,18 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   toggleActivityDropdown(): void {
     this.activityDropdownShown = !this.activityDropdownShown;
+  }
+
+  createFilter(): void {
+    const tempFilter = new ContributorAdminDashboardFilter(
+      this.selectedTopicIds,
+      this.selectedLanguage.id,
+      null,
+      this.selectedLastActivity);
+
+    if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
+      this.filter = tempFilter;
+    }
   }
 
   applyTopicFilter(): void {
@@ -208,11 +217,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         }
         return matchingTopic ? matchingTopic.id : '';
       });
-    this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopicIds,
-      this.selectedLanguage.id,
-      null,
-      this.selectedLastActivity);
+    this.createFilter();
   }
 
   selectLanguage(language: string): void {
@@ -224,28 +229,16 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.selectedLanguage = currentOption;
     this.translationReviewersCount = this.translationReviewersCountByLanguage[
       this.selectedLanguage.id];
-    this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopicIds,
-      this.selectedLanguage.id,
-      null,
-      this.selectedLastActivity);
+    this.createFilter();
   }
 
   selectLastActivity(lastActive: number): void {
     this.selectedLastActivity = lastActive;
-    this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopicIds,
-      this.selectedLanguage.id,
-      null,
-      this.selectedLastActivity);
+    this.createFilter();
   }
 
   setActiveTab(tabName: string): void {
-    this.filter = new ContributorAdminDashboardFilter(
-      this.selectedTopicIds,
-      this.selectedLanguage.id,
-      null,
-      this.selectedLastActivity);
+    this.createFilter();
     this.activeTab = tabName;
   }
 

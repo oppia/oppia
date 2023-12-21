@@ -172,14 +172,12 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 }
 .oppia-contributor-dashboard-main-content .stats-card .stat-description {
   line-height: 1.646;
-  margin-bottom: 3em;
+  margin-bottom: 0;
   padding-right: 10px;
 }
 .oppia-contributor-dashboard-main-content .stats-card .stat-value-with-rating {
   margin-top: 0;
-  padding-top: 1em;
-  position: absolute;
-  top: 0.75em;
+  position: relative;
 }
 .stats-card h2 {
   font-size: 32px;
@@ -365,8 +363,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   .stats-card
   .stat-value-with-rating {
     padding-top: 0;
-    position: absolute;
-    top: 1.25em;
+    position: relative;
   }
   .oppia-contributor-dashboard-main-content .stats-card .stat-description {
     line-height: 1.8;

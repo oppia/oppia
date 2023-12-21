@@ -680,7 +680,8 @@ def _update_user_contribution_rights(
         user_contribution_rights: UserContributionRights. The updated
             UserContributionRights object of the user.
     """
-    if user_contribution_rights.can_review_at_least_one_item():
+    if user_contribution_rights.can_review_at_least_one_item() or (
+       user_contribution_rights.can_submit_at_least_one_item()):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
