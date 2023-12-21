@@ -168,6 +168,26 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
+  describe('null language', () => {
+    beforeEach(() => {
+      getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(fullAccessUserInfo));
+    });
+
+    it('should find language en if no language is populated ' +
+      'if username is not null', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+      component.selectLanguage('French');
+
+      expect(component.selectedLanguage).toEqual({
+        language: 'English',
+        id: 'en'
+      });
+    }));
+  });
+
   describe('Not null username', () => {
     beforeEach(() => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
