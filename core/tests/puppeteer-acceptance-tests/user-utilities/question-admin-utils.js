@@ -31,11 +31,11 @@ const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
 // "View Contributor Dashboard Users" form elements.
-const viewContributorFilterMethodSelect =
+const viewContributorFilterMethodSelector =
   'select#view-contributor-filter-method-select';
 const viewContributerUsernameInput =
   'input#view-contributor-username-input';
-const viewContributorCategorySelect =
+const viewContributorCategorySelector =
   'select#view-contributor-category-select';
 const viewContributorSubmitButton =
   'button#view-contributor-submit-button';
@@ -50,7 +50,7 @@ const viewRoleUserResult =
 // "Add Contribution Rights" form elements.
 const addContributorUsernameInput =
   'input#add-contribution-rights-user-input';
-const addContributonRightsCategorySelect =
+const addContributonRightsCategorySelector =
   'select#add-contribution-rights-category-select';
 const addContributionRightsSubmitButton =
    'button#add-contribution-rights-submit-button';
@@ -58,7 +58,7 @@ const addContributionRightsSubmitButton =
 // "Remove Contribution Rights" form elements.
 const removeContributorUsernameInput =
   'input#remove-contribution-rights-user-input';
-const removeContributonRightsCategorySelect =
+const removeContributonRightsCategorySelector =
   'select#remove-contribution-rights-category-select';
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
@@ -78,7 +78,7 @@ module.exports = class QuestionAdmin extends baseUser {
   async addReviewQuestionRights(username) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelect, reviewQuestionRightValue);
+      addContributonRightsCategorySelector, reviewQuestionRightValue);
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -91,7 +91,7 @@ module.exports = class QuestionAdmin extends baseUser {
   async addSubmitQuestionRights(username) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelect, submitQuestionRightValue);
+      addContributonRightsCategorySelector, submitQuestionRightValue);
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -104,7 +104,7 @@ module.exports = class QuestionAdmin extends baseUser {
   async removeReviewQuestionRights(username) {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelect, reviewQuestionRightValue);
+      removeContributonRightsCategorySelector, reviewQuestionRightValue);
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -117,7 +117,7 @@ module.exports = class QuestionAdmin extends baseUser {
   async removeSubmitQuestionRights(username) {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelect, submitQuestionRightValue);
+      removeContributonRightsCategorySelector, submitQuestionRightValue);
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -128,8 +128,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @returns {string[]} displayedUsers - list of strings of all username
    */
   async getDisplayedListOfQuestionReviewers() {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, reviewQuestionRightValue);
+    await this.select(viewContributorFilterMethodSelector, roleMethodValue);
+    await this.select(viewContributorCategorySelector, reviewQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -147,8 +147,8 @@ module.exports = class QuestionAdmin extends baseUser {
    * @returns {string[]} displayedUsers - list of strings of all username
    */
   async getDisplayedListOfQuestionSubmitters() {
-    await this.select(viewContributorFilterMethodSelect, roleMethodValue);
-    await this.select(viewContributorCategorySelect, submitQuestionRightValue);
+    await this.select(viewContributorFilterMethodSelector, roleMethodValue);
+    await this.select(viewContributorCategorySelector, submitQuestionRightValue);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -169,7 +169,7 @@ module.exports = class QuestionAdmin extends baseUser {
    * @returns {string} contributionStatusForUser - the string of the result
    */
   async getContributionStatusForUser(username, contribution) {
-    await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+    await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
