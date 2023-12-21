@@ -58,6 +58,7 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   OPPIA_AVATAR_IMAGE_URL = (
     this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
   );
+  
   donationValues: DonationValue[] = [
     {
       amount: '10',
