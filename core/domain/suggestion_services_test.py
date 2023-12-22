@@ -2413,7 +2413,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         Returns:
             Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
-            of the change object for the translations.
+            of the change_cmd object for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2470,7 +2470,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         Returns:
             Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
-            of the change object for the translations.
+            of the change_cmd object for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2527,7 +2527,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         Returns:
             Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
-            of the change object for the translations.
+            of the change_cmd object for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2573,11 +2573,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def _get_change_with_normalized_string(self) -> Mapping[
         str, change_domain.AcceptableChangeDictTypes]:
-        """Provides change dictionary with normalized translation html.
+        """Provides change_cmd dictionary with normalized translation html.
 
         Returns:
             Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
-            of the change object for the translations.
+            of the change_cmd object for the translations.
         """
         return {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,

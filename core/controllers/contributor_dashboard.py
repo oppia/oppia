@@ -666,7 +666,7 @@ class TranslatableTextHandler(
         content_id: str,
         suggestions: List[suggestion_registry.BaseSuggestion]
     ) -> bool:
-        """Returns whether a suggestion exists in suggestions with a change dict
+        """Returns whether a suggestion exists in suggestions with a change_cmd dict
         matching the supplied state_name and content_id.
 
         Args:
@@ -675,7 +675,7 @@ class TranslatableTextHandler(
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            bool. True if suggestion exists in suggestions with a change dict
+            bool. True if suggestion exists in suggestions with a change_cmd dict
             matching state_name and content_id, False otherwise.
         """
         return any(

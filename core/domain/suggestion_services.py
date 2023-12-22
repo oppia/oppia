@@ -921,7 +921,7 @@ def auto_reject_translation_suggestions_for_content_ids(
     content_ids: Set[str]
 ) -> None:
     """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID and change content ID matching one of the supplied content
+    exploration ID and change_cmd content ID matching one of the supplied content
     IDs. These suggestions are being rejected because their corresponding
     exploration content was deleted. Reviewer ID is set to
     SUGGESTION_BOT_USER_ID.

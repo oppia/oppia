@@ -206,7 +206,7 @@ class BaseSuggestion:
         """Validates the BaseSuggestion object. Each subclass must implement
         this function.
 
-        The subclasses must validate the change and score_category fields.
+        The subclasses must validate the change_cmd and score_category fields.
 
         Raises:
             ValidationError. One or more attributes of the BaseSuggestion object
@@ -308,7 +308,7 @@ class BaseSuggestion:
             'pre_accept_validate.')
 
     def populate_old_value_of_change(self) -> None:
-        """Populates the old_value field of the change."""
+        """Populates the old_value field of the change_cmd."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
@@ -373,7 +373,7 @@ class BaseSuggestion:
     def convert_html_in_suggestion_change(
         self, conversion_fn: Callable[[str], str]
     ) -> None:
-        """Checks for HTML fields in a suggestion change and converts it
+        """Checks for HTML fields in a suggestion change_cmd and converts it
         according to the conversion function.
         """
         raise NotImplementedError(
@@ -468,7 +468,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
             raise utils.ValidationError(
-                'Expected change to be an ExplorationChange, received %s'
+                'Expected change_cmd to be an ExplorationChange, received %s'
                 % type(self.change_cmd))
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
@@ -511,7 +511,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def _get_change_list_for_accepting_edit_state_content_suggestion(
         self
     ) -> List[exp_domain.ExplorationChange]:
-        """Gets a complete change for the SuggestionEditStateContent.
+        """Gets a complete change_cmd for the SuggestionEditStateContent.
 
         Returns:
             list(ExplorationChange). The change_list corresponding to the
@@ -528,7 +528,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         return [change]
 
     def populate_old_value_of_change(self) -> None:
-        """Populates old value of the change."""
+        """Populates old value of the change_cmd."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             # As the state doesn't exist now, we cannot find the content of the
@@ -563,22 +563,22 @@ class SuggestionEditStateContent(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change_cmd: ExplorationChange. The new change.
+            change_cmd: ExplorationChange. The new change_cmd.
 
         Raises:
-            ValidationError. Invalid new change.
+            ValidationError. Invalid new change_cmd.
         """
         if self.change_cmd.cmd != change_cmd.cmd:
             raise utils.ValidationError(
-                'The new change cmd must be equal to %s' %
+                'The new change_cmd cmd must be equal to %s' %
                 self.change_cmd.cmd)
         if self.change_cmd.property_name != change_cmd.property_name:
             raise utils.ValidationError(
-                'The new change property_name must be equal to %s' %
+                'The new change_cmd property_name must be equal to %s' %
                 self.change_cmd.property_name)
         if self.change_cmd.state_name != change_cmd.state_name:
             raise utils.ValidationError(
-                'The new change state_name must be equal to %s' %
+                'The new change_cmd state_name must be equal to %s' %
                 self.change_cmd.state_name)
         if self.change_cmd.new_value['html'] == change_cmd.new_value['html']:
             raise utils.ValidationError(
@@ -611,7 +611,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def convert_html_in_suggestion_change(
         self, conversion_fn: Callable[[str], str]
     ) -> None:
-        """Checks for HTML fields in a suggestion change and converts it
+        """Checks for HTML fields in a suggestion change_cmd and converts it
         according to the conversion function.
 
         Args:
@@ -692,7 +692,7 @@ class SuggestionTranslateContent(BaseSuggestion):
 
         if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
             raise utils.ValidationError(
-                'Expected change to be an ExplorationChange, received %s'
+                'Expected change_cmd to be an ExplorationChange, received %s'
                 % type(self.change_cmd))
         # The score sub_type needs to match the validation for exploration
         # category, i.e the second part of the score_category should match
@@ -741,22 +741,22 @@ class SuggestionTranslateContent(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: ExplorationChange. The new change.
+            change: ExplorationChange. The new change_cmd.
 
         Raises:
-            ValidationError. Invalid new change.
+            ValidationError. Invalid new change_cmd.
         """
         if self.change_cmd.cmd != change.cmd:
             raise utils.ValidationError(
-                'The new change cmd must be equal to %s' %
+                'The new change_cmd cmd must be equal to %s' %
                 self.change_cmd.cmd)
         if self.change_cmd.state_name != change.state_name:
             raise utils.ValidationError(
-                'The new change state_name must be equal to %s' %
+                'The new change_cmd state_name must be equal to %s' %
                 self.change_cmd.state_name)
         if self.change_cmd.content_html != change.content_html:
             raise utils.ValidationError(
-                'The new change content_html must be equal to %s' %
+                'The new change_cmd content_html must be equal to %s' %
                 self.change_cmd.content_html)
         if self.change_cmd.language_code != change.language_code:
             raise utils.ValidationError(
@@ -840,7 +840,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def convert_html_in_suggestion_change(
         self, conversion_fn: Callable[[str], str]
     ) -> None:
-        """Checks for HTML fields in a suggestion change and converts it
+        """Checks for HTML fields in a suggestion change_cmd and converts it
         according to the conversion function.
 
         Args:
@@ -984,10 +984,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not isinstance(
                 self.change_cmd, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
-                'Expected change to be an instance of QuestionSuggestionChange')
+                'Expected change_cmd to be an instance of QuestionSuggestionChange')
 
         if not self.change_cmd.cmd:
-            raise utils.ValidationError('Expected change to contain cmd')
+            raise utils.ValidationError('Expected change_cmd to contain cmd')
 
         if (
                 self.change_cmd.cmd !=
@@ -998,7 +998,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         if not self.change_cmd.question_dict:
             raise utils.ValidationError(
-                'Expected change to contain question_dict')
+                'Expected change_cmd to contain question_dict')
 
         question_dict: question_domain.QuestionDict = (
             self.change_cmd.question_dict)
@@ -1017,13 +1017,13 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         if not self.change_cmd.skill_difficulty:
             raise utils.ValidationError(
-                'Expected change to contain skill_difficulty')
+                'Expected change_cmd to contain skill_difficulty')
 
         skill_difficulties = list(
             constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
         if self._get_skill_difficulty() not in skill_difficulties:
             raise utils.ValidationError(
-                'Expected change skill_difficulty to be one of %s, found %s '
+                'Expected change_cmd skill_difficulty to be one of %s, found %s '
                 % (skill_difficulties, self._get_skill_difficulty()))
 
         # Here we use MyPy ignore because here we are building Question
@@ -1043,7 +1043,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             # type' error. Thus, to avoid the error, we use ignore here.
             None,  # type: ignore[arg-type]
             self.change_cmd.question_dict['linked_skill_ids'],
-            self.change_cmd.question_dict['inapplicable_skill_misconception_ids'], # pylint: disable=line-too-long
+            self.change_cmd.question_dict
+            ['inapplicable_skill_misconception_ids'],
             self.change_cmd.question_dict['next_content_id_index'])
         question_state_data_schema_version = (
             question_dict['question_state_data_schema_version'])
@@ -1061,7 +1062,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         before accepting the suggestion.
         """
         if self.change_cmd.skill_id is None:
-            raise utils.ValidationError('Expected change to contain skill_id')
+            raise utils.ValidationError('Expected change_cmd to contain skill_id')
         self.validate()
 
         skill_domain.Skill.require_valid_skill_id(self.change_cmd.skill_id)
@@ -1126,7 +1127,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             self._get_skill_difficulty())
 
     def populate_old_value_of_change(self) -> None:
-        """Populates old value of the change."""
+        """Populates old value of the change_cmd."""
         pass
 
     def pre_update_validate(
@@ -1140,18 +1141,18 @@ class SuggestionAddQuestion(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: QuestionChange. The new change.
+            change: QuestionChange. The new change_cmd.
 
         Raises:
-            ValidationError. Invalid new change.
+            ValidationError. Invalid new change_cmd.
         """
         if self.change_cmd.cmd != change.cmd:
             raise utils.ValidationError(
-                'The new change cmd must be equal to %s' %
+                'The new change_cmd cmd must be equal to %s' %
                 self.change_cmd.cmd)
         if self.change_cmd.skill_id != change.skill_id:
             raise utils.ValidationError(
-                'The new change skill_id must be equal to %s' %
+                'The new change_cmd skill_id must be equal to %s' %
                 self.change_cmd.skill_id)
 
         if (self.change_cmd.skill_difficulty == change.skill_difficulty) and (
@@ -1187,7 +1188,7 @@ class SuggestionAddQuestion(BaseSuggestion):
     def convert_html_in_suggestion_change(
         self, conversion_fn: Callable[[str], str]
     ) -> None:
-        """Checks for HTML fields in the suggestion change and converts it
+        """Checks for HTML fields in the suggestion change_cmd and converts it
         according to the conversion function.
 
         Args:
