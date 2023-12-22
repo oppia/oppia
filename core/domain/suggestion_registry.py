@@ -1024,8 +1024,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
         if self._get_skill_difficulty() not in skill_difficulties:
             raise utils.ValidationError(
-                'Expected change_cmd skill_difficulty '
-                'to be one of %s, found %s '
+                'Expected change_cmd skill_difficulty'
+                ' to be one of %s, found %s '
                 % (skill_difficulties, self._get_skill_difficulty()))
 
         # Here we use MyPy ignore because here we are building Question
