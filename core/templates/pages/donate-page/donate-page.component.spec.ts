@@ -98,7 +98,7 @@ describe('Donate page', () => {
     component.getImageSet('abc', 'png');
 
     expect(component.getStaticImageUrl).toHaveBeenCalled();
-    component.getStaticImageUrl();
+    component.getStaticImageUrl('abc.webp');
   });
 
   it('should show thank you modal on query parameters change', () => {
