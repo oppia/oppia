@@ -514,7 +514,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd = {}  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to be an ExplorationChange'
+            utils.ValidationError,
+            'Expected change_cmd to be an ExplorationChange'
         ):
             suggestion.validate()
 
@@ -691,7 +692,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change property_name must be equal to content'
+            'The new change_cmd property_name must be equal to content'
         ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
@@ -717,7 +718,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change state_name must be equal to state_1'
+            'The new change_cmd state_name must be equal to state_1'
         ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd(change_cmd)
@@ -767,7 +768,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change cmd must be equal to edit_state_property'
+            'The new change_cmd cmd must be equal to edit_state_property'
         ):
             suggestion.pre_update_validate(
                 exp_domain.EditExpStatePropertyContentCmd({
@@ -969,7 +970,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change cmd must be equal to %s' % (
+            'The new change_cmd cmd must be equal to %s' % (
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
@@ -996,7 +997,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change state_name must be equal to Introduction'
+            'The new change_cmd state_name must be equal to Introduction'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
@@ -1048,7 +1049,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change content_html must be equal to <p>This is a ' +
+            'The new change_cmd content_html must be equal to <p>This is a ' +
             'content.</p>'
         ):
             suggestion.pre_update_validate(
@@ -1378,7 +1379,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         suggestion.change_cmd = {}  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to be an ExplorationChange'
+            utils.ValidationError,
+            'Expected change_cmd to be an ExplorationChange'
         ):
             suggestion.validate()
 
@@ -1885,7 +1887,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected change to be an instance of QuestionSuggestionChange'
+            'Expected change_cmd to be an '
+            'instance of QuestionSuggestionChange'
         ):
             suggestion.validate()
 
@@ -1906,7 +1909,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.cmd = None
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to contain cmd'
+            utils.ValidationError, 'Expected change_cmd to contain cmd'
         ):
             suggestion.validate()
 
@@ -1952,7 +1955,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.question_dict = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to contain question_dict'
+            utils.ValidationError,
+            'Expected change_cmd to contain question_dict'
         ):
             suggestion.validate()
 
@@ -2006,7 +2010,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.skill_difficulty = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to contain skill_difficulty'
+            utils.ValidationError,
+            'Expected change_cmd to contain skill_difficulty'
         ):
             suggestion.validate()
 
@@ -2026,7 +2031,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected change skill_difficulty to be one of '
+            'Expected change_cmd skill_difficulty to be one of '
         ):
             suggestion.validate()
 
@@ -2054,7 +2059,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.change_cmd.skill_id = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected change to contain skill_id'
+            utils.ValidationError, 'Expected change_cmd to contain skill_id'
         ):
             suggestion.pre_accept_validate()
 
@@ -2144,7 +2149,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change cmd must be equal to '
+            'The new change_cmd cmd must be equal to '
             'create_new_fully_specified_question'
         ):
             suggestion.pre_update_validate(
@@ -2179,7 +2184,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change skill_id must be equal to skill_1'
+            'The new change_cmd skill_id must be equal to skill_1'
         ):
             suggestion.pre_update_validate(
                 question_domain.CreateNewFullySpecifiedQuestionCmd(
