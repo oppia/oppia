@@ -383,13 +383,12 @@ class TopicSummaryModel(base_models.BaseModel):
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
-    # A mapping from each story id belonging to the topic to a list of
-    # exploration ids that are linked to the corresponding published story. This
-    # mapping represents the relationships between a topic, its published
-    # stories and the explorations that are linked to each story. This field
-    # must be kept in-sync with updates made to an owned story's explorations,
-    # to the topic's ownership of said stories, and to the publishing or
-    # unpublishing of said stories.
+    # A mapping whose key is a story id of a published story that belongs to
+    # the topic. Each key maps to a list of exploration ids linked to the
+    # corresponding story's published chapters. This mapping must be kept
+    # up-to-date with changes related to publishing status of stories, creation
+    # and removal of story chapters, publishing status of chapters and the
+    # linking of exploration ids to the chapters.
     published_story_exploration_mapping = datastore_services.JsonProperty(
         required=True)
 

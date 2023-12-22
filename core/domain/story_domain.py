@@ -1132,6 +1132,28 @@ class StoryContents:
             exp_ids.append(node.exploration_id)
         return exp_ids
 
+    def get_linked_exp_ids_of_published_nodes(self) -> List[str]:
+        """Returns a list of exploration ids linked to each published node of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids from published nodes.
+        """
+        return self.get_all_linked_exp_ids()[:self.get_published_node_count()]
+
+    def get_published_node_count(self) -> int:
+        """Returns the number of published nodes of story content.
+
+        Returns:
+            int. Number of published nodes.
+        """
+        published_node_count = 0
+        for node in self.nodes:
+            if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
+                break
+            published_node_count += 1
+        return published_node_count
+
     def get_node_with_corresponding_exp_id(self, exp_id: str) -> StoryNode:
         """Returns the node object which corresponds to a given exploration ids.
 

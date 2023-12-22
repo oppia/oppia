@@ -3529,7 +3529,8 @@ version: 1
         self, topic_id: str, story_id: str, exp_ids: List[str]
     ) -> None:
         """Appends a story node for each exploration id given in exp_ids to the
-        story with story_id.
+        story with story_id. Each story node is assigned its exp id and then it
+        is published.
 
         Args:
             topic_id: str. ID of the topic that contains the story.
@@ -3554,6 +3555,14 @@ version: 1
                     'node_id': node_id,
                     'old_value': None,
                     'new_value': exp_id
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name':
+                        story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': node_id,
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
                 })])
             node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
 

@@ -582,10 +582,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
             topic.additional_story_references[0].story_is_published, False)
-        topic_services.publish_story(
-            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        with self.swap_with_call_counter(
+                topic_services, 'generate_topic_summary') as (
+                generate_topic_summary):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         # Ruling out the possibility of None for mypy type checking.
@@ -596,11 +602,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.additional_story_references[0].story_is_published, True)
         self.assertEqual(topic_summary.canonical_story_count, 1)
         self.assertEqual(topic_summary.additional_story_count, 1)
-
-        topic_services.unpublish_story(
-            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        
+        with self.swap_with_call_counter(
+                topic_services, 'generate_topic_summary') as (
+                generate_topic_summary):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin) 
+            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         # Ruling out the possibility of None for mypy type checking.

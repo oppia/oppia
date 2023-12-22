@@ -1113,7 +1113,7 @@ def compute_summary_of_topic(
         strict=False)
     topic_model_published_story_exploration_mapping = {
         published_story_references[i].story_id:
-            stories[i].story_contents.get_all_linked_exp_ids()
+            stories[i].story_contents.get_linked_exp_ids_of_published_nodes()
             if stories[i] else []
         for i in range(len(stories))
     }
