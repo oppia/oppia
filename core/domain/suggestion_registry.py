@@ -984,7 +984,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not isinstance(
                 self.change_cmd, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
-                'Expected change_cmd to be an instance of QuestionSuggestionChange')
+                'Expected change_cmd to be an instance '
+                'of QuestionSuggestionChange')
 
         if not self.change_cmd.cmd:
             raise utils.ValidationError('Expected change_cmd to contain cmd')
@@ -1023,7 +1024,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
         if self._get_skill_difficulty() not in skill_difficulties:
             raise utils.ValidationError(
-                'Expected change_cmd skill_difficulty to be one of %s, found %s '
+                'Expected change_cmd skill_difficulty '
+                'to be one of %s, found %s '
                 % (skill_difficulties, self._get_skill_difficulty()))
 
         # Here we use MyPy ignore because here we are building Question
@@ -1062,7 +1064,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         before accepting the suggestion.
         """
         if self.change_cmd.skill_id is None:
-            raise utils.ValidationError('Expected change_cmd to contain skill_id')
+            raise utils.ValidationError(
+                'Expected change_cmd to contain skill_id')
         self.validate()
 
         skill_domain.Skill.require_valid_skill_id(self.change_cmd.skill_id)
