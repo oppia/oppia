@@ -123,6 +123,34 @@
   transform: translateX(-50%);
   width: 100vw;
 }
+.learners-review{
+  margin-top: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.review-section{
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 3%;
+}
+
+.review-component{
+    flex: 1;
+    min-width: 200px; /* Set a minimum width for each review */
+    margin: 10px;
+    /* border: 1px solid #ccc; */
+    padding: 10px;
+}
+
+.reviewer{
+  font-weight: bold;
+}
+
+.learners-review-title{
+  text-align: center;
+}
 
 .oppia-android-app-updates-container {
   padding-top: 50px;
