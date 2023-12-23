@@ -125,11 +125,11 @@
 }
 
 .learners-review {
-  display: flex;
   align-items: center;
+  display: flex;
   flex-direction: column;
-  margin-top: 20%;
   justify-content: center;
+  margin-top: 20%;
 }
 
 .review-section {
