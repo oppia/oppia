@@ -57,7 +57,7 @@
       </textarea>
     </div>
   </section>
-  <div [hidden]="!(!reviewable && suggestionIsRejected)"
+  <div [hidden]="reviewable"
        class="oppia-suggestion-review-message">
     <strong>Reviewer: </strong>
     {{reviewer}}

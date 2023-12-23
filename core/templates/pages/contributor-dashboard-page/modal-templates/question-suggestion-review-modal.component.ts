@@ -352,7 +352,9 @@ export class QuestionSuggestionReviewModalComponent
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Question');
-    } else if (this.suggestionIsRejected) {
+    } else {
+      this.reviewMessage = ''; // Reset for next/prev.
+      this.reviewer = '';
       this._getThreadMessagesAsync(this.currentSuggestionId);
     }
     this.showQuestion = true;
