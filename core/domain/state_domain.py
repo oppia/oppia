@@ -1552,17 +1552,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if min_value is None or max_value is None:
             # Raise a ValueError if min or max values are None.
             raise ValueError('Either min or max value is None')
-        # Here we use cast because we are narrowing down the type from
-        # various allowed cust. arg types to 'int', and here we are sure
-        # that the type is always going to be int because 'ItemInputSelection'
-        # customization args always contains 'maxAllowableSelectionCount' key
-        # with int type of values.
+        # Cast to 'int' as 'ItemInputSelection' args always contain
+        #'maxAllowableSelectionCount' with int values.
         min_value = cast(int, min_value)
-        # Here we use cast because we are narrowing down the type from
-        # various allowed cust. arg types to 'int', and here we are sure
-        # that the type is always going to be int because 'ItemInputSelection'
-        # customization args always contains 'maxAllowableSelectionCount' key
-        # with int type of values.
+        # Cast to 'int' as 'ItemInputSelection' args always contain
+        #'maxAllowableSelectionCount' with int values.
         max_value = cast(int, max_value)
 
         rule_spec_till_now: List[RuleSpecDict] = []
