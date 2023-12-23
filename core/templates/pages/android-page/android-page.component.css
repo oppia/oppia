@@ -123,32 +123,33 @@
   transform: translateX(-50%);
   width: 100vw;
 }
-.learners-review{
+
+.learners-review {
   margin-top: 20%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.review-section{
+
+.review-section {
   display: flex;
   flex-wrap: wrap;
   margin-top: 3%;
 }
 
-.review-component{
-    flex: 1;
-    min-width: 200px; /* Set a minimum width for each review */
-    margin: 10px;
-    /* border: 1px solid #ccc; */
-    padding: 10px;
+.review-component {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+  padding: 10px;
 }
 
-.reviewer{
+.reviewer {
   font-weight: bold;
 }
 
-.learners-review-title{
+.learners-review-title {
   text-align: center;
 }
 
