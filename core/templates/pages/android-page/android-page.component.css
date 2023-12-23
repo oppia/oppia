@@ -125,11 +125,11 @@
 }
 
 .learners-review {
-  margin-top: 20%;
   display: flex;
+  margin-top: 20%;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .review-section {
@@ -140,8 +140,8 @@
 
 .review-component {
   flex: 1;
-  min-width: 200px;
   margin: 10px;
+  min-width: 200px;
   padding: 10px;
 }
 
