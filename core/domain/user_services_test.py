@@ -704,11 +704,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             can_receive_email_updates: bool
         ) -> bool:
             """Mocks bulk_email_services.add_or_update_user_status()."""
-            # 'NAME' key is not present in merge_fields
+            # 'NAME' key is not present in merge_fields.
             self.assertNotIn('NAME', merge_fields)
             return can_receive_email_updates
-    
-        fn_swap = self.swap(
+
+            fn_swap = self.swap(
             bulk_email_services, 'add_or_update_user_status',
             _mock_add_or_update_user_status)
         with fn_swap:
