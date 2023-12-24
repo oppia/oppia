@@ -60,7 +60,8 @@ describe('Contribution Opportunities backend API service', function() {
     translation_in_review_counts: {
       hi: 15
     },
-    language_code: 'hi'
+    language_code: 'hi',
+    is_pinned: true
   }];
   const translationOpportunityResponse = {
     opportunities: translationOpportunities,

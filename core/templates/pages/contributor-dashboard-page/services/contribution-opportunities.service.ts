@@ -154,7 +154,7 @@ export class ContributionOpportunitiesService {
   async pinReviewableTranslationOpportunityAsync(
       topicName: string,
       languageCode: string,
-      explorationId?: string):
+      explorationId: string):
     Promise<void> {
     this.pinnedOpportunitiesChanged.emit(
       {topicName, languageCode, explorationId});
