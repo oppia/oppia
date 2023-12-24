@@ -22,7 +22,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DonatePageComponent } from './donate-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';;
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
