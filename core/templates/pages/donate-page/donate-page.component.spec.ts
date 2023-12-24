@@ -18,13 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
 
 import { DonatePageComponent } from './donate-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PageTitleService } from 'services/page-title.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';;
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
@@ -53,8 +51,6 @@ class MockWindowRef {
 
 describe('Donate page', () => {
   let component: DonatePageComponent;
-  let translateService: TranslateService;
-  let pageTitleService: PageTitleService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
   let urlInterpolationService: UrlInterpolationService;
@@ -79,8 +75,6 @@ describe('Donate page', () => {
     const donatePageComponent = TestBed.createComponent(DonatePageComponent);
     component = donatePageComponent.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
-    translateService = TestBed.inject(TranslateService);
-    pageTitleService = TestBed.inject(PageTitleService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ngbModal, 'open');
   });
