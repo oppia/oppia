@@ -90,15 +90,8 @@ describe('Donate page', () => {
 
     component.getStaticImageUrl('abc.webp');
 
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith();
-  });
-
-  it('should get image set', () => {
-    spyOn(component, 'getStaticImageUrl');
-
-    component.getImageSet('abc', 'png');
-
-    expect(component.getStaticImageUrl).toHaveBeenCalled();
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'abc.webp');
   });
 
   it('should show thank you modal on query parameters change', () => {
