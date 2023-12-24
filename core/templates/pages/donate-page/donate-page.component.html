@@ -14,16 +14,15 @@
               <p class="donate-text-1">
                 <span class="donate-font-weight-700">{{
                   'I18N_DONATE_PAGE_CONTENT_TEXT_1_BOLD' | translate
-                  }}
-                </span>
+                }}</span>
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }}
               </p>
             </div>
             <div class="donate-message-1 donate-message-1-border" *ngFor="let donationValue of donationValues">
               <p class="donate-heading-1 donate-font-green donate-font-weight-600">
                 {{
-                'I18N_DONATE_PAGE_CONTENT_DONATION_AMOUNT'
-                | translate : { amount: donationValue.amount }
+                  'I18N_DONATE_PAGE_CONTENT_DONATION_AMOUNT'
+                    | translate : { amount: donationValue.amount }
                 }}
               </p>
               <p class="donate-text-1">
@@ -51,9 +50,7 @@
               <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
                 <div>
                   <div class="donate-stat-svg-container">
-                    <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null"
-                         loading="lazy" alt="Graphic for the statistic"
-                    >
+                    <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null" loading="lazy" alt="Graphic for the statistic">
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
                   <p>{{ impactStat.text | translate }}</p>
@@ -77,9 +74,7 @@
                   <picture>
                     <source type="image/webp" [srcset]="getStaticImageUrl(highlight.imageUrl + '.webp')">
                     <source type="image/png" [srcset]="getStaticImageUrl(highlight.imageUrl + '.png')">
-                    <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')"
-                         loading="lazy" alt="Photo of the hightlight's partners"
-                    >
+                    <img class="highlight-tile-img" [src]="getStaticImageUrl(highlight.imageUrl + '.png')" loading="lazy" alt="Photo of the hightlight's partners">
                   </picture>
                   <div>
                     <p>{{ highlight.heading | translate }}</p>
@@ -88,55 +83,37 @@
                 </div>
               </div>
             </div>
+            <div class="donate-our-learners">
+              <!--Add the learners heading and carousel here-->
+              <p></p>
+              <div class="learner-carousel"></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="carousel-control-prev" type="button" data-target="#donate-page-learner-carousel" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </div>
-      <div class="carousel-control-next" type="button" data-target="#donate-page-learner-carousel" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </div>
-    </div>
-  </div>
-  <div class="oppia-page-card mt-0 mb-0 bg-white">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8">
-          <img class="oppia-donate-page-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-
-          <div class="donate-our-learners">
-            <!--Add the learners heading and carousel here-->
-            <p></p>
-            <div class="learner-carousel"></div>
+        <div class="donate-content-1">
+          <div class="donate-content-padding donate-today-content">
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_1' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_2' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_1' | translate }}</p>
+            <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_2' | translate }}</p>
           </div>
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl('/donate/donate-today.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/donate/donate-today.png')">
+            <img [src]="getStaticImageUrl('/donate/donate-today.png')" alt="Photo of Oppia's learners" loading="lazy">
+          </picture>
         </div>
-      </div>
-      <div class="donate-content-1">
-        <div class="donate-content-padding donate-today-content">
-          <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_1' | translate }}</p>
-          <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_HEADING_2' | translate }}</p>
-          <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_1' | translate }}</p>
-          <p>{{ 'I18N_DONATE_PAGE_CONTENT_DONATE_NOW_CONTENT_2' | translate }}</p>
-        </div>
-        <picture>
-          <source type="image/webp" [srcset]="getStaticImageUrl('/donate/donate-today.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/donate/donate-today.png')">
-          <img [src]="getStaticImageUrl('/donate/donate-today.png')" alt="Photo of Oppia's learners" loading="lazy">
-        </picture>
       </div>
     </div>
-  </div>
-  <button class="donate-modal-button" (click)="openDonationBoxModal()">
-    <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" alt="Graphic of a white heart">
-    <span>{{ 'I18N_DONATE_PAGE_BREADCRUMB' | translate }}</span>
-  </button>
-  <div class="donation-box-container">
-    <div class="donation-box">
-      <div class="donation-box-iframe">
-        <donation-box></donation-box>
+    <button class="donate-modal-button" (click)="openDonationBoxModal()">
+      <img [src]="getStaticImageUrl('/donate/donate-button-heart.svg')" alt="Graphic of a white heart">
+      <span>{{ 'I18N_DONATE_PAGE_BREADCRUMB' | translate }}</span>
+    </button>
+    <div class="donation-box-container">
+      <div class="donation-box">
+        <div class="donation-box-iframe">
+          <donation-box></donation-box>
+        </div>
       </div>
     </div>
   </div>
@@ -180,11 +157,11 @@
       width: auto;
     }
 
-    .donate-hightlights-tile>div {
+    .donate-hightlights-tile > div {
       padding: 8px 7px;
     }
 
-    .donate-hightlights-tile>div>p:first-child {
+    .donate-hightlights-tile > div > p:first-child {
       color: #00645c;
       font-size: 14px;
       font-weight: 700;
@@ -192,7 +169,7 @@
       margin-bottom: 5px;
     }
 
-    .donate-hightlights-tile>div>p:last-child {
+    .donate-hightlights-tile > div > p:last-child {
       color: #333;
       font-size: 11px;
       font-weight: 400;
@@ -212,7 +189,7 @@
       width: fit-content;
     }
 
-    .donate-modal-button>span {
+    .donate-modal-button > span {
       color: #fff;
       font-size: 16px;
       font-weight: 400;
@@ -244,11 +221,11 @@
       width: auto;
     }
 
-    .donate-hightlights-tile>div {
+    .donate-hightlights-tile > div {
       padding: 8px 18px;
     }
 
-    .donate-hightlights-tile>div>p:first-child {
+    .donate-hightlights-tile > div > p:first-child {
       color: #00645c;
       font-size: 20px;
       font-weight: 700;
@@ -256,7 +233,7 @@
       margin-bottom: 8px;
     }
 
-    .donate-hightlights-tile>div>p:last-child {
+    .donate-hightlights-tile > div > p:last-child {
       color: #333;
       font-size: 14px;
       font-weight: 400;
@@ -360,7 +337,7 @@
     padding: 8px;
   }
 
-  .donate-stat>div {
+  .donate-stat > div {
     align-items: center;
     background-color: #fff;
     box-shadow: 0 4px 4px 0 #0000001a;
@@ -373,7 +350,7 @@
     width: 100%;
   }
 
-  .donate-stat>p {
+  .donate-stat > p {
     padding: 4px;
   }
 
@@ -386,7 +363,7 @@
     width: 48px;
   }
 
-  .donate-stat-svg-container>div {
+  .donate-stat-svg-container > div {
     font-size: 20px;
     font-weight: 700;
   }
@@ -395,8 +372,8 @@
     border: none;
   }
 
-  .donate-highlights>p,
-  .donate-our-learners>p {
+  .donate-highlights > p,
+  .donate-our-learners > p {
     font-size: 20px;
     font-weight: 500;
     line-height: 23px;
@@ -416,7 +393,7 @@
     display: none;
   }
 
-  .donate-today-content>p:first-child {
+  .donate-today-content > p:first-child {
     font-size: 20px;
     font-weight: 400;
     line-height: 23px;
@@ -424,20 +401,20 @@
     margin-top: 25px;
   }
 
-  .donate-today-content>P:nth-child(2) {
+  .donate-today-content > P:nth-child(2) {
     font-size: 20px;
     font-weight: 700;
     line-height: 23px;
   }
 
-  .donate-today-content>p:nth-child(3),
-  .donate-today-content>p:nth-child(4) {
+  .donate-today-content > p:nth-child(3),
+  .donate-today-content > p:nth-child(4) {
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
   }
 
-  .donate-today-content>p:nth-child(3) {
+  .donate-today-content > p:nth-child(3) {
     margin-bottom: 16px;
   }
 </style>
