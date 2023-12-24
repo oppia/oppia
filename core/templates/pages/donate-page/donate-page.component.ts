@@ -16,14 +16,12 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
-import { TranslateService } from '@ngx-translate/core';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
 import { InsertScriptService } from 'services/insert-script.service';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
