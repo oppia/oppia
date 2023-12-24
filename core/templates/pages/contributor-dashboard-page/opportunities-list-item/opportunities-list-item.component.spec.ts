@@ -76,7 +76,8 @@ describe('Opportunities List Item Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 50,
-        translationsCount: 0
+        translationsCount: 0,
+        topicName: 'Topic 1'
       };
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
@@ -139,7 +140,8 @@ describe('Opportunities List Item Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 50,
-        translationsCount: 25
+        translationsCount: 25,
+        topicName: 'Topic 1'
       };
       component.opportunityType = 'translation';
       component.clickActionButton.emit =
