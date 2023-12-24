@@ -68,6 +68,7 @@ describe('Donate page', () => {
       ],
       providers: [
         UrlInterpolationService,
+        TranslateService,
         { provide: WindowRef, useValue: windowRef },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
