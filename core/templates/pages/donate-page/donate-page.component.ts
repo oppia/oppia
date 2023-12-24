@@ -51,14 +51,7 @@ interface Highlight {
   styleUrls: [],
 })
 
-export class DonatePageComponent implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
-  windowIsNarrow: boolean = false;
-  donateImgUrl: string = '';
-  OPPIA_AVATAR_IMAGE_URL = (
-    this.getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg')
-  );
-
+export class DonatePageComponent implements OnInit {
   donationValues: DonationValue[] = [
     {
       amount: '10',
@@ -136,7 +129,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private translateService: TranslateService,
     private ngbModal: NgbModal,
     private insertScriptService: InsertScriptService,
   ) {}
@@ -155,18 +147,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  getImageSet(imageName: string, imageExt: string): string {
-    return (
-      this.getStaticImageUrl(imageName + '1x.' + imageExt) + ' 1x, ' +
-      this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
-      this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
   }
 
   openDonationBoxModal(): void {
