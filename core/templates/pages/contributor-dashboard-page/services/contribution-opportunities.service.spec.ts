@@ -57,7 +57,8 @@ describe('Contribution Opportunities Service', () => {
       translation_in_review_counts: {
         hi: 20
       },
-      language_code: 'hi'
+      language_code: 'hi',
+      is_pinned: false
     }],
     next_cursor: '6',
     more: true
@@ -338,11 +339,11 @@ describe('Contribution Opportunities Service', () => {
     let pinTranslationOpportunitySpy = spyOn(
       contributionOpportunitiesBackendApiService,
       'pinTranslationOpportunity')
-      .and.returnValue(Promise.resolve({}));
+      .and.returnValue(Promise.resolve<void>(undefined));
 
     contributionOpportunitiesService
       .pinReviewableTranslationOpportunityAsync(
-        'en', 'Topic 1', 'exp 1').then(
+        'Topic 1', 'en', 'exp 1').then(
         successHandler, failHandler
       );
     tick();
@@ -359,11 +360,11 @@ describe('Contribution Opportunities Service', () => {
     let unpinTranslationOpportunitySpy = spyOn(
       contributionOpportunitiesBackendApiService,
       'unpinTranslationOpportunity')
-      .and.returnValue(Promise.resolve({}));
+      .and.returnValue(Promise.resolve<void>(undefined));
 
     contributionOpportunitiesService
       .unpinReviewableTranslationOpportunityAsync(
-        'en', 'Topic 1').then(
+        'Topic 1', 'en', '1').then(
         successHandler, failHandler
       );
     tick();
