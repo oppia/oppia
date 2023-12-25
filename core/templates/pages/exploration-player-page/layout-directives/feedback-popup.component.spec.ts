@@ -29,6 +29,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 describe('FeedbackPopupComponent', () => {
   let component: FeedbackPopupComponent;
@@ -46,6 +47,7 @@ describe('FeedbackPopupComponent', () => {
         MockTranslatePipe
       ],
       providers: [
+        NgbActiveModal,
         BackgroundMaskService,
         {
           provide: TranslateService,
