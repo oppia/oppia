@@ -38,6 +38,7 @@ describe('FeedbackPopupComponent', () => {
   let playerPositionService: PlayerPositionService;
   let windowDimensionsService: WindowDimensionsService;
   let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
+  let ngbActiveModal: NgbActiveModal;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -64,6 +65,7 @@ describe('FeedbackPopupComponent', () => {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     feedbackPopupBackendApiService = TestBed.get(
       FeedbackPopupBackendApiService);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
     fixture = TestBed.createComponent(FeedbackPopupComponent);
     component = fixture.componentInstance;
 
@@ -96,7 +98,7 @@ describe('FeedbackPopupComponent', () => {
     component.feedbackText = 'Nice exploration!';
     spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync')
       .and.resolveTo();
-    spyOn(component.closePopover, 'emit');
+    spyOn(ngbActiveModal, 'close');
 
     expect(component.feedbackSubmitted).toBe(false);
 
@@ -104,6 +106,6 @@ describe('FeedbackPopupComponent', () => {
     tick(2001);
 
     expect(component.feedbackSubmitted).toBe(true);
-    expect(component.closePopover.emit).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   }));
 });
