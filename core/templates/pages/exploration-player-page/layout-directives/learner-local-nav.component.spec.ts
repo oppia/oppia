@@ -196,7 +196,8 @@ describe('Learner Local Nav Component ', () => {
 
     expect(modalSpy).toHaveBeenCalledWith(
       FeedbackPopupComponent, { backdrop: true,
-        windowClass: 'feedback-modal' });
+        windowClass: 'feedback-modal',
+        size: 'lg' });
   });
 
   it('should hide attribution modal', () => {
