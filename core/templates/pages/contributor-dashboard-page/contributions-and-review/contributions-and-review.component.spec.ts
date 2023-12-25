@@ -1431,6 +1431,11 @@ describe('Contributions and review component', () => {
 
     it('should open a snackbar if a pinned opportunity already exists', () => {
       const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
+
+      const dict = {
+        topic_name: 'Topic 1',
+        exploration_id: '1',
+      };
       component.opportunities = [{
         id: '1',
         heading: 'heading',
@@ -1455,12 +1460,8 @@ describe('Contributions and review component', () => {
         isPinned: false,
         topicName: 'Topic 1'
       }];
-
-      const dict = {
-        topic_name: 'Topic 1',
-        exploration_id: '1',
-      };
       component.languageCode = 'en';
+
       component.pinReviewableTranslationOpportunity(dict);
 
       expect(openSnackbarSpy).toHaveBeenCalledWith(
@@ -1476,6 +1477,10 @@ describe('Contributions and review component', () => {
         'pinReviewableTranslationOpportunityAsync')
         .and.returnValue(Promise.resolve({}));
 
+      const dict = {
+        topic_name: 'Topic 3',
+        exploration_id: '8',
+      };
       component.opportunities = [{
         id: '1',
         heading: 'heading',
@@ -1500,12 +1505,8 @@ describe('Contributions and review component', () => {
         isPinned: false,
         topicName: 'Topic 1'
       }];
-
-      const dict = {
-        topic_name: 'Topic 3',
-        exploration_id: '8',
-      };
       component.languageCode = 'en';
+
       component.pinReviewableTranslationOpportunity(dict);
       tick();
 
@@ -1521,10 +1522,9 @@ describe('Contributions and review component', () => {
           .and.returnValue(Promise.resolve({}));
 
         component.languageCode = 'en';
-        const topicName = 'Dummy Topic 1';
 
         component.unpinReviewableTranslationOpportunity({
-          topic_name: topicName,
+          topic_name: 'Dummy Topic 1',
           exploration_id: '1'
         });
         tick();
@@ -1547,13 +1547,12 @@ describe('Contributions and review component', () => {
         contributionOpportunitiesService,
         'pinReviewableTranslationOpportunityAsync').and.returnValue(
         Promise.resolve());
-      const topicName = 'testTopic';
-      const explorationId = 'testExploration';
-      const message = 'Test message';
-      const actionText = 'Action text';
 
       component.openSnackbarWithAction(
-        topicName, explorationId, message, actionText);
+        'testTopic',
+        'testExploration',
+        'Test message',
+        'Action text');
 
       tick();
       fixture.detectChanges();

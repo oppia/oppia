@@ -42,6 +42,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 export interface Suggestion {
   change: {
@@ -150,7 +151,7 @@ export class ContributionsAndReview
     };
   };
 
-  opportunities = {};
+  opportunities: ExplorationOpportunitySummary[] = [];
 
   /**
    * The feature flag state to gate the contributor_dashboard_accomplishments.
