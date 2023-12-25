@@ -36,6 +36,7 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
 import { LearnerLocalNavComponent } from './learner-local-nav.component';
 import { FlagExplorationModalComponent } from '../modals/flag-exploration-modal.component';
 import { UserInfo } from 'domain/user/user-info.model';
+import { FeedbackPopupComponent } from './feedback-popup.component';
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;
@@ -182,20 +183,19 @@ describe('Learner Local Nav Component ', () => {
       FlagExplorationModalComponent, {backdrop: 'static'});
   });
 
-  it('should toggle feedback popover', () => {
-    component.feedbackPopOver = MockNgbPopover;
+  it('should open a modal to feedback popup when ' +
+    'clicking on feedback button', () => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return (
+        { componentInstance: {},
+          result: Promise.resolve()
+        }) as NgbModalRef;
+    });
 
     component.togglePopover();
 
-    expect(MockNgbPopover.toggle).toHaveBeenCalled();
-  });
-
-  it('should close feedback popover', () => {
-    component.feedbackPopOver = MockNgbPopover;
-
-    component.closePopover();
-
-    expect(MockNgbPopover.close).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalledWith(
+      FeedbackPopupComponent, {backdrop: 'static'});
   });
 
   it('should hide attribution modal', () => {
