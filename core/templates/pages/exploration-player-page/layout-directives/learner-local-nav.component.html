@@ -59,7 +59,7 @@
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">Share</span>
     </span>
-    <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" tabindex="0" #feedbackPopOver="ngbPopover" [autoClose]="false">
+    <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" #feedbackPopOver="ngbPopover" [autoClose]="false">
       <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
     </span>
