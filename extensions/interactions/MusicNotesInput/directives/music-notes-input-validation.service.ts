@@ -31,23 +31,71 @@ import { Outcome } from
 @Injectable({
   providedIn: 'root'
 })
-export class MusicNotesInputValidationService {
-  constructor(
+  export class MusicNotesInputValidationService {
+    constructor(
       private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+        baseInteractionValidationService) { }
 
+  // validate input is array of ReadbleMusicNotes
+  // check invariants for ReadbleMusicNote custom type
   getCustomizationArgsWarnings(
-      customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
-    // TODO(juansaba): Implement customization args validations.
-    return [];
+    customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
+
+   
+    let warningsList = []
+    this.baseInteractionValidationService.requireCustomizationArugments(
+      customizationArgs,
+      ['sequenceToGuess', 'initialSequence']);
+
+    let gSeq = customizationArgs.sequenceToGuess.value; 
+    let initSeq = customizationArgs.initialSequence.value;
+
+    // check if the input exists
+    if (gSeq === undefined || gSeq.length === 0){
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'sequence to guess is undefined'
+      });
+
+    }
+
+    if (initSeq === undefined || initSeq.length === 0){
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'sequence to guess is undefined'
+      });
+
+    }
+
+    let noteName = gSeq[0].noteName;
+    let noteDuration = gSeq[0].noteName;
+
+     // check if noteName is a string
+     if (!(typeof noteName === 'string')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'noteName must be a string'
+      });
+     }
+
+     // check if noteDuration is a number
+     if (!(typeof noteDuration.num === 'number') || !(typeof noteDuration.den === 'number')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'noteDuration must be a number'
+      });
+    }
+    
+  }
+    return warningsList;
   }
 
-  getAllWarnings(
-      stateName: string, customizationArgs: MusicNotesInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+getAllWarnings(
+  stateName: string, customizationArgs: MusicNotesInputCustomizationArgs,
+  answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+  return this.getCustomizationArgsWarnings(customizationArgs).concat(
+    this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      answerGroups, defaultOutcome, stateName));
   }
 }
 
