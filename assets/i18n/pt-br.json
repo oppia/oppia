@@ -76,6 +76,8 @@
 	"I18N_ANDROID_PAGE_BETA_DESCRIPTION": "Uma versão beta do aplicativo para Android da Oppia agora é gratuita para download e uso em <strong>inglês</strong> e <strong>português do Brasil</strong>.",
 	"I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL": "Confirmo que tenho mais de 18 anos ou que tenho o consentimento e a aprovação dos meus pais ou tutores legais.",
 	"I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL": "Endereço eletrônico",
+	"I18N_ANDROID_PAGE_REVIEWS_REVIEW_2": "O aplicativo e muito bom 😘 amei.",
+    "I18N_ANDROID_PAGE_REVIEWS_REVIEW_3": "Muito bom para aprender bem explicativo e com exercícios.",
 	"I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER": "Educação para todos.",
 	"I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1": "Experimente nossas dicas úteis para guiá-lo ao longo",
 	"I18N_ANDROID_PAGE_FEATURE_SUBTEXT_2": "Continue aprendendo mesmo quando estiver off-line.",

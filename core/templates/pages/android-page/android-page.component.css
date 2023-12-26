@@ -139,10 +139,15 @@
 }
 
 .review-component {
+  border: 1px solid #ccc;
+  border-radius: 11px;
+  box-shadow: 8px 4px 6px rgba(0, 0, 0, 0.3);
   flex: 1;
+  height: 250px;
   margin: 10px;
   min-width: 200px;
   padding: 10px;
+  width: 280px;
 }
 
 .reviewer {
