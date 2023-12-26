@@ -60,7 +60,7 @@ YARN_VERSION = '1.22.15'
 BUF_VERSION = '0.29.0'
 
 # Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.13.0'
+PROTOC_VERSION = '3.18.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.

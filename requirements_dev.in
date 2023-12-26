@@ -5,13 +5,13 @@
 # to update `requirements_dev.txt` and your current Python environment.
 Pillow==10.1.0
 PyGithub==1.58.1
-certifi==2022.12.7
+certifi==2023.7.22
 coverage==7.2.3
 esprima==4.0.1
 future==0.18.3
 grpcio==1.54.0
 isort==5.12.0
-protobuf==3.13.0
+protobuf==3.18.3
 psutil==5.9.5
 pycodestyle==2.10.0
 pylint==2.17.2
