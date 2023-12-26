@@ -1,109 +1,100 @@
 <footer class="oppia-footer" role="contentinfo">
+  <div class="oppia-footer-newsletter-container">
+    <div class="oppia-footer-newsletter">
+      <div class="oppia-newsletter-content">
+        <h2>{{ 'I18N_FOOTER_NEWSLETTER_HEADING' | translate }}</h2>
+        <p>{{ 'I18N_FOOTER_NEWSLETTER_TEXT' | translate }}</p>
+      </div>
+      <div class="oppia-footer-newsletter-input">
+        <label id="email">
+          {{ 'I18N_FOOTER_NEWSLETTER_EMAIL' | translate }}
+        </label>
+        <div class="oppia-newsletter-input">
+          <input type="email"
+                 [(ngModel)]="emailAddress"
+                 [ngModelOptions]="{standalone: true}"
+                 required="true"
+                 aria-labelledby="email">
+          <button class="oppia-footer-newsletter-button"
+                  [disabled]="!validateEmailAddress()"
+                  (click)="subscribeToMailingList()">
+            <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="oppia-footer-container">
-    <div class="row row-cols-2">
-      <div class="col">
-        <p [innerHTML]="'I18N_FOOTER_ABOUT_ALL_CAPS' | translate"></p>
+    <div class="row row-cols-2 p-0 m-0">
+      <div class="oppia-mission-volunteer col-7">
+        <p class="oppia-mission">{{ 'I18N_FOOTER_OPPIA_MISSION' | translate }}</p>
+        <oppia-footer-donate-volunteer></oppia-footer-donate-volunteer>
+      </div>
+      <hr class="oppia-footer-separator">
+      <div class="col pd-0 pd-r-10 mr-30">
+        <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
             <a href="/about"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
-               [innerHTML]="'I18N_FOOTER_ABOUT' | translate">
+               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+               {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
           <li>
-            <a href="/about-foundation"
-               [innerHTML]="'I18N_FOOTER_OPPIA_FOUNDATION' | translate">
+            <a href="/about-foundation">
+              {{ 'I18N_FOOTER_OPPIA_FOUNDATION' | translate }}
             </a>
           </li>
           <li>
-            <a [href]="getOppiaBlogUrl()"
-               [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
+            <a [href]="getOppiaBlogUrl()">
+              {{ 'I18N_TOPNAV_BLOG' | translate }}
             </a>
           </li>
           <li>
-            <a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia"
-               [innerHTML]="'I18N_FOOTER_FORUM' | translate">
+            <a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia">
+              {{ 'I18N_FOOTER_FORUM' | translate }}
             </a>
           </li>
         </ul>
-
       </div>
-      <div class="col">
-        <p [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></p>
+      <div class="col pd-0 mr-30">
+        <p>{{ 'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
             <a href="/get-started"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE"
-               class="e2e-test-get-started-link"
-               [innerHTML]="'I18N_FOOTER_GET_STARTED' | translate">
+               class="e2e-test-get-started-link">
+               {{ 'I18N_FOOTER_GET_STARTED' | translate }}
             </a>
           </li>
           <li>
             <a href="/creator-guidelines"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE"
-               [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate">
+               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE">
+               {{ 'I18N_PLAYBOOK_HEADING' | translate }}
             </a>
           </li>
           <li>
             <a href="/teach"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE"
-               [innerHTML]="'I18N_FOOTER_TEACH_PAGE' | translate">
+               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE">
+               {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
             </a>
           </li>
           <li>
             <a href="/community-library"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
-               [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate">
+               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+               {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
             </a>
           </li>
           <li>
             <a href="/contact"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
-               [innerHTML]="'I18N_FOOTER_CONTACT_US' | translate">
+               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
+               {{ 'I18N_FOOTER_CONTACT_US' | translate }}
             </a>
           </li>
         </ul>
       </div>
-      <div class="col">
-        <p [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></p>
-        <ul>
-          <li>
-            <a href="/volunteer"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-               [innerHTML]="'I18N_HEADING_VOLUNTEER' | translate">
-            </a>
-          </li>
-          <li *ngIf="siteFeedbackFormUrl">
-            <a [href]="siteFeedbackFormUrl"
-               target="_blank"
-               rel="noopener"
-               [innerHTML]="'I18N_SPLASH_SITE_FEEDBACK' | translate " >
-            </a>
-          </li>
-          <li>
-            <a href="/donate"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-               class="e2e-test-donate-link"
-               [innerHTML]="'I18N_FOOTER_DONATE' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/terms"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
-               class="e2e-test-terms-link"
-               [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/privacy-policy"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
-               class="e2e-test-privacy-policy-link"
-               [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate">
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div class="col">
+      <div class="oppia-flex-break"></div>
+      <div class="col p-0 max-width-fit">
         <oppia-social-buttons></oppia-social-buttons>
       </div>
     </div>
@@ -111,5 +102,24 @@
          *ngIf="versionInformationIsShown">
       Version: {{ BRANCH_NAME + ' (' + SHORT_COMMIT_HASH + ')' }}
     </div>
+  </div>
+  <div class="oppia-footer-terms-privacy">
+    <small>
+      {{ 'I18N_FOOTER_COPYRIGHT' | translate:{currentYear: currentYear} }}
+    </small>
+    <small>
+      <a href="/terms"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
+         class="e2e-test-terms-link">
+         {{ 'I18N_FOOTER_TERMS_OF_SERVICE' | translate }}
+      </a>
+    </small>
+    <small>
+      <a href="/privacy-policy"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
+         class="e2e-test-privacy-policy-link">
+          {{ 'I18N_FOOTER_PRIVACY_POLICY' | translate }}
+      </a>
+    </small>
   </div>
 </footer>

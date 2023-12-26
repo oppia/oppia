@@ -13,12 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the donation page thanks for subscribing modal.
+ * @fileoverview Controller for the thanks-for-subscribing-modal.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
 
 @Component({
   selector: 'thanks-for-subscribing-modal',

@@ -693,7 +693,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with fn_swap:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
-                    'email@example.com', 'Name', 'Android'))
+                    'email@example.com', 'Android', name='Name'))
+
+    def test_add_user_to_mailing_list_no_name(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            # 'NAME' key is not present in merge_fields.
+            self.assertNotIn('NAME', merge_fields)
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'

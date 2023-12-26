@@ -459,6 +459,12 @@ export default {
   // The supported tags for the mailing list subscriptions.
   "MAILING_LIST_ANDROID_TAG": "Android",
   "MAILING_LIST_WEB_TAG": "Web",
+
+  // The error message to be displayed when the user tries to subscribe to the
+  // mailing list but fails.
+  // eslint-disable-next-line max-len
+  "MAILING_LIST_UNEXPECTED_ERROR_MESSAGE": "Sorry, an unexpected error occurred. Please email admin@oppia.org to be added to the mailing list.",
+
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.

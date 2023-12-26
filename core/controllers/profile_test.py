@@ -986,7 +986,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args,
+            **kwargs: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -996,8 +997,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             json_response = self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name',
-                    'tag': 'Web'
+                    'tag': 'Web',
+                    'name': 'Name'
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
 
@@ -1017,8 +1018,8 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name',
-                    'tag': 'Web'
+                    'tag': 'Web',
+                    'name': 'Name'
                 }, csrf_token=csrf_token, expected_status_int=500)
 
         self.logout()
@@ -1035,22 +1036,22 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'invalidemail.com',
-                    'name': 'Name',
-                    'tag': 'Web'
+                    'tag': 'Web',
+                    'name': 'Name'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': '',
-                    'tag': 'Web'
+                    'tag': 'Web',
+                    'name': ''
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name',
-                    'tag': ''
+                    'tag': '',
+                    'name': 'Name'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
