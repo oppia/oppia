@@ -19,10 +19,12 @@
 var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
+const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
 
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
-const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://127.0.0.1:8181/topics-and-skills-dashboard';
+
+const ADMIN_URL = 'http://localhost:8181/admin';
+const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
+const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://localhost:8181/topics-and-skills-dashboard';
 // Read more about networkidle0
 // https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 const networkIdle = 'networkidle0';
@@ -41,7 +43,20 @@ var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
-
+var stateEditSelector = '.e2e-test-state-edit-content';
+var saveContentButton = '.e2e-test-save-state-content';
+var addInteractionButton = '.e2e-test-open-add-interaction-modal';
+var endIneractionSelector = '.e2e-test-interaction-tile-EndExploration';
+var saveInteractionButton = '.e2e-test-save-interaction';
+var saveChangesButton = '.e2e-test-save-changes';
+var saveDraftButton = '.e2e-test-save-draft-button';
+var publishExplorationButton = '.e2e-test-publish-exploration';
+var explorationTitleInput = '.e2e-test-exploration-title-input-modal';
+var explorationGoalInput = '.e2e-test-exploration-objective-input-modal';
+var expCategoryDropdownElement =
+  '.e2e-test-exploration-category-metadata-modal';
+var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
+var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
 var topicNameField = '.e2e-test-new-topic-name-field';
 var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
@@ -80,6 +95,13 @@ var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
+var generateTopicButton = '.load-dummy-new-structures-data-button';
+var generateClassroomButton = '.load-dummy-math-classroom';
+var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
+var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
+var saveTopicButton = '.e2e-test-save-topic-button';
+var topicCommitMessageInput = '.e2e-test-commit-message-input';
+var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = (
   '.e2e-test-oppia-cookie-banner-accept-button');
 
@@ -120,7 +142,7 @@ const setRole = async function(browser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+      'http://localhost:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(usernameInputFieldForRolesEditing);
     await page.type(usernameInputFieldForRolesEditing, 'username1');
     await page.waitForSelector(editUserRoleButton);
@@ -146,11 +168,72 @@ const getExplorationEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
       dismissWelcomeModalSelector, {visible: true});
+
+    await page.click(dismissWelcomeModalSelector);
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(stateEditSelector, {visible: true});
+    await page.click(stateEditSelector);
+    await page.waitForTimeout(5000);
+    await page.waitForSelector(saveContentButton, {visible: true});
+    await page.click(saveContentButton);
+    await page.waitForTimeout(2000);
+    await page.waitForSelector(addInteractionButton, {visible: true});
+    await page.click(addInteractionButton);
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(endIneractionSelector, {visible: true});
+    await page.click(endIneractionSelector);
+    await page.waitForSelector(saveInteractionButton, {visible: true});
+    await page.click(saveInteractionButton);
+
+    await page.waitForSelector(saveChangesButton, {visible: true});
+    await page.click(saveChangesButton);
+
+    await page.waitForSelector(saveDraftButton, {visible: true});
+    await page.click(saveDraftButton);
+
+    const successMessage = 'Changes saved.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.e2e-test-toast-message');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(publishExplorationButton);
+    await page.click(publishExplorationButton);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(explorationTitleInput, {visible: true});
+    await page.type(explorationTitleInput, 'Sample exploration');
+
+    await page.waitForSelector(explorationGoalInput, {visible: true});
+    await page.type(explorationGoalInput, 'Sample exploration goal');
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(expCategoryDropdownElement, {visible: true});
+    await page.click(expCategoryDropdownElement);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector('mat-option');
+    await page.waitForTimeout(3000);
+    await page.click('mat-option[ng-reflect-value="Algebra"]');
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector(expConfirmPublishButton, {visible: true});
+    await page.click(expConfirmPublishButton);
+    await page.waitForTimeout(5000);
+    await page.waitForSelector(explorationConfirmPublish, {visible: true});
+    await page.click(explorationConfirmPublish);
+
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -268,6 +351,110 @@ const getSkillEditorUrl = async function(browser, page) {
   }
 };
 
+const generateDataForTopicAndStoryPlayer = async function(browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateTopicButton);
+    await page.click(generateTopicButton);
+
+    const successMessage = 'Dummy new structures data generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    process.exit(1);
+  }
+};
+
+const generateDataForClassroom = async function(browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto('http://localhost:8181/admin#/activities', { waitUntil: networkIdle });
+
+    await page.waitForSelector(generateClassroomButton);
+    await page.click(generateClassroomButton);
+
+    const successMessage = 'Dummy new classroom generated successfully.';
+    let statusMessage;
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      statusMessage = await page.evaluate(() => {
+        const statusMessageElement = document
+          .querySelector('.oppia-status-message-container');
+        return statusMessageElement ? statusMessageElement
+          .textContent.trim() : '';
+      });
+    } while (statusMessage !== successMessage);
+
+    await addThumbnailToTopic(page, 'Fraction');
+    await addThumbnailToTopic(page, 'Addition');
+    await addThumbnailToTopic(page, 'Subtraction');
+    await addThumbnailToTopic(page, 'Multiplication');
+    await addThumbnailToTopic(page, 'Division');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
+const addThumbnailToTopic = async function(page, topicName) {
+  try {
+    await page.goto(TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
+
+    const topicLinkXPath = `//a[contains(text(), "${topicName}")]`;
+    await page.waitForXPath(topicLinkXPath);
+    const [topicLinkElement] = await page.$x(topicLinkXPath);
+    await topicLinkElement.click();
+    await page.waitForTimeout(5000);
+
+    await page.waitForSelector(topicThumbnailButton);
+    await page.click(topicThumbnailButton);
+
+    await page.waitForSelector(topicThumbnailResetButton);
+    await page.click(topicThumbnailResetButton);
+
+    await page.waitForSelector(topicUploadButton, { visible: true });
+
+    const elementHandle = await page.$(topicUploadButton);
+    await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
+
+    await page.waitForSelector(thumbnailContainer, { visible: true });
+    await page.click(topicPhotoSubmit);
+    await page.waitForTimeout(3000);
+
+    await page.waitForSelector(topicMetaTagInput);
+    await page.focus(topicMetaTagInput);
+    await page.type(topicMetaTagInput, 'meta');
+
+    await page.waitForSelector(saveTopicButton);
+    await page.click(saveTopicButton);
+
+    await page.waitForSelector(topicCommitMessageInput);
+    await page.focus(topicCommitMessageInput);
+    await page.type(topicCommitMessageInput, 'Updated thumbnail');
+
+    await page.waitForSelector(publishChangesButton);
+    await page.click(publishChangesButton);
+    await page.waitForTimeout(10000);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    process.exit(1);
+  }
+};
+
 const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
@@ -278,6 +465,33 @@ const main = async function() {
     width: 1920,
     height: 1080
   });
+
+  var recorder = null;
+  let record = process.argv[2] && process.argv[2] === '-record';
+  let videoPath = process.argv[3];
+  if (record && videoPath) { // Start recording via puppeteer-screen-recorder.
+    const Config = {
+      followNewTab: true,
+      fps: 25,
+      ffmpeg_Path: null,
+      videoFrame: {
+        width: 1920,
+        height: 1080,
+      },
+      videoCrf: 18,
+      videoCodec: 'libx264',
+      videoPreset: 'ultrafast',
+      videoBitrate: 1000,
+      autopad: {
+        color: 'black' | '#35A5FF',
+      },
+      aspectRatio: '16:9',
+    };
+    recorder = new PuppeteerScreenRecorder(page, Config);
+    // Create directory for video in opensource.
+    await recorder.start(videoPath);
+  }
+
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
 
@@ -287,6 +501,8 @@ const main = async function() {
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
+  await generateDataForTopicAndStoryPlayer(browser, page);
+  await generateDataForClassroom(browser, page);
   await process.stdout.write(
     [
       explorationEditorUrl,
@@ -295,6 +511,9 @@ const main = async function() {
       skillEditorUrl,
     ].join('\n')
   );
+  if (record) {
+    await recorder.stop();
+  }
   await page.close();
   process.exit(0);
 };

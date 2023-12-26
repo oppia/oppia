@@ -475,7 +475,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1
+            'exploration_id': self.EXP_ID_1,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
@@ -490,7 +495,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0
+            'exploration_id': self.EXP_ID_0,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
@@ -505,7 +515,12 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_7
+            'exploration_id': self.EXP_ID_7,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
@@ -708,7 +723,12 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1
+            'exploration_id': self.EXP_ID_1,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
@@ -723,7 +743,12 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0
+            'exploration_id': self.EXP_ID_0,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 200,
+            'unpublishing_reason': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),

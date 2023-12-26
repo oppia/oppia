@@ -1,0 +1,258 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-feedback-updates-container {
+  margin: 0 auto 30px auto;
+  max-width: 1400px;
+  text-align: left;
+}
+
+oppia-learner-dashboard-page .empty-feedback-threads {
+  color: #333;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 18px;
+}
+
+.oppia-feedback-updates-main-content {
+  margin-top: 20px;
+  padding: 0;
+  width: 60%;
+}
+
+.oppia-feedback-updates-main-content .remove-icon {
+  color: white;
+  float: right;
+  font-size: 20px;
+  margin-left: -26px;
+  margin-top: 10px;
+  position: relative;
+  width: 18px;
+  z-index: 20;
+}
+
+.oppia-feedback-updates-mobile-mode {
+  margin: 0 0 0;
+  width: 100%;
+}
+
+.oppia-feedback-updates-main-content-title {
+  color: #076962;
+  display: inline-block;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  padding-bottom: 8px;
+}
+
+.oppia-feedback-updates-sort {
+  float: right;
+  margin-top: -10px;
+  padding-right: 7.5px;
+  padding-top: 8px;
+}
+
+.oppia-feedback-updates-main-content-container .oppia-feedback-updates-page-no-activity-card {
+  background: rgb(255,255,255);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin: 0 0 0 18px;
+  padding: 30px 55px 30px 30px;
+}
+
+.oppia-feedback-updates-sort-mobile {
+  float: none;
+  padding: 0 7.5px;
+}
+
+.oppia-feedback-updates-page-feedback-section {
+  margin: 60px 23px 0 0;
+}
+
+.oppia-feedback-updates-page-feedback-section .table {
+  background-color: white;
+  margin-bottom: 10px;
+  margin-left: 6px;
+}
+
+oppia-learner-dashboard-page .oppia-feedback-section-top-margin {
+  margin-top: 64px;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-message-count {
+  color: #757575;
+  font-size: 100.25%;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-message-spacing {
+  left: 3px;
+  padding: 0;
+  text-align: center;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-message-header {
+  display: inline-block;
+  text-align: center;
+  width: 8%;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-new-message {
+  margin-right: 10px;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-new-message-send {
+  margin: 6px 0 0 14px;
+}
+
+oppia-feedback-updates-page .oppia-sort-options {
+  width: auto;
+}
+.oppia-feedback-updates-intro-button-link {
+  margin-top: 13px;
+  width: 230px;
+}
+oppia-feedback-updates-page .oppia-btn-secondary {
+  padding: 0 3px;
+}
+oppia-feedback-updates-page .oppia-exploration-title {
+  font-size: 105%;
+  margin-left: 7px;
+}
+oppia-feedback-updates-page .oppia-message-summaries {
+  padding: 13px 8px 7px 8px;
+}
+oppia-feedback-updates-page .oppia-profile-picture {
+  margin-top: 4px;
+  min-width: 32px;
+}
+oppia-feedback-updates-page .oppia-updated-status {
+  float: right;
+  margin-right: 15px;
+}
+oppia-feedback-updates-page .oppia-feedback-message-spacing {
+  width: 8%;
+}
+
+@media (max-width: 768px) {
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-new-message {
+    margin-left: 14px;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-message-author-name {
+    margin-left: 10px;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-new-message-send {
+    margin: 6px 0 0 28px;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-reply-box {
+    margin-top: 9px;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-message-body {
+    margin-left: 43px;
+  }
+
+  .oppia-feedback-updates-container {
+    margin-bottom: 0;
+  }
+}
+
+.oppia-feedback-updates-page-feedback-section .col-sm-11 {
+  padding: 0 20px 0 0;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-reply-box {
+  font-size: 1em;
+  height: 70px;
+  margin-left: 14px;
+  resize: vertical;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-warning {
+  color: #0277bd;
+  margin-left: 4px;
+}
+
+.oppia-feedback-updates-page-feedback-section .feedback-thread-learner-profile-pic {
+  margin-left: 26px;
+  margin-top: 4px;
+  min-width: 32px;
+}
+
+@media (max-width: 1160px) {
+  .sort-explorations-select.oppia-feedback-updates-sort {
+    margin-top: 10px;
+    padding: 0 0 6px 7.5px;
+    width: 100%;
+  }
+
+  .oppia-feedback-updates-main-content-container {
+    margin-bottom: 10vh;
+    padding-left: 1px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .oppia-feedback-updates-main-content-container {
+    padding: 7px;
+  }
+
+  .oppia-feedback-updates-main-content-container .oppia-feedback-updates-page-no-activity-card {
+    margin: 0 -18px 0 4px;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-reply-box {
+    font-size: 1em;
+    height: 70px;
+    margin-left: 14px;
+    resize: vertical;
+  }
+
+  .oppia-feedback-updates-page-feedback-section .feedback-thread-learner-profile-pic {
+    margin-left: 15px;
+  }
+}
+
+@media screen and (max-width: 470px) {
+  .oppia-feedback-updates-main-content,
+  .oppia-learner-dashboard-side-content {
+    width: 100%;
+  }
+}
+
+.oppia-feedback-updates-page-pagination-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  width: 100%;
+}
+oppia-feedback-updates-page .oppia-pagination-button {
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  color: #009688;
+  font-size: 18px;
+  font-weight: bold;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.oppia-pagination-button:hover {
+  border: 2px solid #009688;
+  border-radius: 5px;
+}
+.oppia-pagination-button[disabled] {
+  color: #a9e5df;
+}
+.oppia-pagination-button[disabled]:hover {
+  border: none;
+}
+
+.oppia-diagram-spinning-button {
+  margin: 0 auto;
+}

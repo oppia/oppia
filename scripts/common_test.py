@@ -35,6 +35,7 @@ import time
 from urllib import request as urlrequest
 
 from core import constants
+from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
@@ -46,16 +47,11 @@ from typing import Generator, List, Literal, NoReturn
 from . import common
 
 
-# Here we use MyPy ignore because the pool_size argument is required by
-# Requester.__init__(), but it is missing from the typing definition in
-# Requester.pyi. We therefore disable type checking here. A PR was opened
-# to PyGithub to fix this, but it was closed due to inactivity (the project
-# does not seem very active). Here is the PR:
-# https://github.com/PyGithub/PyGithub/pull/2151.
-_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+_MOCK_REQUESTER = github.Requester.Requester(
     login_or_token=None,
     password=None,
     jwt=None,
+    app_auth=None,
     base_url='https://github.com',
     timeout=0,
     user_agent='user',
@@ -877,10 +873,13 @@ class CommonTests(test_utils.GenericTestBase):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_inplace_replace_file(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        shutil.copyfile(origin_filepath, backup_filepath)
+
         expected_lines = [
             '{\n',
             '    "RANDMON1" : "randomValue1",\n',
@@ -890,55 +889,60 @@ class CommonTests(test_utils.GenericTestBase):
             '}\n'
         ]
 
-        def mock_remove(unused_file: str) -> None:
-            return
-
-        remove_swap = self.swap_with_checks(
-            os, 'remove', mock_remove, expected_args=[(backup_file,)]
+        common.inplace_replace_file(
+            origin_filepath,
+            '"DEV_MODE": .*',
+            '"DEV_MODE": true,',
+            expected_number_of_replacements=1
         )
-        with remove_swap:
-            common.inplace_replace_file(
-                origin_file,
-                '"DEV_MODE": .*',
-                '"DEV_MODE": true,',
-                expected_number_of_replacements=1
-            )
-        with utils.open_file(origin_file, 'r') as f:
+
+        with utils.open_file(origin_filepath, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
-        os.remove(origin_file)
-        shutil.move(backup_file, origin_file)
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
         self
     ) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
-                origin_file,
+                origin_filepath,
                 '"DEV_MODEa": .*',
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_exception_raised(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg: str) -> NoReturn:
@@ -950,56 +954,13 @@ class CommonTests(test_utils.GenericTestBase):
             re.escape('Exception raised from compile()')
         ), compile_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+                origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
-
-    def test_inplace_replace_file_context(self) -> None:
-        file_path = (
-            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
-        backup_file_path = '%s.bak' % file_path
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        replace_file_context = common.inplace_replace_file_context(
-            file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": true,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-            self.assertTrue(os.path.isfile(backup_file_path))
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        try:
-            self.assertFalse(os.path.isfile(backup_file_path))
-        except AssertionError:
-            # Just in case the implementation is wrong, erase the file.
-            os.remove(backup_file_path)
-            raise
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_convert_to_posixpath_on_windows(self) -> None:
         def mock_is_windows() -> Literal[True]:
@@ -1282,6 +1243,76 @@ class CommonTests(test_utils.GenericTestBase):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
 
+    def test_modify_constants_under_docker_env(self) -> None:
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            def mock_check_output(
+                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            ) -> str:
+                return 'test'
+            check_output_swap = self.swap(
+                subprocess, 'check_output', mock_check_output
+            )
+
+            constants_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
+
+            feconf_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is
+            # read-only. In order to silence the MyPy complaints
+            # `setattr` is used to set the attribute.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+
+            with constants_path_swap, feconf_path_swap, check_output_swap:
+                common.modify_constants(prod_env=True, maintenance_mode=False)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": false,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+
+                common.modify_constants(prod_env=False, maintenance_mode=True)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+
+            constants_temp_file.close()
+            feconf_temp_file.close()
+
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
+
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
@@ -1351,6 +1382,10 @@ class CommonTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
+
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
@@ -1395,6 +1430,10 @@ class CommonTests(test_utils.GenericTestBase):
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
+
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
 
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:

@@ -153,12 +153,13 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
         return set()
 
 
-def docstringify(docstring: str) -> _check_docs_utils.Docstring:
-    """Converts a docstring in its str form to its Docstring object
+def docstringify(docstring: astroid.nodes.Const) -> _check_docs_utils.Docstring:
+    """Converts a docstring node to its Docstring object
     as defined in the pylint library.
 
     Args:
-        docstring: str. Docstring for a particular class or function.
+        docstring: astroid.nodes.Const. Docstring for a particular class or
+            function.
 
     Returns:
         Docstring. Pylint Docstring class instance representing
@@ -166,7 +167,7 @@ def docstringify(docstring: str) -> _check_docs_utils.Docstring:
     """
     for docstring_type in [GoogleDocstring]:
         instance = docstring_type(docstring)
-        if instance.is_valid():
+        if instance.matching_sections() > 0:
             return instance
 
     return _check_docs_utils.Docstring(docstring)

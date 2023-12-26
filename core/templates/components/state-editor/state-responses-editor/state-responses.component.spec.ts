@@ -579,7 +579,7 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.suppressDefaultAnswerGroup()).toBe(true);
+    expect(component.shouldHideDefaultAnswerGroup()).toBe(true);
   });
 
   it('should suppress default answer group warnings if each choice' +
@@ -623,14 +623,14 @@ describe('State Responses Component', () => {
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(
       answerChoices as AnswerChoice[]);
 
-    expect(component.suppressDefaultAnswerGroup()).toBe(true);
+    expect(component.shouldHideDefaultAnswerGroup()).toBe(true);
   });
 
   it('should not suppress warnings for interactions other than multiple' +
     ' choice input or item selection input', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.suppressDefaultAnswerGroup()).toBe(false);
+    expect(component.shouldHideDefaultAnswerGroup()).toBe(false);
   });
 
   it('should save displayed value when solicit answer details' +
@@ -1139,6 +1139,23 @@ describe('State Responses Component', () => {
     component.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
 
     expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+  });
+
+  it('should get answer choices', () => {
+    const answerChoices = [
+      {
+        val: 0,
+        label: 'label1'
+      },
+      {
+        val: 1,
+        label: 'label2'
+      }
+    ];
+    spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
+
+    expect(component.getAnswerChoices())
+      .toEqual(answerChoices);
   });
 
   it('should return summary of answer group', () => {

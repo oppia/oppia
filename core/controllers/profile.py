@@ -69,8 +69,8 @@ class ProfileHandler(
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
             user_settings.user_id)
-        is_already_subscribed = (self.user_id in subscriber_ids)
-        is_user_visiting_own_profile = (self.user_id == user_settings.user_id)
+        is_already_subscribed = self.user_id in subscriber_ids
+        is_user_visiting_own_profile = self.user_id == user_settings.user_id
 
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
@@ -81,7 +81,7 @@ class ProfileHandler(
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
-        profile_is_of_current_user = (self.username == username)
+        profile_is_of_current_user = self.username == username
 
         self.values.update({
             'profile_is_of_current_user': profile_is_of_current_user,
@@ -251,9 +251,9 @@ class MailingListSubscriptionHandler(
         """Handles PUT request."""
         assert self.normalized_payload is not None
         email = self.normalized_payload['email']
-        name = self.normalized_payload['name']
+        name = self.normalized_payload.get('name')
         tag = self.normalized_payload['tag']
-        status = user_services.add_user_to_mailing_list(email, name, tag)
+        status = user_services.add_user_to_mailing_list(email, tag, name=name)
         self.render_json({'status': status})
 
 

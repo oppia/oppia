@@ -25,7 +25,12 @@
             "tsConfig": "tsconfig.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/midi/examples/soundfont/",
+                "output": "./midi/examples/soundfont/"
+              }
             ],
             "styles": [
               "core/templates/css/oppia.css",

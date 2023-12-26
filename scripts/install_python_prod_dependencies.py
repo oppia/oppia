@@ -140,7 +140,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         trimmed_lines = (line.strip() for line in f.readlines())
         for line_num, line in enumerate(trimmed_lines, start=1):
-            if not line or line.startswith('#'):
+            if not line or line.startswith('#') or line.startswith('--hash='):
                 continue
 
             if line.startswith('git'):
@@ -234,13 +234,14 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
     possible_normalized_directory_names = (
         _get_possible_normalized_metadata_directory_names(
             library_name, version_string))
-    normalized_directory_names = [
-        normalize_directory_name(name)
+    normalized_to_original_dirnames = {
+        normalize_directory_name(name): name
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         if os.path.isdir(
             os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
-    ]
-    for normalized_directory_name in normalized_directory_names:
+    }
+    for (normalized_dirname, original_dirname) in (
+            normalized_to_original_dirnames.items()):
         # Python metadata directory names contain a python library name that
         # does not have uniform case. However, python libraries are equivalent
         # regardless of their case. Therefore, in order to check if a python
@@ -248,9 +249,9 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
         # directory name. Otherwise, we would need to check every permutation of
         # the casing for metadata directories generated with the naming
         # convention: <library_name>-<library-version>.
-        if normalized_directory_name in possible_normalized_directory_names:
+        if normalized_dirname in possible_normalized_directory_names:
             path_to_delete = os.path.join(
-                common.THIRD_PARTY_PYTHON_LIBS_DIR, normalized_directory_name)
+                common.THIRD_PARTY_PYTHON_LIBS_DIR, original_dirname)
             shutil.rmtree(path_to_delete)
 
 
@@ -538,8 +539,8 @@ def _pip_install_requirements(
     """
     verify_pip_is_installed()
     _run_pip_command([
-        'install', '--target', install_path, '--no-dependencies',
-        '-r', requirements_path, '--upgrade'
+        'install', '--require-hashes', '--no-deps', '--target',
+        install_path, '--no-dependencies', '-r', requirements_path, '--upgrade'
     ])
 
 

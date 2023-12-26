@@ -41,7 +41,11 @@ describe('Creator topic summary model', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       is_published: false,
-      can_edit_topic: false
+      can_edit_topic: false,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [2],
+      published_chapter_counts_for_each_story: [1]
     };
     _sampleCreatorTopicSummary = CreatorTopicSummary.createFromBackendDict(
       sampleCreatorTopicSummaryBackendDict);
@@ -69,5 +73,12 @@ describe('Creator topic summary model', () => {
       'image.svg');
     expect(_sampleCreatorTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
     expect(_sampleCreatorTopicSummary.isTopicPublished()).toBeFalse();
+    expect(_sampleCreatorTopicSummary.getTotalUpcomingChaptersCount()).toEqual(
+      1);
+    expect(_sampleCreatorTopicSummary.getTotalOverdueChaptersCount()).toEqual(
+      1);
+    expect(_sampleCreatorTopicSummary.getTotalChaptersCounts()).toEqual([2]);
+    expect(_sampleCreatorTopicSummary.getPublishedChaptersCounts()).
+      toEqual([1]);
   });
 });

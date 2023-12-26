@@ -17,4 +17,7 @@
       </div>
     </button>
   </div>
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+    {{errorMessageI18nKey | translate}}
+  </div>
 </form>

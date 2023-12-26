@@ -44,15 +44,11 @@ MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
     'feconf.txt')
 
-# Here we use MyPy ignore because the pool_size argument is required by
-# Requester.__init__(), but it is missing from the typing definition in
-# Requester.pyi. We therefore disable type checking here. Here is the
-# type definition:
-# https://github.com/PyGithub/PyGithub/blob/001970d4a828017f704f6744a5775b4207a6523c/github/Requester.pyi#L97
-MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+MOCK_REQUESTER = github.Requester.Requester(
     login_or_token=None,
     password=None,
     jwt=None,
+    app_auth=None,
     base_url='https://github.com',
     timeout=0,
     user_agent='user',
@@ -288,8 +284,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
-            'INCOMING_EMAILS_DOMAIN_NAME = \'\'',
-            'INCOMING_EMAILS_DOMAIN_NAME = \'oppia.org\'')
+            'ADMIN_EMAIL_ADDRESS = \'\'',
+            'ADMIN_EMAIL_ADDRESS = \'adm@example.com\'')
         try:
             update_configs.apply_changes_based_on_config(
                 MOCK_LOCAL_FECONF_PATH,

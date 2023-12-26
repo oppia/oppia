@@ -36,7 +36,7 @@ import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
 } from 'domain/platform_feature/platform-parameter-filter.model';
-import { PlatformParameter, FeatureStage } from
+import { PlatformParameter } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
@@ -68,31 +68,9 @@ export class FeaturesTabComponent implements OnInit {
       inputRegex?: RegExp;
     }
   } = {
-      [PlatformParameterFilterType.ServerMode]: {
-        displayName: 'Server Mode',
-        options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['='],
-        optionFilter: (feature: PlatformParameter, option: string): boolean => {
-          switch (feature.featureStage) {
-            case FeatureStage.DEV:
-              return option === 'dev';
-            case FeatureStage.TEST:
-              return option === 'dev' || option === 'test';
-            case FeatureStage.PROD:
-              return true;
-            default:
-              return false;
-          }
-        }
-      },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
         options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
-        operators: ['=']
-      },
-      [PlatformParameterFilterType.BrowserType]: {
-        displayName: 'Browser Type',
-        options: AdminFeaturesTabConstants.ALLOWED_BROWSER_TYPES,
         operators: ['=']
       },
       [PlatformParameterFilterType.AppVersion]: {
@@ -110,7 +88,7 @@ export class FeaturesTabComponent implements OnInit {
 
   private readonly defaultNewFilter: PlatformParameterFilter = (
     PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.ServerMode,
+      type: PlatformParameterFilterType.PlatformType,
       conditions: []
     })
   );
@@ -229,7 +207,7 @@ export class FeaturesTabComponent implements OnInit {
       feature: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules, feature.defaultValue);
+        feature.name, commitMessage, feature.rules);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
@@ -280,7 +258,6 @@ export class FeaturesTabComponent implements OnInit {
 
     if (backup) {
       featureFlag.rules = cloneDeep(backup.rules);
-      featureFlag.defaultValue = backup.defaultValue;
     }
   }
 
@@ -295,10 +272,7 @@ export class FeaturesTabComponent implements OnInit {
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return (
-      !isEqual(original.rules, feature.rules) ||
-      !isEqual(original.defaultValue, feature.defaultValue)
-    );
+    return !isEqual(original.rules, feature.rules);
   }
 
   /**

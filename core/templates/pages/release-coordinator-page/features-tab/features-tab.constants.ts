@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ServerMode } from
-  'domain/platform_feature/platform-parameter-filter.model';
-
 import { AppConstants } from 'app.constants';
 
 /**
@@ -22,14 +19,8 @@ import { AppConstants } from 'app.constants';
  */
 
 export const AdminFeaturesTabConstants = {
-  ALLOWED_SERVER_MODES: [
-    ServerMode.Dev, ServerMode.Test, ServerMode.Prod
-  ].map(val => val.toString()),
-
   ALLOWED_PLATFORM_TYPES: (
     AppConstants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES),
-
-  ALLOWED_BROWSER_TYPES: AppConstants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES,
 
   // Matches app version with the numeric part only, hash and flavor are not
   // needed since hash is redundant and there is already app_version_flavor

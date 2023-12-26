@@ -100,6 +100,146 @@ describe('Translation Suggestion Review Modal Component', function() {
       null, null, new ElementRef({offsetHeight: 200}), null);
   });
 
+  describe('when initializing the modal ', () => {
+    const reviewable = true;
+    const subheading = 'topic_1 / story_1 / chapter_1';
+
+    const suggestion1 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p><p>&nbsp;</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content</p><p>&nbsp;</p>'
+    };
+    const suggestion2 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content CHANGED</p>'
+    };
+    const suggestion3 = {
+      author_name: 'author_name',
+      language_code: 'language_code',
+      last_updated_msecs: 1559074000000,
+      status: 'status',
+      suggestion_id: 'suggestion_3',
+      target_id: '3',
+      target_type: 'target_type',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: '<p>content</p>',
+        translation_html: 'Tradução',
+        state_name: 'StateName',
+        cmd: 'edit_state_property',
+        data_format: 'html',
+        language_code: 'language_code',
+      },
+      exploration_content_html: '<p>content CHANGED</p>'
+    };
+
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: {
+        topic_name: 'topic_1',
+        story_title: 'story_1',
+        chapter_title: 'chapter_1'
+      }
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+    const contribution3 = {
+      suggestion: suggestion3,
+      details: {
+        topic_name: 'topic_3',
+        story_title: 'story_3',
+        chapter_title: 'chapter_3'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2,
+      suggestion_3: contribution3
+    };
+    const editedContent = {
+      html: '<p>In Hindi</p>'
+    };
+
+    beforeEach(() => {
+      component.subheading = subheading;
+      component.reviewable = reviewable;
+      component.suggestionIdToContribution = angular.copy(
+        suggestionIdToContribution);
+      component.editedContent = editedContent;
+    });
+
+    it('should be able to navigate to both previous suggestion and ' +
+    'next suggestion if initial suggestion is in middle of list', () => {
+      component.initialSuggestionId = 'suggestion_2';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_2');
+      expect(component.skippedContributionIds).toEqual(['suggestion_1']);
+      expect(component.remainingContributionIds).toEqual(['suggestion_3']);
+    });
+
+    it('should be able to navigate to only previous suggestion ' +
+    'if initial suggestion is the last suggestion of the list', () => {
+      component.initialSuggestionId = 'suggestion_3';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_3');
+      expect(component.skippedContributionIds.sort()).toEqual(
+        ['suggestion_1', 'suggestion_2']);
+      expect(component.remainingContributionIds).toEqual([]);
+    });
+
+    it('should be able to navigate to only next suggestion ' +
+    'if initial suggestion is in first suggestion of the list', () => {
+      component.initialSuggestionId = 'suggestion_1';
+      component.ngOnInit();
+
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.skippedContributionIds).toEqual([]);
+      expect(component.remainingContributionIds.sort()).toEqual(
+        ['suggestion_2', 'suggestion_3']);
+    });
+  });
+
   describe('when reviewing suggestion', function() {
     const reviewable = true;
     const subheading = 'topic_1 / story_1 / chapter_1';
@@ -272,6 +412,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           return Promise.resolve(successCallback(suggestionId));
         });
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
@@ -293,6 +434,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -306,6 +448,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           '2', 'suggestion_2', 'accept', 'Review message example 2',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -328,6 +471,7 @@ describe('Translation Suggestion Review Modal Component', function() {
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.translationUpdated = true;
       component.acceptAndReviewNext();
@@ -341,6 +485,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           '(Note: This suggestion was submitted with reviewer edits.)',
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     });
 
     it('should reject suggestion in suggestion modal service when clicking ' +
@@ -361,6 +506,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
@@ -378,6 +524,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -386,12 +533,15 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
+      expect(alertsService.addSuccessMessage).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
 
-    it('should reject a suggestion if the backend pre accept validation ' +
-    'failed', function() {
+    it('should allow the reviewer to fix the suggestion if the backend pre' +
+      ' accept/reject validation failed', function() {
+      const responseMessage = 'Pre accept validation failed.';
+
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -400,12 +550,15 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(
         siteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.reject(
-            errorCallback('Pre accept validation failed.')
+            errorCallback(responseMessage)
           );
         });
       spyOn(alertsService, 'addWarning');
@@ -413,6 +566,10 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example';
       component.acceptAndReviewNext();
 
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('Review message example');
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -422,7 +579,24 @@ describe('Translation Suggestion Review Modal Component', function() {
           'hint section of "StateName" card', jasmine.any(Function),
           jasmine.any(Function));
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Pre accept validation failed.');
+        jasmine.stringContaining(responseMessage));
+
+      component.reviewMessage = 'Edited review message example';
+      component.rejectAndReviewNext(component.reviewMessage);
+
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('Edited review message example');
+      expect(
+        siteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Edited review message example', null,
+          jasmine.any(Function), jasmine.any(Function));
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        jasmine.stringContaining(responseMessage));
     });
 
     it(
@@ -850,6 +1024,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
+      spyOn(alertsService, 'addSuccessMessage');
 
       component.reviewMessage = 'Review message example';
       component.rejectAndReviewNext(component.reviewMessage);
@@ -862,6 +1037,8 @@ describe('Translation Suggestion Review Modal Component', function() {
           '1', 'suggestion_1', 'reject', 'Review message example',
           null, jasmine.any(Function),
           jasmine.any(Function));
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Suggestion rejected.');
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);
     });

@@ -95,6 +95,8 @@ export class Interaction extends BaseTranslatableObject {
   hints: Hint[];
   id: string | null;
   solution: Solution | null;
+  currentAnswer: InteractionAnswer | null = null;
+  submitClicked = false;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],

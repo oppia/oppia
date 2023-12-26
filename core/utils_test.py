@@ -779,6 +779,13 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
+    def test_convert_millisecs_time_to_datetime_object(self) -> None:
+        msecs = 1690761600000
+        dt = utils.convert_millisecs_time_to_datetime_object(
+            msecs + 1000.0 * time.timezone)
+        dt2 = datetime.datetime(2023, 7, 31)
+        self.assertEqual(dt, dt2)
+
     def test_grouper(self) -> None:
         self.assertEqual(
             [list(g) for g in utils.grouper(range(7), 3)],
@@ -884,7 +891,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_require_valid_name_with_incorrect_input(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The length of the exploration title should be between 1 and 50 ' 'characters; received '):   # pylint: disable=line-too-long
+            'The length of the exploration title should be between 1 and 50 '
+            'characters; received '):
             utils.require_valid_name('', 'the exploration title')
         with self.assertRaisesRegex(
             utils.ValidationError,

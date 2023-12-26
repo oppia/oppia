@@ -104,7 +104,11 @@ describe('Topics and Skills Dashboard backend API service', () => {
           total_skill_count: 0,
           additional_story_count: 0,
           topic_model_last_updated: 1623851496406.582,
-          thumbnail_filename: 'thumbnail_filename'
+          thumbnail_filename: 'thumbnail_filename',
+          total_upcoming_chapters_count: 1,
+          total_overdue_chapters_count: 1,
+          total_chapter_counts_for_each_story: [5, 4],
+          published_chapter_counts_for_each_story: [3, 4]
         },
         {
           version: 3,
@@ -125,7 +129,11 @@ describe('Topics and Skills Dashboard backend API service', () => {
           total_skill_count: 2,
           additional_story_count: 0,
           topic_model_last_updated: 1623851737518.369,
-          thumbnail_filename: 'thumbnail_filename'
+          thumbnail_filename: 'thumbnail_filename',
+          total_upcoming_chapters_count: 1,
+          total_overdue_chapters_count: 1,
+          total_chapter_counts_for_each_story: [5, 4],
+          published_chapter_counts_for_each_story: [3, 4]
         }
       ],
       can_delete_skill: true,

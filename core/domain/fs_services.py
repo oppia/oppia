@@ -233,7 +233,7 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        source_file_url = ('%s/%s' % (source_assets_path, filepath))
+        source_file_url = '%s/%s' % (source_assets_path, filepath)
         storage_services.copy(
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )

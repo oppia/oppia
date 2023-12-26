@@ -67,7 +67,6 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     feature_name: str
     commit_message: str
     new_rules: List[parameter_domain.PlatformParameterRule]
-    default_value: bool
 
 
 class FeatureFlagsHandler(
@@ -111,13 +110,7 @@ class FeatureFlagsHandler(
                     }
                 },
                 'default_value': None
-            },
-            'default_value': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': None
-            },
+            }
         }
     }
 
@@ -160,14 +153,12 @@ class FeatureFlagsHandler(
                     'The \'commit_message\' must be provided when the '
                     'action is update_feature_flag.'
                 )
-            default_value = self.normalized_payload.get('default_value')
-            assert default_value is not None
 
             assert self.user_id is not None
             try:
                 feature_services.update_feature_flag(
                     feature_name, self.user_id, commit_message,
-                    new_rules, default_value)
+                    new_rules)
             except (
                     utils.ValidationError,
                     feature_services.FeatureFlagNotFoundException) as e:

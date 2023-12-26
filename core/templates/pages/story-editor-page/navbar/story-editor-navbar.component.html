@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right" *ngIf="!isSerialChapterFeatureFlagEnabled()">
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
       <span [matTooltip]="getAllStoryWarnings()"
@@ -77,6 +77,269 @@
     </button>
   </li>
 </ul>
+
+<div  *ngIf="isSerialChapterFeatureFlagEnabled()">
+  <div *ngIf="currentTab === 'story_editor'">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+      <li class="oppia-dropdown-menu-container">
+        <div ngbDropdown>
+          <span [matTooltip]="getAllStoryWarnings()"
+                matTooltipClass="oppia-mat-tooltip-list"
+                [matTooltipDisabled]="isWarningTooltipDisabled()"
+                aria-label="List that shows issues preventing to save story as draft"
+                class="w-100">
+            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+                    [ngClass]="{'btn-success': isStorySaveable() && !isChapterStatusBeingChanged()}"
+                    (click)="saveChanges()"
+                    [disabled]="!isStorySaveable() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+                <i *ngIf="isWarningTooltipDisabled()"
+                   class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
+                   alt="Save Story">
+                </i>
+                <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
+                  *ngIf="!isWarningTooltipDisabled()">
+                </i>
+                <span class="oppia-save-publish-button-label float-left">
+                  Save Changes
+                </span>
+                <span class="d-none d-md-block float-left oppia-changes-count"
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+                  ({{ getChangeListLength() }})
+                </span>
+              </span>
+
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+                <span class="oppia-save-publish-button-label">
+                  Saving
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </button>
+          </span>
+          <button type="button"
+                  class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
+                  aria-label="Dropdown toggle"
+                  ngbDropdownToggle>
+          </button>
+          <ul ngbDropdownMenu
+              class="oppia-dropdown-menu dropdown-menu"
+              [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
+            <li title="Discard all pending changes">
+              <a (click)="discardChanges()"
+                 [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+                 class="dropdown-item e2e-test-discard-story-changes">
+                Discard Changes
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="oppia-editor-publish-button-container">
+        <button type="button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-publish-chapters-button"
+                (click)="changeChapterStatus('Published')"
+                [ngClass]="{'btn-success': !isPublishButtonDisabled() && !getChangeListLength()}"
+                [disabled]="isPublishButtonDisabled() || getChangeListLength() > 0">
+          <span class="oppia-save-publish-button-label"
+                *ngIf="areChaptersBeingPublished()">
+            Publish Chapters
+          </span>
+          <span class="oppia-save-publish-button-label"
+                *ngIf="!areChaptersBeingPublished()">
+            Unpublish Chapters
+          </span>
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Draft'">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+      <li class="oppia-dropdown-menu-container">
+        <div ngbDropdown>
+          <span class="w-100">
+            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+                    [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
+                    (click)="saveChanges()"
+                    [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+                <span class="oppia-save-publish-button-label float-left">
+                  Save Draft
+                </span>
+                <span class="d-none d-md-block float-left oppia-changes-count"
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+                  ({{ getChangeListLength() }})
+                </span>
+              </span>
+
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+                <span class="oppia-save-publish-button-label">
+                  Saving
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </button>
+          </span>
+          <button type="button"
+                  class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
+                  aria-label="Dropdown toggle"
+                  ngbDropdownToggle>
+          </button>
+          <ul ngbDropdownMenu
+              class="oppia-dropdown-menu dropdown-menu"
+              [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
+            <li title="Discard all pending changes">
+              <a (click)="discardChanges()"
+                 [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+                 class="dropdown-item e2e-test-discard-story-changes">
+                Discard Draft
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="oppia-editor-publish-button-container"
+          [matTooltip]="'Chapter Publication Checklist should be fulfilled'"
+          matTooltipClass="oppia-mat-tooltip-list"
+          [matTooltipDisabled]="isChapterPublishable()">
+        <button type="button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-mark-as-ready-to-publish-button"
+                (click)="changeChapterStatus('Ready To Publish')"
+                [ngClass]="{'btn-success': isChapterPublishable() && getChangeListLength() === 0}"
+                [disabled]="!isChapterPublishable() || getChangeListLength() > 0">
+          <span class="oppia-save-publish-button-label">
+            Mark as Ready To Publish
+          </span>
+          <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
+             *ngIf="!isChapterPublishable()">
+          </i>
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Ready To Publish'">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+      <li class="oppia-dropdown-menu-container">
+        <div ngbDropdown>
+          <span class="w-100">
+            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+                    [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
+                    (click)="saveChangesInReadyToPublishChapter()"
+                    [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
+              <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+                <span class="oppia-save-publish-button-label float-left">
+                  Save Changes
+                </span>
+                <span class="d-none d-md-block float-left oppia-changes-count"
+                      *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+                  ({{ getChangeListLength() }})
+                </span>
+              </span>
+
+              <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+                <span class="oppia-save-publish-button-label">
+                  Saving
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </button>
+          </span>
+          <button type="button"
+                  class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
+                  [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
+                  aria-label="Dropdown toggle"
+                  ngbDropdownToggle>
+          </button>
+          <ul ngbDropdownMenu
+              class="oppia-dropdown-menu dropdown-menu"
+              [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
+            <li title="Discard all pending changes">
+              <a (click)="discardChanges()"
+                 [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+                 class="dropdown-item e2e-test-discard-story-changes">
+                Discard Changes
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="oppia-editor-publish-button-container">
+        <button type="button"
+                class="btn btn-secondary oppia-editor-publish-button e2e-test-mark-as-draft-button"
+                (click)="changeChapterStatus('Draft')"
+                [disabled]="getChangeListLength() > 0">
+          <span class="oppia-save-publish-button-label">
+            Mark as Draft
+          </span>
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Published'">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+      <li class="oppia-dropdown-menu-container">
+        <div ngbDropdown>
+          <span [matTooltip]="'Chapter Publication Checklist should be fulfilled'"
+                matTooltipClass="oppia-mat-tooltip-list"
+                [matTooltipDisabled]="isChapterPublishable()"
+                aria-label="List that shows issues preventing to publish changes"
+                class="w-100">
+            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-publish-changes-button"
+                    [ngClass]="{'btn-success': getChangeListLength() && isChapterPublishable()}"
+                    (click)="saveChanges()"
+                    [disabled]="!getChangeListLength() || !isChapterPublishable()">
+              <span *ngIf="!isSaveInProgress()">
+                <i *ngIf="isChapterPublishable()"
+                   class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
+                   alt="Publish Changes">
+                </i>
+                <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
+                  *ngIf="!isChapterPublishable()">
+                </i>
+                <span class="oppia-save-publish-button-label float-left">
+                  Publish Changes
+                </span>
+                <span class="d-none d-md-block float-left oppia-changes-count"
+                      *ngIf="getChangeListLength() > 0">
+                  ({{ getChangeListLength() }})
+                </span>
+              </span>
+
+              <span *ngIf="isSaveInProgress()">
+                <span class="oppia-save-publish-button-label">
+                  Publishing
+                </span>
+                <loading-dots></loading-dots>
+              </span>
+            </button>
+          </span>
+          <button type="button"
+                  class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
+                  [disabled]="!getChangeListLength()"
+                  aria-label="Dropdown toggle"
+                  ngbDropdownToggle>
+          </button>
+          <ul ngbDropdownMenu
+              class="oppia-dropdown-menu dropdown-menu"
+              [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
+            <li title="Discard all pending changes">
+              <a (click)="discardChanges()"
+                 [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+                 class="dropdown-item e2e-test-discard-story-changes">
+                Discard Changes
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
 <div class="story-nav-mobile">
   <div class="story-navbar-mobile-tabs">
     <div class="story-nav-dropdown-container">
@@ -125,7 +388,9 @@
         </div>
       </div>
     </div>
-    <div class="story-nav-dropdown-container save-options-dropdown">
+
+    <div *ngIf="!isSerialChapterFeatureFlagEnabled()"
+         class="story-nav-dropdown-container save-options-dropdown">
       <div class="story-nav-story-nav-dropdown-options"
            *ngIf="showStoryEditOptions">
         <div class="story-nav-dropdown-option"
@@ -168,9 +433,165 @@
         </div>
       </div>
     </div>
+    <div class="story-nav-dropdown-container save-options-dropdown"
+          *ngIf="isSerialChapterFeatureFlagEnabled() && currentTab === 'story_editor'">
+      <div class="story-nav-story-nav-dropdown-options"
+          *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
+          <i class="fas fa-pen navbar-tab-icon"></i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="story-nav-dropdown-option e2e-test-mobile-publish-button"
+             [class.disabled]="isPublishButtonDisabled()">
+          <div *ngIf="areChaptersBeingPublished()"
+               (click)="changeChapterStatus('Published')">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Publish Chapters</span>
+          </div>
+          <div (click)="changeChapterStatus('Published')"
+               *ngIf="!areChaptersBeingPublished()"
+               class="unpublish-chapters-mobile-option">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Unpublish Chapters</span>
+          </div>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content right-container">
+        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+                [disabled]="!isStorySaveable() || isChapterStatusBeingChanged()"
+                (click)="saveChanges()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+            <span>Saving</span>
+          </span>
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+            Save Changes
+          </span>
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+            ({{ getChangeListLength() }})
+          </span>
+        </button>
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
+          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
+        </div>
+      </div>
+    </div>
+    <div class="story-nav-dropdown-container save-options-dropdown"
+          *ngIf="isSerialChapterFeatureFlagEnabled() && currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Draft'">
+      <div class="story-nav-story-nav-dropdown-options"
+          *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
+          <i class="fas fa-pen navbar-tab-icon"></i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="story-nav-dropdown-option"
+             [class.disabled]="!isChapterPublishable() || getChangeListLength() > 0">
+          <div (click)="changeChapterStatus('Ready To Publish')" class="ready-to-publish-mobile-option">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Mark as Ready To Publish</span>
+          </div>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content right-container">
+        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+                [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
+                (click)="saveChanges()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+            <span>Saving</span>
+          </span>
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+            Save Draft
+          </span>
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+            ({{ getChangeListLength() }})
+          </span>
+        </button>
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
+          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
+        </div>
+      </div>
+    </div>
+    <div class="story-nav-dropdown-container save-options-dropdown"
+          *ngIf="isSerialChapterFeatureFlagEnabled() && currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Ready To Publish'">
+      <div class="story-nav-story-nav-dropdown-options"
+          *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
+          <i class="fas fa-pen navbar-tab-icon"></i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="story-nav-dropdown-option"
+             [class.disabled]="getChangeListLength() > 0">
+          <div (click)="changeChapterStatus('Draft')">
+            <i class="fas fa-pen navbar-tab-icon"></i>
+            <span>Mark as Draft</span>
+          </div>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content right-container">
+        <button class="story-nav-dropdown-text"
+                [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()"
+                (click)="saveChangesInReadyToPublishChapter()">
+          <span *ngIf="isSaveInProgress() && !isChapterStatusBeingChanged()">
+            <span>Saving</span>
+          </span>
+          <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
+            Save Changes
+          </span>
+          <span *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
+            ({{ getChangeListLength() }})
+          </span>
+        </button>
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
+          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
+        </div>
+      </div>
+    </div>
+    <div class="story-nav-dropdown-container save-options-dropdown"
+          *ngIf="isSerialChapterFeatureFlagEnabled() && currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Published'">
+      <div class="story-nav-story-nav-dropdown-options"
+          *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
+          <i class="fas fa-pen navbar-tab-icon"></i>
+          <span>Discard Changes</span>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content right-container">
+        <button class="story-nav-dropdown-text"
+                [disabled]="!getChangeListLength() || !isChapterPublishable()"
+                (click)="saveChanges()">
+          <span *ngIf="isSaveInProgress()">
+            <span>Publishing</span>
+          </span>
+          <span *ngIf="!isSaveInProgress()">
+            Publish
+          </span>
+          <span *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
+          </span>
+        </button>
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
+          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <style>
+  .disabled {
+    background-color: #cecece;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .ready-to-publish-mobile-option, .unpublish-chapters-mobile-option {
+    display: flex;
+  }
   .oppia-editor-warnings-text {
     width: 100%;
     word-wrap: break-word;

@@ -619,8 +619,21 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + (datetime_obj.microsecond / 1000.0)
+    return datetime_obj.timestamp() * 1000.0
+
+
+def convert_millisecs_time_to_datetime_object(
+        date_time_msecs: float) -> datetime.datetime:
+    """Returns the datetime object from the given date time in milliseconds.
+
+    Args:
+        date_time_msecs: float. Date time represented in milliseconds.
+
+    Returns:
+        datetime. An object of type datetime.datetime corresponding to
+        the given milliseconds.
+    """
+    return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -659,7 +672,9 @@ def get_current_time_in_millisecs() -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
-    return get_time_in_millisecs(datetime.datetime.utcnow())
+    return get_time_in_millisecs(
+        datetime.datetime.now(datetime.timezone.utc)
+    )
 
 
 def get_human_readable_time_string(time_msec: float) -> str:
@@ -1424,8 +1439,6 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
-    # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())
     return urllib.request.urlopen(source_url, context=context)
 

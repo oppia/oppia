@@ -258,7 +258,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog post is currently not published.
-    published_on = (datastore_services.DateTimeProperty(indexed=True))
+    published_on = datastore_services.DateTimeProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

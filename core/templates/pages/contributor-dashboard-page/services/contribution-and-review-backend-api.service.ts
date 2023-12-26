@@ -98,22 +98,23 @@ export class ContributionAndReviewBackendApiService {
 
   async fetchSuggestionsAsync(
       fetchType: string,
-      limit: number,
+      limit: number | null,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId: string | null,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'skill', 'add_question', limit, offset, sortKey);
+        'skill', 'add_question', limit || 0, offset, sortKey);
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset, sortKey);
+        'exploration', 'translate_content', limit || 0, offset, sortKey);
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, sortKey);
+        'skill', 'add_question', limit || 0, offset, sortKey, null, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
@@ -122,7 +123,8 @@ export class ContributionAndReviewBackendApiService {
         limit,
         offset,
         sortKey,
-        explorationId);
+        explorationId,
+        null);
     }
     throw new Error('Invalid fetch type');
   }
@@ -151,10 +153,11 @@ export class ContributionAndReviewBackendApiService {
   async fetchReviewableSuggestionsAsync(
       targetType: string,
       suggestionType: string,
-      limit: number,
+      limit: number | null,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId: string | null,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -163,17 +166,23 @@ export class ContributionAndReviewBackendApiService {
       }
     );
     const params: {
-      limit: string;
+      limit?: string;
       offset: string;
       sort_key: string;
       exploration_id?: string;
+      topic_name?: string;
     } = {
-      limit: limit.toString(),
       offset: offset.toString(),
       sort_key: sortKey
     };
-    if (explorationId !== undefined) {
+    if (limit) {
+      params.limit = limit.toString();
+    }
+    if (explorationId) {
       params.exploration_id = explorationId;
+    }
+    if (topicName) {
+      params.topic_name = topicName;
     }
     return this.http.get<FetchSuggestionsResponse>(
       url,

@@ -31,6 +31,7 @@ import logging
 import math
 import os
 import pprint
+import re
 import zipfile
 
 from core import android_validation_constants
@@ -395,7 +396,14 @@ def export_to_zip_file(
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
-            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+            exploration_file_name = re.sub(
+                r'[^A-Za-z0-9_ -]+', '', exploration.title)
+            # Trim whitespace when checking to handle potential
+            # whitespace-only 'exploration_file_name'.
+            if not exploration_file_name.strip():
+                zfile.writestr('exploration.yaml', yaml_repr)
+            else:
+                zfile.writestr('%s.yaml' % exploration_file_name, yaml_repr)
 
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
@@ -2098,21 +2106,26 @@ def compute_models_to_put_when_saving_new_exp_version(
     content_ids_corresponding_translations_to_remove = (
         old_content_id_set - new_content_id_set
     )
-    content_ids_corresponding_translations_to_mark_needs_update = set()
+
+    translation_changes = []
     for change in change_list:
-        if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            content_ids_corresponding_translations_to_mark_needs_update.add(
-                change.content_id)
+        if not change.cmd in [
+            exp_domain.CMD_EDIT_TRANSLATION,
+            exp_domain.CMD_REMOVE_TRANSLATIONS,
+            exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE
+        ]:
             continue
 
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
             content_ids_corresponding_translations_to_remove.add(
-                change.content_id)
+                change.content_id
+            )
+        translation_changes.append(change)
+
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             updated_exploration,
-            list(content_ids_corresponding_translations_to_remove),
-            list(content_ids_corresponding_translations_to_mark_needs_update),
+            translation_changes
         )
     )
     models_to_put.extend(new_translation_models)
@@ -2367,7 +2380,7 @@ def compute_exploration_contributors_summary(
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        is_revert = snapshot_metadata['commit_type'] == 'revert'
         if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
         if current_version == 1:

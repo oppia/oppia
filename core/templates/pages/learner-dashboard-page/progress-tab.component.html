@@ -7,7 +7,7 @@
     <div class="skill-proficiency-heading">
       <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
       </p>
-      <a aria-label="Progress" class="info-tooltip" href="#/">
+      <a aria-label="Progress" class="info-tooltip" href="#/" tabindex="-1">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
           <div class="badge-info">
@@ -40,7 +40,7 @@
     <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
       <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
       </p>
-      <a id="setting-a-goal-link" (click)="changeActiveSection()">
+      <a id="setting-a-goal-link" (click)="changeActiveSection()" tabindex="0" (keydown.enter)="changeActiveSection()">
         <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL' | translate"
            class="empty-skill-proficiency">
         </p>

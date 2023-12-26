@@ -19,7 +19,9 @@
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CookieModule } from 'ngx-cookie';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -34,6 +36,7 @@ import { SideNavigationBarComponent } from 'components/common-layout-directives/
 import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { LoadingMessageComponent } from './loading-message.component';
 import { OppiaFooterComponent } from './oppia-footer.component';
+import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
 // Directives.
@@ -49,6 +52,7 @@ import {
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
+import { FooterDonateVolunteerComponent } from './footer-donate-volunteer.component';
 
 @NgModule({
   imports: [
@@ -56,6 +60,9 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbModule,
     NgBootstrapModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
@@ -77,6 +84,8 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     PromoBarComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,
+    FooterDonateVolunteerComponent,
+    ThanksForSubscribingModalComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
   ],
@@ -92,6 +101,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     SideNavigationBarComponent,
     SocialButtonsComponent,
     TopNavigationBarComponent,
+    ThanksForSubscribingModalComponent,
     WarningsAndAlertsComponent,
   ],
 
@@ -115,6 +125,7 @@ import { NgBootstrapModule } from 'modules/ng-boostrap.module';
     OppiaFooterComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,
+    ThanksForSubscribingModalComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
   ],

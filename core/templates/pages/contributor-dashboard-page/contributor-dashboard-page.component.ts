@@ -29,7 +29,6 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -68,7 +67,6 @@ export class ContributorDashboardPageComponent
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private windowRef: WindowRef,
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -114,20 +112,21 @@ export class ContributorDashboardPageComponent
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
-    return activeTabDetail.customizationOptions.includes('topic') ||
-      (
-        activeTabType === 'reviews' &&
-        activeSuggestionType === 'translate_content' &&
-        this.activeTabName !== 'submitQuestionTab'
-      );
-  }
 
-  scrollFunction(): void {
-    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
-      this.defaultHeaderVisible = false;
-    } else {
-      this.defaultHeaderVisible = true;
-    }
+    const userIsReviewingQuestionSuggestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'add_question' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
+    const userIsReviewingTranslationSuggestions = (
+      activeTabType === 'reviews' &&
+      activeSuggestionType === 'translate_content' &&
+      this.activeTabName !== 'submitQuestionTab'
+    );
+
+    return activeTabDetail.customizationOptions.includes('topic') ||
+      userIsReviewingQuestionSuggestions ||
+      userIsReviewingTranslationSuggestions;
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
@@ -152,10 +151,6 @@ export class ContributorDashboardPageComponent
 
     const prevSelectedTopicName = (
       this.localStorageService.getLastSelectedTranslationTopicName());
-
-    this.windowRef.nativeWindow.addEventListener('scroll', () => {
-      this.scrollFunction();
-    });
 
     this.userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
@@ -211,6 +206,8 @@ export class ContributorDashboardPageComponent
       .then((topicNames) => {
         // TODO(#15710): Set default active topic to 'All'.
         if (topicNames.length <= 0) {
+          this.translationTopicService.setActiveTopicName(
+            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
           return;
         }
         this.topicName = topicNames[0];

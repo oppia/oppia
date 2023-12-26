@@ -18,7 +18,6 @@
 
 export interface ClientContextBackendDict {
   'platform_type': string;
-  'browser_type': string;
 }
 
 /**
@@ -27,15 +26,13 @@ export interface ClientContextBackendDict {
  */
 export class ClientContext {
   readonly platformType: string;
-  readonly browserType: string;
 
-  constructor(platformType: string, browserType: string) {
+  constructor(platformType: string) {
     this.platformType = platformType;
-    this.browserType = browserType;
   }
 
-  static create(platformType: string, browserType: string): ClientContext {
-    return new ClientContext(platformType, browserType);
+  static create(platformType: string): ClientContext {
+    return new ClientContext(platformType);
   }
 
   /**
@@ -47,7 +44,6 @@ export class ClientContext {
   toBackendDict(): ClientContextBackendDict {
     return {
       platform_type: this.platformType,
-      browser_type: this.browserType,
     };
   }
 }

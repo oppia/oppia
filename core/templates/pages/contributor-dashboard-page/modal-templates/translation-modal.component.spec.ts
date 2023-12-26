@@ -521,12 +521,19 @@ describe('Translation Modal Component', () => {
         stateName2: {
           contentId2: {
             content_format: 'unicode',
-            content_value: 'Continue',
+            content_value: 'input',
             content_type: 'interaction',
-            interaction_id: null,
+            interaction_id: 'TextInput',
             rule_type: null
           },
           contentId3: {
+            content_format: 'unicode',
+            content_value: 'Continue',
+            content_type: 'ca',
+            interaction_id: 'Continue',
+            rule_type: null
+          },
+          contentId4: {
             content_format: 'set_of_normalized_string',
             content_value: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
@@ -676,6 +683,17 @@ describe('Translation Modal Component', () => {
       });
     });
 
+    describe('when skipping translations', () => {
+      it('should update activeContentType', () => {
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('TextInput interaction');
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('label');
+        component.skipActiveTranslation();
+        expect(component.activeContentType).toBe('input rule');
+      });
+    });
+
     describe('when suggesting the last available text', () => {
       beforeEach(() => {
         expectedPayload = {
@@ -686,7 +704,7 @@ describe('Translation Modal Component', () => {
           target_version_at_submission: 1,
           change: {
             cmd: 'add_written_translation',
-            content_id: 'contentId3',
+            content_id: 'contentId4',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: ['answer1', 'answer2', 'answer3'],
@@ -695,6 +713,7 @@ describe('Translation Modal Component', () => {
           },
           files: {}
         };
+        component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.activeWrittenTranslation = [

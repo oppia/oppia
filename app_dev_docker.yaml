@@ -1,0 +1,149 @@
+# TODO(#18260): This file is used within the Docker setup for local development.
+# Modify the `app_dev.yaml` file when we permanently switch to Docker.
+runtime: custom
+instance_class: F2
+# The "version" line is added here so that MR jobs can run locally (see issue
+# #6534 on oppia/oppia).
+version: default
+# Timeout is set to 60 so that the gunicorn workers don't die while sending
+# the Apache Beam jobs to Google Cloud Dataflow.
+entrypoint: gunicorn --timeout 60 --bind :$PORT main:app
+
+inbound_services:
+- warmup
+- mail
+
+default_expiration: "10m"
+handlers:
+# PRODUCTION STATIC
+- url: /favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
+  secure: always
+- url: /robots.txt
+  static_files: assets/robots.txt
+  upload: assets/robots.txt
+  secure: always
+- url: /sitemap.xml
+  static_files: assets/sitemap.xml
+  upload: assets/sitemap.xml
+  secure: always
+- url: /build
+  static_dir: build
+  secure: always
+  expiration: "90d"
+- url: /third_party/static
+  static_dir: third_party/static
+  secure: always
+  expiration: "90d"
+- url: /.well-known/security.txt
+  static_files: assets/.well-known/security.txt
+  upload: assets/.well-known/security.txt
+  secure: always
+
+# DEVELOPMENT STATIC
+- url: /webpack_bundles
+  static_dir: webpack_bundles
+  secure: always
+  expiration: "0"
+# /dist is the build output folder for angular.
+- url: /dist
+  static_dir: dist/
+  secure: always
+  expiration: "0"
+- url: /assets
+  static_dir: assets
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+# Serve CSS files under core/templates.
+# This regex allows us to recursively serve CSS files.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
+  secure: always
+  expiration: "0"
+- url: /templates/(.*\.(html))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(html))$
+  secure: always
+  expiration: "0"
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
+  expiration: "0"
+- url: /extensions/interactions/(.*)/static/(.*\.(css|png))
+  static_files: extensions/interactions/\1/static/\2
+  upload: extensions/interactions/(.*)/static/(.*\.(css|png))
+  secure: always
+  expiration: "0"
+- url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
+  static_files: extensions/\1/\2/directives/\3
+  upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
+  secure: always
+  expiration: "0"
+# Serve PNG images for interactions, rich_text_components, objects, classifiers,
+# and custom ckeditor plugins under extensions in dev mode. This regex allows
+# us to recursively serve PNG images scripts under the five specified
+# directories. "\1" and "\2" insert capture groups from the url pattern.
+- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  static_files: extensions/\1/\2
+  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  secure: always
+  expiration: "0"
+- url: /extensions/ckeditor_plugins/(.*\.(js))$
+  static_files: extensions/ckeditor_plugins/\1
+  upload: extensions/ckeditor_plugins/(.*\.(js))$
+  secure: always
+  expiration: "0"
+- url: /extensions/visualizations/(.*\.html)
+  static_files: extensions/visualizations/\1
+  upload: extensions/visualizations/(.*\.html)
+  secure: always
+  expiration: "0"
+- url: /extensions/objects/templates/(.*\.html)
+  static_files: extensions/objects/templates/\1
+  upload: extensions/objects/templates/(.*\.html)
+  secure: always
+  expiration: "0"
+
+# This is an access connector that connects to the Google Cloud Redis instance
+# used for memory caching. Please replace PROJECT_ID with the correct project id
+# for oppia on the production server.
+vpc_access_connector:
+  name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
+
+env_variables:
+# We need these env variables to be set so that the services that are executed
+# by the Google App Engine knows which host they must bind with that they are
+# running in the docker environment.
+  REDIS_HOST: "redis"
+  ES_HOST: "elasticsearch"
+  PYTHONHTTPSVERIFY: 1
+# GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
+# runtime. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+# (The second note under 'Configuring your app to use a connector') which
+# redirects to these instructions to disable URL fetch:
+# https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
+  GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
+# FIREBASE_AUTH_EMULATOR_HOST is needed to allow the Firebase SDK to connect
+# with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
+# protect against this in the build script.
+  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"
+# These environment variables allows Cloud NDB services to communicate with the
+# Cloud Datastore Emulator. THESE MUST NOT BE DEPLOYED TO PRODUCTION! We strip
+# them from the deployed app.yaml in scripts.build.
+  DATASTORE_DATASET: "dev-project-id"
+  DATASTORE_EMULATOR_HOST: "datastore:8089"
+  DATASTORE_EMULATOR_HOST_PATH: "datastore:8089/datastore"
+  DATASTORE_HOST: "http://datastore:8089"
+  DATASTORE_PROJECT_ID: "dev-project-id"
+  DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
+  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\", \"VM_ID\": \"vm_default\", \"SHARED_SECRET_KEY\": \"1a2b3c4e\"}"

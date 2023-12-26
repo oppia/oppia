@@ -181,7 +181,7 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             next_content_id_index=6
         )
 
-        exp_model_3.states['text_state']['interaction']['id'] = ('TextInput')
+        exp_model_3.states['text_state']['interaction']['id'] = 'TextInput'
         exp_model_3.states['text_state']['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'CaseSensitiveEquals',

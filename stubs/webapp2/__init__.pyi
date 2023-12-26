@@ -13,6 +13,9 @@ class Request:
     cookies: Dict[str, str] = ...
     headers: Dict[str, str] = ...
     GET: Dict[str, Any]
+    method: str
+    params: Dict[str, str]
+    domain: str
 
     def arguments(self) -> List[str]: ...
     def get(self, value: str) -> Any: ...
@@ -39,6 +42,8 @@ class Response:
     pragma: Any
     expires: Any
     body_file: io.BytesIO
+    status: int
+    body: bytes
 
     def write(self, content: Union[bytes, str]) -> None: ...
     def set_cookie(

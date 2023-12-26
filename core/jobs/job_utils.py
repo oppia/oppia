@@ -64,7 +64,9 @@ def clone_model(
     # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
     model_id = new_values.pop('id', None) or get_model_id(model)
     cls = model.__class__
-    props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
+    # Pylint doesn't like that we call __get__() directly, but we have to in
+    # order to specify its arguments model and cls.
+    props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access,unnecessary-dunder-call
     props.update(new_values)
     with datastore_services.get_ndb_context():
         return cls(id=model_id, **props)

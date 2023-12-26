@@ -44,7 +44,8 @@ describe('SuggestionsService', () => {
           },
           old_value: {
             html: 'old value'
-          }
+          },
+          content_id: 'content'
         },
         last_updated_msecs: 10000000
       })).toEqual('exploration.exp1.abc1');

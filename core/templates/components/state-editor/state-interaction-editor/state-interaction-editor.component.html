@@ -2,18 +2,28 @@
           id="tutorialStateInteraction">
   <div>
     <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header"
-         (click)="toggleInteractionEditor()">
+         tabindex="0"
+         #collapseAnswersAndResponsesButton
+         (click)="toggleInteractionEditor()"
+         (keydown.tab)="focusOnCustomizeInteraction($event)"
+         (keydown.enter)="toggleInteractionEditor()">
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
       <div *ngIf="getCurrentInteractionName().length>0">
         <i class="fa fa-caret-down"
            *ngIf="!interactionEditorIsShown"
-           aria-hidden="true">
+           tabindex="0"
+           role="button"
+           aria-label="Expand interaction card"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'true' : 'false'">
         </i>
         <i class="fa fa-caret-up"
            *ngIf="interactionEditorIsShown"
-           aria-hidden="true">
+           tabindex="0"
+           role="button"
+           aria-label="collapse interaction card"
+           [attr.aria-hidden]="interactionEditorIsShown ? 'false' : 'true'">
         </i>
       </div>
     </div>
@@ -22,6 +32,7 @@
       <button type="button"
               class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
               (click)="openInteractionCustomizerModal()"
+              aria-label="Add interaction"
               *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
       </button>
@@ -50,6 +61,7 @@
               <div class="oppia-interaction-preview oppia-transition-200"
                    (click)="openInteractionCustomizerModal()"
                    *ngIf="editabilityService.isEditable()"
+                   role="button"
                    aria-label="edit interaction">
               </div>
               <div>
@@ -58,6 +70,14 @@
                 </oppia-interaction-display>
               </div>
             </div>
+            <button tabindex="0"
+                    class="oppia-open-interaction-customizer-button fas fa-pen"
+                    (click)="openInteractionCustomizerModal()"
+                    (keydown)="focusOnCollapseAnswersAndResponses($event)"
+                    *ngIf="editabilityService.isEditable()"
+                    aria-label="Customize Interaction"
+                    #customizeInteractionButton>
+            </button>
             <button type="button"
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
@@ -82,6 +102,26 @@
   .oppia-exp-interaction-card-header {
     font-size: 18px;
     margin: 0;
+  }
+
+  .oppia-open-interaction-customizer-button {
+    background-color: transparent;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    height: 0;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    width: 0;
+  }
+
+  .oppia-open-interaction-customizer-button:focus {
+    color: black;
+    height: 22px;
+    opacity: 0.8;
+    outline: 1px solid #000;
+    width: 22px;
   }
 
   .oppia-exp-interaction-card-header-container {

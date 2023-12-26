@@ -16,5 +16,5 @@
  * @fileoverview This file imports the skulpt library.
  */
 
-require('static/skulpt-dist-1.1.0/skulpt.min.js');
-require('static/skulpt-dist-1.1.0/skulpt-stdlib.js');
+import 'skulpt-dist/skulpt.min.js';
+import 'skulpt-dist/skulpt-stdlib.js';

@@ -17,14 +17,14 @@
  * js_ts_linter_test.py. This file contain valid ts file content.
  */
 
-const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
+const CodeMirror = require('codemirror-v5.17.0/lib/codemirror.js');
 Object.defineProperty(window, 'CodeMirror', {
   value: CodeMirror,
   writable: false
 });
 
-require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
-require('static/code-mirror-5.17.0/mode/python/python.js');
-require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
+require('codemirror-v5.17.0/mode/javascript/javascript.js');
+require('codemirror-v5.17.0/mode/python/python.js');
+require('codemirror-v5.17.0/mode/yaml/yaml.js');
 require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+import 'diff_match_patch';

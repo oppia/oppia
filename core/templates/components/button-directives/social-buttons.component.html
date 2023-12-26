@@ -1,8 +1,8 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
 <div class="oppia-footer-social">
   <div class="oppia-follow-us">
-    <h3>
-      <span [innerHTML]="'I18N_FOOTER_FOLLOW_US' | translate"></span>:
-    </h3>
+    <p [innerHTML]="'I18N_FOOTER_FOLLOW_US' | translate"></p>
   </div>
 
   <div class="oppia-footer-social-icons">
@@ -22,12 +22,18 @@
 
     <div class="oppia-twitter-follow">
       <a href="https://twitter.com/oppiaorg" target="_blank" rel="noopener">
-        <i class="oppia-follow-icons fab fa-twitter"></i>
+        <i class="oppia-follow-icons fa-brands fa-x-twitter"></i>
         <span class="oppia-icon-accessibility-label">Twitter</span>
       </a>
     </div>
+    <div class="oppia-github-follow">
+      <a href="https://github.com/oppia" target="_blank" rel="noopener">
+        <i class="oppia-follow-icons fa-brands fa-github oppia-follow-github-icon"></i>
+        <span class="oppia-icon-accessibility-label">Github</span>
+      </a>
+    </div>
   </div>
-  <div *ngIf="androidAppButtonIsShown">
+  <div class="oppia-android-app">
     <a href="https://play.google.com/store/apps/details?id=org.oppia.android" target="_blank" rel="noopener">
       <img class="oppia-android-app-button"
            src="/assets/images/android/android-landing-google-play.svg"

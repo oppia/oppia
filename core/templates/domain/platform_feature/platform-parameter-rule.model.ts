@@ -18,8 +18,7 @@
 
 import {
   PlatformParameterFilter,
-  PlatformParameterFilterBackendDict,
-  PlatformParameterFilterType
+  PlatformParameterFilterBackendDict
 } from 'domain/platform_feature/platform-parameter-filter.model';
 
 
@@ -71,15 +70,5 @@ export class PlatformParameterRule {
       filters: this.filters.map(filter => filter.toBackendDict()),
       value_when_matched: this.valueWhenMatched
     };
-  }
-
-  /**
-   * Checks if there is any filter of server_mode type in the rule.
-   *
-   * @returns {boolean} - True if there's any filter of server_mode type.
-   */
-  hasServerModeFilter(): boolean {
-    return this.filters.some(
-      filter => filter.type === PlatformParameterFilterType.ServerMode);
   }
 }

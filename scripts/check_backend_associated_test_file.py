@@ -43,6 +43,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/linters/test_files/invalid_todo.py',
     'scripts/linters/test_files/invalid_urlopen.py',
     'scripts/linters/test_files/valid.py',
+    'scripts/linters/test_files/valid_job_imports.py',
     'scripts/linters/test_files/valid_py_ignore_pragma.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
@@ -50,7 +51,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
     'proto_files/text_classifier_pb2.py',
-    'proto_files/training_job_response_payload_pb2.py',
+    'proto_files/training_job_response_payload_pb2.py'
 ]
 
 

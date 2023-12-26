@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -149,8 +149,42 @@ class TopicEditorStoryHandler(
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
 
+        canonical_stories_ids = [summary['id'] for
+            summary in canonical_story_summary_dicts]
+        canonical_stories = list(filter(
+            None, story_fetchers.get_stories_by_ids(canonical_stories_ids)))
+        canonical_stories_dict: Dict[str, story_domain.Story] = {
+            canonical_story.id: canonical_story for canonical_story in
+            canonical_stories}
         updated_canonical_story_summary_dicts = []
+
         for summary in canonical_story_summary_dicts:
+            if summary['id'] not in canonical_stories_dict:
+                continue
+            story = canonical_stories_dict[summary['id']]
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            upcoming_chapters_count = 0
+            overdue_chapters_count = 0
+            upcoming_chapters_expected_days = []
+            for node in nodes:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                if node.planned_publication_date is not None:
+                    current_time_msecs = utils.get_current_time_in_millisecs()
+                    planned_publication_date_msecs = (
+                        utils.get_time_in_millisecs(
+                            node.planned_publication_date))
+                    if node.is_node_upcoming():
+                        upcoming_chapters_count += 1
+                        upcoming_chapters_expected_days.append((int)((
+                            planned_publication_date_msecs -
+                            current_time_msecs) / (1000.0 * 3600 * 24)))
+                    if node.is_node_behind_schedule():
+                        overdue_chapters_count += 1
+
+            upcoming_chapters_expected_days.sort()
             updated_canonical_story_summary_dict = {
                 'id': summary['id'],
                 'title': summary['title'],
@@ -166,7 +200,13 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': []
+                'all_node_dicts': [],
+                'total_chapters_count': total_chapters_count,
+                'published_chapters_count': published_chapters_count,
+                'upcoming_chapters_count': upcoming_chapters_count,
+                'upcoming_chapters_expected_days': (
+                    upcoming_chapters_expected_days),
+                'overdue_chapters_count': overdue_chapters_count
             }
             updated_canonical_story_summary_dicts.append(
                 updated_canonical_story_summary_dict
@@ -483,7 +523,7 @@ class EditableTopicDataHandler(
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():

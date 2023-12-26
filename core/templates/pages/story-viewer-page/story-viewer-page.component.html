@@ -3,25 +3,25 @@
     <div class="oppia-story-viewer-inner-container">
       <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">
         <div class="oppia-story-viewer-title">
-          <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+          <span *ngIf="!isHackyStoryTitleTranslationDisplayed()" tabindex="0">
             {{ storyTitle }}
           </span>
-          <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+          <span *ngIf="isHackyStoryTitleTranslationDisplayed()" tabindex="0">
             {{ storyTitleTranslationKey | translate }}
           </span>
         </div>
         <div class="oppia-story-viewer-description">
-          <span *ngIf="!isHackyStoryDescTranslationDisplayed()">
+          <span *ngIf="!isHackyStoryDescTranslationDisplayed()" tabindex="0">
             {{ storyDescription }}
           </span>
-          <span *ngIf="isHackyStoryDescTranslationDisplayed()">
+          <span *ngIf="isHackyStoryDescTranslationDisplayed()" tabindex="0">
             {{ storyDescTranslationKey | translate }}
           </span>
         </div>
 
         <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a *ngFor="let node of storyPlaythroughObject.getStoryNodes();let last = isLast;let index = index"
-             [href]="getExplorationUrl(node)">
+             [href]="getExplorationUrl(node)" tabindex="0">
 
             <div>
               <div class="fx-row">
@@ -83,7 +83,7 @@
                                  xlink:href="">
                           </image>
                         </pattern>
-                        <filter id="blur" x="0" y="0">
+                        <filter x="0" y="0">
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>
@@ -107,7 +107,7 @@
                     </div>
                   </div>
 
-                  <div class="oppia-story-viewer-mobile-card-content">
+                  <div class="oppia-story-viewer-mobile-card-content" aria-hidden="true">
                     <svg width="192"
                          height="108"
                          xmlns="http://www.w3.org/1600/svg"
@@ -128,7 +128,7 @@
                                  xlink:href="">
                           </image>
                         </pattern>
-                        <filter id="blur-mobile" x="0" y="0">
+                        <filter x="0" y="0">
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>

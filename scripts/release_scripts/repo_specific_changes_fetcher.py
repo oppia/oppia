@@ -62,7 +62,7 @@ def get_changed_schema_version_constant_names(
         list(str). List of version constant names in feconf that changed.
     """
     changed_version_constants_in_feconf = []
-    git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % release_tag_to_diff_against)
+    git_show_cmd = GIT_CMD_SHOW_FORMAT_STRING % release_tag_to_diff_against
     old_feconf = common.run_cmd(git_show_cmd.split(' '))
     with utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()

@@ -38,6 +38,9 @@ describe('Current Interaction Service', () => {
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  const displayedCard = new StateCard(
+    '', '', '', {} as Interaction, [],
+    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -172,5 +175,34 @@ describe('Current Interaction Service', () => {
     currentInteractionService.updateViewWithNewAnswer();
 
     expect(currentInteractionService.onAnswerChanged$).toBeDefined();
+  });
+
+  it('should return display card', () => {
+    spyOn(
+      playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+
+    expect(currentInteractionService.getDisplayedCard()).toEqual(displayedCard);
+  });
+
+  it('should update current answer', () => {
+    spyOn(displayedCard, 'updateCurrentAnswer');
+    spyOn(
+      currentInteractionService,
+      'getDisplayedCard').and.returnValue(displayedCard);
+
+    currentInteractionService.updateCurrentAnswer('answer');
+
+    expect(
+      displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith('answer');
+  });
+
+  it('should check if "no response error" should be displayed', () => {
+    spyOn(
+      currentInteractionService,
+      'getDisplayedCard').and.returnValue(displayedCard);
+    spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
+
+    expect(currentInteractionService.showNoResponseError()).toBeTrue();
   });
 });

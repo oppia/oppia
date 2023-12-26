@@ -3,7 +3,8 @@
     <div class="list-group oppia-list-group">
       <mat-card class="list-view-item e2e-test-skill-select-header">
         Search By Skill
-        <input type="text" class="form-control e2e-test-skill-name-input" placeholder="Enter a skill name" [(ngModel)]="skillFilterText" autofocus>
+        <input type="text" class="form-control e2e-test-skill-name-input" placeholder="Enter a skill name"
+          [(ngModel)]="skillFilterText" autofocus>
       </mat-card>
       <div class="skill-list-box">
         <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
@@ -17,7 +18,7 @@
                   <mat-card class="list-view-item">
                     <label class="oppia-subtopic-name-text">{{ subtopic.key }}</label>
                     <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInSubtopicSkills(subtopic.value, skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
-                      {{ skill.description }}
+                      <span class="oppia-mat-radio-button-label">{{ skill.description }}</span>
                     </mat-radio-button>
                   </mat-card>
                 </div>
@@ -31,8 +32,7 @@
             <div *ngIf="!checkIfEmpty(untriagedSkillSummaries)" class="list-view-item ">
               <mat-card class="list-view-item">
                 <label>
-                  <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}">
-                    {{ skill.description }}
+                  <mat-radio-button class="oppia-skills-list-item e2e-test-skills-list-item" *ngFor="let skill of searchInUntriagedSkillSummaries(skillFilterText)" [value]="skill.id" [disabled]="!userCanEditSkills" attr.aria-label="{{ skill.description }}"><span class="oppia-mat-radio-button-label">{{ skill.description }}</span>
                   </mat-radio-button>
                 </label>
               </mat-card>
@@ -42,30 +42,38 @@
       </div>
     </div>
     <div class="list-group oppia-filter-list-group">
-      <mat-card *ngIf="allowSkillsFromOtherTopics" class="list-view-item oppia-list-view-item">
-        <label>Filter By Topics</label>
-      </mat-card>
-      <div *ngIf="allowSkillsFromOtherTopics" class="oppia-list-view-item-container">
-        <mat-card *ngIf="topicFilterList.length" class="list-view-item ">
-          <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList" [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}</mat-checkbox>
+      <div>
+        <mat-card *ngIf="allowSkillsFromOtherTopics" class="list-view-item oppia-list-view-item">
+          <label>Filter By Topics</label>
         </mat-card>
+        <div *ngIf="allowSkillsFromOtherTopics" class="oppia-list-view-item-container">
+          <mat-card *ngIf="topicFilterList.length" class="list-view-item ">
+            <mat-checkbox class="oppia-skills-list-item" *ngFor="let topic of topicFilterList"
+              [(ngModel)]="topic.checked" (change)="updateSkillsListOnTopicFilterChange()">{{ topic.topicName }}
+            </mat-checkbox>
+          </mat-card>
+        </div>
       </div>
       <br>
-      <mat-card class="list-view-item oppia-list-view-item">
-        <label>Filter By Subtopic</label>
-      </mat-card>
-      <div class="oppia-list-view-item-container">
-        <mat-card class="list-view-item">
-          <div *ngFor="let topic of subTopicFilterDict | keyvalue">
-            <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
-            <mat-card class="list-view-item">
-              <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value" [(ngModel)]="subtopic.checked" (change)="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}</mat-checkbox>
-            </mat-card>
-          </div>
+      <div>
+        <mat-card class="list-view-item oppia-list-view-item">
+          <label>Filter By Subtopic</label>
         </mat-card>
+        <div class="oppia-list-view-item-container">
+          <mat-card class="list-view-item">
+            <div *ngFor="let topic of subTopicFilterDict | keyvalue">
+              <h3><label class="list-group-item-heading oppia-heading-text">{{ topic.key }}</label></h3>
+              <mat-card class="list-view-item">
+                <mat-checkbox class="oppia-skills-list-item" *ngFor="let subtopic of topic.value"
+                  [(ngModel)]="subtopic.checked" (change)="updateSkillsListOnSubtopicFilterChange()">{{ subtopic.subTopicName }}
+                </mat-checkbox>
+              </mat-card>
+            </div>
+          </mat-card>
+        </div>
+        <button class="btn btn-secondary" (click)="clearAllFilters()">Clear All Filters</button>
       </div>
       <br>
-      <button class="btn btn-secondary" (click)="clearAllFilters()">Clear All Filters</button>
     </div>
   </div>
 </div>
@@ -109,10 +117,37 @@
     overflow-y: auto;
     word-break: break-word;
   }
+  .skill-selector .oppia-mat-radio-button-label {
+    white-space: normal;
+    word-break: break-word;
+  }
   @media screen and (max-width: 768px) {
     .skill-selector .skill-selector-parent,
     .skill-selector .skill-list-box {
       max-height: initial;
+    }
+
+    .skill-selector .oppia-topic-name-text {
+      word-break: break-word;
+    }
+  }
+  @media screen and (max-width: 480px) {
+    .skill-selector .oppia-skill-container {
+      flex-direction: column;
+    }
+    .skill-selector.oppia-filter-list-group {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-top: 1rem;
+      width: 100%;
+    }
+    .skill-selector .oppia-list-group {
+      width: 100%;
+    }
+    .skill-selector .oppia-filter-list-group {
+      padding-left: 0;
+      width: 100%;
     }
   }
 </style>

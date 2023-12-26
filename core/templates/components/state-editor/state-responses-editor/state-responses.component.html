@@ -5,16 +5,20 @@
         <div class="state-responses-header"
              (click)="toggleResponseCard()"
              (keydown.enter)="toggleResponseCard()">
-          <h3 class="oppia-exp-answer-card-header">Learner's Answers and Oppia's Responses</h3>
+          <h3 class="oppia-exp-answer-card-header" tabindex="0">Learner's Answers and Oppia's Responses</h3>
           <i class="fa fa-caret-down"
              *ngIf="!responseCardIsShown"
              tabindex="0"
-             aria-hidden="true">
+             role="button"
+             aria-label="Expand answers and responses"
+             [attr.aria-hidden]="responseCardIsShown ? 'true' : 'false'">
           </i>
           <i class="fa fa-caret-up"
              *ngIf="responseCardIsShown"
              tabindex="0"
-             aria-hidden="true">
+             role="button"
+             aria-label="Collapse answers and responses"
+             [attr.aria-hidden]="responseCardIsShown ? 'false' : 'true'">
           </i>
         </div>
       </div>
@@ -37,12 +41,14 @@
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
+                   tabindex="0"
+                   data-container="body"
                    placement="auto">
-                <div class="oppia-rule-header-warning-style" >
+                <div class="oppia-rule-header-warning-style">
                   ⚠
                 </div>
               </div>
-              <a (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
+              <a (click)="changeActiveAnswerGroupIndex(index)" (keydown.enter)="changeActiveAnswerGroupIndex(index)" tabindex="0" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
                 <oppia-response-header [index]="index"
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [shortSummary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
@@ -87,7 +93,7 @@
           </div>
           <!-- CkDrop End -->
         </div>
-        <div *ngIf="!suppressDefaultAnswerGroup()">
+        <div *ngIf="!shouldHideDefaultAnswerGroup()">
           <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
             <div class="option-list-default"
                  [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}"
@@ -96,12 +102,15 @@
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                    ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
+                   tabindex="0"
                    placement="auto">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
               </div>
               <a (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
+                 tabindex="0"
+                 (keydown.enter)="changeActiveAnswerGroupIndex(answerGroups.length)"
                  class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab"
                  [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
                 <oppia-response-header [index]="index"
@@ -123,7 +132,7 @@
                                                [outcome]="defaultOutcome"
                                                [taggedSkillMisconceptionId]="null"
                                                [isEditable]="editabilityService.isEditable()"
-                                               [suppressWarnings]="suppressDefaultAnswerGroup()"
+                                               [suppressWarnings]="shouldHideDefaultAnswerGroup()"
                                                [displayFeedback]="!isLinearWithNoFeedback(defaultOutcome)"
                                                [addState]="addState"
                                                (onSaveAnswerGroupFeedback)="saveDefaultOutcomeFeedback($event)"
@@ -236,6 +245,11 @@
     justify-content: space-between;
     position: relative;
     width: 100%;
+  }
+
+  .oppia-sortable-rule-block:focus,
+  .oppia-rule-tab:focus {
+    outline: 1px solid #000;
   }
 
   .oppia-rule-sort-handle {

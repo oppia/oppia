@@ -18,12 +18,13 @@
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminBackendApiService, HumanReadableRolesBackendResponse, RoleToActionsBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
+import { TranslationCoordinatorRoleEditorModalComponent } from './translation-coordinator-role-editor-modal.component';
 import { AlertsService } from 'services/alerts.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-admin-roles-tab',
@@ -46,6 +47,7 @@ export class AdminRolesTabComponent implements OnInit {
   userRoles: string[] = [];
   possibleRolesToAdd: string[] = [];
   managedTopicIds: string[] = [];
+  coordinatedLanguageIds: string[] = [];
   // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
   // removed or added to user roles. This value is used to present a progress
   // spinner next to the role which is currently being updated in the backend.
@@ -75,6 +77,7 @@ export class AdminRolesTabComponent implements OnInit {
       this.rolesFetched = true;
       this.userRoles = userRoles.roles;
       this.managedTopicIds = userRoles.managed_topic_ids;
+      this.coordinatedLanguageIds = userRoles.coordinated_language_ids;
       this.userIsBanned = userRoles.banned;
     },
     (errorResponse) => {
@@ -97,6 +100,9 @@ export class AdminRolesTabComponent implements OnInit {
       roleToRemove, this.username).then(() => {
       if (roleToRemove === 'TOPIC_MANAGER') {
         this.managedTopicIds = [];
+      }
+      if (roleToRemove === 'TRANSLATION_COORDINATOR') {
+        this.coordinatedLanguageIds = [];
       }
       this.userRoles.splice(roleIndex, 1);
       this.roleCurrentlyBeingUpdatedInBackend = null;
@@ -124,9 +130,35 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 
+  openTranslationCoordinatorRoleEditor(): void {
+    const modalRef = this.modalService.open(
+      TranslationCoordinatorRoleEditorModalComponent);
+    modalRef.componentInstance.coordinatedLanguageIds = (
+      this.coordinatedLanguageIds);
+    modalRef.componentInstance.username = this.username;
+    let languageIdToName: Record<string, string> = {};
+    constants.SUPPORTED_AUDIO_LANGUAGES.forEach(
+      language => languageIdToName[language.id] = language.description);
+    modalRef.componentInstance.languageIdToName = languageIdToName;
+    modalRef.result.then(coordinatedLanguageIds => {
+      this.coordinatedLanguageIds = coordinatedLanguageIds;
+      if (
+        !this.userRoles.includes('TRANSLATION_COORDINATOR') &&
+        coordinatedLanguageIds.length) {
+        this.userRoles.push('TRANSLATION_COORDINATOR');
+      }
+      this.roleSelectorIsShown = false;
+    });
+  }
+
   addNewRole(role: string): void {
     if (role === 'TOPIC_MANAGER') {
       this.openTopicManagerRoleEditor();
+      return;
+    }
+
+    if (role === 'TRANSLATION_COORDINATOR') {
+      this.openTranslationCoordinatorRoleEditor();
       return;
     }
 
@@ -182,8 +214,3 @@ export class AdminRolesTabComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive('oppiaAdminRolesTab',
-  downgradeComponent({
-    component: AdminRolesTabComponent
-  }) as angular.IDirectiveFactory);

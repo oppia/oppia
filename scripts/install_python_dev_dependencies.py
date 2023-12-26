@@ -27,9 +27,9 @@ from typing import List, Optional
 
 
 INSTALLATION_TOOL_VERSIONS = {
-    'pip': '22.1.1',
-    'pip-tools': '6.6.2',
-    'setuptools': '58.5.3',
+    'pip': '23.1.2',
+    'pip-tools': '6.13.0',
+    'setuptools': '67.7.1',
 }
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
 COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
@@ -87,7 +87,8 @@ def install_installation_tools() -> None:
 def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
-        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH],
+        ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '--pip-args',
+        '--require-hashes --no-deps'],
         check=True,
         encoding='utf-8',
     )
@@ -118,7 +119,8 @@ def compile_pip_requirements(
         old_compiled = f.read()
     subprocess.run(
         [
-            'pip-compile', '--no-emit-index-url', requirements_path,
+            'pip-compile', '--no-emit-index-url',
+            '--generate-hashes', requirements_path,
             '--output-file', compiled_path,
         ],
         check=True,
