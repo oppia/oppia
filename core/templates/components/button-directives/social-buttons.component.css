@@ -24,11 +24,12 @@
 .oppia-footer-social a:focus {
   text-decoration: none;
 }
-.oppia-footer-social a > img {
+
+.oppia-footer-social a>img {
   width: 30px;
 }
 
-.oppia-footer-social a:focus > img {
+.oppia-footer-social a:focus>img {
   outline: 1px dotted #fff;
   outline: auto 5px -webkit-focus-ring-color;
 }
@@ -93,12 +94,14 @@
   color: #000;
   border-radius: 50%;
 }
-.oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
+
+.oppia-footer-social .oppia-facebook-follow i.oppia-follow-icons.fab.fa-facebook {
   bottom: -7px;
   position: relative;
   right: -5px;
 }
-.oppia-footer-social .oppia-youtube-follow  i.oppia-follow-icons.fab.fa-youtube-play {
+
+.oppia-footer-social .oppia-youtube-follow i.oppia-follow-icons.fab.fa-youtube-play {
   font-size: 18px;
   left: -0.35px;
   position: relative;
