@@ -65,7 +65,7 @@ describe('AddTopicToClassroomModalComponent', () => {
 
   it('should initialize form and load unused topics', fakeAsync(() => {
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
-    .and.returnValue(Promise.resolve({}));
+      .and.returnValue(Promise.resolve({}));
     componentInstance.loadUnusedTopics();
     tick();
     expect(componentInstance.topicBackendDictList).toBeDefined();
@@ -88,23 +88,24 @@ describe('AddTopicToClassroomModalComponent', () => {
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should initialize form and load unused topics on ngOnInit', fakeAsync(() => {
-    spyOn(componentInstance, 'loadUnusedTopics');
-    componentInstance.ngOnInit();
-    tick();
-    expect(componentInstance.loadUnusedTopics).toHaveBeenCalled();
-  }));
+  it('should initialize form and load unused topics on ngOnInit',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'loadUnusedTopics');
+      componentInstance.ngOnInit();
+      tick();
+      expect(componentInstance.loadUnusedTopics).toHaveBeenCalled();
+    }));
 
   it('should log an error if loading unused topics fails', fakeAsync(() => {
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
-    .and.throwError('Simulated error');
+      .and.throwError('Simulated error');
     spyOn(console, 'error');
     try {
       componentInstance.loadUnusedTopics();
       tick();
     } catch (error) {
       expect(console.error)
-      .toHaveBeenCalledWith('Error loading unused topics:', error);
+        .toHaveBeenCalledWith('Error loading unused topics:', error);
     }
   }));
 
@@ -115,7 +116,7 @@ describe('AddTopicToClassroomModalComponent', () => {
     ];
 
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
-    .and.returnValue(Promise.resolve(mockUnusedTopics));
+      .and.returnValue(Promise.resolve(mockUnusedTopics));
 
     componentInstance.loadUnusedTopics();
     tick();

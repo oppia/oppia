@@ -469,7 +469,7 @@ describe('Editable topic backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection when fetching unused topics fails', 
+  it('should use the rejection when fetching unused topics fails',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -486,11 +486,11 @@ describe('Editable topic backend API service', () => {
       }, {
         status: 500,
         statusText: 'Internal Server Error'
-    });
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error fetching unused topics');
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error fetching unused topics');
   }));
 });
