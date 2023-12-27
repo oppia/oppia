@@ -25,9 +25,6 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 
 
-function convertToTopic(topicBackendDict: TopicBackendDict): Topic {
-  return Topic.create(topicBackendDict, null);
-}
 
 @Component({
   selector: 'oppia-add-topic-to-classroom-modal',
