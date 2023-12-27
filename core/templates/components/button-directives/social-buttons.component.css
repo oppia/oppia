@@ -24,11 +24,9 @@
 .oppia-footer-social a:focus {
   text-decoration: none;
 }
-
 .oppia-footer-social a>img {
   width: 30px;
 }
-
 .oppia-footer-social a:focus>img {
   outline: 1px dotted #fff;
   outline: auto 5px -webkit-focus-ring-color;
