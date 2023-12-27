@@ -536,7 +536,8 @@ class SuggestionEditStateContent(BaseSuggestion):
             old_content = None
         else:
             old_content = (
-                exploration.states[self.change_cmd.state_name].content.to_dict()) # pylint: disable=line-too-long
+                exploration.states
+                [self.change_cmd.state_name].content.to_dict())
 
         self.change_cmd.old_value = old_content
 
@@ -771,7 +772,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change_cmd.state_name not in exploration.states:
             raise utils.ValidationError(
-                'Expected %s to be a valid state name' % self.change_cmd.state_name) # pylint: disable=line-too-long
+                'Expected %s to be a valid state name'
+                % self.change_cmd.state_name)
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
@@ -904,7 +906,9 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
         self.change_cmd: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
-            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change_cmd) # pylint: disable=line-too-long
+            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                change_cmd
+                )
         )
         self.score_category = score_category
         self.language_code = language_code

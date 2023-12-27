@@ -1252,7 +1252,8 @@ def _construct_exploration_suggestions(
         content_html: Optional[Union[str, List[str]]] = None
         try:
             content_html = exploration.get_content_html(
-            suggestion.change_cmd.state_name, suggestion.change_cmd.content_id)
+                suggestion.change_cmd.state_name,
+                suggestion.change_cmd.content_id)
         except ValueError:
             # Exploration content is no longer available.
             pass
