@@ -18,12 +18,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
+import { InsertScriptService } from 'services/insert-script.service';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 
 interface ImpactStat {
@@ -48,6 +48,7 @@ interface Highlight {
   templateUrl: './donate-page.component.html',
   styleUrls: [],
 })
+
 export class DonatePageComponent implements OnInit {
   donationValues: DonationValue[] = [
     {
@@ -126,7 +127,8 @@ export class DonatePageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private insertScriptService: InsertScriptService,
   ) {}
 
   ngOnInit(): void {
