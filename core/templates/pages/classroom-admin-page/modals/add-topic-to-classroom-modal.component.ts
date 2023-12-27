@@ -20,10 +20,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
+import { TopicBackendDict } from 'domain/topic/topic-object.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
-
 
 
 @Component({
@@ -48,10 +46,11 @@ export class AddTopicToClassroomModalComponent
     this.loadUnusedTopics();
   }
 
-  
+
   async loadUnusedTopics(): Promise<void> {
     try {
-      const unusedTopicsResponse = await this.editableTopicBackendApiService.getUnusedTopicsAsync();
+      const unusedTopicsResponse = await this.editableTopicBackendApiService
+      .getUnusedTopicsAsync();
       this.topicBackendDictList = Object.values(unusedTopicsResponse);
       this.initializeForm();
     } catch (error) {

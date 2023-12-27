@@ -680,27 +680,27 @@ describe('Classroom Admin Page component ', () => {
       expect(component.topicNameToPrerequisiteTopicNames).toEqual(
         topicNameToPrerequisiteTopicNames);
     }));
-  
-  it('should open the Add Topic modal and handle selected topics', fakeAsync(() => {
-    const mockModalRef: NgbModalRef = {
-      componentInstance: {
-        topicsList: ['topic1', 'topic2', 'topic3'],
-      },
-      result: Promise.resolve(['selectedTopic1', 'selectedTopic2']),
-    } as NgbModalRef;
 
-    spyOn(component.ngbModal, 'open').and.returnValue(mockModalRef);
-    spyOn(component, 'addTopicId');
+  it('should open the Add Topic modal and handle selected topics',
+    fakeAsync(() => {
+      const mockModalRef: NgbModalRef = {
+        componentInstance: {
+          topicsList: ['topic1', 'topic2', 'topic3'],
+        },
+        result: Promise.resolve(['selectedTopic1', 'selectedTopic2']),
+      } as NgbModalRef;
 
-    component.openAddTopicModal();
-    tick();
+      spyOn(component.ngbModal, 'open').and.returnValue(mockModalRef);
+      spyOn(component, 'addTopicId');
 
-    expect(component.ngbModal.open).toHaveBeenCalled();
-    
-    expect(mockModalRef.componentInstance.topicsList).toEqual([]);
-    expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic1');
-    expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic2');
-  }));
+      component.openAddTopicModal();
+      tick();
+
+      expect(component.ngbModal.open).toHaveBeenCalled();
+      expect(mockModalRef.componentInstance.topicsList).toEqual([]);
+      expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic1');
+      expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic2');
+    }));
 
   it(
     'should be able to add new topic ID to classroom', fakeAsync(() => {

@@ -453,42 +453,43 @@ describe('Editable topic backend API service', () => {
   it('should fetch unused topics successfully', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-  
+
     editableTopicBackendApiService.getUnusedTopicsAsync().then(
       successHandler, failHandler);
-      
+
     let req = httpTestingController.expectOne('/unused_topics');
     expect(req.request.method).toEqual('GET');
     req.flush({
       unused_topics: ['topic1', 'topic2']
     });
-  
+
     flushMicrotasks();
-  
+
     expect(successHandler).toHaveBeenCalledWith(['topic1', 'topic2']);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection when fetching unused topics fails', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-  
-    editableTopicBackendApiService.getUnusedTopicsAsync().then(
-      successHandler, failHandler);
-  
-    let req = httpTestingController.expectOne('/unused_topics');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: {
-        error: 'Error fetching unused topics'
-      }
-    }, {
-      status: 500,
-      statusText: 'Internal Server Error'
+  it('should use the rejection when fetching unused topics fails', 
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      editableTopicBackendApiService.getUnusedTopicsAsync().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/unused_topics');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: {
+          error: 'Error fetching unused topics'
+        }
+      }, {
+        status: 500,
+        statusText: 'Internal Server Error'
     });
-  
+
     flushMicrotasks();
-  
+
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Error fetching unused topics');
   }));

@@ -362,7 +362,8 @@ export class EditableTopicBackendApiService {
 
   async getUnusedTopicsAsync(): Promise<UnusedTopicsResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<UnusedTopicsBackendDict>('/unused_topics').toPromise().then(response => {
+      this.http.get<UnusedTopicsBackendDict>('/unused_topics')
+      .toPromise().then(response => {
         resolve(response.unused_topics);
       }, errorResponse => {
         reject(errorResponse.error.error.error);

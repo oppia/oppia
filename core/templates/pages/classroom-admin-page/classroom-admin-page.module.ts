@@ -75,7 +75,6 @@ declare var angular: ng.IAngularStatic;
     AddTopicToClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
-    
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
