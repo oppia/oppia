@@ -63,13 +63,14 @@ describe('AddTopicToClassroomModalComponent', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should initialize form and load unused topics', async () => {
+  it('should initialize form and load unused topics', fakeAsync(() => {
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
     .and.returnValue(Promise.resolve({}));
-    await componentInstance.loadUnusedTopics();
+    componentInstance.loadUnusedTopics();
+    tick();
     expect(componentInstance.topicBackendDictList).toBeDefined();
     expect(componentInstance.topicForm).toBeDefined();
-  });
+  }));
 
   it('should add topics', () => {
     spyOn(ngbActiveModal, 'close');
@@ -87,25 +88,27 @@ describe('AddTopicToClassroomModalComponent', () => {
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 
-  it('should initialize form and load unused topics on ngOnInit', async () => {
+  it('should initialize form and load unused topics on ngOnInit', fakeAsync(() => {
     spyOn(componentInstance, 'loadUnusedTopics');
     componentInstance.ngOnInit();
+    tick();
     expect(componentInstance.loadUnusedTopics).toHaveBeenCalled();
-  });
+  }));
 
-  it('should log an error if loading unused topics fails', async () => {
+  it('should log an error if loading unused topics fails', fakeAsync(() => {
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
     .and.throwError('Simulated error');
     spyOn(console, 'error');
     try {
-      await componentInstance.loadUnusedTopics();
+      componentInstance.loadUnusedTopics();
+      tick();
     } catch (error) {
       expect(console.error)
       .toHaveBeenCalledWith('Error loading unused topics:', error);
     }
-  });
+  }));
 
-  it('should initialize topicFormControls with false values', async () => {
+  it('should initialize topicFormControls with false values', fakeAsync(() => {
     const mockUnusedTopics: Partial<TopicBackendDict>[] = [
       { id: 'topicId1', name: 'topic1' },
       { id: 'topicId2', name: 'topic2' },
@@ -114,11 +117,12 @@ describe('AddTopicToClassroomModalComponent', () => {
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
     .and.returnValue(Promise.resolve(mockUnusedTopics));
 
-    await componentInstance.loadUnusedTopics();
+    componentInstance.loadUnusedTopics();
+    tick();
 
     const initialFormValues = componentInstance.topicForm.value;
     Object.keys(initialFormValues).forEach(topicId => {
       expect(initialFormValues[topicId]).toBe(false);
     });
-  });
+  }));
 });
