@@ -49,13 +49,17 @@
   transform: scale(1.1);
 }
 
+.oppia-youtube-follow {
+  border-radius: 50%;
+}
+
 .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
   background: #cd201f;
   margin-right: 6px;
   padding: 8px 8px;
 }
 
-.oppia-youtube-follow {
+.oppia-facebook-follow {
   border-radius: 50%;
 }
 
@@ -65,7 +69,7 @@
   padding: 8px 12px;
 }
 
-.oppia-facebook-follow {
+.oppia-twitter-follow {
   border-radius: 50%;
 }
 
@@ -75,19 +79,14 @@
   padding: 8px 8px;
 }
 
-.oppia-twitter-follow {
+.oppia-github-follow {
   border-radius: 50%;
 }
-
 
 .oppia-footer-social .oppia-footer-social-icons .oppia-github-follow {
   background: #fff;
   margin-right: 6px;
   padding: 8px 8px;
-}
-
-.oppia-github-follow {
-  border-radius: 50%;
 }
 
 .oppia-follow-github-icon {
