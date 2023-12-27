@@ -410,20 +410,9 @@ Registry.create_feature_flag(
 )
 
 Registry.create_feature_flag(
-    ParamNames.ANDROID_BETA_LANDING_PAGE,
-    'This flag is for Android beta promo landing page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
-    ParamNames.BLOG_PAGES,
-    'This flag is for blog home page, blog author profile page and blog post' +
-    ' page.',
-    platform_parameter_domain.FeatureStages.PROD)
-
-Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
-    platform_parameter_domain.FeatureStages.PROD)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,

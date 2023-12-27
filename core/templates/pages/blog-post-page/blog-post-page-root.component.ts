@@ -28,7 +28,6 @@ import { PageHeadService } from 'services/page-head.service';
 import { UrlService } from 'services/contextual/url.service';
 import { BlogPostData } from 'domain/blog/blog-post.model';
 import { PageTitleService } from 'services/page-title.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -54,7 +53,6 @@ export class BlogPostPageRootComponent implements OnDestroy, OnInit {
     private pageTitleService: PageTitleService,
     private urlService: UrlService,
     private userService: UserService,
-    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   ngOnInit(): void {
@@ -66,22 +64,14 @@ export class BlogPostPageRootComponent implements OnDestroy, OnInit {
     this.blogPostUrlFragment = this.urlService.getBlogPostUrlFromUrl();
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
-      ) {
-        this.accessValidationBackendApiService
-          .validateAccessToBlogPostPage(this.blogPostUrlFragment)
-          .then((resp) => {
-            this.fetchBlogPostData(this.blogPostUrlFragment);
-          }, (err) => {
-            this.errorPageIsShown = true;
-            this.loaderService.hideLoadingScreen();
-          });
-      } else {
-        this.errorPageIsShown = true;
-        this.loaderService.hideLoadingScreen();
-      }
+      this.accessValidationBackendApiService
+        .validateAccessToBlogPostPage(this.blogPostUrlFragment)
+        .then((resp) => {
+          this.fetchBlogPostData(this.blogPostUrlFragment);
+        }, (err) => {
+          this.errorPageIsShown = true;
+          this.loaderService.hideLoadingScreen();
+        });
     });
   }
 
