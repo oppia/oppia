@@ -492,5 +492,5 @@ describe('Editable topic backend API service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error fetching unused topics');
-  }));
+    }));
 });

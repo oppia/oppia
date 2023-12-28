@@ -50,7 +50,7 @@ export class AddTopicToClassroomModalComponent
   async loadUnusedTopics(): Promise<void> {
     try {
       const unusedTopicsResponse = await this.editableTopicBackendApiService
-      .getUnusedTopicsAsync();
+        .getUnusedTopicsAsync();
       this.topicBackendDictList = Object.values(unusedTopicsResponse);
       this.initializeForm();
     } catch (error) {
