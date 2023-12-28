@@ -70,6 +70,61 @@ describe('MusicNotesInput interaction', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
+    it('should throw an error if sequenceToGuess is equal to initialSequence', function() {
+      ctrlScope.noteSequence = [
+        {
+          note: {
+            baseNoteMidiNumber: 71,
+            offset: 0,
+            noteId: 'note_id_0',
+            noteStart: {
+              num: 1,
+              den: 1
+            }
+          }
+        },
+        {
+          note: {
+            baseNoteMidiNumber: 72,
+            offset: 0,
+            noteId: 'note_id_1',
+            noteStart: {
+              num: 1,
+              den: 1
+            }
+          }
+        }
+      ];
+      ctrlScope.initialSequence = [
+        {
+          note: {
+            baseNoteMidiNumber: 71,
+            offset: 0,
+            noteId: 'note_id_0',
+            noteStart: {
+              num: 1,
+              den: 1
+            }
+          }
+        },
+        {
+          note: {
+            baseNoteMidiNumber: 72,
+            offset: 0,
+            noteId: 'note_id_1',
+            noteStart: {
+              num: 1,
+              den: 1
+            }
+          }
+        }
+      ];
+
+      expect(function() {
+        ctrlScope._validateSequenceToGuess();
+      }).toThrowError('Please ensure that the sequence to guess is not the same as the initial sequence.');
+    });
+
     it('should load the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
       expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
@@ -227,7 +282,39 @@ describe('MusicNotesInput interaction', function() {
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
       expect(ctrlScope.noteSequence).toEqual([]);
     });
-  });
+
+    it('should check that sequenceToGuess is not empty', function() {
+      ctrlScope.sequenceToGuess = [];
+      expect(function() {
+        ctrlScope._validateSequenceToGuess();
+      }).toThrowError('The sequence to guess should not be empty.');
+    });
+
+    it('should validate sequenceToGuess as a valid MusicPhrase', function() {
+      ctrlScope.sequenceToGuess = [
+        { note: 'C4', duration: '1/4' },
+        { note: 'D4', duration: '1/2' },
+        { note: 'E4', duration: '1/8' },
+        { note: 'F4', duration: '1/16' },
+        { note: 'G4', duration: '1/32' },
+        { note: 'A4', duration: '1/64' },
+        { note: 'B4', duration: '1/128' },
+        { note: 'C5', duration: '1/256' },
+        { note: 'D5', duration: '1/512' },
+        { note: 'E5', duration: '1/1024' },
+        { note: 'F5', duration: '1/2048' },
+        { note: 'G5', duration: '1/4096' },
+        { note: 'A5', duration: '1/8192' }
+      ];
+
+      expect(function() {
+        ctrlScope._validateSequenceToGuess();
+      }).not.toThrowError();
+    });
+
+    
+    
+
 });
 
 describe('Music phrase player service', function() {
