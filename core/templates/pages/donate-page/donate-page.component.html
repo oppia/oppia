@@ -15,7 +15,7 @@
                 <span class="donate-font-weight-700">{{
                   'I18N_DONATE_PAGE_CONTENT_TEXT_1_BOLD' | translate
                 }}</span>
-                {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }}
+                <span> {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_1_NORMAL' | translate }} </span>
               </p>
             </div>
             <div class="donate-message-1 donate-message-1-border" *ngFor="let donationValue of donationValues">
@@ -29,6 +29,7 @@
                 {{ donationValue.description | translate }}
               </p>
             </div>
+            
           </div>
         </div>
         <div class="donate-content-2">
@@ -46,10 +47,11 @@
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_2' | translate }}
               </p>
             </div>
-            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats">
-              <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
-                <div>
-                  <div class="donate-stat-svg-container">
+            <!--Add span, change size can I combine first-child? [ngClass]="{'donate-stat-small': i > 0 , 'donate-stat-normal' : i === 0}"-->
+            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats;index as i"> 
+              <div class="donate-stat" [ngClass]="{'donate-stat-sm': i === 1 , 'donate-stat-lg' : i !== 1}" *ngFor="let impactStat of impactStatRow">
+                <div [ngClass]="{'donate-stat-sm': i > 0 , 'donate-stat-lg' : i === 0}">
+                  <div class="donate-stat-svg-container" [ngClass]="{'donate-stat-svg-container-sm': i > 0 , 'donate-stat-svg-container-lg' : i === 0}">
                     <img [src]="getStaticImageUrl(impactStat.imageUrl)" *ngIf="impactStat.imageUrl !== null" loading="lazy" alt="Graphic for the statistic">
                     <div *ngIf="impactStat.stat !== null">{{ impactStat.stat }}</div>
                   </div>
@@ -57,6 +59,7 @@
                 </div>
               </div>
             </div>
+            <!--Add span, change size-->
           </div>
         </div>
         <div class="donate-content-1 no-border">
@@ -83,10 +86,24 @@
                 </div>
               </div>
             </div>
-            <div class="donate-our-learners">
               <!--Add the learners heading and carousel here-->
-              <p></p>
-              <div class="learner-carousel"></div>
+            <div class="donate-our-learners-container">
+              <p> {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_4' | translate }} </p>
+              <div class="donate-our-learners">
+                <div class="donate-our-learners-tile" *ngFor="let learner of learners">
+                  <picture>
+                    <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl + '.png')">
+                    <img class="learner-tile-img" [src]="getStaticImageUrl(learner.imageUrl + '.png')" loading="lazy" alt="Photo of learner">
+                  </picture>
+                  <div class="donate-our-learners-content">
+                    <p class="donate-our-learners-country">{{ learner.country | translate }}</p>
+                    <div class="donate-our-learners-text-grow">
+                      <p class="donate-our-learners-text">{{ learner.text | translate }}</p>
+                    </div>
+                    <p class="donate-our-learners-name">- {{ learner.name | translate }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,6 +193,12 @@
       line-height: 12px;
     }
 
+    .learner-tile-img {
+      height: 128px;
+      max-width: fit-content;
+      width: auto;
+    }
+
     .donate-modal-button {
       background: #00645c;
       border-radius: 8px;
@@ -215,6 +238,10 @@
       padding: 0 32px 25px 32px;
     }
 
+    .donate-stat-svg-container-sm {
+      width: 48px
+    }
+
     .highlight-tile-img {
       height: 128px;
       max-width: fit-content;
@@ -238,6 +265,12 @@
       font-size: 14px;
       font-weight: 400;
       line-height: 16px;
+    }
+
+    .learner-tile-img {
+      height: 160px;
+      max-width: fit-content;
+      width: auto;
     }
 
     .donate-modal-button {
@@ -343,11 +376,19 @@
     box-shadow: 0 4px 4px 0 #0000001a;
     color: #333;
     display: flex;
-    font-size: 16px;
     font-weight: 400;
     height: 100%;
-    line-height: 19px;
     width: 100%;
+  }
+
+  .donate-stat-lg {
+    font-size: 16px;
+    line-height: 19px;
+  }
+
+  .donate-stat-sm {
+    font-size: 14px;
+    line-height: 16px;
   }
 
   .donate-stat > p {
@@ -360,6 +401,13 @@
     flex: 0 0 auto;
     height: 64px;
     justify-content: center;
+  }
+
+  .donate-stat-svg-container-sm {
+    width: 36px
+  }
+
+  .donate-stat-svg-container-lg {
     width: 48px;
   }
 
@@ -372,8 +420,12 @@
     border: none;
   }
 
+  .donate-our-learners-container {
+    margin-top: 18px;
+  }
+
   .donate-highlights > p,
-  .donate-our-learners > p {
+  .donate-our-learners-container > p {
     font-size: 20px;
     font-weight: 500;
     line-height: 23px;
@@ -390,7 +442,51 @@
   }
 
   .donate-our-learners {
-    display: none;
+    background-color: #eee;
+    display: flex;
+    gap: 0px 16px;
+    height: fit-content;
+    overflow-x: hidden;
+    padding: 25px 16px;
+  }
+
+  .donate-our-learners-tile {
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+  }
+
+  .donate-our-learners-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 8px 16px;
+  }
+
+  .donate-our-learners-country {
+    color:#003c34;
+    font-weight: 500;
+    margin: 8px 0px;
+  }
+
+  .donate-our-learners-name {
+    align-self: flex-end;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 8px 0px;
+  }
+
+  .donate-our-learners-text-grow {
+    flex-grow: 1;
+  }
+
+  .donate-our-learners-text {
+    color: #333;
+    font-size: 14px;
   }
 
   .donate-today-content > p:first-child {

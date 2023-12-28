@@ -43,6 +43,13 @@ interface Highlight {
   text: string;
 }
 
+interface Learner {
+  name: string;
+  country: string;
+  imageUrl: string,
+  text: string;
+}
+
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
@@ -123,6 +130,40 @@ export class DonatePageComponent implements OnInit {
       text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
     },
   ];
+  
+  learners: Learner[] = [
+    {
+      name: 'Abasiekeme',
+      country: 'Nigeria',
+      imageUrl:'/donate/learners-abasiekeme',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_1'
+    },
+    {
+      name: 'Sandra Bosso',
+      country: 'Ghana',
+      imageUrl:'/donate/learners-sandra',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_2'
+    },
+    {
+      name: 'Kajal',
+      country: 'India',
+      imageUrl:'/donate/learners-kajal',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_3'
+    },
+    {
+      name: 'Seneen',
+      country: 'Palestine',
+      imageUrl:'/donate/learners-seneen',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_4'
+    },
+    {
+      name: 'Juweria Cabdalla',
+      country: 'Somalia',
+      imageUrl:'/donate/learners-juweria',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_5'
+    },
+  ]  
+  ;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
