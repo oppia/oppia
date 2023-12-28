@@ -24,7 +24,7 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "Windows" ]; then
+if [ "$OS_NAME" = "MSYS_NT-10.0-22621" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
@@ -64,7 +64,7 @@ fi
 # Rename node directory to node-16.13.0.
 cd ../oppia_tools &&
 if [ "$node_file_name" != "node-v16.13.0" ]; then
-    mv $node_file_name node-v16.13.0
+    mv $node_file_name node-16.13.0
 fi
 
 echo "Node.js installation completed."
