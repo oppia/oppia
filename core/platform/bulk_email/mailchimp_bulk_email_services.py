@@ -252,17 +252,19 @@ def add_or_update_user_status(
             'email_address': user_email,
             'status': 'subscribed',
             'tags': [tag],
-            'merge_fields': {
-                'NAME': merge_fields['NAME']
-            }
+            'merge_fields': {}
         }
         subscribed_mailchimp_data = {
             'email_address': user_email,
             'status': 'subscribed',
-            'merge_fields': {
-                'NAME': merge_fields['NAME']
-            }
+            'merge_fields': {}
         }
+
+        if 'NAME' in merge_fields and merge_fields['NAME'] is not None:
+            new_user_mailchimp_data['merge_fields']['NAME'] = (
+                merge_fields['NAME'])
+            subscribed_mailchimp_data['merge_fields']['NAME'] = (
+                merge_fields['NAME'])
 
     try:
         client.lists.members.get(
