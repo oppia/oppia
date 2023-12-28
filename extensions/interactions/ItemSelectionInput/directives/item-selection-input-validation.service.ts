@@ -189,6 +189,48 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 
+  private getWarningsForRulesInputs(
+      rule: Rule,
+      choicesContentIds: Set<string | null>,
+      ruleIndex: number,
+      answerIndex: number) {
+    const warningsList: Warning[] = [];
+    const ruleInputs = rule.inputs.x as string[];
+    ruleInputs.forEach((ruleInput) => {
+      if (!choicesContentIds.has(ruleInput)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            `Learner answer ${(ruleIndex + 1)} from Oppia response ` +
+            `${(answerIndex + 1)} options do not match customization ` +
+            'argument choices.')
+        });
+      }
+    });
+    return warningsList;
+  }
+
+  private getWarningsForRulesDuplicates(
+      rules: Rule[],
+      answerGroupIndex: number): Warning[] {
+    const warningsList: Warning[] = [];
+    const rulesSet = new Set<string>();
+    rules.forEach((rule, ruleIndex) => {
+      const ruleStr = JSON.stringify(rule.toBackendDict());
+      if (rulesSet.has(ruleStr)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            `The rule ${ruleIndex} of answer group ` +
+            `${answerGroupIndex} of ItemSelectionInput interaction ` +
+            'is a duplicate.')}
+        );
+      }
+      rulesSet.add(ruleStr);
+    });
+    return warningsList;
+  }
+
   getAllWarnings(
       stateName: string, customizationArgs:
       ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
@@ -220,19 +262,14 @@ export class ItemSelectionInputValidationService {
 
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
+      warningsList = warningsList.concat(
+        this.getWarningsForRulesDuplicates(rules, answerIndex));
+
       rules.forEach((rule, ruleIndex) => {
-        var ruleInputs = rule.inputs.x as string[];
-        ruleInputs.forEach((ruleInput) => {
-          if (!choicesContentIds.has(ruleInput)) {
-            warningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                `Learner answer ${(ruleIndex + 1)} from Oppia response ` +
-                `${(answerIndex + 1)} options do not match customization ` +
-                'argument choices.')
-            });
-          }
-        });
+        const ruleInputs = rule.inputs.x as string[];
+        warningsList = warningsList.concat(
+          this.getWarningsForRulesInputs(
+            rule, choicesContentIds, ruleIndex, answerIndex));
 
         if (rule.type === 'IsProperSubsetOf') {
           if (ruleInputs.length < 2) {
