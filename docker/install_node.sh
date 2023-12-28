@@ -33,8 +33,8 @@ if [ "$OS_NAME" = "Windows" ]; then
     extension=".zip"
     node_file_name="node-v16.13.0-win-$architecture"
     url_to_retrieve="https://nodejs.org/dist/v16.13.0/$node_file_name$extension"
-    curl -o node-download "$url_to_retrieve"
-    powershell.exe -c "Expand-Archive -Path node-download -DestinationPath ../oppia_tools"
+    curl -o node-download.zip "$url_to_retrieve"
+    powershell.exe -c "Expand-Archive -Path node-download.zip -DestinationPath ../oppia_tools"
 else
     extension=".tar.gz"
     if [ "$(python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(uname -m)" = "x86_64" ]; then
@@ -63,12 +63,8 @@ fi
 
 # Rename node directory to node-16.13.0.
 cd ../oppia_tools &&
-if [ "$OS_NAME" = "Linux" ]; then
-    mv node-v16.13.0-linux-x64 node-16.13.0
-elif [ "$OS_NAME" = "Darwin" ]; then
-    mv node-v16.13.0-darwin-x64 node-16.13.0
-elif [ "$OS_NAME" = "Windows" ]; then
-    mv node-v16.13.0-win-$architecture node-16.13.0
+if [ "$node_file_name" != "node-v16.13.0" ]; then
+    mv $node_file_name node-v16.13.0
 fi
 
 echo "Node.js installation completed."
