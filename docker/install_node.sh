@@ -24,7 +24,7 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "MSYS_NT-10.0-22621" ]; then
+if [ "$OS_NAME" = "Windows" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
