@@ -67,17 +67,8 @@ if [ "$OS_NAME" = "Linux" ]; then
     mv node-v16.13.0-linux-x64 node-16.13.0
 elif [ "$OS_NAME" = "Darwin" ]; then
     mv node-v16.13.0-darwin-x64 node-16.13.0
-else [ "$OS_NAME" = "Windows" ]; then
-    if [ "$(uname -m)" = "x86_64" ]; then
-        architecture=x64
-    else
-        architecture=x86
-    fi
+elif [ "$OS_NAME" = "Windows" ]; then
     mv node-v16.13.0-win-$architecture node-16.13.0
-else  # No need as if system is unsupported, this script would already be exited with code 1
-    echo "Unsupported OS: $OS_NAME"
-    exit 1
 fi
-cd ../oppia_tools && find . -maxdepth 1 -type d -name 'node*' -exec mv {} node-16.13.0 \;
 
 echo "Node.js installation completed."
