@@ -54,7 +54,8 @@ var ExplorationPlayerPage = function() {
   var lessonInfoTooltip = $('.e2e-test-close-lesson-info-tooltip');
   var gotItButton = $('.e2e-test-learner-got-it-button');
   var infoCardRating = $('.e2e-test-info-card-rating');
-  var nextCardButton = $('.e2e-test-continue-to-next-card-button');
+  var continueToNextCardButton = $('.e2e-test-continue-to-next-card-button');
+  var nextButton = $('.e2e-test-next-button');
   var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
   var radioButton = $('.e2e-test-report-exploration-radio-button');
@@ -105,8 +106,13 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
-    await waitFor.elementToBeClickable(nextCardButton);
-    await action.click('Next Card button', nextCardButton);
+    await waitFor.elementToBeClickable(continueToNextCardButton);
+    await action.click('Next Card button', continueToNextCardButton);
+  };
+
+  this.clickNextButton = async function() {
+    await waitFor.elementToBeClickable(nextButton);
+    await action.click('Next Card button', nextButton);
   };
 
   this.clickSuggestChangesButton = async function() {
@@ -115,8 +121,9 @@ var ExplorationPlayerPage = function() {
 
   this.expectNextCardButtonTextToBe = async function(text) {
     await waitFor.visibilityOf(
-      nextCardButton, 'Next Card Button not showing up.');
-    var buttonText = await action.getText('Next Card Button', nextCardButton);
+      continueToNextCardButton, 'Next Card Button not showing up.');
+    var buttonText = await action.getText(
+      'Next Card Button', continueToNextCardButton);
     expect(buttonText).toMatch(text);
   };
 
