@@ -2943,7 +2943,7 @@ class IndentListByFour(checkers.BaseChecker):  # type: ignore[misc]
     def visit_list(self, node: astroid.nodes.List) -> None:
         """Visits all lists in a python file to ensure that
         all items in the lists are indented by 4 spaces.
-        
+
         Args:
             node: astroid.nodes.List. List node in AST
         """
@@ -2983,7 +2983,7 @@ class IndentFunctionByFour(checkers.BaseChecker): # type: ignore[misc]
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits all function definitions in a python file to ensure a
         four-space indentation before every statement inside the function
-        
+
         Args:
             node: astroid.nodes.FunctionDef.Function
             definition node in AST
@@ -3020,7 +3020,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def _indent_check(self, node) -> None:
         """Calculates the indentation of the necessary lines to determine
         the correctness of the indentation levels
-        
+
         Args:
             node. Any node in python that introduces a scope and requires
             a condition (e.g. if, elif, with, etc.)
@@ -3062,7 +3062,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_if(self, node: astroid.nodes.If) -> None:
         """Visits all if-statements in a python file and implements the
         _indent_check function
-        
+
         Args:
             node: astroid.nodes.If. if-statement node in AST
         """
@@ -3071,7 +3071,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_for(self, node: astroid.nodes.For) -> None:
         """Visits all for loops in a python file and implements the
         _indent_check function
-        
+
         Args:
             node: astroid.nodes.For. for loop node in AST
         """
@@ -3080,7 +3080,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_while(self, node: astroid.nodes.While) -> None:
         """Visits all while loops in a python file and implements the
         _indent_check function
-        
+
         Args:
             node: astroid.nodes.While. while loop node in AST
         """
@@ -3089,7 +3089,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits all function definitions in a python file and implements
         the _indent_check function
-        
+
         Args:
         node: astroid.nodes.FunctionDef. function definition node in AST
         """
@@ -3098,7 +3098,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_with(self, node: astroid.nodes.With) -> None:
         """Visits all with statement in a python file and implements
         the _indent_check function
-        
+
         Args:
             node: astroid.nodes.With. with statement node in AST
         """
@@ -3126,11 +3126,11 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
         'closing-bracket-checker',
         'Closing bracket/brace/parentheses should be at the end of line. If placed on the next line, then it should have the same indentation as the opening bracket/brace/parentheses'),
         }
-    
+
     def _indent_calculator(self, node) -> tuple:
         """Calculates the indentation by calculating the first and last
         line indentation of a structure (list, tuple, etc.)
-        
+
         Args:
             node. Any node in python that contains brackets/braces/parentheses
 
@@ -3147,12 +3147,12 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
         end_line_indent = len(end_line) - len(end_line.lstrip())
 
         return start_line_indent, end_line_indent, end_line_number
-       
-    
+
+
     def visit_list(self, node: astroid.nodes.List) -> None:
         """Visits all lists in a python file and checks if the closing
         brackets are misplaced
-        
+
         Args:
             node: astroid.nodes.List. list node in AST
         """
@@ -3167,7 +3167,7 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_dict(self, node: astroid.nodes.Dict) -> None:
         """Visits all lists in a python file and checks if the closing
         braces are misplaced
-        
+
         Args:
             node: astroid.nodes.Dict. dictionary node in AST
         """
@@ -3175,7 +3175,7 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
 
         if not node.items:
             return
-        
+
         last_item = node.items[-1]
         if last_item[1].lineno != node.end_lineno:
             if start_line_indent != end_line_indent:
@@ -3184,7 +3184,7 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_tuple(self, node: astroid.nodes.Tuple) -> None:
         """Visits all tuples in a python files and checks if the closing
         parentheses are misplace
-        
+
         Args:
             node: astroid.nodes.Tuple. tuple node in AST
         """
@@ -3194,11 +3194,11 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
         if node.elts[-1].lineno != node.end_lineno:
             if start_line_indent != end_line_indent:
                 self.add_message('closing-bracket-checker', node=node, line=end_line_number)
-       
+  
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Similar to tuples, it checks whether the closing parentheses
         are misplaced
-        
+
         Args:
             node: astroid.nodes.FunctionDef. function definition in AST
         """
@@ -3210,7 +3210,7 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
         while not current_line.endswith(':'):
            current_line_number += 1
            current_line = linecache.getline(node.root().file, current_line_number).rstrip()
-        
+
         functiondef_end_lineno = current_line_number
         end_line_indent = len(current_line) - len(current_line.lstrip())
 
@@ -3253,7 +3253,7 @@ class DisallowIndentChecker(checkers.BaseChecker): # type: ignore[misc]
     def visit_call(self, node: astroid.nodes.Call) -> None:
         """Visits all function calls in a python file and checks whether
         an indentation is necessary and the indentation is correct
-        
+
         Args:
             node: astroid.nodes.Call. function call node in AST
         """
@@ -3267,7 +3267,7 @@ class DisallowIndentChecker(checkers.BaseChecker): # type: ignore[misc]
         if len(node.args) == 1:
             if node.fromlineno != node.args[0].fromlineno:
                 self.add_message('combined-operation', node=node.args[0])
-            
+
             elif type(node.args[0]).__name__ == 'Dict' or type(node.args[0]).__name__ == 'List' or type(node.args[0]).__name__ == 'Tuple':
                 if argument_indent - start_line_indent != 4:
                     self.add_message('four-space-indent', node=node, line = argument_indent)
