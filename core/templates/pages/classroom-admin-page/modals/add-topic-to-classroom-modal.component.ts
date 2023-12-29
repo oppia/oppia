@@ -25,7 +25,7 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 
 interface TopicFormControls {
   [key: string]: boolean;
-};
+}
 
 @Component({
   selector: 'oppia-add-topic-to-classroom-modal',
