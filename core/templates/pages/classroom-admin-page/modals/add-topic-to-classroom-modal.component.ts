@@ -23,7 +23,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { TopicBackendDict } from 'domain/topic/topic-object.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 
-type TopicFormControls = {
+interface TopicFormControls {
   [key: string]: boolean;
 };
 

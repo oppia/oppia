@@ -25,8 +25,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EditableTopicBackendApiService, UnusedTopicsResponse } from 'domain/topic/editable-topic-backend-api.service';
 import { AddTopicToClassroomModalComponent } from './add-topic-to-classroom-modal.component';
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
-import { TopicBackendDict } from 'domain/topic/topic-object.model';
-
 
 
 describe('AddTopicToClassroomModalComponent', () => {
@@ -111,8 +109,8 @@ describe('AddTopicToClassroomModalComponent', () => {
 
   it('should initialize topicFormControls with false values', fakeAsync(() => {
     const mockUnusedTopics: UnusedTopicsResponse = {
-      'topicId1': { id: 'topicId1', name: 'topic1' },
-      'topicId2': { id: 'topicId2', name: 'topic2' },
+      topicId1: { id: 'topicId1', name: 'topic1' },
+      topicId2: { id: 'topicId2', name: 'topic2' },
     };
 
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
