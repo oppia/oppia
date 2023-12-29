@@ -39,6 +39,7 @@ dev_output.txt
 tmpcompiledjs*
 uploads/*
 env/
+/oppia-env/*
 venv/
 *.db
 .DS_Store
