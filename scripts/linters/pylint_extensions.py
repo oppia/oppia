@@ -2933,7 +2933,7 @@ class IndentListByFour(checkers.BaseChecker):  # type: ignore[misc]
     name = 'indent-elements-by-four'
     priority = -1
     msgs = {
-        'C0040':(
+        'C0052':(
         'list elements not indented by 4 spaces',
         'indent-elements-by-four',
         'The first element of the list should be started at a new line and every subsequent lines should have a 4-space indentation'
@@ -2973,7 +2973,7 @@ class IndentFunctionByFour(checkers.BaseChecker): # type: ignore[misc]
     name = 'indent-statements-by-four'
     priority = -1
     msgs = {
-        'C0041':(
+        'C0053':(
             'function statements not indented by 4 spaces',
             'indent-statements-by-four',
             'Every statement should be indented by 4 spaces'
@@ -3011,7 +3011,7 @@ class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
     name = "indent-condition-by-eight"
     priority = -1
     msgs = {
-        "C0042": (
+        "C0054": (
             "condition not indented by 8 spaces",
             "indent-condition-by-eight",
             "The condition should be indented by 8 spaces"),
@@ -3121,7 +3121,7 @@ class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
     name = "closing-bracket-checker"
     priority = -1
     msgs =  {
-        'C0043': (
+        'C0055': (
         'misplaced closing bracket/brace/parentheses',
         'closing-bracket-checker',
         'Closing bracket/brace/parentheses should be at the end of line. If placed on the next line, then it should have the same indentation as the opening bracket/brace/parentheses'),
@@ -3238,12 +3238,12 @@ class DisallowIndentChecker(checkers.BaseChecker): # type: ignore[misc]
     name = 'function_call_arg_checker'
     priority = -1
     msgs = {
-        'C0044':(
+        'C0056':(
             'unnecessary indentation found',
             'combined-operation',
             'Indentation is unnecessary here. Please write the parentheses/brackets/braces together. e.g. "({" and indent the next line by 4 spaces'
         ),
-        'C0045':(
+        'C0057':(
             'indentation not four-spaced',
             'four-space-indent',
             'Please ensure that the inner indentation of the argument is four'
