@@ -8,12 +8,7 @@
     <p *ngIf="!topicForm" class="loading-message">Loading unused topics <loading-dots></loading-dots></p>
     <form *ngIf="topicForm" [formGroup]="topicForm">
       <div class="form-check" *ngFor="let topic of topicBackendDictList">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          [id]="topic.id"
-          [formControlName]="topic.id"
-        />
+        <input class="form-check-input" type="checkbox" [id]="topic.id" [formControlName]="topic.id" />
         <label class="form-check-label" [for]="topic.id">
           {{ topic.name }}
         </label>
