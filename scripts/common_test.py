@@ -782,7 +782,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.exists('temp_file'))
 
     def test_install_npm_library_path_exists(self) -> None:
-        """Install an npm library that already exists"""
+        """Install an npm library that already exists."""
         def mock_exists(unused_file: str) -> bool:
             return True
 
