@@ -22,7 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { EditableTopicBackendApiService, UnusedTopicsResponse } from 'domain/topic/editable-topic-backend-api.service';
 import { AddTopicToClassroomModalComponent } from './add-topic-to-classroom-modal.component';
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 import { TopicBackendDict } from 'domain/topic/topic-object.model';
@@ -110,10 +110,10 @@ describe('AddTopicToClassroomModalComponent', () => {
   }));
 
   it('should initialize topicFormControls with false values', fakeAsync(() => {
-    const mockUnusedTopics: Partial<TopicBackendDict>[] = [
-      { id: 'topicId1', name: 'topic1' },
-      { id: 'topicId2', name: 'topic2' },
-    ];
+    const mockUnusedTopics: UnusedTopicsResponse = {
+      'topicId1': { id: 'topicId1', name: 'topic1' },
+      'topicId2': { id: 'topicId2', name: 'topic2' },
+    };
 
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
       .and.returnValue(Promise.resolve(mockUnusedTopics));

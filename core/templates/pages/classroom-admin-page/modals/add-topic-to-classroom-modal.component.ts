@@ -23,6 +23,9 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { TopicBackendDict } from 'domain/topic/topic-object.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 
+type TopicFormControls = {
+  [key: string]: boolean;
+};
 
 @Component({
   selector: 'oppia-add-topic-to-classroom-modal',
@@ -41,7 +44,7 @@ export class AddTopicToClassroomModalComponent
   }
 
   topicBackendDictList: TopicBackendDict[] = [];
-  topicForm: FormGroup;
+  topicForm!: FormGroup;
   ngOnInit(): void {
     this.loadUnusedTopics();
   }
@@ -59,7 +62,7 @@ export class AddTopicToClassroomModalComponent
   }
 
   initializeForm(): void {
-    const topicFormControls = {};
+    const topicFormControls: TopicFormControls = {};
     this.topicBackendDictList.forEach(topic => {
       topicFormControls[topic.id] = false;
     });

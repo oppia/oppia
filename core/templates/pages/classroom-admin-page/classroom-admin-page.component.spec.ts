@@ -690,13 +690,13 @@ describe('Classroom Admin Page component ', () => {
         result: Promise.resolve(['selectedTopic1', 'selectedTopic2']),
       } as NgbModalRef;
 
-      spyOn(component.ngbModal, 'open').and.returnValue(mockModalRef);
+      spyOn((component as any).ngbModal, 'open').and.returnValue(mockModalRef);
       spyOn(component, 'addTopicId');
 
       component.openAddTopicModal();
       tick();
 
-      expect(component.ngbModal.open).toHaveBeenCalled();
+      expect((component as any).ngbModal.open).toHaveBeenCalled();
       expect(mockModalRef.componentInstance.topicsList).toEqual([]);
       expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic1');
       expect(component.addTopicId).toHaveBeenCalledWith('selectedTopic2');
