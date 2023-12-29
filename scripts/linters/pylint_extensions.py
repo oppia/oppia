@@ -2919,6 +2919,360 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class IndentListByFour(checkers.BaseChecker):  # type: ignore[misc]
+    """Check that all items in a list are indented by 4 spaces"""
+
+    __implements__= interfaces.IAstroidChecker
+
+    name = 'indent-elements-by-four'
+    priority = -1
+    msgs = {
+        'C0040':(
+        'list elements not indented by 4 spaces',
+        'indent-elements-by-four',
+        'The first element of the list should be started at a new line and every subsequent lines should have a 4-space indentation'
+        ),
+    }
+
+    def visit_list(self, node: astroid.nodes.List) -> None:
+        """Visits all lists in a python file to ensure that
+        all items in the lists are indented by 4 spaces.
+        
+        Args:
+            node: astroid.nodes.List. List node in AST
+        """
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number)
+        list_indent = len(line) - len(line.lstrip())
+
+        count = 0
+        for item in node.elts:
+            item_indent = item.col_offset
+            if item_indent - list_indent != 4:
+                self.add_message('indent-elements-by-four', node=node.elts[count])
+            count += 1
+
+
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class IndentFunctionByFour(checkers.BaseChecker): # type: ignore[misc]
+    """Check that all statements within a function are indented by four spaces"""
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'indent-statements-by-four'
+    priority = -1
+    msgs = {
+        'C0041':(
+            'function statements not indented by 4 spaces',
+            'indent-statements-by-four',
+            'Every statement should be indented by 4 spaces'
+        )
+    }
+
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
+        """Visits all function definitions in a python file to ensure a
+        four-space indentation before every statement inside the function
+        
+        Args:
+            node: astroid.nodes.FunctionDef.Function
+            definition node in AST
+        """
+        def_indent = node.col_offset
+        if node.body[0].col_offset - def_indent != 4:
+            self.add_message('indent-statements-by-four', node=node, line=node.body[0].lineno)
+
+
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class IndentByEIghtChecker(checkers.BaseChecker): # type: ignore[misc]
+    """Checks if the indentation level of the conditions of a
+    scope-introducing-statement is the same as the indentation level
+    of the code within that scope. If same, the conditions are indented
+    by eight spaces
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = "indent-condition-by-eight"
+    priority = -1
+    msgs = {
+        "C0042": (
+            "condition not indented by 8 spaces",
+            "indent-condition-by-eight",
+            "The condition should be indented by 8 spaces"),
+    }
+
+    def _indent_check(self, node) -> None:
+        """Calculates the indentation of the necessary lines to determine
+        the correctness of the indentation levels
+        
+        Args:
+            node. Any node in python that introduces a scope and requires
+            a condition (e.g. if, elif, with, etc.)
+        """
+        statement_start_indent = node.col_offset
+        statement_start_lineno = node.fromlineno
+        condition_lineno = statement_start_lineno
+        current_line = linecache.getline(node.root().file, condition_lineno).rstrip()
+        # checks if the statement is expressed in one line
+        if current_line.endswith(':'):
+            return
+        elif current_line.endswith('('):
+            condition_lineno += 1
+            while True:
+                current_line = linecache.getline(node.root().file, condition_lineno).rstrip()
+                if not current_line.endswith(':'):
+                    condition_indent = len(current_line) - len(current_line.lstrip())
+                    # check indentation level of conditional statement
+                    if condition_indent == node.body[0].col_offset:
+                        self.add_message("indent-condition-by-eight", node=node, line=condition_lineno)
+                    elif condition_indent - statement_start_indent != 8:
+                        self.add_message("indent-condition-by-eight", node=node, line=condition_lineno)
+                    condition_lineno += 1
+                else:
+                    current_line = linecache.getline(node.root().file, condition_lineno).rstrip()
+                    condition_indent = len(current_line) - len(current_line.lstrip())
+                    # check indentation of the final condition line
+                    if condition_indent == node.body[0].col_offset:
+                        self.add_message("indent-condition-by-eight", node=node, line=condition_lineno)
+
+                    # checks if condition/argument is on the same line as the
+                    # last line of the structure (list, tuple, functiondef,
+                    # etc.) if first condition is true then it checks whether
+                    # the indentation of that line is eight spaces
+                    elif condition_indent == node.body[0].col_offset and condition_indent - statement_start_indent != 8:
+                        self.add_message("indent-condition-by-eight", node=node, line=condition_lineno) 
+                    break
+
+    def visit_if(self, node: astroid.nodes.If) -> None:
+        """Visits all if-statements in a python file and implements the
+        _indent_check function
+        
+        Args:
+            node: astroid.nodes.If. if-statement node in AST
+        """
+        self._indent_check(node)
+
+    def visit_for(self, node: astroid.nodes.For) -> None:
+        """Visits all for loops in a python file and implements the
+        _indent_check function
+        
+        Args:
+            node: astroid.nodes.For. for loop node in AST
+        """
+        self._indent_check(node)
+
+    def visit_while(self, node: astroid.nodes.While) -> None:
+        """Visits all while loops in a python file and implements the
+        _indent_check function
+        
+        Args:
+            node: astroid.nodes.While. while loop node in AST
+        """
+        self._indent_check(node)
+
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
+        """Visits all function definitions in a python file and implements
+        the _indent_check function
+        
+        Args:
+        node: astroid.nodes.FunctionDef. function definition node in AST
+        """
+        self._indent_check(node)
+
+    def visit_with(self, node: astroid.nodes.With) -> None:
+        """Visits all with statement in a python file and implements
+        the _indent_check function
+        
+        Args:
+            node: astroid.nodes.With. with statement node in AST
+        """
+        self._indent_check(node)
+
+
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class ClosingBracketChecker(checkers.BaseChecker): # type: ignore[misc]
+    """Checks if closing brackets/braces/parentheses are at the end of line
+    or has the same indentation as opening brackets/braces/parentheses
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = "closing-bracket-checker"
+    priority = -1
+    msgs =  {
+        'C0043': (
+        'misplaced closing bracket/brace/parentheses',
+        'closing-bracket-checker',
+        'Closing bracket/brace/parentheses should be at the end of line. If placed on the next line, then it should have the same indentation as the opening bracket/brace/parentheses'),
+        }
+    
+    def _indent_calculator(self, node) -> tuple:
+        """Calculates the indentation by calculating the first and last
+        line indentation of a structure (list, tuple, etc.)
+        
+        Args:
+            node. Any node in python that contains brackets/braces/parentheses
+
+        Returns:
+            tuple. Tuple of the start and end line indentation level and
+            the end line number for some calculations
+        """
+        start_line_number = node.fromlineno
+        start_line = linecache.getline(node.root().file, start_line_number)
+        start_line_indent = len(start_line) - len(start_line.lstrip())
+
+        end_line_number = node.end_lineno
+        end_line = linecache.getline(node.root().file, end_line_number)
+        end_line_indent = len(end_line) - len(end_line.lstrip())
+
+        return start_line_indent, end_line_indent, end_line_number
+       
+    
+    def visit_list(self, node: astroid.nodes.List) -> None:
+        """Visits all lists in a python file and checks if the closing
+        brackets are misplaced
+        
+        Args:
+            node: astroid.nodes.List. list node in AST
+        """
+        start_line_indent, end_line_indent, end_line_number = self._indent_calculator(node)
+
+        if not node.elts:
+            return
+        if node.elts[-1].lineno != node.end_lineno:
+            if start_line_indent != end_line_indent:
+                self.add_message('closing-bracket-checker', node=node, line=end_line_number)
+
+    def visit_dict(self, node: astroid.nodes.Dict) -> None:
+        """Visits all lists in a python file and checks if the closing
+        braces are misplaced
+        
+        Args:
+            node: astroid.nodes.Dict. dictionary node in AST
+        """
+        start_line_indent, end_line_indent, end_line_number = self._indent_calculator(node)
+
+        if not node.items:
+            return
+        
+        last_item = node.items[-1]
+        if last_item[1].lineno != node.end_lineno:
+            if start_line_indent != end_line_indent:
+                self.add_message('closing-bracket-checker', node=node, line = end_line_number)
+
+    def visit_tuple(self, node: astroid.nodes.Tuple) -> None:
+        """Visits all tuples in a python files and checks if the closing
+        parentheses are misplace
+        
+        Args:
+            node: astroid.nodes.Tuple. tuple node in AST
+        """
+        start_line_indent, end_line_indent, end_line_number = self._indent_calculator(node)
+        if not node.elts:
+            return
+        if node.elts[-1].lineno != node.end_lineno:
+            if start_line_indent != end_line_indent:
+                self.add_message('closing-bracket-checker', node=node, line=end_line_number)
+       
+    def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
+        """Similar to tuples, it checks whether the closing parentheses
+        are misplaced
+        
+        Args:
+            node: astroid.nodes.FunctionDef. function definition in AST
+        """
+        start_line_indent, _, _ = self._indent_calculator(node)
+        current_line_number = node.fromlineno
+        current_line = linecache.getline(node.root().file, current_line_number).rstrip()
+
+        # finds the line with ':' or the last line of the function definition
+        while not current_line.endswith(':'):
+           current_line_number += 1
+           current_line = linecache.getline(node.root().file, current_line_number).rstrip()
+        
+        functiondef_end_lineno = current_line_number
+        end_line_indent = len(current_line) - len(current_line.lstrip())
+
+        if not node.args.args:
+            return
+        if node.args.args[-1].lineno != functiondef_end_lineno:
+            if start_line_indent != end_line_indent:
+                self.add_message('closing-bracket-checker', node=node, line=functiondef_end_lineno)
+
+
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class DisallowIndentChecker(checkers.BaseChecker): # type: ignore[misc]
+    """Disallow indent when brackets/braces/parentheses can be combined.
+    Also checks if the indentation is correct after 'combining' the
+    brackets/braces/parentheses
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'function_call_arg_checker'
+    priority = -1
+    msgs = {
+        'C0044':(
+            'unnecessary indentation found',
+            'combined-operation',
+            'Indentation is unnecessary here. Please write the parentheses/brackets/braces together. e.g. "({" and indent the next line by 4 spaces'
+        ),
+        'C0045':(
+            'indentation not four-spaced',
+            'four-space-indent',
+            'Please ensure that the inner indentation of the argument is four'
+        ),
+    }
+
+    def visit_call(self, node: astroid.nodes.Call) -> None:
+        """Visits all function calls in a python file and checks whether
+        an indentation is necessary and the indentation is correct
+        
+        Args:
+            node: astroid.nodes.Call. function call node in AST
+        """
+        start_line_number = node.fromlineno
+        start_line = linecache.getline(node.root().file, start_line_number)
+        start_line_indent = len(start_line) - len(start_line.lstrip())
+
+        argument_inner_indent = linecache.getline(node.root().file, start_line_number + 1)
+        argument_indent = len(argument_inner_indent) - len(argument_inner_indent.lstrip())
+
+        if len(node.args) == 1:
+            if node.fromlineno != node.args[0].fromlineno:
+                self.add_message('combined-operation', node=node.args[0])
+            
+            elif type(node.args[0]).__name__ == 'Dict' or type(node.args[0]).__name__ == 'List' or type(node.args[0]).__name__ == 'Tuple':
+                if argument_indent - start_line_indent != 4:
+                    self.add_message('four-space-indent', node=node, line = argument_indent)
+
+
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -2943,3 +3297,8 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
+    linter.register_checker(IndentListByFour(linter))
+    linter.register_checker(IndentFunctionByFour(linter))
+    linter.register_checker(IndentByEIghtChecker(linter))
+    linter.register_checker(ClosingBracketChecker(linter))
+    linter.register_checker(DisallowIndentChecker(linter))
