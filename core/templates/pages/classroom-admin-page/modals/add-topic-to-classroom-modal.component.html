@@ -1,50 +1,42 @@
 <div class="modal-header">
-    <h4 class="modal-title">Add topics to classroom</h4>
-    <button type="button" class="close" (click)="close()">
-      <span>&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p *ngIf="!topicForm" class="loading-message">Loading unused topics <loading-dots></loading-dots></p>
-    <form *ngIf="topicForm" [formGroup]="topicForm">
-      <div class="form-check" *ngFor="let topic of topicBackendDictList">
-        <input class="form-check-input" type="checkbox" [id]="topic.id" [formControlName]="topic.id">
-        <label class="form-check-label" [for]="topic.id">
-          {{ topic.name }}
-        </label>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-secondary"
-      (click)="close()"
-    >
-        Cancel
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="addTopics()"
-    >
-      Add Topics
-    </button>
-  </div>
+  <h4 class="modal-title">Add topics to classroom</h4>
+  <button type="button" class="close" (click)="close()">
+    <span>&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p *ngIf="!topicForm" class="loading-message">Loading unused topics <loading-dots></loading-dots></p>
+  <form *ngIf="topicForm" [formGroup]="topicForm">
+    <div class="form-check" *ngFor="let topic of topicBackendDictList">
+      <input class="form-check-input" type="checkbox" [id]="topic.id" [formControlName]="topic.id">
+      <label class="form-check-label" [for]="topic.id">
+        {{ topic.name }}
+      </label>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="close()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" (click)="addTopics()">
+    Add Topics
+  </button>
+</div>
 
-  <style>
-    .loading-message {
-      font-size: 30px;
-      font-weight: bold;
-      text-align: center;
-    }
+<style>
+  .loading-message {
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+  }
 
-    .modal-body {
-      max-height: 300px;
-      overflow-y: auto;
-    }
+  .modal-body {
+    max-height: 300px;
+    overflow-y: auto;
+  }
 
-    .form-check-label {
-      margin-left: 5px;
-    }
-  </style>
+  .form-check-label {
+    margin-left: 5px;
+  }
+</style>
