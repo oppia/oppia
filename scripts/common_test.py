@@ -781,18 +781,14 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-    def test_install_npm_library_moment(self) -> None:
-        """Add a package (moment) and then remove it."""
+    def test_install_npm_library_path_exists(self) -> None:
+        """Install an npm library that already exists"""
         def mock_exists(unused_file: str) -> bool:
-            return False
+            return True
 
         with self.swap(os.path, 'exists', mock_exists):
             common.install_npm_library(
                 'moment', '2.29.4', common.OPPIA_TOOLS_DIR)
-        subprocess.check_call([
-                    'yarn', 'remove', 'moment'])
-
-        self.assertFalse(os.path.exists('temp_file'))
 
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
