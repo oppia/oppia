@@ -179,6 +179,7 @@ import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { MultipleChoiceInputOrderedChoicesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-ordered-choices-service';
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { MusicNotesInputRulesService } from 'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
@@ -688,6 +689,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
+  ['MultipleChoiceInputOrderedChoicesService',
+    MultipleChoiceInputOrderedChoicesService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
     MultipleChoiceInputValidationService],

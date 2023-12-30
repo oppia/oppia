@@ -24,7 +24,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
@@ -32,6 +31,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
+import { MultipleChoiceInputOrderedChoicesService, ChoiceWithIndex } from './multiple-choice-input-ordered-choices-service';
 
 import '../static/multiple_choice_input.css';
 
@@ -43,21 +43,22 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
   @Input() choicesWithValue: string;
   @Input() showChoicesInShuffledOrderWithValue: string;
-  choices;
+  choices: ChoiceWithIndex[];
   answer;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;
 
   constructor(
-    private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService
+    private playerTranscriptService: PlayerTranscriptService,
+    private multipleChoiceInputOrderedChoicesService:
+      MultipleChoiceInputOrderedChoicesService
   ) { }
 
   private getAttrs() {
@@ -68,11 +69,30 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     };
   }
 
-  private validityCheckFn(): boolean {
+  private validate(): boolean {
     return this.answer !== null;
   }
 
-  ngOnInit(): void {
+  private shuffleChoices(choices: ChoiceWithIndex[]): void {
+    for (
+      var currentIndex = choices.length - 1;
+      currentIndex >= 0;
+      currentIndex--
+    ) {
+      var temporaryValue = null;
+      var randomIndex = null;
+      randomIndex = Math.floor(Math.random() * (currentIndex + 1));
+      temporaryValue = choices[currentIndex];
+      choices[currentIndex] = choices[randomIndex];
+      choices[randomIndex] = temporaryValue;
+    }
+  }
+
+  private getOrderedChoices(): ChoiceWithIndex[] {
+    if (this.playerTranscriptService.getNumSubmitsForLastCard() > 0) {
+      return this.multipleChoiceInputOrderedChoicesService.get();
+    }
+
     const {
       showChoicesInShuffledOrder,
       choices
@@ -81,33 +101,22 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       this.getAttrs()
     ) as MultipleChoiceInputCustomizationArgs;
 
-    var choicesWithIndex = choices.value.map(
-      function(value, originalIndex) {
-        return {originalIndex: originalIndex, value: value.html};
-      }
+    const choicesWithIndex = choices.value.map(
+      (value, originalIndex) => ({originalIndex, choice: value})
     );
 
-    var shuffleChoices = (choices) => {
-      for (
-        var currentIndex = choices.length - 1;
-        currentIndex >= 0;
-        currentIndex--
-      ) {
-        var temporaryValue = null;
-        var randomIndex = null;
-        randomIndex = Math.floor(Math.random() * (currentIndex + 1));
-        temporaryValue = choices[currentIndex];
-        choices[currentIndex] = choices[randomIndex];
-        choices[randomIndex] = temporaryValue;
-      }
-      return choices;
-    };
-    // If choices need to be shuffled, shuffle them, otherwise order the
-    // choices based on their original index.
-    this.choices = (
-      showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
-      choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex));
+    if (showChoicesInShuffledOrder.value) {
+      this.shuffleChoices(choicesWithIndex);
+    } else {
+      choicesWithIndex.sort(
+        (c1, c2) => c1.originalIndex - c2.originalIndex);
+    }
+    this.multipleChoiceInputOrderedChoicesService.store(choicesWithIndex);
+    return choicesWithIndex;
+  }
 
+  ngOnInit(): void {
+    this.choices = this.getOrderedChoices();
     // Setup voiceover.
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
@@ -116,22 +125,21 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
-      for (let i = 0; i < choices.value.length; i++) {
-        const index = this.choices[i].originalIndex;
+      for (const choice of this.choices) {
         combinedChoiceLabels += this.audioTranslationManagerService
-          .cleanUpHTMLforVoiceover(choices.value[index].html);
+          .cleanUpHTMLforVoiceover(choice.choice.html);
       }
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
         this.recordedVoiceovers.getBindableVoiceovers(
-          choices.value[0]._contentId),
+          this.choices[0].choice.contentId),
         combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
       );
     }
 
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(), () => this.validityCheckFn());
+      () => this.submitAnswer(), () => this.validate());
   }
 
   selectAnswer(event: MouseEvent, answer: string): void {
