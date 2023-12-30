@@ -57,6 +57,7 @@ interface Learner {
 })
 
 export class DonatePageComponent implements OnInit {
+
   donationValues: DonationValue[] = [
     {
       amount: '10',
@@ -134,33 +135,33 @@ export class DonatePageComponent implements OnInit {
   learners: Learner[] = [
     {
       name: 'Abasiekeme',
-      country: 'Nigeria',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
       imageUrl:'/donate/learners-abasiekeme',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_1'
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1'
     },
     {
       name: 'Sandra Bosso',
-      country: 'Ghana',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
       imageUrl:'/donate/learners-sandra',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_2'
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2'
     },
     {
       name: 'Kajal',
-      country: 'India',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
       imageUrl:'/donate/learners-kajal',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_3'
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3'
     },
     {
       name: 'Seneen',
-      country: 'Palestine',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
       imageUrl:'/donate/learners-seneen',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_4'
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4'
     },
     {
       name: 'Juweria Cabdalla',
-      country: 'Somalia',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
       imageUrl:'/donate/learners-juweria',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_CONTENT_5'
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5'
     },
   ]  
   ;
@@ -171,6 +172,8 @@ export class DonatePageComponent implements OnInit {
     private ngbModal: NgbModal,
     private insertScriptService: InsertScriptService,
   ) {}
+
+  tileShown: number = 0
 
   ngOnInit(): void {
     const searchParams = new URLSearchParams(
@@ -194,5 +197,11 @@ export class DonatePageComponent implements OnInit {
       size: 'xl',
       windowClass: 'donation-box-modal',
     });
+  }
+
+  nextTile(clickedValue: number) : void {
+    let learnerTiles = document.getElementById('tile-' + clickedValue)
+    this.tileShown = clickedValue
+    learnerTiles.scrollIntoView({'behavior' : 'smooth', 'block' : 'nearest', 'inline' : 'center'})
   }
 }
