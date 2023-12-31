@@ -55,7 +55,7 @@ var ExplorationPlayerPage = function() {
   var gotItButton = $('.e2e-test-learner-got-it-button');
   var infoCardRating = $('.e2e-test-info-card-rating');
   var continueToNextCardButton = $('.e2e-test-continue-to-next-card-button');
-  var nextButton = $('.e2e-test-next-button');
+  var forwardButton = $('.e2e-test-next-button');
   var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
   var radioButton = $('.e2e-test-report-exploration-radio-button');
@@ -106,13 +106,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
-    await waitFor.elementToBeClickable(continueToNextCardButton);
     await action.click('Next Card button', continueToNextCardButton);
   };
 
-  this.clickNextButton = async function() {
-    await waitFor.elementToBeClickable(nextButton);
-    await action.click('Next Card button', nextButton);
+  this.clickForwardButton = async function() {
+    await action.click('Forward button', forwardButton);
   };
 
   this.clickSuggestChangesButton = async function() {
@@ -120,8 +118,6 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
-    await waitFor.visibilityOf(
-      continueToNextCardButton, 'Next Card Button not showing up.');
     var buttonText = await action.getText(
       'Next Card Button', continueToNextCardButton);
     expect(buttonText).toMatch(text);
