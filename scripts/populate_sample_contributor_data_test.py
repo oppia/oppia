@@ -228,7 +228,8 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
                 topic_summary_dicts_from_classroom[index])
             topic_summary_dict['is_published'] = (
                 topic_summary_dict_from_classroom['is_published'])
-            self.assertEqual(topic_summary_dict, topic_summary_dict_from_classroom)
+            self.assertEqual(
+                topic_summary_dict, topic_summary_dict_from_classroom)
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
         """Asserts that the function _mock_firebase_auth_create_user() is called
