@@ -629,8 +629,8 @@ class AdminHandler(
 
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
-            question_id_4 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
             question_id_5 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(

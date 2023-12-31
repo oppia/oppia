@@ -29,7 +29,6 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
-
 from scripts import populate_sample_contributor_data
 
 import requests
@@ -229,7 +228,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
                 topic_summary_dicts_from_classroom[index])
             topic_summary_dict['is_published'] = (
                 topic_summary_dict_from_classroom['is_published'])
-            assert topic_summary_dict, topic_summary_dict_from_classroom
+            self.assertEqual(topic_summary_dict, topic_summary_dict_from_classroom)
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
         """Asserts that the function _mock_firebase_auth_create_user() is called
