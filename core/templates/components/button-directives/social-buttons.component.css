@@ -12,7 +12,7 @@
   color: #fff;
   font-size: 1em;
   font-weight: 700;
-  margin: 1.33em 0;
+  margin: 20px 0;
   text-transform: uppercase;
 }
 
@@ -38,13 +38,21 @@
   position: relative;
 }
 
+.oppia-footer-social .oppia-footer-social-icons .oppia-instagram-follow {
+  background: #d6249f;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285aeb 90%);
+  margin-right: 6px;
+  padding: 5px 6px;
+}
 .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
   background: #cd201f;
+  border-radius: 5px;
   margin-right: 6px;
   padding: 5px 9px;
 }
 .oppia-footer-social .oppia-footer-social-icons .oppia-facebook-follow {
   background: #3b5998;
+  border-radius: 5px;
   margin-right: 6px;
   padding: 5px 10px;
 }
@@ -62,11 +70,13 @@
   color: #000;
 }
 .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
+  border-radius: 5px;
   bottom: -7px;
   position: relative;
   right: -5px;
 }
 .oppia-footer-social .oppia-youtube-follow  i.oppia-follow-icons.fab.fa-youtube-play {
+  border-radius: 5px;
   font-size: 18px;
   left: -0.35px;
   position: relative;

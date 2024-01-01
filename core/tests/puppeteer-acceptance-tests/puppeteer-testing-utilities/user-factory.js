@@ -21,10 +21,15 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
+<<<<<<< HEAD
 let e2ePracticeQuestionSubmitter = require(
   '../user-utilities/question-submitter-utils.js');
 
 const testConstants = require('./test-constants.js');
+=======
+let e2eQuestionAdmin = require(
+  '../user-utilities/question-admin-utils.js');
+>>>>>>> develop
 
 /**
  * Global user instances that are created and can be reused again.
@@ -34,6 +39,7 @@ let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 const ROLE_TRANSLATION_ADMIN = 'translation admin';
+const ROLE_QUESTION_ADMIN = 'question admin';
 
 const CONTRIBUTION_RIGHT_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
@@ -172,6 +178,32 @@ const createNewPracticeQuestionSubmitter = async function(username) {
 };
 
 /**
+ * Function to create a user with the question admin role.
+ * @param {string} username - the username of the question admin.
+ * @param {string} email - the email of the user.
+ * @returns the instance of the question admin.
+ */
+let createNewQuestionAdmin = async function(username, email) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
+  const questionAdmin = new e2eQuestionAdmin();
+  await questionAdmin.openBrowser();
+  await questionAdmin.signUpNewUser(
+    username,
+    'question_admin@example.com');
+
+  await superAdminInstance.assignRoleToUser(
+    username, ROLE_QUESTION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(
+    username, ROLE_QUESTION_ADMIN);
+
+  activeUsers.push(questionAdmin);
+  return questionAdmin;
+};
+
+/**
  * The function closes all the browsers opened by different users.
  */
 let closeAllBrowsers = async function() {
@@ -197,6 +229,7 @@ module.exports = {
   createNewBlogPostEditor,
   createNewGuestUser,
   createNewTranslationAdmin,
+  createNewQuestionAdmin,
   closeAllBrowsers,
   closeBrowserForUser
 };
