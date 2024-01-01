@@ -34,9 +34,9 @@ describe('Practice Question Submitter', function() {
   const correctAnswer = 'Correct';
   const incorrectAnswer = 'Incorrect answer'
   const misconception = {
-    name: '',
-    feedback: '',
-    shouldEnforceResponseOnAllQuestions: false
+    name: '3 before 2',
+    feedback: '2 to 3 (two to three)',
+    mustBeTaggedToQuestion: false
   };
   const hintText = 'Sort by number';
   const acceptedQuestionsPercentage = 30;
@@ -61,8 +61,8 @@ describe('Practice Question Submitter', function() {
       description: skillDescription,
       reviewMaterial: 'how to perform skill',
       difficulties: {
-        [DIFFICULTY_MEDIUM]: { rubric: mediumDifficultyRubricNotes },
-        [DIFFICULTY_HARD]: { rubric: hardDifficultyRubricNotes }
+        [DIFFICULTY_MEDIUM]: { rubricNotes: mediumDifficultyRubricNotes },
+        [DIFFICULTY_HARD]: { rubricNotes: hardDifficultyRubricNotes }
       },
       misconception,
       questionCount: 3,
@@ -105,8 +105,8 @@ describe('Practice Question Submitter', function() {
     await practiceQuestionSubmitter.suggestQuestionForSkillOpportunity(
       { topicName, skillDescription });
     await practiceQuestionSubmitter.expectQuestionDifficultyChoices(
-      { difficulty: DIFFICULTY_MEDIUM, rubric: mediumDifficultyRubricNotes },
-      { difficulty: DIFFICULTY_HARD, rubric: hardDifficultyRubricNotes });
+      { difficulty: DIFFICULTY_MEDIUM, rubricNotes: mediumDifficultyRubricNotes },
+      { difficulty: DIFFICULTY_HARD, rubricNotes: hardDifficultyRubricNotes });
     
     await practiceQuestionSubmitter.chooseDifficulty(DIFFICULTY_MEDIUM);
     await practiceQuestionSubmitter.expectChosenDifficultyToBe(
