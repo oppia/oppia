@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DebugElement, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DonatePageComponent } from './donate-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -121,13 +121,13 @@ describe('Donate page', () => {
   });
 
   it('should change learner tile in carousel', () => {
-    fixture.detectChanges()
+    fixture.detectChanges();
     const randomVal = Math.floor(Math.random() * 5);
-    const componentDe: DebugElement = fixture.debugElement;
-    spyOn(componentDe.nativeElement.querySelector('#tile-' + randomVal), 'scrollIntoView').and.callThrough();
-    
+    const componentNa = fixture.debugElement.nativeElement
+    spyOn(componentNa.querySelector('#tile-' + randomVal), 'scrollIntoView').and.callThrough();
+  
     component.nextTile(randomVal);
     expect(component.tileShown).toEqual(randomVal);
-    expect(componentDe.nativeElement.querySelector('#tile-' + randomVal).scrollIntoView).toHaveBeenCalled();
+    expect(componentNa.querySelector('#tile-' + randomVal).scrollIntoView).toHaveBeenCalled();
   });
 });
