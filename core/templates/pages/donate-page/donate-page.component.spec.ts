@@ -118,4 +118,11 @@ describe('Donate page', () => {
       }
     );
   });
+
+  it('should change learner tile in carousel', () => { 
+    let randomVal = Math.floor(Math.random() * 5);
+    component.nextTile(randomVal);
+
+    expect(component.tileShown).toEqual(randomVal);
+  });
 });
