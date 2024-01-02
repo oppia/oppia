@@ -22,10 +22,12 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { DonatePageRootComponent } from './donate-page-root.component';
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
 
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
   let component: DonatePageRootComponent;
+  let insertScriptService: InsertScriptService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -33,12 +35,12 @@ describe('Donate Page Root', () => {
         DonatePageRootComponent,
         MockTranslatePipe,
       ],
-      providers: [
-      ],
+      providers: [InsertScriptService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
     fixture = TestBed.createComponent(DonatePageRootComponent);
     component = fixture.componentInstance;
+    insertScriptService = TestBed.inject(InsertScriptService);
   }));
 
   it('should be defined', () => {
@@ -47,5 +49,13 @@ describe('Donate Page Root', () => {
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE);
     expect(component.meta).toEqual(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
+  });
+
+  it('should load the script on ngOnInit', () => {
+    spyOn(insertScriptService, 'loadScript');
+    component.ngOnInit();
+
+    expect(insertScriptService.loadScript).toHaveBeenCalledOnceWith(
+      KNOWN_SCRIPTS.DONORBOX);
   });
 });

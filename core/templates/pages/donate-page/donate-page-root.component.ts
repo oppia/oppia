@@ -17,9 +17,12 @@
  */
 
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 import { AppConstants } from 'app.constants';
 import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-donate-page-root',
@@ -30,4 +33,20 @@ export class DonatePageRootComponent extends BaseRootComponent {
   meta: MetaTagData[] =
   AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META as
     unknown as Readonly<MetaTagData>[];
+
+  insertScriptService: InsertScriptService;
+
+  constructor(
+      pageHeadService: PageHeadService,
+      translateService: TranslateService,
+      insertScriptService: InsertScriptService,
+  ) {
+    super(pageHeadService, translateService);
+    this.insertScriptService = insertScriptService;
+  }
+
+  ngOnInit(): void {
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    super.ngOnInit();
+  }
 }
