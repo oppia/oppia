@@ -200,8 +200,11 @@ export class DonatePageComponent implements OnInit {
   nextTile(clickedValue: number): void {
     let learnerTiles = document.getElementById('tile-' + clickedValue);
     this.tileShown = clickedValue;
-    learnerTiles!.scrollIntoView({
-      behavior: 'smooth', block: 'nearest', inline: 'center'
-    });
+
+    if (learnerTiles !== null) {
+      learnerTiles.scrollIntoView({
+        behavior: 'smooth', block: 'nearest', inline: 'center'
+      });
+    }
   }
 }
