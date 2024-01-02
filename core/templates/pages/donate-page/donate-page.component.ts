@@ -46,7 +46,7 @@ interface Highlight {
 interface Learner {
   name: string;
   country: string;
-  imageUrl: string,
+  imageUrl: string;
   text: string;
 }
 
@@ -57,7 +57,6 @@ interface Learner {
 })
 
 export class DonatePageComponent implements OnInit {
-
   donationValues: DonationValue[] = [
     {
       amount: '10',
@@ -136,35 +135,36 @@ export class DonatePageComponent implements OnInit {
     {
       name: 'Abasiekeme',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
-      imageUrl:'/donate/learners-abasiekeme',
+      imageUrl: '/donate/learners-abasiekeme',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1'
     },
     {
       name: 'Sandra Bosso',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
-      imageUrl:'/donate/learners-sandra',
+      imageUrl: '/donate/learners-sandra',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2'
     },
     {
       name: 'Kajal',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
-      imageUrl:'/donate/learners-kajal',
+      imageUrl: '/donate/learners-kajal',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3'
     },
     {
       name: 'Seneen',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
-      imageUrl:'/donate/learners-seneen',
+      imageUrl: '/donate/learners-seneen',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4'
     },
     {
       name: 'Juweria Cabdalla',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
-      imageUrl:'/donate/learners-juweria',
+      imageUrl: '/donate/learners-juweria',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5'
     },
-  ]  
-  ;
+  ];
+
+  tileShown: number = 0;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -172,8 +172,6 @@ export class DonatePageComponent implements OnInit {
     private ngbModal: NgbModal,
     private insertScriptService: InsertScriptService,
   ) {}
-
-  tileShown: number = 0
 
   ngOnInit(): void {
     const searchParams = new URLSearchParams(
