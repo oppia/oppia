@@ -1651,6 +1651,31 @@ describe('Conversation skin component', () => {
     expect(componentInstance.isLearnAgainButton()).toBeTrue();
   });
 
+  it('should jump to the revision state via changing card', () => {
+    const currentCard = new StateCard(
+      'currentCard', null, null, new Interaction(
+        [], [], null, null, [], 'Continue', null),
+      [], null, '', null);
+    componentInstance.displayedCard = currentCard;
+
+    componentInstance.nextCard = new StateCard(
+      'revisionState', null, null, new Interaction(
+        [], [], null, null, [], 'ImageClickInput', null),
+      [], null, '', null);
+    spyOn(componentInstance, 'isLearnAgainButton').and.returnValue(true);
+    spyOn(playerTranscriptService, 'findIndexOfLatestStateWithName')
+      .withArgs('revisionState').and.returnValue(2);
+    const changeCard = spyOn(componentInstance, 'changeCard');
+    const recordNewCardAdded = spyOn(
+      explorationPlayerStateService, 'recordNewCardAdded');
+
+    componentInstance.showUpcomingCard();
+
+    expect(currentCard.isCompleted()).toBeFalse();
+    expect(recordNewCardAdded).not.toHaveBeenCalled();
+    expect(changeCard).toHaveBeenCalledWith(2);
+  });
+
   it('should adjust page height on scroll', fakeAsync(() => {
     componentInstance.lastRequestedHeight = document.body.scrollHeight + 100;
     componentInstance.lastRequestedScroll = false;
