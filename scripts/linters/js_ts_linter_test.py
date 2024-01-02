@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/js_ts_linter.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import multiprocessing
 import os
@@ -102,7 +103,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ) -> Ret:
             return Ret()
 
-        popen_error_swap = self.swap(
+        popen_error_swap = patch.object(
             subprocess, 'Popen', mock_popen_error_call)
         with popen_error_swap:
             with self.assertRaisesRegex(Exception, 'Some error'):
@@ -112,9 +113,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_parse_script(unused_file_content: str, comment: str) -> None:  # pylint: disable=unused-argument
             raise Exception('Exception raised from parse_script()')
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_swap = patch.object(
             js_ts_linter, 'compile_all_ts_files', lambda: None)
-        esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
+        esprima_swap = patch.object(esprima, 'parseScript', mock_parse_script)
 
         with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegex(
             Exception, re.escape('Exception raised from parse_script()')
@@ -135,7 +136,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     INVALID_CONSTANT_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_swap = patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
@@ -166,7 +167,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     INVALID_CONSTANT_IN_TS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_swap = patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
@@ -197,8 +198,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
             return process
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'Output', b'Invalid')
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
+        communicate_swap = patch.object(
             subprocess.Popen, 'communicate', mock_communicate)
         with popen_swap, communicate_swap:
             with self.assertRaisesRegex(Exception, 'Invalid'):
@@ -210,7 +211,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return False
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
 
         with exists_swap, self.assertRaisesRegex(
             Exception,
@@ -261,7 +262,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     VALID_UNLISTED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_swap = patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
@@ -300,7 +301,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     VALID_IGNORED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_swap = patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
         with compile_all_ts_files_swap:
             lint_task_report = js_ts_linter.JsTsLintChecksManager(

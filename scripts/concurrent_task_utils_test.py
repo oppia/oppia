@@ -17,6 +17,7 @@
 """Unit tests for scripts/concurrent_task_utils.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import threading
@@ -52,7 +53,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):

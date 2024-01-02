@@ -17,6 +17,7 @@
 """Unit tests for scripts/pre_commit_hook.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -43,7 +44,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
     def test_install_hook_with_existing_symlink(self) -> None:
         def mock_islink(unused_file: str) -> bool:
@@ -55,9 +56,9 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> Tuple[str, None]:
             return ('Output', None)
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -84,7 +85,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         exists_swap = self.swap_with_checks(
             os.path, 'exists', mock_exists,
             expected_args=((pre_commit_file,),))
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        is_windows_swap = patch.object(common, 'is_windows_os', mock_is_windows)
 
         with islink_swap, exists_swap, self.print_swap, is_windows_swap:
             pre_commit_hook.install_hook()
@@ -107,9 +108,9 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> Tuple[str, str]:
             return ('Output', 'Error')
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -135,12 +136,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap, (
             symlink_swap):
@@ -174,13 +175,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_copy(unused_type: str, unused_file: str) -> None:
             check_function_calls['copy_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
-        copy_swap = self.swap(shutil, 'copy', mock_copy)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
+        copy_swap = patch.object(shutil, 'copy', mock_copy)
 
         with islink_swap, exists_swap, subprocess_swap, symlink_swap, copy_swap:
             with self.print_swap:
@@ -208,13 +209,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        unlink_swap = self.swap(os, 'unlink', mock_unlink)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+        unlink_swap = patch.object(os, 'unlink', mock_unlink)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             with unlink_swap, symlink_swap:
@@ -235,7 +236,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> psutil.Popen:
             return process
 
-        with self.swap(subprocess, 'Popen', mock_popen):
+        with patch.object(subprocess, 'Popen', mock_popen):
             self.assertEqual(
                 pre_commit_hook.start_subprocess_for_result(['cmd']),
                 (b'test\n', b''))
@@ -248,7 +249,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             return (b'package-lock.json\nfile.1py\nfile2.ts', None)
 
-        with self.swap(
+        with patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result
         ):
@@ -263,7 +264,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             return (b'file.1py\nfile2.ts', None)
 
-        with self.swap(
+        with patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result):
             self.assertFalse(
@@ -275,7 +276,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, bytes]:
             return (b'file.1py\nfile2.ts', b'Error')
 
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
@@ -284,7 +285,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_does_current_folder_contain_have_package_lock_file(self) -> None:
         def mock_isfile(unused_path: str) -> bool:
             return True
-        with self.swap(os.path, 'isfile', mock_isfile):
+        with patch.object(os.path, 'isfile', mock_isfile):
             self.assertTrue(
                 pre_commit_hook
                 .does_current_folder_contain_have_package_lock_file())
@@ -298,7 +299,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
-        with self.swap(subprocess, 'check_output', mock_check_output):
+        with patch.object(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
 
     def test_check_changes_with_no_config_file_changed(self) -> None:
@@ -315,7 +316,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
@@ -334,7 +335,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return (
                 b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
                 b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n')
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
@@ -350,13 +351,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
-        package_lock_swap = self.swap(
+        package_lock_swap = patch.object(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
-        package_lock_in_current_folder_swap = self.swap(
+        package_lock_in_current_folder_swap = patch.object(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
             mock_func)
-        check_config_swap = self.swap(
+        check_config_swap = patch.object(
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
@@ -374,7 +375,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         }
         def mock_install_hook() -> None:
             check_function_calls['install_hook_is_called'] = True
-        with self.swap(
+        with patch.object(
             pre_commit_hook, 'install_hook', mock_install_hook):
             pre_commit_hook.main(args=['--install'])
 
@@ -386,13 +387,13 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return False
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
-        package_lock_swap = self.swap(
+        package_lock_swap = patch.object(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
-        package_lock_in_current_folder_swap = self.swap(
+        package_lock_in_current_folder_swap = patch.object(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
             mock_func)
-        check_config_swap = self.swap(
+        check_config_swap = patch.object(
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
@@ -410,7 +411,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         temp_file.name = temp_file_name  # type: ignore[misc]
         with utils.open_file(temp_file_name, 'w') as tmp:
             tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
-        with self.swap(
+        with patch.object(
             pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
             pre_commit_hook.check_changes_in_gcloud_path()
         temp_file.close()
@@ -430,7 +431,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             'bin/gcloud')
         with utils.open_file(temp_file_name, 'w') as tmp:
             tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
-        constants_file_swap = self.swap(
+        constants_file_swap = patch.object(
             pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
         with constants_file_swap, self.assertRaisesRegex(
             Exception, (

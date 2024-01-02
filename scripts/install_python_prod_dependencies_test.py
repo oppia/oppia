@@ -17,6 +17,7 @@
 """Unit tests for 'scripts/install_python_prod_dependencies.py'."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import itertools
@@ -101,7 +102,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         self.file_arr: List[str] = []
         def mock_write(msg: str) -> None:
@@ -128,7 +129,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             def __exit__(self, *args: int) -> None:
                 pass
 
-        self.open_file_swap = self.swap(
+        self.open_file_swap = patch.object(
             utils, 'open_file', MockOpenFile)
 
         self.cmd_token_list: List[List[str]] = []
@@ -154,11 +155,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list.append(cmd_tokens)
             return ''
 
-        self.swap_check_call = self.swap(
+        self.swap_check_call = patch.object(
             subprocess, 'check_call', mock_check_call)
-        self.swap_Popen = self.swap(
+        self.swap_Popen = patch.object(
             subprocess, 'Popen', mock_check_call)
-        self.swap_run = self.swap(subprocess, 'run', mock_run)
+        self.swap_run = patch.object(subprocess, 'run', mock_run)
 
         class MockErrorProcess:
 
@@ -178,7 +179,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     'Popen should have been called with encoding="utf-8"')
             return MockErrorProcess()
 
-        self.swap_Popen_error = self.swap(
+        self.swap_Popen_error = patch.object(
             subprocess, 'Popen', mock_check_call_error)
 
     def get_git_version_string(self, name: str, sha1_piece: str) -> str:
@@ -196,7 +197,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
     def test_invalid_git_dependency_raises_an_exception(self) -> None:
-        swap_requirements = self.swap(
+        swap_requirements = patch.object(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
             self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
@@ -207,7 +208,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_python_prod_dependencies.get_mismatches()
 
     def test_multiple_discrepancies_returns_correct_mismatches(self) -> None:
-        swap_requirements = self.swap(
+        swap_requirements = patch.object(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
             self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
@@ -229,7 +230,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 })
             ]
 
-        swap_find_distributions = self.swap(
+        swap_find_distributions = patch.object(
             pkg_resources, 'find_distributions', mock_find_distributions)
         with swap_requirements, swap_find_distributions:
             self.assertEqual(
@@ -267,14 +268,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_validate_metadata_directories() -> None:
             pass
 
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
-        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
+        swap_remove_dir = patch.object(shutil, 'rmtree', mock_remove_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.open_file_swap, swap_get_mismatches:
@@ -320,11 +321,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_validate_metadata_directories() -> None:
             pass
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
 
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
@@ -394,15 +395,15 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_validate_metadata_directories() -> None:
             pass
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
 
-        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
+        swap_remove_dir = patch.object(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.open_file_swap, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
@@ -440,10 +441,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return {}
         def mock_validate_metadata_directories() -> None:
             pass
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
@@ -488,13 +489,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_validate_metadata_directories() -> None:
             pass
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
-        swap_print = self.swap(builtins, 'print', mock_print)
+        swap_print = patch.object(builtins, 'print', mock_print)
         with self.swap_run, swap_get_mismatches, swap_print:
             with swap_validate_metadata_directories, self.open_file_swap:
                 install_python_prod_dependencies.main()
@@ -550,16 +551,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_validate_metadata_directories() -> None:
             pass
 
-        swap_validate_metadata_directories = self.swap(
+        swap_validate_metadata_directories = patch.object(
             install_python_prod_dependencies, 'validate_metadata_directories',
             mock_validate_metadata_directories)
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
-        swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
-        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
-        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+        swap_rm_tree = patch.object(shutil, 'rmtree', mock_rm)
+        swap_list_dir = patch.object(os, 'listdir', mock_list_dir)
+        swap_is_dir = patch.object(os.path, 'isdir', mock_is_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
             with swap_validate_metadata_directories, self.open_file_swap:
@@ -636,10 +637,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_is_dir(unused_path: str) -> bool:
             return True
 
-        swap_find_distributions = self.swap(
+        swap_find_distributions = patch.object(
             pkg_resources, 'find_distributions', mock_find_distributions)
-        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
-        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+        swap_list_dir = patch.object(os, 'listdir', mock_list_dir)
+        swap_is_dir = patch.object(os.path, 'isdir', mock_is_dir)
 
         with swap_find_distributions, swap_list_dir, swap_is_dir:
             install_python_prod_dependencies.validate_metadata_directories()
@@ -674,11 +675,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_is_dir(unused_path: str) -> bool:
             return True
-        swap_find_distributions = self.swap(
+        swap_find_distributions = patch.object(
             pkg_resources, 'find_distributions', mock_find_distributions)
-        swap_list_dir = self.swap(
+        swap_list_dir = patch.object(
             os, 'listdir', mock_list_dir)
-        swap_is_dir = self.swap(
+        swap_is_dir = patch.object(
             os.path, 'isdir', mock_is_dir
         )
 
@@ -733,7 +734,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'package==version', 'path')
 
     def test_pip_install_with_import_error_and_darwin_os(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Darwin')
 
         import pip
         try:
@@ -755,7 +756,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'OS%29' in self.print_arr)
 
     def test_pip_install_with_import_error_and_linux_os(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
 
         import pip
         try:
@@ -777,7 +778,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             '%29' in self.print_arr)
 
     def test_pip_install_with_import_error_and_windows_os(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
         import pip
         try:
             # Here we use MyPy ignore because to test the case where pip

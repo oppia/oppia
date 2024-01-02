@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_search_indexing_jobs."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.constants import constants
 from core.domain import search_services
@@ -121,7 +122,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        max_batch_size_swap = self.swap(
+        max_batch_size_swap = patch.object(
             exp_search_indexing_jobs.IndexExplorationsInSearchJob,
             'MAX_BATCH_SIZE', 1)
 

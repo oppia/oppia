@@ -17,6 +17,7 @@
 """Unit tests for scripts/clean_test.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 import shutil
@@ -43,8 +44,8 @@ class CleanTests(test_utils.GenericTestBase):
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
-        rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        rmtree_swap = patch.object(shutil, 'rmtree', mock_rmtree)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
         with rmtree_swap, exists_swap:
             clean.delete_directory_tree('dir_path')
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -61,8 +62,8 @@ class CleanTests(test_utils.GenericTestBase):
         def mock_exists(unused_path: str) -> Literal[True]:
             return True
 
-        rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        rmtree_swap = patch.object(shutil, 'rmtree', mock_rmtree)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
         with rmtree_swap, exists_swap:
             clean.delete_directory_tree('dir_path')
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -79,8 +80,8 @@ class CleanTests(test_utils.GenericTestBase):
         def mock_isfile(unused_path: str) -> Literal[False]:
             return False
 
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        remove_swap = patch.object(os, 'remove', mock_remove)
+        isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
         with remove_swap, isfile_swap:
             clean.delete_file('file_path')
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -97,8 +98,8 @@ class CleanTests(test_utils.GenericTestBase):
         def mock_isfile(unused_path: str) -> Literal[True]:
             return True
 
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        remove_swap = patch.object(os, 'remove', mock_remove)
+        isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
         with remove_swap, isfile_swap:
             clean.delete_file('file_path')
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -118,10 +119,10 @@ class CleanTests(test_utils.GenericTestBase):
             check_function_calls['delete_file_is_called'] += 1
         def mock_listdir(unused_path: str) -> List[str]:
             return ['some_dir', 'tmpcompiledjs_dir']
-        delete_dir_swap = self.swap(
+        delete_dir_swap = patch.object(
             clean, 'delete_directory_tree', mock_delete_dir)
-        delete_file_swap = self.swap(clean, 'delete_file', mock_delete_file)
-        listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        delete_file_swap = patch.object(clean, 'delete_file', mock_delete_file)
+        listdir_swap = patch.object(os, 'listdir', mock_listdir)
 
         with delete_dir_swap, delete_file_swap, listdir_swap:
             clean.main(args=[])

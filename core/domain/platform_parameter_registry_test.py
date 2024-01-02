@@ -17,6 +17,7 @@
 """Tests for the platform parameter registry."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import enum
 
@@ -255,8 +256,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in dev stage cannot be updated in prod '
@@ -282,8 +283,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
 
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in dev stage cannot be updated in test '
@@ -309,8 +310,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.create_feature_flag(
             ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
 
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in test stage cannot be updated in prod '
@@ -405,7 +406,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 [name]
             )
 
-        with self.swap(
+        with patch.object(
             registry.Registry,
             'update_platform_parameter',
             _mock_update_platform_parameter

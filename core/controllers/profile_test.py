@@ -15,6 +15,7 @@
 """Tests for the profile page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import io
@@ -511,7 +512,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # The email update preference should be True in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
+        with patch.object(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, True)
             self.assertEqual(
@@ -523,7 +524,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
+        with patch.object(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, True)
             self.assertEqual(
@@ -540,7 +541,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             with self.swap_to_always_return(
                 user_services, 'has_ever_registered', False
             ):
@@ -594,7 +595,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
         # The email update preference should be False in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
+        with patch.object(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, False)
             self.assertEqual(
@@ -607,7 +608,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
+        with patch.object(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, False)
             self.assertEqual(
@@ -963,7 +964,7 @@ class SignupTests(test_utils.GenericTestBase):
             'has_ever_registered': True,
             'username': 'owner',
         }
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             response = self.get_json(feconf.SIGNUP_DATA_URL)
             self.assertDictEqual(values_dict, response)
 
@@ -985,7 +986,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
 class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self) -> None:
-        swap_add_fn = self.swap(
+        swap_add_fn = patch.object(
             user_services, 'add_user_to_mailing_list', lambda *args,
             **kwargs: True)
 
@@ -1007,7 +1008,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
     def test_email_provider_error(self) -> None:
         def raise_exception() -> None:
             raise Exception('Backend error')
-        swap_add_fn = self.swap(
+        swap_add_fn = patch.object(
             user_services, 'add_user_to_mailing_list', raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -1025,7 +1026,7 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_inputs(self) -> None:
-        swap_add_fn = self.swap(
+        swap_add_fn = patch.object(
             user_services, 'add_user_to_mailing_list', lambda *args: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -1066,7 +1067,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         self.swap_secret = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret')
         self.swap_audience_id = (
-            self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
+            patch.object(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
             self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -1224,7 +1225,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             deleted=user_settings.deleted
         ).put()
 
-        time_swap = self.swap(
+        time_swap = patch.object(
             user_services, 'record_user_logged_in', lambda *args: None)
 
         with time_swap:
@@ -1305,7 +1306,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
         fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
-        time_swap = self.swap(
+        time_swap = patch.object(
             user_services, 'record_user_logged_in', lambda *args: None)
 
         with time_swap:

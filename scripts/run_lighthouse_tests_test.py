@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_lighthouse_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -67,9 +68,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
-        self.swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        self.swap_sys_exit = patch.object(sys, 'exit', lambda _: None)
         puppeteer_path = (
             os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
         self.puppeteer_bash_command = [common.NODE_BIN_PATH, puppeteer_path]
@@ -91,17 +92,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockCompilerContextManager()
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
-        self.swap_ng_build = self.swap(
+        self.swap_ng_build = patch.object(
             servers, 'managed_ng_build', mock_context_manager)
-        self.swap_webpack_compiler = self.swap(
+        self.swap_webpack_compiler = patch.object(
             servers, 'managed_webpack_compiler', mock_context_manager)
-        self.swap_redis_server = self.swap(
+        self.swap_redis_server = patch.object(
             servers, 'managed_redis_server', mock_context_manager)
-        self.swap_elasticsearch_dev_server = self.swap(
+        self.swap_elasticsearch_dev_server = patch.object(
             servers, 'managed_elasticsearch_dev_server', mock_context_manager)
-        self.swap_firebase_auth_emulator = self.swap(
+        self.swap_firebase_auth_emulator = patch.object(
             servers, 'managed_firebase_auth_emulator', mock_context_manager)
-        self.swap_cloud_datastore_emulator = self.swap(
+        self.swap_cloud_datastore_emulator = patch.object(
             servers, 'managed_cloud_datastore_emulator', mock_context_manager)
         self.swap_dev_appserver = self.swap_with_checks(
             servers, 'managed_dev_appserver',
@@ -177,7 +178,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_isfile = patch.object(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
@@ -207,7 +208,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_isfile = patch.object(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.puppeteer_bash_command + self.extra_args,),))
@@ -334,17 +335,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(
+        swap_popen = patch.object(
             subprocess, 'Popen', mock_popen)
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
             lambda *unused_args: None, expected_args=(('accessibility', '1'),))
-        swap_isdir = self.swap(
+        swap_isdir = patch.object(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None,
             expected_kwargs=[{'args': []}])
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_emulator_mode = patch.object(constants, 'EMULATOR_MODE', False)
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
@@ -369,9 +370,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             lambda *unused_args: None, expected_args=(('performance', '1'),))
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
-        swap_popen = self.swap(
+        swap_popen = patch.object(
             subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(
+        swap_isdir = patch.object(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None,
@@ -404,14 +405,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=(('performance', '1'),))
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
-        swap_popen = self.swap(
+        swap_popen = patch.object(
             subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(
+        swap_isdir = patch.object(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
                     build, 'main', lambda args: None,
                     expected_kwargs=[{'args': []}])
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_emulator_mode = patch.object(constants, 'EMULATOR_MODE', False)
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
@@ -459,17 +460,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             lambda *unused_args: None, expected_args=(('performance', '1'),))
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
-        swap_popen = self.swap(
+        swap_popen = patch.object(
             subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(
+        swap_isdir = patch.object(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None,
             expected_kwargs=[{'args': []}])
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
-        swap_popen = self.swap(
+        swap_emulator_mode = patch.object(constants, 'EMULATOR_MODE', False)
+        swap_popen = patch.object(
             subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(
+        swap_isdir = patch.object(
             os.path, 'isdir', lambda _: True)
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:

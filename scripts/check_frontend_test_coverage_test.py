@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_frontend_test_coverage.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -66,12 +67,12 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         def mock_check_call(command: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
 
-        self.open_file_swap = self.swap(
+        self.open_file_swap = patch.object(
             utils, 'open_file', mock_open_file
         )
-        self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.check_call_swap = self.swap(
+        self.exists_swap = patch.object(os.path, 'exists', mock_exists)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
+        self.check_call_swap = patch.object(
             subprocess, 'check_call', mock_check_call
         )
 
@@ -158,7 +159,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['file.ts', 'file2.ts'],
@@ -170,7 +171,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
 
-        sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
+        sys_exit_swap = patch.object(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap:  # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.check_coverage_changes()
@@ -182,7 +183,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         def mock_exists(unused_path: str) -> Literal[False]:
             return False
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
         with exists_swap:
             with self.assertRaisesRegex(
                 Exception,
@@ -206,7 +207,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
         )
 
@@ -229,7 +230,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:10\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['file.ts'],
@@ -260,7 +261,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['file.ts'],
@@ -299,7 +300,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['anotherfile.tsfile.ts'],
@@ -311,7 +312,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
 
-        sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
+        sys_exit_swap = patch.object(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap:
             with self.print_swap, not_fully_covered_files_swap:
                 (
@@ -333,7 +334,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['file.ts', 'anotherfile.ts'],
@@ -361,7 +362,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        not_fully_covered_files_swap = self.swap(
+        not_fully_covered_files_swap = patch.object(
             check_frontend_test_coverage,
             'NOT_FULLY_COVERED_FILENAMES',
             ['file.ts'],

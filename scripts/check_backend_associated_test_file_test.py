@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_backend_associated_test_file.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import logging
@@ -39,9 +40,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         def mock_error(msg: str) -> None:
             self.error_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.swap_logging = self.swap(logging, 'error', mock_error)
-        self.swap_exit = self.swap(sys, 'exit', lambda _: None)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
+        self.swap_logging = patch.object(logging, 'error', mock_error)
+        self.swap_exit = patch.object(sys, 'exit', lambda _: None)
 
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
             self) -> None:

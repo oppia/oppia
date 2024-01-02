@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import collections
@@ -1410,7 +1411,7 @@ class TestBase(unittest.TestCase):
         Example usage:
 
             import math
-            with self.swap(math, 'sqrt', lambda x: 42):
+            with patch.object(math, 'sqrt', lambda x: 42):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
@@ -1418,7 +1419,7 @@ class TestBase(unittest.TestCase):
         first, for example:
 
             import types
-            with self.swap(
+            with patch.object(
                 SomePythonClass, 'some_classmethod',
                 classmethod(new_classmethod)):
 
@@ -1449,7 +1450,7 @@ class TestBase(unittest.TestCase):
         def function_that_always_returns(*_: str, **__: str) -> Any:
             """Returns the input value."""
             return value
-        with self.swap(obj, attr, function_that_always_returns):
+        with patch.object(obj, attr, function_that_always_returns):
             yield
 
     # Here we use type Any because the argument 'obj' can accept any
@@ -1465,7 +1466,7 @@ class TestBase(unittest.TestCase):
         def function_that_always_raises(*_: str, **__: str) -> None:
             """Raises the input exception."""
             raise error
-        with self.swap(obj, attr, function_that_always_raises):
+        with patch.object(obj, attr, function_that_always_raises):
             yield
 
     # Here we use type Any because argument 'obj' can accept any kind
@@ -1503,7 +1504,7 @@ class TestBase(unittest.TestCase):
                 raise raises # pylint: disable=raising-bad-type
             return returns
         call_counter = CallCounter(impl)
-        with self.swap(obj, attr, call_counter):
+        with patch.object(obj, attr, call_counter):
             yield call_counter
 
     # Here we use type Any because the argument 'obj' can accept any
@@ -1863,7 +1864,7 @@ class AppEngineTestBase(TestBase):
         # Mock set_constans_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.
-        self.contextManager = self.swap(
+        self.contextManager = patch.object(
             common, 'set_constants_to_default',
             self.mock_set_constants_to_default)
         self.contextManager.__enter__()
@@ -1890,7 +1891,7 @@ class AppEngineTestBase(TestBase):
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        platform_taskqueue_services_swap = self.swap(
+        platform_taskqueue_services_swap = patch.object(
             platform_taskqueue_services, 'create_http_task',
             self._platform_taskqueue_services_stub.create_http_task)
         with platform_taskqueue_services_swap:
@@ -2322,37 +2323,37 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES.indices, 'create',
                 es_stub.mock_create_index))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES, 'index',
                 es_stub.mock_index))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES, 'exists',
                 es_stub.mock_exists))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES, 'delete',
                 es_stub.mock_delete))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES, 'delete_by_query',
                 es_stub.mock_delete_by_query))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 elastic_search_services.ES, 'search',
                 es_stub.mock_search))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 memory_cache_services, 'flush_caches',
                 memory_cache_services_stub.flush_caches))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 memory_cache_services, 'get_multi',
                 memory_cache_services_stub.get_multi))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 memory_cache_services, 'set_multi',
                 memory_cache_services_stub.set_multi))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 memory_cache_services, 'get_memory_cache_stats',
                 memory_cache_services_stub.get_memory_cache_stats))
-            stack.enter_context(self.swap(
+            stack.enter_context(patch.object(
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
 
@@ -2724,7 +2725,7 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(base, 'load_template', mock_load_template):
+        with patch.object(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url,
                 params=params,
@@ -2823,7 +2824,7 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(base, 'load_template', mock_load_template):
+        with patch.object(base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params=params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
@@ -3997,7 +3998,7 @@ class LinterTestBase(GenericTestBase):
             """
             self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
     def assert_same_list_elements(
         self, phrases: List[str], stdout: List[str]
@@ -4100,7 +4101,7 @@ class GenericEmailTestBase(GenericTestBase):
         mailgun api key, mailgun domain name and mocked version of
         send_email_to_recipients().
         """
-        with self.swap(
+        with patch.object(
             email_services, 'send_email_to_recipients',
             self._send_email_to_recipients):
             super().run(result=result)

@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_custom_eslint_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -35,7 +36,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
@@ -48,7 +49,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         self.sys_exit_code: int = 0
         def mock_sys_exit(err_code: int) -> None:
             self.sys_exit_code = err_code
-        self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
+        self.swap_sys_exit = patch.object(sys, 'exit', mock_sys_exit)
 
     def test_custom_eslint_tests_failed_due_to_internal_error(self) -> None:
         class MockTask:
@@ -62,7 +63,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = patch.object(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
             run_custom_eslint_tests.main()
@@ -83,7 +84,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = patch.object(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
             run_custom_eslint_tests.main()
@@ -104,7 +105,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = patch.object(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
             run_custom_eslint_tests.main()
@@ -125,7 +126,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = patch.object(subprocess, 'Popen', mock_popen)
         error_msg = 'Eslint test coverage is not 100%'
 
         with swap_popen, self.print_swap, self.swap_sys_exit:

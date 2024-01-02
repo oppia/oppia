@@ -17,6 +17,7 @@
 """Tests for MyPy type check runner script."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 import site
@@ -83,23 +84,23 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
-        self.popen_swap_success = self.swap(
+        self.popen_swap_success = patch.object(
             subprocess, 'Popen', mock_popen_success)
-        self.popen_swap_failure = self.swap(
+        self.popen_swap_failure = patch.object(
             subprocess, 'Popen', mock_popen_failure)
 
-        self.install_mypy_prereq_swap_success = self.swap(
+        self.install_mypy_prereq_swap_success = patch.object(
             run_mypy_checks,
             'install_mypy_prerequisites',
             lambda _: (0, 'exec')
         )
-        self.install_mypy_prereq_swap_failure = self.swap(
+        self.install_mypy_prereq_swap_failure = patch.object(
             run_mypy_checks,
             'install_mypy_prerequisites',
             lambda _: (1, 'exec')
         )
 
-        self.directories_swap = self.swap(
+        self.directories_swap = patch.object(
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
 
@@ -107,7 +108,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             unused_ci: bool
         ) -> Tuple[int, str]:
             return (0, self.mypy_cmd_path)
-        self.swap_install_success = self.swap(
+        self.swap_install_success = patch.object(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
 
@@ -116,7 +117,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> Ret:
             return Ret(cmd_tokens)
 
-        self.popen_swap_user_prefix_error = self.swap(
+        self.popen_swap_user_prefix_error = patch.object(
             subprocess, 'Popen', mock_popen_user_prefix_error_call)
 
         self.mypy_cmd_path = os.path.join(
@@ -186,7 +187,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.popen_swap_user_prefix_error:
-            with self.swap(site, 'USER_BASE', None):
+            with patch.object(site, 'USER_BASE', None):
                 with self.assertRaisesRegex(
                     Exception,
                     'No USER_BASE found for the user.'
@@ -195,7 +196,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_install_mypy_prerequisites_with_wrong_script(self) -> None:
         with self.popen_swap_failure:
-            with self.swap(
+            with patch.object(
                 run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'
             ):
                 code, _ = run_mypy_checks.install_mypy_prerequisites(False)

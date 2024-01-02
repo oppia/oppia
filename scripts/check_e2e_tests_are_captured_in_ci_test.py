@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_e2e_tests_are_captured_in_ci.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 import re
@@ -41,7 +42,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
     def test_read_ci_file(self) -> None:
         ci_filepath = os.path.join(DUMMY_CONF_FILES)
 
-        ci_filepath_swap = self.swap(
+        ci_filepath_swap = patch.object(
             check_e2e_tests_are_captured_in_ci, 'CI_PATH',
             ci_filepath)
         with ci_filepath_swap:
@@ -54,7 +55,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         webdriverio_config_file = os.path.join(
             DUMMY_CONF_FILES, 'dummy_webdriverio.conf.js')
 
-        webdriverio_config_file_swap = self.swap(
+        webdriverio_config_file_swap = patch.object(
             check_e2e_tests_are_captured_in_ci, 'WEBDRIVERIO_CONF_FILE_PATH',
             webdriverio_config_file)
         with webdriverio_config_file_swap:
@@ -67,7 +68,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_read_ci_config_file() -> List[str]:
             return EXPECTED_CI_LIST
 
-        dummy_path = self.swap(
+        dummy_path = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files',
             mock_read_ci_config_file)
@@ -84,7 +85,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     DUMMY_CONF_FILES, 'dummy_webdriverio.conf.js'), 'r').read()
             return webdriverio_config_file
 
-        dummy_path = self.swap(
+        dummy_path = patch.object(
             check_e2e_tests_are_captured_in_ci, 'read_webdriverio_conf_file',
             mock_read_webdriverio_conf_file)
         with dummy_path:
@@ -101,21 +102,21 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_suite_names_from_ci() -> List[str]:
             return ['oneword', 'twoWords']
 
-        mock_webdriverio_test_suites = self.swap(
+        mock_webdriverio_test_suites = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_webdriverio_file',
             mock_get_e2e_suite_names_from_webdriverio_file)
 
-        mock_ci_scripts = self.swap(
+        mock_ci_scripts = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_ci_config_file',
             mock_get_e2e_suite_names_from_ci)
 
-        mock_tests_to_remove = self.swap(
+        mock_tests_to_remove = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'TEST_SUITES_NOT_RUN_IN_CI', ['fourWord'])
 
-        common_test_swap = self.swap(
+        common_test_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
             'oneword')
@@ -141,16 +142,16 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_return_empty_list() -> List[str]:
             return []
 
-        ci_path_swap = self.swap(
+        ci_path_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files',
             mock_read_ci_config_file)
 
-        mock_tests_to_remove = self.swap(
+        mock_tests_to_remove = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        mock_get_e2e_suite_names_from_ci_config_file = self.swap(
+        mock_get_e2e_suite_names_from_ci_config_file = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_ci_config_file',
             mock_return_empty_list)
@@ -176,20 +177,20 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_test_filenames_from_webdriverio_dir() -> List[str]:
             return ['fourWords.js', 'threeWords.js']
 
-        webdriverio_test_suite_files_swap = self.swap(
+        webdriverio_test_suite_files_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_test_filenames_from_webdriverio_dir',
             mock_get_e2e_test_filenames_from_webdriverio_dir)
 
-        webdriverio_path_swap = self.swap(
+        webdriverio_path_swap = patch.object(
             check_e2e_tests_are_captured_in_ci, 'read_webdriverio_conf_file',
             mock_read_webdriverio_conf_file)
 
-        mock_tests_to_remove = self.swap(
+        mock_tests_to_remove = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        mock_e2e_test_suites = self.swap(
+        mock_e2e_test_suites = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_webdriverio_file',
             mock_return_empty_list)
@@ -208,7 +209,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_test_filenames_from_webdriverio_dir() -> List[str]:
             return ['fourWords.js', 'threeWords.js']
 
-        webdriverio_test_suite_files_swap = self.swap(
+        webdriverio_test_suite_files_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_test_filenames_from_webdriverio_dir',
             mock_get_e2e_test_filenames_from_webdriverio_dir)
@@ -234,22 +235,22 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_read_ci_config() -> List[str]:
             return EXPECTED_CI_LIST
 
-        webdriverio_test_suite_files_swap = self.swap(
+        webdriverio_test_suite_files_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_test_filenames_from_webdriverio_dir',
             mock_get_e2e_test_filenames_from_webdriverio_dir)
-        webdriverio_path_swap = self.swap(
+        webdriverio_path_swap = patch.object(
             check_e2e_tests_are_captured_in_ci, 'read_webdriverio_conf_file',
             mock_read_webdriverio_conf_file)
-        ci_path_swap = self.swap(
+        ci_path_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files', mock_read_ci_config)
-        common_test_swap = self.swap(
+        common_test_swap = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
             'threeWords')
 
-        mock_tests_to_remove = self.swap(
+        mock_tests_to_remove = patch.object(
             check_e2e_tests_are_captured_in_ci,
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 

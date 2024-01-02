@@ -15,6 +15,7 @@
 """Tests for the contributor dashboard controllers."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import unittest.mock
@@ -228,7 +229,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination(self) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -293,7 +294,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
         # to a classroom, another fetch will be made to retrieve skill_id_3,
         # skill_id_4, skill_id_5 to fulfill the page size.
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -324,7 +325,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi', 'topic_name': 'topic'})
@@ -352,14 +353,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_opportunity_with_invalid_language_code(
         self
     ) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_translation_opportunity_without_language_code(self) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
@@ -395,7 +396,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_opportunity_for_invalid_opportunity_type(self) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),

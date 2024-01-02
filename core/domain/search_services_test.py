@@ -17,6 +17,7 @@
 """Unit tests for core.domain.search_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.domain import blog_services
 from core.domain import collection_services
@@ -144,7 +145,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_offset
 
-        with self.swap(gae_search_services, 'search', mock_search):
+        with patch.object(gae_search_services, 'search', mock_search):
             result, result_offset = search_services.search_explorations(
                 expected_query_string, [], [], expected_size,
                 offset=expected_offset,
@@ -180,7 +181,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_offset
 
-        with self.swap(gae_search_services, 'search', mock_search):
+        with patch.object(gae_search_services, 'search', mock_search):
             result, result_offset = search_services.search_collections(
                 expected_query_string, [], [], expected_size,
                 offset=expected_offset,
@@ -230,7 +231,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             gae_search_services, 'delete_documents_from_index',
             delete_docs_counter)
 
@@ -248,7 +249,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             gae_search_services, 'delete_documents_from_index',
             delete_docs_counter)
 
@@ -317,7 +318,7 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_offset
 
-        with self.swap(
+        with patch.object(
             gae_search_services, 'blog_post_summaries_search', mock_search
         ):
             result, result_offset = (
@@ -349,7 +350,7 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
 
         delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             gae_search_services, 'delete_documents_from_index',
             delete_docs_counter)
 

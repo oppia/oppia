@@ -17,6 +17,7 @@
 """Unit tests for scripts/release_scripts/update_configs.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import getpass
 import os
@@ -90,14 +91,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_url_open(unused_url: str) -> None:
             pass
 
-        self.get_org_swap = self.swap(
+        self.get_org_swap = patch.object(
             github.Github, 'get_organization', mock_get_organization)
-        self.get_repo_swap = self.swap(
+        self.get_repo_swap = patch.object(
             github.Organization.Organization, 'get_repo', mock_get_repo)
-        self.open_tab_swap = self.swap(
+        self.open_tab_swap = patch.object(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        self.getpass_swap = patch.object(getpass, 'getpass', mock_getpass)
+        self.url_open_swap = patch.object(utils, 'url_open', mock_url_open)
 
     def test_feconf_verification_with_correct_config(self) -> None:
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -341,13 +342,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'update_analytics_constants_based_on_config'
             ] = True
 
-        apply_changes_swap = self.swap(
+        apply_changes_swap = patch.object(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        verify_config_files_swap = self.swap(
+        verify_config_files_swap = patch.object(
             update_configs, 'verify_config_files', mock_verify_config_files)
-        update_app_yaml_swap = self.swap(
+        update_app_yaml_swap = patch.object(
             update_configs, 'update_app_yaml', mock_update_app_yaml)
-        update_analytics_constants_based_on_config_swap = self.swap(
+        update_analytics_constants_based_on_config_swap = patch.object(
             update_configs,
             'update_analytics_constants_based_on_config',
             mock_update_analytics_constants_based_on_config)

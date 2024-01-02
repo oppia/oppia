@@ -15,6 +15,7 @@
 """Unit tests for scripts/create_topological_sort_of_all_services.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import collections
@@ -46,7 +47,7 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         self.assertEqual(visit_stack, ['A', 'B', 'C', 'D'])
 
     def test_make_graph(self) -> None:
-        with self.swap(
+        with patch.object(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES):
             adj_list, node_list = (
@@ -79,8 +80,8 @@ class TopologicalSortTests(test_utils.GenericTestBase):
         def mock_print(val: str) -> None:
             actual_output.append(val)
 
-        print_swap = self.swap(builtins, 'print', mock_print)
-        dir_names_swap = self.swap(
+        print_swap = patch.object(builtins, 'print', mock_print)
+        dir_names_swap = patch.object(
             create_topological_sort_of_all_services, 'DIRECTORY_NAMES',
             MOCK_DIRECTORY_NAMES)
         with print_swap, dir_names_swap:

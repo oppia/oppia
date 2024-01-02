@@ -17,6 +17,7 @@
 """Tests for opportunity domain objects."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import re
 
@@ -37,7 +38,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         }, {
             'id': 'hi-en'
         }]
-        self.mock_supported_audio_languages_context = self.swap(
+        self.mock_supported_audio_languages_context = patch.object(
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages)
 
@@ -59,7 +60,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'is_pinned': False
                 }))
         # Re-initializing this swap, so that we can use this in test method.
-        self.mock_supported_audio_languages_context = self.swap(
+        self.mock_supported_audio_languages_context = patch.object(
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages)
 

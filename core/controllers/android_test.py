@@ -15,6 +15,7 @@
 """Tests for the android handler."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.constants import constants
 from core.domain import classroom_config_domain
@@ -41,7 +42,7 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
     def test_initialize_in_production_raises_exception(self) -> None:
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.'
         )

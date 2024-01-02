@@ -17,6 +17,7 @@
 """Unit tests for scripts/populate_sample_data.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.controllers import base
@@ -78,7 +79,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
 
         self.initializer.csrf_token = self.get_new_csrf_token()
 
-        self.request_swap = self.swap(
+        self.request_swap = patch.object(
             self.initializer.session,
             'request',
             self._mock_request)
@@ -114,7 +115,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
                     if token == cur_token:
                         self._mock_login_as_admin(email)
                         break
-            with self.swap(
+            with patch.object(
                 base, 'load_template', test_utils.mock_load_template
             ):
                 return self.testapp.get(url, params=params, headers=headers)

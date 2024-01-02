@@ -17,6 +17,7 @@
 """Unit tests for scripts/setup_gae.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -68,11 +69,11 @@ class SetupGaeTests(test_utils.GenericTestBase):
             self.check_function_calls['url_retrieve_is_called'] = True
             if self.raise_error:
                 raise Exception
-        self.walk_swap = self.swap(os, 'walk', mock_walk)
-        self.remove_swap = self.swap(os, 'remove', mock_remove)
-        self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.url_retrieve_swap = self.swap(
+        self.walk_swap = patch.object(os, 'walk', mock_walk)
+        self.remove_swap = patch.object(os, 'remove', mock_remove)
+        self.makedirs_swap = patch.object(os, 'makedirs', mock_makedirs)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
+        self.url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
 
     def test_main_with_no_installs_required(self) -> None:
@@ -93,9 +94,9 @@ class SetupGaeTests(test_utils.GenericTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        walk_swap = self.swap(os, 'walk', mock_walk)
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        walk_swap = patch.object(os, 'walk', mock_walk)
+        remove_swap = patch.object(os, 'remove', mock_remove)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
         with walk_swap, remove_swap, exists_swap:
             setup_gae.main(args=[])
         self.assertEqual(check_file_removals, expected_check_file_removals)
@@ -119,11 +120,11 @@ class SetupGaeTests(test_utils.GenericTestBase):
             self.check_function_calls['extractall_is_called'] = True
         def mock_close(unused_self: str) -> None:
             self.check_function_calls['close_is_called'] = True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extractall_swap = self.swap(
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        open_swap = patch.object(tarfile, 'open', mock_open)
+        extractall_swap = patch.object(
             tarfile.TarFile, 'extractall', mock_extractall)
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
+        close_swap = patch.object(tarfile.TarFile, 'close', mock_close)
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
@@ -142,7 +143,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
             if path == common.GOOGLE_CLOUD_SDK_HOME:
                 return False
             return True
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:

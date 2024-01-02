@@ -15,6 +15,7 @@
 """Tests for the topic editor page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import os
@@ -268,7 +269,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with patch.object(
             utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs):
             response = self.get_json(
@@ -592,7 +593,7 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -763,7 +764,7 @@ class TopicEditorTests(
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -1051,7 +1052,7 @@ class TopicPublishSendMailHandlerTests(
     def test_send_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),

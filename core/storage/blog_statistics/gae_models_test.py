@@ -17,6 +17,7 @@
 """Tests for Blog Post Statistics Models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import types
 
@@ -102,7 +103,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             Exception, 'The id generator for the model is producing too many'
             ' collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_stats_models.BlogPostViewedEventLogEntryModel,
                 'get_by_id', types.MethodType(
                     lambda x, y: True,
@@ -115,12 +116,12 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         rand_hash = '123456789123'
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
             return rand_hash
-        with self.swap(
+        with patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with patch.object(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
                     blog_stats_models.BlogPostViewedEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
@@ -225,12 +226,12 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
             return rand_hash
-        with self.swap(
+        with patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with patch.object(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
                     blog_stats_models.BlogPostReadEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
@@ -246,7 +247,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             Exception, 'The id generator for the model is producing too many'
             ' collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_stats_models.BlogPostReadEventLogEntryModel,
                 'get_by_id', types.MethodType(
                     lambda x, y: True,
@@ -354,12 +355,12 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         rand_hash = '123456789123'
         def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
             return rand_hash
-        with self.swap(
+        with patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with patch.object(utils, 'convert_to_hash', mock_convert_to_hash):
                 new_id = (
                     blog_stats_models.BlogPostExitedEventLogEntryModel
                         .get_new_event_entity_id('BLOG')
@@ -387,7 +388,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             Exception, 'The id generator for the model is producing too many'
             ' collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_stats_models.BlogPostExitedEventLogEntryModel,
                 'get_by_id', types.MethodType(
                     lambda x, y: True,

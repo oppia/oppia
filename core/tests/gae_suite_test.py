@@ -15,6 +15,7 @@
 """Tests for gae_suite."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import unittest
 
@@ -48,7 +49,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
     def test_cannot_add_directory_with_invalid_path(self) -> None:
         """Creates invalid path."""
 
-        dir_to_add_swap = self.swap(
+        dir_to_add_swap = patch.object(
             common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Directory invalid_path does not exist.')
@@ -65,7 +66,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('core.tests.data.failing_tests')]
 
-        create_test_suites_swap = self.swap(
+        create_test_suites_swap = patch.object(
             gae_suite, 'create_test_suites', _mock_create_test_suites)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
@@ -83,7 +84,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('invalid_test')]
 
-        create_test_suites_swap = self.swap(
+        create_test_suites_swap = patch.object(
             gae_suite, 'create_test_suites', _mock_create_test_suites)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Test suite failed: 1 tests run, 1 errors, 0 failures.')

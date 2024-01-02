@@ -15,6 +15,7 @@
 """ Tests for services relating to emails."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.constants import constants
@@ -34,14 +35,14 @@ class EmailServicesTest(test_utils.EmailTestBase):
         send_email_exception = (
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
+        with send_email_exception, patch.object(constants, 'DEV_MODE', False):
             email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
 
     def test_send_mail_data_properly_sent(self) -> None:
         """Verifies that the data sent in send_mail is correct."""
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
         with allow_emailing:
             email_services.send_mail(
@@ -57,7 +58,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the bcc admin flag is working properly in
         send_mail.
         """
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
         with allow_emailing:
             email_services.send_mail(
@@ -75,7 +76,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
         with send_email_exception, (
-            self.swap(constants, 'DEV_MODE', False)
+            patch.object(constants, 'DEV_MODE', False)
         ):
             email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
@@ -85,7 +86,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """Verifies that the data sent in send_bulk_mail is correct
            for each user in the recipient list.
         """
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
 
         with allow_emailing:
@@ -105,7 +106,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             # TODO(#13528): Here we use MyPy ignore because we remove this test
             # after the backend is fully type-annotated. send_mail() method
             # doesn't expect recipient_email to be None, and the case when
@@ -121,7 +122,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             email_services.send_mail(
                 'sender@example.com', malformed_recipient_email,
                 'subject', 'body', 'html')
@@ -131,7 +132,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             email_services.send_mail(
                 malformed_sender_email, 'recipient@example.com',
                 'subject', 'body', 'html')
@@ -142,7 +143,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             email_services.send_mail(
                 malformed_sender_email, 'recipient@example.com',
                 'subject', 'body', 'html')
@@ -152,7 +153,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             email_services.send_bulk_mail(
                 malformed_sender_email, ['recipient@example.com'],
                 'subject', 'body', 'html')
@@ -162,7 +163,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_emails[1])
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             email_services.send_bulk_mail(
                 'sender@example.com', malformed_recipient_emails,
                 'subject', 'body', 'html')
@@ -173,8 +174,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             Exception, 'Bulk email failed to send. Please try again later or' +
             ' contact us to report a bug at https://www.oppia.org/contact.')
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        swap_send_email_to_recipients = self.swap(
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        swap_send_email_to_recipients = patch.object(
             platform_email_services, 'send_email_to_recipients',
             lambda *_: False)
         recipients = [feconf.ADMIN_EMAIL_ADDRESS]
@@ -189,8 +190,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'Email to %s failed to send. Please try again later or ' +
                 'contact us to report a bug at ' +
                 'https://www.oppia.org/contact.') % feconf.ADMIN_EMAIL_ADDRESS)
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        swap_send_email_to_recipients = self.swap(
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        swap_send_email_to_recipients = patch.object(
             platform_email_services, 'send_email_to_recipients',
             lambda *_: False)
 

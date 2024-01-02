@@ -17,6 +17,7 @@
 """Unit tests for scripts/setup.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import collections
@@ -95,11 +96,11 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_get(unused_var: str) -> None:
             return None
 
-        self.create_swap = self.swap(
+        self.create_swap = patch.object(
             setup, 'create_directory', mock_create_directory)
-        self.test_py_swap = self.swap(
+        self.test_py_swap = patch.object(
             setup, 'test_python_version', mock_test_python_version)
-        self.download_swap = self.swap(
+        self.download_swap = patch.object(
             setup, 'download_and_install_package',
             mock_download_and_install_package)
         self.exists_true_swap = self.swap_to_always_return(
@@ -110,19 +111,19 @@ class SetupTests(test_utils.GenericTestBase):
             common, 'is_x64_architecture', True)
         self.is_x64_architecture_false_swap = self.swap_to_always_return(
             common, 'is_x64_architecture', False)
-        self.chown_swap = self.swap(
+        self.chown_swap = patch.object(
             common, 'recursive_chown', mock_recursive_chown)
-        self.chmod_swap = self.swap(
+        self.chmod_swap = patch.object(
             common, 'recursive_chmod', mock_recursive_chmod)
-        self.uname_swap = self.swap(os, 'uname', mock_uname)
-        self.rename_swap = self.swap(os, 'rename', mock_rename)
-        self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
-        self.get_swap = self.swap(os.environ, 'get', mock_get)
-        self.cd_swap = self.swap(common, 'CD', MockCD)
+        self.uname_swap = patch.object(os, 'uname', mock_uname)
+        self.rename_swap = patch.object(os, 'rename', mock_rename)
+        self.isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
+        self.delete_swap = patch.object(clean, 'delete_file', mock_delete_file)
+        self.get_swap = patch.object(os.environ, 'get', mock_get)
+        self.cd_swap = patch.object(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        self.version_info_py38_swap = self.swap(
+        self.version_info_py38_swap = patch.object(
             sys, 'version_info', version_info(major=3, minor=8, micro=15)
         )
         self.python2_print_swap = self.swap_with_checks(
@@ -144,7 +145,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
 
-        makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
+        makedirs_swap = patch.object(os, 'makedirs', mock_makedirs)
         with makedirs_swap, self.exists_false_swap:
             setup.create_directory('dir')
         self.assertTrue(check_function_calls['makedirs_is_called'])
@@ -155,7 +156,7 @@ class SetupTests(test_utils.GenericTestBase):
         }
         def mock_makedirs(unused_path: str) -> None:
             check_function_calls['makedirs_is_called'] = True
-        makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
+        makedirs_swap = patch.object(os, 'makedirs', mock_makedirs)
         with makedirs_swap, self.exists_true_swap:
             setup.create_directory('dir')
         self.assertFalse(check_function_calls['makedirs_is_called'])
@@ -175,12 +176,12 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_uname() -> List[str]:
             return ['Linux']
 
-        print_swap = self.swap(
+        print_swap = patch.object(
             common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        uname_swap = patch.object(os, 'uname', mock_uname)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        version_swap = self.swap(
+        version_swap = patch.object(
             sys, 'version_info', version_info(major=3, minor=4, micro=12))
         with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'
@@ -196,12 +197,12 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(msg_list: List[str]) -> None:
             print_arr.extend(msg_list)
 
-        print_swap = self.swap(
+        print_swap = patch.object(
             common, 'print_each_string_after_two_new_lines', mock_print)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        version_swap = self.swap(
+        version_swap = patch.object(
             sys, 'version_info', version_info(major=3, minor=4, micro=12))
         with print_swap, os_name_swap, version_swap:
             with self.assertRaisesRegex(
@@ -256,12 +257,12 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
 
-        url_retrieve_swap = self.swap(
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extract_swap = self.swap(tarfile.TarFile, 'extractall', mock_extractall)
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+        open_swap = patch.object(tarfile, 'open', mock_open)
+        extract_swap = patch.object(tarfile.TarFile, 'extractall', mock_extractall)
+        close_swap = patch.object(tarfile.TarFile, 'close', mock_close)
+        remove_swap = patch.object(os, 'remove', mock_remove)
 
         with url_retrieve_swap, open_swap, extract_swap, close_swap:
             with remove_swap:
@@ -285,8 +286,8 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        getcwd_swap = patch.object(os, 'getcwd', mock_getcwd)
+        print_swap = patch.object(builtins, 'print', mock_print)
         with self.test_py_swap, getcwd_swap, print_swap:
             with self.assertRaisesRegex(Exception, 'Invalid root directory.'):
                 setup.main(args=[])
@@ -298,7 +299,7 @@ class SetupTests(test_utils.GenericTestBase):
 
     def test_package_install_with_darwin_x64(self) -> None:
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Darwin')
 
         with self.test_py_swap, self.create_swap, os_name_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
@@ -318,11 +319,11 @@ class SetupTests(test_utils.GenericTestBase):
 
     def test_package_install_with_darwin_x86(self) -> None:
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Darwin')
         all_cmd_tokens: List[str] = []
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, self.chown_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
@@ -343,7 +344,7 @@ class SetupTests(test_utils.GenericTestBase):
 
     def test_package_install_with_linux_x64(self) -> None:
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
 
         with self.test_py_swap, self.create_swap, os_name_swap, self.chown_swap:
             with self.download_swap, self.rename_swap, self.exists_false_swap:
@@ -363,12 +364,12 @@ class SetupTests(test_utils.GenericTestBase):
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
 
         all_cmd_tokens: List[str] = []
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, check_call_swap:
             with self.download_swap, self.rename_swap, self.cd_swap:
@@ -398,10 +399,10 @@ class SetupTests(test_utils.GenericTestBase):
             nonlocal check_call_commands
             check_call_commands = commands
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        url_retrieve_swap = self.swap(
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, check_call_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
@@ -437,10 +438,10 @@ class SetupTests(test_utils.GenericTestBase):
             nonlocal check_call_commands
             check_call_commands = commands
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        url_retrieve_swap = self.swap(
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, check_call_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
@@ -468,7 +469,7 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_incompatible_system_raises_error(
         self
     ) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Solaris')
 
         with self.test_py_swap, self.create_swap, os_name_swap, self.chown_swap:
             with self.rename_swap, self.exists_false_swap:
@@ -483,8 +484,8 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(arg: str) -> None:
             print_list.append(arg)
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        print_swap = self.swap(builtins, 'print', mock_print)
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
+        print_swap = patch.object(builtins, 'print', mock_print)
 
         with self.test_py_swap, self.create_swap, self.chown_swap, print_swap:
             with self.rename_swap, self.exists_true_swap, os_name_swap:

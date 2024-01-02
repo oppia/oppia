@@ -15,6 +15,7 @@
 """Tests the methods defined in story services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -713,7 +714,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Expected change to be of type StoryChange')
 
@@ -1234,8 +1235,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.exception()."""
             raise Exception('Error in exploration')
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-        validate_fn_swap = self.swap(
+        logging_swap = patch.object(logging, 'exception', _mock_logging_function)
+        validate_fn_swap = patch.object(
             exp_services, 'validate_exploration_for_story',
             _mock_validate_function)
         with logging_swap, validate_fn_swap:
@@ -2190,7 +2191,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with patch.object(
             utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs):
             chapter_notifications = (
@@ -2537,7 +2538,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
 
-        current_schema_version_swap = self.swap(
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:

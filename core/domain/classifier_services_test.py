@@ -17,6 +17,7 @@
 """Tests for classifier services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import copy
 import datetime
@@ -71,7 +72,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
                 assets_list)
@@ -146,7 +147,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'recorded_voiceovers',
             'new_value': state.recorded_voiceovers.to_dict()
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -164,7 +165,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'title',
             'new_value': 'New title'
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -185,7 +186,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'old_state_name': 'Home2',
             'new_state_name': 'Home3'
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -237,7 +238,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'recorded_voiceovers',
             'new_value': state.recorded_voiceovers.to_dict()
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -255,7 +256,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'title',
             'new_value': 'New title'
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', False):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -275,7 +276,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'title',
             'new_value': 'New title'
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -827,7 +828,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         )
         # Ruling out the possibility of None for mypy type checking.
         assert expected_state_training_jobs is not None
-        with self.swap(
+        with patch.object(
             feconf,
             'INTERACTION_CLASSIFIER_MAPPING',
             mock_interaction_classifier_mapping):
@@ -851,7 +852,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
                 'algorithm_version': 2
                 },
             }
-        with self.swap(
+        with patch.object(
             feconf,
             'INTERACTION_CLASSIFIER_MAPPING',
             mock_interaction_classifier_mapping):
@@ -889,7 +890,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': 'title',
             'new_value': 'A new title'
         })]
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -902,7 +903,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         assert old_job is not None
         old_job_id = old_job.job_id
         # Revert the exploration.
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.revert_exploration(
                 feconf.SYSTEM_COMMITTER_ID,
                 self.exp_id,

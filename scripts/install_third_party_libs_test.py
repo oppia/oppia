@@ -17,6 +17,7 @@
 """Unit tests for scripts/install_third_party_libs.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -90,29 +91,29 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.check_call_swap = self.swap(
+        self.check_call_swap = patch.object(
             subprocess, 'check_call', mock_check_call)
-        self.Popen_swap = self.swap(
+        self.Popen_swap = patch.object(
             subprocess, 'Popen', mock_check_call)
-        self.check_call_error_swap = self.swap(
+        self.check_call_error_swap = patch.object(
             subprocess, 'check_call', mock_check_call_error)
-        self.Popen_error_swap = self.swap(
+        self.Popen_error_swap = patch.object(
             subprocess, 'Popen', mock_popen_error_call)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         def mock_ensure_directory_exists(unused_path: str) -> None:
             pass
 
-        self.dir_exists_swap = self.swap(
+        self.dir_exists_swap = patch.object(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
 
     def test_install_third_party_main_under_docker(self) -> None:
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+        with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', True):
             with self.check_call_swap:
                 install_third_party_libs.main()
 
     def test_install_third_party_main(self) -> None:
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+        with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', False):
             with self.check_call_swap:
                 install_third_party_libs.main()
 
@@ -127,8 +128,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.assertEqual(origin_name + '.sh', new_name)
             check_function_calls['mock_rename'] = True
         check_function_calls['mock_rename'] = False
-        isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
-        rename_swap = self.swap(os, 'rename', mock_rename)
+        isfile_swap = patch.object(os.path, 'isfile', mock_is_file)
+        rename_swap = patch.object(os, 'rename', mock_rename)
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
         self.assertTrue(check_function_calls['mock_rename'])
@@ -146,26 +147,26 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.assertEqual(origin_name + '.sh', new_name)
             check_function_calls['mock_rename'] = True
         check_function_calls['mock_rename'] = False
-        isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
-        rename_swap = self.swap(os, 'rename', mock_rename)
+        isfile_swap = patch.object(os.path, 'isfile', mock_is_file)
+        rename_swap = patch.object(os, 'rename', mock_rename)
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
         self.assertFalse(check_function_calls['mock_rename'])
 
     def test_get_yarn_command_on_windows(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn.cmd')
 
     def test_get_yarn_command_on_linux(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
     def test_get_yarn_command_on_mac(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Darwin')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
@@ -210,14 +211,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_remove(unused_path: str) -> None:  # pylint: disable=unused-argument
             return
 
-        url_retrieve_swap = self.swap(
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        recursive_chmod_swap = self.swap(
+        recursive_chmod_swap = patch.object(
             common, 'recursive_chmod', mock_recursive_chmod)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
+        isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
+        zipfile_swap = patch.object(zipfile, 'ZipFile', MockZipFile)
+        remove_swap = patch.object(os, 'remove', mock_remove)
 
         with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap, remove_swap:
@@ -268,14 +269,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_remove(unused_path: str) -> None:  # pylint: disable=unused-argument
             return
 
-        url_retrieve_swap = self.swap(
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        recursive_chmod_swap = self.swap(
+        recursive_chmod_swap = patch.object(
             common, 'recursive_chmod', mock_recursive_chmod)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+        os_name_swap = patch.object(common, 'OS_NAME', 'Darwin')
+        isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
+        zipfile_swap = patch.object(zipfile, 'ZipFile', MockZipFile)
+        remove_swap = patch.object(os, 'remove', mock_remove)
 
         with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap, remove_swap:
@@ -302,11 +303,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_exists(unused_fname: str) -> bool:
             return True
 
-        url_retrieve_swap = self.swap(
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        recursive_chmod_swap = self.swap(
+        recursive_chmod_swap = patch.object(
             common, 'recursive_chmod', mock_recursive_chmod)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
 
         with url_retrieve_swap, recursive_chmod_swap:
             with self.dir_exists_swap, exists_swap:
@@ -349,11 +350,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_isfile(unused_fname: str) -> bool:
             return False
 
-        url_retrieve_swap = self.swap(
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
+        os_name_swap = patch.object(common, 'OS_NAME', 'Linux')
+        isfile_swap = patch.object(os.path, 'isfile', mock_isfile)
+        zipfile_swap = patch.object(zipfile, 'ZipFile', MockZipFile)
 
         with os_name_swap, url_retrieve_swap:
             with self.dir_exists_swap, isfile_swap, zipfile_swap:
@@ -446,20 +447,20 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 os.path.join(correct_google_path, 'pyglib'))
         ]
 
-        swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
-        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
-        swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        install_third_party_main_swap = self.swap(
+        swap_isdir = patch.object(os.path, 'isdir', mock_isdir)
+        swap_mkdir = patch.object(os, 'mkdir', mock_mkdir)
+        swap_copytree = patch.object(shutil, 'copytree', mock_copytree)
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
+        install_third_party_main_swap = patch.object(
             install_third_party, 'main', mock_main_for_install_third_party)
-        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
-        setup_gae_main_swap = self.swap(
+        setup_main_swap = patch.object(setup, 'main', mock_main_for_setup)
+        setup_gae_main_swap = patch.object(
             setup_gae, 'main', mock_main_for_setup_gae)
-        pre_commit_hook_main_swap = self.swap(
+        pre_commit_hook_main_swap = patch.object(
             pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
-        pre_push_hook_main_swap = self.swap(
+        pre_push_hook_main_swap = patch.object(
             pre_push_hook, 'main', mock_main_for_pre_push_hook)
-        tweak_yarn_executable_swap = self.swap(
+        tweak_yarn_executable_swap = patch.object(
             install_third_party_libs, 'tweak_yarn_executable',
             mock_tweak_yarn_executable)
 
@@ -510,20 +511,20 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_tweak_yarn_executable() -> None:
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        install_third_party_main_swap = self.swap(
+        check_call_swap = patch.object(subprocess, 'check_call', mock_check_call)
+        install_third_party_main_swap = patch.object(
             install_third_party, 'main', mock_main_for_install_third_party)
-        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
-        setup_gae_main_swap = self.swap(
+        setup_main_swap = patch.object(setup, 'main', mock_main_for_setup)
+        setup_gae_main_swap = patch.object(
             setup_gae, 'main', mock_main_for_setup_gae)
-        pre_commit_hook_main_swap = self.swap(
+        pre_commit_hook_main_swap = patch.object(
             pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
-        pre_push_hook_main_swap = self.swap(
+        pre_push_hook_main_swap = patch.object(
             pre_push_hook, 'main', mock_main_for_pre_push_hook)
-        tweak_yarn_executable_swap = self.swap(
+        tweak_yarn_executable_swap = patch.object(
             install_third_party_libs, 'tweak_yarn_executable',
             mock_tweak_yarn_executable)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = patch.object(common, 'OS_NAME', 'Windows')
 
         py_actual_text = (
             'ConverterMapping,\nLine ending with '

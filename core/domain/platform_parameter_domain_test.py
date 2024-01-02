@@ -17,6 +17,7 @@
 """Tests for the domain objects relating to platform parameters."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import collections
 import enum
@@ -1667,7 +1668,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             param.validate()
 
     def test_create_with_old_rule_schema_version_failure(self) -> None:
-        with self.swap(
+        with patch.object(
             feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
             with self.assertRaisesRegex(
                 Exception,
@@ -2008,8 +2009,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in dev stage cannot be updated in test '
@@ -2034,8 +2035,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in dev stage cannot be updated in prod '
@@ -2062,8 +2063,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'test',
         })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with patch.object(constants, 'DEV_MODE', False):
+            with patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature in test stage cannot be updated in prod '
@@ -2126,7 +2127,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': 'dev',
         })
-        swap_platform_params_list = self.swap(
+        swap_platform_params_list = patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [DummyParamNames.PARAMETER_A]

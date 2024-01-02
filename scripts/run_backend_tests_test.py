@@ -17,6 +17,7 @@
 """Unit tests for scripts/run_backend_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import json
@@ -90,14 +91,14 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         def mock_install_third_party_libs() -> None:
             pass
         # We need to create a swap for install_third_party_libs because
         # run_backend_tests.py script installs third party libraries whenever
         # it is imported.
-        self.swap_install_third_party_libs = self.swap(
+        self.swap_install_third_party_libs = patch.object(
             install_third_party_libs, 'main', mock_install_third_party_libs)
 
         test_target_flag = '--test_target=random_test'
@@ -117,15 +118,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         def mock_log(msg: str) -> None:
             self.terminal_logs.append(msg)
-        self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
+        self.swap_logs = patch.object(concurrent_task_utils, 'log', mock_log)
 
         def mock_context_manager(**_: str) -> MockCompilerContextManager:
             return MockCompilerContextManager()
-        self.swap_redis_server = self.swap(
+        self.swap_redis_server = patch.object(
             servers, 'managed_redis_server', mock_context_manager)
-        self.swap_cloud_datastore_emulator = self.swap(
+        self.swap_cloud_datastore_emulator = patch.object(
             servers, 'managed_cloud_datastore_emulator', mock_context_manager)
-        self.swap_execute_task = self.swap(
+        self.swap_execute_task = patch.object(
             concurrent_task_utils, 'execute_tasks', lambda *unused_args: None)
         self.swap_check_call = self.swap_with_checks(
             subprocess, 'check_call', lambda *unused_args: None,
@@ -215,7 +216,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append(shards_spec['1'][0])
-        swap_shard_modules = self.swap(
+        swap_shard_modules = patch.object(
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
@@ -233,7 +234,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append('scripts.new_script_test')
-        swap_shard_modules = self.swap(
+        swap_shard_modules = patch.object(
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
@@ -252,7 +253,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         test_modules = run_backend_tests.get_all_test_targets_from_path()
         test_modules.append('scripts.new_script_test')
 
-        swap_test_modules = self.swap(
+        swap_test_modules = patch.object(
             run_backend_tests, 'get_all_test_targets_from_path',
             lambda *unused_args, **unused_kwargs: test_modules)
 
@@ -581,7 +582,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 if os.path.dirname(directory) == dirname:
                     return False
             return True
-        swap_path_exists = self.swap(os.path, 'exists', mock_path_exists)
+        swap_path_exists = patch.object(os.path, 'exists', mock_path_exists)
 
         with swap_path_exists, self.assertRaisesRegex(
             Exception,
@@ -613,10 +614,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_invalid_test_target_message_is_displayed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
         with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
@@ -634,13 +635,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_invalid_test_target_message_is_displayed_docker(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+        with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', True):
             with self.swap_execute_task, swapcheck_coverage:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with self.print_swap, self.swap_redis_server:
@@ -657,10 +658,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_error_in_matching_shards_with_tests_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
 
@@ -680,10 +681,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_no_tests_run_raises_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (0, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
 
@@ -699,10 +700,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_incomplete_coverage_raises_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 2))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
 
@@ -717,10 +718,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_incomplete_overall_backend_coverage_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 98.00))
 
@@ -741,9 +742,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         def mock_execute_tasks(*_: str) -> None:
             raise Exception('XYZ error occured.')
-        self.swap_execute_task = self.swap(
+        self.swap_execute_task = patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks)
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
 
@@ -756,7 +757,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_errors_in_test_suite_throw_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 2, 0, 0))
 
@@ -781,12 +782,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             for task in tasks:
                 executed_tasks.append(task)
 
-        swap_execute_task = self.swap(
+        swap_execute_task = patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute)
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swap_check_coverage = self.swap(
+        swap_check_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
@@ -804,10 +805,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_all_test_pass_successfully_with_full_coverage(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        swap_check_results = self.swap(
+        swap_check_results = patch.object(
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, 0))
-        swap_check_coverage = self.swap(
+        swap_check_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
@@ -836,7 +837,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 raise Exception(
                     'Invalid command passed to subprocess.run() method')
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = patch.object(subprocess, 'run', mock_subprocess_run)
         error_msg = (
             'Failed to combine coverage because subprocess failed.'
             '\n%s' % failed_process_output)
@@ -859,7 +860,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 raise Exception(
                     'Invalid command passed to subprocess.run() method')
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = patch.object(subprocess, 'run', mock_subprocess_run)
         error_msg = (
             'Failed to calculate coverage because subprocess failed. '
             '%s' % failed_process_output)
@@ -886,7 +887,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 raise Exception(
                     'Invalid command passed to subprocess.run() method')
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = patch.object(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(
                 True, include=include_files)
@@ -911,7 +912,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 raise Exception(
                     'Invalid command passed to subprocess.run() method')
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = patch.object(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file)
@@ -935,7 +936,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 raise Exception(
                     'Invalid command passed to subprocess.run() method')
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = patch.object(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(
                 True)
@@ -949,10 +950,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         def mock_run_shell_cmd(*_: str, **__: str) -> None:
             raise Exception('XYZ error.')
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
+        swap_hostname = patch.object(socket, 'gethostname', lambda: 'IamEzio')
+        swap_getpid = patch.object(os, 'getpid', lambda: 12345)
 
         task = run_backend_tests.TestingTaskSpec(
             'scripts.run_backend_tests_test', False)
@@ -969,11 +970,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 return 'Task result'
             self.call_count = 1
             raise Exception('ev_epollex_linux.cc')
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
-        swapcheck_coverage = self.swap(
+        swap_hostname = patch.object(socket, 'gethostname', lambda: 'IamEzio')
+        swap_getpid = patch.object(os, 'getpid', lambda: 12345)
+        swapcheck_coverage = patch.object(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
@@ -995,10 +996,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 return 'Task result'
             self.call_count = 1
             raise Exception('ev_epollex_linux.cc')
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
+        swap_hostname = patch.object(socket, 'gethostname', lambda: 'IamEzio')
+        swap_getpid = patch.object(os, 'getpid', lambda: 12345)
 
         task = run_backend_tests.TestingTaskSpec(
             'scripts.random_test', True)
@@ -1017,10 +1018,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 return 'Task result'
             self.call_count = 1
             raise Exception('ev_epollex_linux.cc')
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd)
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
+        swap_hostname = patch.object(socket, 'gethostname', lambda: 'IamEzio')
+        swap_getpid = patch.object(os, 'getpid', lambda: 12345)
 
         task = run_backend_tests.TestingTaskSpec(
             'scripts.random_test', False)

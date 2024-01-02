@@ -17,6 +17,7 @@
 """Unit tests for jobs.io.job_io."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.domain import beam_job_services
 from core.jobs import job_test_utils
@@ -53,7 +54,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
             job_run_result.JobRunResult(stdout='ghi', stderr='789'),
         ]
 
-        with self.swap(job_run_result, 'MAX_OUTPUT_CHARACTERS', 8):
+        with patch.object(job_run_result, 'MAX_OUTPUT_CHARACTERS', 8):
             self.assert_pcoll_empty(
                 self.pipeline
                 | beam.Create(messages)

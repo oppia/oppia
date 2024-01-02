@@ -17,6 +17,7 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import contextlib
 import importlib
@@ -70,7 +71,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
     def test_load_template(self) -> None:
         oppia_root_path = os.path.join(
             'core', 'templates', 'pages', 'oppia-root')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
+        with patch.object(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
                 '"Loading | Oppia"',
                 base.load_template(
@@ -271,13 +272,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with patch.object(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_deleted_user_dev_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn('pending-account-deletion', response.headers['location'])
@@ -295,7 +296,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with patch.object(logging, 'warning', mock_logging_function):
             self.get_json('/mock', expected_status_int=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -314,7 +315,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with patch.object(logging, 'warning', mock_logging_function):
             self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -341,7 +342,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
-        server_software_swap = self.swap(
+        server_software_swap = patch.object(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'DEV_MODE can\'t be true on production.')
@@ -357,7 +358,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with patch.object(logging, 'error', _mock_logging_function):
             self.post_json('/frontend_errors', {'error': 'errors'})
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
@@ -606,7 +607,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_RELEASE_COORDINATOR)
         with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
-                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
+                patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()
 
     def tearDown(self) -> None:
@@ -680,7 +681,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self) -> None:
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_user_is_super_admin(self) -> None:
@@ -700,7 +701,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
         self.context_stack.enter_context(self.super_admin_context())
 
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
@@ -718,7 +719,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
@@ -753,7 +754,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
         def mock_get_current_time(unused_cls: str) -> float:
             return current_time
 
-        with self.swap(
+        with patch.object(
             base.CsrfTokenManager, '_get_current_time',
             types.MethodType(mock_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
@@ -1104,7 +1105,7 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         fake_urls = []
         fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
         fake_urls.append(main.URLS[-1])
-        with self.swap(main, 'URLS', fake_urls):
+        with patch.object(main, 'URLS', fake_urls):
             self.testapp = webtest.TestApp(
                 webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
             response = self.get_json(
@@ -1190,7 +1191,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        with self.swap(self, 'testapp', mock_testapp):
+        with patch.object(self, 'testapp', mock_testapp):
             params = {
                 'param1': 'value1',
                 'param2': 'value2'
@@ -1518,7 +1519,7 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             payload['message'].encode('utf-8'),
             payload['vm_id'])
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/incorrectmock', payload, expected_status_int=500)
 
@@ -1543,7 +1544,7 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
             secret.encode('utf-8'),
             payload['message'].encode('utf-8'),
             payload['vm_id'])
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
+        with patch.object(self, 'testapp', self.mock_testapp), swap_secret:
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)
 
@@ -1862,7 +1863,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
 
     def test_cannot_access_exploration_with_incorrect_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp1):
+        with patch.object(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                     expected_status_int=400)
@@ -1876,7 +1877,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
 
     def test_can_access_exploration_with_correct_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp2):
+        with patch.object(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                     expected_status_int=200)
@@ -1888,7 +1889,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
             'Missing schema for url path args in '
             'MockHandlerWithMissingUrlPathSchema handler class.')
 
-        with self.swap(self, 'testapp', self.mock_testapp3):
+        with patch.object(self, 'testapp', self.mock_testapp3):
             response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
                 expected_status_int=500)
             self.assertEqual(response['error'], error_msg)
@@ -2063,7 +2064,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
     def test_cannot_access_exploration_with_incorrect_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp1):
+        with patch.object(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=400)
@@ -2079,7 +2080,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             'Missing schema for GET method in '
             'MockHandlerWithMissingRequestSchema handler class.')
 
-        with self.swap(self, 'testapp', self.mock_testapp2):
+        with patch.object(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=500)
@@ -2089,11 +2090,11 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
     def test_can_access_exploration_with_default_value_in_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp3):
+        with patch.object(self, 'testapp', self.mock_testapp3):
             self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp4):
+        with patch.object(self, 'testapp', self.mock_testapp4):
             self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
 
@@ -2137,8 +2138,8 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
         ))
 
     def test_post_request_raise_internal_server_error(self) -> None:
-        test_app_ctx = self.swap(self, 'testapp', self.testapp)
-        handler_class_still_needs_schema_list_ctx = self.swap(
+        test_app_ctx = patch.object(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = patch.object(
             handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
             ['MockHandler'])
         with test_app_ctx, handler_class_still_needs_schema_list_ctx:
@@ -2178,11 +2179,11 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
         ))
 
     def test_head_request_with_invalid_url_args_raises(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.testapp.head('/mock/not_int', status=400)
 
     def test_valid_head_request_returns_only_headers(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             response = self.testapp.head('/mock/234', status=200)
             self.assertEqual(response.body, b'')
             self.assertIsNotNone(response.headers)
@@ -2211,7 +2212,7 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
         ))
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.get_json('/mock', expected_status_int=404)
 
 
@@ -2281,20 +2282,20 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
     def test_both_args_in_post_request(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request', self.payload,
                 csrf_token=self.csrf_token)
 
     def test_post_request_with_invalid_source_raise_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request', self.payload,
                 csrf_token=self.csrf_token, source='fake_url',
                 expected_status_int=400)
 
     def test_post_request_with_valid_source_do_not_raise_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request', self.payload,
                 csrf_token=self.csrf_token,
@@ -2407,7 +2408,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             response_dict = self.post_json(
                 '/mock_upload/exploration/0', {'filename': 'test.png'},
                 csrf_token=csrf_token,
@@ -2466,7 +2467,7 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
         list_string = '["id1", "id2", "id3"]'
         int_string = '1'
 
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.get_json(
                 '/mock_normalization/%s/%s' % (int_string, list_string),
                 expected_status_int=200)
@@ -2534,7 +2535,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     def test_request_with_schema_using_payload_or_request_attr_raise_error(
         self
     ) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock_with_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=500)
@@ -2542,8 +2543,8 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     def test_request_without_schema_using_payload_or_request_attr_raise_no_err(
         self
     ) -> None:
-        test_app_ctx = self.swap(self, 'testapp', self.testapp)
-        handler_class_still_needs_schema_list_ctx = self.swap(
+        test_app_ctx = patch.object(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = patch.object(
             handler_schema_constants, 'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
             ['MockHandlerWithoutSchema'])
         with test_app_ctx, handler_class_still_needs_schema_list_ctx:

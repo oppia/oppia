@@ -17,6 +17,7 @@
 """Tests for core.storage.feedback.gae_models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import types
 
@@ -107,7 +108,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Feedback thread ID conflict on create.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 feedback_thread_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -120,7 +121,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             Exception,
             'New thread id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 feedback_thread_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,

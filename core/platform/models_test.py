@@ -17,6 +17,7 @@
 """Tests interface for storage model switching."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import re
 import sys
@@ -297,10 +298,10 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailgun.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'EMAIL_SERVICE_PROVIDER',
             feconf.EMAIL_SERVICE_PROVIDER_MAILGUN), (
-                self.swap(constants, 'DEV_MODE', False)):
+                patch.object(constants, 'DEV_MODE', False)):
             from core.platform.email import mailgun_email_services
             self.assertEqual(
                 mailgun_email_services,
@@ -310,10 +311,10 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'EMAIL_SERVICE_PROVIDER',
             'invalid service provider'), (
-                self.swap(constants, 'DEV_MODE', False)):
+                patch.object(constants, 'DEV_MODE', False)):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid email service provider: invalid service provider'
@@ -324,10 +325,10 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailchimp.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
             feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+                patch.object(constants, 'EMULATOR_MODE', False)):
             from core.platform.bulk_email import mailchimp_bulk_email_services
             self.assertEqual(
                 mailchimp_bulk_email_services,
@@ -337,10 +338,10 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
             'invalid service provider'), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+                patch.object(constants, 'EMULATOR_MODE', False)):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid bulk email service provider: invalid service '
@@ -360,7 +361,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudTaskqueue():
             pass
 
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with patch.object(constants, 'EMULATOR_MODE', False):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudTaskqueue
             # which is of class type. So because of this MyPy throws an error.
@@ -378,7 +379,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_cloud_translate_services(self) -> None:
         """Tests import cloud translate services function."""
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with patch.object(constants, 'EMULATOR_MODE', False):
             from core.platform.translate import cloud_translate_services
             self.assertEqual(
                 self.registry_instance.import_translate_services(),
@@ -402,7 +403,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudStorage():
             pass
 
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with patch.object(constants, 'EMULATOR_MODE', False):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudStorage
             # which is of class type. So because of this MyPy throws an error.

@@ -17,6 +17,7 @@
 """Tests for email_subscription_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import email_subscription_services
@@ -61,9 +62,9 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_subscription_email_ctx = self.swap(
+        self.can_send_subscription_email_ctx = patch.object(
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
 
     def test_inform_subscribers(self) -> None:

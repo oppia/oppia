@@ -17,6 +17,7 @@
 """Tests for the email services API wrapper in DEV_MODE."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import textwrap
@@ -67,9 +68,9 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
         with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+            patch.object(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -124,9 +125,9 @@ class EmailTests(test_utils.GenericTestBase):
             'dev environment. Emails are sent out in the production' +
             ' environment.')
 
-        allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        allow_emailing = patch.object(feconf, 'CAN_SEND_EMAILS', True)
         with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+            patch.object(logging, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

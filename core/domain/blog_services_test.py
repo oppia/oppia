@@ -17,6 +17,7 @@
 """Tests for blog post services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -644,7 +645,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_swap = patch.object(
             search_services,
             'add_documents_to_index',
             add_docs_counter)
@@ -698,7 +699,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             actual_docs.extend(docs)
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_swap = patch.object(
             search_services,
             'add_documents_to_index',
             add_docs_counter)
@@ -777,7 +778,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         def _mock_get_author_details_by_author(unused_user_id: str) -> None:
             return None
 
-        get_author_details_swap = self.swap(
+        get_author_details_swap = patch.object(
             blog_models.BlogAuthorDetailsModel,
             'get_by_author',
             _mock_get_author_details_by_author
@@ -1057,7 +1058,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Ensure the maximum number of blog posts that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(
+        with patch.object(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
             ):
             # Need to load 3 pages to find all of the blog posts. Since the
@@ -1119,10 +1120,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        search_results_page_size_swap = self.swap(
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
+        search_results_page_size_swap = patch.object(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 5)
-        max_iterations_swap = self.swap(blog_services, 'MAX_ITERATIONS', 1)
+        max_iterations_swap = patch.object(blog_services, 'MAX_ITERATIONS', 1)
 
         def _mock_delete_documents_from_index(
             unused_doc_ids: List[str], unused_index: int
@@ -1133,7 +1134,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             """
             pass
 
-        with self.swap(
+        with patch.object(
             search_services,
             'delete_documents_from_index',
             _mock_delete_documents_from_index):

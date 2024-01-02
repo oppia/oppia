@@ -15,6 +15,7 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import contextlib
 import importlib
@@ -52,7 +53,7 @@ class CloudLoggingTests(test_utils.GenericTestBase):
             def setup_logging(self) -> None:
                 function_calls['setup_logging'] = True
 
-        emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
+        emulator_mode_swap = patch.object(constants, 'EMULATOR_MODE', False)
         logging_client_swap = self.swap_with_checks(
             google.cloud.logging, 'Client', MockClient)
         with emulator_mode_swap, logging_client_swap:

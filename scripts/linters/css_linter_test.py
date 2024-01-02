@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/css_linter.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 import subprocess
@@ -59,7 +60,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_join(*unused_args: str) -> str:
             return 'node_modules/stylelint/bin/stylelinter.js'
 
-        join_swap = self.swap(os.path, 'join', mock_join)
+        join_swap = patch.object(os.path, 'join', mock_join)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             [INVALID_CSS_FILEPATH])

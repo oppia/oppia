@@ -1,4 +1,4 @@
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+s# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 """Tests for Constants object and cosntants.json file."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 import pkgutil
@@ -185,5 +186,5 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_can_be_set(self) -> None:
         """Test __setattr__ to see if constants can be set as needed."""
-        with self.swap(constants.constants, 'TESTING_CONSTANT', 'test_2'):
+        with patch.object(constants.constants, 'TESTING_CONSTANT', 'test_2'):
             self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')

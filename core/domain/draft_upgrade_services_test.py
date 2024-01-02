@@ -17,6 +17,7 @@
 """Tests for draft upgrade services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core import utils
@@ -142,7 +143,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # The migration will automatically migrate the exploration to the latest
         # state schema version, so we set the latest schema version to be the
         # target_schema_version.
-        with self.swap(
+        with patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', int(target_schema_version)):
 
             # Create and migrate the exploration.

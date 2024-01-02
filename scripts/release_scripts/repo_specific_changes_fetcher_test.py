@@ -17,6 +17,7 @@
 """Unit tests for scripts/release_scripts/repo_specific_changes_fetcher.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -40,8 +41,8 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             return (
                 'CURRENT_STATE_SCHEMA_VERSION = 3'
                 '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        feconf_swap = self.swap(
+        run_cmd_swap = patch.object(common, 'run_cmd', mock_run_cmd)
+        feconf_swap = patch.object(
             repo_specific_changes_fetcher, 'FECONF_FILEPATH',
             MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
@@ -55,8 +56,8 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             return (
                 'CURRENT_STATE_SCHEMA_VERSION = 8'
                 '\nCURRENT_COLLECTION_SCHEMA_VERSION = 4\n')
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        feconf_swap = self.swap(
+        run_cmd_swap = patch.object(common, 'run_cmd', mock_run_cmd)
+        feconf_swap = patch.object(
             repo_specific_changes_fetcher, 'FECONF_FILEPATH',
             MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
@@ -71,7 +72,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
     ) -> None:
         def mock_run_cmd(unused_cmd: str) -> str:
             return 'scripts/setup.py\nscripts/setup_gae.py'
-        with self.swap(common, 'run_cmd', mock_run_cmd):
+        with patch.object(common, 'run_cmd', mock_run_cmd):
             actual_scripts = (
                 repo_specific_changes_fetcher.get_setup_scripts_changes_status(
                     'release_tag'))
@@ -89,7 +90,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
                 'scripts/setup.py\nextensions/test.ts\n'
                 'core/storage/activity/gae_models.py\n'
                 'core/storage/user/gae_models.py')
-        with self.swap(common, 'run_cmd', mock_run_cmd):
+        with patch.object(common, 'run_cmd', mock_run_cmd):
             actual_storgae_models = (
                 repo_specific_changes_fetcher
                 .get_changed_storage_models_filenames('release_tag'))
@@ -112,14 +113,14 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         ) -> None:
             return None
 
-        versions_swap = self.swap(
+        versions_swap = patch.object(
             repo_specific_changes_fetcher,
             'get_changed_schema_version_constant_names',
             mock_get_changed_schema_version_constant_names)
-        setup_scripts_swap = self.swap(
+        setup_scripts_swap = patch.object(
             repo_specific_changes_fetcher, 'get_setup_scripts_changes_status',
             mock_get_setup_scripts_changes_status)
-        storage_models_swap = self.swap(
+        storage_models_swap = patch.object(
             repo_specific_changes_fetcher,
             'get_changed_storage_models_filenames',
             mock_get_changed_storage_models_filenames)
@@ -144,14 +145,14 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         ) -> List[str]:
             return ['storage_changes']
 
-        versions_swap = self.swap(
+        versions_swap = patch.object(
             repo_specific_changes_fetcher,
             'get_changed_schema_version_constant_names',
             mock_get_changed_schema_version_constant_names)
-        setup_scripts_swap = self.swap(
+        setup_scripts_swap = patch.object(
             repo_specific_changes_fetcher, 'get_setup_scripts_changes_status',
             mock_get_setup_scripts_changes_status)
-        storage_models_swap = self.swap(
+        storage_models_swap = patch.object(
             repo_specific_changes_fetcher,
             'get_changed_storage_models_filenames',
             mock_get_changed_storage_models_filenames)
@@ -176,9 +177,9 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         def mock_print(text_to_print: str) -> None:
             printed_lines.append(text_to_print)
 
-        get_changes_swap = self.swap(
+        get_changes_swap = patch.object(
             repo_specific_changes_fetcher, 'get_changes', mock_get_changes)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        print_swap = patch.object(builtins, 'print', mock_print)
 
         with get_changes_swap, print_swap:
             repo_specific_changes_fetcher.main(args=['--release_tag', 'tag'])

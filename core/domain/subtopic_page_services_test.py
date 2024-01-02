@@ -17,6 +17,7 @@
 """Tests for subtopic page domain objects."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import re
 
@@ -280,7 +281,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, self.TOPIC_ID, 1)
 
     def test_migrate_page_contents_from_v1_to_v2_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
@@ -345,7 +346,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
     def test_migrate_page_contents_from_v2_to_v3_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 3)
         html_content = (
             '<oppia-noninteractive-svgdiagram '
@@ -412,7 +413,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
     def test_migrate_page_contents_from_v3_to_v4_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 4)
         expected_html_content = (
             '<p>1 × 3 😕 😊</p>'
@@ -476,7 +477,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
         self
     ) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,

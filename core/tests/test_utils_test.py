@@ -17,6 +17,7 @@
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import os
@@ -109,7 +110,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
         wrapped = test_utils.FunctionWrapper(MockClass.mock_method)
 
-        with self.swap(MockClass, 'mock_method', wrapped):
+        with patch.object(MockClass, 'mock_method', wrapped):
             val = MockClass('foo').mock_method('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
@@ -127,7 +128,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 return (cls.str_attr + string) * 2
 
         wrapped = test_utils.FunctionWrapper(MockClass.mock_classmethod)
-        with self.swap(MockClass, 'mock_classmethod', wrapped):
+        with patch.object(MockClass, 'mock_classmethod', wrapped):
             val = MockClass.mock_classmethod('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
@@ -143,7 +144,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 return string * 2
 
         wrapped = test_utils.FunctionWrapper(MockClass.mock_staticmethod)
-        with self.swap(MockClass, 'mock_staticmethod', wrapped):
+        with patch.object(MockClass, 'mock_staticmethod', wrapped):
             val = MockClass.mock_staticmethod('foobar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
@@ -363,7 +364,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(asset_url, '/assets/images/subjects/Lightbulb.svg')
 
     def test_get_static_asset_filepath_with_prod_mode_on(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with patch.object(constants, 'DEV_MODE', False):
             filepath = self.get_static_asset_filepath()
             self.assertEqual(filepath, 'build')
 

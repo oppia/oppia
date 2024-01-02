@@ -17,6 +17,7 @@
 """Tests for Exploration models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import copy
 import datetime
@@ -242,7 +243,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_1))
@@ -413,7 +414,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 'new_role': rights_domain.ROLE_OWNER
             }]
         )
-        self.allow_revert_swap = self.swap(
+        self.allow_revert_swap = patch.object(
             exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True)
 
         exploration_rights_allowed_commands = copy.deepcopy(
@@ -426,7 +427,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'allowed_values': {},
             'deprecated_values': {}
         })
-        self.allowed_commands_swap = self.swap(
+        self.allowed_commands_swap = patch.object(
             feconf,
             'EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
             exploration_rights_allowed_commands
@@ -1071,7 +1072,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             'New id generator is producing too many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 transient_checkpoint_progress_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,

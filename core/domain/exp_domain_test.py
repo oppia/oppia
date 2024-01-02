@@ -17,6 +17,7 @@
 """Tests for exploration domain objects and methods defined on them."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import copy
 import os
@@ -17950,7 +17951,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -18285,7 +18286,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -18481,7 +18482,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
     def test_metadata_properties_are_synced(self) -> None:
         self._require_metadata_properties_to_be_synced()
 
-        swapped_metadata_properties = self.swap(
+        swapped_metadata_properties = patch.object(
             constants, 'METADATA_PROPERTIES', [
                 'title', 'category', 'objective', 'language_code',
                 'blurb', 'author_notes', 'states_schema_version',
@@ -18503,7 +18504,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         ):
             self._require_metadata_properties_to_be_synced()
 
-        swapped_metadata_properties = self.swap(
+        swapped_metadata_properties = patch.object(
             constants, 'METADATA_PROPERTIES', [
                 'title', 'category', 'objective', 'language_code', 'tags',
                 'blurb', 'author_notes', 'states_schema_version',

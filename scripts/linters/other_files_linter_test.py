@@ -17,6 +17,7 @@
 """Unit tests for app_dev_linter.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import io
 import multiprocessing
@@ -70,9 +71,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             return file
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
-        self.open_file_swap = self.swap(
+        self.open_file_swap = patch.object(
             utils, 'open_file', mock_open_file)
-        self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        self.listdir_swap = patch.object(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self) -> None:
         def mock_readlines(
@@ -83,7 +84,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '# Third party files:',
                 '- third_party/static/bootstrap-4.3.1/')
 
-        readlines_swap = self.swap(
+        readlines_swap = patch.object(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -101,7 +102,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             return (
                 '# Third party files:', '- third_party/static/bootstrap-4.3/')
 
-        readlines_swap = self.swap(
+        readlines_swap = patch.object(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -130,7 +131,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '       inject: false', '}),]'
             )
 
-        readlines_swap = self.swap(
+        readlines_swap = patch.object(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -155,7 +156,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '       inject: false', '}),]'
             )
 
-        readlines_swap = self.swap(
+        readlines_swap = patch.object(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -179,7 +180,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '}),]'
             )
 
-        readlines_swap = self.swap(
+        readlines_swap = patch.object(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -312,7 +313,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         listdir_swap = self.swap_with_checks(
             os, 'listdir', mock_listdir,
             expected_args=[(other_files_linter.WORKFLOWS_DIR,)])
-        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        read_swap = patch.object(FILE_CACHE, 'read', mock_read)
 
         expected = [
             '%s --> Job run does not use the .github/actions/merge action.' %

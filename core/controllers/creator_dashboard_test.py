@@ -15,6 +15,7 @@
 """Tests for the creator dashboard and the notifications dashboard."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import os
@@ -267,7 +268,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             return [feedback_domain.FeedbackAnalytics(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3)]
 
-        with self.swap(
+        with patch.object(
             feedback_services, 'get_thread_analytics_multi',
             mock_get_thread_analytics_multi):
 
@@ -372,7 +373,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
-        get_last_week_dashboard_stats_swap = self.swap(
+        get_last_week_dashboard_stats_swap = patch.object(
             user_services,
             'get_last_week_dashboard_stats',
             lambda _: {
@@ -399,7 +400,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_broken_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
-        get_last_week_dashboard_stats_swap = self.swap(
+        get_last_week_dashboard_stats_swap = patch.object(
             user_services,
             'get_last_week_dashboard_stats',
             lambda _: {'key_1': 1, 'key_2': 2}
@@ -559,7 +560,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_upload_exploration(self) -> None:
-        with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
+        with patch.object(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
             self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 

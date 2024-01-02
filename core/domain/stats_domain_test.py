@@ -17,6 +17,7 @@
 """Tests for core.domain.stats_domain."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import re
@@ -1210,9 +1211,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exp_issues_model is not None
 
-        current_issue_schema_version_swap = self.swap(
+        current_issue_schema_version_swap = patch.object(
             stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
-        convert_issue_dict_swap = self.swap(
+        convert_issue_dict_swap = patch.object(
             stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
             self._dummy_convert_issue_v1_dict_to_v2_dict)
@@ -1244,9 +1245,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exp_issues_model1 is not None
 
-        current_issue_schema_version_swap = self.swap(
+        current_issue_schema_version_swap = patch.object(
             stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
-        convert_issue_dict_swap = self.swap(
+        convert_issue_dict_swap = patch.object(
             stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
             self._dummy_convert_issue_v1_dict_to_v2_dict)
@@ -1463,9 +1464,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        current_action_schema_version_swap = self.swap(
+        current_action_schema_version_swap = patch.object(
             stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2)
-        convert_action_dict_swap = self.swap(
+        convert_action_dict_swap = patch.object(
             stats_domain.LearnerAction,
             '_convert_action_v1_dict_to_v2_dict',
             self._dummy_convert_action_v1_dict_to_v2_dict)
@@ -1497,9 +1498,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
         playthrough_model_1 = stats_models.PlaythroughModel.get(
             playthrough_id_1)
 
-        current_action_schema_version_swap = self.swap(
+        current_action_schema_version_swap = patch.object(
             stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2)
-        convert_action_dict_swap = self.swap(
+        convert_action_dict_swap = patch.object(
             stats_domain.LearnerAction,
             '_convert_action_v1_dict_to_v2_dict',
             self._dummy_convert_action_v1_dict_to_v2_dict)

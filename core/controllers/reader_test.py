@@ -15,6 +15,7 @@
 """Tests for the page that allows learners to play through an exploration."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 
@@ -307,7 +308,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_2, self.skill_id, 0.5)
         # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+        with patch.object(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
                 '%s/%s?story_url_fragment=title' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id))
@@ -388,7 +389,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_2, self.skill_id, 0.5)
         # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+        with patch.object(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             with self.swap_to_always_return(
                 story_domain.Story,
                 'get_prerequisite_skill_ids_for_exp_id',
@@ -1214,7 +1215,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             title='Welcome to Oppia!',
             category='This is just a spam category',
             objective='Test a spam exploration.')
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
@@ -1581,7 +1582,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(
+        story_fetchers_swap = patch.object(
             story_fetchers, 'get_story_by_id', _mock_none_function)
 
         with story_fetchers_swap:
@@ -2910,7 +2911,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             self.put_json(
                 '%s/%s/%s' % (
@@ -2922,7 +2923,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer': 'This is an answer.',
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=404)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -2984,7 +2985,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -3026,7 +3027,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC', content_id_generator),
             ['skill_1'],
             content_id_generator.next_content_id_index)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             state_reference = (
                 stats_services.get_state_reference_for_question(question_id))

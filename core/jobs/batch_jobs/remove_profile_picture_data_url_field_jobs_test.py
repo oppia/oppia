@@ -17,6 +17,7 @@
 """Remove profile_picture_data_url field from UserSettingsModel."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import user_services
@@ -88,7 +89,7 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
             'profile_picture_data_url', migrated_setting_model._properties)  # pylint: disable=protected-access
 
     def test_removal_of_profile_field(self) -> None:
-        with self.swap(
+        with patch.object(
             user_models, 'UserSettingsModel',
             MockUserSettingsModelWithProfilePicture
         ):

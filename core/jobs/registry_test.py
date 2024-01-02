@@ -17,6 +17,7 @@
 """Unit tests for jobs.registry."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.jobs import base_jobs
 from core.jobs import registry
@@ -49,7 +50,7 @@ class RegistryTests(test_utils.TestBase):
         return cls.unique_obj
 
     def test_get_all_jobs_returns_value_from_job_metaclass(self) -> None:
-        get_all_jobs_swap = self.swap(
+        get_all_jobs_swap = patch.object(
             base_jobs.JobMetaclass, 'get_all_jobs', self.get_all_jobs_mock)
 
         with get_all_jobs_swap:
@@ -59,7 +60,7 @@ class RegistryTests(test_utils.TestBase):
         self.assertNotEqual(registry.get_all_jobs(), [])
 
     def test_get_all_job_names_returns_value_from_job_metaclass(self) -> None:
-        get_all_job_names_swap = self.swap(
+        get_all_job_names_swap = patch.object(
             base_jobs.JobMetaclass,
             'get_all_job_names', self.get_all_job_names_mock)
 
@@ -72,7 +73,7 @@ class RegistryTests(test_utils.TestBase):
     def test_get_job_class_by_name_returns_value_from_job_metaclass(
         self
     ) -> None:
-        get_job_class_by_name_swap = self.swap(
+        get_job_class_by_name_swap = patch.object(
             base_jobs.JobMetaclass,
             'get_job_class_by_name', self.get_job_class_by_name_mock)
 

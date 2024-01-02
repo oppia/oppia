@@ -15,6 +15,7 @@
 """Tests for email dashboard handler."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import user_query_services
@@ -261,7 +262,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         )
         query_model.put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
             csrf_token = self.get_new_csrf_token()
@@ -383,7 +384,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             user_ids=[self.user_a_id, self.user_b_id]
         ).put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardcancelresult/%s' % query_id, {},
@@ -457,7 +458,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             user_ids=[self.user_a_id, self.user_b_id]
         ).put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             email_subject = 'email_subject'
             email_body = 'email_body'
 

@@ -17,6 +17,7 @@
 """Tests for the domain taskqueue services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 
@@ -125,7 +126,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             self.assertIsNotNone(scheduled_for)
             self.assertIsNone(task_name)
 
-        swap_create_http_task = self.swap(
+        swap_create_http_task = patch.object(
             platform_taskqueue_services, 'create_http_task',
             mock_create_http_task)
 

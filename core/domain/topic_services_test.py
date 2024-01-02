@@ -17,6 +17,7 @@
 """Tests for topic services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import os
@@ -2326,7 +2327,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with patch.object(
             utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs):
             topic_summary = (
@@ -2389,7 +2390,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with patch.object(
             utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs):
             with self.capture_logging(min_level=logging.ERROR) as logs:
@@ -2494,8 +2495,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'topic model created', commit_cmd_dicts)
 
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_schema_version_swap = self.swap(
+        swap_topic_object = patch.object(topic_domain, 'Topic', MockTopicObject)
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 4)
 
         with swap_topic_object, current_schema_version_swap:
@@ -2541,8 +2542,8 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'topic model created', commit_cmd_dicts)
 
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_schema_version_swap = self.swap(
+        swap_topic_object = patch.object(topic_domain, 'Topic', MockTopicObject)
+        current_schema_version_swap = patch.object(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
 
         with swap_topic_object, current_schema_version_swap:

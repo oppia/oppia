@@ -182,7 +182,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             'many collisions.'
             ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 question_models.QuestionModel, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -604,11 +604,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             alist.sort(key=k)
             return alist[:num]
 
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        sample_swap = patch.object(random, 'sample', mock_random_sample)
 
         def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
-        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
+        random_int_swap = patch.object(utils, 'get_random_int', mock_random_int)
         with sample_swap, random_int_swap:
             question_skill_links_1 = (
                 question_models.QuestionSkillLinkModel.
@@ -814,11 +814,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             alist.sort(key=k)
             return alist[:num]
 
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        sample_swap = patch.object(random, 'sample', mock_random_sample)
 
         def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
-        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
+        random_int_swap = patch.object(utils, 'get_random_int', mock_random_int)
         with sample_swap, random_int_swap:
             question_skill_links_1 = (
                 question_models.QuestionSkillLinkModel.

@@ -15,6 +15,7 @@
 """ Tests for the questions list. """
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.constants import constants
@@ -80,7 +81,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 self.admin_id, question_id, self.skill_id_2, 0.3)
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
+        with patch.object(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
             json_response = self.get_json(
                 '%s/%s,%s?offset=0' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,

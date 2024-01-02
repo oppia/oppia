@@ -23,6 +23,7 @@ in start, then adding the same import statement in a test function
 """
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import subprocess
 import sys
@@ -41,7 +42,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             cmd_tokens: List[str], *_args: str, **_kwargs: str
         ) -> None:
             commands.append(cmd_tokens)
-        run_swap = self.swap(subprocess, 'run', mock_run)
+        run_swap = patch.object(subprocess, 'run', mock_run)
 
         with run_swap:
             from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long

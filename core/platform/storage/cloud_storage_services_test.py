@@ -17,6 +17,7 @@
 """Tests for cloud_storage_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.platform.storage import cloud_storage_services
 from core.tests import test_utils
@@ -155,9 +156,9 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.bucket_2 = MockBucket()
         self.client.buckets['bucket_1'] = self.bucket_1
         self.client.buckets['bucket_2'] = self.bucket_2
-        self.get_client_swap = self.swap(
+        self.get_client_swap = patch.object(
             storage, 'Client', lambda: self.client)
-        self.get_bucket_swap = self.swap(
+        self.get_bucket_swap = patch.object(
             cloud_storage_services,
             '_get_bucket',
             self.client.get_bucket

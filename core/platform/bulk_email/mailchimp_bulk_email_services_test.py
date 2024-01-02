@@ -15,6 +15,7 @@
 """Tests for mailchimp services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 
@@ -202,7 +203,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_function_input_validation(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = patch.object(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
         with swap_mailchimp_context:
@@ -241,7 +242,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_get_mailchimp_class_errors_when_username_is_not_available(
         self
     ) -> None:
-        swap_mailchimp_username = self.swap(
+        swap_mailchimp_username = patch.object(
             feconf, 'MAILCHIMP_USERNAME', None
         )
         swap_get_secret = self.swap_with_checks(
@@ -298,11 +299,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = patch.object(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
+        swap_api = patch.object(secrets_services, 'get_secret', lambda _: 'key')
+        swap_username = patch.object(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
             # Tests condition where user was initally unsubscribed in list and
@@ -357,11 +358,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = patch.object(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
+        swap_api = patch.object(secrets_services, 'get_secret', lambda _: 'key')
+        swap_username = patch.object(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
             # Tests condition where user was initally unsubscribed in list and
@@ -379,11 +380,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = patch.object(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
+        swap_api = patch.object(secrets_services, 'get_secret', lambda _: 'key')
+        swap_username = patch.object(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
             # Creates a mailchimp entry for a deleted user.
@@ -405,11 +406,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = patch.object(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
+        swap_api = patch.object(secrets_services, 'get_secret', lambda _: 'key')
+        swap_username = patch.object(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)

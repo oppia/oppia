@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.opportunity_management_jobs."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.constants import constants
@@ -326,7 +327,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             opportunity_models.SkillOpportunityModel.get_all())
         self.assertEqual(len(all_opportunity_models), 0)
 
-        with self.swap(
+        with patch.object(
             opportunity_management_jobs.GenerateSkillOpportunityModelJob,
             '_count_unique_question_ids',
             lambda _: -1

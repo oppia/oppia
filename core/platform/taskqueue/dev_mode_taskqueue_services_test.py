@@ -17,6 +17,7 @@
 """Tests for methods in the dev_mode_taskqueue_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 
@@ -61,7 +62,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(payload, correct_payload)
             self.assertEqual(task_name, correct_task_name)
 
-        swap_create_task = self.swap(
+        swap_create_task = patch.object(
             dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task)
         with swap_create_task:
             dev_mode_taskqueue_services.create_http_task(
@@ -106,7 +107,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(headers, correct_headers)
             self.assertEqual(timeout, feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
 
-        swap_post = self.swap(requests, 'post', mock_post)
+        swap_post = patch.object(requests, 'post', mock_post)
         with swap_post:
             # I have to test _task_handler by calling it because I cannot
             # surround this task handler in a context manager reliably. The

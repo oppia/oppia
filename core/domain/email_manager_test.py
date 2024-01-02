@@ -15,6 +15,7 @@
 """Tests for methods relating to sending emails."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -62,9 +63,9 @@ class FailedMLTest(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.ADMIN_USERNAME = 'admusername'
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.signup(
             feconf.ADMIN_EMAIL_ADDRESS, self.ADMIN_USERNAME, True)
@@ -94,12 +95,12 @@ class EmailToAdminTest(test_utils.EmailTestBase):
         dummy_system_address = 'dummy@system.com'
         dummy_admin_address = 'admin@system.com'
 
-        send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        system_name_ctx = self.swap(
+        send_email_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        system_name_ctx = patch.object(
             feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
-        system_email_ctx = self.swap(
+        system_email_ctx = patch.object(
             feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
-        admin_email_ctx = self.swap(
+        admin_email_ctx = patch.object(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
@@ -130,12 +131,12 @@ class DummyMailTest(test_utils.EmailTestBase):
         dummy_system_address = 'dummy@system.com'
         dummy_receiver_address = 'admin@system.com'
 
-        send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        system_name_ctx = self.swap(
+        send_email_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        system_name_ctx = patch.object(
             feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
-        system_email_ctx = self.swap(
+        system_email_ctx = patch.object(
             feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
-        admin_email_ctx = self.swap(
+        admin_email_ctx = patch.object(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_receiver_address)
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
@@ -237,13 +238,13 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         self.expected_email_subject = (
             '%s - invitation to collaborate') % self.EXPLORATION_TITLE
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_editor_role_email_ctx = self.swap(
+        self.can_send_editor_role_email_ctx = patch.object(
             feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', True)
-        self.can_not_send_editor_role_email_ctx = self.swap(
+        self.can_not_send_editor_role_email_ctx = patch.object(
             feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', False)
 
     def test_role_email_is_sent_when_editor_assigns_role(self) -> None:
@@ -636,7 +637,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_footer
             )
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value_return_email_footer, patch.object(
             feconf, 'CAN_SEND_EMAILS', False
         ):
             self._set_signup_email_content_platform_parameter(
@@ -664,10 +665,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self._reset_signup_email_content_platform_parameters()
 
     def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
-        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(
+        log_new_error_ctx = patch.object(
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
@@ -708,7 +709,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_partially_modified(
         self
     ) -> None:
-        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
         platform_parameter_registry.Registry.update_platform_parameter(
             email_manager.SIGNUP_EMAIL_SUBJECT_CONTENT.name,
@@ -731,7 +732,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         )
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(
+        log_new_error_ctx = patch.object(
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
@@ -771,12 +772,12 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._reset_signup_email_content_platform_parameters()
 
     def test_email_with_bad_content_is_not_sent(self) -> None:
-        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
         self._set_signup_email_content_platform_parameter(
             'New email subject', 'New HTML body.<script>alert(3);</script>')
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(
+        log_new_error_ctx = patch.object(
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
@@ -813,7 +814,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
         self._reset_signup_email_content_platform_parameters()
 
     def test_contents_of_signup_email_are_correct(self) -> None:
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             platform_parameter_registry.Registry.update_platform_parameter(
                 email_manager.EMAIL_SENDER_NAME.name,
                 self.admin_id,
@@ -896,7 +897,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_footer
             )
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value_return_email_footer, patch.object(
             feconf, 'CAN_SEND_EMAILS', True
         ):
             self._set_signup_email_content_platform_parameter(
@@ -950,7 +951,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_footer
             )
         )
-        with swap_get_platform_parameter_value_return_email_footer, self.swap(
+        with swap_get_platform_parameter_value_return_email_footer, patch.object(
             feconf, 'CAN_SEND_EMAILS', True
         ):
             self._set_signup_email_content_platform_parameter(
@@ -998,7 +999,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self._reset_signup_email_content_platform_parameters()
 
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             platform_parameter_registry.Registry.update_platform_parameter(
                 email_manager.EMAIL_SENDER_NAME.name,
                 self.admin_id,
@@ -1123,20 +1124,20 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             """Returns the generated hash for tests."""
             return 'Email Hash'
 
-        self.generate_hash_ctx = self.swap(
+        self.generate_hash_ctx = patch.object(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(
                 _generate_hash_for_tests, email_models.SentEmailModel))
 
     def test_send_email_does_not_resend_if_same_hash_exists(self) -> None:
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000)
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(
+        log_new_error_ctx = patch.object(
             logging, 'error', log_new_error_counter)
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
@@ -1180,14 +1181,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(len(all_models), 1)
 
     def test_send_email_does_not_resend_within_duplicate_interval(self) -> None:
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(
+        log_new_error_ctx = patch.object(
             logging, 'error', log_new_error_counter)
 
         swap_get_platform_parameter_value = self.swap_to_always_return(
@@ -1242,10 +1243,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_recipient_but_same_hash(self) -> None:
         """Hash for both messages is same but recipients are different."""
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
         with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
@@ -1292,10 +1293,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_subject_but_same_hash(self) -> None:
         """Hash for both messages is same but subjects are different."""
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
         with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
@@ -1343,10 +1344,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
     def test_sending_email_with_different_body_but_same_hash(self) -> None:
         """Hash for both messages is same but body is different."""
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
         with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
@@ -1395,10 +1396,10 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(
         self
     ) -> None:
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
 
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
         with can_send_emails_ctx, duplicate_email_ctx:
@@ -1472,12 +1473,12 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.expected_email_subject = (
             'You\'ve received 3 new messages on your explorations')
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -1612,13 +1613,13 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -1721,13 +1722,13 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_subscription_email_ctx = self.swap(
+        self.can_send_subscription_email_ctx = patch.object(
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', True)
-        self.can_not_send_subscription_email_ctx = self.swap(
+        self.can_not_send_subscription_email_ctx = patch.object(
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -1821,13 +1822,13 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
     def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -1943,8 +1944,8 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -2046,8 +2047,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -2123,8 +2124,8 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -2193,8 +2194,8 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         user_services.update_email_preferences(
             self.user_id, True, False, False, False)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -2566,7 +2567,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
@@ -2698,15 +2699,15 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.reviewer_2_id, True, False, False, False)
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
         self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = patch.object(
             logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = patch.object(
             logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
@@ -2719,7 +2720,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        self.swap_get_platform_parameter_value = self.swap(
+        self.swap_get_platform_parameter_value = patch.object(
             platform_feature_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
@@ -4152,7 +4153,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
-        with self.swap(
+        with patch.object(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
@@ -4280,15 +4281,15 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
         self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = patch.object(
             logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = patch.object(
             logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
@@ -4301,7 +4302,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
-        self.swap_get_platform_parameter_value = self.swap(
+        self.swap_get_platform_parameter_value = patch.object(
             platform_feature_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
@@ -4311,7 +4312,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.cannot_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                     (
@@ -4334,7 +4335,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                     (
@@ -4357,7 +4358,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
                 ):
@@ -4381,7 +4382,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         with self.swap_get_platform_parameter_value, self.capture_logging(
             min_level=logging.ERROR) as logs:
             with self.can_send_emails_ctx, self.log_new_error_ctx:
-                with self.swap(
+                with patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
                 ):
@@ -4401,7 +4402,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self
     ) -> None:
         with self.can_send_emails_ctx, self.log_new_info_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4463,7 +4464,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4539,7 +4540,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4606,7 +4607,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4682,7 +4683,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4766,7 +4767,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -4891,7 +4892,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
-            with self.swap_get_platform_parameter_value, self.swap(
+            with self.swap_get_platform_parameter_value, patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
@@ -5066,22 +5067,22 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
         self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = patch.object(
             logging, 'error', self.log_new_error_counter)
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = patch.object(
             logging, 'info', self._mock_logging_info)
 
         self.suggestion_types_needing_reviewers: Dict[str, Set[str]] = {
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-        self.swap_get_platform_parameter_value = self.swap(
+        self.swap_get_platform_parameter_value = patch.object(
             platform_feature_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
@@ -5648,7 +5649,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
         self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
         self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
         self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
         self.set_curriculum_admins([self.SENDER_USERNAME, ])
@@ -5843,8 +5844,8 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
         super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
@@ -5859,7 +5860,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     def test_account_deletion_failed_email_is_sent_correctly(self) -> None:
         dummy_admin_address = 'admin@system.com'
 
-        admin_email_ctx = self.swap(
+        admin_email_ctx = patch.object(
             feconf, 'ADMIN_EMAIL_ADDRESS', dummy_admin_address)
 
         with self.can_send_emails_ctx, admin_email_ctx:
@@ -5954,7 +5955,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
         self.set_curriculum_admins([self.SENDER_USERNAME])
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self) -> None:
         email_subject = 'Dummy subject'
@@ -6137,11 +6138,11 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
         self.recipient_id = self.get_user_id_from_email(
             self.RECIPIENT_EMAIL)
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.can_send_email_moderator_action_ctx = self.swap(
+        self.can_send_email_moderator_action_ctx = patch.object(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
 
     def test_exception_raised_if_email_on_moderator_action_is_false(
@@ -6219,9 +6220,9 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.question_submitter_id, True, False, False, False)
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_assign_translation_reviewer_email_for_can_send_emails_is_false(
@@ -6616,8 +6617,8 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.admin_email_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.admin_email_ctx = patch.object(
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)
 
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
@@ -6706,8 +6707,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
         self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
         self.log_new_error_counter = test_utils.CallCounter(
             logging.error)

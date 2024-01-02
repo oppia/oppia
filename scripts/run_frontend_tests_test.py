@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_frontend_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -39,7 +40,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         class MockFile:
             def __init__(self, flakes: int = 0) -> None:
@@ -124,21 +125,21 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_check_frontend_coverage() -> None:
             self.frontend_coverage_checks_called = True
 
-        self.swap_success_Popen = self.swap(
+        self.swap_success_Popen = patch.object(
             subprocess, 'Popen', mock_success_check_call)
-        self.swap_flaky_Popen = self.swap(
+        self.swap_flaky_Popen = patch.object(
             subprocess, 'Popen', mock_flaky_check_call)
-        self.swap_very_flaky_Popen = self.swap(
+        self.swap_very_flaky_Popen = patch.object(
             subprocess, 'Popen', mock_very_flaky_check_call)
-        self.swap_failed_Popen = self.swap(
+        self.swap_failed_Popen = patch.object(
             subprocess, 'Popen', mock_failed_check_call)
-        self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
-        self.swap_build = self.swap(build, 'main', mock_build)
-        self.swap_common = self.swap(
+        self.swap_sys_exit = patch.object(sys, 'exit', mock_sys_exit)
+        self.swap_build = patch.object(build, 'main', mock_build)
+        self.swap_common = patch.object(
             common, 'print_each_string_after_two_new_lines', lambda _: None)
-        self.swap_install_third_party_libs = self.swap(
+        self.swap_install_third_party_libs = patch.object(
             install_third_party_libs, 'main', lambda: None)
-        self.swap_check_frontend_coverage = self.swap(
+        self.swap_check_frontend_coverage = patch.object(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
 
     def test_run_dtslint_type_tests_passed(self) -> None:

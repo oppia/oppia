@@ -17,6 +17,7 @@
 """Tests for domain objects related to translations."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import re
 
@@ -337,7 +338,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
-        min_value_swap = self.swap(
+        min_value_swap = patch.object(
             feconf,
             'MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS',
             1)
@@ -942,23 +943,23 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode HTML string, received 30'):
-            with self.swap(written_translation, 'translation', 30):
+            with patch.object(written_translation, 'translation', 30):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
         ):
-            with self.swap(written_translation, 'needs_update', 20):
+            with patch.object(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
         ):
-            with self.swap(written_translation, 'data_format', 'int'):
+            with patch.object(written_translation, 'data_format', 'int'):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
         ):
-            with self.swap(written_translation, 'data_format', 2):
+            with patch.object(written_translation, 'data_format', 2):
                 written_translation.validate()

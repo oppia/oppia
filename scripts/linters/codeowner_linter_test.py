@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/codeowner_linter.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import multiprocessing
 import os
@@ -94,9 +95,9 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 '.github/stale.yml',
                 'core/domain/new_file.py']
 
-        self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        self.listdir_swap = patch.object(os, 'listdir', mock_listdir)
         self.listdir_swap_file_with_blanket_codeowner_only = (
-            self.swap(
+            patch.object(
                 os, 'listdir', mock_listdir_with_blanket_codeowner_only_file)
         )
 
@@ -105,11 +106,11 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         # for testing purpose.
         mock_codeowner_important_paths = CODEOWNER_IMPORTANT_PATHS[:-1]
 
-        codeowner_important_paths_swap = self.swap(
+        codeowner_important_paths_swap = patch.object(
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             mock_codeowner_important_paths)
 
-        codeowner_filepath_swap = self.swap(
+        codeowner_filepath_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             VALID_CODEOWNER_FILEPATH)
 
@@ -129,7 +130,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
     def test_duplicate_important_patterns_at_the_bottom_of_codeowners(
         self
     ) -> None:
-        codeowner_path_swap = self.swap(
+        codeowner_path_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_DUPLICATE_CODEOWNER_FILEPATH)
 
@@ -145,10 +146,10 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
     def test_duplicate_important_patterns_in_list(self) -> None:
         mock_codeowner_important_paths = (
             CODEOWNER_IMPORTANT_PATHS + ['/.github/stale.yml'])
-        codeowner_path_swap = self.swap(
+        codeowner_path_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH', VALID_CODEOWNER_FILEPATH)
 
-        codeowner_important_paths_swap = self.swap(
+        codeowner_important_paths_swap = patch.object(
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             mock_codeowner_important_paths)
 
@@ -166,7 +167,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
     def test_missing_important_codeowner_path_from_critical_section(
         self
     ) -> None:
-        codeowner_path_swap = self.swap(
+        codeowner_path_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_MISSING_IMPORTANT_PATTERN_CODEOWNER_FILEPATH)
 
@@ -185,10 +186,10 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_with_success_message(self) -> None:
-        codeowner_path_swap = self.swap(
+        codeowner_path_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH', VALID_CODEOWNER_FILEPATH)
 
-        codeowner_important_paths_swap = self.swap(
+        codeowner_important_paths_swap = patch.object(
             codeowner_linter, 'CODEOWNER_IMPORTANT_PATHS',
             CODEOWNER_IMPORTANT_PATHS)
 
@@ -202,7 +203,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report.failed)
 
     def test_check_file_with_only_blanket_codeowner_defined_fails(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_FILEPATH_WITH_BLANKET_CODEOWNER_ONLY)
 
@@ -220,7 +221,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_invalid_inline_comment_codeowner_filepath(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_INLINE_COMMENT_CODEOWNER_FILEPATH)
 
@@ -234,7 +235,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_without_codeowner_name(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_MISSING_CODEOWNER_NAME_FILEPATH)
 
@@ -248,7 +249,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_without_full_file_path(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_FULL_FILEPATH_CODEOWNER_FILEPATH)
 
@@ -263,7 +264,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_with_wildcard(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_WILDCARD_IN_FILEPATH)
 
@@ -277,7 +278,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_with_no_valid_match(self) -> None:
-        codeowner_swap = self.swap(
+        codeowner_swap = patch.object(
             codeowner_linter, 'CODEOWNER_FILEPATH',
             INVALID_FILEPATH_MISSING_FROM_DIRECTORY)
 

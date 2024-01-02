@@ -17,6 +17,7 @@
 """Unit tests for platform_feature_services.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import enum
 
@@ -128,19 +129,19 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             False
         )
 
-        self.swap_all_platform_params_except_feature_flags = self.swap(
+        self.swap_all_platform_params_except_feature_flags = patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             self.param_name_enums
         )
 
-        self.swap_all_feature_flags = self.swap(
+        self.swap_all_feature_flags = patch.object(
             feature_services,
             'ALL_FEATURE_FLAGS',
             self.param_name_enums_features
         )
 
-        self.swap_all_feature_names_set = self.swap(
+        self.swap_all_feature_names_set = patch.object(
             feature_services,
             'ALL_FEATURES_NAMES_SET',
             set(self.param_names_features)
@@ -181,7 +182,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_create_evaluation_context_for_client_returns_correct_context(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',
@@ -209,7 +210,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
+            with patch.object(constants, 'DEV_MODE', True):
                 context = (
                     feature_services.create_evaluation_context_for_client({
                         'platform_type': 'Android',
@@ -228,8 +229,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_test_returns_correct_values(
         self
     ) -> None:
-        constants_swap = self.swap(constants, 'DEV_MODE', False)
-        env_swap = self.swap(
+        constants_swap = patch.object(constants, 'DEV_MODE', False)
+        env_swap = patch.object(
             feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with constants_swap, env_swap:
@@ -251,8 +252,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(
         self
     ) -> None:
-        constants_swap = self.swap(constants, 'DEV_MODE', False)
-        env_swap = self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
+        constants_swap = patch.object(constants, 'DEV_MODE', False)
+        env_swap = patch.object(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
             with constants_swap, env_swap:
                 context = (
@@ -272,26 +273,26 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_evaluate_dev_feature_for_dev_server_returns_true(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
+            with patch.object(constants, 'DEV_MODE', True):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_test_feature_for_dev_server_returns_true(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
+            with patch.object(constants, 'DEV_MODE', True):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.test_feature.name))
 
     def test_evaluate_prod_feature_for_dev_server_returns_true(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
+            with patch.object(constants, 'DEV_MODE', True):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_dev_feature_for_test_server_returns_false(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with patch.object(constants, 'DEV_MODE', False):
+                with patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
                 ):
                     self.assertFalse(
@@ -300,8 +301,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_evaluate_test_feature_for_test_server_returns_true(self) -> None:
         with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with patch.object(constants, 'DEV_MODE', False):
+                with patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
                 ):
                     self.assertTrue(
@@ -309,40 +310,40 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             self.test_feature.name))
 
     def test_evaluate_prod_feature_for_test_server_returns_true(self) -> None:
-        with self.swap_all_feature_flags, self.swap(
+        with self.swap_all_feature_flags, patch.object(
             constants, 'DEV_MODE', False
         ):
-            with self.swap_all_feature_names_set, self.swap(
+            with self.swap_all_feature_names_set, patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
             ):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_dev_feature_for_prod_server_returns_false(self) -> None:
-        with self.swap_all_feature_flags, self.swap(
+        with self.swap_all_feature_flags, patch.object(
             constants, 'DEV_MODE', False
         ):
-            with self.swap_all_feature_names_set, self.swap(
+            with self.swap_all_feature_names_set, patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
             ):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_test_feature_for_prod_server_returns_false(self) -> None:
-        with self.swap_all_feature_flags, self.swap(
+        with self.swap_all_feature_flags, patch.object(
             constants, 'DEV_MODE', False
         ):
-            with self.swap_all_feature_names_set, self.swap(
+            with self.swap_all_feature_names_set, patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
             ):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.test_feature.name))
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(self) -> None:
-        with self.swap_all_feature_flags, self.swap(
+        with self.swap_all_feature_flags, patch.object(
             constants, 'DEV_MODE', False
         ):
-            with self.swap_all_feature_names_set, self.swap(
+            with self.swap_all_feature_names_set, patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
             ):
                 self.assertTrue(
@@ -371,15 +372,15 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 False
             )
 
-            with self.swap(constants, 'BRANCH_NAME', ''):
+            with patch.object(constants, 'BRANCH_NAME', ''):
                 self.assertTrue(feature_services.get_platform_parameter_value(
                     self.param_c.name))
 
-            with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
+            with patch.object(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
                 self.assertTrue(feature_services.get_platform_parameter_value(
                     self.param_c.name))
 
-            with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            with patch.object(constants, 'BRANCH_NAME', 'release-3-3-1'):
                 self.assertTrue(feature_services.get_platform_parameter_value(
                     self.param_c.name))
 
@@ -404,8 +405,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 ],
                 False
             )
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with patch.object(constants, 'DEV_MODE', False):
+                with patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
                     self.assertTrue(
@@ -431,7 +432,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 ]
             )
 
-            with self.swap(constants, 'DEV_MODE', True):
+            with patch.object(constants, 'DEV_MODE', True):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 

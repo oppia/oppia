@@ -17,6 +17,7 @@ classifiers.
 """
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import json
@@ -65,7 +66,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
                 assets_list)
@@ -197,11 +198,11 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         def mock_get_classifier_training_job_by_id(_: str) -> FakeTrainingJob:
             return FakeTrainingJob()
 
-        can_send_emails_ctx = self.swap(
+        can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        can_send_feedback_email_ctx = self.swap(
+        can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        fail_training_job = self.swap(
+        fail_training_job = patch.object(
             classifier_services,
             'get_classifier_training_job_by_id',
             mock_get_classifier_training_job_by_id)
@@ -234,7 +235,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
 
     def test_error_on_prod_mode_and_default_vm_id(self) -> None:
         # Turn off DEV_MODE.
-        with self.swap(constants, 'DEV_MODE', False):
+        with patch.object(constants, 'DEV_MODE', False):
             self.post_blob(
                 '/ml/trainedclassifierhandler',
                 self.payload_proto.SerializeToString(), expected_status_int=401)
@@ -433,7 +434,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 }
             })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, new_exp_id, change_list, '')
 
@@ -471,7 +472,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 }
             })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, new_exp_id, change_list, '')
 
@@ -499,7 +500,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             },
         }
 
-        with self.swap(
+        with patch.object(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             self.get_json(
@@ -521,7 +522,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         )
 
-        with self.swap(
+        with patch.object(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             with swap_secret:
@@ -561,7 +562,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             },
         }
 
-        with self.swap(
+        with patch.object(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             self.get_json(
@@ -583,7 +584,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         )
 
-        with self.swap(
+        with patch.object(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             with swap_secret:

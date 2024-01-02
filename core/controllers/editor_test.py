@@ -17,6 +17,7 @@
 """Tests for the exploration editor page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import io
@@ -1124,7 +1125,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        logging_swap = patch.object(logging, 'exception', _mock_logging_function)
 
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
@@ -1254,7 +1255,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', mock_logging_function), self.swap(
+        with patch.object(logging, 'info', mock_logging_function), patch.object(
             logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
 
@@ -2529,9 +2530,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         )
 
     def test_error_cases_for_email_sending(self) -> None:
-        with self.swap(
+        with patch.object(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
+            ), patch.object(
                 feconf, 'CAN_SEND_EMAILS', False):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
@@ -2572,7 +2573,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 valid_payload, csrf_token=csrf_token,
                 expected_status_int=500)
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            with patch.object(feconf, 'CAN_SEND_EMAILS', True):
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
@@ -2582,9 +2583,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.logout()
 
     def test_email_is_sent_correctly_when_unpublishing(self) -> None:
-        with self.swap(
+        with patch.object(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
+            ), patch.object(
                 feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
@@ -2642,9 +2643,9 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.logout()
 
     def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
-        with self.swap(
+        with patch.object(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
+            ), patch.object(
                 feconf, 'CAN_SEND_EMAILS', True):
             # Log in as a non-moderator.
             self.login(self.EDITOR_EMAIL)
@@ -3380,14 +3381,14 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
                 expected_status_int=404)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
@@ -3429,7 +3430,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         stats_services.record_learner_answer_info(
             feconf.ENTITY_TYPE_QUESTION, state_reference, self.interaction_id,
             self.answer, self.answer_details)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
@@ -3452,7 +3453,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
@@ -3460,7 +3461,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
                     self.state_name, 'learner_answer_info_id'),
                 expected_status_int=404)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
@@ -3514,7 +3515,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         stats_services.record_learner_answer_info(
             feconf.ENTITY_TYPE_QUESTION, state_reference, self.interaction_id,
             self.answer, self.answer_details)
-        with self.swap(
+        with patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)

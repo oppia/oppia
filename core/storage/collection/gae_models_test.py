@@ -17,6 +17,7 @@
 """Tests for collection models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import copy
 import datetime
@@ -225,7 +226,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_1))
@@ -396,7 +397,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 'new_role': rights_domain.ROLE_OWNER
             }]
         )
-        self.allow_revert_swap = self.swap(
+        self.allow_revert_swap = patch.object(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
 
         collection_rights_allowed_commands = copy.deepcopy(
@@ -409,7 +410,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'allowed_values': {},
             'deprecated_values': {}
         })
-        self.allowed_commands_swap = self.swap(
+        self.allowed_commands_swap = patch.object(
             feconf,
             'COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
             collection_rights_allowed_commands

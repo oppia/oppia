@@ -15,6 +15,7 @@
 """Unit tests for scripts/typescript_checks.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import json
 import os
@@ -41,7 +42,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
-        self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        self.popen_swap = patch.object(subprocess, 'Popen', mock_popen)
 
     def test_compiled_js_dir_validation(self) -> None:
         """Test that typescript_checks.COMPILED_JS_DIR is validated correctly
@@ -56,7 +57,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 config_data = json.load(f)
                 out_dir = os.path.join(
                     config_data['compilerOptions']['outDir'], '')
-            compiled_js_dir_swap = self.swap(
+            compiled_js_dir_swap = patch.object(
                 typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
             with compiled_js_dir_swap, self.assertRaisesRegex(
                 Exception,
@@ -72,9 +73,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         def mock_validate_compiled_js_dir() -> None:
             pass
 
-        compiled_js_dir_swap = self.swap(
+        compiled_js_dir_swap = patch.object(
             typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
-        validate_swap = self.swap(
+        validate_swap = patch.object(
             typescript_checks, 'validate_compiled_js_dir',
             mock_validate_compiled_js_dir)
         with self.popen_swap, compiled_js_dir_swap, validate_swap:
@@ -107,7 +108,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
-        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
+        with patch.object(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
@@ -115,7 +116,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def test_error_is_raised_for_invalid_compilation_of_strict_tsconfig(
             self) -> None:
         """Test that error is produced if stdout is not empty."""
-        with self.swap(typescript_checks, 'TS_STRICT_EXCLUDE_PATHS', []):
+        with patch.object(typescript_checks, 'TS_STRICT_EXCLUDE_PATHS', []):
             with self.assertRaisesRegex(SystemExit, '1'):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.STRICT_TSCONFIG_FILEPATH)
@@ -151,8 +152,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         ) -> MockProcess:  # pylint: disable=unsubscriptable-object
             return MockProcess()
 
-        swap_path_exists = self.swap(os.path, 'exists', lambda _: False)
-        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
+        swap_path_exists = patch.object(os.path, 'exists', lambda _: False)
+        with patch.object(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'), swap_path_exists:
                 typescript_checks.compile_temp_strict_tsconfig(
                     typescript_checks.STRICT_TSCONFIG_FILEPATH,
@@ -163,7 +164,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """Test if the config path is correct when no arg is used."""
         def mock_compile_and_check_typescript(config_path: str) -> None:
             self.assertEqual(config_path, typescript_checks.TSCONFIG_FILEPATH)
-        compile_and_check_typescript_swap = self.swap(
+        compile_and_check_typescript_swap = patch.object(
             typescript_checks, 'compile_and_check_typescript',
             mock_compile_and_check_typescript)
 
@@ -175,7 +176,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         def mock_compile_and_check_typescript(config_path: str) -> None:
             self.assertEqual(
                 config_path, typescript_checks.STRICT_TSCONFIG_FILEPATH)
-        compile_and_check_typescript_swap = self.swap(
+        compile_and_check_typescript_swap = patch.object(
             typescript_checks, 'compile_and_check_typescript',
             mock_compile_and_check_typescript)
 

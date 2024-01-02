@@ -17,6 +17,7 @@
 """Tests for the Mailgun API wrapper."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import urllib
 
@@ -84,11 +85,11 @@ class EmailTests(test_utils.GenericTestBase):
         )
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
 
-        swap_urlopen_context = self.swap(
+        swap_urlopen_context = patch.object(
             utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
+        swap_request_context = patch.object(
             urllib.request, 'Request', self.swapped_request)
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        swap_domain = patch.object(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
             with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
@@ -114,11 +115,11 @@ class EmailTests(test_utils.GenericTestBase):
             b'%27%3A+%7B%27first%27%3A+%27Bob%27%2C+%27id%27%3A+1%7D%7D',
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
-        swap_urlopen_context = self.swap(
+        swap_urlopen_context = patch.object(
             utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
+        swap_request_context = patch.object(
             urllib.request, 'Request', self.swapped_request)
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        swap_domain = patch.object(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
             with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
@@ -148,11 +149,11 @@ class EmailTests(test_utils.GenericTestBase):
             b'%27%3A+%7B%27first%27%3A+%27Bob%27%2C+%27id%27%3A+1%7D%7D',
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
-        swap_urlopen_context = self.swap(
+        swap_urlopen_context = patch.object(
             utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
+        swap_request_context = patch.object(
             urllib.request, 'Request', self.swapped_request)
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        swap_domain = patch.object(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
             with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
@@ -182,11 +183,11 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(
+        swap_urlopen_context = patch.object(
             utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
+        swap_request_context = patch.object(
             urllib.request, 'Request', swapped_request)
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        swap_domain = patch.object(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
             with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
@@ -246,11 +247,11 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic'})
         swapped_request = lambda *args: args
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
-        swap_urlopen_context = self.swap(
+        swap_urlopen_context = patch.object(
             utils, 'url_open', swapped_urlopen)
-        swap_request_context = self.swap(
+        swap_request_context = patch.object(
             urllib.request, 'Request', swapped_request)
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        swap_domain = patch.object(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
             with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(

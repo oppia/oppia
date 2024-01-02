@@ -15,6 +15,7 @@
 """Tests for the story viewer page"""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 
@@ -328,7 +329,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
     ) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.get_html_response(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -344,7 +345,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.get_html_response(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -410,7 +411,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.logout()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.get_html_response(
                 '%s/staging/topic-frag/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -422,7 +423,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
     def test_redirect_to_next_node(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.get_html_response(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -436,7 +437,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_new_structures_not_enabled(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -446,7 +447,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_succeeds_when_story_and_node_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -462,7 +463,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self
     ) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -476,7 +477,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_story_does_not_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, 'invalid-story',
@@ -486,7 +487,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_node_does_not_exist(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -496,7 +497,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_node_id_schema_is_invalid(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -508,7 +509,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -522,7 +523,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -566,7 +567,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -581,7 +582,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self
     ) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -607,7 +608,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -674,7 +675,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
@@ -693,7 +694,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(
+        story_fetchers_swap = patch.object(
             story_fetchers, 'get_story_by_id', _mock_none_function)
 
         with story_fetchers_swap:
@@ -720,7 +721,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,

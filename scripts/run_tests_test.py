@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import subprocess
@@ -34,7 +35,7 @@ class RunTestsTests(test_utils.GenericTestBase):
         print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        print_swap = patch.object(builtins, 'print', mock_print)
 
         scripts_called = {
             'setup': False,
@@ -58,13 +59,13 @@ class RunTestsTests(test_utils.GenericTestBase):
         def mock_install_third_party_libs() -> None:
             pass
 
-        swap_install_third_party_libs = self.swap(
+        swap_install_third_party_libs = patch.object(
             install_third_party_libs, 'main', mock_install_third_party_libs)
-        swap_setup = self.swap(setup, 'main', mock_setup)
-        swap_setup_gae = self.swap(setup_gae, 'main', mock_setup_gae)
-        swap_frontend_tests = self.swap(
+        swap_setup = patch.object(setup, 'main', mock_setup)
+        swap_setup_gae = patch.object(setup_gae, 'main', mock_setup_gae)
+        swap_frontend_tests = patch.object(
             run_frontend_tests, 'main', mock_frontend_tests)
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = patch.object(subprocess, 'Popen', mock_popen)
 
         # We import run_backend_tests script under install_third_party_libs
         # mock since run_backend_tests script installs third party libs
@@ -74,7 +75,7 @@ class RunTestsTests(test_utils.GenericTestBase):
         with swap_install_third_party_libs:
             from scripts import run_backend_tests
             from scripts import run_tests
-            swap_backend_tests = self.swap(
+            swap_backend_tests = patch.object(
                 run_backend_tests, 'main', mock_backend_tests)
             with print_swap, swap_setup, swap_setup_gae, swap_popen:
                 with swap_frontend_tests, swap_backend_tests:

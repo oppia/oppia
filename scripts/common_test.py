@@ -15,6 +15,7 @@
 """Unit tests for scripts/common.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import contextlib
@@ -90,7 +91,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
@@ -201,25 +202,25 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(common.PROTOC_VERSION, protobuf_version)
 
     def test_is_x64_architecture_in_x86(self) -> None:
-        maxsize_swap = self.swap(sys, 'maxsize', 1)
+        maxsize_swap = patch.object(sys, 'maxsize', 1)
         with maxsize_swap:
             self.assertFalse(common.is_x64_architecture())
 
     def test_is_x64_architecture_in_x64(self) -> None:
-        maxsize_swap = self.swap(sys, 'maxsize', 2**32 + 1)
+        maxsize_swap = patch.object(sys, 'maxsize', 2**32 + 1)
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
     def test_is_mac_os(self) -> None:
-        with self.swap(common, 'OS_NAME', 'Darwin'):
+        with patch.object(common, 'OS_NAME', 'Darwin'):
             self.assertTrue(common.is_mac_os())
-        with self.swap(common, 'OS_NAME', 'Linux'):
+        with patch.object(common, 'OS_NAME', 'Linux'):
             self.assertFalse(common.is_mac_os())
 
     def test_is_linux_os(self) -> None:
-        with self.swap(common, 'OS_NAME', 'Linux'):
+        with patch.object(common, 'OS_NAME', 'Linux'):
             self.assertTrue(common.is_linux_os())
-        with self.swap(common, 'OS_NAME', 'Windows'):
+        with patch.object(common, 'OS_NAME', 'Windows'):
             self.assertFalse(common.is_linux_os())
 
     def test_run_cmd(self) -> None:
@@ -233,7 +234,7 @@ class CommonTests(test_utils.GenericTestBase):
         }
         def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
-        with self.swap(os, 'makedirs', mock_makedirs):
+        with patch.object(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('assets')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': False})
 
@@ -243,7 +244,7 @@ class CommonTests(test_utils.GenericTestBase):
         }
         def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
-        with self.swap(os, 'makedirs', mock_makedirs):
+        with patch.object(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('test-dir')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': True})
 
@@ -262,7 +263,7 @@ class CommonTests(test_utils.GenericTestBase):
     ) -> None:
         def mock_getcwd() -> str:
             return 'invalid'
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        getcwd_swap = patch.object(os, 'getcwd', mock_getcwd)
         with getcwd_swap, self.assertRaisesRegex(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
@@ -278,9 +279,9 @@ class CommonTests(test_utils.GenericTestBase):
 
         def mock_isdir(unused_dirpath: str) -> Literal[True]:
             return True
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        basename_swap = self.swap(os.path, 'basename', mock_basename)
-        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        getcwd_swap = patch.object(os, 'getcwd', mock_getcwd)
+        basename_swap = patch.object(os.path, 'basename', mock_basename)
+        isdir_swap = patch.object(os.path, 'isdir', mock_isdir)
         with getcwd_swap, basename_swap, isdir_swap:
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
@@ -306,10 +307,10 @@ class CommonTests(test_utils.GenericTestBase):
             def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
                 return 'n'
-            call_swap = self.swap(subprocess, 'call', mock_call)
-            check_call_swap = self.swap(
+            call_swap = patch.object(subprocess, 'call', mock_call)
+            check_call_swap = patch.object(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(builtins, 'input', mock_input)
+            input_swap = patch.object(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -341,10 +342,10 @@ class CommonTests(test_utils.GenericTestBase):
                 if check_function_calls['input_gets_called'] == 2:
                     return '1'
                 return 'y'
-            call_swap = self.swap(subprocess, 'call', mock_call)
-            check_call_swap = self.swap(
+            call_swap = patch.object(subprocess, 'call', mock_call)
+            check_call_swap = patch.object(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(builtins, 'input', mock_input)
+            input_swap = patch.object(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -376,10 +377,10 @@ class CommonTests(test_utils.GenericTestBase):
                 if check_function_calls['input_gets_called'] == 2:
                     return '1'
                 return 'y'
-            call_swap = self.swap(subprocess, 'call', mock_call)
-            check_call_swap = self.swap(
+            call_swap = patch.object(subprocess, 'call', mock_call)
+            check_call_swap = patch.object(
                 subprocess, 'check_call', mock_check_call)
-            input_swap = self.swap(builtins, 'input', mock_input)
+            input_swap = patch.object(builtins, 'input', mock_input)
             with call_swap, check_call_swap, input_swap:
                 common.open_new_tab_in_browser_if_possible('test-url')
             self.assertEqual(
@@ -392,7 +393,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'remote1 url1\nremote2 url2'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output
         ):
             self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
@@ -402,7 +403,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'remote1 url1\nremote2 url2'
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
@@ -413,7 +414,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_verify_local_repo_is_clean_with_clean_repo(self) -> None:
         def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'nothing to commit, working directory clean'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output
         ):
             common.verify_local_repo_is_clean()
@@ -421,7 +422,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_verify_local_repo_is_clean_with_unclean_repo(self) -> None:
         def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'invalid'
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception, 'ERROR: This script should be run from a clean branch.'
@@ -433,7 +434,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
@@ -446,8 +447,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_run_cmd(cmd: str) -> str:
             return cmd
 
-        with self.swap(subprocess, 'check_output', mock_check_output):
-            with self.swap(common, 'run_cmd', mock_run_cmd):
+        with patch.object(subprocess, 'check_output', mock_check_output):
+            with patch.object(common, 'run_cmd', mock_run_cmd):
                 common.update_branch_with_upstream()
 
     def test_get_current_release_version_number_with_non_hotfix_branch(
@@ -484,7 +485,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
@@ -493,7 +494,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3-hotfix-1'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
@@ -504,7 +505,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
@@ -515,7 +516,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3-hotfix-1'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
@@ -526,7 +527,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-maintenance-1.2.3'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
@@ -537,7 +538,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
@@ -546,7 +547,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test-common'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
@@ -555,7 +556,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch invalid-test'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
@@ -564,7 +565,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
-        with self.swap(
+        with patch.object(
             subprocess, 'check_output', mock_check_output):
             common.verify_current_branch_name('test')
 
@@ -573,7 +574,7 @@ class CommonTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch invalid'
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
             Exception,
@@ -594,7 +595,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         sleep_swap = self.swap_with_checks(
             time, 'sleep', mock_sleep, expected_args=[(1,)] * 60)
-        is_port_in_use_swap = self.swap(
+        is_port_in_use_swap = patch.object(
             common, 'is_port_in_use', mock_is_port_in_use)
 
         with sleep_swap, is_port_in_use_swap:
@@ -607,9 +608,9 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_is_port_in_use(unused_port_number: int) -> Literal[False]:
             return False
 
-        sleep_swap = self.swap(
+        sleep_swap = patch.object(
             time, 'sleep', mock_sleep)
-        is_port_in_use_swap = self.swap(
+        is_port_in_use_swap = patch.object(
             common, 'is_port_in_use', mock_is_port_in_use)
 
         with sleep_swap, is_port_in_use_swap:
@@ -626,7 +627,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         sleep_swap = self.swap_with_checks(
             time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5)
-        is_port_in_use_swap = self.swap(
+        is_port_in_use_swap = patch.object(
             common, 'is_port_in_use', mock_is_port_in_use)
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
@@ -642,10 +643,10 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_exit(unused_code: str) -> NoReturn:
             raise AssertionError('mock_exit should not be called.')
 
-        sleep_swap = self.swap(time, 'sleep', mock_sleep)
-        is_port_in_use_swap = self.swap(
+        sleep_swap = patch.object(time, 'sleep', mock_sleep)
+        is_port_in_use_swap = patch.object(
             common, 'is_port_in_use', mock_is_port_in_use)
-        exit_swap = self.swap(sys, 'exit', mock_exit)
+        exit_swap = patch.object(sys, 'exit', mock_exit)
 
         with sleep_swap, is_port_in_use_swap, exit_swap:
             common.wait_for_port_to_be_in_use(9999)
@@ -739,7 +740,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-        with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
+        with patch.object(subprocess, 'check_call', _mock_subprocess_check_call):
             common.install_npm_library('library_name', 'version', 'path')
 
         self.assertFalse(os.path.exists('temp_file'))
@@ -747,19 +748,19 @@ class CommonTests(test_utils.GenericTestBase):
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
             return 'Y'
-        with self.swap(builtins, 'input', mock_input):
+        with patch.object(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self) -> None:
         def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
             return 'token'
-        with self.swap(getpass, 'getpass', mock_getpass):
+        with patch.object(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self) -> None:
         def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
             return None
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        getpass_swap = patch.object(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegex(
             Exception,
             'No personal access token provided, please set up a personal '
@@ -807,9 +808,9 @@ class CommonTests(test_utils.GenericTestBase):
         ) -> List[github.Label.Label]:
             return [label]
 
-        get_issues_swap = self.swap(
+        get_issues_swap = patch.object(
             github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
+        get_label_swap = patch.object(
             github.Repository.Repository, 'get_label', mock_get_label)
         with get_issues_swap, get_label_swap:
             common.check_prs_for_current_release_are_released(mock_repo)
@@ -856,11 +857,11 @@ class CommonTests(test_utils.GenericTestBase):
         ) -> List[github.Label.Label]:
             return [label]
 
-        get_issues_swap = self.swap(
+        get_issues_swap = patch.object(
             github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
+        get_label_swap = patch.object(
             github.Repository.Repository, 'get_label', mock_get_label)
-        open_tab_swap = self.swap(
+        open_tab_swap = patch.object(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_issues_swap, get_label_swap, open_tab_swap:
             with self.assertRaisesRegex(
@@ -966,7 +967,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_is_windows() -> Literal[True]:
             return True
 
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        is_windows_swap = patch.object(common, 'is_windows_os', mock_is_windows)
         original_filepath = 'c:\\path\\to\\a\\file.js'
         with is_windows_swap:
             actual_file_path = common.convert_to_posixpath(original_filepath)
@@ -976,7 +977,7 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_is_windows() -> Literal[False]:
             return False
 
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        is_windows_swap = patch.object(common, 'is_windows_os', mock_is_windows)
         original_filepath = 'c:\\path\\to\\a\\file.js'
         with is_windows_swap:
             actual_file_path = common.convert_to_posixpath(original_filepath)
@@ -1003,7 +1004,7 @@ class CommonTests(test_utils.GenericTestBase):
                 ('/new/path',),
                 ('/old/path',),
             ])
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        getcwd_swap = patch.object(os, 'getcwd', mock_getcwd)
 
         with chdir_swap, getcwd_swap:
             with common.CD('/new/path'):
@@ -1067,7 +1068,7 @@ class CommonTests(test_utils.GenericTestBase):
         write_swap = self.swap_to_always_raise(
             os, 'write',
             io.UnsupportedOperation('unsupported operation'))
-        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+        stdout_write_swap = patch.object(sys, 'stdout', mock_stdout)
 
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
@@ -1119,7 +1120,7 @@ class CommonTests(test_utils.GenericTestBase):
                 self._assert_ssl_context_matches_default(context)
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_swap = patch.object(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
                 common.url_retrieve('https://example.com', output_path)
@@ -1141,7 +1142,7 @@ class CommonTests(test_utils.GenericTestBase):
                     raise ssl.SSLError()
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_swap = patch.object(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
                 common.url_retrieve('https://example.com', output_path)
@@ -1161,8 +1162,8 @@ class CommonTests(test_utils.GenericTestBase):
             self._assert_ssl_context_matches_default(context)
             raise ssl.SSLError('test_error')
 
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        open_swap = patch.object(builtins, 'open', mock_open)
+        urlopen_swap = patch.object(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap:
             with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
@@ -1174,8 +1175,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
             raise AssertionError('urlopen() should not be called')
 
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        open_swap = patch.object(builtins, 'open', mock_open)
+        urlopen_swap = patch.object(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap:
             with self.assertRaisesRegex(
@@ -1196,7 +1197,7 @@ class CommonTests(test_utils.GenericTestBase):
                 self._assert_ssl_context_matches_default(context)
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_swap = patch.object(urlrequest, 'urlopen', mock_urlopen)
 
             with urlopen_swap:
                 common.url_retrieve(
@@ -1205,7 +1206,7 @@ class CommonTests(test_utils.GenericTestBase):
                 self.assertEqual(buffer.read(), b'content')
 
     def test_chrome_bin_setup_with_google_chrome(self) -> None:
-        isfile_swap = self.swap(
+        isfile_swap = patch.object(
             os.path, 'isfile', lambda path: path == '/usr/bin/google-chrome'
         )
         with isfile_swap:
@@ -1213,7 +1214,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
 
     def test_chrome_bin_setup_with_wsl_chrome_browser(self) -> None:
-        isfile_swap = self.swap(
+        isfile_swap = patch.object(
             os.path,
             'isfile',
             lambda path: path == (
@@ -1234,8 +1235,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        isfile_swap = patch.object(os.path, 'isfile', lambda _: False)
+        print_swap = patch.object(builtins, 'print', mock_print)
 
         with print_swap, isfile_swap, self.assertRaisesRegex(
             Exception, 'Chrome not found.'
@@ -1246,16 +1247,16 @@ class CommonTests(test_utils.GenericTestBase):
     def test_modify_constants_under_docker_env(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
-        constants_path_swap = self.swap(
+        constants_path_swap = patch.object(
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+        feconf_path_swap = patch.object(common, 'FECONF_PATH', mock_feconf_path)
 
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+        with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', True):
             def mock_check_output(
                 unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
             ) -> str:
                 return 'test'
-            check_output_swap = self.swap(
+            check_output_swap = patch.object(
                 subprocess, 'check_output', mock_check_output
             )
 
@@ -1316,15 +1317,15 @@ class CommonTests(test_utils.GenericTestBase):
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
-        constants_path_swap = self.swap(
+        constants_path_swap = patch.object(
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+        feconf_path_swap = patch.object(common, 'FECONF_PATH', mock_feconf_path)
 
         def mock_check_output(
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'test'
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output
         )
 
@@ -1389,9 +1390,9 @@ class CommonTests(test_utils.GenericTestBase):
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
-        constants_path_swap = self.swap(
+        constants_path_swap = patch.object(
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+        feconf_path_swap = patch.object(common, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to

@@ -17,6 +17,7 @@
 """Tests for the controller managing incoming feedback reports."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 
@@ -168,10 +169,10 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         # Webapp requires the header values to be str-types, so they must have
         # parity for the tests to correctly check these fields.
         token = self.get_new_csrf_token()
-        with self.swap(
+        with patch.object(
             android_validation_constants, 'ANDROID_API_KEY',
             ANDROID_API_KEY_STRING):
-            with self.swap(
+            with patch.object(
                 android_validation_constants, 'ANDROID_APP_PACKAGE_NAME',
                 ANDROID_APP_PACKAGE_NAME_STRING):
                 return (

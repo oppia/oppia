@@ -17,6 +17,7 @@
 """Unit tests for scripts/install_third_party.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -77,16 +78,16 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_extractall(_self: zipfile.ZipFile, path: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
 
-        self.unzip_swap = self.swap(
+        self.unzip_swap = patch.object(
             install_third_party, 'TMP_UNZIP_PATH', MOCK_TMP_UNZIP_PATH)
-        self. dir_exists_swap = self.swap(
+        self. dir_exists_swap = patch.object(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
-        self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.remove_swap = self.swap(os, 'remove', mock_remove)
-        self.rename_swap = self.swap(os, 'rename', mock_rename)
-        self.url_retrieve_swap = self.swap(
+        self.exists_swap = patch.object(os.path, 'exists', mock_exists)
+        self.remove_swap = patch.object(os, 'remove', mock_remove)
+        self.rename_swap = patch.object(os, 'rename', mock_rename)
+        self.url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
-        self.extract_swap = self.swap(
+        self.extract_swap = patch.object(
             zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self) -> None:
@@ -116,8 +117,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_url_retrieve(_url: str, filename: str) -> None:
             check_file_downloads[filename] = True
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_retrieve_swap = self.swap(
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        url_retrieve_swap = patch.object(
             common, 'url_retrieve', mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_third_party.download_files(
@@ -132,7 +133,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             exists_arr.append(False)
             return False
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
 
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.unzip_swap:
@@ -162,8 +163,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             file_obj = utils.open_file(MOCK_TMP_UNZIP_PATH, 'rb', None)
             return file_obj
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        url_open_swap = patch.object(utils, 'url_open', mock_url_open)
         with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
             with self.remove_swap, self.rename_swap, self.extract_swap:
                 with url_open_swap:
@@ -181,10 +182,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_extractall(_self: zipfile.ZipFile, _path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        extract_swap = self.swap(
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        extract_swap = patch.object(
             tarfile.TarFile, 'extractall', mock_extractall)
-        unzip_swap = self.swap(
+        unzip_swap = patch.object(
             install_third_party, 'TMP_UNZIP_PATH', os.path.join(
                 RELEASE_TEST_DIR, 'tmp_unzip.tar.gz'))
 
@@ -228,7 +229,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        print_swap = patch.object(builtins, 'print', mock_print)
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'files', {
@@ -245,7 +246,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        print_swap = patch.object(builtins, 'print', mock_print)
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'zip', {
@@ -263,7 +264,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
-        print_swap = self.swap(builtins, 'print', mock_print)
+        print_swap = patch.object(builtins, 'print', mock_print)
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
             install_third_party.test_dependencies_syntax(
                 'tar', {
@@ -297,7 +298,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        return_json_swap = self.swap(
+        return_json_swap = patch.object(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap:
             install_third_party.validate_dependencies('filepath')
@@ -317,7 +318,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     }
                 }
             }
-        return_json_swap = self.swap(
+        return_json_swap = patch.object(
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap, self.assertRaisesRegex(
             Exception,
@@ -400,22 +401,22 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_install_python_prod_dependencies() -> None:
             check_function_calls[
                 'install_python_prod_dependencies_is_called'] = True
-        return_json_swap = self.swap(
+        return_json_swap = patch.object(
             install_third_party, 'return_json', mock_return_json)
-        validate_swap = self.swap(
+        validate_swap = patch.object(
             install_third_party,
             'validate_dependencies',
             mock_validate_dependencies
         )
-        download_files_swap = self.swap(
+        download_files_swap = patch.object(
             install_third_party, 'download_files', mock_download_files)
-        unzip_files_swap = self.swap(
+        unzip_files_swap = patch.object(
             install_third_party, 'download_and_unzip_files',
             mock_download_and_unzip_files)
-        untar_files_swap = self.swap(
+        untar_files_swap = patch.object(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
-        mock_install_python_prod_dependencies_swap = self.swap(
+        mock_install_python_prod_dependencies_swap = patch.object(
             install_python_prod_dependencies, 'main',
             mock_install_python_prod_dependencies)
 
@@ -433,7 +434,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
 
-        with self.swap(common, 'is_windows_os', mock_is_windows_os), (
+        with patch.object(common, 'is_windows_os', mock_is_windows_os), (
             windows_not_supported_exception):
             install_third_party.main(args=[])
 
@@ -464,9 +465,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(
+        swap_call = patch.object(
             subprocess, 'call', mock_call)
-        untar_files_swap = self.swap(
+        untar_files_swap = patch.object(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
         with swap_call, untar_files_swap:
@@ -510,15 +511,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(
+        swap_call = patch.object(
             subprocess, 'call', mock_call)
-        unzip_files_swap = self.swap(
+        unzip_files_swap = patch.object(
             install_third_party, 'download_and_unzip_files',
             mock_download_and_unzip_files)
 
-        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
-        windows_swap = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        mac_swap = patch.object(common, 'is_mac_os', mock_is_mac_os)
+        linux_swap = patch.object(common, 'is_linux_os', mock_is_linux_os)
+        windows_swap = patch.object(common, 'is_windows_os', mock_is_windows_os)
         with swap_call, unzip_files_swap, mac_swap, linux_swap, windows_swap:
             install_third_party.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -555,9 +556,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(
+        swap_call = patch.object(
             subprocess, 'call', mock_call)
-        untar_files_swap = self.swap(
+        untar_files_swap = patch.object(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
 
@@ -567,8 +568,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_and_unzip_files_is_called': False
         }
 
-        mac_os_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_os_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
+        mac_os_swap = patch.object(common, 'is_mac_os', mock_is_mac_os)
+        linux_os_swap = patch.object(common, 'is_linux_os', mock_is_linux_os)
         with swap_call, untar_files_swap, mac_os_swap, linux_os_swap:
             install_third_party.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -595,14 +596,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(
+        swap_call = patch.object(
             subprocess, 'call', mock_call)
 
         os_not_supported_exception = self.assertRaisesRegex(
             Exception, 'Unrecognized or unsupported operating system.')
-        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
-        windows_swap = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        mac_swap = patch.object(common, 'is_mac_os', mock_is_mac_os)
+        linux_swap = patch.object(common, 'is_linux_os', mock_is_linux_os)
+        windows_swap = patch.object(common, 'is_windows_os', mock_is_windows_os)
         with mac_swap, linux_swap, windows_swap, swap_call, (
             os_not_supported_exception):
             install_third_party.install_elasticsearch_dev_server()
@@ -623,7 +624,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(
+        swap_call = patch.object(
             subprocess, 'call', mock_call)
 
         expected_check_function_calls = {

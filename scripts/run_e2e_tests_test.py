@@ -16,6 +16,7 @@
 """Unit tests for scripts/run_e2e_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import contextlib
 import subprocess
@@ -57,7 +58,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
+        self.swap_mock_set_constants_to_default = patch.object(
             common, 'set_constants_to_default', mock_constants)
 
     def tearDown(self) -> None:
@@ -89,7 +90,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self) -> None:
         mock_sleep = self.exit_stack.enter_context(self.swap_with_call_counter(
             time, 'sleep'))
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             common, 'is_port_in_use', lambda _: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None))
@@ -217,7 +218,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
@@ -228,7 +229,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
@@ -241,7 +242,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
@@ -256,7 +257,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
@@ -269,7 +270,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
+        self.exit_stack.enter_context(patch.object(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))

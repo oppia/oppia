@@ -17,6 +17,7 @@
 """Unit tests for scripts/pre_push_hook.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -94,33 +95,33 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_check_backend_python_library_for_inconsistencies() -> None:
             return
 
-        self.swap_check_backend_python_libs = self.swap(
+        self.swap_check_backend_python_libs = patch.object(
             pre_push_hook,
             'check_for_backend_python_library_inconsistencies',
             mock_check_backend_python_library_for_inconsistencies)
-        self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        self.get_remote_name_swap = self.swap(
+        self.popen_swap = patch.object(subprocess, 'Popen', mock_popen)
+        self.get_remote_name_swap = patch.object(
             pre_push_hook, 'get_remote_name', mock_get_remote_name)
-        self.get_refs_swap = self.swap(pre_push_hook, 'get_refs', mock_get_refs)
-        self.collect_files_swap = self.swap(
+        self.get_refs_swap = patch.object(pre_push_hook, 'get_refs', mock_get_refs)
+        self.collect_files_swap = patch.object(
             pre_push_hook, 'collect_files_being_pushed',
             mock_collect_files_being_pushed)
-        self.uncommitted_files_swap = self.swap(
+        self.uncommitted_files_swap = patch.object(
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.check_output_swap = self.swap(
+        self.print_swap = patch.object(builtins, 'print', mock_print)
+        self.check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
-        self.start_linter_swap = self.swap(
+        self.start_linter_swap = patch.object(
             pre_push_hook, 'start_linter', mock_start_linter)
-        self.execute_mypy_checks_swap = self.swap(
+        self.execute_mypy_checks_swap = patch.object(
             pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks)
-        self.js_or_ts_swap = self.swap(
+        self.js_or_ts_swap = patch.object(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
-        self.ts_swap = self.swap(
+        self.ts_swap = patch.object(
             pre_push_hook, 'does_diff_include_ts_files',
             mock_does_diff_include_ts_files)
-        self.ci_config_or_js_files_swap = self.swap(
+        self.ci_config_or_js_files_swap = patch.object(
             pre_push_hook,
             'does_diff_include_ci_config_or_js_files',
             mock_does_diff_include_ci_config_or_js_files)
@@ -150,7 +151,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
         with popen_swap:
             self.assertEqual(pre_push_hook.get_remote_name(), b'upstream')
 
@@ -168,7 +169,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             pre_push_hook.get_remote_name()
 
@@ -188,10 +189,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        communicate_swap = self.swap(
+        communicate_swap = patch.object(
             process_for_remote_url, 'communicate', mock_communicate
         )
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
         with communicate_swap:
             with popen_swap:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
@@ -216,7 +217,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(
             Exception,
             'Error: Please set upstream for the lint checks to run '
@@ -249,7 +250,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        popen_swap = patch.object(subprocess, 'Popen', mock_popen)
         with popen_swap, self.print_swap:
             self.assertIsNone(pre_push_hook.get_remote_name())
         self.assertTrue(
@@ -261,7 +262,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -278,7 +279,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[str, str]:
             return ('M\tfile1\nA\tfile2', 'test_oppia_error')
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -311,12 +312,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
             check_function_calls['get_merge_base_is_called'] = True
             return 'Merge Base'
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        git_diff_swap = self.swap(
+        git_diff_swap = patch.object(
             pre_push_hook, 'git_diff_name_status', mock_git_diff_name_status)
-        get_merge_base_swap = self.swap(
+        get_merge_base_swap = patch.object(
             pre_push_hook, 'get_merge_base', mock_get_merge_base)
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
@@ -331,7 +332,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str]
         ) -> Tuple[None, str]:
             return None, 'Test'
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -350,7 +351,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             check_function_calls['start_subprocess_for_result_is_called'] = True
             return b'Test', None
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -373,7 +374,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_parent_branch_name_for_diff_with_hotfix_branch(self) -> None:
         def mock_get_branch() -> str:
             return 'release-1.2.3-hotfix-1'
-        get_branch_swap = self.swap(
+        get_branch_swap = patch.object(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
@@ -383,7 +384,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_parent_branch_name_for_diff_with_release_branch(self) -> None:
         def mock_get_branch() -> str:
             return 'release-1.2.3'
-        get_branch_swap = self.swap(
+        get_branch_swap = patch.object(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
@@ -394,7 +395,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     ) -> None:
         def mock_get_branch() -> str:
             return 'branch-1'
-        get_branch_swap = self.swap(
+        get_branch_swap = patch.object(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
@@ -403,7 +404,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_collect_files_being_pushed_with_empty_ref_list(self) -> None:
         def mock_get_branch() -> str:
             return 'branch-1'
-        get_branch_swap = self.swap(
+        get_branch_swap = patch.object(
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
@@ -423,11 +424,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> List[str]:
             return ['file1', 'file2']
 
-        get_branch_swap = self.swap(
+        get_branch_swap = patch.object(
             common, 'get_current_branch_name', mock_get_branch)
-        compare_to_remote_swap = self.swap(
+        compare_to_remote_swap = patch.object(
             pre_push_hook, 'compare_to_remote', mock_compare_to_remote)
-        extract_files_swap = self.swap(
+        extract_files_swap = patch.object(
             pre_push_hook, 'extract_files_to_lint', mock_extract_files_to_lint)
 
         with compare_to_remote_swap, extract_files_swap, get_branch_swap:
@@ -447,7 +448,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with utils.open_file(temp_stdin_file, 'w') as f:
             f.write('local_ref local_sha1 remote_ref remote_sha1')
         with utils.open_file(temp_stdin_file, 'r') as f:
-            with self.swap(sys, 'stdin', f):
+            with patch.object(sys, 'stdin', f):
                 self.assertEqual(
                     pre_push_hook.get_refs(),
                     [
@@ -474,7 +475,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'file1'
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap:
             self.assertTrue(pre_push_hook.has_uncommitted_files())
@@ -489,9 +490,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> Tuple[str, None]:
             return ('Output', None)
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -516,9 +517,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> Tuple[str, str]:
             return ('Output', 'test_oppia_error')
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
@@ -544,12 +545,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
 
         with islink_swap, exists_swap, subprocess_swap, symlink_swap, (
             self.print_swap):
@@ -583,13 +584,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_copy(unused_type: str, unused_file: str) -> None:
             check_function_calls['copy_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
-        copy_swap = self.swap(shutil, 'copy', mock_copy)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
+        copy_swap = patch.object(shutil, 'copy', mock_copy)
 
         with islink_swap, exists_swap, subprocess_swap, symlink_swap, copy_swap:
             with self.print_swap:
@@ -617,13 +618,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
-        islink_swap = self.swap(os.path, 'islink', mock_islink)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        subprocess_swap = self.swap(
+        islink_swap = patch.object(os.path, 'islink', mock_islink)
+        exists_swap = patch.object(os.path, 'exists', mock_exists)
+        subprocess_swap = patch.object(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        unlink_swap = self.swap(os, 'unlink', mock_unlink)
-        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+        unlink_swap = patch.object(os, 'unlink', mock_unlink)
+        symlink_swap = patch.object(os, 'symlink', mock_symlink)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             with unlink_swap, symlink_swap:
@@ -668,7 +669,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_has_uncommitted_files() -> bool:
             return True
 
-        uncommitted_files_swap = self.swap(
+        uncommitted_files_swap = patch.object(
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
@@ -687,7 +688,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return 'old-branch'
             raise subprocess.CalledProcessError(1, 'cmd', output='Output')
 
-        check_output_swap = self.swap(
+        check_output_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
@@ -735,7 +736,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             if script == pre_push_hook.TYPESCRIPT_CHECKS_CMDS:
                 return 1
             return 0
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
@@ -756,7 +757,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return 1
             return 0
 
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
@@ -776,7 +777,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             if script == pre_push_hook.BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD:
                 return 1
             return 0
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
 
@@ -798,7 +799,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             if script == pre_push_hook.FRONTEND_TEST_CMDS:
                 return 1
             return 0
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
@@ -819,7 +820,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             if script == pre_push_hook.CI_PROTRACTOR_CHECK_CMDS:
                 return 1
             return 0
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
@@ -841,7 +842,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         }
         def mock_install_hook() -> None:
             check_function_calls['install_hook_is_called'] = True
-        with self.swap(
+        with patch.object(
             pre_push_hook, 'install_hook', mock_install_hook), (
                 self.swap_check_backend_python_libs):
             pre_push_hook.main(args=['--install'])
@@ -849,7 +850,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_main_without_install_arg_and_errors(self) -> None:
         def mock_run_script_and_get_returncode(unused_script: List[str]) -> int:
             return 0
-        run_script_and_get_returncode_swap = self.swap(
+        run_script_and_get_returncode_swap = patch.object(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
@@ -876,10 +877,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exit_error(error_code: int) -> None:
             self.assertEqual(error_code, 1)
 
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
-        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
+        swap_sys_exit = patch.object(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
@@ -913,10 +914,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exit_error(error_code: int) -> None:
             self.assertEqual(error_code, 1)
 
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
-        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
+        swap_sys_exit = patch.object(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
@@ -940,7 +941,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_main_with_no_inconsistencies_in_backend_python_libs(self) -> None:
         def mock_get_mismatches() -> Dict[str, Tuple[str, str]]:
             return {}
-        swap_get_mismatches = self.swap(
+        swap_get_mismatches = patch.object(
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)

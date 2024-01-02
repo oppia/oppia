@@ -15,6 +15,7 @@
 """Tests for wipeout service."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -287,7 +288,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with patch.object(logging, 'info', _mock_logging_function):
             wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -695,7 +696,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             )]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with send_email_swap, patch.object(feconf, 'CAN_SEND_EMAILS', True):
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -738,7 +739,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with send_email_swap, patch.object(feconf, 'CAN_SEND_EMAILS', True):
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -769,7 +770,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             called=False
         )
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
+        with patch.object(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -5596,11 +5597,11 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.email_subjects.append(email_subject)
             self.email_bodies.append(email_body)
 
-        self.send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_swap = patch.object(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
+        self.can_send_email_swap = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
+        self.cannot_send_email_swap = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_repeated_deletion_is_successful_when_emails_enabled(
@@ -5707,11 +5708,11 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             self.email_subjects.append(email_subject)
             self.email_bodies.append(email_body)
 
-        self.send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_swap = patch.object(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
+        self.can_send_email_swap = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
+        self.cannot_send_email_swap = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
 
     def test_verification_when_user_is_not_deleted_emails_enabled(

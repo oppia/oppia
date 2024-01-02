@@ -17,6 +17,7 @@
 """Tests for Blog Post models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import types
@@ -113,7 +114,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             'A blog post with the given blog post ID exists already.'):
 
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_post_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -126,7 +127,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             Exception,
             'New blog post id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_post_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -466,7 +467,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             Exception,
             'Blog Post ID conflict on creating new blog post rights model.'):
             #  Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_post_rights_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -549,7 +550,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
 
             # Swap dependent method get_by_author to simulate collision every
             # time.
-            with self.swap(
+            with patch.object(
                 blog_author_details_model_cls, 'get_by_author',
                 types.MethodType(
                     lambda x, y: True,
@@ -562,7 +563,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
             Exception,
             'New instance id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 blog_author_details_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,

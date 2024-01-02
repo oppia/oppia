@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_acceptance_tests.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import contextlib
 import subprocess
@@ -81,7 +82,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
+        self.swap_mock_set_constants_to_default = patch.object(
             common, 'set_constants_to_default', mock_constants)
 
     def tearDown(self) -> None:
@@ -278,7 +279,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            with self.swap(constants, 'EMULATOR_MODE', False):
+            with patch.object(constants, 'EMULATOR_MODE', False):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_for_long_lived_process(self) -> None:
@@ -312,5 +313,5 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
         with self.swap_mock_set_constants_to_default:
-            with self.swap(constants, 'EMULATOR_MODE', True):
+            with patch.object(constants, 'EMULATOR_MODE', True):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])

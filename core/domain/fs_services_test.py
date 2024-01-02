@@ -15,6 +15,7 @@
 """Tests for File System services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import json
 import os
@@ -234,7 +235,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             encoding=None) as f:
             original_image_content = f.read()
 
-        with self.swap(constants, 'DEV_MODE', False):
+        with patch.object(constants, 'DEV_MODE', False):
             fs = fs_services.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
 
@@ -278,7 +279,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             encoding=None) as f:
             image_content = f.read()
 
-        with self.swap(constants, 'DEV_MODE', False):
+        with patch.object(constants, 'DEV_MODE', False):
             fs = fs_services.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
 

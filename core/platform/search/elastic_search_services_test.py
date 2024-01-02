@@ -17,6 +17,7 @@
 """Tests for the python elastic search wrapper."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.domain import search_services
 from core.platform.search import elastic_search_services
@@ -45,7 +46,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'failed': 0
                 }
             }
-        with self.swap(elastic_search_services.ES, 'index', mock_index):
+        with patch.object(elastic_search_services.ES, 'index', mock_index):
             elastic_search_services.add_documents_to_index([{
                 'id': correct_id
             }], correct_index_name)
@@ -74,7 +75,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         assert_raises_ctx = self.assertRaisesRegex(
             Exception,
             'Failed to add document to index.')
-        with assert_raises_ctx, self.swap(
+        with assert_raises_ctx, patch.object(
             elastic_search_services.ES, 'index', mock_index):
             elastic_search_services.add_documents_to_index(
                 documents, correct_index_name)
@@ -119,7 +120,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'match_all': {}
                 }
             })
-        swap_delete_by_query = self.swap(
+        swap_delete_by_query = patch.object(
             elastic_search_services.ES, 'delete_by_query', mock_delete_by_query)
 
         with swap_delete_by_query:
@@ -203,7 +204,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
+        swap_search = patch.object(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
             result, new_offset = (
@@ -262,7 +263,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
+        swap_search = patch.object(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
             result, new_offset = (
@@ -380,7 +381,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
+        swap_search = patch.object(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
             result, new_offset = (
@@ -442,7 +443,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
+        swap_search = patch.object(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
             result, new_offset = (

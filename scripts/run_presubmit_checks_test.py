@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_presubmit_checks.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -36,7 +37,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
 
         current_dir = os.path.abspath(os.getcwd())
         self.changed_frontend_file = os.path.join(
@@ -87,7 +88,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = patch.object(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests, self.swap_frontend_tests:
@@ -117,7 +118,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = patch.object(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests, self.swap_frontend_tests:
@@ -147,7 +148,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = patch.object(
             subprocess, 'check_output', mock_check_output)
         with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
             with self.swap_backend_tests:

@@ -17,6 +17,7 @@
 """Tests for core.storage.classifier.gae_models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import types
@@ -150,7 +151,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(
         self
     ) -> None:
-        with self.swap(
+        with patch.object(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
             next_scheduled_check_time = (
                 datetime.datetime.utcnow() - datetime.timedelta(minutes=1))
@@ -315,7 +316,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'producing too many collisions.'
             ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 classifier_models.ClassifierTrainingJobModel, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,

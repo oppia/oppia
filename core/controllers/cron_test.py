@@ -15,6 +15,7 @@
 """Tests for the cron jobs."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 
@@ -73,7 +74,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.testapp_swap = self.swap(
+        self.testapp_swap = patch.object(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.email_subjects: List[str] = []
@@ -88,7 +89,7 @@ class CronJobTests(test_utils.GenericTestBase):
             self.email_subjects.append(email_subject)
             self.email_bodies.append(email_body)
 
-        self.send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_swap = patch.object(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
         self.task_status = 'Not Started'
@@ -100,7 +101,7 @@ class CronJobTests(test_utils.GenericTestBase):
             """
             self.task_status = 'Started'
 
-        self.taskqueue_service_defer_swap = self.swap(
+        self.taskqueue_service_defer_swap = patch.object(
             taskqueue_services, 'defer', _mock_taskqueue_service_defer)
 
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self) -> None:
@@ -350,9 +351,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
-        self.testapp_swap = self.swap(
+        self.can_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', False)
+        self.testapp_swap = patch.object(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.reviewers_suggestion_email_infos = []
@@ -364,7 +365,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -385,7 +386,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         )
 
         with self.cannot_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with swap_platform_parameter_value, patch.object(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -408,7 +409,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         )
 
         with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with swap_platform_parameter_value, patch.object(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -434,7 +435,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewer_id, self.language_code)
 
         with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with swap_platform_parameter_value, patch.object(
                 email_manager,
                 'send_mail_to_notify_contributor_dashboard_reviewers',
                 self._mock_send_contributor_dashboard_reviewers_emails):
@@ -602,9 +603,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
-        self.testapp_swap = self.swap(
+        self.can_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', False)
+        self.testapp_swap = patch.object(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.admin_ids = []
@@ -622,15 +623,15 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
 
         with self.cannot_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with swap_platform_parameter_value, patch.object(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
-                with self.swap(
+                with patch.object(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
-                    with self.swap(
+                    with patch.object(
                         suggestion_models,
                         'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                         self.get_json(
@@ -647,7 +648,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -665,7 +666,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -688,7 +689,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
 
         with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
+            with swap_platform_parameter_value, patch.object(
                 email_manager,
                 'send_mail_to_notify_admins_that_reviewers_are_needed',
                 self.mock_send_mail_to_notify_admins_that_reviewers_are_needed):
@@ -729,11 +730,11 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         )
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0
             ):
-                with self.swap(
+                with patch.object(
                     email_manager,
                     'send_mail_to_notify_admins_suggestions_waiting_long',
                     self._mock_send_mail_to_notify_admins_suggestions_waiting):
@@ -819,9 +820,9 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
             story_domain.StoryPublicationTimeliness(
             'story_2', 'Story 2', 'Topic', ['Chapter 3'], ['Chapter 4']))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
-        self.testapp_swap = self.swap(
+        self.can_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails = patch.object(feconf, 'CAN_SEND_EMAILS', False)
+        self.testapp_swap = patch.object(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
         self.curriculum_admin_ids: List[str] = []
@@ -857,7 +858,7 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.cannot_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',
                 self._mock_send_reminder_mail_to_notify_curriculum_admins):
@@ -874,11 +875,11 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.can_send_emails, self.testapp_swap:
-            with self.swap(
+            with patch.object(
                 email_manager,
                 'send_reminder_mail_to_notify_curriculum_admins',
                 self._mock_send_reminder_mail_to_notify_curriculum_admins):
-                with self.swap(
+                with patch.object(
                     story_services, 'get_chapter_notifications_stories_list',
                     self._mock_get_chapter_notifications_stories_list):
                     self.get_json(

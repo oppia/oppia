@@ -15,6 +15,7 @@
 """Tests for core.storage.app_feedback_report.gae_models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import enum
@@ -206,7 +207,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             Exception, 'The id generator for AppFeedbackReportModel is '
             'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 app_feedback_report_models.AppFeedbackReportModel,
                 'get_by_id', types.MethodType(
                     lambda x, y: True,
@@ -356,7 +357,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'The field %s is not a valid field to filter reports on' % (
                 InvalidFilter.INVALID_FIELD.name)
         ):
-            with self.swap(
+            with patch.object(
                 model_class, 'query',
                 self._mock_query_filters_returns_empty_list):
                 # Here we use MyPy ignore because we passes arg of type
@@ -522,7 +523,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
             'many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(model_class, 'get_by_id', types.MethodType(
+            with patch.object(model_class, 'get_by_id', types.MethodType(
                 lambda x, y: True, model_class)):
                 ticket_id = model_class.generate_id(self.TICKET_NAME)
                 model_class.create(

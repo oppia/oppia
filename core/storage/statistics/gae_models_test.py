@@ -807,7 +807,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_swap = patch.object(
             stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, stats_models.PlaythroughModel))
 
@@ -1108,7 +1108,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
+        with patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
             stats_models.StateAnswersModel.insert_submitted_answers(
                 'exp_id', 1, 'state_name', 'interaction_id',
@@ -1205,7 +1205,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
     def test_get_all_state_answer_models_of_all_shards(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
+        with patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
             submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [{
                 'answer': 'value1',

@@ -15,6 +15,7 @@
 """Tests for the admin page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import enum
@@ -90,7 +91,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        self.prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -514,7 +515,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertFalse(collection_rights.community_owned)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with patch.object(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_collection',
@@ -823,7 +824,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }]
         )
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with patch.object(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
@@ -885,7 +886,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'Param for test.',
                 platform_parameter_domain.DataTypes.BOOL)
         )
-        with self.swap(
+        with patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
@@ -920,7 +921,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
@@ -968,7 +969,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
@@ -1012,7 +1013,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with patch.object(
             platform_feature_list,
             'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
             [ParamNames.TEST_PARAMETER_1]
@@ -1441,7 +1442,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.')
 
@@ -2557,13 +2558,13 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
                 '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
                 '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=400)
@@ -2714,7 +2715,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         # swap flakes can occur, since as the time flows the saved milliseconds
         # can differ from the milliseconds saved into the
         # UsernameChangeAuditModel's ID.
-        with self.swap(
+        with patch.object(
             utils, 'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs):
             self.put_json(

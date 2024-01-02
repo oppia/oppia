@@ -254,7 +254,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             topic_rights = topic_models.TopicRightsModel(
                 id=self.TOPIC_1_ID, manager_ids=['manager_id'])
             topic_rights.commit(

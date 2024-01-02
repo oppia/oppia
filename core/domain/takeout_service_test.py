@@ -15,6 +15,7 @@
 """Unit tests for core.domain.takeout_service."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import json
@@ -1350,7 +1351,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             user_bio='I want to leak uid_abcdefghijabcdefghijabcdefghijab'
         ).put()
 
-        with self.swap(
+        with patch.object(
             user_services, 'get_user_settings', lambda _, strict: None # pylint: disable=unused-argument
         ):
             user_takeout_object = takeout_service.export_data_for_user(

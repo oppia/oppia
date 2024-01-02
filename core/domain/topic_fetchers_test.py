@@ -17,6 +17,7 @@
 """Tests for topic domain objects."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import topic_domain
@@ -299,8 +300,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_story_refrence_schema_version_swap = self.swap(
+        swap_topic_object = patch.object(topic_domain, 'Topic', MockTopicObject)
+        current_story_refrence_schema_version_swap = patch.object(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
         with swap_topic_object, current_story_refrence_schema_version_swap:
             topic: topic_domain.Topic = (

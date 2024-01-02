@@ -15,6 +15,7 @@
 """Tests for the topic viewer page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.constants import constants
@@ -179,7 +180,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with patch.object(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)

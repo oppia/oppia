@@ -17,6 +17,7 @@
 """Unit tests for core/feconf.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import os
@@ -36,7 +37,7 @@ class FeconfTests(test_utils.GenericTestBase):
                 return 'Production'
             return 'Development'
 
-        swap_getenv = self.swap(os, 'getenv', mock_getenv)
+        swap_getenv = patch.object(os, 'getenv', mock_getenv)
         with swap_getenv, self.assertRaisesRegex(
                 Exception, 'DEV_MODE can\'t be true on production.'):
             feconf.check_dev_mode_is_true()
@@ -45,7 +46,7 @@ class FeconfTests(test_utils.GenericTestBase):
         def mock_getenv(*unused_args: str) -> str:
             return 'Development'
 
-        swap_getenv = self.swap(os, 'getenv', mock_getenv)
+        swap_getenv = patch.object(os, 'getenv', mock_getenv)
         with swap_getenv:
             feconf.check_dev_mode_is_true()
 

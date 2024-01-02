@@ -17,6 +17,7 @@
 """Unit tests for scripts/docstrings_checker."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.tests import test_utils
 from . import docstrings_checker  # isort:skip
@@ -239,7 +240,7 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         def func():
             raise Exception('An exception.') #@
         """)
-        node_ignores_exception_swap = self.swap(
+        node_ignores_exception_swap = patch.object(
             utils, 'node_ignores_exception',
             lambda _, __: (_ for _ in ()).throw(astroid.InferenceError())
         )

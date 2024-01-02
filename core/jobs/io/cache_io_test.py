@@ -17,6 +17,7 @@
 """Unit tests for jobs.io.cache_io."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.domain import caching_services
 from core.jobs import job_test_utils
@@ -39,7 +40,7 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
                 """Flush cache."""
                 called_functions['flush_caches'] = True
 
-        with self.swap(
+        with patch.object(
             caching_services, 'memory_cache_services', MockMemoryCachingServices
         ):
             self.assert_pcoll_equal(

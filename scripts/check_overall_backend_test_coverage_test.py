@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_overall_backend_test_coverage.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -35,7 +36,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
         self.env = os.environ.copy()
         self.cmd = [
             sys.executable, '-m', 'coverage', 'report',

@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import event_services
@@ -684,7 +685,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         event_handler_call_counter_exploration = test_utils.CallCounter(
             event_services.FeedbackThreadCreatedEventHandler.record)
-        with self.swap(
+        with patch.object(
             event_services.FeedbackThreadCreatedEventHandler, 'record',
             event_handler_call_counter_exploration):
             feedback_services.create_thread(
@@ -697,7 +698,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         event_handler_call_counter_non_exploration = (
             test_utils.CallCounter(
                 event_services.FeedbackThreadCreatedEventHandler.record))
-        with self.swap(
+        with patch.object(
             event_services.FeedbackThreadCreatedEventHandler, 'record',
             event_handler_call_counter_non_exploration):
             feedback_services.create_thread(
@@ -887,9 +888,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_pop_feedback_message_references(self) -> None:
@@ -967,7 +968,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.editor_id)
             self.assertEqual(model.retries, 0)
 
-            with self.swap(
+            with patch.object(
                 feconf, 'DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS', -1
             ):
                 feedback_services.update_feedback_email_retries_transactional(
@@ -1119,9 +1120,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self) -> None:
-        cannot_send_emails_ctx = self.swap(
+        cannot_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', False)
-        cannot_send_feedback_message_email_ctx = self.swap(
+        cannot_send_feedback_message_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
         with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
             feedback_services.create_thread(
@@ -1247,9 +1248,9 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_that_emails_are_sent(self) -> None:
@@ -1403,9 +1404,9 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_that_emails_are_sent_for_feedback_message(self) -> None:

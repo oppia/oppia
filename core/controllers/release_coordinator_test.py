@@ -15,6 +15,7 @@
 """Tests for the release coordinator page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import enum
 
@@ -105,7 +106,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_name\' must be provided when the action is '
@@ -126,7 +127,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'new_rules\' must be provided when the action is '
@@ -148,7 +149,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'commit_message\' must be provided when the action is '
@@ -170,10 +171,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         feature = platform_parameter_registry.Registry.create_feature_flag(
             ParamNames.TEST_FEATURE_1, 'feature for test.', FeatureStages.DEV)
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
-        feature_set_ctx = self.swap(
+        feature_set_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
@@ -203,10 +204,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             }
         ]
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_1])
-        feature_set_ctx = self.swap(
+        feature_set_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
@@ -235,9 +236,9 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURE_FLAGS', [])
-        feature_set_ctx = self.swap(
+        feature_set_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
@@ -274,10 +275,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             }
         ]
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
-        feature_set_ctx = self.swap(
+        feature_set_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
@@ -307,10 +308,10 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURE_FLAGS',
             [ParamNames.TEST_FEATURE_2])
-        feature_set_ctx = self.swap(
+        feature_set_ctx = patch.object(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([ParamNames.TEST_FEATURE_2.value]))
         # Here we use MyPy ignore because we are assigning a None value

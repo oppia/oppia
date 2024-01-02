@@ -17,6 +17,7 @@
 """Unit tests for scripts/pre_commit_linter.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import multiprocessing
 import os
@@ -76,7 +77,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.sys_swap = self.swap(sys, 'exit', mock_exit)
+        self.sys_swap = patch.object(sys, 'exit', mock_exit)
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
@@ -90,7 +91,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         ) -> List[str]:
             return []
 
-        all_filepath_swap = self.swap(
+        all_filepath_swap = patch.object(
             pre_commit_linter, '_get_all_filepaths', mock_get_all_filepaths)
 
         with self.print_swap, self.sys_swap:
@@ -104,7 +105,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         def mock_get_changed_filepaths() -> List[str]:
             return []
 
-        get_changed_filepaths_swap = self.swap(
+        get_changed_filepaths_swap = patch.object(
             pre_commit_linter, '_get_changed_filepaths',
             mock_get_changed_filepaths)
 
@@ -131,7 +132,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 return [VALID_PY_FILEPATH]
             return []
 
-        shards_swap = self.swap(
+        shards_swap = patch.object(
             pre_commit_linter, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
@@ -164,7 +165,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ],
         }
 
-        shards_swap = self.swap(
+        shards_swap = patch.object(
             pre_commit_linter, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
@@ -174,7 +175,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 (prefix,)
                 for prefix in mock_shards['1']
             ])
-        install_swap = self.swap(
+        install_swap = patch.object(
             install_third_party_libs, 'main',
             mock_install_third_party_main)
 
@@ -206,7 +207,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ],
         }
 
-        shards_swap = self.swap(
+        shards_swap = patch.object(
             pre_commit_linter, 'SHARDS', mock_shards)
 
         filenames_from_path_expected_args = [(os.getcwd(),)] + [
@@ -233,7 +234,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_error_message(self) -> None:
-        all_errors_swap = self.swap(
+        all_errors_swap = patch.object(
             concurrent_task_utils, 'ALL_ERRORS', ['This is an error.'])
 
         with self.print_swap, self.sys_swap:
@@ -271,7 +272,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         ) -> List[str]:
             return [VALID_PY_FILEPATH]
 
-        get_all_files_swap = self.swap(
+        get_all_files_swap = patch.object(
             pre_commit_linter, '_get_all_files_in_directory',
             mock_get_all_files_in_directory)
 
@@ -318,7 +319,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_get_changed_filepaths(self) -> None:
         def mock_check_output(unused_list: List[str]) -> Optional[str]:
             return ''
-        subprocess_swap = self.swap(
+        subprocess_swap = patch.object(
             subprocess, 'check_output', mock_check_output)
 
         with self.print_swap, self.sys_swap:

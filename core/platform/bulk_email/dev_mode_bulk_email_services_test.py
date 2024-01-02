@@ -15,6 +15,7 @@
 """Tests for dev mode bulk email services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 
@@ -31,7 +32,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with patch.object(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.add_or_update_user_status(
                 'test@example.com', {}, 'Web', can_receive_email_updates=True)
             self.assertItemsEqual(
@@ -55,7 +56,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with patch.object(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.permanently_delete_user_from_list(
                 'test@example.com')
             self.assertItemsEqual(

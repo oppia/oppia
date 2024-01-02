@@ -17,6 +17,7 @@
 """Unit tests for core.domain.opportunity_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import unittest.mock
@@ -163,7 +164,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         """Creates a translation suggestion for exploration 0 and performs basic
         assertions.
         """
-        with self.swap(
+        with patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id_for_suggestion):
@@ -972,7 +973,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(observed_log_messages), 0)
 
-        with self.swap(logging, 'info', _mock_logging_function), self.swap(
+        with patch.object(logging, 'info', _mock_logging_function), patch.object(
             constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages):
             opportunities = (
                 opportunity_services
@@ -1069,7 +1070,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
         # Mock the get method of ExplorationOpportunitySummaryModel.
-        with self.swap(
+        with patch.object(
             opportunity_models.ExplorationOpportunitySummaryModel, 'get',
             lambda _id: mock_opportunity_summary if _id == lesson_id else None
         ):

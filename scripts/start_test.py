@@ -15,6 +15,7 @@
 """Unit tests for scripts/start.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 import os
 
 from core.constants import constants
@@ -56,7 +57,7 @@ class StartTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
-        self.swap_print = self.swap(
+        self.swap_print = patch.object(
             common, 'print_each_string_after_two_new_lines', mock_print)
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
@@ -66,9 +67,9 @@ class StartTests(test_utils.GenericTestBase):
         # We need to create a swap for install_third_party_libs because
         # scripts/start.py installs third party libraries whenever it is
         # imported.
-        self.swap_install_third_party_libs = self.swap(
+        self.swap_install_third_party_libs = patch.object(
             install_third_party_libs, 'main', lambda: None)
-        self.swap_extend_index_yaml = self.swap(
+        self.swap_extend_index_yaml = patch.object(
             extend_index_yaml, 'main', lambda: None)
         self.swap_webpack_compiler = self.swap_with_checks(
             servers, 'managed_webpack_compiler',
@@ -84,9 +85,9 @@ class StartTests(test_utils.GenericTestBase):
             lambda **unused_kwargs: MockCompilerContextManager(),
             expected_kwargs=[{'watch_mode': True}]
         )
-        self.swap_redis_server = self.swap(
+        self.swap_redis_server = patch.object(
             servers, 'managed_redis_server', mock_context_manager)
-        self.swap_elasticsearch_dev_server = self.swap(
+        self.swap_elasticsearch_dev_server = patch.object(
             servers, 'managed_elasticsearch_dev_server', mock_context_manager)
         self.swap_firebase_auth_emulator = self.swap_with_checks(
             servers, 'managed_firebase_auth_emulator',
@@ -113,7 +114,7 @@ class StartTests(test_utils.GenericTestBase):
         self.swap_create_managed_web_browser = self.swap_to_always_raise(
             servers, 'create_managed_web_browser',
             Exception(MANAGED_WEB_BROWSER_ERROR))
-        self.swap_mock_set_constants_to_default = self.swap(
+        self.swap_mock_set_constants_to_default = patch.object(
             common, 'set_constants_to_default', mock_constants)
 
     def test_start_servers_successfully(self) -> None:
@@ -237,7 +238,7 @@ class StartTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': ['--source_maps']}])
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_emulator_mode = patch.object(constants, 'EMULATOR_MODE', False)
         self.swap_webpack_compiler = self.swap_with_checks(
             servers, 'managed_webpack_compiler',
             lambda **unused_kwargs: MockCompilerContextManager(),

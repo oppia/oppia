@@ -17,6 +17,7 @@
 """Tests for Learner group models."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import types
 
@@ -98,7 +99,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'A learner group with the given group ID exists already.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 learner_group_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
@@ -111,7 +112,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'New id generator is producing too many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with patch.object(
                 learner_group_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,

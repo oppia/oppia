@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import caching_services
@@ -176,7 +177,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                     '61'
                 )
         )
-        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
+        with patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
             with self.assertRaisesRegex(Exception, error_regex):
                 (
                 exp_fetchers
@@ -717,9 +718,9 @@ title: Old Title
 
         # Create exploration that uses an old states schema version and ensure
         # it is properly converted.
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
@@ -769,9 +770,9 @@ title: Old Title
     def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
         swap_earlier_state_to_60 = (
-            self.swap(feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60)
+            patch.object(feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60)
         )
-        swap_current_state_61 = self.swap(
+        swap_current_state_61 = patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61)
         with swap_earlier_state_to_60, swap_current_state_61:
             exploration_model = exp_models.ExplorationModel.get(
@@ -807,9 +808,9 @@ title: Old Title
         end_state_name: str = 'End'
 
         # Create an exploration with an old states schema version.
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(

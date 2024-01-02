@@ -17,6 +17,7 @@
 """Unit tests for scripts/build.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import ast
 import collections
@@ -118,8 +119,8 @@ class BuildTests(test_utils.GenericTestBase):
             )
             self.assertEqual(command, excepted_cmd)
 
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap(
+        with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            with patch.object(
                 subprocess, 'check_call', mock_subprocess_check_call):
                 build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                     INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
@@ -316,7 +317,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
-        with self.swap(
+        with patch.object(
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)
         ):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
@@ -325,7 +326,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
         """
-        with self.swap(
+        with patch.object(
             build, 'FILEPATHS_NOT_TO_RENAME', (
                 '*.py', 'path/to/fonts/*', 'path/to/third_party.min.js.map',
                 'path/to/third_party.min.css.map')
@@ -362,7 +363,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test is_file_hash_provided_to_frontend returns the correct boolean
         value for filepath that should be provided to frontend.
         """
-        with self.swap(
+        with patch.object(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/file.js', 'path/to/file.html', 'file.js')
         ):
@@ -371,7 +372,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.html'))
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
-        with self.swap(
+        with patch.object(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/*', '*.js', '*_end.html')
         ):
@@ -420,7 +421,7 @@ class BuildTests(test_utils.GenericTestBase):
         excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
         # Prevent getting hashes of HTML files.
-        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
+        with patch.object(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
             file_hashes: Dict[str, str] = {}
             self.assertEqual(len(file_hashes), 0)
             file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
@@ -435,7 +436,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_filter_hashes(self) -> None:
         """Test filter_hashes filters the provided hash correctly."""
         # Set constant to provide everything to frontend.
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
+        with patch.object(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
@@ -446,7 +447,7 @@ class BuildTests(test_utils.GenericTestBase):
                 filtered_hashes['/path/file.min.js'],
                 hashes['path/file.min.js'])
 
-        with self.swap(
+        with patch.object(
             build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('test_path/*', 'path/to/file.js')
         ):
@@ -469,8 +470,8 @@ class BuildTests(test_utils.GenericTestBase):
         hashes_path = os.path.join(MOCK_ASSETS_OUT_DIR, 'hashes.json')
 
         # Set constant to provide everything to frontend.
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
+        with patch.object(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
+            with patch.object(build, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with utils.open_file(hashes_path, 'r') as hashes_file:
@@ -694,7 +695,7 @@ class BuildTests(test_utils.GenericTestBase):
         recently_changed_filenames = build.get_recently_changed_filenames(
             assets_hashes, EMPTY_DIR)
         # Since all HTML and Python files are already built, they are ignored.
-        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html', '.py',)):
+        with patch.object(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html', '.py',)):
             self.assertEqual(
                 len(recently_changed_filenames), build.get_file_count(
                     MOCK_ASSETS_DEV_DIR))
@@ -718,11 +719,11 @@ class BuildTests(test_utils.GenericTestBase):
     def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
+        app_dev_yaml_filepath_swap = patch.object(
             build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath)
-        app_yaml_filepath_swap = self.swap(
+        app_yaml_filepath_swap = patch.object(
             build, 'APP_YAML_FILEPATH', mock_yaml_filepath)
-        env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
+        env_vars_to_remove_from_deployed_app_yaml_swap = patch.object(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
             ['FIREBASE_AUTH_EMULATOR_HOST']
@@ -734,7 +735,7 @@ class BuildTests(test_utils.GenericTestBase):
         setattr(
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
+            with patch.object(feconf, 'OPPIA_IS_DOCKERIZED', True):
                 tmp.write('Some content in mock_app_dev.yaml\n')
                 tmp.write(
                     '  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
@@ -767,11 +768,11 @@ class BuildTests(test_utils.GenericTestBase):
     ) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
+        app_dev_yaml_filepath_swap = patch.object(
             build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath)
-        app_yaml_filepath_swap = self.swap(
+        app_yaml_filepath_swap = patch.object(
             build, 'APP_YAML_FILEPATH', mock_yaml_filepath)
-        env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
+        env_vars_to_remove_from_deployed_app_yaml_swap = patch.object(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
             ['DATASTORE_HOST']
@@ -857,7 +858,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.isfile(
             'core/tests/data/third_party/js/third_party.min.js.map'))
 
-        with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
+        with patch.object(build, 'safe_delete_file', _mock_safe_delete_file):
             build.minify_third_party_libs('core/tests/data/third_party')
 
         self.assertTrue(os.path.isfile(
@@ -894,7 +895,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_safe_delete_directory_tree(unused_path: str) -> None:
             check_function_calls['safe_delete_directory_tree_gets_called'] += 1
 
-        with self.swap(
+        with patch.object(
             build, 'safe_delete_directory_tree',
             mock_safe_delete_directory_tree
         ):
@@ -947,17 +948,17 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_swap = patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
+        build_using_webpack_swap = patch.object(
             build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
+        modify_constants_swap = patch.object(
             common, 'modify_constants', mock_modify_constants)
-        compare_file_count_swap = self.swap(
+        compare_file_count_swap = patch.object(
             build, '_compare_file_count', mock_compare_file_count)
-        generate_python_package_swap = self.swap(
+        generate_python_package_swap = patch.object(
             build, 'generate_python_package', mock_generate_python_package)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_swap = patch.object(build, 'clean', mock_clean)
 
         with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
             with modify_constants_swap, compare_file_count_swap:
@@ -1006,15 +1007,15 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_swap = patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_webpack_swap = self.swap(
+        build_using_webpack_swap = patch.object(
             build, 'build_using_webpack', mock_build_using_webpack)
-        modify_constants_swap = self.swap(
+        modify_constants_swap = patch.object(
             common, 'modify_constants', mock_modify_constants)
-        compare_file_count_swap = self.swap(
+        compare_file_count_swap = patch.object(
             build, '_compare_file_count', mock_compare_file_count)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_swap = patch.object(build, 'clean', mock_clean)
         install_python_dev_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'main',
@@ -1054,11 +1055,11 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_swap = patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        modify_constants_swap = self.swap(
+        modify_constants_swap = patch.object(
             common, 'modify_constants', mock_modify_constants)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_swap = patch.object(build, 'clean', mock_clean)
 
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=[])
@@ -1088,9 +1089,9 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_swap = patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_swap = patch.object(build, 'clean', mock_clean)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod env.')
@@ -1124,11 +1125,11 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_swap = patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        modify_constants_swap = self.swap(
+        modify_constants_swap = patch.object(
             common, 'modify_constants', mock_modify_constants)
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_swap = patch.object(build, 'clean', mock_clean)
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
@@ -1148,10 +1149,10 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        webpack_compiler_swap = self.swap(
+        webpack_compiler_swap = patch.object(
             servers, 'managed_webpack_compiler',
             mock_managed_webpack_compiler)
-        get_file_count_swap = self.swap(
+        get_file_count_swap = patch.object(
             build, 'get_file_count', mock_get_file_count)
 
         with webpack_compiler_swap, get_file_count_swap:
@@ -1172,10 +1173,10 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        webpack_compiler_swap = self.swap(
+        webpack_compiler_swap = patch.object(
             servers, 'managed_webpack_compiler',
             mock_managed_webpack_compiler)
-        get_file_count_swap = self.swap(
+        get_file_count_swap = patch.object(
             build, 'get_file_count', mock_get_file_count)
 
         with webpack_compiler_swap, get_file_count_swap:

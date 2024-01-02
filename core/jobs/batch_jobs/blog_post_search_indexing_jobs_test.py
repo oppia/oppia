@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import math
@@ -132,7 +133,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        max_batch_size_swap = self.swap(
+        max_batch_size_swap = patch.object(
             blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob,
             'MAX_BATCH_SIZE', 1)
 

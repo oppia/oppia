@@ -15,6 +15,7 @@
 """Tests for Tasks Email Handler."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import exp_fetchers
@@ -55,9 +56,9 @@ class TasksTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = patch.object(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
@@ -278,7 +279,7 @@ class TasksTests(test_utils.EmailTestBase):
         def fake_get_user_ids_by_role(_: str) -> List[str]:
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
-        get_moderator_id_as_list = self.swap(
+        get_moderator_id_as_list = patch.object(
             user_services, 'get_user_ids_by_role',
             fake_get_user_ids_by_role)
 

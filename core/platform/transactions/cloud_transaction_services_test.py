@@ -15,6 +15,7 @@
 """Unit tests for the cloud_transaction_services.py"""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
@@ -39,7 +40,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             def transaction(self) -> MockTransaction: # pylint: disable=missing-docstring
                 return MockTransaction()
 
-        swap_client = self.swap(
+        swap_client = patch.object(
             cloud_transaction_services, 'CLIENT', MockClient())
 
         def add(x: int, y: int) -> int:

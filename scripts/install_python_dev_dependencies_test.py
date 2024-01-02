@@ -17,6 +17,7 @@
 """Tests for install_python_dev_dependencies.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import contextlib
@@ -61,35 +62,35 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 delattr(sys, 'real_prefix')
 
     def test_check_python_env_is_suitable_passes_when_in_venv(self) -> None:
-        prefix_swap = self.swap(
+        prefix_swap = patch.object(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(
+        base_prefix_swap = patch.object(
             sys, 'base_prefix', '/home/user/.pyenv/versions/oppia')
         real_prefix_manager = self.sys_real_prefix_context('')
-        environ_swap = self.swap(os, 'environ', {})
+        environ_swap = patch.object(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_passes_when_in_venv_real_prefix(
         self
     ) -> None:
-        prefix_swap = self.swap(
+        prefix_swap = patch.object(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(
+        base_prefix_swap = patch.object(
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
         real_prefix_manager = self.sys_real_prefix_context(
             '/home/user/.pyenv/versions/oppia')
-        environ_swap = self.swap(os, 'environ', {})
+        environ_swap = patch.object(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_fails_when_out_of_venv(self) -> None:
-        prefix_swap = self.swap(
+        prefix_swap = patch.object(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(
+        base_prefix_swap = patch.object(
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
         real_prefix_manager = self.sys_real_prefix_context('')
-        environ_swap = self.swap(os, 'environ', {})
+        environ_swap = patch.object(os, 'environ', {})
         expected_error = (
             'Oppia must be developed within a virtual environment.')
         with self.assertRaisesRegex(
@@ -103,12 +104,12 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                     )
 
     def test_check_python_env_is_suitable_passes_when_on_ci(self) -> None:
-        prefix_swap = self.swap(
+        prefix_swap = patch.object(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(
+        base_prefix_swap = patch.object(
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
         real_prefix_manager = self.sys_real_prefix_context('')
-        environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
+        environ_swap = patch.object(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
@@ -136,7 +137,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             self.assertTrue(check)
             self.assertEqual(encoding, 'utf-8')
 
-        run_swap = self.swap(subprocess, 'run', mock_run)
+        run_swap = patch.object(subprocess, 'run', mock_run)
 
         with run_swap:
             install_python_dev_dependencies.install_installation_tools()

@@ -15,6 +15,7 @@
 """Tests for platform feature evaluation handler."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import enum
 
@@ -99,7 +100,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
     def test_get_dev_mode_android_client_returns_correct_flag_values(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={
@@ -114,7 +115,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
     def test_get_features_invalid_platform_type_returns_features_disabled(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={
@@ -129,7 +130,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
     def test_get_features_missing_platform_type_returns_features_disabled(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={}
@@ -141,7 +142,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
     def test_get_features_invalid_version_flavor_raises_400(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             resp_dict = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={
@@ -157,7 +158,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
             )
 
     def test_get_features_invalid_app_version_raises_400(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with patch.object(constants, 'DEV_MODE', True):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
                 params={
@@ -220,7 +221,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         feature = registry.Registry.parameter_registry.get(
             param_list.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
-        return self.swap(feature, '_feature_stage', stage.value)
+        return patch.object(feature, '_feature_stage', stage.value)
 
     def test_get_with_dummy_feature_enabled_returns_ok(self) -> None:
         self.get_json(

@@ -17,6 +17,7 @@
 """Unit tests for core.domain.collection_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -301,7 +302,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         collection = self.save_new_valid_collection(
             'collection_id', self.owner_id)
 
-        apply_change_list_swap = self.swap(
+        apply_change_list_swap = patch.object(
             collection_services, 'apply_change_list', lambda _, __: collection)
 
         with apply_change_list_swap, self.assertRaisesRegex(
@@ -471,7 +472,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
 
         self.save_new_valid_collection('collection_id', self.owner_id)
 
@@ -861,7 +862,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of collections that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
+        with patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
             # Need to load 3 pages to find all of the collections. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all collections are returned. We validate the correct
@@ -1192,7 +1193,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
             self.assertEqual(doc_ids, [self.COLLECTION_0_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             gae_search_services,
             'delete_documents_from_index',
             mock_delete_docs)
@@ -1212,7 +1213,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.assertEqual(
                 doc_ids, [self.COLLECTION_0_ID, self.COLLECTION_1_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             gae_search_services,
             'delete_documents_from_index',
             mock_delete_docs)
@@ -1921,7 +1922,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_swap = patch.object(
             gae_search_services,
             'add_documents_to_index',
             add_docs_counter)

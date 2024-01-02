@@ -17,6 +17,7 @@
 """Unit tests for core.domain.stats_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import os
 
@@ -406,7 +407,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(
+        with patch.object(
             stats_services, 'get_stats_for_new_exploration',
             stats_for_new_exploration_log):
             exp_services.save_new_exploration_from_yaml_and_assets(
@@ -439,7 +440,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'property_name': 'next_content_id_index',
             'new_value': content_id_generator.next_content_id_index
         })]
-        with self.swap(
+        with patch.object(
             stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
             exp_services.update_exploration(
@@ -2265,7 +2266,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     def test_record_answers_exceeding_one_shard(self) -> None:
         # Use a smaller max answer list size so less answers are needed to
         # exceed a shard.
-        with self.swap(
+        with patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
             100000):
             state_answers = stats_services.get_state_answers(
@@ -2494,7 +2495,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     def test_only_sample_answers_in_main_shard_returned(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard.
-        with self.swap(
+        with patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
             15000):
             state_answers = stats_services.get_state_answers(

@@ -17,6 +17,7 @@
 """Unit tests for core.domain.moderator services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import moderator_services
@@ -47,7 +48,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = patch.object(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_flag_exploration_emails_are_correct(self) -> None:
 

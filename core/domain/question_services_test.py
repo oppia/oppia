@@ -17,6 +17,7 @@
 """Tests for core.domain.question_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import logging
 import re
@@ -649,7 +650,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 

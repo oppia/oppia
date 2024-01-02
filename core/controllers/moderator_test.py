@@ -15,6 +15,7 @@
 """Tests for the moderator page."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 from core import feconf
 from core.domain import rights_manager
@@ -109,9 +110,9 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.can_send_emails_ctx = self.swap(
+        self.can_send_emails_ctx = patch.object(
             feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_email_moderator_action_ctx = self.swap(
+        self.can_send_email_moderator_action_ctx = patch.object(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
 
     def test_get_draft_email_body(self) -> None:

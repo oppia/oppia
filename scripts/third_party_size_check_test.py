@@ -15,6 +15,7 @@
 """Unit tests for scripts/third_party_size_check.py"""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import builtins
 import os
@@ -34,7 +35,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_swap = patch.object(builtins, 'print', mock_print)
         if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
             shutil.rmtree('dummy_dir')
         skip_files_list = (
@@ -95,10 +96,10 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
     def test_check_size_in_dir(self) -> None:
         def mock_get_skip_files_list() -> list[str]:
             return []
-        swap_get_skip_files_list = self.swap(
+        swap_get_skip_files_list = patch.object(
             third_party_size_check, 'get_skip_files_list',
             mock_get_skip_files_list)
-        swap_third_party_dir = self.swap(
+        swap_third_party_dir = patch.object(
             third_party_size_check, 'THIRD_PARTY_PATH',
             os.path.join(os.getcwd(), 'dummy_dir'))
         with swap_third_party_dir, swap_get_skip_files_list, self.print_swap:
@@ -112,10 +113,10 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), 'dummy_dir', 'file1.py'),
                 os.path.join(os.getcwd(), 'dummy_dir', 'random*.py')
             ]
-        swap_get_skip_files_list = self.swap(
+        swap_get_skip_files_list = patch.object(
             third_party_size_check, 'get_skip_files_list',
             mock_get_skip_files_list)
-        swap_third_party_dir = self.swap(
+        swap_third_party_dir = patch.object(
             third_party_size_check, 'THIRD_PARTY_PATH',
             os.path.join(os.getcwd(), 'dummy_dir'))
         with swap_third_party_dir, swap_get_skip_files_list, self.print_swap:
@@ -124,7 +125,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
             '    Number of files in third-party folder: 2', self.print_arr)
 
     def test_check_third_party_size_pass(self) -> None:
-        swap_check_size_in_dir = self.swap(
+        swap_check_size_in_dir = patch.object(
             third_party_size_check, '_check_size_in_dir',
             lambda *unused_args: 100)
         with self.print_swap, swap_check_size_in_dir:
@@ -135,11 +136,11 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_check_third_party_size_fail(self) -> None:
-        swap_check_size_in_dir = self.swap(
+        swap_check_size_in_dir = patch.object(
             third_party_size_check, '_check_size_in_dir',
             lambda *unused_args: (
                 third_party_size_check.THIRD_PARTY_SIZE_LIMIT + 1))
-        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        swap_sys_exit = patch.object(sys, 'exit', lambda _: None)
         with self.print_swap, swap_check_size_in_dir, swap_sys_exit:
             third_party_size_check.check_third_party_size()
 

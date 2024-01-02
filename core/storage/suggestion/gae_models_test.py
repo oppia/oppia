@@ -1115,7 +1115,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
-        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
+        with patch.object(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestions = (
                 suggestion_models.GeneralSuggestionModel
                 .get_translation_suggestions_in_review_with_exp_id(
@@ -1243,7 +1243,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_10', self.translation_language_code)
 
-        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
+        with patch.object(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestion_model_results = (
                 suggestion_models
                 .GeneralSuggestionModel
@@ -1256,13 +1256,13 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_model_results), 2)
 
     def test_get_all_stale_suggestion_ids(self) -> None:
-        with self.swap(
+        with patch.object(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestion_ids()), 1)
 
-        with self.swap(
+        with patch.object(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(len(
@@ -1272,7 +1272,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
         self
     ) -> None:
-        with self.swap(
+        with patch.object(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegex(
                 Exception,
@@ -1297,10 +1297,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         mocked_contributor_dashboard_suggestion_types = [
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
-        with self.swap(
+        with patch.object(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
-            with self.swap(
+            with patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
                 suggestions_waiting_too_long_for_review = (
@@ -1322,7 +1322,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread1', self.translation_language_code)
 
         # Make sure the threshold is nonzero.
-        with self.swap(
+        with patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 1):
             suggestions_waiting_too_long_for_review = (
@@ -1349,7 +1349,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         with self.mock_datetime_utcnow(
             mocked_datetime_less_than_review_wait_time_threshold):
-            with self.swap(
+            with patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
@@ -1378,7 +1378,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         with self.mock_datetime_utcnow(
             mocked_datetime_eq_review_wait_time_threshold):
-            with self.swap(
+            with patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
@@ -1400,7 +1400,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread1', self.translation_language_code)
 
-        with self.swap(
+        with patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
             suggestions_waiting_too_long_for_review = (
@@ -1436,7 +1436,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         with self.mock_datetime_utcnow(
             mocked_datetime_past_review_wait_time_threshold):
-            with self.swap(
+            with patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days):
@@ -1478,7 +1478,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp3.thread1', 'hi')
 
-        with self.swap(
+        with patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS', 0):
             suggestions_waiting_too_long_for_review = (
@@ -1719,7 +1719,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp2.thread1', self.translation_language_code)
 
-        with self.swap(
+        with patch.object(
             suggestion_models,
             'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
             translation_suggestion_models = (
@@ -1752,7 +1752,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, 'category2',
             'skill2.thread1', self.question_language_code)
 
-        with self.swap(
+        with patch.object(
             suggestion_models,
             'MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
             question_suggestion_models = (

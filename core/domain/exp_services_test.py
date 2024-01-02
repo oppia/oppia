@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_services."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import datetime
 import logging
@@ -205,9 +206,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             Exception,
             'No classifier algorithm found for NumericInput interaction'
         ):
-            with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-                with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                    with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+            with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+                with patch.object(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                    with patch.object(feconf, 'MIN_ASSIGNED_LABELS', 1):
                         exp_services.update_exploration(
                             self.owner_id, 'tes_exp_id', change_list, '')
 
@@ -215,7 +216,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         """Test that when exploration is reverted to previous version
         it maintains appropriate classifier models mapping.
         """
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             self.save_new_valid_exploration(
                 self.EXP_0_ID, self.owner_id, title='Bridges in England',
                 category='Architecture', language_code='en')
@@ -254,9 +255,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'new_value': interaction_answer_groups
         })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with patch.object(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with patch.object(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     exp_services.update_exploration(
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
@@ -278,9 +279,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'new_value': 'A new title'
         })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with patch.object(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with patch.object(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     exp_services.update_exploration(
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
@@ -575,7 +576,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of explorations that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
+        with patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct
@@ -620,10 +621,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        search_results_page_size_swap = self.swap(
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
+        search_results_page_size_swap = patch.object(
             feconf, 'SEARCH_RESULTS_PAGE_SIZE', 6)
-        max_iterations_swap = self.swap(exp_services, 'MAX_ITERATIONS', 1)
+        max_iterations_swap = patch.object(exp_services, 'MAX_ITERATIONS', 1)
 
         def _mock_delete_documents_from_index(
             unused_doc_ids: List[str], unused_index: str
@@ -634,7 +635,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             """
             pass
 
-        with self.swap(
+        with patch.object(
             search_services, 'delete_documents_from_index',
             _mock_delete_documents_from_index):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
@@ -1088,7 +1089,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(doc_ids, [self.EXP_0_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             search_services, 'delete_documents_from_index', mock_delete_docs)
 
         with delete_docs_swap:
@@ -1105,7 +1106,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(doc_ids, [self.EXP_0_ID, self.EXP_1_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_swap = patch.object(
             search_services, 'delete_documents_from_index', mock_delete_docs)
 
         with delete_docs_swap:
@@ -1134,7 +1135,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list: List[Tuple[str, bytes]] = []
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+        with patch.object(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
                 assets_list)
@@ -5828,7 +5829,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_swap = patch.object(
             search_services,
             'add_documents_to_index',
             add_docs_counter)
@@ -5881,7 +5882,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             actual_docs.extend(docs)
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_swap = patch.object(
             search_services,
             'add_documents_to_index',
             add_docs_counter)
@@ -6167,7 +6168,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
         with logging_swap:
             exp_services.regenerate_exploration_summary_with_new_contributor(
                 'dummy_id', self.albert_id)
@@ -6701,7 +6702,7 @@ title: Old Title
             """Mocks exp_fetchers.get_exploration_by_id()."""
             return exploration
 
-        fetch_swap = self.swap(
+        fetch_swap = patch.object(
             exp_services, 'apply_change_list',
             _mock_apply_change_list)
 
@@ -7615,7 +7616,7 @@ title: Old Title
             """Mocks exploration.validate()."""
             raise utils.ValidationError('Bad')
 
-        validate_swap = self.swap(
+        validate_swap = patch.object(
             exp_domain.Exploration, 'validate',
             _mock_exploration_validate_function)
         with validate_swap:
@@ -7984,7 +7985,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=1,
             draft_change_list_id=2).put()
-        with self.swap(state_domain.SubtitledHtml, 'validate', lambda x: True):
+        with patch.object(state_domain.SubtitledHtml, 'validate', lambda x: True):
             updated_exploration = exp_services.get_exp_with_draft_applied(
                 'exp_id', self.USER_ID)
         self.assertIsNone(updated_exploration)
@@ -9447,7 +9448,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = patch.object(logging, 'error', _mock_logging_function)
 
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)

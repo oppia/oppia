@@ -17,6 +17,7 @@
 """Unit tests for scripts/extend_index_yaml.py."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import tempfile
 
@@ -177,10 +178,10 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         self.web_inf_index_xml_file = tempfile.NamedTemporaryFile()
         self.index_yaml_file_name = self.index_yaml_file.name
         self.web_inf_index_xml_file_name = self.web_inf_index_xml_file.name
-        self.index_yaml_swap = self.swap(
+        self.index_yaml_swap = patch.object(
             extend_index_yaml, 'INDEX_YAML_PATH',
             self.index_yaml_file.name)
-        self.web_inf_index_xml_swap = self.swap(
+        self.web_inf_index_xml_swap = patch.object(
             extend_index_yaml, 'WEB_INF_INDEX_XML_PATH',
             self.web_inf_index_xml_file.name)
         self.open_index_yaml_r = open(

@@ -17,6 +17,7 @@
 """Tests for suggestion controllers."""
 
 from __future__ import annotations
+from unittest.mock import patch
 
 import base64
 import os
@@ -603,9 +604,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # has a high enough score to review suggestions in this category. This
         # will be used to test whether the author can review a suggestion in
         # the same category because of the author's high score in a later test.
-        enable_recording_of_scores_swap = self.swap(
+        enable_recording_of_scores_swap = patch.object(
             feconf, 'ENABLE_RECORDING_OF_SCORES', True)
-        increment_score_of_author_swap = self.swap(
+        increment_score_of_author_swap = patch.object(
             suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
 
@@ -833,7 +834,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.translator_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x
@@ -974,7 +975,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(
+        with patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x
@@ -1122,7 +1123,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
-        with self.swap(
+        with patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x
@@ -1924,7 +1925,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -2106,7 +2107,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion.target_id,
@@ -2327,7 +2328,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/skill/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -2354,7 +2355,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/skill/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -2381,7 +2382,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 self.author_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/skill/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -2411,7 +2412,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_reject['target_id'],
@@ -2440,7 +2441,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
@@ -2470,7 +2471,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+        with patch.object(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
