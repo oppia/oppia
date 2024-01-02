@@ -162,6 +162,15 @@ export class PlayerTranscriptService {
   getLastStateName(): string {
     return this.getLastCard().getStateName();
   }
+
+  findIndexOfLatestStateWithName(name: string): number | null {
+    for (let i = this.transcript.length - 1; i >= 0; i--) {
+      if (this.transcript[i].getStateName() === name) {
+        return i;
+      }
+    }
+    return null;
+  }
 }
 
 angular.module('oppia').factory(
