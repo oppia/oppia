@@ -130,7 +130,7 @@ export class DonatePageComponent implements OnInit {
       text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
     },
   ];
-  
+
   learners: Learner[] = [
     {
       name: 'Abasiekeme',
