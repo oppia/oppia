@@ -107,9 +107,22 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
+
+        def mock_subprocess_check_call(command: str, **kwargs: bool) -> None:   # pylint: disable=unused-argument
+            """Mock method for replacing subprocess.check_call()."""
+            excepted_cmd = (
+                'node /app/oppia/node_modules/uglify-js/bin/uglifyjs '
+                '/app/oppia/third_party/generated/js/third_party.js -c -m'
+                ' --source-map includeSources,url=\'third_party.min.js.map\' '
+                '-o /app/oppia/third_party/generated/js/third_party.min.js'
+            )
+            self.assertEqual(command, excepted_cmd)
+
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
+            with self.swap(
+                subprocess, 'check_call', mock_subprocess_check_call):
+                build._minify_and_create_sourcemap(  # pylint: disable=protected-access
+                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
 
     def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS

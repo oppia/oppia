@@ -380,6 +380,15 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  skipEditorNavbar(): void {
+    let mainContentElement: HTMLElement | null = document.querySelector(
+      '.exploration-editor-content');
+
+    mainContentElement.tabIndex = -1;
+    mainContentElement.scrollIntoView();
+    mainContentElement.focus();
+  }
+
   startEditorTutorial(): void {
     this.editabilityService.onStartTutorial();
 
@@ -418,6 +427,15 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         this.isModalOpenable = true;
       });
     }
+  }
+
+  generateAriaLabelForWarnings(): string {
+    const warnings = this.getWarnings() as { message: string }[];
+    const warningLabels = warnings.map(
+      (warning, index) => 'Warning ' + (index + 1) + ': ' + warning.message)
+      .join('. ');
+
+    return 'Total warnings: ' + this.countWarnings() + '. ' + warningLabels;
   }
 
   getNavbarText(): string {

@@ -38,7 +38,7 @@
 	"I18N_CONTACT_PAGE_GREETING_HEADING": "Mes norėtume jus išgirsti!",
 	"I18N_CONTACT_PAGE_HEADING": "Susisiekite su mumis",
 	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING": "Kitos užklausos",
-	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "Jei turite žiniasklaidos užklausą, siųskite ją adresu <a href=\"mailto:press@oppia.org\">press@oppia.org</a>.",
+	"I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2": "Jei turite žiniasklaidos užklausą, siųskite ją adresu <a class=\"oppia-contact-mail\" href=\"mailto:press@oppia.org\">press@oppia.org</a>.",
 	"I18N_CONTACT_PAGE_PARTNER_HEADING": "Partneris",
 	"I18N_CONTACT_PAGE_PARTNER_PARAGRAPH": "Bendradarbiaukite su mumis, kad gautumėte švietimo pagalbą savo organizacijai ar bendruomenei.",
 	"I18N_CONTACT_PAGE_VOLUNTEER_HEADING": "Savanorystė",

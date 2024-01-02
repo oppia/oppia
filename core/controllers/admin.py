@@ -80,6 +80,9 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
     )
 ])
 
+supported_languages: List[str] = [
+    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -94,21 +97,6 @@ class ClassroomPageDataDict(TypedDict):
 AllowedAdminConfigPropertyValueTypes = Union[
     str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
 ]
-
-
-class AdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Admin page shown in the App Engine admin console."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_admin_page
-    def get(self) -> None:
-        """Renders the admin page."""
-
-        self.render_template('admin-page.mainpage.html')
 
 
 class AdminHandlerNormalizePayloadDict(TypedDict):
@@ -1244,7 +1232,7 @@ class AdminRoleHandler(
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves information about users based on different filter
         criteria to populate the roles tab.
@@ -2126,7 +2114,8 @@ class TranslationCoordinatorRoleHandler(
             },
             'language_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': supported_languages
                 }
             }
         }

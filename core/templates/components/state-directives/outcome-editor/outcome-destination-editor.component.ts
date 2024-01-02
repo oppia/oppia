@@ -198,7 +198,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
           this.editorFirstTimeEventsService
             .registerFirstCreateSecondStateEvent();
 
-          let newStateName = this.outcomeNewStateName;
+          let newStateName = this.outcomeNewStateName.trim();
           this.outcome.dest = newStateName;
           this.addState.emit(newStateName);
         }

@@ -20,6 +20,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 import { UserService } from 'services/user.service';
@@ -150,6 +152,10 @@ describe('Lesson Information card modal component', () => {
         {
           provide: WindowRef,
           useValue: mockWindowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

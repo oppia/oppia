@@ -1640,7 +1640,7 @@ pre.oppia-pre-wrapped-text {
   color: #009688;
 }
 .btn:focus, .btn:active:focus {
-  outline: 0;
+  outline: 1px solid #000;
 }
 .skipBtn {
   height: 25px;
@@ -1793,6 +1793,14 @@ pre.oppia-pre-wrapped-text {
   max-width: 100%;
   position: relative;
   text-align: left;
+}
+
+.oppia-rte-keyboard-accessibility-text {
+  color: #757575;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  margin-bottom: 0;
 }
 
 .oppia-prevent-selection {
@@ -2131,7 +2139,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-header-warning-placement {
-  left: -0.5em;
+  left: 0.5em;
   position: absolute;
   top: 6px;
   z-index: 2;
@@ -2265,9 +2273,13 @@ oppia-parameter {
 }
 
 .oppia-modal-lesson-information-card .modal-dialog {
-  margin: 100px auto;
+  margin: 25px auto;
   max-width: 400px;
   min-width: 320px;
+}
+
+.oppia-modal-lesson-information-card {
+  height: fit-content;
 }
 
 .oppia-progress-reminder-modal .modal-dialog {
@@ -2289,7 +2301,7 @@ oppia-parameter {
 @media (max-width: 576px) {
   .skill-select-modal .modal-xl {
     margin: 1.75rem auto;
-    max-width: 500px;
+    max-width: 350px;
   }
 }
 
