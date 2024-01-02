@@ -102,7 +102,7 @@
                   </div>
                 </div>
                 <div class="donate-learners-nav">
-                  <button class="donate-learners-nav-item" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
+                  <button class="donate-learners-nav-item" type="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
                 </div>
               </div>
             </div>
