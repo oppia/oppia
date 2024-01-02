@@ -123,11 +123,13 @@ describe('Donate page', () => {
   it('should change learner tile in carousel', () => {
     fixture.detectChanges();
     const randomVal = Math.floor(Math.random() * 5);
-    const componentNa = fixture.debugElement.nativeElement
-    spyOn(componentNa.querySelector('#tile-' + randomVal), 'scrollIntoView').and.callThrough();
-  
+    const nativeEle = fixture.debugElement.nativeElement;
+    spyOn(nativeEle.querySelector('#tile-' + randomVal), 
+      'scrollIntoView').and.callThrough();
+
     component.nextTile(randomVal);
     expect(component.tileShown).toEqual(randomVal);
-    expect(componentNa.querySelector('#tile-' + randomVal).scrollIntoView).toHaveBeenCalled();
+    expect(nativeEle.querySelector(
+      '#tile-' + randomVal).scrollIntoView).toHaveBeenCalled();
   });
 });
