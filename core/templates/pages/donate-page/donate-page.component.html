@@ -46,7 +46,7 @@
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_2' | translate }}
               </p>
             </div>
-            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats;index as i"> 
+            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats;index as i">
               <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
                 <div>
                   <div class="donate-stat-svg-container" [ngClass]="{'donate-stat-svg-container-sm': i > 0 }">
@@ -100,7 +100,7 @@
                       <p class="donate-learners-name">- {{ learner.name | translate }} </p>
                     </div>
                   </div>
-                </div>  
+                </div>
                 <div class="donate-learners-nav">
                   <button class="donate-learners-nav-item" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
                 </div>
@@ -427,7 +427,7 @@
   .donate-learners-container {
     margin-top: 16px;
   }
-  
+
   .donate-learners-bg {
     align-items: center;
     background-color: #eee;
@@ -439,8 +439,8 @@
   .donate-learners-carousel {
     display: flex;
     gap: 0 24px;
-    overflow-x: hidden;
     max-width: 100%;
+    overflow-x: hidden;
     padding: 0 16px;
   }
 
