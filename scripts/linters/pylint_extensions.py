@@ -3418,10 +3418,6 @@ class DisallowIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
             if node.fromlineno == node.args[0].fromlineno:
                 return
 
-            # elif (
-            #     type(node.args[0]).__name__ == 'Dict' or
-            #     type(node.args[0]).__name__ == 'List'
-            # ):
             if type(node.args[0]).__name__ in ('Dict','List'):
                 # Run if Dict/List/Tuple argument is on a different line
                 self.add_message('combined-operation', node=node.args[0])
