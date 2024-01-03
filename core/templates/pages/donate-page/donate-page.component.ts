@@ -47,8 +47,8 @@ interface Learner {
   name: string;
   country: string;
   imageUrl: string;
-  text: string;
   webpUrl: string;
+  text: string;
 }
 
 @Component({
@@ -137,36 +137,36 @@ export class DonatePageComponent implements OnInit {
       name: 'Abasiekeme',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
       imageUrl: '/donate/learners-abasiekeme.png',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1',
-      webpUrl: '/donate/learners-abasiekeme.webp'
+      webpUrl: '/donate/learners-abasiekeme.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1'
     },
     {
       name: 'Sandra Bosso',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
       imageUrl: '/donate/learners-sandra.png',
+      webpUrl: '/donate/learners-sandra.webp',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2',
-      webpUrl: '/donate/learners-sandra.webp'
     },
     {
       name: 'Kajal',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
       imageUrl: '/donate/learners-kajal.png',
+      webpUrl: '/donate/learners-kajal.webp',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3',
-      webpUrl: '/donate/learners-kajal.webp'
     },
     {
       name: 'Seneen',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
       imageUrl: '/donate/learners-seneen.png',
+      webpUrl: '/donate/learners-seneen.webp',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4',
-      webpUrl: '/donate/learners-seneen.webp'
     },
     {
       name: 'Juweria Cabdalla',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
       imageUrl: '/donate/learners-juweria.png',
+      webpUrl: '/donate/learners-juweria.webp',
       text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5',
-      webpUrl: '/donate/learners-juweria.webp'
     },
   ];
 
@@ -203,12 +203,12 @@ export class DonatePageComponent implements OnInit {
     });
   }
 
-  nextTile(clickedValue: number): void {
-    let learnerTiles = document.getElementById('tile-' + clickedValue);
-    this.tileShown = clickedValue;
+  nextTile(clickedVal: number): void {
+    let learnerTiles = document.getElementsByClassName('tile-' + clickedVal);
+    this.tileShown = clickedVal;
 
     if (learnerTiles !== null) {
-      learnerTiles.scrollIntoView({
+      learnerTiles[0].scrollIntoView({
         behavior: 'smooth', block: 'nearest', inline: 'center'
       });
     }

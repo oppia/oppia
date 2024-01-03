@@ -46,7 +46,7 @@
                 {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_2' | translate }}
               </p>
             </div>
-            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats;index as i">
+            <div class="donate-stats-container" *ngFor="let impactStatRow of impactStats; index as i">
               <div class="donate-stat" *ngFor="let impactStat of impactStatRow">
                 <div>
                   <div class="donate-stat-svg-container" [ngClass]="{'donate-stat-svg-container-sm': i > 0 }">
@@ -87,10 +87,10 @@
               <p> {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_4' | translate }} </p>
               <div class="donate-learners-bg">
                 <div class="donate-learners-carousel">
-                  <div class="donate-learners-tile" *ngFor="let learner of learners;index as id" id="tile-{{id}}">
+                  <div class="donate-learners-tile tile-{{id}}" *ngFor="let learner of learners;index as id">
                     <picture>
                       <source type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)" width="300px" height="164.83px">
-                      <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
+                      <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)" width="300px" height="164.83px">
                       <img [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner" width="300px" height="164.83px">
                     </picture>
                     <div class="donate-learners-content">
@@ -470,7 +470,7 @@
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
-    width: 106px;
+    width: 114px;
   }
 
   .donate-learners-nav-item {
@@ -482,12 +482,7 @@
 
   @media (max-width: 500px) {
     .donate-learners-nav {
-      width: 132px;
-    }
-
-    .donate-learners-nav-item {
-      height: 20px;
-      width: 20px;
+      width: 130px;
     }
   }
 
