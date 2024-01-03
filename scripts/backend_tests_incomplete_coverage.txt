@@ -89,7 +89,6 @@ core.tests.test_utils_test
 core.utils_test
 main_test
 scripts.build_test
-scripts.common_test
 scripts.concurrent_task_utils_test
 scripts.install_dependencies_json_packages_test
 scripts.install_python_prod_dependencies_test
