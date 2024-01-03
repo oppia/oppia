@@ -111,7 +111,7 @@ interface UnusedTopicsBackendDict {
   };
 }
 
-interface UnusedTopicsResponse {
+export interface UnusedTopicsResponse {
   [topicId: string]: TopicBackendDict;
 }
 
