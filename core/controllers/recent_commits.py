@@ -41,10 +41,6 @@ class RecentCommitsHandler(
 ):
     """Returns a list of recent commits."""
 
-    # TODO(sll): Accept additional URL parameters that filter by user_id and
-    # exploration_id. For the former, do a check to ensure that the user is
-    # allowed to see this data (as it may include private explorations).
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {

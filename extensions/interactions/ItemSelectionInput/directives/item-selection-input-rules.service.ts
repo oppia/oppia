@@ -49,8 +49,6 @@ export class ItemSelectionInputRulesService {
     return normalizedAnswer.some(val => normalizedInput.includes(val));
   }
 
-  // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
-  // in sync with the backend migration of the same rule.
   DoesNotContainAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {

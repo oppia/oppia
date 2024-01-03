@@ -98,9 +98,6 @@ describe('rich-text components', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([
-      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
-      // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
-      'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
       // Triple backslashes are needed because backslashes are escape characters
       // in both regexes and strings: https://stackoverflow.com/a/5514380
       'The target origin provided \\\(\'https://www\.youtube\.com\'\\\) does ' +

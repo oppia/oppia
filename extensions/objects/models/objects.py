@@ -976,7 +976,6 @@ class Graph(BaseObject):
         Checks that there are no self-loops or multiple edges.
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
-        TODO(czx): Think about support for multigraphs?
 
         Args:
             raw: *. A Python object to be validated against the schema,

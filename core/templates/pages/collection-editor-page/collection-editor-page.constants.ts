@@ -16,8 +16,6 @@
  * @fileoverview Constants for the collection editor page.
  */
 
-// TODO(bhenning): These constants should be provided by the backend.
-
 export const CollectionEditorPageConstants = {
   EDITABLE_COLLECTION_DATA_URL_TEMPLATE:
     '/collection_editor_handler/data/<collection_id>',

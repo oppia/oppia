@@ -734,10 +734,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     # TODO(bhenning): Add tests for ensuring system explorations are properly
     # sampled when there are many matched for a given exploration ID.
 
-    # TODO(bhenning): Verify whether recommended author-specified explorations
-    # are also played within the context of collections, and whether that's
-    # desirable.
-
     def _set_recommendations(
         self, exp_id: str, recommended_ids: List[str]
     ) -> None:

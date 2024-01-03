@@ -227,9 +227,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                     url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
-        # TODO(sll): Set a self.payload attr in the BaseHandler for
-        #     POST, PUT and DELETE. Something needs to regulate what
-        #     the fields in the payload should be.
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""

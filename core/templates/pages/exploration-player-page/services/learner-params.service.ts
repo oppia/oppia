@@ -47,8 +47,6 @@ export class LearnerParamsService {
   }
 
   setValue(paramName: string, newParamValue: string): void {
-    // TODO(sll): Currently, all parameters are strings. In the future, we
-    // will need to maintain information about parameter types.
     if (!this._paramDict.hasOwnProperty(paramName)) {
       throw new Error('Cannot set unknown parameter: ' + paramName);
     } else {
