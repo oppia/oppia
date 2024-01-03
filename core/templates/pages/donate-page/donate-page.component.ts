@@ -48,6 +48,7 @@ interface Learner {
   country: string;
   imageUrl: string;
   text: string;
+  webpUrl: string;
 }
 
 @Component({
@@ -135,32 +136,37 @@ export class DonatePageComponent implements OnInit {
     {
       name: 'Abasiekeme',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
-      imageUrl: '/donate/learners-abasiekeme',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1'
+      imageUrl: '/donate/learners-abasiekeme.png',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1',
+      webpUrl: '/donate/learners-abasiekeme.webp'
     },
     {
       name: 'Sandra Bosso',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
-      imageUrl: '/donate/learners-sandra',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2'
+      imageUrl: '/donate/learners-sandra.png',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2',
+      webpUrl: '/donate/learners-sandra.webp'
     },
     {
       name: 'Kajal',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
-      imageUrl: '/donate/learners-kajal',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3'
+      imageUrl: '/donate/learners-kajal.png',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3',
+      webpUrl: '/donate/learners-kajal.webp'
     },
     {
       name: 'Seneen',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
-      imageUrl: '/donate/learners-seneen',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4'
+      imageUrl: '/donate/learners-seneen.png',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4',
+      webpUrl: '/donate/learners-seneen.webp'
     },
     {
       name: 'Juweria Cabdalla',
       country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
-      imageUrl: '/donate/learners-juweria',
-      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5'
+      imageUrl: '/donate/learners-juweria.png',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5',
+      webpUrl: '/donate/learners-juweria.webp'
     },
   ];
 

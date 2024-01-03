@@ -89,8 +89,9 @@
                 <div class="donate-learners-carousel">
                   <div class="donate-learners-tile" *ngFor="let learner of learners;index as id" id="tile-{{id}}">
                     <picture>
-                      <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl + '.png')">
-                      <img [src]="getStaticImageUrl(learner.imageUrl + '.png')" loading="lazy" alt="Photo of learner" width="300px" height="168.75px">
+                      <source type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)" width="300px" height="164.83px">
+                      <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
+                      <img [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner" width="300px" height="164.83px">
                     </picture>
                     <div class="donate-learners-content">
                       <p class="donate-learners-country">{{ learner.country | translate }}</p>
@@ -102,7 +103,7 @@
                   </div>
                 </div>
                 <div class="donate-learners-nav">
-                  <button class="donate-learners-nav-item" role="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
+                  <button [attr.aria-label]="'learner-' + id + ' button'" class="donate-learners-nav-item" role="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
                 </div>
               </div>
             </div>
@@ -469,14 +470,25 @@
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
-    width: 100px;
+    width: 106px;
   }
 
   .donate-learners-nav-item {
     border: 2px solid #00645c;
     border-radius: 50%;
-    height: 15px;
-    width: 15px;
+    height: 16px;
+    width: 16px;
+  }
+
+  @media (max-width: 500px) {
+    .donate-learners-nav {
+      width: 132px;
+    }
+
+    .donate-learners-nav-item {
+      height: 20px;
+      width: 20px;
+    }
   }
 
   .donate-learners-nav-item.active {
