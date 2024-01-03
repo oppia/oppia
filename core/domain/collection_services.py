@@ -297,7 +297,6 @@ def get_collection_summary_by_id(
         corresponding to a collection with the given collection_id or
         None if no CollectionSummaryModel exists for the given ID.
     """
-    # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
     collection_summary_model = collection_models.CollectionSummaryModel.get(
         collection_id, strict=False)
     if collection_summary_model is None:
