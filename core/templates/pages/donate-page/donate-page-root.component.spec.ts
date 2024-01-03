@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { DonatePageRootComponent } from './donate-page-root.component';
 import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
@@ -32,6 +32,7 @@ describe('Donate Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       declarations: [
         DonatePageRootComponent,
         MockTranslatePipe,
