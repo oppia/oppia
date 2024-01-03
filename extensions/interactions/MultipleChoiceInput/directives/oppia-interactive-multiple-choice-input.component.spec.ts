@@ -21,7 +21,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-multiple-choice-input.component';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
@@ -34,7 +33,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;
-  let browserCheckerService: BrowserCheckerService;
   let playerTranscriptService: PlayerTranscriptService;
   let displayedCard: StateCard;
 
@@ -87,15 +85,13 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
         {
           provide: CurrentInteractionService,
           useClass: MockCurrentInteractionService
-        },
-        BrowserCheckerService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    browserCheckerService = TestBed.inject(BrowserCheckerService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveMultipleChoiceInputComponent);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
@@ -136,24 +132,26 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+    spyOn(playerTranscriptService, 'getNumSubmitsForLastCard')
+      .and.returnValue(0);
     component.ngOnInit();
 
     expect(component.choices).toEqual([
       {
         originalIndex: 0,
-        value: '<p>opt1</p>'
+        choice: {html: '<p>opt1</p>', contentId: 'ca_choices_9'}
       },
       {
         originalIndex: 1,
-        value: '<p>opt2</p>'
+        choice: {html: '<p>opt2</p>', contentId: 'ca_choices_10'}
       },
       {
         originalIndex: 2,
-        value: '<p>opt3</p>'
+        choice: {html: '<p>opt3</p>', contentId: 'ca_choices_11'}
       },
       {
         originalIndex: 3,
-        value: '<p>opt4</p>'
+        choice: {html: '<p>opt4</p>', contentId: 'ca_choices_12'}
       }
     ]);
 
@@ -163,25 +161,31 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   });
 
   it('should initialise component when user selects multiple choice ' +
-  'interaction', () => {
+  'interaction. Should persist the order when component is reinitiated', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+    spyOn(playerTranscriptService, 'getNumSubmitsForLastCard')
+      .and.returnValues(0, 1);
     component.showChoicesInShuffledOrderWithValue = 'true';
 
     component.ngOnInit();
+
+    const choices = component.choices;
 
     // We cannot test if the choices have been shuffled because
     // each time a different order will come. Since the shuffling is random
     // there is a possibility that the choices may not be shuffled.
     // Therefore testing the order can result in flakiness in the
     // frontend tests.
+
+    component.ngOnInit();
+    expect(component.choices).toEqual(choices);
   });
 
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
     component.errorMessageI18nKey = 'Some error';
-    spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
     spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected').and.returnValue({
@@ -236,7 +240,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   ' a mobile', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
     component.errorMessageI18nKey = 'Some error';
-    spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
     spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(document, 'querySelectorAll')
       .withArgs('button.multiple-choice-option.selected').and.returnValue([{
