@@ -3050,7 +3050,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
     }
 
-    def _find_last_condition_lineno(self, node: astroid.Node) -> Optional[int]:
+    def _find_last_condition_lineno(self, node: astroid.Node) -> int:
         """Finds the line number of the last condition in an if statement.
 
         Args:
@@ -3263,7 +3263,7 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     }
 
-    def _indent_calculator(self, node: astroid.Node) -> tuple:
+    def _indent_calculator(self, node: astroid.Node) -> tuple[int, int, int]:
         """Calculates the indentation by calculating the first and last
         line indentation of a structure (list, tuple, etc.)
 
