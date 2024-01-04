@@ -3006,7 +3006,7 @@ class IndentFunctionByFour(checkers.BaseChecker):  # type: ignore[misc]
         def_indent = node.col_offset
         if node.body[0].col_offset - def_indent != 4:
             self.add_message(
-              'indent-statements-by-four', node=node.args
+              'indent-statements-by-four', node=node.body[0]
             )
 
 
@@ -3051,7 +3051,9 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
     }
 
     def _find_last_condition_lineno(self, node: astroid.Node) -> Optional[int]:
-        """Finds the line number of the last condition in an if statement.
+        """Finds the line number of the last item in a scope-introducing
+        statement. e.g. last argument of a functiondef or last condition
+        of an if-statement.
 
         Args:
             node: astroid.Node. The AST node representing the if statement.
@@ -3061,7 +3063,9 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             None if not found.
         """
         if isinstance(node, astroid.If):
+            # Handle if statements.
             last_item = node.test
+            # Recursively find last item.
             return self._find_last_condition_lineno(last_item)
         if isinstance(node, astroid.BoolOp):
             # Handle boolean operations (and, or, not)
@@ -3080,7 +3084,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             # Handle function calls as conditions.
             return int(node.lineno)
 
-        # Handle single-line conditions or other cases.
+        # Handle other cases.
         return int(node.lineno)
 
     def _indent_check(
@@ -3103,7 +3107,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         curr_line = linecache.getline(
             node.root().file, curr_lineno
         ).rstrip()
-        # Checks if the scope introducing statement has no outer items.
+        # Checks if the scope introducing statement has no body.
         if not node.body:
             return
 
@@ -3138,27 +3142,30 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
                     prev_line.lstrip()
                 )
                 # Check if indentation of inner items (within the
-                # arentheses of the structure) is same as the indentation
-                # of the outer items (outside the parentheses of that
-                # structure)
+                # arentheses of the structure) is less than/equal to
+                # the indentation of the body items (outside the
+                # parentheses of that structure)
                 if item_indent <= node.body[0].col_offset:
                     self.add_message(
                         'indent-higher-than-body',
                         node=node,
                         line=curr_lineno,
                     )
+                # Ensure all items have the same indentation level.
                 elif prev_line_indent != item_indent:
                     self.add_message(
                         'inconsistent-indentation',
                         node=node,
                         line=curr_lineno,
                     )
+                # Ensure the indentation level is not higher than 8 spaces.
                 elif item_indent - statement_start_indent > 8:
                     self.add_message(
                         'indentation-more-than-eight',
                         node=node,
                         line=curr_lineno,
                     )
+            # Performs all the logic of the above if-statement one last time.
             else:
                 item_indent = len(curr_line) - len(curr_line.lstrip())
                 prev_line_indent = len(prev_line) - len(
@@ -3183,7 +3190,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
                         line=curr_lineno,
                     )
                 break
-
+            # Update prev_line and curr_line.
             prev_line = curr_line
             curr_lineno += 1
             curr_line = linecache.getline(
@@ -3262,7 +3269,7 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     }
 
-    def _indent_calculator(self, node: astroid.Node) -> tuple[int, int, int]:
+    def _indent_calculator(self, node: astroid.Node) -> Tuple[int, int, int]:
         """Calculates the indentation by calculating the first and last
         line indentation of a structure (list, tuple, etc.)
 
