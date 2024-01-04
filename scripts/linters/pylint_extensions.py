@@ -3050,13 +3050,13 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
     }
 
-    def _find_last_condition_lineno(self, node: astroid.Node) -> Optional[int]:
+    def _find_last_condition_lineno(self, node: astroid.nodes) -> Optional[int]:
         """Finds the line number of the last item in a scope-introducing
         statement. e.g. last argument of a functiondef or last condition
         of an if-statement.
 
         Args:
-            node: astroid.Node. The AST node representing the if statement.
+            node: astroid.nodes. The AST node representing the if statement.
 
         Returns:
             Optional[int]. The line number of the last condition, or
@@ -3088,13 +3088,13 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         return int(node.lineno)
 
     def _indent_check(
-            self, node: astroid.Node, last_item_lineno: int
+            self, node: astroid.nodes, last_item_lineno: int
     ) -> None:
         """Calculates the indentation of the necessary lines to determine
         the correctness of the indentation levels
 
         Args:
-            node: astroid.Node. Any node in python that introduces a scope
+            node: astroid.nodes. Any node in python that introduces a scope
                 and requires a condition (e.g. if, elif, with, etc.)
 
             last_item_lineno: int. The line number for the last within the
@@ -3142,9 +3142,9 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
                     prev_line.lstrip()
                 )
                 # Check if indentation of inner items (within the
-                # arentheses of the structure) is less than/equal to
+                # parenthesis of the structure) is less than/equal to
                 # the indentation of the body items (outside the
-                # parentheses of that structure)
+                # parenthesis of that structure)
                 if item_indent <= node.body[0].col_offset:
                     self.add_message(
                         'indent-higher-than-body',
@@ -3269,12 +3269,12 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     }
 
-    def _indent_calculator(self, node: astroid.Node) -> Tuple[int, int, int]:
+    def _indent_calculator(self, node: astroid.nodes) -> Tuple[int, int, int]:
         """Calculates the indentation by calculating the first and last
         line indentation of a structure (list, tuple, etc.)
 
         Args:
-            node: astroid.Node. Any node in python that contains
+            node: astroid.nodes. Any node in python that contains
                 brackets/braces/parentheses.
 
         Returns:
