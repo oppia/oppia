@@ -3057,7 +3057,8 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.Node. The AST node representing the if statement.
 
         Returns:
-            The line number of the last condition, or None if not found.
+            Optional[int]. The line number of the last condition, or
+                None if not found.
         """
         if isinstance(node, astroid.If):
             last_item = node.test
@@ -3268,7 +3269,7 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         Args:
             node: astroid.Node. Any node in python that contains
-                brackets/braces/parentheses
+                brackets/braces/parentheses.
 
         Returns:
             tuple. Tuple of the start and end line indentation level and
