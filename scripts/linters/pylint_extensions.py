@@ -3058,7 +3058,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         Returns:
             Optional[int]. The line number of the last condition, or
-                None if not found.
+            None if not found.
         """
         if isinstance(node, astroid.If):
             last_item = node.test
