@@ -3050,7 +3050,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
     }
 
-    def _find_last_condition_lineno(self, node: astroid.Node) -> int:
+    def _find_last_condition_lineno(self, node: astroid.Node) -> Optional[int]:
         """Finds the line number of the last condition in an if statement.
 
         Args:
@@ -3070,21 +3070,18 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             return self._find_last_condition_lineno(last_item)
         if isinstance(node, astroid.BinOp):
             # Handle binary operations (comparisons, arithmetic)
-            # Last condition is the entire expression.
-            return node.test.lineno
+            return int(node.test.lineno)
         if isinstance(node, astroid.Compare):
             # Handle chained comparisons.
             last_op = node.ops[-1]
             # Line number of the last right-hand expression.
-            return last_op[1].lineno
+            return int(last_op[1].lineno)
         if isinstance(node, astroid.Call):
             # Handle function calls as conditions.
-            # (Implement your logic to extract relevant information)
-            # Or extract line number from call arguments.
-            return node.lineno
+            return int(node.lineno)
 
         # Handle single-line conditions or other cases.
-        return node.lineno
+        return int(node.lineno)
 
     def _indent_check(
             self, node: astroid.Node, last_item_lineno: int
