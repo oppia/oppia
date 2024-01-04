@@ -2949,13 +2949,13 @@ class IndentListByFour(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.nodes.List. List node in AST.
         """
 
-        # Node is empty
+        # Node is empty.
         if not node.elts:
             return
-        # The list is expressed in one line
+        # The list is expressed in one line.
         if node.fromlineno == node.end_lineno:
             return
-        # All elements of the list are expressed in one line
+        # All elements of the list are expressed in one line.
         if (len(node.elts) > 1 and
             node.elts[0].lineno == node.elts[1].lineno
         ):
@@ -3001,7 +3001,7 @@ class IndentFunctionByFour(checkers.BaseChecker):  # type: ignore[misc]
 
         Args:
             node: astroid.nodes.FunctionDef. Function
-            definition node in AST.
+                definition node in AST.
         """
         def_indent = node.col_offset
         if node.body[0].col_offset - def_indent != 4:
@@ -3050,11 +3050,11 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
     }
 
-    def _find_last_condition_lineno(self, node) -> Optional[int]:
+    def _find_last_condition_lineno(self, node: astroid.Node) -> Optional[int]:
         """Finds the line number of the last condition in an if statement.
 
         Args:
-            node: The AST node representing the if statement.
+            node: astroid.Node. The AST node representing the if statement.
 
         Returns:
             The line number of the last condition, or None if not found.
@@ -3065,37 +3065,39 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         if isinstance(node, astroid.BoolOp):
             # Handle boolean operations (and, or, not)
             last_item = node.values[-1]
-            # Recursively find last item
+            # Recursively find last item.
             return self._find_last_condition_lineno(last_item)
         if isinstance(node, astroid.BinOp):
             # Handle binary operations (comparisons, arithmetic)
-            # Last condition is the entire expression
+            # Last condition is the entire expression.
             return node.test.lineno
         if isinstance(node, astroid.Compare):
-            # Handle chained comparisons
+            # Handle chained comparisons.
             last_op = node.ops[-1]
-            # Line number of the last right-hand expression
+            # Line number of the last right-hand expression.
             return last_op[1].lineno
         if isinstance(node, astroid.Call):
-            # Handle function calls as conditions
+            # Handle function calls as conditions.
             # (Implement your logic to extract relevant information)
-            # Or extract line number from call arguments
+            # Or extract line number from call arguments.
             return node.lineno
 
-        # Handle single-line conditions or other cases
+        # Handle single-line conditions or other cases.
         return node.lineno
 
-    def _indent_check(self, node, last_item_lineno) -> None:
+    def _indent_check(
+            self, node: astroid.Node, last_item_lineno: int
+    ) -> None:
         """Calculates the indentation of the necessary lines to determine
         the correctness of the indentation levels
 
         Args:
-            node. Any node in python that introduces a scope and requires
-            a condition (e.g. if, elif, with, etc.)
+            node: astroid.Node. Any node in python that introduces a scope
+                and requires a condition (e.g. if, elif, with, etc.)
 
-            last_item_lineno. The line number for the last within the
-            parentheses. e.g. the last condition in a for loop or the
-            last argument of a functiondef, etc.
+            last_item_lineno: int. The line number for the last within the
+                parentheses. e.g. the last condition in a for loop or the
+                last argument of a functiondef, etc.
         """
         statement_start_indent = node.col_offset
         statement_start_lineno = node.fromlineno
@@ -3103,7 +3105,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         curr_line = linecache.getline(
             node.root().file, curr_lineno
         ).rstrip()
-        # Checks if the scope introducing statement has no outer items
+        # Checks if the scope introducing statement has no outer items.
         if not node.body:
             return
 
@@ -3111,8 +3113,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             return
 
         curr_lineno += 1
-        # While loop checks if the closing parenthese is at the
-        # End of line or at a new line
+        # While loop finds line number containing ':'.
         while True:
             curr_line = linecache.getline(
                 node.root().file, curr_lineno
@@ -3122,8 +3123,8 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
                     return
 
                 break
-            else:
-                curr_lineno += 1
+            curr_lineno += 1
+
         curr_line = linecache.getline(
             node.root().file, statement_start_lineno + 1
         ).rstrip()
@@ -3131,7 +3132,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         prev_line = curr_line
         prev_line_indent = len(curr_line) - len(curr_line.lstrip())
 
-        # While loop checks the indentation of every inner items
+        # While loop checks the indentation of every inner items.
         while True:
             if not curr_line.endswith(':'):
                 item_indent = len(curr_line) - len(curr_line.lstrip())
@@ -3196,7 +3197,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         _indent_check function
 
         Args:
-            node: astroid.nodes.If. if-statement node in AST.
+            node: astroid.nodes.If. If-statement node in AST.
         """
         last_item_lineno = self._find_last_condition_lineno(node)
         self._indent_check(node, last_item_lineno)
@@ -3206,7 +3207,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         _indent_check function
 
         Args:
-            node: astroid.nodes.For. for loop node in AST.
+            node: astroid.nodes.For. For loop node in AST.
         """
         last_item_lineno = node.iter.lineno
         self._indent_check(node, last_item_lineno)
@@ -3216,7 +3217,7 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         _indent_check function
 
         Args:
-            node: astroid.nodes.While. while loop node in AST.
+            node: astroid.nodes.While. While loop node in AST.
         """
         last_item_lineno = self._find_last_condition_lineno(node)
         self._indent_check(node, last_item_lineno)
@@ -3226,9 +3227,9 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
         the _indent_check function
 
         Args:
-        node: astroid.nodes.FunctionDef. function definition node in AST.
+            node: astroid.nodes.FunctionDef. Function definition node in AST.
         """
-        # if functiondef has no arguments
+        # If functiondef has no arguments.
         if not node.args.args:
             return
 
@@ -3261,12 +3262,13 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         ),
     }
 
-    def _indent_calculator(self, node) -> tuple:
+    def _indent_calculator(self, node: astroid.Node) -> tuple:
         """Calculates the indentation by calculating the first and last
         line indentation of a structure (list, tuple, etc.)
 
         Args:
-            node. Any node in python that contains brackets/braces/parentheses
+            node: astroid.Node. Any node in python that contains
+                brackets/braces/parentheses
 
         Returns:
             tuple. Tuple of the start and end line indentation level and
@@ -3291,16 +3293,18 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         brackets are misplaced
 
         Args:
-            node: astroid.nodes.List. list node in AST.
+            node: astroid.nodes.List. List node in AST.
         """
-        (start_line_indent,
-         end_line_indent,
-         end_line_number) = self._indent_calculator(node)
-        # Checks if the list is empty
+        (
+            start_line_indent,
+            end_line_indent,
+            end_line_number
+        ) = self._indent_calculator(node)
+        # Checks if the list is empty.
         if not node.elts:
             return
         # If the closing bracket is not at the end of line then
-        # checks for indentation
+        # checks for indentation.
         if node.elts[-1].lineno != node.end_lineno:
             if start_line_indent != end_line_indent:
                 self.add_message(
@@ -3312,18 +3316,20 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         braces are misplaced
 
         Args:
-            node: astroid.nodes.Dict. dictionary node in AST.
+            node: astroid.nodes.Dict. Dictionary node in AST.
         """
-        (start_line_indent,
-         end_line_indent,
-         end_line_number) = self._indent_calculator(node)
-        # Checks if the dictionary is empty
+        (
+            start_line_indent,
+            end_line_indent,
+            end_line_number
+        ) = self._indent_calculator(node)
+        # Checks if the dictionary is empty.
         if not node.items:
             return
 
         last_item = node.items[-1]
         # If the closing brace is not at the end of line then
-        # checks for indentation
+        # checks for indentation.
         if last_item[1].lineno != node.end_lineno:
             if start_line_indent != end_line_indent:
                 self.add_message(
@@ -3335,7 +3341,7 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
         are misplaced
 
         Args:
-            node: astroid.nodes.FunctionDef. function definition in AST.
+            node: astroid.nodes.FunctionDef. Function definition in AST.
         """
         start_line_indent, _, _ = self._indent_calculator(node)
         current_line_number = node.fromlineno
@@ -3343,7 +3349,7 @@ class ClosingBracketChecker(checkers.BaseChecker):  # type: ignore[misc]
             node.root().file, current_line_number
         ).rstrip()
 
-        # Finds the line with ':' or the last line of the function definition
+        # Finds the line with ':' or the last line of the function definition.
         while not current_line.endswith(':'):
             current_line_number += 1
             current_line = linecache.getline(
@@ -3400,7 +3406,7 @@ class DisallowIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
         an indentation is necessary and the indentation is correct
 
         Args:
-            node: astroid.nodes.Call. function call node in AST.
+            node: astroid.nodes.Call. Function call node in AST.
         """
         start_line_number = node.fromlineno
         start_line = linecache.getline(node.root().file, start_line_number)
@@ -3414,12 +3420,12 @@ class DisallowIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
         )
 
         if len(node.args) == 1:
-            # If arguments on the same line as function name
+            # If arguments on the same line as function name.
             if node.fromlineno == node.args[0].fromlineno:
                 return
 
-            if type(node.args[0]).__name__ in ('Dict','List'):
-                # Run if Dict/List/Tuple argument is on a different line
+            if type(node.args[0]).__name__ in ('Dict', 'List'):
+                # Run if Dict/List/Tuple argument is on a different line.
                 self.add_message('combined-operation', node=node.args[0])
                 if argument_indent - start_line_indent != 4:
                     self.add_message(
