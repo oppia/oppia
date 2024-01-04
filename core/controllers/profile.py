@@ -525,12 +525,17 @@ class SignupHandler(
         if feconf.CAN_SEND_EMAILS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
-        user_services.generate_initial_profile_picture(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=True)
+        initial_profile_picture = user_services.generate_initial_profile_picture( # pylint: disable=line-too-long
+            user_settings.email)
+        user_settings.update_profile_picture_data_url(initial_profile_picture)
 
         if not has_ever_registered:
             # Set the default dashboard for new users.
-            user_services.update_user_default_dashboard(
-                self.user_id, default_dashboard)
+            user_settings.default_dashboard = default_dashboard
+
+        user_services.save_user_settings(user_settings)
 
         self.render_json({
             'bulk_email_signup_message_should_be_shown': (
@@ -688,8 +693,9 @@ class SiteLanguageHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         site_language_code = self.normalized_payload['site_language_code']
-        user_services.update_preferred_site_language_code(
-            self.user_id, site_language_code)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.preferred_site_language_code = site_language_code
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 

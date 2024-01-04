@@ -27,6 +27,8 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
+from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
+
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
@@ -524,6 +526,58 @@ class UserSettings:
         info modal at least once in their lifetime journey.
         """
         self.has_viewed_lesson_info_modal_once = True
+
+    def update_profile_picture_data_url(
+        self, profile_picture_data_url: str
+    ) -> None:
+        """Updates profile_picture_data_url of user.
+
+        Args:
+            profile_picture_data_url: str. New profile picture url 
+                to be set.
+        """
+        username = self.username
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(username, str)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+        filename_png = 'profile_picture.png'
+        png_binary = utils.convert_data_url_to_binary(
+            profile_picture_data_url, 'png')
+        fs.commit(filename_png, png_binary, mimetype='image/png')
+
+        webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
+        filename_webp = 'profile_picture.webp'
+        fs.commit(filename_webp, webp_binary, mimetype='image/webp')
+
+    def update_subject_interests(
+        self, subject_interests: List[str]
+    ) -> None:
+        """Updates subject_interests of user.
+
+        Args:
+            subject_interests: list(str). New subject interests to be set.
+        """
+        if not isinstance(subject_interests, list):
+            raise utils.ValidationError(
+                'Expected subject_interests to be a list.')
+
+        for interest in subject_interests:
+            if not isinstance(interest, str):
+                raise utils.ValidationError(
+                    'Expected each subject interest to be a string.')
+            if not interest:
+                raise utils.ValidationError(
+                    'Expected each subject interest to be non-empty.')
+            if not re.match(constants.TAG_REGEX, interest):
+                raise utils.ValidationError(
+                    'Expected each subject interest to consist only of '
+                    'lowercase alphabetic characters and spaces.')
+
+        if len(set(subject_interests)) != len(subject_interests):
+            raise utils.ValidationError(
+                'Expected each subject interest to be distinct.')
+
+        self.subject_interests = subject_interests
 
 
 class UserActionsInfo:

@@ -352,16 +352,18 @@ def get_users_settings(
     return result
 
 
-def generate_initial_profile_picture(user_id: str) -> None:
+def generate_initial_profile_picture(user_email: str) -> str:
     """Generates a profile picture for a new user and
     updates the user's settings in the datastore.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_email: str. The email of the user.
+
+    Returns:
+        str. The profile picture data url.
     """
-    user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
-    update_profile_picture_data_url(user_id, user_gravatar)
+    return user_gravatar
 
 
 def get_gravatar_url(email: str) -> str:
@@ -379,19 +381,19 @@ def get_gravatar_url(email: str) -> str:
         (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
-def fetch_gravatar(email: str) -> str:
+def fetch_gravatar(user_email: str) -> str:
     """Returns the gravatar corresponding to the user's email, or an
     identicon generated from the email if the gravatar doesn't exist.
 
     Args:
-        email: str. The user email.
+        user_email: str. The user email.
 
     Returns:
         str. The gravatar url corresponding to the given user email. If the call
         to the gravatar service fails, this returns DEFAULT_IDENTICON_DATA_URL
         and logs an error.
     """
-    gravatar_url = get_gravatar_url(email)
+    gravatar_url = get_gravatar_url(user_email)
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},

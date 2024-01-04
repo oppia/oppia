@@ -134,8 +134,10 @@ class ExplorationDisplayableSummariesTest(
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
-        user_services.update_profile_picture_data_url(
-            self.user_c_id, user_services.DEFAULT_IDENTICON_DATA_URL)
+        user_settings = user_services.get_user_settings(self.user_c_id)
+        user_settings.update_profile_picture_data_url(
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+        user_services.save_user_settings(user_settings)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
         exp_services.update_exploration(

@@ -505,6 +505,50 @@ class UserSettingsTests(test_utils.GenericTestBase):
             user_settings.user_id)
         self.assertEqual(user_settings_model.created_on, time_of_creation)
 
+    def test_invalid_subject_interests_are_not_accepted(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
+            self.user_settings.update_subject_interests('not a list')  # type: ignore[arg-type]
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
+            self.user_settings.update_subject_interests([1, 2, 3])  # type: ignore[list-item]
+
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
+            self.user_settings.update_subject_interests(['', 'ab'])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.update_subject_interests(['!'])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.update_subject_interests(
+                ['has-hyphens'])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.update_subject_interests(
+                ['HasCapitalLetters'])
+
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
+            self.user_settings.update_subject_interests(['a', 'a'])
+
+        # The following cases are all valid.
+        self.user_settings.update_subject_interests([])
+        self.user_settings.update_subject_interests(
+            ['singleword', 'has spaces'])
+
 
 class UserContributionsTests(test_utils.GenericTestBase):
 
