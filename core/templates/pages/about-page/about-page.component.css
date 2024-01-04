@@ -92,10 +92,7 @@
   display: none;
 }
 .about-page .oppia-about-button {
-  background-color: #015c53;
   border-radius: 5px;
-  color: #fff;
-  font-family: "Roboto", Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 40px;
