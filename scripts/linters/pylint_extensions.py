@@ -3198,7 +3198,8 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.nodes.If. If-statement node in AST.
         """
         last_item_lineno = self._find_last_condition_lineno(node)
-        self._indent_check(node, last_item_lineno)
+        if last_item_lineno is not None:
+            self._indent_check(node, last_item_lineno)
 
     def visit_for(self, node: astroid.nodes.For) -> None:
         """Visits all for loops in a python file and implements the
@@ -3218,7 +3219,8 @@ class IndentByEIghtChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.nodes.While. While loop node in AST.
         """
         last_item_lineno = self._find_last_condition_lineno(node)
-        self._indent_check(node, last_item_lineno)
+        if last_item_lineno is not None:
+            self._indent_check(node, last_item_lineno)
 
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits all function definitions in a python file and implements
