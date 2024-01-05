@@ -29,8 +29,8 @@ import './primary-button.component.css';
   styleUrls: ['./primary-button.component.css']
 })
 export class PrimaryButtonComponent {
-  @Input() buttonText: string;
-  @Input() customClasses: string[];
+  @Input() buttonText: string = '';
+  @Input() customClasses?: string[];
   @Input() buttonHref: string | null = null;
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
@@ -57,8 +57,10 @@ export class PrimaryButtonComponent {
 
   private openExternalLink(link: string): void {
     const newTab = window.open();
-    newTab.opener = null;
-    newTab.location.href = link;
+    if (newTab) {
+      newTab.opener = null;
+      newTab.location.href = link;
+    }
   }
 }
 
