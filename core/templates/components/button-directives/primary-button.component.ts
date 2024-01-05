@@ -42,9 +42,29 @@ export class PrimaryButtonComponent {
     if (this.onClickPrimaryButton && typeof this.onClickPrimaryButton === 'function') {
       this.onClickPrimaryButton.emit();
     } else if (this.buttonHref && typeof this.buttonHref === 'string') {
-      this.windowRef.nativeWindow.location.href = this.buttonHref;
+      // Check if the link is external
+      const isExternalLink = this.isExternalLink(this.buttonHref);
+      if (isExternalLink) {
+        // Open the external link in a new tab/window
+        this.openExternalLink(this.buttonHref);
+      } else {
+        this.windowRef.nativeWindow.location.href = this.buttonHref;
+      }
     }
   }
+
+  // Check if a link is external
+  private isExternalLink(link: string): boolean {
+    return link.startsWith('http://') || link.startsWith('https://');
+  }
+
+  // Open an external link in a new tab
+  private openExternalLink(link: string): void {
+    const newTab = window.open();
+    newTab.opener = null;
+    newTab.location.href = link;
+  }
+
 }
 
 angular.module('oppia').directive('oppiaPrimaryButton',
