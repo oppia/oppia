@@ -12,14 +12,14 @@
       <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
         <oppia-primary-button
-          (click)="onClickVisitClassroomButton()"
+          (onClickPrimaryButton)="onClickVisitClassroomButton()"
           [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
           buttonText="{{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}">
         </oppia-primary-button>
       </div>
       <div class="oppia-about-button-container">
         <oppia-primary-button
-          (click)="onClickAccessAndroidButton()"
+          (onClickPrimaryButton)="onClickAccessAndroidButton()"
           [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
           buttonText="{{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}">
         </oppia-primary-button>
