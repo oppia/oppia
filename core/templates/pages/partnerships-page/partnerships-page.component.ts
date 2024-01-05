@@ -96,7 +96,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.org3Url = this.urlInterpolationService.getStaticImageUrl(
       '/partner_logos/injazPalestine.png');
     this.org4Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/nairoBits.png');
+      '/partner_logos/nairobits.png');
     this.org5Url = this.urlInterpolationService.getStaticImageUrl(
       '/partner_logos/edri.png');
     this.org6Url = this.urlInterpolationService.getStaticImageUrl(
