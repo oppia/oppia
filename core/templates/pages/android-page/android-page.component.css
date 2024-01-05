@@ -151,7 +151,10 @@
 }
 
 .reviewer {
-  font-weight: bold;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 500;
+  padding-top: 5px;
 }
 
 .learners-review-title {
