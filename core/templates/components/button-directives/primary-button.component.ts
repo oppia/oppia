@@ -16,9 +16,10 @@
  * @fileoverview Component for the primary buttons displayed on static pages.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-
+import { WindowRef } from
+  'services/contextual/window-ref.service';
 import './primary-button.component.css';
 
 
@@ -30,6 +31,20 @@ import './primary-button.component.css';
 export class PrimaryButtonComponent {
   @Input() buttonText: string;
   @Input() customClasses: string[];
+  @Input() buttonHref: string | null = null; // Optional href attribute
+  @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>(); // Optional function attribute if no buttonHref is passed
+
+  constructor(
+    private windowRef: WindowRef,
+  ) {}
+
+  handleButtonClick(): void {
+    if (this.onClickPrimaryButton && typeof this.onClickPrimaryButton === 'function') {
+      this.onClickPrimaryButton.emit();
+    } else if (this.buttonHref && typeof this.buttonHref === 'string') {
+      this.windowRef.nativeWindow.location.href = this.buttonHref;
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaPrimaryButton',
