@@ -5,11 +5,15 @@
 */
 
 .oppia-primary-button {
-  background-color: #015c53;
+  background-color: #00645c;
   color: rgba(255, 255, 255, 1.0);
   font-family: "Roboto", Arial, sans-serif;
   font-weight: 500;
   letter-spacing: 0.7px;
+}
+
+.about-foundation-page-button-area .oppia-primary-button {
+  height: 40px;
 }
 
 .oppia-primary-button:hover,
