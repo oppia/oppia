@@ -12,10 +12,6 @@
   letter-spacing: 0.7px;
 }
 
-.about-foundation-page-button-area .oppia-primary-button {
-  height: 40px;
-}
-
 .oppia-primary-button:hover,
 .oppia-primary-button:focus {
   background-color: #3d9991;
