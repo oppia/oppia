@@ -32,20 +32,21 @@ export class PrimaryButtonComponent {
   @Input() buttonText: string;
   @Input() customClasses: string[];
   @Input() buttonHref: string | null = null; // Optional href attribute
-  @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>(); // Optional function attribute if no buttonHref is passed
+  // Optional function attribute if no href is passed
+  @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     private windowRef: WindowRef,
   ) {}
 
   handleButtonClick(): void {
-    if (this.onClickPrimaryButton && typeof this.onClickPrimaryButton === 'function') {
+    if (this.onClickPrimaryButton &&
+        typeof this.onClickPrimaryButton === 'function') {
       this.onClickPrimaryButton.emit();
     } else if (this.buttonHref && typeof this.buttonHref === 'string') {
-      // Check if the link is external
       const isExternalLink = this.isExternalLink(this.buttonHref);
       if (isExternalLink) {
-        // Open the external link in a new tab/window
+        // Open the external link in a new tab
         this.openExternalLink(this.buttonHref);
       } else {
         this.windowRef.nativeWindow.location.href = this.buttonHref;
@@ -53,18 +54,15 @@ export class PrimaryButtonComponent {
     }
   }
 
-  // Check if a link is external
   private isExternalLink(link: string): boolean {
     return link.startsWith('http://') || link.startsWith('https://');
   }
 
-  // Open an external link in a new tab
   private openExternalLink(link: string): void {
     const newTab = window.open();
     newTab.opener = null;
     newTab.location.href = link;
   }
-
 }
 
 angular.module('oppia').directive('oppiaPrimaryButton',
