@@ -1410,16 +1410,14 @@ def record_agreement_to_terms(user_id: str) -> None:
 
 
 def update_profile_picture_data_url(
-    user_id: str, profile_picture_data_url: str
+    username: str, profile_picture_data_url: str
 ) -> None:
-    """Updates profile_picture_data_url of user with given user_id.
+    """Updates profile_picture_data_url of user with given username.
 
     Args:
-        user_id: str. The unique ID of the user.
+        username: str. The username of the user.
         profile_picture_data_url: str. New profile picture url to be set.
     """
-    user_settings = get_user_settings(user_id, strict=True)
-    username = user_settings.username
     # Ruling out the possibility of different types for mypy type checking.
     assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)

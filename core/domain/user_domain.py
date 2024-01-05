@@ -27,8 +27,6 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
-from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
-
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
@@ -526,28 +524,6 @@ class UserSettings:
         info modal at least once in their lifetime journey.
         """
         self.has_viewed_lesson_info_modal_once = True
-
-    def update_profile_picture_data_url(
-        self, profile_picture_data_url: str
-    ) -> None:
-        """Updates profile_picture_data_url of user.
-
-        Args:
-            profile_picture_data_url: str. New profile picture url 
-                to be set.
-        """
-        username = self.username
-        # Ruling out the possibility of different types for mypy type checking.
-        assert isinstance(username, str)
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
-        filename_png = 'profile_picture.png'
-        png_binary = utils.convert_data_url_to_binary(
-            profile_picture_data_url, 'png')
-        fs.commit(filename_png, png_binary, mimetype='image/png')
-
-        webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
-        filename_webp = 'profile_picture.webp'
-        fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
     def update_subject_interests(
         self, subject_interests: List[str]

@@ -324,7 +324,9 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         elif update_type == 'subject_interests':
             user_settings.update_subject_interests(data)
         elif update_type == 'profile_picture_data_url':
-            user_settings.update_profile_picture_data_url(data)
+            assert user_settings.username is not None
+            user_services.update_profile_picture_data_url(
+                user_settings.username, data)
         elif update_type == 'preferred_language_codes':
             user_settings.update_preferred_language_codes(data)
         elif update_type == 'email_preferences':
@@ -334,12 +336,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email']))
-
-        if not isinstance(data, str):
-            raise self.InvalidInputException(
-                'Expected data to be a string, received %s' % data)
-
-        if update_type == 'preferred_site_language_code':
+        elif update_type == 'preferred_site_language_code':
             user_settings.preferred_site_language_code = data
         elif update_type == 'preferred_audio_language_code':
             user_settings.preferred_audio_language_code = data
@@ -527,9 +524,12 @@ class SignupHandler(
 
         user_settings = user_services.get_user_settings(
             self.user_id, strict=True)
-        initial_profile_picture = user_services.generate_initial_profile_picture( # pylint: disable=line-too-long
-            user_settings.email)
-        user_settings.update_profile_picture_data_url(initial_profile_picture)
+        initial_profile_picture = (
+            user_services.generate_initial_profile_picture(user_settings.email)
+        )
+        assert user_settings.username is not None
+        user_services.update_profile_picture_data_url(
+            user_settings.username, initial_profile_picture)
 
         if not has_ever_registered:
             # Set the default dashboard for new users.
