@@ -22,7 +22,6 @@ import { AboutPageRootComponent } from './about-page-root.component';
 import { AboutPageRoutingModule } from './about-page-routing.module';
 import { CommonModule } from '@angular/common';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { PrimaryButtonComponent } from 'components/button-directives/primary-button.component';
 
 @NgModule({
   imports: [
@@ -32,8 +31,7 @@ import { PrimaryButtonComponent } from 'components/button-directives/primary-but
   ],
   declarations: [
     AboutPageComponent,
-    AboutPageRootComponent,
-    PrimaryButtonComponent
+    AboutPageRootComponent
   ],
 })
 export class AboutPageModule {}
