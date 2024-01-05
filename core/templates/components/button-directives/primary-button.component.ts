@@ -39,8 +39,7 @@ export class PrimaryButtonComponent {
   ) {}
 
   handleButtonClick(): void {
-    if (this.onClickPrimaryButton &&
-        typeof this.onClickPrimaryButton === 'function') {
+    if (this.onClickPrimaryButton.observers.length > 0) {
       this.onClickPrimaryButton.emit();
     } else if (this.buttonHref && typeof this.buttonHref === 'string') {
       const isExternalLink = this.isExternalLink(this.buttonHref);
