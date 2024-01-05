@@ -67,10 +67,17 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  getFormLink(): string {
+    let translationKey = this.translateService.instant(
+      'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON_LINK');
+    return translationKey;
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
+        this.getFormLink();
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(

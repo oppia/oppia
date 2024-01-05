@@ -454,6 +454,7 @@
 	"I18N_NEXT_LESSON": "下一堂课程",
 	"I18N_ONE_SUBSCRIBER_TEXT": "您有1位订阅者。",
 	"I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "合作伙伴",
+	"I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON_LINK": "https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=zh-CN&_x_tr_hl=en-US&_x_tr_pto=wapp",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "将要被删除的账户",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1": "您的用户计划于在24小时内被删除。完成删除后将通过电子邮箱通知您。",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2": "此操作将会删除该用户账号与所有关联该账号的隐私数据。已公开的数据因为无法与账号关联，因此会匿名处理。一些已公开数据的所有权则可能会转移到社区。",

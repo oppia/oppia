@@ -24,7 +24,7 @@
         </ul>
       </div>
       <button class="btn">
-        <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+        <a [href]="getFormLink()"
            target="_blank"
            rel="noopener">
            {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
@@ -238,7 +238,7 @@
     </div>
 
     <button class="btn">
-      <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
+      <a [href]="getFormLink()"
          target="_blank"
          rel="noopener">
          {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
