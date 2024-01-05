@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing voiceovers."""
+"""Model for storing voiceovers."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # A dict representing content-id as keys and a nested dict as values.
     # The nested dict contains 'manual' and 'auto' as keys and dict(Voiceover)
     # as values.
-    voiceovers_mapping = datastore_services.JsonProperty(required=True)
+    voiceovers = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -75,7 +75,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voiceovers_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voiceovers': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     @staticmethod
@@ -138,7 +138,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers_mapping: Dict[str, Dict[str, feconf.VoiceoverDict]]
+        voiceovers: Dict[str, Dict[str, feconf.VoiceoverDict]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -147,7 +147,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
-            voiceovers_mapping: dict(str, dict(str, VoiceoverDict)). A dict
+            voiceovers: dict(str, dict(str, VoiceoverDict)). A dict
                 representing content-id as keys and dict(TranslatedContent)
                 as values.
 
@@ -161,5 +161,5 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id=entity_id,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
-            voiceovers_mapping=voiceovers_mapping
+            voiceovers=voiceovers
         )
