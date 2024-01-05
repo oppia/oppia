@@ -412,8 +412,6 @@ describe('ItemSelectionInputValidationService', () => {
   });
 
   it('should not warn user when user selects only one answer choice', () => {
-    // CustomizationArguments.choices.value =
-    // [new SubtitledHtml('Selection 1', 'ca_0')];
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [agof.createNew(
@@ -589,6 +587,35 @@ describe('ItemSelectionInputValidationService', () => {
       message: (
         'Please add something for Oppia to say in the ' +
           '\"All other answers\" response.')
+    }]);
+  });
+
+  it('should warn about duplicated rules', () => {
+    const answerGroups = [agof.createNew(
+      [Rule.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['ca_0']
+        }
+      }, 'ItemSelectionInput'),
+      Rule.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['ca_0']
+        }
+      }, 'ItemSelectionInput')],
+      goodDefaultOutcome,
+      [],
+      null)
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'The rule 1 of answer group 0 of ItemSelectionInput interaction ' +
+        'is a duplicate.')
     }]);
   });
 });
