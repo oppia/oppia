@@ -23,13 +23,11 @@
           </li>
         </ul>
       </div>
-      <button class="btn">
-        <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
-           target="_blank"
-           rel="noopener">
-           {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
-        </a>
-      </button>
+      <oppia-primary-button
+          buttonHref="https://forms.gle/Y71U8FdhQwZpicJj8"
+          [customClasses]="['btn']"
+          buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}">
+      </oppia-primary-button>
     </div>
 
     <div class="oppia-partnerships-banner-image
@@ -81,13 +79,11 @@
       <img class="partering-with-oppia-image" alt="Partnerships page image" [src]="partneringImgUrl">
       <div class="partering-with-oppia-content">
         <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_CONTENT' | translate }}</p>
-        <button class="btn">
-          <a href="https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing"
-             target="_blank"
-             rel="noopener">
-             {{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}
-          </a>
-        </button>
+          <oppia-primary-button
+            buttonHref="https://drive.google.com/file/d/1RZ1mWDA2XWXTh1GlWFf5AWWuV2iGBBa2/view?usp=sharing"
+            [customClasses]="['btn']"
+            buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_BROCHURE_BUTTON' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
   </div>
@@ -177,11 +173,11 @@
           </a>
         </mat-card-content>
       </div>
-      <button class="btn">
-        <a href="https://www.oppia.org/blog" target="_blank" rel="noopener">
-           {{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}
-        </a>
-      </button>
+        <oppia-primary-button
+          buttonHref="/blog"
+          [customClasses]="['btn']"
+          buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_PARTNER_STORIES_BUTTON' | translate }}">
+      </oppia-primary-button>
     </div>
   </div>
 
@@ -236,14 +232,11 @@
         <p>{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_3' | translate }}</p>
       </div>
     </div>
-
-    <button class="btn">
-      <a href="https://forms.gle/Y71U8FdhQwZpicJj8"
-         target="_blank"
-         rel="noopener">
-         {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
-      </a>
-    </button>
+    <oppia-primary-button
+        buttonHref="https://forms.gle/Y71U8FdhQwZpicJj8"
+        [customClasses]="['btn']"
+        buttonText="{{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}">
+    </oppia-primary-button>
   </div>
 
   <div class="oppia-partnerships-faqs">
@@ -649,6 +642,11 @@
 
     .carousel-control-next-icon {
       margin-right: -5em;
+    }
+
+    .btn {
+      height: 40px;
+      width: 300px;
     }
   }
 
