@@ -317,30 +317,16 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
         bulk_email_signup_message_should_be_shown = False
-        if update_type == 'user_bio':
-            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
-                raise self.InvalidInputException(
-                    'User bio exceeds maximum character limit: %s'
-                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+        user_settings = user_services.get_user_settings(self.user_id)
 
-            user_services.update_user_bio(self.user_id, data)
+        if update_type == 'user_bio':
+            user_settings.update_user_bio(data)
         elif update_type == 'subject_interests':
-            user_services.update_subject_interests(self.user_id, data)
-        elif update_type == 'preferred_language_codes':
-            user_services.update_preferred_language_codes(self.user_id, data)
-        elif update_type == 'preferred_site_language_code':
-            user_services.update_preferred_site_language_code(
-                self.user_id, data)
-        elif update_type == 'preferred_audio_language_code':
-            user_services.update_preferred_audio_language_code(
-                self.user_id, data)
-        elif update_type == 'preferred_translation_language_code':
-            user_services.update_preferred_translation_language_code(
-                self.user_id, data)
+            user_settings.update_subject_interests(data)
         elif update_type == 'profile_picture_data_url':
-            user_services.update_profile_picture_data_url(self.user_id, data)
-        elif update_type == 'default_dashboard':
-            user_services.update_user_default_dashboard(self.user_id, data)
+            user_settings.update_profile_picture_data_url(data)
+        elif update_type == 'preferred_language_codes':
+            user_settings.update_preferred_language_codes(data)
         elif update_type == 'email_preferences':
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
@@ -348,10 +334,24 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email']))
+
+        if not isinstance(data, str):
+            raise self.InvalidInputException(
+                'Expected data to be a string, received %s' % data)
+
+        if update_type == 'preferred_site_language_code':
+            user_settings.preferred_site_language_code = data
+        elif update_type == 'preferred_audio_language_code':
+            user_settings.preferred_audio_language_code = data
+        elif update_type == 'preferred_translation_language_code':
+            user_settings.preferred_translation_language_code = data
+        elif update_type == 'default_dashboard':
+            user_settings.default_dashboard = data
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
+        user_services.save_user_settings(user_settings)
         self.render_json({
             'bulk_email_signup_message_should_be_shown': (
                 bulk_email_signup_message_should_be_shown)

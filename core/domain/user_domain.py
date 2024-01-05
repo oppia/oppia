@@ -579,6 +579,53 @@ class UserSettings:
 
         self.subject_interests = subject_interests
 
+    def update_user_bio(self, user_bio: str) -> None:
+        """Updates user_bio of user.
+
+        Args:
+            user_bio: str. New user bio to be set.
+
+        Raises:
+            ValidationError. The given user bio is not a string.
+            ValidationError. User bio exceeds maximum character limit.
+        """
+        if not isinstance(user_bio, str):
+            raise utils.ValidationError(
+                'Expected user_bio to be a string.')
+        if len(user_bio) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+            raise utils.ValidationError(
+                'User bio exceeds maximum character limit: %s'
+                % feconf.MAX_BIO_LENGTH_IN_CHARS)
+
+        self.user_bio = user_bio
+
+    def update_preferred_language_codes(
+        self, preferred_language_codes: List[str]
+    ) -> None:
+        """Updates preferred_language_codes of user.
+
+        Args:
+            preferred_language_codes: list(str). New preferred language codes
+                to be set.
+        """
+        if not isinstance(preferred_language_codes, list):
+            raise utils.ValidationError(
+                'Expected preferred_language_codes to be a list.')
+
+        for language_code in preferred_language_codes:
+            if not isinstance(language_code, str):
+                raise utils.ValidationError(
+                    'Expected each language code to be a string.')
+            if not language_code:
+                raise utils.ValidationError(
+                    'Expected each language code to be non-empty.')
+
+        if len(set(preferred_language_codes)) != len(preferred_language_codes):
+            raise utils.ValidationError(
+                'Expected each language code to be distinct.')
+
+        self.preferred_language_codes = preferred_language_codes
+
 
 class UserActionsInfo:
     """A class representing information of user actions.

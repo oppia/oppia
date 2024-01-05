@@ -499,7 +499,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+        user_settings.update_user_bio('New bio.')
+        user_services.save_user_settings(user_settings)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
@@ -516,10 +517,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
-            self.user_settings.update_subject_interests([1, 2, 3])  # type: ignore[list-item]
+            self.user_settings.update_subject_interests(['ab', 'de', 1])  # type: ignore[list-item]
 
         with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
-            self.user_settings.update_subject_interests(['', 'ab'])
+            self.user_settings.update_subject_interests(['ab', ''])
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -548,6 +549,45 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.update_subject_interests([])
         self.user_settings.update_subject_interests(
             ['singleword', 'has spaces'])
+
+    def test_invalid_user_bio_is_not_accepted(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected user_bio to be a string.'):
+            self.user_settings.update_user_bio(123) # type: ignore[arg-type]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS
+            ):
+            self.user_settings.update_user_bio(
+                'a' * (feconf.MAX_BIO_LENGTH_IN_CHARS + 1))
+
+        # The following case is valid.
+        self.user_settings.update_user_bio('a' * 200)
+
+    def test_invalid_preferred_language_codes_are_not_accepted(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
+            self.user_settings.update_preferred_language_codes('not a list')  # type: ignore[arg-type]
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
+            self.user_settings.update_preferred_language_codes(['en', 'hi', 1])  # type: ignore[list-item]
+
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
+            self.user_settings.update_subject_interests(['en', ''])
+
+        # The following case is valid.
+        self.user_settings.update_preferred_language_codes(['en', 'hi'])
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
