@@ -31,8 +31,7 @@ import './primary-button.component.css';
 export class PrimaryButtonComponent {
   @Input() buttonText: string;
   @Input() customClasses: string[];
-  @Input() buttonHref: string | null = null; // Optional href attribute
-  // Optional function attribute if no href is passed
+  @Input() buttonHref: string | null = null;
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
@@ -46,7 +45,6 @@ export class PrimaryButtonComponent {
     } else if (this.buttonHref && typeof this.buttonHref === 'string') {
       const isExternalLink = this.isExternalLink(this.buttonHref);
       if (isExternalLink) {
-        // Open the external link in a new tab
         this.openExternalLink(this.buttonHref);
       } else {
         this.windowRef.nativeWindow.location.href = this.buttonHref;
