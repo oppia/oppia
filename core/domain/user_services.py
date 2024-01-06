@@ -806,7 +806,7 @@ def get_user_actions_info(
         UserActionsInfo. User object with system committer user id.
     """
     roles = (
-        get_user_roles_from_id(user_id) if user_id else [feconf.ROLE_ID_GUEST]
+        get_user_roles_from_id(user_id)
     )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
@@ -1440,20 +1440,6 @@ def update_user_bio(user_id: str, user_bio: str) -> None:
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
-    save_user_settings(user_settings)
-
-
-def update_user_default_dashboard(
-    user_id: str, default_dashboard: str
-) -> None:
-    """Updates the default dashboard of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        default_dashboard: str. The dashboard the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.default_dashboard = default_dashboard
     save_user_settings(user_settings)
 
 

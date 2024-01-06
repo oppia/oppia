@@ -363,6 +363,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
             ' received %s' % self.user_settings.email):
             self.user_settings.validate()
 
+    def test_validation_empty_email_raises_error(self) -> None:
+        self.user_settings.email = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No user email specified.'
+        ):
+            self.user_settings.validate()
+
     def test_validation_wrong_email_raises_error(self) -> None:
         invalid_emails_list = [
             'testemail.com', '@testemail.com', 'testemail.com@']
@@ -585,7 +592,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.update_preferred_language_codes(['en', 'hi', 1])  # type: ignore[list-item]
 
         with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
-            self.user_settings.update_subject_interests(['en', ''])
+            self.user_settings.update_preferred_language_codes(['en', ''])
+        
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
+            self.user_settings.update_preferred_language_codes(['en', 'en'])
 
         # The following case is valid.
         self.user_settings.update_preferred_language_codes(['en', 'hi'])
