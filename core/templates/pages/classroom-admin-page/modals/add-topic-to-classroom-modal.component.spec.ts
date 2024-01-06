@@ -151,8 +151,6 @@ describe('AddTopicToClassroomModalComponent', () => {
       },
     };
 
-    
-
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
       .and.returnValue(Promise.resolve(mockUnusedTopics));
 
