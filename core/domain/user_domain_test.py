@@ -593,7 +593,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
             self.user_settings.update_preferred_language_codes(['en', ''])
-        
+
         with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
             self.user_settings.update_preferred_language_codes(['en', 'en'])
 

@@ -806,7 +806,7 @@ def get_user_actions_info(
         UserActionsInfo. User object with system committer user id.
     """
     roles = (
-        get_user_roles_from_id(user_id)
+        get_user_roles_from_id(user_id) if user_id else [feconf.ROLE_ID_GUEST]
     )
     actions = role_services.get_all_actions(roles)
     return user_domain.UserActionsInfo(user_id, roles, actions)
