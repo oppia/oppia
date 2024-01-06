@@ -109,9 +109,49 @@ describe('AddTopicToClassroomModalComponent', () => {
 
   it('should initialize topicFormControls with false values', fakeAsync(() => {
     const mockUnusedTopics: UnusedTopicsResponse = {
-      topicId1: { id: 'topicId1', name: 'topic1' },
-      topicId2: { id: 'topicId2', name: 'topic2' },
+      topicId1: {
+        id: 'topicId1',
+        name: 'topic1',
+        abbreviated_name: '',
+        description: '',
+        language_code: '',
+        uncategorized_skill_ids: [],
+        next_subtopic_id: 0,
+        version: 0,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        subtopics: [],
+        canonical_story_references: [],
+        additional_story_references: [],
+        url_fragment: '',
+        practice_tab_is_displayed: false,
+        meta_tag_content: '',
+        page_title_fragment_for_web: '',
+        skill_ids_for_diagnostic_test: []
+      },
+      topicId2: {
+        id: 'topicId2',
+        name: 'topic2',
+        abbreviated_name: '',
+        description: '',
+        language_code: '',
+        uncategorized_skill_ids: [],
+        next_subtopic_id: 0,
+        version: 0,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        subtopics: [],
+        canonical_story_references: [],
+        additional_story_references: [],
+        url_fragment: '',
+        practice_tab_is_displayed: false,
+        meta_tag_content: '',
+        page_title_fragment_for_web: '',
+        skill_ids_for_diagnostic_test: []
+      },
     };
+
+    
 
     spyOn(editableTopicBackendApiService, 'getUnusedTopicsAsync')
       .and.returnValue(Promise.resolve(mockUnusedTopics));
