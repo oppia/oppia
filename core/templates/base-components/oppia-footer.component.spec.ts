@@ -17,11 +17,14 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OppiaFooterComponent } from './oppia-footer.component';
 
 class MockRouter {
@@ -31,9 +34,12 @@ class MockRouter {
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
+  let mailingListBackendApiService: MailingListBackendApiService;
+  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         OppiaFooterComponent,
         MockTranslatePipe
@@ -50,6 +56,9 @@ describe('OppiaFooterComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(OppiaFooterComponent);
+    alertsService = TestBed.inject(AlertsService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
     component = fixture.componentInstance;
   });
 
@@ -67,4 +76,63 @@ describe('OppiaFooterComponent', () => {
     () => {
       expect(component.getOppiaBlogUrl()).toEqual('/blog');
     });
+
+  it('should validate email address correctly', () => {
+    component.emailAddress = 'invalidEmail';
+    expect(component.validateEmailAddress()).toBeFalse();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.validateEmailAddress()).toBeTrue();
+  });
+
+  it('should add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(true));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'Done!', 1000);
+    }));
+
+  it('should fail to add user to mailing list and return status',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.resolve(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
+    }));
+
+  it('should reject request to the mailing list correctly',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addInfoMessage');
+      tick();
+      component.emailAddress = 'validEmail@example.com';
+      component.name = 'validName';
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
+        .and.returnValue(Promise.reject(false));
+
+      component.subscribeToMailingList();
+
+      flushMicrotasks();
+
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE, 10000);
+    }));
 });

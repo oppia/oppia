@@ -78,7 +78,6 @@ export class ModeratorPageBackendApiService {
   async getRecentCommitsAsync(): Promise<RecentCommitResponse> {
     let options = {params: new HttpParams()
       .set('query_type', 'all_non_private_commits')};
-    // TODO(sll): Update this to also support collections.
     return this.httpClient.get<RecentCommitResponse>(
       '/recentcommitshandler/recent_commits', options).toPromise();
   }
