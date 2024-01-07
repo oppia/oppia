@@ -25,8 +25,6 @@
  *     blob/master/sklearn/feature_extraction/text.py#L541
  */
 
-// TODO(anmol): Add functionality to add n_grams, remove stop words.
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
