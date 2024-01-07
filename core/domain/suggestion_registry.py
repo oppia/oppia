@@ -737,7 +737,8 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change_cmd.language_code, self.language_code))
 
-    def pre_update_validate(self, change_cmd: exp_domain.ExplorationChange) -> None:
+    def pre_update_validate(self,
+                            change_cmd: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
@@ -1162,8 +1163,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The new change_cmd skill_id must be equal to %s' %
                 self.change_cmd.skill_id)
 
-        if (self.change_cmd.skill_difficulty == change_cmd.skill_difficulty) and (
-                self.change_cmd.question_dict == change_cmd.question_dict):
+        if ((self.change_cmd.skill_difficulty == change_cmd.skill_difficulty)
+            and (self.change_cmd.question_dict == change_cmd.question_dict)):
             raise utils.ValidationError(
                 'At least one of the new skill_difficulty or question_dict '
                 'should be changed.')
