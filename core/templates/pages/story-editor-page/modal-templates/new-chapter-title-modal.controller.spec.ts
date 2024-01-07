@@ -157,7 +157,6 @@ describe('Create New Chapter Modal Component', () => {
     () => {
       expect(component.nodeTitles).toEqual(nodeTitles);
       expect(component.errorMsg).toBe(null);
-      expect(component.correctnessFeedbackDisabled).toBe(false);
       expect(component.categoryIsDefault).toBe(true);
     });
 

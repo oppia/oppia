@@ -297,9 +297,6 @@ import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
-import { PlayerCorrectnessFeedbackEnabledService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
@@ -580,8 +577,6 @@ export class UpgradedServices {
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
-    upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
-      new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =

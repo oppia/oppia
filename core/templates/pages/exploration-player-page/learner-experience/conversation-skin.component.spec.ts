@@ -69,7 +69,6 @@ import { ImagePreloaderService } from '../services/image-preloader.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { LearnerParamsService } from '../services/learner-params.service';
 import { NumberAttemptsService } from '../services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from '../services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { QuestionPlayerEngineService } from '../services/question-player-engine.service';
@@ -143,8 +142,6 @@ describe('Conversation skin component', () => {
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
@@ -544,8 +541,6 @@ describe('Conversation skin component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     messengerService = TestBed.inject(MessengerService);
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
-    playerCorrectnessFeedbackEnabledService = TestBed.inject(
-      PlayerCorrectnessFeedbackEnabledService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
@@ -1414,20 +1409,9 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should tell if correctness feedback is enabled', () => {
-    spyOn(playerCorrectnessFeedbackEnabledService, 'isEnabled');
-
-    componentInstance.isCorrectnessFeedbackEnabled();
-
-    expect(playerCorrectnessFeedbackEnabledService.isEnabled)
-      .toHaveBeenCalled();
-  });
-
   it('should tell if correctness footer is enabled', () => {
     componentInstance.answerIsCorrect = true;
 
-    spyOn(componentInstance, 'isCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     spyOn(playerPositionService, 'hasLearnerJustSubmittedAnAnswer')
       .and.returnValue(true);
 
@@ -1638,8 +1622,6 @@ describe('Conversation skin component', () => {
 
     componentInstance.pendingCardWasSeenBefore = true;
     componentInstance.answerIsCorrect = false;
-    spyOn(componentInstance, 'isCorrectnessFeedbackEnabled')
-      .and.returnValue(true);
 
     expect(componentInstance.isLearnAgainButton()).toBeTrue();
   });

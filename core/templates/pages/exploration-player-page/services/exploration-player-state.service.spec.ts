@@ -41,8 +41,6 @@ import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engi
 import { ExplorationEngineService } from './exploration-engine.service';
 import { ExplorationPlayerStateService } from './exploration-player-state.service';
 import { NumberAttemptsService } from './number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService }
-  from './player-correctness-feedback-enabled.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
@@ -52,8 +50,6 @@ describe('Exploration Player State Service', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let statsReportingService: StatsReportingService;
   let playthroughService: PlaythroughService;
-  let playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService;
   let explorationEngineService: ExplorationEngineService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let editableExplorationBackendApiService:
@@ -292,11 +288,6 @@ describe('Exploration Player State Service', () => {
     playthroughService = TestBed.inject(PlaythroughService);
     playthroughService = playthroughService as
       jasmine.SpyObj<PlaythroughService>;
-    playerCorrectnessFeedbackEnabledService = TestBed.inject(
-      PlayerCorrectnessFeedbackEnabledService);
-    playerCorrectnessFeedbackEnabledService = (
-      playerCorrectnessFeedbackEnabledService) as
-      jasmine.SpyObj<PlayerCorrectnessFeedbackEnabledService>;
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationEngineService = explorationEngineService as
       jasmine.SpyObj<ExplorationEngineService>;
@@ -358,7 +349,6 @@ describe('Exploration Player State Service', () => {
   it('should initialize exploration services', () => {
     spyOn(statsReportingService, 'initSession');
     spyOn(playthroughService, 'initSession');
-    spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(explorationEngineService, 'init');
 
     explorationPlayerStateService.initializeExplorationServices(
@@ -366,25 +356,20 @@ describe('Exploration Player State Service', () => {
 
     expect(statsReportingService.initSession).toHaveBeenCalled();
     expect(playthroughService.initSession).toHaveBeenCalled();
-    expect(playerCorrectnessFeedbackEnabledService.init).toHaveBeenCalled();
     expect(explorationEngineService.init).toHaveBeenCalled();
   });
 
   it('should initialize pretest services', () => {
-    spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
     let pretestQuestionObjects: Question[] = [];
     let callback = () => {};
 
     explorationPlayerStateService.initializePretestServices(
       pretestQuestionObjects, callback);
-    expect(playerCorrectnessFeedbackEnabledService.init)
-      .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalled();
   });
 
   it('should initialize question player services', () => {
-    spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(questionPlayerEngineService, 'init');
     let questions = [questionBackendDict];
     let questionObjects = [questionObject];
@@ -394,8 +379,6 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService.initializeQuestionPlayerServices(
       questions, successCallback, errorCallback);
 
-    expect(playerCorrectnessFeedbackEnabledService.init)
-      .toHaveBeenCalledWith(true);
     expect(questionPlayerEngineService.init).toHaveBeenCalledWith(
       questionObjects, successCallback, errorCallback);
   });
@@ -485,7 +468,6 @@ describe('Exploration Player State Service', () => {
       }));
     spyOn(explorationFeaturesService, 'init');
     spyOn(explorationEngineService, 'init');
-    spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(numberAttemptsService, 'reset');
 
     explorationPlayerStateService.initExplorationPreviewPlayer(() => {});
@@ -493,7 +475,6 @@ describe('Exploration Player State Service', () => {
 
     expect(explorationFeaturesService.init).toHaveBeenCalled();
     expect(explorationEngineService.init).toHaveBeenCalled();
-    expect(playerCorrectnessFeedbackEnabledService.init).toHaveBeenCalled();
     expect(numberAttemptsService.reset).toHaveBeenCalled();
   }));
 

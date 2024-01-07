@@ -241,7 +241,7 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     # DEPRECATED. Do not use.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=False, indexed=True)
+        default=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

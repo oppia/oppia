@@ -151,8 +151,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
-    if (!outcome ||
-        !this.stateEditorService.getCorrectnessFeedbackEnabled()) {
+    if (!outcome) {
       return false;
     }
 

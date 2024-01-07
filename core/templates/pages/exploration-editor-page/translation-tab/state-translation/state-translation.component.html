@@ -248,7 +248,7 @@
                                      [isResponse]="true"
                                      [showWarning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
                                      (navigateToState)="navigateToState($event)"
-                                     [correctnessFeedbackEnabled]="explorationCorrectnessFeedbackService.isEnabled()">
+                                     [correctnessFeedbackEnabled]="true">
               </oppia-response-header>
             </a>
             <div *ngIf="activeAnswerGroupIndex === index">
@@ -291,7 +291,7 @@
                                      [isResponse]="true"
                                      [showWarning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
                                      (navigateToState)="navigateToState($event)"
-                                     [correctnessFeedbackEnabled]="explorationCorrectnessFeedbackService.isEnabled()">
+                                     [correctnessFeedbackEnabled]="true">
               </oppia-response-header>
             </a>
             <div *ngIf="activeAnswerGroupIndex === stateAnswerGroups.length">
