@@ -319,7 +319,7 @@ class BaseSuggestion:
     # in every sub-class where this pre_update_validate method is used. So, to
     # avoid the error in every sub-class, we have used Any type here but once
     # this BaseSuggestion class is refactored, we can remove type Any from here.
-    def pre_update_validate(self, change: Any) -> None:
+    def pre_update_validate(self, change_cmd: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
         """
@@ -517,15 +517,15 @@ class SuggestionEditStateContent(BaseSuggestion):
             list(ExplorationChange). The change_list corresponding to the
             suggestion.
         """
-        change = self.change_cmd
+        change_cmd = self.change_cmd
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         old_content = (
             exploration.states[self.change_cmd.state_name].content.to_dict())
 
-        change.old_value = old_content
-        change.new_value['content_id'] = old_content['content_id']
+        change_cmd.old_value = old_content
+        change_cmd.new_value['content_id'] = old_content['content_id']
 
-        return [change]
+        return [change_cmd]
 
     def populate_old_value_of_change(self) -> None:
         """Populates old value of the change_cmd."""
@@ -737,29 +737,29 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change_cmd.language_code, self.language_code))
 
-    def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
+    def pre_update_validate(self, change_cmd: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
         Args:
-            change: ExplorationChange. The new change_cmd.
+            change_cmd: ExplorationChange. The new change_cmd.
 
         Raises:
             ValidationError. Invalid new change_cmd.
         """
-        if self.change_cmd.cmd != change.cmd:
+        if self.change_cmd.cmd != change_cmd.cmd:
             raise utils.ValidationError(
                 'The new change_cmd cmd must be equal to %s' %
                 self.change_cmd.cmd)
-        if self.change_cmd.state_name != change.state_name:
+        if self.change_cmd.state_name != change_cmd.state_name:
             raise utils.ValidationError(
                 'The new change_cmd state_name must be equal to %s' %
                 self.change_cmd.state_name)
-        if self.change_cmd.content_html != change.content_html:
+        if self.change_cmd.content_html != change_cmd.content_html:
             raise utils.ValidationError(
                 'The new change_cmd content_html must be equal to %s' %
                 self.change_cmd.content_html)
-        if self.change_cmd.language_code != change.language_code:
+        if self.change_cmd.language_code != change_cmd.language_code:
             raise utils.ValidationError(
                 'The language code must be equal to %s' %
                 self.change_cmd.language_code)
@@ -1139,7 +1139,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def pre_update_validate(
         self,
-        change: Union[
+        change_cmd: Union[
             question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd,
             question_domain.CreateNewFullySpecifiedQuestionCmd
         ]
@@ -1148,22 +1148,22 @@ class SuggestionAddQuestion(BaseSuggestion):
         before updating the suggestion.
 
         Args:
-            change: QuestionChange. The new change_cmd.
+            change_cmd: QuestionChange. The new change_cmd.
 
         Raises:
             ValidationError. Invalid new change_cmd.
         """
-        if self.change_cmd.cmd != change.cmd:
+        if self.change_cmd.cmd != change_cmd.cmd:
             raise utils.ValidationError(
                 'The new change_cmd cmd must be equal to %s' %
                 self.change_cmd.cmd)
-        if self.change_cmd.skill_id != change.skill_id:
+        if self.change_cmd.skill_id != change_cmd.skill_id:
             raise utils.ValidationError(
                 'The new change_cmd skill_id must be equal to %s' %
                 self.change_cmd.skill_id)
 
-        if (self.change_cmd.skill_difficulty == change.skill_difficulty) and (
-                self.change_cmd.question_dict == change.question_dict):
+        if (self.change_cmd.skill_difficulty == change_cmd.skill_difficulty) and (
+                self.change_cmd.question_dict == change_cmd.question_dict):
             raise utils.ValidationError(
                 'At least one of the new skill_difficulty or question_dict '
                 'should be changed.')
