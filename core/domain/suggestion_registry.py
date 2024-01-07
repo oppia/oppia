@@ -737,8 +737,10 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change_cmd.language_code, self.language_code))
 
-    def pre_update_validate(self,
-                            change_cmd: exp_domain.ExplorationChange) -> None:
+    def pre_update_validate(
+        self,
+        change_cmd: exp_domain.ExplorationChange
+    ) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
