@@ -53,12 +53,12 @@ else
     mkdir -p ../oppia_tools
     tar -xvf node-download -C ../oppia_tools
     rm node-download
-fi
 
-if [ "$node_file_name" = "node-v16.13.0" ]; then
-    cd ../oppia_tools/node-16.13.0
-    ./configure
-    make
+    if [ "$node_file_name" = "node-v16.13.0" ]; then
+        cd ../oppia_tools/node-16.13.0
+        ./configure
+        make
+    fi
 fi
 
 # Rename node directory to node-16.13.0.
