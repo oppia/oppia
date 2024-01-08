@@ -319,35 +319,71 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 
-        if update_type == 'user_bio':
-            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+        if update_type == 'subject_interests':
+            if not isinstance(data, list):
                 raise self.InvalidInputException(
-                    'User bio exceeds maximum character limit: %s'
-                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
-            user_settings.user_bio = data
-        elif update_type == 'subject_interests':
+                    'Expected subject interests to be a list, received %s'
+                    % data)
             user_settings.subject_interests = data
         elif update_type == 'preferred_language_codes':
+            if not isinstance(data, list):
+                raise self.InvalidInputException(
+                    'Expected preferred language codes to be a list,'
+                    'received %s' % data)
             user_settings.preferred_language_codes = data
-        elif update_type == 'preferred_site_language_code':
-            user_settings.preferred_site_language_code = data
-        elif update_type == 'preferred_audio_language_code':
-            user_settings.preferred_audio_language_code = data
-        elif update_type == 'preferred_translation_language_code':
-            user_settings.preferred_translation_language_code = data
-        elif update_type == 'default_dashboard':
-            user_settings.default_dashboard = data
-        elif update_type == 'profile_picture_data_url':
-            assert user_settings.username is not None
-            user_services.update_profile_picture_data_url(
-                user_settings.username, data)
         elif update_type == 'email_preferences':
+            required_keys = [
+                'can_receive_email_updates', 'can_receive_editor_role_email',
+                'can_receive_feedback_message_email',
+                'can_receive_subscription_email']
+            # Check if all required keys are in the data dictionary.
+            if not all(key in data for key in required_keys):
+                raise self.InvalidInputException(
+                    'Expected data to contain the fields,%s, received %s'
+                    % (required_keys, data))
+
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
                     self.user_id, data['can_receive_email_updates'],
                     data['can_receive_editor_role_email'],
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email']))
+        elif update_type == 'user_bio':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                raise self.InvalidInputException(
+                    'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+            user_settings.user_bio = data
+        elif update_type == 'preferred_site_language_code':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            user_settings.preferred_site_language_code = data
+        elif update_type == 'preferred_audio_language_code':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            user_settings.preferred_audio_language_code = data
+        elif update_type == 'preferred_translation_language_code':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            user_settings.preferred_translation_language_code = data
+        elif update_type == 'default_dashboard':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            user_settings.default_dashboard = data
+        elif update_type == 'profile_picture_data_url':
+            if not isinstance(data, str):
+                raise self.InvalidInputException(
+                        'Expected data to be a string, received %s' % data)
+            assert user_settings.username is not None
+            user_services.update_profile_picture_data_url(
+                user_settings.username, data)
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)

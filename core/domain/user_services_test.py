@@ -1066,26 +1066,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
-    def test_update_user_creator_dashboard_display(self) -> None:
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
-
-        user_services.update_user_creator_dashboard_display(
-            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
-
     def test_add_user_role(self) -> None:
         auth_id = 'test_id'
         username = 'testname'

@@ -1416,22 +1416,6 @@ def update_profile_picture_data_url(
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
-def update_user_creator_dashboard_display(
-    user_id: str, creator_dashboard_display_pref: str
-) -> None:
-    """Updates the creator dashboard preference of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        creator_dashboard_display_pref: str. The creator dashboard preference
-            the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.creator_dashboard_display_pref = (
-        creator_dashboard_display_pref)
-    save_user_settings(user_settings)
-
-
 def add_user_role(user_id: str, role: str) -> None:
     """Updates the roles of the user with given user_id.
 
