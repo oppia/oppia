@@ -124,7 +124,7 @@
   width: 100vw;
 }
 
-.learners-review {
+.oppia-android-learners-review {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -132,13 +132,13 @@
   margin-top: 20%;
 }
 
-.review-section {
+.oppia-android-review-section {
   display: flex;
   flex-wrap: wrap;
   margin-top: 3%;
 }
 
-.review-component {
+.oppia-android-review-component {
   border: 1px solid #ccc;
   border-radius: 11px;
   box-shadow: 8px 4px 6px rgba(0, 0, 0, 0.3);
@@ -150,14 +150,14 @@
   width: 280px;
 }
 
-.reviewer {
+.oppia-android-reviewer {
   font-size: 14px;
   font-style: italic;
   font-weight: 500;
   padding-top: 5px;
 }
 
-.learners-review-title {
+.oppia-android-learners-review-title {
   text-align: center;
 }
 
