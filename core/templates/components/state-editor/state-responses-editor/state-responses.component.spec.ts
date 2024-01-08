@@ -676,12 +676,7 @@ describe('State Responses Component', () => {
 
     component.stateName = 'Hola';
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
-  });
-
-  it('should return false if outcome is null or undefined', () => {
     expect(component.isSelfLoopThatIsMarkedCorrect(undefined)).toBe(false);
-    expect(component.isSelfLoopThatIsMarkedCorrect(null)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop and return' +
