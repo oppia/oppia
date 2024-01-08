@@ -89,9 +89,9 @@
                 <div class="donate-learners-carousel">
                   <div class="donate-learners-tile tile-{{id}}" *ngFor="let learner of learners;index as id">
                     <picture>
-                      <source type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)" width="300px" height="164.83px">
-                      <source type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)" width="300px" height="164.83px">
-                      <img [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner" width="300px" height="164.83px">
+                      <source class="donate-learners-img" type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)">
+                      <source class="donate-learners-img" type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
+                      <img class="donate-learners-img" [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner">
                     </picture>
                     <div class="donate-learners-content">
                       <p class="donate-learners-country">{{ learner.country | translate }}</p>
@@ -198,7 +198,7 @@
     .donate-modal-button {
       background: #00645c;
       border-radius: 8px;
-      bottom: 8px;
+      bottom: 12px;
       box-shadow: 0 4px 4px 0 #00000040;
       height: fit-content;
       left: 50%;
@@ -379,6 +379,13 @@
     padding: 4px;
   }
 
+  @media (max-width: 375px) {
+    .donate-stat-text-sm {
+      font-size: 12px;
+      padding: 0 4px 0 0;
+    }
+  }
+
   .donate-stat > p {
     padding: 4px;
   }
@@ -445,6 +452,16 @@
     padding: 0 16px;
   }
 
+  @media (max-width: 400px) {
+    .donate-learners-carousel {
+      padding: 0 0 0 calc((100vw - 372px) / 2);
+    }
+
+    .donate-learners-bg {
+      padding: 25px 12px;
+    }
+  }
+
   .donate-learners-content {
     display: flex;
     flex-direction: column;
@@ -456,6 +473,11 @@
     color: #003c34;
     font-weight: 500;
     margin: 8px 0;
+  }
+
+  .donate-learners-img {
+    height: 164.83px;
+    width: 300px;
   }
 
   .donate-learners-name {
@@ -508,6 +530,21 @@
     flex-direction: column;
     flex-shrink: 0;
     width: 300px;
+  }
+
+  @media (max-width: 364px) {
+    .donate-learners-carousel {
+      padding: 0 0 0 calc((100vw - 326px) / 2);
+    }
+
+    .donate-learners-img {
+      height: 139.55px;
+      width: 254px;
+    }
+
+    .donate-learners-tile {
+      width: 254px;
+    }
   }
 
   .donate-today-content > p:first-child {
