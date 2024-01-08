@@ -55,6 +55,8 @@ else
     tar -xvf node-download -C ../oppia_tools
     rm node-download
 
+    # Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/main/BUILDING.md#building-nodejs-1).
+    # Source code is useful for non-x64 linux/darwin systems.
     if [ "$node_file_name" = "node-v16.13.0" ]; then
         cd ../oppia_tools/node-16.13.0
         ./configure
