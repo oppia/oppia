@@ -237,6 +237,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             url_fragment='story-frag')
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
+        self.story.story_contents.nodes[0].exploration_id = 'exp 1'
+        self.story.story_contents.nodes[1].exploration_id = 'exp 2'
         self.story.update_node_destination_node_ids(
             self.NODE_ID_1, [self.NODE_ID_2])
         self.signup('user@example.com', 'user')
@@ -971,7 +973,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.story_contents.nodes[1].is_node_behind_schedule(),
                 True)
 
-    def test_valididate_non_string_unpublishing_reason(self) -> None:
+    def test_validate_non_string_unpublishing_reason(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
@@ -1159,58 +1161,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2', 'exp_4'])
-
-    def test_get_all_linked_exp_ids_raises_exception_over_node_without_exp_id(
-        self
-    ) -> None:
-        node_1: story_domain.StoryNodeDict = {
-            'id': 'node_1',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'destination_node_ids': ['node_2'],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'a',
-            'outline_is_finalized': False,
-            'exploration_id': 'exp_1',
-            'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
-        }
-        node_2: story_domain.StoryNodeDict = {
-            'id': 'node_2',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'title': 'Title 2',
-            'description': 'Description 2',
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None,
-            'status': 'Published',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
-            'first_publication_date_msecs': 100,
-            'unpublishing_reason': None
-        }
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
-        ]
-        with self.assertRaisesRegex(
-            Exception, 'No exploration_id found for the node_id node_2'
-        ):
-            self.story.story_contents.get_all_linked_exp_ids()
 
     def test_get_linked_exp_ids_of_published_nodes(self) -> None:
         node_1: story_domain.StoryNodeDict = {
@@ -1533,7 +1483,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1553,7 +1503,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1573,7 +1523,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1600,7 +1550,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1620,7 +1570,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1640,7 +1590,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1668,7 +1618,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1688,7 +1638,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1708,7 +1658,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1738,7 +1688,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_1', 'skill_0'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1758,7 +1708,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1778,7 +1728,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_4'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -1798,7 +1748,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_4',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2044,6 +1994,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].exploration_id = ''
         self._assert_validation_error(
             'Expected exploration ID to not be an empty string')
+
+    def test_validate_no_exploration_id(self) -> None:
+        self.story.story_contents.nodes[0].exploration_id = None
+        self._assert_validation_error(
+            'Expected exploration ID to not be None')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong

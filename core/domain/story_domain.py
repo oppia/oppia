@@ -763,11 +763,18 @@ class StoryNode:
             ValidationError. One or more attributes of the story node are
                 invalid.
         """
-        if self.exploration_id:
-            if not isinstance(self.exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected exploration ID to be a string, received %s' %
-                    self.exploration_id)
+        if self.exploration_id is None:
+            raise utils.ValidationError(
+                'Expected exploration ID to not be None') 
+        if self.exploration_id and not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration ID to be a string, received %s' %
+                self.exploration_id)
+        if self.exploration_id == '':
+            raise utils.ValidationError(
+                'Expected exploration ID to not be an empty string, '
+                'received %s' % self.exploration_id)
+
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
@@ -785,11 +792,7 @@ class StoryNode:
                 self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
                 'Story node thumbnail size in bytes cannot be zero.')
-        if self.exploration_id == '':
-            raise utils.ValidationError(
-                'Expected exploration ID to not be an empty string, '
-                'received %s' % self.exploration_id)
-
+        
         if not isinstance(self.outline, str):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
