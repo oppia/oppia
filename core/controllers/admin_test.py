@@ -560,7 +560,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[0].id, skill_summaries[1].id,
                     skill_summaries[2].id], 0)
         )
-        self.assertEqual(len(questions), 3)
+        self.assertEqual(len(questions), 5)
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
