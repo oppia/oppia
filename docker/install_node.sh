@@ -24,7 +24,7 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "Windows" ]; then
+if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
@@ -35,6 +35,7 @@ if [ "$OS_NAME" = "Windows" ]; then
     url_to_retrieve="https://nodejs.org/dist/v16.13.0/$node_file_name$extension"
     curl -o node-download.zip "$url_to_retrieve"
     powershell.exe -c "Expand-Archive -Path node-download.zip -DestinationPath ../oppia_tools"
+    rm node-download.zip
 else
     extension=".tar.gz"
     if [ "$(python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(uname -m)" = "x86_64" ]; then
