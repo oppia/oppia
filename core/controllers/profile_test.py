@@ -433,6 +433,156 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token)
         self.logout()
 
+    def test_update_subject_interests_non_list_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected subject interests to be a list'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'subject_interests', 'data': 'not a list'},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_preferrd_language_codes_non_list_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected preferred language codes to be a list'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'preferred_language_codes', 'data': 'en'},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_incorrect_key_in_email_data_dict_raises_exception(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        data = {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+            'can_receive_subscription_email_this_key_is_wrong': False
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to contain the fields,'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'email_preferences', 'data': data},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_missing_key_in_email_data_dict_raises_exception(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        data = {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to contain the fields'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'email_preferences', 'data': data},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_non_boolean_values_in_email_data_dict_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        data = {
+            'can_receive_email_updates': False,
+            'can_receive_editor_role_email': False,
+            'can_receive_feedback_message_email': False,
+            'can_receive_subscription_email': 1
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Expected all values of data to be boolean'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'email_preferences', 'data': data},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_user_bio_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'user_bio', 'data': 1},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_site_lang_code_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'preferred_site_language_code', 'data': 1},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_audio_lang_code_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'preferred_audio_language_code', 'data': 1},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_translation_lang_code_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'update_type': 'preferred_translation_language_code',
+                    'data': 1
+                },
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_default_dashboard_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'default_dashboard', 'data': 1},
+                csrf_token=csrf_token)
+        self.logout()
+
+    def test_update_profile_picture_url_with_non_str_input_raises_exception(
+        self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.assertRaisesRegex(
+            Exception, 'Expected data to be a string'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'update_type': 'profile_picture_data_url', 'data': 1},
+                csrf_token=csrf_token)
+        self.logout()
+
 
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
     USERNAME_A: Final = 'a'

@@ -341,6 +341,10 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 raise self.InvalidInputException(
                     'Expected data to contain the fields,%s, received %s'
                     % (required_keys, data))
+            if not all(isinstance(value, bool) for value in data.values()):
+                raise self.InvalidInputException(
+                    'Expected all values of data to be boolean,received %s'
+                    % data)
 
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
