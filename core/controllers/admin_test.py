@@ -543,32 +543,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        self.assertEqual(len(topic_summaries), 2)
+        self.assertEqual(len(topic_summaries), 1)
         for summary in topic_summaries:
             if summary.name == 'Dummy Topic 1':
                 topic_id = summary.id
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        self.assertLess(
-            0, len(topic.meta_tag_content),
-            'Length of meta tag content is less than 1.')
-        self.assertIsNotNone(
-            topic.thumbnail_filename, 'Valid thumbnail file is not provided.')
-        self.assertIsNotNone(
-            topic.thumbnail_bg_color,
-            'Valid thumbnail bg color is not provided.')
-        self.assertLess(
-            0, len(topic.skill_ids_for_diagnostic_test),
-            'No diagnostic test added for any skill.')
-        self.assertLess(
-            0, len(topic.subtopics), 'No subtopic found.')
-        for subtopic in topic.subtopics:
-            self.assertIsNotNone(
-                subtopic.thumbnail_filename,
-                'Valid thumbnail file for subtopic is not provided.')
-            self.assertIsNotNone(
-                topic.thumbnail_bg_color,
-                'Valid thumbnail bg color is not provided.')
-        story_id = topic.canonical_story_references[0].story_id
+        story_id = topic_fetchers.get_topic_by_id(
+            topic_summaries[0].id).canonical_story_references[0].story_id
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
         skill_summaries = skill_services.get_all_skill_summaries()

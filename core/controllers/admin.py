@@ -626,11 +626,11 @@ class AdminHandler(
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
-            question_id_1_1 = question_services.get_new_question_id()
-            question_id_1_2 = question_services.get_new_question_id()
-            question_id_1_3 = question_services.get_new_question_id()
+            question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
@@ -639,38 +639,35 @@ class AdminHandler(
             skill_3 = self._create_dummy_skill(
                 skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
 
-            question_1_1 = self._create_dummy_question(
-                question_id_1_1, 'Question 1.1', [skill_id_1])
-            question_1_2 = self._create_dummy_question(
-                question_id_1_2, 'Question 1.2', [skill_id_3])
-            question_1_3 = self._create_dummy_question(
-                question_id_1_3, 'Question 1.3', [skill_id_3])
+            question_1 = self._create_dummy_question(
+                question_id_1, 'Question 1', [skill_id_1])
             question_2 = self._create_dummy_question(
                 question_id_2, 'Question 2', [skill_id_2])
             question_3 = self._create_dummy_question(
                 question_id_3, 'Question 3', [skill_id_3])
-            question_services.add_question(self.user_id, question_1_1)
-            question_services.add_question(self.user_id, question_1_2)
-            question_services.add_question(self.user_id, question_1_3)
+            question_4 = self._create_dummy_question(
+                question_id_4, 'Question 4', [skill_id_1])
+            question_5 = self._create_dummy_question(
+                question_id_5, 'Question 5', [skill_id_1])
+            question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
 
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_1_1, skill_id_1, 0.3)
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_1_2, skill_id_1, 0.3)
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_1_3, skill_id_1, 0.3)
+                self.user_id, question_id_1, skill_id_1, 0.3)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_2, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_3, skill_id_3, 0.7)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_1, 0.3)
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
-                'fragm')
-            topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'empty-topic', 'description',
                 'fragm')
 
             topic_1.update_meta_tag_content('dummy-meta')
@@ -680,6 +677,7 @@ class AdminHandler(
             topic_1.add_uncategorized_skill_id(skill_id_1)
             topic_1.add_uncategorized_skill_id(skill_id_2)
             topic_1.add_uncategorized_skill_id(skill_id_3)
+            topic_1.update_skill_ids_for_diagnostic_test([skill_id_1])
             topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
             topic_1.update_subtopic_thumbnail_bg_color(
                 1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
@@ -687,7 +685,6 @@ class AdminHandler(
                 1, 'image.svg', 21131)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
-            topic_1.update_skill_ids_for_diagnostic_test([skill_id_1])
 
             subtopic_page = (
                 subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -778,7 +775,6 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
-            topic_services.save_new_topic(self.user_id, topic_2)
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -795,6 +791,7 @@ class AdminHandler(
                 story_id, exp_ids_in_story)
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
+            topic_services.publish_topic(topic_id_1, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 
