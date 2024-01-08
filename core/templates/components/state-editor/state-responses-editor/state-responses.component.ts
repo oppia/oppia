@@ -151,10 +151,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
-    if (!outcome) {
-      return false;
-    }
-
     let currentStateName = this.stateName;
 
     return (
