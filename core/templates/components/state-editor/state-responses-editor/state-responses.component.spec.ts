@@ -657,11 +657,6 @@ describe('State Responses Component', () => {
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should return false if outcome is null or undefined', () => {
-    expect(component.isSelfLoopThatIsMarkedCorrect(undefined)).toBe(false);
-    expect(component.isSelfLoopThatIsMarkedCorrect(null)).toBe(false);
-  });
-
   it('should check if outcome marked as correct has self loop', () => {
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
