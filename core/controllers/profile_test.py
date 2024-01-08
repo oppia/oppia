@@ -464,8 +464,8 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
                 'update_type': 'user_bio',
                 'data': 'I am not within 2000 char limit' * 200
             },
-            csrf_token=csrf_token, expected_status_int=500)
-        self.assertEqual(user_bio_response['status_code'], 500)
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(user_bio_response['status_code'], 400)
         self.assertIn(
             'User bio exceeds maximum character limit: %s'
             % feconf.MAX_BIO_LENGTH_IN_CHARS,

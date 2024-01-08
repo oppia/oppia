@@ -326,6 +326,52 @@ class UserSettings:
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
+        if not isinstance(self.subject_interests, list):
+            raise utils.ValidationError(
+                'Expected subject_interests to be a list.')
+
+        for interest in self.subject_interests:
+            if not isinstance(interest, str):
+                raise utils.ValidationError(
+                    'Expected each subject interest to be a string.')
+            if not interest:
+                raise utils.ValidationError(
+                    'Expected each subject interest to be non-empty.')
+            if not re.match(constants.TAG_REGEX, interest):
+                raise utils.ValidationError(
+                    'Expected each subject interest to consist only of '
+                    'lowercase alphabetic characters and spaces.')
+
+        if len(set(self.subject_interests)) != len(self.subject_interests):
+            raise utils.ValidationError(
+                'Expected each subject interest to be distinct.')
+
+        if not isinstance(self.user_bio, str):
+            raise utils.ValidationError(
+                'Expected user_bio to be a string.')
+
+        if len(self.user_bio) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+            raise utils.ValidationError(
+                'User bio exceeds maximum character limit: %s'
+                % feconf.MAX_BIO_LENGTH_IN_CHARS)
+
+        if not isinstance(self.preferred_language_codes, list):
+            raise utils.ValidationError(
+                'Expected preferred_language_codes to be a list.')
+
+        for language_code in self.preferred_language_codes:
+            if not isinstance(language_code, str):
+                raise utils.ValidationError(
+                    'Expected each language code to be a string.')
+            if not language_code:
+                raise utils.ValidationError(
+                    'Expected each language code to be non-empty.')
+
+        if len(set(self.preferred_language_codes)) != (
+            len(self.preferred_language_codes)):
+            raise utils.ValidationError(
+                'Expected each language code to be distinct.')
+
     def record_user_edited_an_exploration(self) -> None:
         """Updates last_edited_an_exploration to the current datetime for the
         user.
@@ -524,83 +570,6 @@ class UserSettings:
         info modal at least once in their lifetime journey.
         """
         self.has_viewed_lesson_info_modal_once = True
-
-    def update_subject_interests(
-        self, subject_interests: List[str]
-    ) -> None:
-        """Updates subject_interests of user.
-
-        Args:
-            subject_interests: list(str). New subject interests to be set.
-        """
-        if not isinstance(subject_interests, list):
-            raise utils.ValidationError(
-                'Expected subject_interests to be a list.')
-
-        for interest in subject_interests:
-            if not isinstance(interest, str):
-                raise utils.ValidationError(
-                    'Expected each subject interest to be a string.')
-            if not interest:
-                raise utils.ValidationError(
-                    'Expected each subject interest to be non-empty.')
-            if not re.match(constants.TAG_REGEX, interest):
-                raise utils.ValidationError(
-                    'Expected each subject interest to consist only of '
-                    'lowercase alphabetic characters and spaces.')
-
-        if len(set(subject_interests)) != len(subject_interests):
-            raise utils.ValidationError(
-                'Expected each subject interest to be distinct.')
-
-        self.subject_interests = subject_interests
-
-    def update_user_bio(self, user_bio: str) -> None:
-        """Updates user_bio of user.
-
-        Args:
-            user_bio: str. New user bio to be set.
-
-        Raises:
-            ValidationError. The given user bio is not a string.
-            ValidationError. User bio exceeds maximum character limit.
-        """
-        if not isinstance(user_bio, str):
-            raise utils.ValidationError(
-                'Expected user_bio to be a string.')
-        if len(user_bio) > feconf.MAX_BIO_LENGTH_IN_CHARS:
-            raise utils.ValidationError(
-                'User bio exceeds maximum character limit: %s'
-                % feconf.MAX_BIO_LENGTH_IN_CHARS)
-
-        self.user_bio = user_bio
-
-    def update_preferred_language_codes(
-        self, preferred_language_codes: List[str]
-    ) -> None:
-        """Updates preferred_language_codes of user.
-
-        Args:
-            preferred_language_codes: list(str). New preferred language codes
-                to be set.
-        """
-        if not isinstance(preferred_language_codes, list):
-            raise utils.ValidationError(
-                'Expected preferred_language_codes to be a list.')
-
-        for language_code in preferred_language_codes:
-            if not isinstance(language_code, str):
-                raise utils.ValidationError(
-                    'Expected each language code to be a string.')
-            if not language_code:
-                raise utils.ValidationError(
-                    'Expected each language code to be non-empty.')
-
-        if len(set(preferred_language_codes)) != len(preferred_language_codes):
-            raise utils.ValidationError(
-                'Expected each language code to be distinct.')
-
-        self.preferred_language_codes = preferred_language_codes
 
 
 class UserActionsInfo:

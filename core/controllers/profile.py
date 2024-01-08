@@ -320,22 +320,15 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         user_settings = user_services.get_user_settings(self.user_id)
 
         if update_type == 'user_bio':
-            user_settings.update_user_bio(data)
+            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                raise self.InvalidInputException(
+                    'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+            user_settings.user_bio = data
         elif update_type == 'subject_interests':
-            user_settings.update_subject_interests(data)
-        elif update_type == 'profile_picture_data_url':
-            assert user_settings.username is not None
-            user_services.update_profile_picture_data_url(
-                user_settings.username, data)
+            user_settings.subject_interests = data
         elif update_type == 'preferred_language_codes':
-            user_settings.update_preferred_language_codes(data)
-        elif update_type == 'email_preferences':
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, data['can_receive_email_updates'],
-                    data['can_receive_editor_role_email'],
-                    data['can_receive_feedback_message_email'],
-                    data['can_receive_subscription_email']))
+            user_settings.preferred_language_codes = data
         elif update_type == 'preferred_site_language_code':
             user_settings.preferred_site_language_code = data
         elif update_type == 'preferred_audio_language_code':
@@ -344,6 +337,17 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_settings.preferred_translation_language_code = data
         elif update_type == 'default_dashboard':
             user_settings.default_dashboard = data
+        elif update_type == 'profile_picture_data_url':
+            assert user_settings.username is not None
+            user_services.update_profile_picture_data_url(
+                user_settings.username, data)
+        elif update_type == 'email_preferences':
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, data['can_receive_email_updates'],
+                    data['can_receive_editor_role_email'],
+                    data['can_receive_feedback_message_email'],
+                    data['can_receive_subscription_email']))
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -522,11 +526,9 @@ class SignupHandler(
         if feconf.CAN_SEND_EMAILS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
-        user_settings = user_services.get_user_settings(
-            self.user_id, strict=True)
-        initial_profile_picture = (
-            user_services.generate_initial_profile_picture(user_settings.email)
-        )
+        user_settings = user_services.get_user_settings(self.user_id)
+        initial_profile_picture = user_services.fetch_gravatar(
+            user_settings.email)
         assert user_settings.username is not None
         user_services.update_profile_picture_data_url(
             user_settings.username, initial_profile_picture)

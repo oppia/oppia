@@ -3222,8 +3222,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
 
     def test_exploration_handler_returns_data_with_no_limit(self) -> None:
-        user_services.update_preferred_translation_language_code(
-            self.reviewer_id, 'hi')
+        user_settings = user_services.get_user_settings(self.reviewer_id)
+        user_settings.preferred_translation_language_code = 'hi'
+        user_services.save_user_settings(user_settings)
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': self.EXP_ID,

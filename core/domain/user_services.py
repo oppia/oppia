@@ -23,7 +23,6 @@ import hashlib
 import imghdr
 import itertools
 import logging
-import re
 import urllib
 
 from core import feconf
@@ -350,20 +349,6 @@ def get_users_settings(
                 if model is not None else None
             )
     return result
-
-
-def generate_initial_profile_picture(user_email: str) -> str:
-    """Generates a profile picture for a new user and
-    updates the user's settings in the datastore.
-
-    Args:
-        user_email: str. The email of the user.
-
-    Returns:
-        str. The profile picture data url.
-    """
-    user_gravatar = fetch_gravatar(user_email)
-    return user_gravatar
 
 
 def get_gravatar_url(email: str) -> str:
@@ -1431,18 +1416,6 @@ def update_profile_picture_data_url(
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
-def update_user_bio(user_id: str, user_bio: str) -> None:
-    """Updates user_bio of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        user_bio: str. New user biography to be set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.user_bio = user_bio
-    save_user_settings(user_settings)
-
-
 def update_user_creator_dashboard_display(
     user_id: str, creator_dashboard_display_pref: str
 ) -> None:
@@ -1456,103 +1429,6 @@ def update_user_creator_dashboard_display(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.creator_dashboard_display_pref = (
         creator_dashboard_display_pref)
-    save_user_settings(user_settings)
-
-
-def update_subject_interests(
-    user_id: str, subject_interests: List[str]
-) -> None:
-    """Updates subject_interests of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        subject_interests: list(str). New subject interests to be set.
-    """
-    if not isinstance(subject_interests, list):
-        raise utils.ValidationError('Expected subject_interests to be a list.')
-
-    for interest in subject_interests:
-        if not isinstance(interest, str):
-            raise utils.ValidationError(
-                'Expected each subject interest to be a string.')
-        if not interest:
-            raise utils.ValidationError(
-                'Expected each subject interest to be non-empty.')
-        if not re.match(constants.TAG_REGEX, interest):
-            raise utils.ValidationError(
-                'Expected each subject interest to consist only of '
-                'lowercase alphabetic characters and spaces.')
-
-    if len(set(subject_interests)) != len(subject_interests):
-        raise utils.ValidationError(
-            'Expected each subject interest to be distinct.')
-
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.subject_interests = subject_interests
-    save_user_settings(user_settings)
-
-
-def update_preferred_language_codes(
-    user_id: str, preferred_language_codes: List[str]
-) -> None:
-    """Updates preferred_language_codes of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_language_codes: list(str). New exploration language
-            preferences to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_language_codes = preferred_language_codes
-    save_user_settings(user_settings)
-
-
-def update_preferred_site_language_code(
-    user_id: str, preferred_site_language_code: str
-) -> None:
-    """Updates preferred_site_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_site_language_code: str. New system language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_site_language_code = (
-        preferred_site_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_audio_language_code(
-    user_id: str, preferred_audio_language_code: str
-) -> None:
-    """Updates preferred_audio_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_audio_language_code: str. New audio language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_audio_language_code = (
-        preferred_audio_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_translation_language_code(
-    user_id: str, preferred_translation_language_code: str
-) -> None:
-    """Updates preferred_translation_language_code of user with
-    given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_translation_language_code: str. New text translation
-            language preference to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_translation_language_code = (
-        preferred_translation_language_code)
     save_user_settings(user_settings)
 
 

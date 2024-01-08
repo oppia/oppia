@@ -763,7 +763,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         user_settings = user_services.create_new_user(auth_id, user_email)
         self.user_id = user_settings.user_id
-        user_settings.update_user_bio(self.user_bio)
+        user_settings.user_bio = self.user_bio
         user_services.save_user_settings(user_settings)
         user_services.set_username(self.user_id, self.user_name)
 
