@@ -975,9 +975,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     self.log_line('- %s' % key)
                 self.log_line('')
 
-    def test_alphabetic_i18n_keys(self) -> None:
+    def test_lexicographic_i18n_keys(self) -> None:
         """Tests that the keys of all i18n json files are arranged in
-        alphabetical order.
+        lexicographical order.
         """
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
