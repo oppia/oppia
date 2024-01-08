@@ -25,9 +25,8 @@ export interface FetchIssuesResponseBackendDict {
 }
 
 import {
-  PlaythroughIssueBackendDict,
   PlaythroughIssue,
-  PlaythroughIssueModel
+  PlaythroughIssueBackendDict
 } from 'domain/statistics/playthrough-issue.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
@@ -54,7 +53,7 @@ export class PlaythroughIssuesBackendApiService {
           params: { exp_version: explorationVersion.toString() }}).toPromise()
         .then(response => {
           resolve(this.cachedIssues = response.unresolved_issues.map(
-            PlaythroughIssueModel.createFromBackendDict));
+            PlaythroughIssue.createFromBackendDict));
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
@@ -68,7 +67,7 @@ export class PlaythroughIssuesBackendApiService {
       this.httpClient.get<PlaythroughIssueBackendDict>(
         this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
         .then(response => {
-          resolve(PlaythroughIssueModel.createFromBackendDict(
+          resolve(PlaythroughIssue.createFromBackendDict(
             response));
         }, errorResponse => {
           reject(errorResponse.error.error);
