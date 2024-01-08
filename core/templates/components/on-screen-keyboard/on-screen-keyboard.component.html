@@ -1,4 +1,4 @@
-<div class="oppia-osk-container" *ngIf="true" (click)="activateGuppy()">
+<div class="oppia-osk-container" *ngIf="showOSK()" (click)="activateGuppy()">
   <div class="oppia-osk-container" (click)="activateGuppy()">
     <div class="oppia-osk-navbar">
       <button [ngClass]="(currentTab === mainTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" (click)="changeTab(mainTab)">
