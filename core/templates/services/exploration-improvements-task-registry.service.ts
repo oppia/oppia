@@ -42,9 +42,6 @@ import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/successive-incorrect-answers-task.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
-  CyclicStateTransitionsPlaythroughIssue,
-  EarlyQuitPlaythroughIssue,
-  MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssue,
   PlaythroughIssueType,
 } from 'domain/statistics/playthrough-issue.model';
@@ -57,9 +54,9 @@ type IflTask = IneffectiveFeedbackLoopTask;
 type NgrTask = NeedsGuidingResponsesTask;
 type SiaTask = SuccessiveIncorrectAnswersTask;
 
-type CstPlaythroughIssue = CyclicStateTransitionsPlaythroughIssue;
-type EqPlaythroughIssue = EarlyQuitPlaythroughIssue;
-type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
+type CstPlaythroughIssue = PlaythroughIssue;
+type EqPlaythroughIssue = PlaythroughIssue;
+type MisPlaythroughIssue = PlaythroughIssue;
 
 /**
  * Holds shallow references to the state-specific statistics used to support the

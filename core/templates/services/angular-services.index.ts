@@ -121,7 +121,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -734,7 +733,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlayerTranscriptService', PlayerTranscriptService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
-  ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
   ['PreventPageUnloadEventService', PreventPageUnloadEventService],

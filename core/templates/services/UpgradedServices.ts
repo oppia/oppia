@@ -308,8 +308,6 @@ import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from
@@ -727,8 +725,6 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
-    upgradedServices['PlaythroughObjectFactory'] =
-      new PlaythroughObjectFactory();
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['ResponsesService'] =
