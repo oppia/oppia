@@ -78,8 +78,6 @@ export const ExplorationPlayerConstants = {
 
   FLAG_EXPLORATION_URL_TEMPLATE: '/flagexplorationhandler/<exploration_id>',
 
-  // TODO(bhenning): Find a better place for these constants.
-
   // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
   // the corresponding classification constants defined in
   // core.domain.exp_domain.

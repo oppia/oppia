@@ -55,8 +55,6 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -622,9 +620,11 @@ class AdminHandler(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
+
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
+
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
@@ -649,6 +649,8 @@ class AdminHandler(
             question_5 = self._create_dummy_question(
                 question_id_5, 'Question 5', [skill_id_1])
             question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
             question_services.add_question(self.user_id, question_4)
@@ -656,6 +658,10 @@ class AdminHandler(
 
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_1, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_1, 0.3)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_2, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
