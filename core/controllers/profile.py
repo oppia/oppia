@@ -355,7 +355,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         elif update_type == 'user_bio':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                 raise self.InvalidInputException(
                     'User bio exceeds maximum character limit: %s'
@@ -364,27 +364,27 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         elif update_type == 'preferred_site_language_code':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             user_settings.preferred_site_language_code = data
         elif update_type == 'preferred_audio_language_code':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             user_settings.preferred_audio_language_code = data
         elif update_type == 'preferred_translation_language_code':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             user_settings.preferred_translation_language_code = data
         elif update_type == 'default_dashboard':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             user_settings.default_dashboard = data
         elif update_type == 'profile_picture_data_url':
             if not isinstance(data, str):
                 raise self.InvalidInputException(
-                        'Expected data to be a string, received %s' % data)
+                    'Expected data to be a string, received %s' % data)
             assert user_settings.username is not None
             user_services.update_profile_picture_data_url(
                 user_settings.username, data)
