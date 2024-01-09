@@ -29,7 +29,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
   providedIn: 'root'
 })
 export class HintsAndSolutionManagerService {
-  solutionForLatestCard: Solution | null;
+  solutionForLatestCard: Solution | null = null;
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
