@@ -18,14 +18,43 @@
 
 import { PrimaryButtonComponent } from './primary-button.component';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
 describe('PrimaryButtonComponent', () => {
   let component: PrimaryButtonComponent;
   let fixture: ComponentFixture<PrimaryButtonComponent>;
+  let windowRef: MockWindowRef;
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [PrimaryButtonComponent],
+      providers: [
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+      ],
     });
 
     fixture = TestBed.createComponent(PrimaryButtonComponent);
@@ -49,5 +78,28 @@ describe('PrimaryButtonComponent', () => {
     const buttonElement = fixture.nativeElement.querySelector('button');
     expect(buttonElement.classList.contains('custom-class-1')).toBe(true);
     expect(buttonElement.classList.contains('custom-class-2')).toBe(true);
+  });
+
+   it('should handle button click with observers', () => {
+    spyOn(component.onClickPrimaryButton, 'emit');
+    component.onClickPrimaryButton.subscribe();
+    component.handleButtonClick();
+    expect(component.onClickPrimaryButton.emit).toHaveBeenCalled();
+  });
+
+  it('should handle button click with internal link', () => {
+    component.buttonHref = '/about';
+    component.handleButtonClick();
+    expect(windowRef.nativeWindow.location.href).toBe('/about');
+  });
+
+  it('should handle button click with external link', () => {
+    spyOn(window, 'open').and.returnValue({
+      opener: null,
+      location: { href: '' },
+    });
+    component.buttonHref = 'https://oppia.org';
+    component.handleButtonClick();
+    expect(window.open).toHaveBeenCalledWith();
   });
 });
