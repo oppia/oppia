@@ -35,7 +35,7 @@ import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.mo
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
-import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
+import { Playthrough } from 'domain/statistics/playthrough.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StateStats } from 'domain/statistics/state-stats-model';
@@ -70,7 +70,6 @@ describe('Exploration Improvements Service', () => {
   let ngbModal: NgbModal;
   let pibasFetchIssuesSpy: jasmine.Spy;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
-  let playthroughObjectFactory: PlaythroughObjectFactory;
   let stassGetTopAnswersByStateNameAsyncSpy: jasmine.Spy;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
@@ -179,7 +178,6 @@ describe('Exploration Improvements Service', () => {
     ngbModal = TestBed.inject(NgbModal);
     playthroughIssuesBackendApiService = (
       TestBed.inject(PlaythroughIssuesBackendApiService));
-    playthroughObjectFactory = TestBed.inject(PlaythroughObjectFactory);
     stateTopAnswersStatsService = TestBed.inject(StateTopAnswersStatsService);
     userExplorationPermissionsService = (
       TestBed.inject(UserExplorationPermissionsService));
@@ -351,7 +349,7 @@ describe('Exploration Improvements Service', () => {
       essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
       // -   A state with an early-quit playthrough associated to it.
       const eqPlaythrough = (
-        playthroughObjectFactory.createNewEarlyQuitPlaythrough(
+        Playthrough.createNewEarlyQuitPlaythrough(
           expId, expVersion, {
             state_name: {value: stateName},
             time_spent_in_exp_in_msecs: {value: 1000},

@@ -387,6 +387,44 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
+    def test_open_new_tab_in_browser_if_possible_no_new_tab(
+        self
+    ) -> None:
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
+                return 0
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+                check_function_calls['check_call_gets_called'] = True
+
+            def mock_input() -> str:
+                check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
+                return 'no'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(builtins, 'input', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                # Make it so the program asks the user to
+                # Open the link in their browser.
+                common.USER_PREFERENCES['open_new_tab_in_browser'] = 'no'
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+
     def test_get_remote_alias_with_correct_alias(self) -> None:
         def mock_check_output(
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
@@ -718,7 +756,6 @@ class CommonTests(test_utils.GenericTestBase):
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
     def test_install_npm_library(self) -> None:
-
         def _mock_subprocess_check_call(unused_command: str) -> None:
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
@@ -744,8 +781,30 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
+    def test_install_npm_library_path_exists(self) -> None:
+        """Install an npm library that already exists."""
+        def mock_exists(unused_file: str) -> bool:
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            common.install_npm_library(
+                'moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
+            return 'Y'
+        with self.swap(builtins, 'input', mock_input):
+            common.ask_user_to_confirm('Testing')
+
+    def test_ask_user_to_confirm_n_then_y(self) -> None:
+        check_function_calls = {
+            'input_gets_called': 0,
+        }
+
+        def mock_input() -> str:
+            check_function_calls['input_gets_called'] += 1
+            if check_function_calls['input_gets_called'] == 1:
+                return 'N'
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')

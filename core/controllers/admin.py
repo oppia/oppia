@@ -55,8 +55,6 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -622,13 +620,18 @@ class AdminHandler(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
             topic_id_2 = topic_fetchers.get_new_topic_id()
+
             story_id = story_services.get_new_story_id()
+
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
+
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
@@ -643,12 +646,23 @@ class AdminHandler(
                 question_id_2, 'Question 2', [skill_id_2])
             question_3 = self._create_dummy_question(
                 question_id_3, 'Question 3', [skill_id_3])
+            question_4 = self._create_dummy_question(
+                question_id_4, 'Question 4', [skill_id_1])
+            question_5 = self._create_dummy_question(
+                question_id_5, 'Question 5', [skill_id_1])
+
             question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
 
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_1, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_1, 0.3)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_1, 0.3)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_2, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
@@ -657,21 +671,21 @@ class AdminHandler(
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
                 'fragm')
+            topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
+            topic_1.thumbnail_filename = 'thumbnail.svg'
+            topic_1.thumbnail_bg_color = '#C6DCDA'
+            topic_1.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_1], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_1.next_subtopic_id = 2
+            topic_1.add_canonical_story(story_id)
+
             topic_2 = topic_domain.Topic.create_default_topic(
                 topic_id_2, 'Empty Topic', 'empty-topic', 'description',
                 'fragm')
 
-            topic_1.add_canonical_story(story_id)
-            topic_1.add_uncategorized_skill_id(skill_id_1)
-            topic_1.add_uncategorized_skill_id(skill_id_2)
-            topic_1.add_uncategorized_skill_id(skill_id_3)
-            topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
-            topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
-            topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
-
-            subtopic_page = (
-                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                    1, topic_id_1))
             # These explorations were chosen since they pass the validations
             # for published stories.
             self._reload_exploration('6')
@@ -758,16 +772,8 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.publish_topic(topic_id_1, self.user_id)
             topic_services.save_new_topic(self.user_id, topic_2)
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title',
-                    'url_fragment': 'dummy-fragment'
-                })]
-            )
 
             # Generates translation opportunities for the Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
