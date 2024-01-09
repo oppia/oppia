@@ -331,7 +331,7 @@ describe('HintsAndSolutionManager service', () => {
     let mockOnLearnerGetsReallyStuck = new EventEmitter();
     expect(hasms.onLearnerReallyStuck).toEqual(mockOnLearnerGetsReallyStuck);
   });
-  
+
   it('should throw if solution is absent and asked to display solution', () => {
     hasms.reset([], null);
 
