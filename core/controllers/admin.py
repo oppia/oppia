@@ -630,8 +630,8 @@ class AdminHandler(
             question_id_1 = question_services.get_new_question_id()
             question_id_2 = question_services.get_new_question_id()
             question_id_3 = question_services.get_new_question_id()
-            question_id_5 = question_services.get_new_question_id()
             question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
@@ -651,8 +651,6 @@ class AdminHandler(
             question_5 = self._create_dummy_question(
                 question_id_5, 'Question 5', [skill_id_1])
             question_services.add_question(self.user_id, question_1)
-            question_services.add_question(self.user_id, question_4)
-            question_services.add_question(self.user_id, question_5)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
             question_services.add_question(self.user_id, question_4)
@@ -668,10 +666,6 @@ class AdminHandler(
                 self.user_id, question_id_2, skill_id_2, 0.5)
             question_services.create_new_question_skill_link(
                 self.user_id, question_id_3, skill_id_3, 0.7)
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_4, skill_id_1, 0.3)
-            question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_1, 0.3)
 
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
