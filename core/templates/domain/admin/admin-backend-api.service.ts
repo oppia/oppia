@@ -493,6 +493,12 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyBlogAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_blog'
+    });
+  }
+
   async generateDummyNewSkillDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
