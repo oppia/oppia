@@ -80,7 +80,7 @@ describe('PrimaryButtonComponent', () => {
     expect(buttonElement.classList.contains('custom-class-2')).toBe(true);
   });
 
-   it('should handle button click with observers', () => {
+  it('should handle button click with observers', () => {
     spyOn(component.onClickPrimaryButton, 'emit');
     component.onClickPrimaryButton.subscribe();
     component.handleButtonClick();
