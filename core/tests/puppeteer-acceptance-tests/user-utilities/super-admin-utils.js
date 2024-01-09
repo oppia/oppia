@@ -320,7 +320,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
     this.page = pages[pages.length - 1];
 
     if (misconception) {
-      await this.clickOn('.e2e-test-add-misconception-modal-button');
+      await this.page.waitForSelector(
+        '.e2e-test-add-misconception-modal-button', { visible: true });
+      await this.page.click('.e2e-test-add-misconception-modal-button');
       await this.type(
         '.e2e-test-misconception-name-field', misconception.name);
       await this.page.waitForSelector(
@@ -355,54 +357,89 @@ module.exports = class e2eSuperAdmin extends baseUser {
       }, difficulty, rubricNotes); 
     }*/
 
-    // await this.clickOn('.e2e-test-save-skill:not([disabled])');
-    await this.page.waitForSelector(
-      '.e2e-test-save-or-publish-skill:enabled', { visible: true });
-    await this.page.click('.e2e-test-save-or-publish-skill:enabled');
+    await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
+    await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
     await this.page.waitForSelector(
       '.e2e-test-commit-message-input', { visible: true });
     await this.page.type('.e2e-test-commit-message-input', 'test');
     await this.clickOn('.e2e-test-close-save-modal-button');
+    await this.page.waitForSelector('.e2e-test-save-or-publish-skill:disabled');
 
-    // Create questions under the skill
+    // Create dummy questions under the skill
     await this.clickOn('.e2e-test-questions-tab');
     for (let i = 0; i < questionCount; i++) {
-      await this.clickOn('.e2e-test-create-question-button');
-      await this.clickOn('.e2e-test-skill-difficulty-medium');
+      await this.page.waitForNetworkIdle();
+      await this.page.waitForSelector(
+        '.e2e-test-create-question-button', { visible: true });
+      await this.page.click('.e2e-test-create-question-button');
+      await this.page.waitForSelector(
+        '.e2e-test-skill-difficulty-medium', { visible: true });
+      await this.page.click('.e2e-test-skill-difficulty-medium');
+      await this.page.waitForNetworkIdle();
 
-      await this.clickOn('.e2e-test-state-edit-content');
+      await this.clickOn('.e2e-test-edit-content');
       await this.type(
-        '.e2e-test-rte', 'Question created by Skill Owner');
+        '.e2e-test-state-content-editor .e2e-test-rte',
+        'Question created by Skill Owner');
       await this.clickOn('.e2e-test-save-state-content');
 
-      await this.clickOn('.e2e-test-open-add-interaction-modal');
-      await this.clickOn('.e2e-test-interaction-tile-TextInput button');
-      await this.clickOn('.e2e-test-save-interaction');
+      await this.page.waitForSelector(
+        '.e2e-test-open-add-interaction-modal', { visible: true });
+      await this.page.click('.e2e-test-open-add-interaction-modal');
+      await this.page.waitForSelector(
+        '.e2e-test-interaction-tile-TextInput button', { visible: true });
+      await this.page.click('.e2e-test-interaction-tile-TextInput button');
+      await this.page.waitForSelector(
+        '.e2e-test-save-interaction', { visible: true });
+      await this.page.click('.e2e-test-save-interaction');
 
-      await this.clickOn('.e2e-test-add-list-entry');
+      await this.page.waitForSelector(
+        '.e2e-test-add-list-entry', { visible: true });
+      await this.page.click('.e2e-test-add-list-entry');
       await this.type(
         '.e2e-test-schema-based-list-editor-table-data input', 't');
       await this.clickOn('.e2e-test-open-feedback-editor');
-      await this.type('.e2e-test-rte', 'Correct!');
+      await this.page.waitForSelector(
+        '.e2e-test-add-response-details .e2e-test-rte', { visible: true });
+      await this.page.type(
+        '.e2e-test-add-response-details .e2e-test-rte', 'Correct!');
       await this.clickOn('.e2e-test-editor-correctness-toggle');
       await this.clickOn('.e2e-test-add-new-response');
 
-      await this.clickOn('.e2e-test-default-response-tab');
+      await this.page.waitForSelector(
+        '.e2e-test-default-response-tab', { visible: true });
+      await this.page.click('.e2e-test-default-response-tab');
       await this.clickOn('.e2e-test-open-outcome-feedback-editor');
-      await this.type('.e2e-test-rte', 'Incorrect!');
+      await this.page.waitForSelector(
+        '.e2e-test-response-body-default .e2e-test-rte', { visible: true });
+      await this.page.type(
+        '.e2e-test-response-body-default .e2e-test-rte', 'Incorrect!');
       await this.clickOn('.e2e-test-save-outcome-feedback');
 
+      await this.page.waitForSelector(
+        '.e2e-test-oppia-add-hint-button', { visible: true });
       await this.clickOn('.e2e-test-oppia-add-hint-button');
-      await this.type('.e2e-test-rte', 'hint text');
+      await this.page.waitForSelector(
+        '.e2e-test-hint-text .e2e-test-rte', { visible: true });
+      await this.page.type('.e2e-test-hint-text .e2e-test-rte', 'hint text');
       await this.clickOn('.e2e-test-save-hint');
 
-      await this.clickOn('.e2e-test-oppia-add-solution-button');
-      await this.type('.e2e-test-description-box', 't');
+      await this.page.waitForSelector(
+        '.e2e-test-oppia-add-solution-button', { visible: true });
+      await this.page.click('.e2e-test-oppia-add-solution-button');
+      await this.page.waitForSelector(
+        '.e2e-test-description-box', { visible: true });
+      await this.page.type('.e2e-test-description-box', 't');
       await this.clickOn('.e2e-test-submit-answer-button');
-      await this.type('.e2e-test-rte', 'Explain');
+      await this.page.waitForSelector(
+        '.e2e-test-explanation-textarea .e2e-test-rte', { visible: true });
+      await this.page.type(
+        '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation');
       await this.clickOn('.e2e-test-submit-solution-button');
 
-      await this.clickOn('.e2e-test-save-question-button');
+      await this.page.waitForSelector(
+        '.e2e-test-save-question-button', { visible: true });
+      await this.page.click('.e2e-test-save-question-button');
     }
   }
 };

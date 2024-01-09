@@ -21,15 +21,12 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
-<<<<<<< HEAD
+let e2eQuestionAdmin = require(
+  '../user-utilities/question-admin-utils.js');
 let e2ePracticeQuestionSubmitter = require(
   '../user-utilities/question-submitter-utils.js');
 
 const testConstants = require('./test-constants.js');
-=======
-let e2eQuestionAdmin = require(
-  '../user-utilities/question-admin-utils.js');
->>>>>>> develop
 
 /**
  * Global user instances that are created and can be reused again.
