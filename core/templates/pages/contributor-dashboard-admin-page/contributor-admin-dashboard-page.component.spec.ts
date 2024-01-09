@@ -421,6 +421,25 @@ describe('Contributor dashboard Admin page', () => {
         expect(component.activityDropdownShown).toBe(false);
       }));
 
+    it('should show and hide activity dropdown when clicked away on review tab',
+      fakeAsync(() => {
+        spyOn(component, 'checkMobileView').and.returnValue(false);
+        const fakeClickAwayEvent = new MouseEvent('click');
+        Object.defineProperty(
+          fakeClickAwayEvent,
+          'target',
+          {value: document.createElement('div')});
+
+        component.toggleActivityDropdown();
+        component.ngOnInit();
+        tick();
+        component.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+        component.onDocumentClick(fakeClickAwayEvent);
+        fixture.detectChanges();
+
+        expect(component.activityDropdownShown).toBe(false);
+      }));
+
     it('should not show and hide activity dropdown when clicked away on mobile',
       fakeAsync(() => {
         spyOn(component, 'checkMobileView').and.returnValue(true);
@@ -460,6 +479,38 @@ describe('Contributor dashboard Admin page', () => {
           result: Promise.resolve({
             isQuestionSubmitter: false,
             isQuestionReviewer: true
+          })
+        }) as NgbModalRef;
+      });
+
+      component.openRoleEditor('user1');
+      tick();
+
+      expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
+      expect(removeRightsSpy).toHaveBeenCalled();
+    }));
+
+    it('should open question role editor modal when on question' +
+      ' reviewer tabs', fakeAsync(() => {
+      const removeRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'removeContributionReviewerAsync');
+      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      fixture.detectChanges();
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
+        can_submit_questions: false,
+        can_review_questions: true,
+        can_review_translation_for_language_codes: ['en'],
+        can_review_voiceover_for_language_codes: []
+      }));
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: false
           })
         }) as NgbModalRef;
       });
