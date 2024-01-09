@@ -164,8 +164,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       interactionObjectFactory.createFromBackendDict(interactionDict);
     const card = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction html',
-      interaction,
-      [], null, RecordedVoiceovers.createEmpty(), 'content',
+      interaction, RecordedVoiceovers.createEmpty(), 'content',
       audioTranslationLanguageService
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -181,8 +180,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       defaultInteractionBackendDict);
     const card = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction html',
-      interaction,
-      [], null, RecordedVoiceovers.createEmpty(), 'content',
+      interaction, RecordedVoiceovers.createEmpty(), 'content',
       audioTranslationLanguageService
     );
     spyOn(component, 'resetLocalHintsArray');
