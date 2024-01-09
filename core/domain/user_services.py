@@ -41,7 +41,8 @@ from core.platform import models
 import requests
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict,
+    Union, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1744,21 +1745,23 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_mailing_list(email: str, name: str, tag: str) -> bool:
+def add_user_to_mailing_list(
+    email: str,
+    tag: str,
+    name: Union[str, None]=None
+) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
     Args:
         email: str. Email of the user.
-        name: str. Name of the user.
         tag: str. Tag for the mailing list.
+        name: str or None. Name of the user, or None if no name was supplied.
 
     Returns:
         bool. Whether the operation was successful or not.
     """
-    merge_fields = {
-        'NAME': name
-    }
+    merge_fields = {'NAME': name} if name is not None else {}
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 
@@ -2540,34 +2543,27 @@ def get_contributor_usernames(
     user_ids = []
     if (
         category in (
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         ) and language_code is None
     ):
         raise Exception(
             'The language_code cannot be None if review category is'
             ' \'translation\' or \'voiceover\'.'
         )
-    if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
         user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
-        user_ids = (
-            user_models.UserContributionRightsModel
-            .get_voiceover_reviewer_user_ids(language_code))
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
         if language_code is not None:
             raise Exception('Expected language_code to be None, found: %s' % (
                 language_code))
         user_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
-    elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+    elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
         user_ids = (
             user_models.UserContributionRightsModel
             .get_question_submitter_user_ids())

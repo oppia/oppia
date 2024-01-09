@@ -387,6 +387,44 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
+    def test_open_new_tab_in_browser_if_possible_no_new_tab(
+        self
+    ) -> None:
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
+                return 0
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+                check_function_calls['check_call_gets_called'] = True
+
+            def mock_input() -> str:
+                check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
+                return 'no'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(builtins, 'input', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                # Make it so the program asks the user to
+                # Open the link in their browser.
+                common.USER_PREFERENCES['open_new_tab_in_browser'] = 'no'
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+
     def test_get_remote_alias_with_correct_alias(self) -> None:
         def mock_check_output(
             unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
@@ -718,7 +756,6 @@ class CommonTests(test_utils.GenericTestBase):
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
     def test_install_npm_library(self) -> None:
-
         def _mock_subprocess_check_call(unused_command: str) -> None:
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
@@ -744,8 +781,30 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
+    def test_install_npm_library_path_exists(self) -> None:
+        """Install an npm library that already exists."""
+        def mock_exists(unused_file: str) -> bool:
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            common.install_npm_library(
+                'moment', '2.29.4', common.OPPIA_TOOLS_DIR)
+
     def test_ask_user_to_confirm(self) -> None:
         def mock_input() -> str:
+            return 'Y'
+        with self.swap(builtins, 'input', mock_input):
+            common.ask_user_to_confirm('Testing')
+
+    def test_ask_user_to_confirm_n_then_y(self) -> None:
+        check_function_calls = {
+            'input_gets_called': 0,
+        }
+
+        def mock_input() -> str:
+            check_function_calls['input_gets_called'] += 1
+            if check_function_calls['input_gets_called'] == 1:
+                return 'N'
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
@@ -873,10 +932,13 @@ class CommonTests(test_utils.GenericTestBase):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_inplace_replace_file(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        shutil.copyfile(origin_filepath, backup_filepath)
+
         expected_lines = [
             '{\n',
             '    "RANDMON1" : "randomValue1",\n',
@@ -886,55 +948,60 @@ class CommonTests(test_utils.GenericTestBase):
             '}\n'
         ]
 
-        def mock_remove(unused_file: str) -> None:
-            return
-
-        remove_swap = self.swap_with_checks(
-            os, 'remove', mock_remove, expected_args=[(backup_file,)]
+        common.inplace_replace_file(
+            origin_filepath,
+            '"DEV_MODE": .*',
+            '"DEV_MODE": true,',
+            expected_number_of_replacements=1
         )
-        with remove_swap:
-            common.inplace_replace_file(
-                origin_file,
-                '"DEV_MODE": .*',
-                '"DEV_MODE": true,',
-                expected_number_of_replacements=1
-            )
-        with utils.open_file(origin_file, 'r') as f:
+
+        with utils.open_file(origin_filepath, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
-        os.remove(origin_file)
-        shutil.move(backup_file, origin_file)
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
         self
     ) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
-                origin_file,
+                origin_filepath,
                 '"DEV_MODEa": .*',
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_inplace_replace_file_with_exception_raised(self) -> None:
-        origin_file = os.path.join(
+        origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
-        backup_file = os.path.join(
+        new_filepath = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.new')
+
+        backup_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with utils.open_file(origin_file, 'r') as f:
+        shutil.copyfile(origin_filepath, backup_filepath)
+
+        with utils.open_file(origin_filepath, 'r') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg: str) -> NoReturn:
@@ -946,56 +1013,13 @@ class CommonTests(test_utils.GenericTestBase):
             re.escape('Exception raised from compile()')
         ), compile_swap:
             common.inplace_replace_file(
-                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        self.assertFalse(os.path.isfile(backup_file))
-        with utils.open_file(origin_file, 'r') as f:
+                origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        self.assertFalse(os.path.isfile(new_filepath))
+        with utils.open_file(origin_filepath, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
-
-    def test_inplace_replace_file_context(self) -> None:
-        file_path = (
-            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
-        backup_file_path = '%s.bak' % file_path
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        replace_file_context = common.inplace_replace_file_context(
-            file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": true,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-            self.assertTrue(os.path.isfile(backup_file_path))
-
-        with utils.open_file(file_path, 'r') as f:
-            self.assertEqual(f.readlines(), [
-                '{\n',
-                '    "RANDMON1" : "randomValue1",\n',
-                '    "312RANDOM" : "ValueRanDom2",\n',
-                '    "DEV_MODE": false,\n',
-                '    "RAN213DOM" : "raNdoVaLue3"\n',
-                '}\n',
-            ])
-
-        try:
-            self.assertFalse(os.path.isfile(backup_file_path))
-        except AssertionError:
-            # Just in case the implementation is wrong, erase the file.
-            os.remove(backup_file_path)
-            raise
+        # Revert the file.
+        shutil.move(backup_filepath, origin_filepath)
 
     def test_convert_to_posixpath_on_windows(self) -> None:
         def mock_is_windows() -> Literal[True]:
@@ -1344,6 +1368,10 @@ class CommonTests(test_utils.GenericTestBase):
             constants_temp_file.close()
             feconf_temp_file.close()
 
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
+
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
@@ -1413,6 +1441,10 @@ class CommonTests(test_utils.GenericTestBase):
         constants_temp_file.close()
         feconf_temp_file.close()
 
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
+
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
         mock_feconf_path = 'mock_app.yaml'
@@ -1457,6 +1489,10 @@ class CommonTests(test_utils.GenericTestBase):
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
+
+        # Clean up spare files.
+        os.remove(mock_constants_path)
+        os.remove(mock_feconf_path)
 
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:
