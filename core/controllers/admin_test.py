@@ -544,9 +544,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
-        for summary in topic_summaries:
-            if summary.name == 'Dummy Topic 1':
-                topic_id = summary.id
         story_id = topic_fetchers.get_topic_by_id(
             topic_summaries[0].id).canonical_story_references[0].story_id
         self.assertIsNotNone(
