@@ -155,12 +155,11 @@ describe('Contributor dashboard Admin page', () => {
         Promise.resolve(nullUserInfo));
 
       fixture.detectChanges();
-
-      component.ngOnInit();
     });
 
     it('should not update translation and question coordinator view' +
       'if username is null', fakeAsync(() => {
+      component.ngOnInit();
       tick();
       fixture.detectChanges();
 
