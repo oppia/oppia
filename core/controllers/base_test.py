@@ -227,9 +227,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                     url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
-        # TODO(sll): Set a self.payload attr in the BaseHandler for
-        #     POST, PUT and DELETE. Something needs to regulate what
-        #     the fields in the payload should be.
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""
@@ -978,9 +975,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     self.log_line('- %s' % key)
                 self.log_line('')
 
-    def test_alphabetic_i18n_keys(self) -> None:
+    def test_lexicographic_i18n_keys(self) -> None:
         """Tests that the keys of all i18n json files are arranged in
-        alphabetical order.
+        lexicographical order.
         """
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
