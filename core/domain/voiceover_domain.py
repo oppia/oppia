@@ -77,7 +77,7 @@ class EntityVoiceover:
                 as values.
         """
         self.entity_id = entity_id
-        self.entity_type = entity_type.value
+        self.entity_type = entity_type
         self.entity_version = entity_version
         self.language_accent_code = language_accent_code
         self.voiceovers = voiceovers
@@ -161,22 +161,11 @@ class EntityVoiceover:
                     raise utils.ValidationError(
                         'voiceover type must be string, recieved %r' %
                         voiceover_type)
-                if not isinstance(voiceover.filename, str):
+                if voiceover_type not in ['manual', 'auto']:
                     raise utils.ValidationError(
-                        'voieover filename must be string, recieved %r' %
-                        voiceover.filename)
-                if not isinstance(voiceover.file_size_bytes, int):
-                    raise utils.ValidationError(
-                        'voiceover file size must be an int, recieved %r' %
-                        voiceover.file_size_bytes)
-                if not isinstance(voiceover.needs_update, bool):
-                    raise utils.ValidationError(
-                        'needs_update must be a bool, recieved %r' %
-                        voiceover.needs_update)
-                if not isinstance(voiceover.duration_secs, float):
-                    raise utils.ValidationError(
-                        'voiceover duration must be float, recieved %r' %
-                        voiceover.duration_secs)
+                        'The voiceover type must be either manual or auto, but '
+                        'received %r' % voiceover_type)
+                voiceover.validate()
 
     def add_voiceover(
         self,
@@ -187,7 +176,7 @@ class EntityVoiceover:
         """Adds voiceover to the entity voiceover instance."""
         if not isinstance(content_id, str):
             raise utils.ValidationError(
-                'content ID must be a str, received %r' % content_id)
+                'content_id must be a string, received %r' % content_id)
 
         if voiceover_type not in ['manual', 'auto']:
             raise utils.ValidationError(
@@ -204,7 +193,7 @@ class EntityVoiceover:
         """Removes voiceover from the entity voiceover instance."""
         if not isinstance(content_id, str):
             raise utils.ValidationError(
-                'content ID must be a str, received %r' % content_id)
+                'content_id must be a string, received %r' % content_id)
 
         if voiceover_type not in ['manual', 'auto']:
             raise utils.ValidationError(

@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.platform import models
 
@@ -43,13 +44,23 @@ def _get_entity_voiceover_from_model(
         EntityVoiceover. An instance of EntityVoiceover object, created from
         its model.
     """
-    entity_voiceover = voiceover_domain.EntityVoiceover.from_dict({
-        'entity_id': entity_voiceover_model.entity_id,
-        'entity_type': entity_voiceover_model.entity_type,
-        'entity_version': entity_voiceover_model.entity_version,
-        'language_accent_code': entity_voiceover_model.language_accent_code,
-        'voiceovers': entity_voiceover_model.voiceovers
-    })
+    content_id_to_voiceovers_dict = {}
+    for content_id, voiceover_type_to_voiceover in (
+            entity_voiceover_model.voiceovers.items()):
+        content_id_to_voiceovers_dict[content_id] = {
+            'manual': state_domain.Voiceover.from_dict(
+                voiceover_type_to_voiceover['manual']),
+            'auto': state_domain.Voiceover.from_dict(
+                voiceover_type_to_voiceover['auto'])
+        }
+
+    entity_voiceover = voiceover_domain.EntityVoiceover(
+        entity_id=entity_voiceover_model.entity_id,
+        entity_type=entity_voiceover_model.entity_type,
+        entity_version=entity_voiceover_model.entity_version,
+        language_accent_code=entity_voiceover_model.language_accent_code,
+        voiceovers=content_id_to_voiceovers_dict
+    )
     return entity_voiceover
 
 
