@@ -17,7 +17,7 @@
  */
 
 import { PrimaryButtonComponent } from './primary-button.component';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, tick } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
@@ -94,12 +94,17 @@ describe('PrimaryButtonComponent', () => {
   });
 
   it('should handle button click with external link', () => {
-    spyOn(window, 'open').and.returnValue({
-      opener: null,
-      location: { href: '' },
-    });
-    component.buttonHref = 'https://oppia.org';
+    const externalLink = 'https://github.com';
+    
+    // Create a spy for the window.open method
+    const windowOpenSpy = jasmine.createSpyObj('Window', ['location', 'opener', 'reload']);
+    spyOn(window, 'open').and.returnValue(windowOpenSpy);
+    
+    const newTab = window.open('', '_blank') as Window;
+    component.buttonHref = externalLink;
     component.handleButtonClick();
-    expect(window.open).toHaveBeenCalledWith();
+
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
+    expect(newTab.location.href).toBe(externalLink);
   });
 });
