@@ -1785,16 +1785,22 @@ def get_chapter_counts_in_topic_summaries(
 def get_published_story_exploration_ids(
     topic_id: Optional[str] = None
 ) -> List[str]:
-    """Returns a list of all exploration ids linked to published stories within
-    a topic. If no topic_id is provided, all topics will be fetched.
+    """Returns a list of each exploration id linked to each published chapter.
+    The stories who own the published chapter must also be published. The topic
+    that matches the corresponding topic_id who owns the published stories will
+    have their exploration ids searched.
+
+    If no topic_id is provided, all topics will have their exploration ids
+    searched based on their ownership of published stories and published
+    chapters.
 
     Args:
-        topic_id: str|None. The id of the topic to fetch. When not
-            provided, all topics are fetched.
+        topic_id: str|None. The id of the topic to search through. When not
+            provided, all topics are searched through.
 
     Returns:
-        list(str). A list of all exploration ids linked to all the topic(s)
-        published stories.
+        list(str). A list of all exploration ids linked to all the topic(s)'
+        published stories and published chapters.
     """
     mappings = ([
         summary.published_story_exploration_mapping

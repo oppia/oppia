@@ -24,11 +24,13 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import caching_services
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -47,8 +49,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([
-    models.Names.TOPIC
+(topic_models, story_models) = models.Registry.import_models([
+    models.Names.TOPIC,
+    models.Names.STORY
 ])
 
 
@@ -678,8 +681,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.unpublish_story(
                 self.TOPIC_ID, 'story_10', self.user_id_admin)
-
-        # Throw error if a story node doesn't have an exploration.
+ 
+        # Throw error if exploration isn't published.
         self.save_new_story(
             'story_id_new',
             self.user_id,
@@ -689,29 +692,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': 'node_1',
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.user_id_admin, 'story_id_new', changelist,
-            'Added node.')
 
-        with self.assertRaisesRegex(
-            Exception, 'Story node with id node_1 does not contain an '
-            'exploration id.'):
-            topic_services.publish_story(
-                self.TOPIC_ID, 'story_id_new', self.user_id_admin)
-
-        # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
         self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_1',
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
@@ -721,7 +711,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         story_services.update_story(
             self.user_id_admin, 'story_id_new', change_list,
-            'Updated story node.')
+            'Added story node with linked exploration.')
 
         self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
         self.user_admin = user_services.get_user_actions_info(
@@ -2496,8 +2486,35 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'invalid_story_id' % self.TOPIC_ID
                     ]
                 )
+ 
+    def test_get_published_story_exploration_ids_from_non_published_story_gets_no_exploration_ids( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
 
-    def test_get_published_story_exploration_ids_in_all_topics(self) -> None:
+        story_exp_ids = topic_services.get_published_story_exploration_ids(
+            self.TOPIC_ID)
+
+        self.assertItemsEqual(story_exp_ids, [])
+
+    def test_get_published_story_exploration_ids_only_from_published_chapters( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._publish_story_with_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids,
+            chapter_exp_ids=topic_exp_ids[:2])
+
+        story_exp_ids = topic_services.get_published_story_exploration_ids(
+            self.TOPIC_ID)
+
+        self.assertItemsEqual(story_exp_ids, topic_exp_ids[:2])
+
+    def test_get_published_story_exploration_ids_in_all_topics_when_topic_id_not_given( # pylint: disable=line-too-long
+        self
+    ) -> None:
         topic_id_2 = topic_fetchers.get_new_topic_id()
         story_id_4 = 'story_4'
         self.save_new_topic(
@@ -2520,38 +2537,49 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(exp_ids, story_exp_ids)
 
-    def test_get_published_story_exploration_ids_in_a_topic_by_its_id(
-        self
-    ) -> None:
-        topic_id_2 = topic_fetchers.get_new_topic_id()
-        story_id_4 = 'story_4'
-        self.save_new_topic(
-            topic_id_2, self.user_id, name='Name 2',
-            abbreviated_name='name2', url_fragment='name-two',
-            description='Description',
-            canonical_story_ids=[story_id_4], additional_story_ids=[],
-            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
-        self.save_new_story(story_id_4, self.user_id, topic_id_2)
-
-        topic_1_exp_ids = ['exp_1', 'exp_2', 'exp_3']
-        topic_2_exp_ids = ['exp_4']
-        self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_1, topic_1_exp_ids[:1])
-        self._publish_story_with_explorations(
-            self.TOPIC_ID, self.story_id_3, topic_1_exp_ids[1:])
-        self._publish_story_with_explorations(
-            topic_id_2, story_id_4, topic_2_exp_ids)
-
-        story_exp_ids = topic_services.get_published_story_exploration_ids(
-            topic_id_2)
-
-        self.assertItemsEqual(topic_2_exp_ids, story_exp_ids)
-
     def _publish_story_with_explorations(
+        self, topic_id: str, story_id: str, exp_ids: List[str],
+        chapter_exp_ids: Optional[List[str]] = None
+    ) -> None:
+        """Creates explorations with exp_ids. Links them to the story given
+        by story_id. Publishes the story under topic with topic_id, along
+        with its nodes who has linked chapter_exp_ids. If chapter_exp_ids
+        is not provided, then the nodes published will be based on exp_ids.
+
+        Args:
+            topic_id: str. The id of the topic containing the story.
+            story_id: str. The id of the story to publish and to link
+                explorations to.
+            exp_ids: list(str). A list of exploration ids to create
+                explorations with.
+            chapter_exp_ids: list(str)|None. A list of exploration ids that
+                correspond with each story node that will be published.
+        """
+        chapter_exp_ids = chapter_exp_ids or exp_ids
+        self._create_linked_explorations(topic_id, story_id, exp_ids)
+        topic_services.publish_story(topic_id, story_id, self.user_id_admin)
+
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[i].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            }) for i in range(len(chapter_exp_ids))
+            if story.story_contents.nodes[i].exploration_id ==
+            chapter_exp_ids[i]
+        ]
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, story_id, change_list,
+            'Publish these story chapters only.', topic_id)
+
+    def _create_linked_explorations(
         self, topic_id: str, story_id: str, exp_ids: List[str]
     ) -> None:
         """Creates explorations with exp_ids. Links them to the story given
-        by story_id. Publishes the story under topic with topic_id.
+        by story_id.
 
         Args:
             topic_id: str. The id of the topic containing the story.
@@ -2567,7 +2595,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.publish_exploration(self.user_id_admin, exp_id)
 
         self.link_explorations_to_story(topic_id, story_id, exp_ids)
-        topic_services.publish_story(topic_id, story_id, self.user_id_admin)
+
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
