@@ -154,8 +154,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     let currentStateName = this.stateName;
 
     return (
-      (outcome.dest === currentStateName) &&
-      outcome.labelledAsCorrect);
+      (outcome?.dest === currentStateName) &&
+      outcome?.labelledAsCorrect);
   }
 
   changeActiveAnswerGroupIndex(newIndex: number): void {
