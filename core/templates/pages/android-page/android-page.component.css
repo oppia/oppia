@@ -124,6 +124,43 @@
   width: 100vw;
 }
 
+.oppia-android-learners-review {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 20%;
+}
+
+.oppia-android-review-section {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 3%;
+}
+
+.oppia-android-review-component {
+  border: 1px solid #ccc;
+  border-radius: 11px;
+  box-shadow: 8px 4px 6px rgba(0, 0, 0, 0.3);
+  flex: 1;
+  height: 250px;
+  margin: 10px;
+  min-width: 200px;
+  padding: 10px;
+  width: 280px;
+}
+
+.oppia-android-reviewer {
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 500;
+  padding-top: 5px;
+}
+
+.oppia-android-learners-review-title {
+  text-align: center;
+}
+
 .oppia-android-app-updates-container {
   padding-top: 50px;
 }
