@@ -4441,7 +4441,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4460,7 +4460,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4514,7 +4514,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4536,7 +4536,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4584,7 +4584,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4603,7 +4603,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4657,7 +4657,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4679,7 +4679,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4741,7 +4741,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4763,7 +4763,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
@@ -4842,7 +4842,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4861,7 +4861,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL)
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         )
         expected_email_html_body_admin_2 = (
             'Hi user2,'
@@ -4870,7 +4870,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             '<a href="%s%s">Contributor Dashboard</a> that have been waiting '
             'for more than 0 days for review. Please take a look at the '
             'suggestions mentioned below and help them get reviewed by going '
-            'to the <a href="%s%s#/roles">admin roles page</a> and either:'
+            'to the <a href="%s%s">admin roles page</a> and either:'
             '<br><br><ul>'
             '<li>Add more reviewers to the suggestion types that have '
             'suggestions waiting too long for a review</li><br>'
@@ -4889,7 +4889,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'Best Wishes!<br><br>'
             '- The Oppia Contributor Dashboard Team' % (
                 feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL,
-                feconf.OPPIA_SITE_URL, feconf.ADMIN_URL))
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL))
 
         with self.can_send_emails_ctx, self.log_new_error_ctx:
             with self.swap_get_platform_parameter_value, self.swap(
