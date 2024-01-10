@@ -487,8 +487,16 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     count_feature_flag_enabled_for_5_perc += 1
                     user_ids_for_which_feature_flag_enabled_for_5_perc.add(
                         user_id)
+            # To decide the range in order to avoid the flakiness we are using
+            # binomial distribution. Taking a binomial random variable for
+            # n = 1000 and p = 0.05. This roughly follows a normal distribution
+            # with mean np = 50 and standard deviation sqrt(npq) = 6.89. In a
+            # normal distribution, around 0.997 of values are within 3 standard
+            # deviation of the mean, and there is a chance of only 0.00006334 of
+            # them being outside 4 s.d. of the mean. Hence the range can be
+            # (50 - 4 * 6.89, 50 + 4 * 6.89)
             self.assertTrue(
-                count_feature_flag_enabled_for_5_perc in list(range(40, 61)))
+                count_feature_flag_enabled_for_5_perc in list(range(22, 78)))
 
             feature_services.update_feature_flag(
                 self.dev_feature_flag.name, False, 10, [])
@@ -501,8 +509,11 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     count_feature_flag_enabled_for_10_perc += 1
                     user_ids_for_which_feature_flag_enabled_for_10_perc.add(
                         user_id)
+            # (For detail explanation please look at above comment)For p = 0.1,
+            # normal distribution with mean np = 100 and standard deviation
+            # equals 9.48. Range would be (100 - 4 * 9.48, 100 + 4 * 9.48)
             self.assertTrue(
-                count_feature_flag_enabled_for_10_perc in list(range(90, 111)))
+                count_feature_flag_enabled_for_10_perc in list(range(62, 138)))
 
             self.assertTrue(
                 user_ids_for_which_feature_flag_enabled_for_5_perc.issubset(

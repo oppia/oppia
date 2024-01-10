@@ -323,3 +323,27 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             'Invalid feature flag name \'%s\'' % feature_flag.name
         ):
             feature_flag.validate()
+
+    def test_validate_feature_flag_with_perc_more_than_100_raises_exception(
+        self) -> None:
+        feature_flag_config = feature_flag_domain.FeatureFlagConfig(
+            False,
+            101,
+            [],
+            datetime.datetime.utcnow()
+        )
+        feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+            'Feature Description',
+            feature_flag_domain.ServerMode.DEV
+        )
+        feature_flag = feature_flag_domain.FeatureFlag(
+            'Feature',
+            feature_flag_spec,
+            feature_flag_config
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Feature flag rollout-percentage should be between '
+            '0 and 100 inclusive.'
+        ):
+            feature_flag.validate()

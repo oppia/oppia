@@ -108,6 +108,9 @@ class FeatureFlag:
                 'Invalid feature flag name \'%s\', expected to match regexp '
                 '%s.' % (self._name, self.FEATURE_NAME_REGEXP))
 
+        self._feature_flag_config.validate(
+            self._feature_flag_spec.feature_stage)
+
     def to_dict(self) -> FeatureFlagDict:
         """Returns a dict representation of the FeatureFlag domain object.
 

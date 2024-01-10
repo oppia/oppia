@@ -102,6 +102,51 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.BLOG_PAGES,
 ]
 
+FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION = {
+    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS: (
+        'This is a dummy feature flag for the e2e tests.'
+    ),
+    FeatureNames.END_CHAPTER_CELEBRATION: (
+        'This flag is for the end chapter celebration feature.'
+    ),
+    FeatureNames.CHECKPOINT_CELEBRATION: (
+        'This flag is for the checkpoint celebration feature.'
+    ),
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS: (
+        'This flag enables showing per-contributor accomplishments on the '
+        'contributor dashboard.'
+    ),
+    FeatureNames.DIAGNOSTIC_TEST: (
+        'This flag is for the diagnostic test functionality.'
+    ),
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW: (
+        'This flag is for serial chapter launch feature and making changes '
+        'only in the curriculum admin view.'
+    ),
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW: (
+        'This flag is for serial chapter launch feature and making changes '
+        'only in the learner view.'
+    ),
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD: (
+        'This flag is to show redesigned learner dashboard.'
+    ),
+    FeatureNames.SHOW_TRANSLATION_SIZE: (
+        'This flag is to show translation size on translation cards in '
+        'contributor dashboard.'
+    ),
+    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN: (
+        'This flag is to show feedback updates in the '
+        'profile pic drop-down menu.'
+    ),
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI: (
+        'This flag is to show new contributor admin dashboard.'
+    ),
+    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED: (
+        'Exposes the Improvements Tab for creators in the exploration editor.'
+    ),
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED: 'Enable learner groups feature'
+}
+
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[params.ParamNames] = [
     params.ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,

@@ -47,7 +47,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         # plan to create dummy feature flags to conduct testing. To avoid
         # mypy type check we have to add ignore[arg-type].
         feature_flag = registry.Registry.create_feature_flag(
-            feature_name, 'test', feature_stage) # type: ignore[arg-type]
+            feature_name, 'test description', feature_stage) # type: ignore[arg-type]
         return feature_flag
 
     def setUp(self) -> None:
