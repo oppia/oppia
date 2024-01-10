@@ -474,7 +474,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.reviewable_suggestions_by_language = (
             reviewable_suggestions_by_language)
 
-    def _create_translation_suggestion(
+    def _create_translation_suggestion_for_en_language(
         self
     ) -> suggestion_registry.BaseSuggestion:
         """Creates a translation suggestion."""
@@ -495,7 +495,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.author_id, add_translation_change_dict,
             'test description')
 
-    def _create_translation_suggestion_2(
+    def _create_translation_suggestion_for_hi_language(
         self
     ) -> suggestion_registry.BaseSuggestion:
         """Creates a translation suggestion."""
@@ -557,7 +557,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.reviewer_id, self.language_code)
         # Create a translation suggestion so that the reviewer has something
         # to be notified about.
-        translation_suggestion = self._create_translation_suggestion()
+        translation_suggestion = self._create_translation_suggestion_for_en_language()
         self.expected_reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -653,7 +653,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             True
         )
 
-        _ = self._create_translation_suggestion_2()
+        _ = self._create_translation_suggestion_for_hi_language()
 
         with self.can_send_emails, self.testapp_swap:
             with swap_platform_parameter_value, self.swap(

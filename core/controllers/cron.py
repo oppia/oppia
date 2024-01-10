@@ -244,7 +244,7 @@ class CronMailReviewerNewSuggestionsHandler(
 
             # Collect reviewer IDs.
             reviewer_usernames = user_services.get_contributor_usernames(
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_property
             )
 
