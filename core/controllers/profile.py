@@ -35,7 +35,7 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 
-from typing import Callable, Dict, Optional, TypedDict
+from typing import Any, Callable, Dict, Optional, TypedDict
 
 
 class ProfileHandler(
@@ -319,17 +319,21 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 
-        if update_type == 'subject_interests':
-            if not isinstance(data, list):
+        # Here we use type Any because we don't know the Input type.
+        def is_data_of_non_valid_type(
+            update_type: str, required_type: type, data: Any) -> None:
+            if not isinstance(data, required_type):
                 raise self.InvalidInputException(
-                    'Expected subject interests to be a list, received %s'
-                    % data)
+                    'Expected %s to be a %s, received %s'
+                    % (
+                        update_type, required_type.__name__,
+                        type(data).__name__))
+
+        if update_type == 'subject_interests':
+            is_data_of_non_valid_type(update_type, list, data)
             user_settings.subject_interests = data
         elif update_type == 'preferred_language_codes':
-            if not isinstance(data, list):
-                raise self.InvalidInputException(
-                    'Expected preferred language codes to be a list,'
-                    'received %s' % data)
+            is_data_of_non_valid_type(update_type, list, data)
             user_settings.preferred_language_codes = data
         elif update_type == 'email_preferences':
             required_keys = [
@@ -353,38 +357,26 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     data['can_receive_feedback_message_email'],
                     data['can_receive_subscription_email']))
         elif update_type == 'user_bio':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                 raise self.InvalidInputException(
                     'User bio exceeds maximum character limit: %s'
                     % feconf.MAX_BIO_LENGTH_IN_CHARS)
             user_settings.user_bio = data
         elif update_type == 'preferred_site_language_code':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             user_settings.preferred_site_language_code = data
         elif update_type == 'preferred_audio_language_code':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             user_settings.preferred_audio_language_code = data
         elif update_type == 'preferred_translation_language_code':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             user_settings.preferred_translation_language_code = data
         elif update_type == 'default_dashboard':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             user_settings.default_dashboard = data
         elif update_type == 'profile_picture_data_url':
-            if not isinstance(data, str):
-                raise self.InvalidInputException(
-                    'Expected data to be a string, received %s' % data)
+            is_data_of_non_valid_type(update_type, str, data)
             assert user_settings.username is not None
             user_services.update_profile_picture_data_url(
                 user_settings.username, data)
