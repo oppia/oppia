@@ -191,6 +191,10 @@ class _Gae(Platform):
             elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
+            elif name == Names.VOICE_POLICY:
+                from core.storage.voice_policy import (
+                    gae_models as voice_policy_models)
+                returned_models.append(voice_policy_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
