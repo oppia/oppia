@@ -76,11 +76,6 @@ export class CollectionPlaythrough {
     return this._completedExplorationIds.length !== 0;
   }
 
-  // TODO(bhenning): Add setters for some of these properties. Setters allow
-  // the collection editor to setup specifically configured playthrough
-  // sessions of the collection player through this object (for example, the
-  // editor would be able to fake which explorations were completed to see how
-  // that particular configuration would look for a learner).
   hasFinishedCollection(): boolean {
     return this._nextExplorationId === null;
   }
