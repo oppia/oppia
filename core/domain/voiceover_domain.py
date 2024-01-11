@@ -18,22 +18,21 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core import utils
 
 from core.domain import state_domain
 
-from typing import Dict
+from typing import Dict, TypedDict
 
 
-class EntityVoiceoverDict:
+class EntityVoiceoverDict(TypedDict):
     """Dictionary representing the EntityVoiceover object."""
 
     entity_id: str
     entity_type: str
     entity_version: int
     language_accent_code: str
-    voiceovers: Dict[str, Dict[str, feconf.VoiceoverDict]]
+    voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
 
 
 class EntityVoiceover:
@@ -121,9 +120,10 @@ class EntityVoiceover:
         for content_id, voiceover_type_to_voiceover_dict in (
                 entity_voiceover_dict['voiceovers'].items()):
             content_id_to_voiceovers[content_id] = {
-                'manual':
-                    voiceover_type_to_voiceover_dict['manual'].from_dict(),
-                'auto': voiceover_type_to_voiceover_dict['auto'].from_dict(),
+                'manual': state_domain.Voiceover.from_dict(
+                    voiceover_type_to_voiceover_dict['manual']),
+                'auto': state_domain.Voiceover.from_dict(
+                    voiceover_type_to_voiceover_dict['auto'])
             }
 
         return cls(
@@ -134,7 +134,7 @@ class EntityVoiceover:
             content_id_to_voiceovers
         )
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the EntityVoiceover object."""
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
@@ -172,7 +172,7 @@ class EntityVoiceover:
         content_id: str,
         voiceover_type: str,
         voiceover: state_domain.Voiceover
-    ):
+    ) -> None:
         """Adds voiceover to the entity voiceover instance."""
         if not isinstance(content_id, str):
             raise utils.ValidationError(
@@ -189,7 +189,7 @@ class EntityVoiceover:
         self,
         content_id: str,
         voiceover_type: str
-    ):
+    ) -> None:
         """Removes voiceover from the entity voiceover instance."""
         if not isinstance(content_id, str):
             raise utils.ValidationError(

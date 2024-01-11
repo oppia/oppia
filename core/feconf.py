@@ -1694,12 +1694,3 @@ class TranslatedContentDict(TypedDict):
     content_value: ContentValueType
     needs_update: bool
     content_format: str
-
-
-class VoiceoverDict(TypedDict):
-    """Dictionary representing Voiceover object."""
-
-    filename: str
-    file_size_bytes: int
-    needs_update: bool
-    duration_secs: float

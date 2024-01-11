@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict
+from typing import Dict, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -33,6 +33,15 @@ if MYPY: # pragma: no cover
 ])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class VoiceoverDict(TypedDict):
+    """Dictionary representing Voiceover object."""
+
+    filename: str
+    file_size_bytes: int
+    needs_update: bool
+    duration_secs: float
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -138,7 +147,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, feconf.VoiceoverDict]]
+        voiceovers: Dict[str, Dict[str, VoiceoverDict]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
