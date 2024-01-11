@@ -612,7 +612,9 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
 
-        for language_code, reviewer_ids in self.reviewer_ids_by_language.items(): # pylint: disable=line-too-long
+        for (
+            language_code, reviewer_ids
+            ) in self.reviewer_ids_by_language.items():
             suggestions = self.reviewable_suggestions_by_language[language_code]
             self.assertEqual(len(suggestions), 1)
             self.assertEqual(len(reviewer_ids), 1)
