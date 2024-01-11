@@ -4930,9 +4930,13 @@ class NotifyReviewersNewSuggestionsTests(
 
     target_id: str = 'exp1'
     skill_id: str = 'skill_123456'
+    timezone = datetime.timezone.utc
     mocked_review_submission_datetime: datetime.datetime = (
-        datetime.datetime(2023, 10, 23, 5)
+        datetime.datetime(2023, 10, 23, 5, tzinfo=timezone)
     )
+    mocked_review_submission_datetime = (
+        mocked_review_submission_datetime.replace(
+            tzinfo=None))
     AUTHOR_USERNAME: Final = 'author'
     AUTHOR_EMAIL: Final = 'author@example.com'
     REVIEWER_1_USERNAME: Final = 'reviewer1'
