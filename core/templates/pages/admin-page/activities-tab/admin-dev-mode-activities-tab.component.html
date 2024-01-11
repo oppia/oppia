@@ -80,11 +80,11 @@
       <h3>Load dummy new structures data (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-8">
-          Loads a published topics , a story and three skills (two in a subtopic)
-          attached to the first topic and a question attached to each of 2 skill in subtopic
-          and 3 questions to a uncategorized skill. 3 explorations are loaded and associated
-          with the story. Translation and skill question opportunties are populated on the
-          Contributor Dashboard.
+          Loads a published topic that contains a story with 3 explorations, as well as 3
+          skills (two of which are in a subtopic). There is a question attached to each of
+          the two skills in the subtopic, and 3 questions attached to the remaining uncategorized
+          skill. Translation and practice question opportunities are populated on the Contributor
+          Dashboard.
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
           <button type="button"
@@ -94,6 +94,9 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
 
@@ -112,6 +115,9 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
 
@@ -131,6 +137,9 @@
           </button>
         </span>
       </div>
+      <p class="instruction">Note: To get curriculum admin access, go to the Roles tab and
+        assign this role to your username.
+      </p>
     </div>
   </mat-card>
 </div>
@@ -153,5 +162,11 @@
   }
   .admin-dev-mode-activities-tab .oppia-generate-exploration-text {
     margin-top: 20px;
+  }
+  .admin-dev-mode-activities-tab .instruction {
+    color: #555;
+    font-size: smaller;
+    font-style: italic;
+    margin-top: 5px;
   }
 </style>
