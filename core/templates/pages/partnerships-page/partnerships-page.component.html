@@ -25,7 +25,7 @@
           </ul>
         </div>
         <button class="btn">
-          <a [href]=getFormLink() target="_blank" rel="noopener">
+          <a [href]="getFormLink()" target="_blank" rel="noopener">
             {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
           </a>
         </button>
@@ -238,7 +238,7 @@
     </div>
 
     <button class="btn">
-      <a [href]=getFormLink()
+      <a [href]="getFormLink()"
          target="_blank"
          rel="noopener">
          {{ 'I18N_PARTNERSHIPS_PAGE_GET_STARTED_BUTTON' | translate }}
