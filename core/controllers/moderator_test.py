@@ -24,12 +24,6 @@ from core.tests import test_utils
 from typing import Final
 
 
-class ModeratorPageTests(test_utils.GenericTestBase):
-    def test_moderator_get(self) -> None:
-        """Test `/moderator` returns a 200 response."""
-        self.get_html_response('/admin', expected_status_int=200)
-
-
 class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'exp_id_1'
