@@ -18,12 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -77,12 +73,10 @@ class VoiceoverPolicyModelTest(test_utils.GenericTestBase):
         voice_policy_models.VoiceoverPolicyModel(
             language_code_mapping=language_code_mapping_dict).put()
 
-        voice_policy_model  = (
+        voice_policy_model = (
             voice_policy_models.VoiceoverPolicyModel.get_model())
         assert voice_policy_model is not None
 
         self.assertDictEqual(
             voice_policy_model.language_code_mapping,
             language_code_mapping_dict)
-
-

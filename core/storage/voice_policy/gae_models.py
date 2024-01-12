@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
 from core.platform import models
 
 from typing import Dict, Optional, Sequence
@@ -37,9 +35,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class VoiceoverPolicyModel(base_models.BaseModel):
+    """Model for storing language accent codes for Oppia-supported voiceovers.
     """
-    Model for storing language accent codes for Oppia-supported voiceovers.
-    """
+
     # A dict with language_code as the key and a nested dict as the value.
     # The nested dict contains language_accent_code as the key and a boolean
     # value indicating whether it's possible to generate automatic voiceovers
@@ -71,7 +69,8 @@ class VoiceoverPolicyModel(base_models.BaseModel):
         one instance.
 
         Returns:
-            VoiceoverPolicyModel|None. An instance of VoiceoverPolicyModel class.
+            VoiceoverPolicyModel|None. An instance of
+            VoiceoverPolicyModel class.
         """
         voiceover_policy_model_list: Sequence[VoiceoverPolicyModel] = (
             cls.get_all().fetch())
