@@ -30,15 +30,18 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 run-devserver: ## Runs the dev-server
-	docker compose up angular-build -d
+# Add container label that it hasn't completed first run
+	COMPLETED_FIRST_RUN=0 docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
 	docker compose stop angular-build
-	docker compose up dev-server -d --no-deps
+	COMPLETED_FIRST_RUN=0 docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
 	$(MAKE) run-offline
 
 run-offline: ## Runs the dev-server in offline mode
+	$(MAKE) check.container-exists
+	$(MAKE) check.dev-server-started-once
 	$(MAKE) start-devserver
 	@echo 'Please visit http://localhost:8181 to access the development server.'
 	@echo 'Check dev-server logs using "make logs.dev-server"'
@@ -84,6 +87,30 @@ update.package: ## Installs the npm requirements for the project
 # Reverting the .yarnrc file to the original state, so that it works in python setup also.
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
+
+check.container-exists: ## Check if dev-server and angular-build containers exists
+	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
+	containers=$$(docker ps -a --format '{{.Names}}'); \
+	required=(oppia-dev-server oppia-angular-build); \
+	missing=; \
+	for c in $${required[@]}; do \
+		if ! echo "$$containers" | grep -qi $$c; then \
+			missing="$$missing $$c"; \
+		fi; \
+	done; \
+	if [ -n "$$missing" ]; then \
+		echo "Missing containers: $$missing"; \
+		echo $$run_devserver_prompt; \
+		exit 1; \
+	fi
+
+check.dev-server-started-once: ## Check only for dev-server, as if it's started once, applies angular-build is set properly. No need to check explicitely.
+	@COMPLETED_FIRST_RUN=$$(docker ps --all --format="{{json .}}" | grep COMPLETED_FIRST_RUN | jq -r .Labels | sed -n 's/.*COMPLETED_FIRST_RUN=\([^,]*\).*/\1/p'); \
+	if [ "$$COMPLETED_FIRST_RUN" = "0" ]; then \
+		echo "Can't verify if requirements exists in dev-server container."; \
+		echo "Please run \`make dev-server\` (requires internet) once, before running \`make run-offline\`"; \
+		exit 1; \
+	fi
 
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
