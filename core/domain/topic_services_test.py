@@ -205,6 +205,178 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         ):
             topic_services.compute_summary_of_topic(self.topic)
 
+    def test_generate_topic_summary_when_publishing_story(self) -> None:
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+    def test_generate_topic_summary_when_unpublishing_story(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+    def test_generate_topic_summary_when_deleting_published_story(
+        self
+    ) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
+        # Keep the swap assertions separate to ensure exactly 1 call to
+        # generate_topic_summary occurs per delete call
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.delete_canonical_story(
+                self.user_id_admin, self.TOPIC_ID, self.story_id_1)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.delete_additional_story(
+                self.user_id_admin, self.TOPIC_ID, self.story_id_3)
+
+    def test_generate_topic_summary_when_publishing_story_chapter(
+        self
+    ) -> None:
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1'])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+                })], 'Publish story chapter.', self.TOPIC_ID)
+
+    def test_generate_topic_summary_when_unpublishing_story_chapter(
+        self
+    ) -> None:
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1'])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                    'new_value': constants.STORY_NODE_STATUS_DRAFT
+                })], 'Unpublish story chapter.', self.TOPIC_ID)
+
+    def test_generate_topic_summary_when_deleting_published_story_chapter(
+        self
+    ) -> None:
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1'])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_DELETE_STORY_NODE, 
+                    'node_id': story.story_contents.nodes[0].id,
+                })], 'Delete story chapter.', self.TOPIC_ID)
+
+    def test_generate_topic_summary_when_changing_exp_id_linked_to_published_story_chapter( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, ['exp_1'])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+        self.save_new_valid_exploration(
+            'exp_2', self.user_id_admin, end_state_name='end',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.user_id_admin, 'exp_2')
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': 'exp_1',
+                    'new_value': 'exp_2'
+                })], 'Change exploration of chapter.', self.TOPIC_ID)
+
     def test_get_topic_from_model(self) -> None:
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
         topic = topic_fetchers.get_topic_from_model(topic_model)
@@ -2587,7 +2759,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         """
         for exp_id in exp_ids:
             self.save_new_valid_exploration(
-                exp_id, self.user_id_admin, end_state_name='End',
+                exp_id, self.user_id_admin, end_state_name='end',
                 correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_admin, exp_id)
         self.link_explorations_to_story(topic_id, story_id, exp_ids)
