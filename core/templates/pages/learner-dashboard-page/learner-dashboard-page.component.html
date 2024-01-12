@@ -111,7 +111,8 @@
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                               [learntTopicsList]="learntTopicsList"
-                              [activeSubsection]="activeSubsection">
+                              [activeSubsection]="activeSubsection"
+                              (setActiveSection)="setActiveSection($event)">
           </oppia-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.LEARNER_GROUPS && LEARNER_GROUP_FEATURE_IS_ENABLED">
