@@ -72,6 +72,7 @@ from core.storage.topic import gae_models as topic_models
 from core.storage.translation import gae_models as translation_models
 from core.storage.user import gae_models as user_models
 from core.storage.voice_policy import gae_models as voice_policy_models
+from core.storage.voiceover import gae_models as voiceover_models
 
 __all__ = [
     'activity_models',
@@ -116,4 +117,5 @@ __all__ = [
     'transaction_services',
     'user_models',
     'voice_policy_models'
+    'voiceover_models'
 ]

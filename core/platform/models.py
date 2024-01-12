@@ -195,6 +195,10 @@ class _Gae(Platform):
                 from core.storage.voice_policy import (
                     gae_models as voice_policy_models)
                 returned_models.append(voice_policy_models)
+            elif name == Names.VOICEOVER:
+                from core.storage.voiceover import (
+                    gae_models as voiceover_models)
+                returned_models.append(voiceover_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 

@@ -168,6 +168,7 @@ class ValidModelNames(enum.Enum):
     TRANSLATION = 'translation'
     USER = 'user'
     VOICE_POLICY = 'voice_policy'
+    VOICEOVER = 'voiceover'
 
 
 # A mapping of interaction ids to classifier properties.
