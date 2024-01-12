@@ -23,7 +23,7 @@
                 </i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
-                <button disabled class="pagination-button">{{ p }}</button>
+                <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button align-middle"
@@ -161,7 +161,7 @@
           <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
-          <button disabled class="pagination-button">{{ p }}</button>
+          <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
         </ng-template>
         <ng-template ngbPaginationNext>
           <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
