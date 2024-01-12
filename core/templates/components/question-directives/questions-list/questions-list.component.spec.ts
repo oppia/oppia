@@ -491,6 +491,20 @@ describe('Questions List Component', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
   });
 
+  it('should not dave and publish question if there are' +
+    'errors from question backend api service', () => {
+    component.question = question;
+    spyOn(alertsService, 'addWarning');
+    spyOn(editableQuestionBackendApiService, 'createQuestionAsync')
+      .and.returnValue('Error');
+    spyOn(component.question, 'getUnaddressedMisconceptionNames')
+      .and.returnValue(['misconception1', 'misconception2']);
+
+    component.saveAndPublishQuestion(null);
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
+  });
+
   it('should create new question in the backend if there are no validation' +
   ' error on saving and publishing a question when question is not already' +
   ' being updated', fakeAsync(() => {
