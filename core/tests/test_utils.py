@@ -3555,14 +3555,6 @@ version: 1
                     'node_id': node_id,
                     'old_value': None,
                     'new_value': exp_id
-                }),
-                story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name':
-                        story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': node_id,
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
                 })])
             node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
 

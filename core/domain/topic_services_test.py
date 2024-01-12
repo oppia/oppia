@@ -173,6 +173,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, story_1_exp_ids)
         self.link_explorations_to_story(
             self.TOPIC_ID, self.story_id_2, story_2_exp_ids)
+        self._publish_story_chapters(
+            self.TOPIC_ID, self.story_id_2, story_2_exp_ids)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_2, self.user_id_admin)
         topic_services.publish_story(
@@ -2558,7 +2560,22 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         chapter_exp_ids = chapter_exp_ids or exp_ids
         self._create_linked_explorations(topic_id, story_id, exp_ids)
         topic_services.publish_story(topic_id, story_id, self.user_id_admin)
+        self._publish_story_chapters(topic_id, story_id, chapter_exp_ids)
 
+
+    def _publish_story_chapters(
+        self, topic_id: str, story_id: str, chapter_exp_ids: List[str]
+    ) -> None:
+        """Publishes the story chapters linked to each exploration id in
+        chapter_exp_ids. The chapters belong to story_id, and the story
+        belongs to topic_id.
+
+        Args:
+            topic_id: str. Topic id containing the story.
+            story_id: str. Story id containing the chapters.
+            chapter_exp_ids: list(str). List of exp ids linked to each chapter
+                to be published.
+        """
         story = story_fetchers.get_story_by_id(story_id)
         change_list = [
             story_domain.StoryChange({
