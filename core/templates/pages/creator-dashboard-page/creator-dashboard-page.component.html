@@ -463,6 +463,7 @@
     margin-bottom: 12px;
   }
   .oppia-mat-card {
+    align-items: baseline;
     display: flex;
   }
   .oppia-create-question {
@@ -481,13 +482,16 @@
   }
 
   .oppia-creator-dashboard-main-content .stats-card {
-    min-height: 63px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 74px;
     position: relative;
   }
   .oppia-creator-dashboard-main-content .stats-card .stat-description {
-    line-height: 1.646;
-    margin-bottom: 3em;
+    margin-bottom: 0;
     padding-right: 10px;
+    word-wrap: break-word;
   }
   .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
     margin-top: 0;

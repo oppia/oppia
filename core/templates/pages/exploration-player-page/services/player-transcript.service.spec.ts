@@ -306,4 +306,31 @@ describe('Player transcript service', () => {
     expect(ls.error).toHaveBeenCalledWith(
       'Requested card with index 1, but transcript only has length 1 cards.');
   });
+
+  it('should find index of latest state', () => {
+    let card1 = StateCard.createNewCard(
+      'first', '', '',
+      {} as Interaction, {} as RecordedVoiceovers, '', atls);
+
+    let card2 = StateCard.createNewCard(
+      'second', '', '',
+      {} as Interaction, {} as RecordedVoiceovers, '', atls);
+
+    let card3 = StateCard.createNewCard(
+      'third', '', '',
+      {} as Interaction, {} as RecordedVoiceovers, '', atls);
+
+    let card4 = StateCard.createNewCard(
+      'first', '', '',
+      {} as Interaction, {} as RecordedVoiceovers, '', atls);
+
+    pts.addNewCard(card1);
+    pts.addNewCard(card2);
+    pts.addNewCard(card3);
+    pts.addNewCard(card4);
+
+    expect(pts.findIndexOfLatestStateWithName('first')).toBe(3);
+    expect(pts.findIndexOfLatestStateWithName('second')).toBe(1);
+    expect(pts.findIndexOfLatestStateWithName('nonExistent')).toBe(null);
+  });
 });

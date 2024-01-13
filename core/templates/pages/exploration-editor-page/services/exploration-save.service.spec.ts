@@ -187,7 +187,7 @@ describe('Exploration save service ' +
       } as NgbModalRef);
 
     explorationSaveService.showPublishExplorationModal(
-      startLoadingCb, endLoadingCb);
+      startLoadingCb, endLoadingCb).catch(() => {});
 
     tick();
 
@@ -368,6 +368,7 @@ describe('Exploration save service ' +
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('failure')
     } as NgbModalRef);
+    let failHandler = jasmine.createSpy('fail');
     let publishSpy = spyOn(explorationRightsService, 'publish')
       .and.resolveTo();
 
@@ -381,11 +382,13 @@ describe('Exploration save service ' +
     // to suppress this error because of strict type checking. This is
     // because the function is called with null as an argument.
     // @ts-ignore
-    explorationSaveService.showPublishExplorationModal(null, null);
+    explorationSaveService.showPublishExplorationModal(null, null)
+      .catch(failHandler);
     tick();
     tick();
 
     expect(publishSpy).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
   }));
 
   it('should mark exploaration as editable', fakeAsync(() => {

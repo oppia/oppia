@@ -63,7 +63,8 @@ export class LearnerDashboardActivityBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  addToLearnerPlaylist(activityId: string, activityType: string): boolean {
+  async addToLearnerPlaylist(
+      activityId: string, activityType: string): Promise<boolean> {
     this.successfullyAdded = true;
     this.addToLearnerPlaylistUrl = (
       this.urlInterpolationService.interpolateUrl(
@@ -71,32 +72,30 @@ export class LearnerDashboardActivityBackendApiService {
           activityType: activityType,
           activityId: activityId
         }));
-    this.http.post<LearnerPlaylistResponseObject>(
-      this.addToLearnerPlaylistUrl, {}).toPromise()
-      .then(response => {
-        if (response.belongs_to_completed_or_incomplete_list) {
-          this.successfullyAdded = false;
-          this.alertsService.addInfoMessage(
-            'You have already completed or are completing this ' +
-            'activity.');
-        }
-        if (response.belongs_to_subscribed_activities) {
-          this.successfullyAdded = false;
-          this.alertsService.addInfoMessage(
-            'This is present in your creator dashboard');
-        }
-        if (response.playlist_limit_exceeded) {
-          this.successfullyAdded = false;
-          this.alertsService.addInfoMessage(
-            'Your \'Play Later\' list is full!  Either you can ' +
-            'complete some or you can head to the learner dashboard ' +
-            'and remove some.');
-        }
-        if (this.successfullyAdded) {
-          this.alertsService.addSuccessMessage(
-            'Successfully added to your \'Play Later\' list.');
-        }
-      });
+    let response = await this.http.post<LearnerPlaylistResponseObject>(
+      this.addToLearnerPlaylistUrl, {}).toPromise();
+    if (response.belongs_to_completed_or_incomplete_list) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'You have already completed or are completing this ' +
+        'activity.');
+    }
+    if (response.belongs_to_subscribed_activities) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'This is present in your creator dashboard');
+    }
+    if (response.playlist_limit_exceeded) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'Your \'Play Later\' list is full!  Either you can ' +
+        'complete some or you can head to the learner dashboard ' +
+        'and remove some.');
+    }
+    if (this.successfullyAdded) {
+      this.alertsService.addSuccessMessage(
+        'Successfully added to your \'Play Later\' list.');
+    }
     return this.successfullyAdded;
   }
 

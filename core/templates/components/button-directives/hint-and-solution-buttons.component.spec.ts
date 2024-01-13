@@ -20,6 +20,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -49,11 +51,72 @@ describe('HintAndSolutionButtonsComponent', () => {
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
+  const defaultInteractionBackendDict = {
+    id: 'TextInput',
+    answer_groups: [
+      {
+        outcome: {
+          dest: 'State',
+          dest_if_really_stuck: null,
+          feedback: {
+            html: '',
+            content_id: 'This is a new feedback text',
+          },
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+          labelled_as_correct: true,
+          param_changes: [],
+        },
+        rule_specs: [],
+        training_data: [],
+        tagged_skill_misconception_id: '',
+      },
+    ],
+    default_outcome: {
+      dest: 'Hola',
+      dest_if_really_stuck: null,
+      feedback: {
+        content_id: '',
+        html: '',
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: 'test',
+      missing_prerequisite_skill_id: 'test_skill_id',
+    },
+    confirmed_unclassified_answers: [],
+    customization_args: {
+      rows: {
+        value: true,
+      },
+      placeholder: {
+        value: 1,
+      },
+      catchMisspellings: {
+        value: false
+      }
+    },
+    hints: [],
+    solution: {
+      answer_is_exclusive: true,
+      correct_answer: 'test_answer',
+      explanation: {
+        content_id: '2',
+        html: 'test_explanation1',
+      },
+    }
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe],
-      providers: []
+      providers: [
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
+      ]
     }).compileComponents();
   }));
 
@@ -87,63 +150,45 @@ describe('HintAndSolutionButtonsComponent', () => {
     // A StateCard which supports hints.
     newCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [
-          {
-            outcome: {
-              dest: 'State',
-              dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
-              },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
-            },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
-          },
-        ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
-          },
-          placeholder: {
-            value: 1,
-          },
-          catchMisspellings: {
-            value: false
-          }
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        }
-      }),
+      interactionObjectFactory.createFromBackendDict(
+        defaultInteractionBackendDict),
       RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
+  });
+
+  it('should reset hints when solution doesn\'t exist', () => {
+    const interactionDict = JSON.parse(
+      JSON.stringify(defaultInteractionBackendDict));
+    interactionDict.solution = null;
+    const interaction =
+      interactionObjectFactory.createFromBackendDict(interactionDict);
+    const card = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction html',
+      interaction, RecordedVoiceovers.createEmpty(), 'content',
+      audioTranslationLanguageService
+    );
+    spyOn(component, 'resetLocalHintsArray');
+
+    component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit(card);
+
+    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
+  });
+
+  it('should reset hints when solution exists', () => {
+    const interaction = interactionObjectFactory.createFromBackendDict(
+      defaultInteractionBackendDict);
+    const card = StateCard.createNewCard(
+      'Card 1', 'Content html', 'Interaction html',
+      interaction, RecordedVoiceovers.createEmpty(), 'content',
+      audioTranslationLanguageService
+    );
+    spyOn(component, 'resetLocalHintsArray');
+
+    component.ngOnInit();
+    playerPositionService.onNewCardOpened.emit(card);
+
+    expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
   });
 
   it('should subscribe to events on initialization', () => {

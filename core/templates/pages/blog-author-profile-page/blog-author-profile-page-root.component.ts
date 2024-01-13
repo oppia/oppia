@@ -24,7 +24,6 @@ import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/acce
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
 import { UrlService } from 'services/contextual/url.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -45,7 +44,6 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
     private translateService: TranslateService,
     private urlService: UrlService,
     private userService: UserService,
-    private platformFeatureService: PlatformFeatureService,
   ) {}
 
   ngOnInit(): void {
@@ -60,23 +58,15 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
     this.authorUsername = this.urlService.getBlogAuthorUsernameFromUrl();
     this.loaderService.showLoadingScreen('Loading');
     this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
-      ) {
-        this.accessValidationBackendApiService
-          .validateAccessToBlogAuthorProfilePage(this.authorUsername)
-          .then(() => {
-            this.pageIsShown = true;
-          }, () => {
-            this.errorPageIsShown = true;
-          }).then(() => {
-            this.loaderService.hideLoadingScreen();
-          });
-      } else {
-        this.errorPageIsShown = true;
-        this.loaderService.hideLoadingScreen();
-      }
+      this.accessValidationBackendApiService
+        .validateAccessToBlogAuthorProfilePage(this.authorUsername)
+        .then(() => {
+          this.pageIsShown = true;
+        }, () => {
+          this.errorPageIsShown = true;
+        }).then(() => {
+          this.loaderService.hideLoadingScreen();
+        });
     });
   }
 

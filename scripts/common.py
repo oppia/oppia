@@ -56,14 +56,11 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Versions of libraries used in backend.
-PILLOW_VERSION = '9.0.1'
-
 # Buf version.
 BUF_VERSION = '0.29.0'
 
 # Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.13.0'
+PROTOC_VERSION = '3.18.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -219,6 +216,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
     'duplicate-blog-post.spec.js',
+    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
 
@@ -650,7 +648,8 @@ def inplace_replace_file(
     expected_number_of_replacements: Optional[int] = None
 ) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
-    to replace the file's content line by line.
+    to replace the file's content line by line. The old file is kept as-is until
+    it is replaced.
 
     Note:
         This function should only be used with files that are processed line by
@@ -667,26 +666,26 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    backup_filename = '%s.bak' % filename
-    shutil.copyfile(filename, backup_filename)
+    new_filename = '%s.new' % filename
+    shutil.copyfile(filename, new_filename)
     new_contents = []
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(backup_filename, 'r') as f:
-            for line in f:
+        with utils.open_file(filename, 'r') as old_file:
+            for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(filename, 'w') as f:
+        with utils.open_file(new_filename, 'w') as new_file:
             for line in new_contents:
-                f.write(line)
+                new_file.write(line)
 
         if (
-                expected_number_of_replacements is not None and
-                total_number_of_replacements != expected_number_of_replacements
+            expected_number_of_replacements is not None and
+            total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
                 'Wrong number of replacements. Expected %s. Performed %s.' % (
@@ -695,47 +694,12 @@ def inplace_replace_file(
                 )
             )
 
-        os.remove(backup_filename)
+        os.replace(new_filename, filename)
 
     except Exception:
-        # Restore the content if there was en error.
-        os.remove(filename)
-        shutil.move(backup_filename, filename)
+        # Drop the new file if there was an error.
+        os.remove(new_filename)
         raise
-
-
-@contextlib.contextmanager
-def inplace_replace_file_context(
-    filename: str, regex_pattern: str, replacement_string: str
-) -> Generator[None, None, None]:
-    """Context manager in which the file's content is replaced according to the
-    given regex pattern. This function should only be used with files that are
-    processed line by line.
-
-    Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-
-    Yields:
-        None. Nothing.
-    """
-    backup_filename = '%s.bak' % filename
-    regex = re.compile(regex_pattern)
-
-    shutil.copyfile(filename, backup_filename)
-
-    try:
-        with utils.open_file(backup_filename, 'r') as f:
-            new_contents = [regex.sub(replacement_string, line) for line in f]
-        with utils.open_file(filename, 'w') as f:
-            f.write(''.join(new_contents))
-        yield
-    finally:
-        if os.path.isfile(filename) and os.path.isfile(backup_filename):
-            os.remove(filename)
-        if os.path.isfile(backup_filename):
-            shutil.move(backup_filename, filename)
 
 
 def wait_for_port_to_be_in_use(port_number: int) -> None:

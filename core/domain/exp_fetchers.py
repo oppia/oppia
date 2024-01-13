@@ -268,7 +268,6 @@ def get_exploration_summary_by_id(
         ExplorationSummary|None. The summary domain object corresponding to the
         given exploration, and none if no ExpSummaryModel exists for given id.
     """
-    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
         exploration_id, strict=strict)
     if exp_summary_model:
