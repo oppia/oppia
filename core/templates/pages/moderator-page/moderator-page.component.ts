@@ -17,7 +17,6 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import isEqual from 'lodash/isEqual';
@@ -155,6 +154,3 @@ export class ModeratorPageComponent {
     return this.FEATURED_ACTIVITY_REFERENCES_SCHEMA;
   }
 }
-
-angular.module('oppia').directive('oppiaModeratorPage',
-  downgradeComponent({ component: ModeratorPageComponent }));
