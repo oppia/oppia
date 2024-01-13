@@ -194,6 +194,78 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.story_id_3: []
             })
 
+    def _publish_story_with_explorations(
+        self, topic_id: str, story_id: str, exp_ids: List[str],
+        chapter_exp_ids: Optional[List[str]] = None
+    ) -> None:
+        """Creates explorations with exp_ids. Links them to the story given
+        by story_id. Publishes the story under topic with topic_id, along
+        with its nodes who has linked chapter_exp_ids. If chapter_exp_ids
+        is not provided, then the nodes published will be based on exp_ids.
+
+        Args:
+            topic_id: str. The id of the topic containing the story.
+            story_id: str. The id of the story to publish and to link
+                explorations to.
+            exp_ids: list(str). A list of exploration ids to create
+                explorations with.
+            chapter_exp_ids: list(str)|None. A list of exploration ids that
+                correspond with each story node that will be published.
+        """
+        chapter_exp_ids = chapter_exp_ids or exp_ids
+        self._create_linked_explorations(topic_id, story_id, exp_ids)
+        topic_services.publish_story(topic_id, story_id, self.user_id_admin)
+        self._publish_story_chapters(topic_id, story_id, chapter_exp_ids)
+
+    def _publish_story_chapters(
+        self, topic_id: str, story_id: str, chapter_exp_ids: List[str]
+    ) -> None:
+        """Publishes the story chapters linked to each exploration id in
+        chapter_exp_ids. The chapters belong to story_id, and the story
+        belongs to topic_id.
+
+        Args:
+            topic_id: str. Topic id containing the story.
+            story_id: str. Story id containing the chapters.
+            chapter_exp_ids: list(str). List of exp ids linked to each chapter
+                to be published.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[i].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            }) for i in range(len(chapter_exp_ids))
+            if story.story_contents.nodes[i].exploration_id ==
+            chapter_exp_ids[i]
+        ]
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, story_id, change_list,
+            'Publish these story chapters only.', topic_id)
+
+    def _create_linked_explorations(
+        self, topic_id: str, story_id: str, exp_ids: List[str]
+    ) -> None:
+        """Creates explorations with exp_ids. Links them to the story given
+        by story_id.
+
+        Args:
+            topic_id: str. The id of the topic containing the story.
+            story_id: str. The id of the story to publish and to link
+                explorations to.
+            exp_ids: list(str). A list of exploration ids to create
+                explorations with.
+        """
+        for exp_id in exp_ids:
+            self.save_new_valid_exploration(
+                exp_id, self.user_id_admin, end_state_name='end',
+                correctness_feedback_enabled=True)
+            self.publish_exploration(self.user_id_admin, exp_id)
+        self.link_explorations_to_story(topic_id, story_id, exp_ids)
+
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
     ) -> None:
@@ -2691,78 +2763,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         story_exp_ids = topic_services.get_published_story_exploration_ids()
 
         self.assertItemsEqual(exp_ids, story_exp_ids)
-
-    def _publish_story_with_explorations(
-        self, topic_id: str, story_id: str, exp_ids: List[str],
-        chapter_exp_ids: Optional[List[str]] = None
-    ) -> None:
-        """Creates explorations with exp_ids. Links them to the story given
-        by story_id. Publishes the story under topic with topic_id, along
-        with its nodes who has linked chapter_exp_ids. If chapter_exp_ids
-        is not provided, then the nodes published will be based on exp_ids.
-
-        Args:
-            topic_id: str. The id of the topic containing the story.
-            story_id: str. The id of the story to publish and to link
-                explorations to.
-            exp_ids: list(str). A list of exploration ids to create
-                explorations with.
-            chapter_exp_ids: list(str)|None. A list of exploration ids that
-                correspond with each story node that will be published.
-        """
-        chapter_exp_ids = chapter_exp_ids or exp_ids
-        self._create_linked_explorations(topic_id, story_id, exp_ids)
-        topic_services.publish_story(topic_id, story_id, self.user_id_admin)
-        self._publish_story_chapters(topic_id, story_id, chapter_exp_ids)
-
-    def _publish_story_chapters(
-        self, topic_id: str, story_id: str, chapter_exp_ids: List[str]
-    ) -> None:
-        """Publishes the story chapters linked to each exploration id in
-        chapter_exp_ids. The chapters belong to story_id, and the story
-        belongs to topic_id.
-
-        Args:
-            topic_id: str. Topic id containing the story.
-            story_id: str. Story id containing the chapters.
-            chapter_exp_ids: list(str). List of exp ids linked to each chapter
-                to be published.
-        """
-        story = story_fetchers.get_story_by_id(story_id)
-        change_list = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
-                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                'node_id': story.story_contents.nodes[i].id,
-                'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
-            }) for i in range(len(chapter_exp_ids))
-            if story.story_contents.nodes[i].exploration_id ==
-            chapter_exp_ids[i]
-        ]
-        topic_services.update_story_and_topic_summary(
-            self.user_id_admin, story_id, change_list,
-            'Publish these story chapters only.', topic_id)
-
-    def _create_linked_explorations(
-        self, topic_id: str, story_id: str, exp_ids: List[str]
-    ) -> None:
-        """Creates explorations with exp_ids. Links them to the story given
-        by story_id.
-
-        Args:
-            topic_id: str. The id of the topic containing the story.
-            story_id: str. The id of the story to publish and to link
-                explorations to.
-            exp_ids: list(str). A list of exploration ids to create
-                explorations with.
-        """
-        for exp_id in exp_ids:
-            self.save_new_valid_exploration(
-                exp_id, self.user_id_admin, end_state_name='end',
-                correctness_feedback_enabled=True)
-            self.publish_exploration(self.user_id_admin, exp_id)
-        self.link_explorations_to_story(topic_id, story_id, exp_ids)
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
