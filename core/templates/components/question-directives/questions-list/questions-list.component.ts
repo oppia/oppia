@@ -490,6 +490,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.alertsService.addSuccessMessage(
           'Question created successfully.');
         this._initTab(true);
+      }, (error) => {
+        this.alertsService.addWarning(
+          error || 'There was an error saving the question.');
+        this.questionIsBeingSaved = false;
       });
     } else {
       if (this.questionUndoRedoService.hasChanges()) {
