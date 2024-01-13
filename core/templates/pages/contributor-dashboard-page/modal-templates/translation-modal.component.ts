@@ -19,7 +19,6 @@
 import isEqual from 'lodash/isEqual';
 
 import { ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlertsService } from 'services/alerts.service';
@@ -561,7 +560,3 @@ export class TranslationModalComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTranslationModal', downgradeComponent(
-    {component: TranslationModalComponent}));

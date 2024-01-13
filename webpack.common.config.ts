@@ -74,12 +74,6 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
-    creator_dashboard:
-      commonPrefix + '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.import.ts',
-    contributor_dashboard:
-      commonPrefix + '/pages/contributor-dashboard-page/' +
-      'contributor-dashboard-page.import.ts',
     contributor_dashboard_admin:
       commonPrefix + '/pages/contributor-dashboard-admin-page/' +
       'contributor-dashboard-admin-page.import.ts',
@@ -266,17 +260,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['creator_dashboard'],
-      filename: 'creator-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/creator-dashboard-page/' +
-        'creator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['contributor_dashboard_admin'],
       filename: 'contributor-dashboard-admin-page.mainpage.html',
       hybrid: true,
@@ -284,17 +267,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/contributor-dashboard-admin-page/' +
         'contributor-dashboard-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard'],
-      filename: 'contributor-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-page/' +
-        'contributor-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
