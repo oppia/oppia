@@ -362,13 +362,14 @@ class ReviewableOpportunitiesHandler(
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
         """
-        # 1. Fetch all the exploration IDs of chapters in stories under the
-        #    topic(s).
-        # 2. Get the reviewable translation suggestion target IDs for the user.
-        # 3. Get story exploration nodes in order, filtering for explorations
-        #    that have in review translation suggestions.
-        # 4. Fetch all exploration opportunity summaries, order them, and then
-        #    add the pinned lesson's summary on top.
+        # 1. Fetch all the exploration IDs of published chapters in published
+        #    stories under the topic(s).
+        # 2. Get each reviewable translation suggestion's target exploration id
+        #    for the user.
+        # 3. Get story exploration nodes in order. Only keep the ids of
+        #    explorations who have in-review translation suggestions.
+        # 4. Fetch all exploration opportunity summaries and order them.
+        # 5. Move the pinned lesson's summary to the top if there is one.
         if topic_name:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
