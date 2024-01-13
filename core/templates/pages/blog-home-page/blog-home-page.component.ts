@@ -216,24 +216,24 @@ export class BlogHomePageComponent implements OnInit {
     }
   }
 
-  onPageChange(page = this.page): void {
+  onPageChange(): void {
     if (!this.searchPageIsActive) {
       this.calculateFirstPostOnPageNum(
-        page,
+        this.page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
       this.calculateLastPostOnPageNum(
-        page,
+        this.page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
       this.loadPage();
     } else {
       this.calculateFirstPostOnPageNum(
-        page,
+        this.page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
       );
       this.calculateLastPostOnPageNum(
-        page,
+        this.page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
       );
       this.loadPage();
