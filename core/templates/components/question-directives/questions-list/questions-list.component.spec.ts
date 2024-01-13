@@ -491,20 +491,22 @@ describe('Questions List Component', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
   });
 
-  it('should not save and publish question if there are' +
-    ' errors from question backend api service', () => {
-    component.question = question;
-    component.questionIsBeingUpdated = false;
-    spyOn(alertsService, 'addWarning');
-    spyOn(editableQuestionBackendApiService, 'createQuestionAsync')
-      .and.returnValue('Error');
-    spyOn(component.question, 'getUnaddressedMisconceptionNames')
+  it('should show an error and not save question if there are' +
+    ' errors from question backend api service',
+    fakeAsync(() => {
+      component.question = question;
+      component.questionIsBeingUpdated = false;
+      spyOn(editableQuestionBackendApiService, 'createQuestionAsync')
+      .and.returnValue(Promise.reject('Error'));
+      spyOn(component.question, 'getUnaddressedMisconceptionNames')
       .and.returnValue([]);
+      spyOn(alertsService, 'addWarning');
 
-    component.saveAndPublishQuestion(null);
+      component.saveAndPublishQuestion(null);
+      tick();
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
-  });
+      expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
+    }));
 
   it('should create new question in the backend if there are no validation' +
   ' error on saving and publishing a question when question is not already' +
