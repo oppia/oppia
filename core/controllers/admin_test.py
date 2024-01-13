@@ -192,6 +192,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_blog_title_generate_dummy_blog_is_not_performed(
+        self
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'blog_title\' must be provided when the action '
+            'is generate_dummy_blog.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_blog',
+                    'blog_title': None
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_without_num_dummy_exps_generate_dummy_exp_action_is_not_performed(
         self
     ) -> None:
@@ -593,6 +613,21 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
+        self.logout()
+
+    def test_generate_dummy_blog(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Education',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 1)
         self.logout()
 
     def test_regenerate_topic_related_opportunities_action(self) -> None:
