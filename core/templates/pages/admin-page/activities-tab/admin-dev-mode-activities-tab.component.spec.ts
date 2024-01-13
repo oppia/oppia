@@ -330,6 +330,41 @@ describe('Admin dev mode activities tab', () => {
     }));
   });
 
+  describe('.generateDummyBlog', () => {
+    it('should generate dummy blog', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyBlogAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlog('Education');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy Blog generated successfully.');
+      });
+    }));
+
+    it('should show error message if new dummy blog ' +
+      'is not generated', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyBlogAsync')
+        .and.returnValue(Promise.reject('Dummy Blog not generated.'));
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlog('Education');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Dummy Blog not generated.');
+      });
+    }));
+  });
+
   describe('.loadNewStructuresData', () => {
     it('should generate structures data', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewStructuresDataAsync')

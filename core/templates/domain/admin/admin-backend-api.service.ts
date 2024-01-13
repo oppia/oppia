@@ -493,12 +493,6 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyBlogAsync(): Promise<void> {
-    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_blog'
-    });
-  }
-
   async generateDummyNewSkillDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
@@ -542,6 +536,13 @@ export class AdminBackendApiService {
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
+    });
+  }
+
+  async generateDummyBlogAsync(blog: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_blog',
+      blog_title: blog,
     });
   }
 }

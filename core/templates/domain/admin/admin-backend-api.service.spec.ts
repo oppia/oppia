@@ -1225,6 +1225,50 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should generate dummy blogs', fakeAsync(()=> {
+    let action = 'generate_dummy_blog';
+    let blogTitle = 'Education';
+    let payload = {
+      action,
+      blog_title: blogTitle,
+    };
+    abas.generateDummyBlogAsync(blogTitle).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should handle generate dummy blog request failure', fakeAsync(() => {
+    let action = 'generate_dummy_blog';
+    let blogTitle = 'Education';
+    let payload = {
+      action,
+      blog_title: blogTitle,
+    };
+    abas.generateDummyBlogAsync(blogTitle).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
   it('should reload exploration', fakeAsync(() => {
     let action = 'reload_exploration';
     let explorationId = 'exp1';

@@ -36,6 +36,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
+  DUMMY_BLOG_TITLES = [
+    'Education',
+    'Leading The Arabic Translations Team',
+    'Testing types of Text formatting',
+  ];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -170,15 +175,14 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
-  generateNewBlog(): void {
+  generateNewBlog(blog: string): void {
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
-
-    this.adminBackendApiService.generateDummyBlogAsync().then(() => {
-      this.setStatusMessage.emit('Dummy Blog generate successfully.');
+    this.adminBackendApiService.generateDummyBlogAsync(blog).then(() => {
+      this.setStatusMessage.emit('Dummy Blog generated successfully.');
     }, (errorResponse) => {
       this.setStatusMessage.emit('Server error: ' + errorResponse);
-    })
+    });
     this.adminTaskManagerService.finishTask();
   }
 
