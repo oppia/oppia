@@ -16,35 +16,93 @@
  * @fileoverview Module for the collection player page.
  */
 
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { ToastrModule } from 'ngx-toastr';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { APP_BASE_HREF } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { CreatorDashboardPageRootComponent } from './creator-dashboard-page-root.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { toastrConfig } from 'pages/oppia-root/app.module';
+import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 
 @NgModule({
   imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     InteractionExtensionsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig),
-    RouterModule.forChild([
-      {
-        path: '',
-        component: CreatorDashboardPageRootComponent
-      }
-    ])
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CreatorDashboardPageComponent,
-    CreatorDashboardPageRootComponent
+    CreatorDashboardPageComponent
   ],
   entryComponents: [
     CreatorDashboardPageComponent
   ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
+      multi: true
+    },
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
+    }
+  ]
 })
-export class CreatorDashboardPageModule {}
+class CreatorDashboardPageModule {
+  // Empty placeholder method to satisfy the `Compiler`.
+  ngDoBootstrap() {}
+}
+
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeModule } from '@angular/upgrade/static';
+import { ToastrModule } from 'ngx-toastr';
+
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+  const platformRef = platformBrowserDynamic(extraProviders);
+  return platformRef.bootstrapModule(CreatorDashboardPageModule);
+};
+const downgradedModule = downgradeModule(bootstrapFnAsync);
+
+declare var angular: ng.IAngularStatic;
+
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);
