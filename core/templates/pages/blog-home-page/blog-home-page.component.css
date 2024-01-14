@@ -11,7 +11,7 @@
 
   oppia-blog-home-page .input-group .oppia-search-bar-icon {
     border-radius: 0 4px 4px 0;
-    border-width: 1px 1px 1px 0px;
+    border-width: 1px 1px 1px 0;
   }
 }
 
@@ -42,7 +42,7 @@ oppia-blog-home-page .posts-display-heading {
   text-align: left;
 }
 
-oppia-blog-home-page .text-center{
+oppia-blog-home-page .text-center {
   margin-top: 20px
 }
 
@@ -127,8 +127,8 @@ oppia-blog-home-page .search-heading {
   border-color: #333;
   border-left-width: 0;
   border-radius: 0 4px 4px 0;
-  border-right-width: 1px;
   align-items: center;
+  border-right-width: 1px;
 }
 
 
