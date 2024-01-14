@@ -16,7 +16,7 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -122,13 +122,13 @@ export class DonatePageComponent implements OnInit {
   highlights: Highlight[] = [
     {
       imageUrl: '/donate/highlights-1',
-      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_1',
-      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_1',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_1',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_1',
     },
     {
       imageUrl: '/donate/highlights-2',
-      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_2',
-      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_2',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_2',
     },
   ];
 
@@ -171,6 +171,7 @@ export class DonatePageComponent implements OnInit {
   ];
 
   tileShown: number = 0;
+  @ViewChildren('tiles') tiles: QueryList<ElementRef>;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -204,11 +205,11 @@ export class DonatePageComponent implements OnInit {
   }
 
   nextTile(clickedVal: number): void {
-    let learnerTiles = document.getElementsByClassName('tile-' + clickedVal);
+    let learnerTile = this.tiles.toArray()[clickedVal].nativeElement;
     this.tileShown = clickedVal;
 
-    if (learnerTiles !== null) {
-      learnerTiles[0].scrollIntoView({
+    if (learnerTile !== null) {
+      learnerTile.scrollIntoView({
         behavior: 'smooth', block: 'nearest', inline: 'center'
       });
     }

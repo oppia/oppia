@@ -68,7 +68,7 @@
               {{ 'I18N_DONATE_PAGE_CONTENT_TEXT_3' | translate }}
             </p>
             <div class="donate-highlights">
-              <p>{{ 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS' | translate }}</p>
+              <p>{{ 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS' | translate }}</p>
               <div>
                 <div class="donate-hightlights-tile" *ngFor="let highlight of highlights">
                   <picture>
@@ -87,7 +87,7 @@
               <p> {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_4' | translate }} </p>
               <div class="donate-learners-bg">
                 <div class="donate-learners-carousel">
-                  <div class="donate-learners-tile tile-{{id}}" *ngFor="let learner of learners;index as id">
+                  <div class="donate-learners-tile" #tiles *ngFor="let learner of learners">
                     <picture>
                       <source class="donate-learners-img" type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)">
                       <source class="donate-learners-img" type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
@@ -103,7 +103,7 @@
                   </div>
                 </div>
                 <div class="donate-learners-nav">
-                  <button [attr.aria-label]="'learner-' + id + ' button'" class="donate-learners-nav-item" role="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
+                  <button [attr.aria-label]="'learner-' + num + ' button'" class="donate-learners-nav-item" role="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
                 </div>
               </div>
             </div>
