@@ -448,9 +448,9 @@ export class ContributionsAndReview
       tabType, subType);
 
     this.activeTabSubtype = subType;
+    this.contributionAndReviewService.setActiveTabType(tabType);
+    this.contributionAndReviewService.setActiveSuggestionType(subType);
     if (!this.isAccomplishmentsTabActive()) {
-      this.contributionAndReviewService.setActiveTabType(tabType);
-      this.contributionAndReviewService.setActiveSuggestionType(subType);
       this.activeExplorationId = null;
       this.contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.emit();
