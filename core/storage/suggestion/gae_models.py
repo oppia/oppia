@@ -20,6 +20,7 @@ import datetime
 import enum
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.platform import models
 
@@ -473,15 +474,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(GeneralSuggestionModel). A list of new suggestions
             matching the criteria.
         """
-        threshold_time = (
-            datetime.datetime.utcnow() - datetime.timedelta(
-                days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION))
+        current_time_millisecs = utils.get_current_time_in_millisecs()
 
+        threshold_datetime = datetime.datetime.utcfromtimestamp(
+            current_time_millisecs / 1000.0) - datetime.timedelta(
+            days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
+        )
         return (
             cls.get_all().filter(datastore_services.all_of(
                 cls.status == STATUS_IN_REVIEW,
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                cls.created_on > threshold_time
+                cls.created_on > threshold_datetime
             ))
             .order(-cls.created_on)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
