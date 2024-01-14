@@ -44,7 +44,7 @@ class VoiceoverDict(TypedDict):
     duration_secs: float
 
 
-class EntityVoiceoverModel(base_models.BaseModel):
+class EntityVoiceoversModel(base_models.BaseModel):
     """Model for storing entity voiceovers."""
 
     # The id of the corresponding entity.
@@ -117,8 +117,8 @@ class EntityVoiceoverModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str
-    ) -> EntityVoiceoverModel:
-        """Gets EntityVoiceoverModel by help of entity_type, entity_id,
+    ) -> EntityVoiceoversModel:
+        """Gets EntityVoiceoversModel by help of entity_type, entity_id,
         entity_version and language_accent_code.
 
         Args:
@@ -132,7 +132,7 @@ class EntityVoiceoverModel(base_models.BaseModel):
                 voiceovers are to be fetched.
 
         Returns:
-            EntityVoiceoverModel. The EntityVoiceoverModel instance
+            EntityVoiceoversModel. The EntityVoiceoversModel instance
             corresponding to the given inputs, if such a voiceover
             exists, or None if no voiceover is found.
         """
@@ -148,8 +148,8 @@ class EntityVoiceoverModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str,
         voiceovers: Dict[str, Dict[str, VoiceoverDict]]
-    ) -> EntityVoiceoverModel:
-        """Creates and returns a new EntityVoiceoverModel instance.
+    ) -> EntityVoiceoversModel:
+        """Creates and returns a new EntityVoiceoversModel instance.
 
         Args:
             entity_type: str. The type of the entity.
@@ -161,7 +161,7 @@ class EntityVoiceoverModel(base_models.BaseModel):
                 as values.
 
         Returns:
-            EntityVoiceoverModel. Returns a new EntityVoiceoverModel.
+            EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
         """
         return cls(
             id=cls._generate_id(

@@ -31,23 +31,23 @@ if MYPY: # pragma: no cover
     models.Names.VOICEOVER])
 
 
-def _get_entity_voiceover_from_model(
-    entity_voiceover_model: voiceover_models.EntityVoiceoverModel
-) -> voiceover_domain.EntityVoiceover:
-    """Returns the EntityVoiceover domain object from its model representation
-    (EntityVoiceoverModel).
+def _get_entity_voiceovers_from_model(
+    entity_voiceovers_model: voiceover_models.EntityVoiceoversModel
+) -> voiceover_domain.EntityVoiceovers:
+    """Returns the EntityVoiceovers domain object from its model representation
+    (EntityVoiceoversModel).
 
     Args:
-        entity_voiceover_model: EntityVoiceoverModel. An instance of
-            EntityVoiceoverModel.
+        entity_voiceovers_model: EntityVoiceoversModel. An instance of
+            EntityVoiceoversModel.
 
     Returns:
-        EntityVoiceover. An instance of EntityVoiceover object, created from
+        EntityVoiceovers. An instance of EntityVoiceovers object, created from
         its model.
     """
     content_id_to_voiceovers_dict = {}
     for content_id, voiceover_type_to_voiceover in (
-            entity_voiceover_model.voiceovers.items()):
+            entity_voiceovers_model.voiceovers.items()):
         content_id_to_voiceovers_dict[content_id] = {
             feconf.VoiceoverType.MANUAL: state_domain.Voiceover.from_dict(
                 voiceover_type_to_voiceover[feconf.VoiceoverType.MANUAL.value]),
@@ -55,14 +55,14 @@ def _get_entity_voiceover_from_model(
                 voiceover_type_to_voiceover[feconf.VoiceoverType.AUTO.value])
         }
 
-    entity_voiceover = voiceover_domain.EntityVoiceover(
-        entity_id=entity_voiceover_model.entity_id,
-        entity_type=entity_voiceover_model.entity_type,
-        entity_version=entity_voiceover_model.entity_version,
-        language_accent_code=entity_voiceover_model.language_accent_code,
+    entity_voiceovers_instance = voiceover_domain.EntityVoiceovers(
+        entity_id=entity_voiceovers_model.entity_id,
+        entity_type=entity_voiceovers_model.entity_type,
+        entity_version=entity_voiceovers_model.entity_version,
+        language_accent_code=entity_voiceovers_model.language_accent_code,
         voiceovers=content_id_to_voiceovers_dict
     )
-    return entity_voiceover
+    return entity_voiceovers_instance
 
 
 def get_voiceovers_for_given_language_accent_code(
@@ -70,8 +70,8 @@ def get_voiceovers_for_given_language_accent_code(
     entity_id: str,
     entity_version: int,
     language_accent_code: str
-) -> voiceover_domain.EntityVoiceover:
-    """Returns a unique entity voiceover domain object.
+) -> voiceover_domain.EntityVoiceovers:
+    """Returns a unique entity voiceovers domain object.
 
     Args:
         entity_type: str. The type of the entity.
@@ -80,16 +80,17 @@ def get_voiceovers_for_given_language_accent_code(
         language_accent_code: str. The language accent code of the voiceover.
 
     Returns:
-        EntityVoiceover. An instance of entity voiceover.
+        EntityVoiceovers. An instance of entity voiceover.
     """
-    entity_voiceover_model = (
-        voiceover_models.EntityVoiceoverModel.get_model(
+    entity_voiceovers_model = (
+        voiceover_models.EntityVoiceoversModel.get_model(
             entity_type, entity_id, entity_version, language_accent_code))
 
-    if entity_voiceover_model:
-        domain_object = _get_entity_voiceover_from_model(entity_voiceover_model)
+    if entity_voiceovers_model:
+        domain_object = _get_entity_voiceovers_from_model(
+            entity_voiceovers_model)
         return domain_object
-    return voiceover_domain.EntityVoiceover.create_empty(
+    return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,
         entity_version=entity_version,

@@ -26,7 +26,7 @@ from core.tests import test_utils
 
 
 class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
-    """Test for EntityVoiceover."""
+    """Test for EntityVoiceovers."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -44,7 +44,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             'duration_secs': 5.9
         }
 
-        self.entity_voiceover = voiceover_domain.EntityVoiceover(
+        self.entity_voiceovers_instance = voiceover_domain.EntityVoiceovers(
             entity_id='exp_id',
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_version=1,
@@ -61,8 +61,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             }
         )
 
-    def test_to_dict_method_entity_voiceover_class(self) -> None:
-        expected_entity_voiceover_dict = {
+    def test_to_dict_method_entity_voiceovers_class(self) -> None:
+        expected_entity_voiceovers_dict = {
             'entity_id': 'exp_id',
             'entity_type': 'exploration',
             'entity_version': 1,
@@ -75,10 +75,11 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             }
         }
         self.assertDictEqual(
-            self.entity_voiceover.to_dict(), expected_entity_voiceover_dict)
+            self.entity_voiceovers_instance.to_dict(),
+            expected_entity_voiceovers_dict)
 
     def test_from_dict_method_entity_voiceover_class(self) -> None:
-        entity_voiceover_dict = {
+        entity_voiceovers_dict = {
             'entity_id': 'exp_id',
             'entity_type': 'exploration',
             'entity_version': 1,
@@ -90,10 +91,11 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        expected_entity_voiceover_instance = self.entity_voiceover
+        expected_entity_voiceovers_instance = self.entity_voiceovers_instance
 
         self.assertDictEqual(
-            entity_voiceover_dict, expected_entity_voiceover_instance.to_dict())
+            entity_voiceovers_dict,
+            expected_entity_voiceovers_instance.to_dict())
 
     def test_validate_entity_id(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -103,8 +105,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'entity_id must be a string'
         ):
-            self.entity_voiceover.entity_id = 123  # type: ignore[assignment]
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.entity_id = 123  # type: ignore[assignment]
+            self.entity_voiceovers_instance.validate()
 
     def test_validate_entity_version(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -114,9 +116,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'entity_version must be an int'
         ):
-            self.entity_voiceover.entity_version = (
+            self.entity_voiceovers_instance.entity_version = (
                 'version')  # type: ignore[assignment]
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.validate()
 
     def test_validate_entity_type(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -126,8 +128,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'entity_type must be a string'
         ):
-            self.entity_voiceover.entity_type = 1  # type: ignore[assignment]
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.entity_type = 1  # type: ignore[assignment]
+            self.entity_voiceovers_instance.validate()
 
     def test_validate_datatype_of_voiceover_type(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -137,10 +139,10 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'voiceover type must be VoiceoverType'
         ):
-            self.entity_voiceover.voiceovers['content_id_0'][1] = ( # type: ignore[index]
-                self.entity_voiceover.voiceovers['content_id_0'][
+            self.entity_voiceovers_instance.voiceovers['content_id_0'][1] = ( # type: ignore[index]
+                self.entity_voiceovers_instance.voiceovers['content_id_0'][
                     feconf.VoiceoverType.MANUAL])
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.validate()
 
     def test_validate_language_accent_code(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -150,8 +152,30 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'language_accent_code must be a string'
         ):
-            self.entity_voiceover.language_accent_code = 1  # type: ignore[assignment]
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.language_accent_code = 1  # type: ignore[assignment]
+            self.entity_voiceovers_instance.validate()
+
+    def test_validate_language_accent_code_pattern(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'language_accent_code must follow the pattern language-accent'
+        ):
+            self.entity_voiceovers_instance.language_accent_code = 'en'
+            self.entity_voiceovers_instance.validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'language_accent_code must follow the pattern language-accent'
+        ):
+            self.entity_voiceovers_instance.language_accent_code = 'en-us'
+            self.entity_voiceovers_instance.validate()
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'language_accent_code must follow the pattern language-accent'
+        ):
+            self.entity_voiceovers_instance.language_accent_code = 'enUS'
+            self.entity_voiceovers_instance.validate()
 
     def test_validate_content_id(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -161,8 +185,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'content_id must be a string'
         ):
-            self.entity_voiceover.voiceovers[1] = None # type: ignore[index, assignment]
-            self.entity_voiceover.validate()
+            self.entity_voiceovers_instance.voiceovers[1] = None # type: ignore[index, assignment]
+            self.entity_voiceovers_instance.validate()
 
     def test_add_voiceovers_correctly(self) -> None:
         dummy_new_voiceover_dict: state_domain.VoiceoverDict = {
@@ -174,17 +198,17 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         new_voiceover_object = state_domain.Voiceover.from_dict(
             dummy_new_voiceover_dict)
         self.assertDictEqual(
-            self.entity_voiceover.voiceovers['content_id_0'][
+            self.entity_voiceovers_instance.voiceovers['content_id_0'][
                 feconf.VoiceoverType.MANUAL].to_dict(),
             self.dummy_manual_voiceover_dict
         )
 
-        self.entity_voiceover.add_voiceover(
+        self.entity_voiceovers_instance.add_voiceover(
             content_id='content_id_0',
             voiceover_type=feconf.VoiceoverType.MANUAL,
             voiceover=new_voiceover_object)
         self.assertDictEqual(
-            self.entity_voiceover.voiceovers['content_id_0'][
+            self.entity_voiceovers_instance.voiceovers['content_id_0'][
                 feconf.VoiceoverType.MANUAL].to_dict(),
             dummy_new_voiceover_dict
         )
@@ -208,7 +232,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'voiceover type must be VoiceoverType'
         ):
-            self.entity_voiceover.add_voiceover(
+            self.entity_voiceovers_instance.add_voiceover(
             content_id='content_id_0',
             voiceover_type='invalid', # type: ignore[arg-type]
             voiceover=new_voiceover_object)
@@ -223,30 +247,30 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'voiceover type must be VoiceoverType'
         ):
-            self.entity_voiceover.remove_voiceover(
+            self.entity_voiceovers_instance.remove_voiceover(
                 content_id='content_id_0',
                 voiceover_type='invalid' # type: ignore[arg-type]
             )
 
     def test_removes_voiceover_correctly(self) -> None:
-        self.entity_voiceover.remove_voiceover(
+        self.entity_voiceovers_instance.remove_voiceover(
             content_id='content_id_0',
             voiceover_type=feconf.VoiceoverType.MANUAL
         )
 
         self.assertNotIn(
             feconf.VoiceoverType.MANUAL,
-            self.entity_voiceover.voiceovers['content_id_0'].keys())
+            self.entity_voiceovers_instance.voiceovers['content_id_0'].keys())
 
-    def test_create_empty_entity_voiceover_object(self) -> None:
-        empty_entity_voiceover_object = (
-            voiceover_domain.EntityVoiceover.create_empty(
+    def test_create_empty_entity_voiceovers_object(self) -> None:
+        empty_entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
                 'exp_id', 'exploration', 1, 'en-US'))
 
-        self.assertEqual(empty_entity_voiceover_object.entity_id, 'exp_id')
-        self.assertEqual(empty_entity_voiceover_object.entity_version, 1)
+        self.assertEqual(empty_entity_voiceovers_object.entity_id, 'exp_id')
+        self.assertEqual(empty_entity_voiceovers_object.entity_version, 1)
         self.assertEqual(
-            empty_entity_voiceover_object.entity_type, 'exploration')
+            empty_entity_voiceovers_object.entity_type, 'exploration')
         self.assertEqual(
-            empty_entity_voiceover_object.language_accent_code, 'en-US')
-        self.assertEqual(empty_entity_voiceover_object.voiceovers, {})
+            empty_entity_voiceovers_object.language_accent_code, 'en-US')
+        self.assertEqual(empty_entity_voiceovers_object.voiceovers, {})

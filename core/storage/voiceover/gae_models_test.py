@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for EntityVoiceoverModel models."""
+"""Tests for EntityVoiceoversModel models."""
 
 from __future__ import annotations
 
@@ -32,8 +32,8 @@ if MYPY: # pragma: no cover
 ])
 
 
-class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
-    """Unit tests for EntityVoiceoverModel class."""
+class EntityVoiceoversModelTest(test_utils.GenericEmailTestBase):
+    """Unit tests for EntityVoiceoversModel class."""
 
     def test_create_new_model(self) -> None:
         dummy_manual_voiceover_dict: voiceover_models.VoiceoverDict = {
@@ -48,8 +48,8 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
             'needs_update': False,
             'duration_secs': 5.9
         }
-        entity_voiceover_model = (
-            voiceover_models.EntityVoiceoverModel.create_new(
+        entity_voiceovers_model = (
+            voiceover_models.EntityVoiceoversModel.create_new(
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'en-US', {
                     'content_0': {
                         'manual': dummy_manual_voiceover_dict,
@@ -57,11 +57,11 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
                         }
                     }))
 
-        self.assertEqual(entity_voiceover_model.entity_type, 'exploration')
-        self.assertEqual(entity_voiceover_model.entity_id, 'exp_id')
-        self.assertEqual(entity_voiceover_model.entity_version, 1)
-        self.assertEqual(entity_voiceover_model.language_accent_code, 'en-US')
-        voiceovers = entity_voiceover_model.voiceovers
+        self.assertEqual(entity_voiceovers_model.entity_type, 'exploration')
+        self.assertEqual(entity_voiceovers_model.entity_id, 'exp_id')
+        self.assertEqual(entity_voiceovers_model.entity_version, 1)
+        self.assertEqual(entity_voiceovers_model.language_accent_code, 'en-US')
+        voiceovers = entity_voiceovers_model.voiceovers
         self.assertEqual(
             voiceovers['content_0']['manual'], dummy_manual_voiceover_dict)
         self.assertEqual(
@@ -80,7 +80,7 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
             'needs_update': False,
             'duration_secs': 5.9
         }
-        voiceover_models.EntityVoiceoverModel.create_new(
+        voiceover_models.EntityVoiceoversModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'en-US', {
                 'content_0': {
                     'manual': dummy_manual_voiceover_dict,
@@ -89,18 +89,18 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
                 }
         ).put()
 
-        entity_voiceover_model = (
-            voiceover_models.EntityVoiceoverModel.get_model(
+        entity_voiceovers_model = (
+            voiceover_models.EntityVoiceoversModel.get_model(
                 entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 entity_id='exp_id',
                 entity_version=1,
                 language_accent_code='en-US'))
 
-        self.assertEqual(entity_voiceover_model.entity_type, 'exploration')
-        self.assertEqual(entity_voiceover_model.entity_id, 'exp_id')
-        self.assertEqual(entity_voiceover_model.entity_version, 1)
-        self.assertEqual(entity_voiceover_model.language_accent_code, 'en-US')
-        voiceovers = entity_voiceover_model.voiceovers
+        self.assertEqual(entity_voiceovers_model.entity_type, 'exploration')
+        self.assertEqual(entity_voiceovers_model.entity_id, 'exp_id')
+        self.assertEqual(entity_voiceovers_model.entity_version, 1)
+        self.assertEqual(entity_voiceovers_model.language_accent_code, 'en-US')
+        voiceovers = entity_voiceovers_model.voiceovers
         self.assertEqual(
             voiceovers['content_0']['manual'], dummy_manual_voiceover_dict)
         self.assertEqual(
@@ -108,7 +108,7 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
 
     def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
-            voiceover_models.EntityVoiceoverModel.get_export_policy(),
+            voiceover_models.EntityVoiceoversModel.get_export_policy(),
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -124,7 +124,7 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
 
     def test_get_deletion_policy_not_applicable(self) -> None:
         self.assertEqual(
-            voiceover_models.EntityVoiceoverModel.get_deletion_policy(),
+            voiceover_models.EntityVoiceoversModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user_not_corresponding_to_user(
@@ -132,7 +132,7 @@ class EntityVoiceoverModelTest(test_utils.GenericEmailTestBase):
     ) -> None:
         self.assertEqual(
             (
-                voiceover_models.EntityVoiceoverModel
+                voiceover_models.EntityVoiceoversModel
                 .get_model_association_to_user()
             ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
