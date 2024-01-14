@@ -37,6 +37,8 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-dev-server
+    labels:
+      - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-false}
     ports:
       - "8181:8181"
       - "8000:8000"
@@ -66,8 +68,6 @@ services:
       - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
       - GOOGLE_CLOUD_PROJECT=dev-project-id
       - REDIS_HOST=redis
-    labels:
-      - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-1}
     depends_on:
       - angular-build
       - webpack-compiler
