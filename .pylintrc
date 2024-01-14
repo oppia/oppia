@@ -156,7 +156,6 @@ disable=abstract-method,
         # Pylint considers imports to be cyclic even when the cycle is
         # broken by putting imports inside functions so they aren't
         # executed upon module import.
-        cyclic-import,
         broad-exception-raised,
         unnecessary-lambda-assignment,
 
