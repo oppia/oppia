@@ -86,9 +86,9 @@
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-          <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+          <img  [src]="getStaticImageUrl('/general/no_explorations_found.png')">
         </picture>
-        <p class="text-center">
+        <p class="text-center" style="margin-top:20px;">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
         </p>
       </div>
@@ -114,7 +114,7 @@
           </h4>
           <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
             <div class="form-group d-flex"
-                 [ngClass]="{'flex-row-reverse': isSmallScreenViewActive()}">
+                 >
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
@@ -126,7 +126,7 @@
               <div class="input-group oppia-input-group">
                 <div class="input-group-addon oppia-search-bar-icon"
                      [ngClass]="{'d-block': isSmallScreenViewActive()}">
-                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18"
+                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18" 
                      *ngIf="!isSearchInProgress()">
                   </i>
                   <span *ngIf="isSearchInProgress()">
