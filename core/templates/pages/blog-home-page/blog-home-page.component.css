@@ -124,10 +124,10 @@ oppia-blog-home-page .search-heading {
 }
 
 .input-group-addon.oppia-search-bar-icon {
+  align-items: center;
   border-color: #333;
   border-left-width: 0;
   border-radius: 0 4px 4px 0;
-  align-items: center;
   border-right-width: 1px;
 }
 
