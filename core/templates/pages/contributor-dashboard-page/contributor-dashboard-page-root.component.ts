@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Conctributor dashboard root component.
+ * @fileoverview Contributor dashboard root component.
  */
 
 import { Component } from '@angular/core';
