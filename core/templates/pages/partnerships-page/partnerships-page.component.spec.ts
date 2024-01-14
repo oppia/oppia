@@ -105,7 +105,7 @@ describe('Partnerships page', () => {
 
   it('should return the correct form link based on the' +
   ' current language', () => {
-    const linkMap = {
+    const linkMap: { [key: string]: string } = {
       en: 'https://forms.gle/Y71U8FdhQwZpicJj8',
       'pt-br': 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp',
       ar: 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=ar&_x_tr_hl=en-US&_x_tr_pto=wapp',
