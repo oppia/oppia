@@ -38,7 +38,7 @@ services:
       dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-dev-server
     labels:
-      - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-false}
+      - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-1}
     ports:
       - "8181:8181"
       - "8000:8000"
