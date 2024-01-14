@@ -171,7 +171,7 @@ export class DonatePageComponent implements OnInit {
   ];
 
   tileShown: number = 0;
-  @ViewChildren('tiles') tiles: QueryList<ElementRef>;
+  @ViewChildren('tiles') tiles!: QueryList<ElementRef>;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
