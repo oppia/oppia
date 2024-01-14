@@ -1694,3 +1694,10 @@ class TranslatedContentDict(TypedDict):
     content_value: ContentValueType
     needs_update: bool
     content_format: str
+
+
+class VoiceoverType(enum.Enum):
+    """Represents all possible voicever types."""
+
+    AUTO = 'auto'
+    MANUAL = 'manual'

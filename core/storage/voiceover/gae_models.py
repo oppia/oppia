@@ -44,7 +44,7 @@ class VoiceoverDict(TypedDict):
     duration_secs: float
 
 
-class EntityVoiceoversModel(base_models.BaseModel):
+class EntityVoiceoverModel(base_models.BaseModel):
     """Model for storing entity voiceovers."""
 
     # The id of the corresponding entity.
@@ -60,8 +60,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # A language-accent code, e.g., en-US.
     language_accent_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # A dict representing content-id as keys and a nested dict as values.
-    # The nested dict contains 'manual' and 'auto' as keys and dict(Voiceover)
+    # A dict representing content IDs as keys and a nested dict as values.
+    # Each nested dict contains 'manual' and 'auto' as keys and VoiceoverDict
     # as values.
     voiceovers = datastore_services.JsonProperty(required=True)
 
@@ -117,8 +117,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str
-    ) -> EntityVoiceoversModel:
-        """Gets EntityVoiceoversModel by help of entity_type, entity_id,
+    ) -> EntityVoiceoverModel:
+        """Gets EntityVoiceoverModel by help of entity_type, entity_id,
         entity_version and language_accent_code.
 
         Args:
@@ -128,11 +128,11 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 fetched.
             entity_version: int. The version of the entity whose voiceovers
                 are to be fetched.
-            language_accent_code: str. The language accent code  whose
+            language_accent_code: str. The language accent code whose
                 voiceovers are to be fetched.
 
         Returns:
-            EntityVoiceoversModel. The EntityVoiceoversModel instance
+            EntityVoiceoverModel. The EntityVoiceoverModel instance
             corresponding to the given inputs, if such a voiceover
             exists, or None if no voiceover is found.
         """
@@ -148,8 +148,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str,
         voiceovers: Dict[str, Dict[str, VoiceoverDict]]
-    ) -> EntityVoiceoversModel:
-        """Creates and returns a new EntityVoiceoversModel instance.
+    ) -> EntityVoiceoverModel:
+        """Creates and returns a new EntityVoiceoverModel instance.
 
         Args:
             entity_type: str. The type of the entity.
@@ -157,11 +157,11 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
             voiceovers: dict(str, dict(str, VoiceoverDict)). A dict
-                representing content-id as keys and dict(TranslatedContent)
+                representing content IDs as keys and dict(TranslatedContent)
                 as values.
 
         Returns:
-            EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
+            EntityVoiceoverModel. Returns a new EntityVoiceoverModel.
         """
         return cls(
             id=cls._generate_id(

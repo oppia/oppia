@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.platform import models
@@ -31,14 +32,14 @@ if MYPY: # pragma: no cover
 
 
 def _get_entity_voiceover_from_model(
-    entity_voiceover_model: voiceover_models.EntityVoiceoversModel
+    entity_voiceover_model: voiceover_models.EntityVoiceoverModel
 ) -> voiceover_domain.EntityVoiceover:
     """Returns the EntityVoiceover domain object from its model representation
-    (EntityVoiceoversModel).
+    (EntityVoiceoverModel).
 
     Args:
-        entity_voiceover_model: EntityVoiceoversModel. An instance of
-            EntityVoiceoversModel.
+        entity_voiceover_model: EntityVoiceoverModel. An instance of
+            EntityVoiceoverModel.
 
     Returns:
         EntityVoiceover. An instance of EntityVoiceover object, created from
@@ -48,10 +49,10 @@ def _get_entity_voiceover_from_model(
     for content_id, voiceover_type_to_voiceover in (
             entity_voiceover_model.voiceovers.items()):
         content_id_to_voiceovers_dict[content_id] = {
-            'manual': state_domain.Voiceover.from_dict(
-                voiceover_type_to_voiceover['manual']),
-            'auto': state_domain.Voiceover.from_dict(
-                voiceover_type_to_voiceover['auto'])
+            feconf.VoiceoverType.MANUAL: state_domain.Voiceover.from_dict(
+                voiceover_type_to_voiceover[feconf.VoiceoverType.MANUAL.value]),
+            feconf.VoiceoverType.AUTO: state_domain.Voiceover.from_dict(
+                voiceover_type_to_voiceover[feconf.VoiceoverType.AUTO.value])
         }
 
     entity_voiceover = voiceover_domain.EntityVoiceover(
@@ -82,7 +83,7 @@ def get_voiceovers_for_given_language_accent_code(
         EntityVoiceover. An instance of entity voiceover.
     """
     entity_voiceover_model = (
-        voiceover_models.EntityVoiceoversModel.get_model(
+        voiceover_models.EntityVoiceoverModel.get_model(
             entity_type, entity_id, entity_version, language_accent_code))
 
     if entity_voiceover_model:
