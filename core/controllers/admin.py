@@ -672,7 +672,7 @@ class AdminHandler(
                 'fragm')
 
             topic_1.update_meta_tag_content('dummy-meta')
-            raw_image = ''
+            raw_image = b''
             with open(
                 'core/tests/data/thumbnail.svg', 'rt',
                 encoding='utf8') as svg_file:
