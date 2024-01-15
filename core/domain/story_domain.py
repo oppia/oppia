@@ -1124,7 +1124,11 @@ class StoryContents:
         Returns:
             list(str). A list of exploration ids.
         """
-        return [node.exploration_id for node in self.nodes]
+        exp_ids = []
+        for node in self.nodes:
+            if node.exploration_id is not None:
+                exp_ids.append(node.exploration_id)
+        return exp_ids
 
     def get_linked_exp_ids_of_published_nodes(self) -> List[str]:
         """Returns a list of exploration ids linked to each published node of
