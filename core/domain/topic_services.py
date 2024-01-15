@@ -1111,13 +1111,17 @@ def compute_summary_of_topic(
     stories = story_fetchers.get_stories_by_ids([
         story_ref.story_id for story_ref in published_story_references],
         strict=False)
-    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {
-        published_story_references[i].story_id:
-            cast(story_domain.Story, stories[i]).story_contents
-                .get_linked_exp_ids_of_published_nodes()
-            if stories[i] else cast(list[str], [])
-        for i in range(len(stories))
-    }
+    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {}
+    for i, story in enumerate(stories):
+        if story is None:
+            exp_list = []
+        else:
+            exp_list = (
+                story.story_contents
+                .get_linked_exp_ids_of_published_nodes())
+        topic_model_published_story_exploration_mapping[
+            published_story_references[i].story_id
+        ] = exp_list
 
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
