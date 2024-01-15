@@ -70,8 +70,7 @@ import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admi
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal
-  ],  
+  ],
 })
 
 export class ContributorDashboardAdminPageModule {}
-

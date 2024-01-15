@@ -30,3 +30,4 @@ export class ContributorDashboardAdminPageRootComponent extends BaseRootComponen
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.META as
     unknown as Readonly<MetaTagData>[];
 }
+

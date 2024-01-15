@@ -37,13 +37,16 @@ describe('AdminPageRootComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ContributorDashboardAdminPageRootComponent);
+    fixture = TestBed.createComponent(
+      ContributorDashboardAdminPageRootComponent
+      );
     component = fixture.componentInstance;
   });
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.TITLE);
+      AppConstants.
+      PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.TITLE);
     expect(component.meta).toEqual(
       AppConstants.CONTRIBUTOR_DASHBOARD_ADMIN.META);
   });
