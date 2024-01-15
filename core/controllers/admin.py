@@ -675,7 +675,7 @@ class AdminHandler(
             raw_image = b''
             with open(
                 'core/tests/data/thumbnail.svg', 'rt',
-                encoding='utf8') as svg_file:
+                encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             fs_services.save_original_and_compressed_versions_of_image(
