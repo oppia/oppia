@@ -3232,6 +3232,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
+
         self.assertEqual(len(response['suggestions']), 1)
 
     def test_skill_handler_with_no_limit_raise_error(self) -> None:
