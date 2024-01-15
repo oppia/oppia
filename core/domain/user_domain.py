@@ -326,6 +326,52 @@ class UserSettings:
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
+        if not isinstance(self.subject_interests, list):
+            raise utils.ValidationError(
+                'Expected subject_interests to be a list.')
+
+        for interest in self.subject_interests:
+            if not isinstance(interest, str):
+                raise utils.ValidationError(
+                    'Expected each subject interest to be a string.')
+            if not interest:
+                raise utils.ValidationError(
+                    'Expected each subject interest to be non-empty.')
+            if not re.match(constants.TAG_REGEX, interest):
+                raise utils.ValidationError(
+                    'Expected each subject interest to consist only of '
+                    'lowercase alphabetic characters and spaces.')
+
+        if len(set(self.subject_interests)) != len(self.subject_interests):
+            raise utils.ValidationError(
+                'Expected each subject interest to be distinct.')
+
+        if not isinstance(self.user_bio, str):
+            raise utils.ValidationError(
+                'Expected user_bio to be a string.')
+
+        if len(self.user_bio) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+            raise utils.ValidationError(
+                'User bio exceeds maximum character limit: %s'
+                % feconf.MAX_BIO_LENGTH_IN_CHARS)
+
+        if not isinstance(self.preferred_language_codes, list):
+            raise utils.ValidationError(
+                'Expected preferred_language_codes to be a list.')
+
+        for language_code in self.preferred_language_codes:
+            if not isinstance(language_code, str):
+                raise utils.ValidationError(
+                    'Expected each language code to be a string.')
+            if not language_code:
+                raise utils.ValidationError(
+                    'Expected each language code to be non-empty.')
+
+        if len(set(self.preferred_language_codes)) != (
+            len(self.preferred_language_codes)):
+            raise utils.ValidationError(
+                'Expected each language code to be distinct.')
+
     def record_user_edited_an_exploration(self) -> None:
         """Updates last_edited_an_exploration to the current datetime for the
         user.

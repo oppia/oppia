@@ -1696,8 +1696,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # languages.
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id_1, 'hi')
-        user_services.update_preferred_translation_language_code(
-            self.reviewer_id_1, 'hi')
+        user_settings = user_services.get_user_settings(self.reviewer_id_1)
+        user_settings.preferred_translation_language_code = 'hi'
+        user_services.save_user_settings(user_settings)
        # Get all reviewable translation suggestions.
         opportunity_summary_id = self.opportunity_summary_ids[0]
         suggestions, _ = suggestion_services.get_reviewable_translation_suggestions_for_single_exp( # pylint: disable=line-too-long

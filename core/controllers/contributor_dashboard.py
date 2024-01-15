@@ -948,8 +948,9 @@ class TranslationPreferenceHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         language_code = self.normalized_payload['language_code']
-        user_services.update_preferred_translation_language_code(
-            self.user_id, language_code)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.preferred_translation_language_code = language_code
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 
