@@ -4474,8 +4474,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'property_name': 'exploration_id',
                 'node_id': 'node_1',
                 'old_value': self.EXP_ID,
-                'new_value': None
-            })], 'Removed exploration.')
+                'new_value': 'another_exp_id'
+            })], 'Changed exploration.')
 
         # Suggestion should be rejected after exploration is removed from the
         # story.

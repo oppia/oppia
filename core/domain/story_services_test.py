@@ -243,6 +243,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
                 'node_id': self.NODE_ID_2,
                 'old_value': '',
@@ -604,6 +612,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
 
@@ -630,6 +646,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
 
@@ -821,6 +845,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_2,
                 'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -1308,8 +1340,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         })]
 
         with self.assertRaisesRegex(
-            Exception, 'Story node with id node_1 does not contain an '
-            'exploration id.'):
+            Exception, 'No exploration_id found for the node_id node_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -1785,13 +1816,23 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         first: Final = 0
         second: Final = 1
 
-        change_add_story_node = story_domain.StoryChange({
-            'cmd': story_domain.CMD_ADD_STORY_NODE,
-            'node_id': self.NODE_ID_2,
-            'title': 'Title 2'
-        })
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            })
+        ]
         story_services.update_story(
-            self.USER_ID, self.STORY_ID, [change_add_story_node],
+            self.USER_ID, self.STORY_ID, change_list,
             'Added story node.')
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
@@ -2045,6 +2086,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
                 'node_id': self.NODE_ID_2,
                 'old_value': self.OLD_VALUE,
@@ -2283,7 +2332,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_1',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2303,7 +2352,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_2',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2323,7 +2372,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_3',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
@@ -2343,7 +2392,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None,
+            'exploration_id': 'exp_4',
             'status': 'Draft',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
