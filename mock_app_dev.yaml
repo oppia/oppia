@@ -1,0 +1,3 @@
+Some content in mock_app_dev.yaml
+  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"
+version: default

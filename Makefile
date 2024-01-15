@@ -94,18 +94,20 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
 
+# Define a custom signal handler
+SIGINT_HANDLER = $(SHELL_PREFIX) dev-server sh -c 'echo "Received Ctrl+C, stopping containers..." && $(MAKE) stop'
+
 run_tests.backend: ## Runs the backend tests
-	@trap '$(MAKE) stop' EXIT; \
+	@trap '$(SIGINT_HANDLER)' EXIT INT; \
 	docker compose up datastore dev-server redis firebase -d --no-deps; \
 	@echo '------------------------------------------------------'; \
 	@echo '  Backend tests started....'; \
 	@echo '------------------------------------------------------'; \
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS); \
+	$(SHELL_PREFIX) dev-server sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)'; \
 	@echo '------------------------------------------------------'; \
-	@echo '  Backend tests have been executed successfully....'; \
+	@echo '  Backend tests has been executed successfully....'; \
 	@echo '------------------------------------------------------'; \
 	$(MAKE) stop
-
 
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
