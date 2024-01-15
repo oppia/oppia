@@ -154,6 +154,27 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_cannot_generate_dummy_blog_in_prod_mode(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load blog in production.')
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_blog',
+                    'blog_title': 'Education',
+                }, csrf_token=csrf_token)
+
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 0)
+        self.logout()
+
     def test_without_exp_id_reload_exp_action_is_not_performed(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -628,6 +649,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
         self.assertEqual(blog_count, 1)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Testing types of Text formatting',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 2)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Leading The Arabic Translations Team',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 3)
         self.logout()
 
     def test_regenerate_topic_related_opportunities_action(self) -> None:
