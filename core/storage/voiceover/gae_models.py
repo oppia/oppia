@@ -60,7 +60,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # A language-accent code, e.g., en-US.
     language_accent_code = datastore_services.StringProperty(
         required=True, indexed=True)
-    # A dict representing content IDs as keys and a nested dict as values.
+    # A dict representing content IDs as keys and nested dict as values.
     # Each nested dict contains 'manual' and 'auto' as keys and VoiceoverDict
     # as values.
     voiceovers = datastore_services.JsonProperty(required=True)
@@ -94,7 +94,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str
     ) -> str:
-        """Generates the ID for an entity translations model.
+        """Generates the ID for an entity voiceovers model.
 
         Args:
             entity_type: str. The type of the entity.
@@ -157,8 +157,9 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_version: int. The version of the entity.
             language_accent_code: str. The language code for the entity.
             voiceovers: dict(str, dict(str, VoiceoverDict)). A dict
-                representing content IDs as keys and dict(TranslatedContent)
-                as values.
+                containing content IDs as keys and nested dict as values.
+                Each nested dict contains str as keys and
+                VoiceoverDict as values.
 
         Returns:
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.

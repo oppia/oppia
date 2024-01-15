@@ -51,9 +51,9 @@ class EntityVoiceovers:
         entity_version: str. The version of the corresponding entity.
         language_accent_code: str. The language accent code in which the
             voiceover is stored.
-        voiceovers: dict(str, dict(str, VoiceoverDict)). A dict representing
-            content IDs as keys and a nested dict as values. Each nested dict
-            contains VoiceoverType as keys and VoiceoverDict
+        voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
+            containing content IDs as keys and nested dict as values.
+            Each nested dict contains VoiceoverType as keys and VoiceoverDict
             as values.
     """
 
@@ -74,9 +74,9 @@ class EntityVoiceovers:
             entity_version: int. The version of the entity.
             language_accent_code: str. The language accent code of the
                 given voiceover.
-            voiceovers: dict(str, dict(str, VoiceoverDict)). A dict representing
-                content IDs as keys and a nested dict as values. Each
-                nested dict contains VoiceoverType as keys and
+            voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
+                containing content IDs as keys and nested dict as values.
+                Each nested dict contains VoiceoverType as keys and
                 VoiceoverDict as values.
         """
         self.entity_id = entity_id
@@ -165,8 +165,9 @@ class EntityVoiceovers:
         if not bool(re.match(
                 feconf.LANGUAGE_ACCENT_CODE_REGEX, self.language_accent_code)):
             raise utils.ValidationError(
-                'language_accent_code must follow the pattern language-accent'
-                ' code, received %s' % self.language_accent_code)
+                'language_accent_code must be formatted as '
+                '{{language}}-{{accent}}, received %s' %
+                self.language_accent_code)
         for content_id, voiceover_type_to_voiceover in self.voiceovers.items():
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
@@ -185,12 +186,14 @@ class EntityVoiceovers:
         voiceover_type: feconf.VoiceoverType,
         voiceover: state_domain.Voiceover
     ) -> None:
-        """Adds voiceover to the entity voiceover instance."""
-        if not isinstance(voiceover_type, feconf.VoiceoverType):
-            raise utils.ValidationError(
-                'voiceover type must be VoiceoverType, received %s' %
-                voiceover_type)
-        voiceover.validate()
+        """Adds voiceover to the entity voiceover instance.
+
+        Args:
+            content_id: str. The ID of the content.
+            voiceover_type: VoiceoverType. The voiceover type of the given
+                voiceover.
+            voiceover: Voiceover. An instance of Voiceover class.
+        """
         self.voiceovers[content_id][voiceover_type] = voiceover
 
     def remove_voiceover(
@@ -198,12 +201,13 @@ class EntityVoiceovers:
         content_id: str,
         voiceover_type: feconf.VoiceoverType
     ) -> None:
-        """Removes voiceover from the entity voiceover instance."""
-        if not isinstance(voiceover_type, feconf.VoiceoverType):
-            raise utils.ValidationError(
-                'voiceover type must be VoiceoverType, received %s' %
-                voiceover_type)
+        """Removes voiceover from the entity voiceover instance.
 
+        Args:
+            content_id: str. The ID of the content.
+            voiceover_type: VoiceoverType. The voiceover type of the given
+                voiceover.
+        """
         del self.voiceovers[content_id][voiceover_type]
 
     @classmethod
