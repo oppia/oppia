@@ -24,7 +24,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import caching_services
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import question_domain
@@ -307,7 +306,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
 
         # Keep the swap assertions separate to ensure exactly 1 call to
-        # generate_topic_summary occurs per delete call
+        # generate_topic_summary occurs per delete call.
         with self.swap_with_checks(
             topic_services, 'generate_topic_summary',
             topic_services.generate_topic_summary,
@@ -832,12 +831,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.additional_story_references[0].story_is_published, True)
         self.assertEqual(topic_summary.canonical_story_count, 1)
         self.assertEqual(topic_summary.additional_story_count, 1)
-        
+
         with self.swap_with_call_counter(
                 topic_services, 'generate_topic_summary') as (
                 generate_topic_summary):
             topic_services.unpublish_story(
-                self.TOPIC_ID, self.story_id_1, self.user_id_admin) 
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
             self.assertGreaterEqual(generate_topic_summary.times_called, 1)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
@@ -908,7 +907,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.unpublish_story(
                 self.TOPIC_ID, 'story_10', self.user_id_admin)
- 
+
         # Throw error if exploration isn't published.
         self.save_new_story(
             'story_id_new',
@@ -2713,7 +2712,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'invalid_story_id' % self.TOPIC_ID
                     ]
                 )
- 
+
     def test_get_published_story_exploration_ids_from_non_published_story_gets_no_exploration_ids( # pylint: disable=line-too-long
         self
     ) -> None:

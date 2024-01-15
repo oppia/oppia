@@ -792,7 +792,7 @@ class StoryNode:
                 self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
                 'Story node thumbnail size in bytes cannot be zero.')
-        
+
         if not isinstance(self.outline, str):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
@@ -1130,7 +1130,8 @@ class StoryContents:
         exp_ids = []
         for node in self.nodes:
             if node.exploration_id is None:
-                raise Exception('No exploration_id found for the node_id %s' %
+                raise Exception(
+                    'No exploration_id found for the node_id %s' %
                     node.id)
             exp_ids.append(node.exploration_id)
         return exp_ids

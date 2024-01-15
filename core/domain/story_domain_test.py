@@ -1152,7 +1152,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
              ValueError, 'A node with exploration id exp_3 already exists.'
         ):
-             self.story.update_node_exploration_id('node_2', 'exp_3')
+            self.story.update_node_exploration_id('node_2', 'exp_3')
         self.story.update_node_exploration_id('node_3', 'exp_3')
         self.assertEqual(
             self.story.story_contents.get_all_linked_exp_ids(),
