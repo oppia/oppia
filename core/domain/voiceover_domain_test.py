@@ -60,6 +60,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
                 }
             }
         )
+        self.entity_voiceovers_instance.validate()
 
     def test_to_dict_method_entity_voiceovers_class(self) -> None:
         expected_entity_voiceovers_dict = {
@@ -79,7 +80,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             expected_entity_voiceovers_dict)
 
     def test_from_dict_method_entity_voiceover_class(self) -> None:
-        entity_voiceovers_dict = {
+        entity_voiceovers_dict: voiceover_domain.EntityVoiceoversDict = {
             'entity_id': 'exp_id',
             'entity_type': 'exploration',
             'entity_version': 1,
@@ -91,7 +92,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        expected_entity_voiceovers_instance = self.entity_voiceovers_instance
+        expected_entity_voiceovers_instance = (
+            voiceover_domain.EntityVoiceovers.from_dict(entity_voiceovers_dict))
 
         self.assertDictEqual(
             entity_voiceovers_dict,
