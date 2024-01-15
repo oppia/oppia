@@ -22,7 +22,7 @@ from core import platform_feature_list
 from core.domain import feature_flag_domain
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover

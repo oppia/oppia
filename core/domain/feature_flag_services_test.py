@@ -48,7 +48,9 @@ FeatureStages = feature_flag_domain.FeatureStages
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
-    def _swap_name_to_description_feature_stage_registry(self) -> Iterator[None]:
+    def _swap_name_to_description_feature_stage_registry(
+        self) -> Iterator[None]:
+        """Returns swap iterator for the registry variable."""
         return self.swap(
             registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
@@ -66,6 +68,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
 
     def _swap_feature_flags_list(self) -> Tuple[Iterator[None]]:
+        """Returns the tuple of swap iterator of feature flags."""
         swap_all_feature_flags = self.swap(
             feature_services,
             'ALL_FEATURE_FLAGS',
@@ -172,7 +175,6 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     self.test_feature_flag.name, True, 0, [])
                 feature_services.update_feature_flag(
                     self.prod_feature_flag.name, True, 0, [])
-
 
     def test_get_all_feature_flags_returns_correct_feature_flags(self) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
@@ -655,12 +657,13 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 # To avoid this test being flaky, we need to determine what the
                 # likely range is for the number of users who have the feature
                 # flag enabled. This is modelled as a binomial random variable
-                # with n = 1000 and p = 0.5. This roughly follows a
-                # normal distribution with mean np = 50 and standard deviation
+                # with n = 1000 and p = 0.5. This roughly follows a normal
+                # distribution with mean np = 50 and standard deviation
                 # sqrt(npq) = 6.89. In a normal distribution, around 0.997 of
                 # values are within 3 standard deviation of the mean, and there
                 # is a chance of only 0.00006334 of them being outside 4 s.d. of
-                # the mean. Hence the range can be (50 - 4 * 6.89, 50 + 4 * 6.89)
+                # the mean. Hence the range can be
+                # (50 - 4 * 6.89, 50 + 4 * 6.89)
                 self.assertTrue(
                     count_feature_flag_enabled_for_5_perc in list(
                         range(22, 78)
