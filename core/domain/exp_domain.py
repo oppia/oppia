@@ -166,7 +166,7 @@ MATH_INTERACTION_DEPRECATED_RULES: Final = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
 # DEPRECATED: This property is deprecated. Please do not use.
-DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED: Final = 'correctness_feedback_enabled'
+DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED: Final = 'correctness_feedback_enabled' # pylint: disable=line-too-long
 
 
 def clean_math_expression(math_expression: str) -> str:
