@@ -443,6 +443,7 @@ import { ContributorDashboardAdminStatsBackendApiService } from 'pages/contribut
 import { InsertScriptService } from './insert-script.service';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
+import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -688,6 +689,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
+  ['ModeratorAuthGuard', ModeratorAuthGuard],
   ['MultipleChoiceInputOrderedChoicesService',
     MultipleChoiceInputOrderedChoicesService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
