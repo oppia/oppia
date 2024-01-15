@@ -109,7 +109,6 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'; \
 	$(MAKE) stop
 
-
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
 
