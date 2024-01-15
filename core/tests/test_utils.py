@@ -3596,15 +3596,23 @@ version: 1
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Node1',
             }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': exploration_id
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'node_id': 'node_1',
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             })], 'Changes.')
 
     def save_new_story(
