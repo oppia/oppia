@@ -52,7 +52,7 @@ class EntityVoiceovers:
         language_accent_code: str. The language accent code in which the
             voiceover is stored.
         voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
-            containing content IDs as keys and nested dict as values.
+            containing content IDs as keys and nested dicts as values.
             Each nested dict contains VoiceoverType as keys and VoiceoverDict
             as values.
     """
@@ -75,7 +75,7 @@ class EntityVoiceovers:
             language_accent_code: str. The language accent code of the
                 given voiceover.
             voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
-                containing content IDs as keys and nested dict as values.
+                containing content IDs as keys and nested dicts as values.
                 Each nested dict contains VoiceoverType as keys and
                 VoiceoverDict as values.
         """
@@ -95,12 +95,9 @@ class EntityVoiceovers:
         voiceovers_dict = {}
         for content_id, voiceover_type_to_voiceover in self.voiceovers.items():
             voiceovers_dict[content_id] = {
-                feconf.VoiceoverType.MANUAL.value: (
-                    voiceover_type_to_voiceover[
-                        feconf.VoiceoverType.MANUAL].to_dict()),
-                feconf.VoiceoverType.AUTO.value: (
-                    voiceover_type_to_voiceover[
-                        feconf.VoiceoverType.AUTO].to_dict())
+                voiceover_type.value: voiceover_type_to_voiceover[
+                    voiceover_type].to_dict()
+                for voiceover_type in feconf.VoiceoverType
             }
         return {
             'entity_id': self.entity_id,
@@ -128,16 +125,10 @@ class EntityVoiceovers:
         for content_id, voiceover_type_to_voiceover_dict in (
                 entity_voiceovers_dict['voiceovers'].items()):
             content_id_to_voiceovers[content_id] = {
-                feconf.VoiceoverType.MANUAL: (
-                    state_domain.Voiceover.from_dict(
-                        voiceover_type_to_voiceover_dict[
-                            feconf.VoiceoverType.MANUAL.value])),
-                feconf.VoiceoverType.AUTO: (
-                    state_domain.Voiceover.from_dict(
-                        voiceover_type_to_voiceover_dict[
-                            feconf.VoiceoverType.AUTO.value]))
+                voiceover_type: state_domain.Voiceover.from_dict(
+                    voiceover_type_to_voiceover_dict[voiceover_type.value])
+                for voiceover_type in feconf.VoiceoverType
             }
-
         return cls(
             entity_voiceovers_dict['entity_id'],
             entity_voiceovers_dict['entity_type'],
@@ -189,10 +180,11 @@ class EntityVoiceovers:
         """Adds voiceover to the entity voiceover instance.
 
         Args:
-            content_id: str. The ID of the content.
+            content_id: str. The ID of the content for which the voiceover is
+                being added.
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
-            voiceover: Voiceover. An instance of Voiceover class.
+            voiceover: Voiceover. The voiceover to be added.
         """
         self.voiceovers[content_id][voiceover_type] = voiceover
 
@@ -204,7 +196,8 @@ class EntityVoiceovers:
         """Removes voiceover from the entity voiceover instance.
 
         Args:
-            content_id: str. The ID of the content.
+            content_id: str. The ID of the content for which the voiceover is
+                being added.
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
         """
