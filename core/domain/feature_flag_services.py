@@ -43,6 +43,10 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURE_FLAGS
 )
 
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    platform_feature_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+)
+
 
 class FeatureFlagNotFoundException(Exception):
     """Exception thrown when an unknown feature flag is requested."""
@@ -83,6 +87,26 @@ def update_feature_flag(
     )
 
 
+def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
+    """Returns FeatureFlagSpec domain object.
+
+    name: str. The name of the feature flag.
+
+    Returns:
+        FeatureFlagSpec. The FeatureFlagSpec domain object.
+
+    Raises:
+        Exception. Feature flag does not exists.
+    """
+    if name not in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
+        raise Exception('Feature flag not found: %s.' % name)
+
+    return feature_flag_domain.FeatureFlagSpec(
+        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
+        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1]
+    )
+
+
 def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
     """Returns all feature flags. This method is used for providing detailed
     feature flags information to the release coordinator page.
@@ -90,20 +114,11 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
     Returns:
         feature_flags: list(FeatureFlag). A list containing the dict mappings
         of all fields of the feature flags.
-
-    Raises:
-        Exception. Feature flag does not exists.
     """
     feature_flags: List[feature_flag_domain.FeatureFlag] = []
     feature_flags_to_fetch_from_storage = []
 
     for feature_flag_name_enum in ALL_FEATURE_FLAGS:
-        if feature_flag_name_enum.value not in (
-            registry.Registry.feature_flag_spec_registry
-        ):
-            raise Exception(
-                'Feature flag not found: %s.' % feature_flag_name_enum.value)
-
         feature_flags_to_fetch_from_storage.append(
             feature_flag_name_enum.value)
 
@@ -116,8 +131,7 @@ def get_all_feature_flags() -> List[feature_flag_domain.FeatureFlag]:
         if feature_flag is not None:
             feature_flags.append(feature_flag)
         else:
-            feature_flag_spec = registry.Registry.feature_flag_spec_registry[
-                feature_flag_name]
+            feature_flag_spec = _get_feature_flag_spec(feature_flag_name)
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
                 False,
                 0,
@@ -156,9 +170,8 @@ def load_feature_flags_from_storage(
 
     for feature_flag_config_model in feature_flag_config_models:
         if feature_flag_config_model:
-            feature_flag_spec = (
-                registry.Registry.feature_flag_spec_registry[
-                    feature_flag_config_model.id])
+            feature_flag_spec = _get_feature_flag_spec(
+                feature_flag_config_model.id)
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
                 feature_flag_config_model.force_enable_for_all_users,
                 feature_flag_config_model.rollout_percentage,

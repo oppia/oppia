@@ -37,45 +37,61 @@ class FeatureNames(enum.Enum):
 class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagsEvaluationHandler."""
 
-    def _create_dummy_feature_flag(
-        self, feature_name: FeatureNames,
-        feature_stage: FeatureStages
-    ) -> feature_flag_domain.FeatureFlag:
-        """Creates dummy feature flag."""
-        # Here we use MyPy ignore because create_feature_flag accepts feature
-        # flag name to be of type platform_feature_list.FeatureNames and we
-        # plan to create dummy feature flags to conduct testing. To avoid
-        # mypy type check we have to add ignore[arg-type].
-        feature_flag = registry.Registry.create_feature_flag(
-            feature_name, 'test description', feature_stage) # type: ignore[arg-type]
-        return feature_flag
-
     def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.original_registry = registry.Registry.feature_flag_spec_registry
         self.original_feature_list = feature_services.ALL_FEATURE_FLAGS
         self.original_feature_name_set = feature_services.ALL_FEATURES_NAMES_SET
-        registry.Registry.feature_flag_spec_registry.clear()
 
         feature_names = ['feature_a', 'feature_b']
         feature_name_enums = [FeatureNames.FEATURE_A, FeatureNames.FEATURE_B]
 
-        registry.Registry.feature_flag_spec_registry.clear()
+        self.swapped_value = {
+            FeatureNames.FEATURE_A.value: (
+                'a feature in dev stage', FeatureStages.DEV
+            ),
+            FeatureNames.FEATURE_B.value: (
+                'a feature in prod stage', FeatureStages.PROD
+            )
+        }
+        self.swap_name_to_description_feature_stage_registry_dict = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            self.swapped_value
+        )
 
-        self.dev_feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_A,
-            FeatureStages.DEV
+        self.dev_feature_flag = feature_flag_domain.FeatureFlag(
+            FeatureNames.FEATURE_A.value,
+            feature_flag_domain.FeatureFlagSpec(
+                'a feature in dev stage',
+                FeatureStages.DEV
+            ),
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
         )
-        self.prod_feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_B,
-            FeatureStages.PROD
+        self.prod_feature_flag = feature_flag_domain.FeatureFlag(
+            FeatureNames.FEATURE_B.value,
+            feature_flag_domain.FeatureFlagSpec(
+                'a feature in prod stage',
+                FeatureStages.PROD
+            ),
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
         )
-        registry.Registry.update_feature_flag(
-            self.prod_feature_flag.name, True, 0, []
-        )
+        with self.swap_name_to_description_feature_stage_registry_dict:
+            registry.Registry.update_feature_flag(
+                self.prod_feature_flag.name, True, 0, []
+            )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
         # is a list of 'platform_feature_list.FeatureNames' Enum, but here for
@@ -91,12 +107,24 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         feature_services.ALL_FEATURE_FLAGS = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
-        registry.Registry.feature_flag_spec_registry = self.original_registry
 
     def test_feature_flag_evaluation_is_correct(self) -> None:
-        result = self.get_json(
-            '/feature_flags_evaluation_handler'
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_services,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            self.swapped_value
         )
+        swap_name_to_description_feature_stage_registry_dict = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            self.swapped_value
+        )
+
+        with swap_name_to_description_feature_stage_dict:
+            with swap_name_to_description_feature_stage_registry_dict:
+                result = self.get_json(
+                    '/feature_flags_evaluation_handler'
+                )
         self.assertEqual(
             result,
             {

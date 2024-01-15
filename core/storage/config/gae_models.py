@@ -189,14 +189,14 @@ class FeatureFlagConfigModel(base_models.BaseModel):
     The id is the name of the feature-flag.
     """
 
-    # If the feature flag is force enable for all the users.
+    # Whether the feature flag is force enabled for all the users.
     force_enable_for_all_users = datastore_services.BooleanProperty(
         default=False, indexed=True)
     # The percentage of logged-in users for which the feature flag will
-    # be enabled. Ranges between 0 to 100.
+    # be enabled. The value of this field should be between 0 and 100.
     rollout_percentage = datastore_services.IntegerProperty(
         default=0, indexed=True)
-    # User groups for which the feature flag will be enabled.
+    # A list of IDs of user groups for which the feature flag will be enabled.
     user_group_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod

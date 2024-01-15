@@ -27,7 +27,7 @@ from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
-from typing import Tuple
+from typing import Iterator, Tuple
 
 
 class FeatureNames(enum.Enum):
@@ -48,19 +48,37 @@ FeatureStages = feature_flag_domain.FeatureStages
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
-    def _create_dummy_feature_flag(
-        self, feature_name: FeatureNames,
-        description: str,
-        feature_stage: FeatureStages
-    ) -> feature_flag_domain.FeatureFlag:
-        """Creates dummy feature flag."""
-        # Here we use MyPy ignore because create_feature_flag accepts feature
-        # flag name to be of type platform_feature_list.FeatureNames and we
-        # plan to create dummy feature flags to conduct testing. To avoid
-        # mypy type check we have to add ignore[arg-type].
-        feature_flag = registry.Registry.create_feature_flag(
-            feature_name, description, feature_stage) # type: ignore[arg-type]
-        return feature_flag
+    def _swap_name_to_description_feature_stage_registry(self) -> Iterator[None]:
+        return self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.FEATURE_A.value: (
+                    'a feature in dev stage', FeatureStages.DEV
+                ),
+                FeatureNames.FEATURE_B.value: (
+                    'a feature in test stage', FeatureStages.TEST
+                ),
+                FeatureNames.FEATURE_C.value: (
+                    'a feature in prod stage', FeatureStages.PROD
+                )
+            }
+        )
+
+    def _swap_feature_flags_list(self) -> Tuple[Iterator[None]]:
+        swap_all_feature_flags = self.swap(
+            feature_services,
+            'ALL_FEATURE_FLAGS',
+            self.feature_name_enums
+        )
+
+        swap_all_feature_names_set = self.swap(
+            feature_services,
+            'ALL_FEATURES_NAMES_SET',
+            set(self.feature_names)
+        )
+
+        return (swap_all_feature_flags, swap_all_feature_names_set)
 
     def setUp(self) -> None:
         super().setUp()
@@ -68,9 +86,6 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.original_feature_flag_spec_registry = (
-            registry.Registry.feature_flag_spec_registry.copy())
-        registry.Registry.feature_flag_spec_registry.clear()
         # Feature names that might be used in following tests.
         self.feature_names = ['feature_a', 'feature_b', 'feature_c']
         self.feature_name_enums = [
@@ -79,91 +94,141 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             FeatureNames.FEATURE_C
         ]
 
-        self.swap_all_feature_flags = self.swap(
-            feature_services,
-            'ALL_FEATURE_FLAGS',
-            self.feature_name_enums
-        )
-
         self.swap_all_feature_names_set = self.swap(
             feature_services,
             'ALL_FEATURES_NAMES_SET',
             set(self.feature_names)
         )
 
-        self.dev_feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_A,
-            'a feature in dev stage',
-            FeatureStages.DEV
-        )
-        self.test_feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_B,
-            'a feature in test stage',
-            FeatureStages.TEST
-        )
-        self.prod_feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_C,
-            'a feature in prod stage',
-            FeatureStages.PROD
-        )
+        swapped_value = {
+            FeatureNames.FEATURE_A.value: (
+                'a feature in dev stage', FeatureStages.DEV
+            ),
+            FeatureNames.FEATURE_B.value: (
+                'a feature in test stage', FeatureStages.TEST
+            ),
+            FeatureNames.FEATURE_C.value: (
+                'a feature in prod stage', FeatureStages.PROD
+            )
+        }
 
-        with self.swap(
+        self.swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
-            'ALL_FEATURES_NAMES_SET',
-            set(self.feature_names)
-        ):
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, True, 0, [])
-            feature_services.update_feature_flag(
-                self.test_feature_flag.name, True, 0, [])
-            feature_services.update_feature_flag(
-                self.prod_feature_flag.name, True, 0, [])
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            swapped_value
+        )
 
-    def tearDown(self) -> None:
-        super().tearDown()
-        registry.Registry.feature_flag_spec_registry = (
-            self.original_feature_flag_spec_registry)
+        self.swap_name_to_description_feature_stage_registry_dict = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            swapped_value
+        )
+
+        self.dev_feature_flag = feature_flag_domain.FeatureFlag(
+            FeatureNames.FEATURE_A.value,
+            feature_flag_domain.FeatureFlagSpec(
+                'a feature in dev stage',
+                FeatureStages.DEV
+            ),
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
+        )
+        self.test_feature_flag = feature_flag_domain.FeatureFlag(
+            FeatureNames.FEATURE_B.value,
+            feature_flag_domain.FeatureFlagSpec(
+                'a feature in test stage',
+                FeatureStages.TEST
+            ),
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
+        )
+        self.prod_feature_flag = feature_flag_domain.FeatureFlag(
+            FeatureNames.FEATURE_C.value,
+            feature_flag_domain.FeatureFlagSpec(
+                'a feature in prod stage',
+                FeatureStages.PROD
+            ),
+            feature_flag_domain.FeatureFlagConfig(
+                False,
+                0,
+                [],
+                None
+            )
+        )
+
+        with self.swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_registry_dict:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, True, 0, [])
+                feature_services.update_feature_flag(
+                    self.test_feature_flag.name, True, 0, [])
+                feature_services.update_feature_flag(
+                    self.prod_feature_flag.name, True, 0, [])
+
 
     def test_get_all_feature_flags_returns_correct_feature_flags(self) -> None:
-        expected_feature_flags_dict = [
-            registry.Registry.get_feature_flag(
-                self.dev_feature_flag.name).to_dict(),
-            registry.Registry.get_feature_flag(
-                self.test_feature_flag.name).to_dict(),
-            registry.Registry.get_feature_flag(
-                self.prod_feature_flag.name).to_dict(),
-        ]
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            self.assertEqual(
-                [
-                    feature_flag.to_dict() for feature_flag in
-                    feature_services.get_all_feature_flags()
-                ],
-                expected_feature_flags_dict
-            )
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_name_to_description_feature_stage_registry_dict:
+            expected_feature_flags_dict = [
+                registry.Registry.get_feature_flag(
+                    self.dev_feature_flag.name).to_dict(),
+                registry.Registry.get_feature_flag(
+                    self.test_feature_flag.name).to_dict(),
+                registry.Registry.get_feature_flag(
+                    self.prod_feature_flag.name).to_dict(),
+            ]
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_dict:
+                self.assertEqual(
+                    [
+                        feature_flag.to_dict() for feature_flag in
+                        feature_services.get_all_feature_flags()
+                    ],
+                    expected_feature_flags_dict
+                )
 
     def test_feature_flag_is_correctly_fetched_when_not_present_in_storage(
-        self) -> None:
-        feature_flag_one = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_ONE,
-            'feature flag one',
-            FeatureStages.DEV
-        )
-        feature_flag_two = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_TWO,
-            'feature flag two',
-            FeatureStages.DEV
-        )
-        feature_flag_three = self._create_dummy_feature_flag(
-            FeatureNames.FEATURE_THREE,
-            'feature flag three',
-            FeatureStages.DEV
-        )
-
+        self
+    ) -> None:
         expected_feature_flags_dict = [
-            feature_flag_one.to_dict(),
-            feature_flag_two.to_dict(),
-            feature_flag_three.to_dict()
+            {
+                'name': FeatureNames.FEATURE_ONE.value,
+                'description': 'feature flag one',
+                'feature_stage': FeatureStages.DEV.value,
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+                'last_updated': None
+            },
+            {
+                'name': FeatureNames.FEATURE_TWO.value,
+                'description': 'feature flag two',
+                'feature_stage': FeatureStages.DEV.value,
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+                'last_updated': None
+            },
+            {
+                'name': FeatureNames.FEATURE_THREE.value,
+                'description': 'feature flag three',
+                'feature_stage': FeatureStages.DEV.value,
+                'force_enable_for_all_users': False,
+                'rollout_percentage': 0,
+                'user_group_ids': [],
+                'last_updated': None
+            }
         ]
         feature_flag_name_enums = [
             FeatureNames.FEATURE_ONE,
@@ -171,24 +236,40 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             FeatureNames.FEATURE_THREE
         ]
         feature_flag_names = ['feature_one', 'feature_two', 'feature_three']
-        self.swap_all_feature_flags = self.swap(
+        swap_all_feature_flags = self.swap(
             feature_services,
             'ALL_FEATURE_FLAGS',
             feature_flag_name_enums
         )
-        self.swap_all_feature_names_set = self.swap(
+        swap_all_feature_names_set = self.swap(
             feature_services,
             'ALL_FEATURES_NAMES_SET',
             set(feature_flag_names)
         )
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_services,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.FEATURE_ONE.value: (
+                    'feature flag one', FeatureStages.DEV
+                ),
+                FeatureNames.FEATURE_TWO.value: (
+                    'feature flag two', FeatureStages.DEV
+                ),
+                FeatureNames.FEATURE_THREE.value: (
+                    'feature flag three', FeatureStages.DEV
+                )
+            }
+        )
 
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            self.assertEqual(
-                [
-                    feature_flag.to_dict() for feature_flag in
-                    feature_services.get_all_feature_flags()
-                ],
-                expected_feature_flags_dict)
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with swap_name_to_description_feature_stage_dict:
+                self.assertEqual(
+                    [
+                        feature_flag.to_dict() for feature_flag in
+                        feature_services.get_all_feature_flags()
+                    ],
+                    expected_feature_flags_dict)
 
     def test_get_all_features_dicts_raises_error_when_feature_not_present(
         self) -> None:
@@ -203,38 +284,51 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             ]
         )
         with swap_all_feature_flags:
-            with self.assertRaisesRegex(
-                Exception, 'Feature flag not found: feature_d'
-            ):
-                feature_services.get_all_feature_flags()
+            with self.swap_name_to_description_feature_stage_dict:
+                with self.assertRaisesRegex(
+                    Exception, 'Feature flag not found: feature_d'
+                ):
+                    feature_services.get_all_feature_flags()
 
     def test_get_feature_flag_configs_with_unknown_name_raises_error(
         self
     ) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.assertRaisesRegex(
-                Exception, 'Feature flag not found: '
-                'feature_that_does_not_exist.'
-            ):
-                feature_services.is_feature_flag_enabled(
-                    self.owner_id, 'feature_that_does_not_exist')
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with swap_name_to_description_feature_stage_registry_dict:
+                with self.assertRaisesRegex(
+                    Exception, 'Feature flag not found: '
+                    'feature_that_does_not_exist.'
+                ):
+                    feature_services.is_feature_flag_enabled(
+                        self.owner_id, 'feature_that_does_not_exist')
 
     def test_updating_non_existing_feature_results_in_error(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Unknown feature flag: unknown_feature'
-        ):
-            feature_services.update_feature_flag(
-                'unknown_feature',
-                True,
-                0,
-                []
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_name_to_description_feature_stage_registry_dict:
+            with self.assertRaisesRegex(
+                Exception, 'Unknown feature flag: unknown_feature'
+            ):
+                feature_services.update_feature_flag(
+                    'unknown_feature',
+                    True,
+                    0,
+                    []
             )
 
     def test_get_all_feature_flag_configs_in_dev_returns_correct_values(
         self
     ) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_dict, self.swap(
+                constants, 'DEV_MODE', True
+            ):
                 self.assertEqual(
                     feature_services.evaluate_all_feature_flag_configs(
                         self.owner_id),
@@ -247,72 +341,154 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_configs_in_test_returns_correct_values(
         self
     ) -> None:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
         constants_swap = self.swap(constants, 'DEV_MODE', False)
         env_swap = self.swap(
             feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with constants_swap, env_swap:
-                self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_configs(
-                        self.owner_id),
-                    {
-                        self.dev_feature_flag.name: False,
-                        self.test_feature_flag.name: True,
-                        self.prod_feature_flag.name: True,
-                    })
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_dict:
+                with constants_swap, env_swap:
+                    self.assertEqual(
+                        feature_services.evaluate_all_feature_flag_configs(
+                            self.owner_id),
+                        {
+                            self.dev_feature_flag.name: False,
+                            self.test_feature_flag.name: True,
+                            self.prod_feature_flag.name: True,
+                        })
 
     def test_get_all_feature_flag_configs_in_prod_returns_correct_values(
         self
     ) -> None:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
         constants_swap = self.swap(constants, 'DEV_MODE', False)
         env_swap = self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with constants_swap, env_swap:
-                self.assertEqual(
-                    feature_services.evaluate_all_feature_flag_configs(
-                        self.owner_id),
-                    {
-                        self.dev_feature_flag.name: False,
-                        self.test_feature_flag.name: False,
-                        self.prod_feature_flag.name: True,
-                    })
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with self.swap_name_to_description_feature_stage_dict:
+                with constants_swap, env_swap:
+                    self.assertEqual(
+                        feature_services.evaluate_all_feature_flag_configs(
+                            self.owner_id),
+                        {
+                            self.dev_feature_flag.name: False,
+                            self.test_feature_flag.name: False,
+                            self.prod_feature_flag.name: True,
+                        })
 
     def test_evaluate_dev_feature_flag_for_dev_server_returns_true(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
-                self.assertTrue(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.dev_feature_flag.name)
-                    )
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with swap_name_to_description_feature_stage_registry_dict:
+                with self.swap(constants, 'DEV_MODE', True):
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.owner_id,
+                            self.dev_feature_flag.name)
+                        )
 
     def test_evaluate_test_feature_flag_for_dev_server_returns_true(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', True):
-                self.assertTrue(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.test_feature_flag.name)
-                    )
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with swap_name_to_description_feature_stage_registry_dict:
+                with self.swap(constants, 'DEV_MODE', True):
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.owner_id,
+                            self.test_feature_flag.name)
+                        )
 
     def test_evaluate_prod_feature_flag_for_dev_server_returns_true(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
             with self.swap(constants, 'DEV_MODE', True):
-                self.assertTrue(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.prod_feature_flag.name)
-                    )
+                with swap_name_to_description_feature_stage_registry_dict:
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.owner_id,
+                            self.prod_feature_flag.name)
+                        )
 
     def test_evaluate_dev_feature_flag_for_test_server_returns_false(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
             with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+                with swap_name_to_description_feature_stage_registry_dict:
+                    with self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                    ):
+                        self.assertFalse(
+                            feature_services.is_feature_flag_enabled(
+                                self.owner_id,
+                                self.dev_feature_flag.name)
+                            )
+
+    def test_evaluate_test_feature_flag_for_test_server_returns_true(
+        self) -> None:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, swap_all_feature_names_set:
+            with self.swap(constants, 'DEV_MODE', False):
+                with swap_name_to_description_feature_stage_registry_dict:
+                    with self.swap(
+                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                    ):
+                        self.assertTrue(
+                            feature_services.is_feature_flag_enabled(
+                                self.owner_id,
+                                self.test_feature_flag.name)
+                            )
+
+    def test_evaluate_prod_feature_flag_for_test_server_returns_true(
+        self) -> None:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, self.swap(
+            constants, 'DEV_MODE', False
+        ):
+            with swap_name_to_description_feature_stage_registry_dict:
+                with swap_all_feature_names_set, self.swap(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                ):
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.owner_id,
+                            self.prod_feature_flag.name)
+                        )
+
+    def test_evaluate_dev_feature_flag_for_prod_server_returns_false(
+        self) -> None:
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, self.swap(
+            constants, 'DEV_MODE', False
+        ):
+            with swap_name_to_description_feature_stage_registry_dict:
+                with swap_all_feature_names_set, self.swap(
+                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
                     self.assertFalse(
                         feature_services.is_feature_flag_enabled(
@@ -320,91 +496,70 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                             self.dev_feature_flag.name)
                         )
 
-    def test_evaluate_test_feature_flag_for_test_server_returns_true(
+    def test_evaluate_test_feature_flag_for_prod_server_returns_false(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap_all_feature_names_set:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
-                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, self.swap(
+            constants, 'DEV_MODE', False
+        ):
+            with swap_name_to_description_feature_stage_registry_dict:
+                with swap_all_feature_names_set, self.swap(
+                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
-                    self.assertTrue(
+                    self.assertFalse(
                         feature_services.is_feature_flag_enabled(
                             self.owner_id,
                             self.test_feature_flag.name)
                         )
 
-    def test_evaluate_prod_feature_flag_for_test_server_returns_true(
-        self) -> None:
-        with self.swap_all_feature_flags, self.swap(
-            constants, 'DEV_MODE', False
-        ):
-            with self.swap_all_feature_names_set, self.swap(
-                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
-            ):
-                self.assertTrue(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.prod_feature_flag.name)
-                    )
-
-    def test_evaluate_dev_feature_flag_for_prod_server_returns_false(
-        self) -> None:
-        with self.swap_all_feature_flags, self.swap(
-            constants, 'DEV_MODE', False
-        ):
-            with self.swap_all_feature_names_set, self.swap(
-                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
-            ):
-                self.assertFalse(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.dev_feature_flag.name)
-                    )
-
-    def test_evaluate_test_feature_flag_for_prod_server_returns_false(
-        self) -> None:
-        with self.swap_all_feature_flags, self.swap(
-            constants, 'DEV_MODE', False
-        ):
-            with self.swap_all_feature_names_set, self.swap(
-                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
-            ):
-                self.assertFalse(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.test_feature_flag.name)
-                    )
-
     def test_evaluate_prod_feature_flag_for_prod_server_returns_true(
         self) -> None:
-        with self.swap_all_feature_flags, self.swap(
+        swap_all_feature_flags, swap_all_feature_names_set = (
+            self._swap_feature_flags_list())
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_all_feature_flags, self.swap(
             constants, 'DEV_MODE', False
         ):
-            with self.swap_all_feature_names_set, self.swap(
-                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
-            ):
-                self.assertTrue(
-                    feature_services.is_feature_flag_enabled(
-                        self.owner_id,
-                        self.prod_feature_flag.name)
-                    )
+            with swap_name_to_description_feature_stage_registry_dict:
+                with swap_all_feature_names_set, self.swap(
+                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+                ):
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.owner_id,
+                            self.prod_feature_flag.name)
+                        )
 
     def test_feature_flag_flag_is_enabled_when_force_enable_is_set_to_true(
         self) -> None:
-        self.assertTrue(feature_services.is_feature_flag_enabled(
-            self.owner_id, self.dev_feature_flag.name))
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_name_to_description_feature_stage_registry_dict:
+            self.assertTrue(feature_services.is_feature_flag_enabled(
+                self.owner_id, self.dev_feature_flag.name))
 
     def test_feature_flag_enable_for_logged_out_user_with_force_enable_property(
         self) -> None:
-        self.assertTrue(feature_services.is_feature_flag_enabled(
-            None, self.dev_feature_flag.name))
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_name_to_description_feature_stage_registry_dict:
+            self.assertTrue(feature_services.is_feature_flag_enabled(
+                None, self.dev_feature_flag.name))
 
     def test_feature_flag_not_enabled_for_logged_out_user(self) -> None:
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 0, [])
-        self.assertFalse(feature_services.is_feature_flag_enabled(
-            None, self.dev_feature_flag.name))
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        _, swap_all_feature_names_set = self._swap_feature_flags_list()
+        with swap_all_feature_names_set:
+            with swap_name_to_description_feature_stage_registry_dict:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 0, [])
+                self.assertFalse(feature_services.is_feature_flag_enabled(
+                    None, self.dev_feature_flag.name))
 
     def _signup_multiple_users_and_return_ids(self) -> Tuple[str, str, str]:
         """Signup multiple users and returns user ids of them
@@ -433,40 +588,47 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._signup_multiple_users_and_return_ids())
         initial_user1_value, initial_user2_value, initial_user3_value = (
             False, False, False)
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 50, [])
-            initial_user1_value = feature_services.is_feature_flag_enabled(
-                user_1_id, self.dev_feature_flag.name)
-            initial_user2_value = feature_services.is_feature_flag_enabled(
-                user_2_id, self.dev_feature_flag.name)
-            initial_user3_value = feature_services.is_feature_flag_enabled(
-                user_3_id, self.dev_feature_flag.name)
-            for _ in range(500):
-                self.assertEqual(
-                    initial_user1_value,
-                    feature_services.is_feature_flag_enabled(
-                        user_1_id,
-                        self.dev_feature_flag.name
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        _, swap_all_feature_names_set = self._swap_feature_flags_list()
+        with swap_name_to_description_feature_stage_registry_dict:
+            with swap_all_feature_names_set:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 50, [])
+                initial_user1_value = feature_services.is_feature_flag_enabled(
+                    user_1_id, self.dev_feature_flag.name)
+                initial_user2_value = feature_services.is_feature_flag_enabled(
+                    user_2_id, self.dev_feature_flag.name)
+                initial_user3_value = feature_services.is_feature_flag_enabled(
+                    user_3_id, self.dev_feature_flag.name)
+                for _ in range(500):
+                    self.assertEqual(
+                        initial_user1_value,
+                        feature_services.is_feature_flag_enabled(
+                            user_1_id,
+                            self.dev_feature_flag.name
+                        )
                     )
-                )
-                self.assertEqual(
-                    initial_user2_value,
-                    feature_services.is_feature_flag_enabled(
-                        user_2_id,
-                        self.dev_feature_flag.name
+                    self.assertEqual(
+                        initial_user2_value,
+                        feature_services.is_feature_flag_enabled(
+                            user_2_id,
+                            self.dev_feature_flag.name
+                        )
                     )
-                )
-                self.assertEqual(
-                    initial_user3_value,
-                    feature_services.is_feature_flag_enabled(
-                        user_3_id,
-                        self.dev_feature_flag.name
+                    self.assertEqual(
+                        initial_user3_value,
+                        feature_services.is_feature_flag_enabled(
+                            user_3_id,
+                            self.dev_feature_flag.name
+                        )
                     )
-                )
 
     def test_feature_flag_enabled_for_users_in_5_perc_when_increased_to_10_perc(
         self) -> None:
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        _, swap_all_feature_names_set = self._swap_feature_flags_list()
         user_ids_list = []
         user_ids_for_which_feature_flag_enabled_for_5_perc = set()
         count_feature_flag_enabled_for_5_perc = 0
@@ -475,62 +637,78 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         for count in range(1, 1001):
             user_ids_list.append('userid' + str(count))
 
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 5, [])
-            for user_id in user_ids_list:
-                feature_is_enabled = feature_services.is_feature_flag_enabled(
-                    user_id,
-                    self.dev_feature_flag.name
+        with swap_name_to_description_feature_stage_registry_dict:
+            with swap_all_feature_names_set:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 5, [])
+                for user_id in user_ids_list:
+                    feature_is_enabled = (
+                        feature_services.is_feature_flag_enabled(
+                            user_id,
+                            self.dev_feature_flag.name
+                        )
+                    )
+                    if feature_is_enabled:
+                        count_feature_flag_enabled_for_5_perc += 1
+                        user_ids_for_which_feature_flag_enabled_for_5_perc.add(
+                            user_id)
+                # To avoid this test being flaky, we need to determine what the
+                # likely range is for the number of users who have the feature
+                # flag enabled. This is modelled as a binomial random variable
+                # with n = 1000 and p = 0.5. This roughly follows a
+                # normal distribution with mean np = 50 and standard deviation
+                # sqrt(npq) = 6.89. In a normal distribution, around 0.997 of
+                # values are within 3 standard deviation of the mean, and there
+                # is a chance of only 0.00006334 of them being outside 4 s.d. of
+                # the mean. Hence the range can be (50 - 4 * 6.89, 50 + 4 * 6.89)
+                self.assertTrue(
+                    count_feature_flag_enabled_for_5_perc in list(
+                        range(22, 78)
+                    )
                 )
-                if feature_is_enabled:
-                    count_feature_flag_enabled_for_5_perc += 1
-                    user_ids_for_which_feature_flag_enabled_for_5_perc.add(
-                        user_id)
-            # To decide the range in order to avoid the flakiness we are using
-            # binomial distribution. Taking a binomial random variable for
-            # n = 1000 and p = 0.05. This roughly follows a normal distribution
-            # with mean np = 50 and standard deviation sqrt(npq) = 6.89. In a
-            # normal distribution, around 0.997 of values are within 3 standard
-            # deviation of the mean, and there is a chance of only 0.00006334 of
-            # them being outside 4 s.d. of the mean. Hence the range can be
-            # (50 - 4 * 6.89, 50 + 4 * 6.89)
-            self.assertTrue(
-                count_feature_flag_enabled_for_5_perc in list(range(22, 78)))
 
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 10, [])
-            for user_id in user_ids_list:
-                feature_is_enabled = feature_services.is_feature_flag_enabled(
-                    user_id,
-                    self.dev_feature_flag.name
-                )
-                if feature_is_enabled:
-                    count_feature_flag_enabled_for_10_perc += 1
-                    user_ids_for_which_feature_flag_enabled_for_10_perc.add(
-                        user_id)
-            # (For detail explanation please look at above comment)For p = 0.1,
-            # normal distribution with mean np = 100 and standard deviation
-            # equals 9.48. Range would be (100 - 4 * 9.48, 100 + 4 * 9.48)
-            self.assertTrue(
-                count_feature_flag_enabled_for_10_perc in list(range(62, 138)))
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 10, [])
+                for user_id in user_ids_list:
+                    feature_is_enabled = (
+                        feature_services.is_feature_flag_enabled(
+                            user_id,
+                            self.dev_feature_flag.name
+                        )
+                    )
+                    if feature_is_enabled:
+                        count_feature_flag_enabled_for_10_perc += 1
+                        user_ids_for_which_feature_flag_enabled_for_10_perc.add(
+                            user_id)
+                # (For a detailed explanation, please see the similar
+                # comment above.) For p = 0.1, the binomial random variable
+                # follows an approximate normal distribution with mean np = 100
+                # and standard deviation 9.49. The range would be
+                # (100 - 4 * 9.49, 100 + 4 * 9.49)
+                self.assertTrue(
+                    count_feature_flag_enabled_for_10_perc in list(
+                        range(62, 138)))
 
-            self.assertTrue(
-                user_ids_for_which_feature_flag_enabled_for_5_perc.issubset(
-                    user_ids_for_which_feature_flag_enabled_for_10_perc))
+                self.assertTrue(
+                    user_ids_for_which_feature_flag_enabled_for_5_perc.issubset(
+                        user_ids_for_which_feature_flag_enabled_for_10_perc))
 
     def test_feature_flag_not_enabled_for_all_users(self) -> None:
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        _, swap_all_feature_names_set = self._swap_feature_flags_list()
         user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids())
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
         feature_status_for_users = []
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 0, [])
-            for user_id in user_ids:
-                feature_status_for_users.append(
-                    feature_services.is_feature_flag_enabled(
-                        user_id, self.dev_feature_flag.name))
+        with swap_name_to_description_feature_stage_registry_dict:
+            with swap_all_feature_names_set:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 0, [])
+                for user_id in user_ids:
+                    feature_status_for_users.append(
+                        feature_services.is_feature_flag_enabled(
+                            user_id, self.dev_feature_flag.name))
 
         for feature_status in feature_status_for_users:
             self.assertFalse(feature_status)
@@ -541,13 +719,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._signup_multiple_users_and_return_ids())
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
         feature_status_for_users = []
-        with self.swap_all_feature_names_set:
-            feature_services.update_feature_flag(
-                self.dev_feature_flag.name, False, 100, [])
-            for user_id in user_ids:
-                feature_status_for_users.append(
-                    feature_services.is_feature_flag_enabled(
-                        user_id, self.dev_feature_flag.name))
+        _, swap_all_feature_names_set = self._swap_feature_flags_list()
+        swap_name_to_description_feature_stage_registry_dict = (
+            self._swap_name_to_description_feature_stage_registry())
+        with swap_name_to_description_feature_stage_registry_dict:
+            with swap_all_feature_names_set:
+                feature_services.update_feature_flag(
+                    self.dev_feature_flag.name, False, 100, [])
+                for user_id in user_ids:
+                    feature_status_for_users.append(
+                        feature_services.is_feature_flag_enabled(
+                            user_id, self.dev_feature_flag.name))
 
         for feature_status in feature_status_for_users:
             self.assertTrue(feature_status)

@@ -31,65 +31,12 @@ if MYPY: # pragma: no cover
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 FeatureNames = platform_feature_list.FeatureNames
-FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION = (
-    platform_feature_list.FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION)
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
+    platform_feature_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE)
 
 
 class Registry:
     """Registry for all feature flags."""
-
-    # The keys of feature_flag_spec_registry are the feature flags name,
-    # and the values are FeatureFlagSpec instances with initial settings
-    # defined in this file.
-    feature_flag_spec_registry: Dict[
-        str, feature_flag_domain.FeatureFlagSpec] = {}
-
-    @classmethod
-    def create_feature_flag(
-        cls,
-        name: FeatureNames,
-        description: str,
-        feature_stage: feature_flag_domain.FeatureStages,
-    ) -> feature_flag_domain.FeatureFlag:
-        """Creates, registers and returns a feature flag.
-
-        Args:
-            name: str. The name of the feature flag.
-            description: str. The description of the feature flag.
-            feature_stage: Enum(FeatureStages). The development stage of
-                the feature flag.
-
-        Returns:
-            feature_flag_domain.FeatureFlag. The FeatureFlag object.
-
-        Raises:
-            Exception. Feature flag with the same name already exists.
-        """
-        if cls.feature_flag_spec_registry.get(name.value):
-            raise Exception(
-                'Feature flag with name %s already exists.' % name.value)
-
-        feature_flag_spec = (
-            feature_flag_domain.FeatureFlagSpec(
-                description,
-                feature_stage
-            )
-        )
-        feature_flag_config = (
-            feature_flag_domain.FeatureFlagConfig(
-                False,
-                0,
-                [],
-                None
-            )
-        )
-        cls.feature_flag_spec_registry[name.value] = feature_flag_spec
-
-        return feature_flag_domain.FeatureFlag(
-            name.value,
-            feature_flag_spec,
-            feature_flag_config
-        )
 
     @classmethod
     def get_feature_flag(cls, name: str) -> feature_flag_domain.FeatureFlag:
@@ -108,14 +55,20 @@ class Registry:
             cls.load_feature_flag_config_from_storage(name))
 
         if feature_flag_config_from_storage is not None:
-            feature_flag_spec = cls.feature_flag_spec_registry[name]
+            feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)[0],
+                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)[1]
+            )
             return feature_flag_domain.FeatureFlag(
                 name,
                 feature_flag_spec,
                 feature_flag_config_from_storage
             )
-        elif name in cls.feature_flag_spec_registry:
-            feature_flag_spec = cls.feature_flag_spec_registry[name]
+        elif name in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
+            feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
+                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)[0],
+                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name)[1]
+            )
             feature_flag_config = feature_flag_domain.FeatureFlagConfig(
                 False,
                 0,
@@ -215,25 +168,3 @@ class Registry:
             feature_flag.feature_flag_config.user_group_ids)
         model_instance.update_timestamps()
         model_instance.put()
-
-
-for feature_flag_name_enum_in_dev in platform_feature_list.DEV_FEATURES_LIST:
-    Registry.create_feature_flag(
-        feature_flag_name_enum_in_dev,
-        FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION[feature_flag_name_enum_in_dev],
-        feature_flag_domain.FeatureStages.DEV
-    )
-
-for feature_flag_name_enum_in_test in platform_feature_list.TEST_FEATURES_LIST:
-    Registry.create_feature_flag(
-        feature_flag_name_enum_in_test,
-        FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION[feature_flag_name_enum_in_test],
-        feature_flag_domain.FeatureStages.TEST
-    )
-
-for feature_flag_name_enum_in_prod in platform_feature_list.PROD_FEATURES_LIST:
-    Registry.create_feature_flag(
-        feature_flag_name_enum_in_prod,
-        FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION[feature_flag_name_enum_in_prod],
-        feature_flag_domain.FeatureStages.PROD
-    )

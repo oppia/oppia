@@ -21,6 +21,7 @@ from __future__ import annotations
 import enum
 
 from core.domain import platform_parameter_list as params
+from core.domain import feature_flag_domain
 
 from typing import List
 
@@ -102,49 +103,91 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.BLOG_PAGES,
 ]
 
-FEATURE_FLAG_NAME_ENUM_TO_DESCRIPTION = {
-    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS: (
-        'This is a dummy feature flag for the e2e tests.'
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
+    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
+        (
+            'This is a dummy feature flag for the e2e tests.',
+            feature_flag_domain.ServerMode.PROD
+        )
     ),
-    FeatureNames.END_CHAPTER_CELEBRATION: (
-        'This flag is for the end chapter celebration feature.'
+    FeatureNames.END_CHAPTER_CELEBRATION.value: (
+        (
+            'This flag is for the end chapter celebration feature.',
+            feature_flag_domain.ServerMode.PROD
+        )
     ),
-    FeatureNames.CHECKPOINT_CELEBRATION: (
-        'This flag is for the checkpoint celebration feature.'
+    FeatureNames.CHECKPOINT_CELEBRATION.value: (
+        (
+            'This flag is for the checkpoint celebration feature.',
+            feature_flag_domain.ServerMode.PROD
+        )
     ),
-    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS: (
-        'This flag enables showing per-contributor accomplishments on the '
-        'contributor dashboard.'
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
+        (
+            'This flag enables showing per-contributor accomplishments on the '
+            'contributor dashboard.',
+            feature_flag_domain.ServerMode.PROD
+        )
     ),
-    FeatureNames.DIAGNOSTIC_TEST: (
-        'This flag is for the diagnostic test functionality.'
+    FeatureNames.DIAGNOSTIC_TEST.value: (
+        (
+            'This flag is for the diagnostic test functionality.',
+            feature_flag_domain.ServerMode.TEST
+        )
     ),
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW: (
-        'This flag is for serial chapter launch feature and making changes '
-        'only in the curriculum admin view.'
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
+        (
+            'This flag is for serial chapter launch feature and making changes '
+            'only in the curriculum admin view.',
+            feature_flag_domain.ServerMode.TEST
+        )
     ),
-    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW: (
-        'This flag is for serial chapter launch feature and making changes '
-        'only in the learner view.'
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
+        (
+            'This flag is for serial chapter launch feature and making changes '
+            'only in the learner view.',
+            feature_flag_domain.ServerMode.TEST
+        )
     ),
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD: (
-        'This flag is to show redesigned learner dashboard.'
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
+        (
+            'This flag is to show redesigned learner dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
     ),
-    FeatureNames.SHOW_TRANSLATION_SIZE: (
-        'This flag is to show translation size on translation cards in '
-        'contributor dashboard.'
+    FeatureNames.SHOW_TRANSLATION_SIZE.value: (
+        (
+            'This flag is to show translation size on translation cards in '
+            'contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
     ),
-    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN: (
-        'This flag is to show feedback updates in the '
-        'profile pic drop-down menu.'
+    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
+        (
+            'This flag is to show feedback updates in the '
+            'profile pic drop-down menu.',
+            feature_flag_domain.ServerMode.DEV
+        )
     ),
-    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI: (
-        'This flag is to show new contributor admin dashboard.'
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
+        (
+            'This flag is to show new contributor admin dashboard.',
+            feature_flag_domain.ServerMode.TEST
+        )
     ),
-    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED: (
-        'Exposes the Improvements Tab for creators in the exploration editor.'
+    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
+        (
+            'Exposes the Improvements Tab for creators in the exploration '
+            'editor.',
+            feature_flag_domain.ServerMode.PROD
+        )
     ),
-    FeatureNames.LEARNER_GROUPS_ARE_ENABLED: 'Enable learner groups feature'
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
+        (
+            'Enable learner groups feature',
+            feature_flag_domain.ServerMode.PROD
+        )
+    )
 }
 
 ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[params.ParamNames] = [

@@ -74,18 +74,6 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
 class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     """Tests FeatureFlagsHandler."""
 
-    def _create_dummy_feature_flag(
-        self, feature_name: FeatureNames
-    ) -> feature_flag_domain.FeatureFlag:
-        """Creates dummy feature flag."""
-        # Here we use MyPy ignore because create_feature_flag accepts feature
-        # flag name to be of type platform_feature_list.FeatureNames and we
-        # plan to create dummy feature flags to conduct testing. To avoid
-        # mypy type check we have to add ignore[arg-type].
-        feature_flag = feature_flag_registry.Registry.create_feature_flag(
-            feature_name, 'test description', FeatureStages.DEV) # type: ignore[arg-type]
-        return feature_flag
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -119,62 +107,85 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_handler_includes_all_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.TEST_FEATURE_1)
-
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_flag_services,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.TEST_FEATURE_1.value: (
+                    'a feature in dev stage', FeatureStages.DEV
+                )
+            }
+        )
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
-        with feature_list_ctx, feature_set_ctx:
-            response_dict = self.get_json(feconf.FEATURE_FLAGS_URL)
-            self.assertEqual(
-                response_dict['feature_flags'], [feature_flag.to_dict()])
+            set([FeatureNames.TEST_FEATURE_1.value]))
 
-        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
-            feature_flag.name)
+        with swap_name_to_description_feature_stage_dict:
+            with feature_list_ctx, feature_set_ctx:
+                response_dict = self.get_json(feconf.FEATURE_FLAGS_URL)
+                self.assertEqual(
+                    response_dict['feature_flags'],
+                    [
+                        {
+                            'name': FeatureNames.TEST_FEATURE_1.value,
+                            'description': 'a feature in dev stage',
+                            'feature_stage': FeatureStages.DEV.value,
+                            'force_enable_for_all_users': False,
+                            'rollout_percentage': 0,
+                            'user_group_ids': [],
+                            'last_updated': None
+                        }
+                    ])
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
-        feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.TEST_FEATURE_1)
-
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_flag_registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.TEST_FEATURE_1.value: (
+                    'a feature in dev stage', FeatureStages.DEV
+                )
+            }
+        )
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
-        with feature_list_ctx, feature_set_ctx:
-            self.put_json(
-                feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag',
-                    'feature_flag_name': feature_flag.name,
-                    'force_enable_for_all_users': False,
-                    'rollout_percentage': 50,
-                    'user_group_ids': []
-                }, csrf_token=csrf_token)
+            set([FeatureNames.TEST_FEATURE_1.value]))
 
-            updated_feature_flag = (
-                feature_flag_registry.Registry.get_feature_flag(
-                    feature_flag.name))
-            self.assertEqual(
-                updated_feature_flag.feature_flag_config.
-                force_enable_for_all_users,
-                False
-            )
-            self.assertEqual(
-                updated_feature_flag.feature_flag_config.rollout_percentage, 50)
-            self.assertEqual(
-                updated_feature_flag.feature_flag_config.user_group_ids, [])
+        with swap_name_to_description_feature_stage_dict:
+            with feature_list_ctx, feature_set_ctx:
+                self.put_json(
+                    feconf.FEATURE_FLAGS_URL, {
+                        'action': 'update_feature_flag',
+                        'feature_flag_name': FeatureNames.TEST_FEATURE_1.value,
+                        'force_enable_for_all_users': False,
+                        'rollout_percentage': 50,
+                        'user_group_ids': []
+                    }, csrf_token=csrf_token)
 
-        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
-            feature_flag.name)
+                updated_feature_flag = (
+                    feature_flag_registry.Registry.get_feature_flag(
+                        FeatureNames.TEST_FEATURE_1.value))
+                self.assertEqual(
+                    updated_feature_flag.feature_flag_config.
+                    force_enable_for_all_users,
+                    False
+                )
+                self.assertEqual(
+                    updated_feature_flag.feature_flag_config.rollout_percentage,
+                    50
+                )
+                self.assertEqual(
+                    updated_feature_flag.feature_flag_config.user_group_ids, [])
+
         self.logout()
 
     def test_update_flag_with_unknown_feature_flag_name_returns_400(
@@ -187,21 +198,32 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature_flag_services, 'ALL_FEATURE_FLAGS', [])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([]))
-        with feature_list_ctx, feature_set_ctx:
-            response = self.put_json(
-                feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag',
-                    'feature_flag_name': 'test_feature_1',
-                    'force_enable_for_all_users': False,
-                    'rollout_percentage': 50,
-                    'user_group_ids': []
-                },
-                csrf_token=csrf_token,
-                expected_status_int=400
-            )
-            self.assertEqual(
-                response['error'],
-                'Unknown feature flag: test_feature_1.')
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_flag_registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.TEST_FEATURE_1.value: (
+                    'a feature in dev stage', FeatureStages.DEV
+                )
+            }
+        )
+
+        with swap_name_to_description_feature_stage_dict:
+            with feature_list_ctx, feature_set_ctx:
+                response = self.put_json(
+                    feconf.FEATURE_FLAGS_URL, {
+                        'action': 'update_feature_flag',
+                        'feature_flag_name': 'test_feature_1',
+                        'force_enable_for_all_users': False,
+                        'rollout_percentage': 50,
+                        'user_group_ids': []
+                    },
+                    csrf_token=csrf_token,
+                    expected_status_int=400
+                )
+                self.assertEqual(
+                    response['error'],
+                    'Unknown feature flag: test_feature_1.')
 
         self.logout()
 
@@ -209,33 +231,39 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_flag = self._create_dummy_feature_flag(
-            FeatureNames.TEST_FEATURE_2)
-
+        swap_name_to_description_feature_stage_dict = self.swap(
+            feature_flag_registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.TEST_FEATURE_2.value: (
+                    'a feature in dev stage', FeatureStages.DEV
+                )
+            }
+        )
         feature_list_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_2])
         feature_set_ctx = self.swap(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET',
-            set([feature_flag.name]))
-        with feature_list_ctx, feature_set_ctx:
-            response = self.put_json(
-                feconf.FEATURE_FLAGS_URL, {
-                    'action': 'update_feature_flag',
-                    'feature_flag_name': feature_flag.name,
-                    'force_enable_for_all_users': False,
-                    'rollout_percentage': 200,
-                    'user_group_ids': []
-                },
-                csrf_token=csrf_token,
-                expected_status_int=400
-            )
-            self.assertEqual(
-                response['error'],
-                'Schema validation for \'rollout_percentage\' failed: '
-                'Validation failed: is_at_most ({\'max_value\': 100}) '
-                'for object 200')
+            set([FeatureNames.TEST_FEATURE_2.value]))
 
-        feature_flag_registry.Registry.feature_flag_spec_registry.pop(
-            feature_flag.name)
+        with swap_name_to_description_feature_stage_dict:
+            with feature_list_ctx, feature_set_ctx:
+                response = self.put_json(
+                    feconf.FEATURE_FLAGS_URL, {
+                        'action': 'update_feature_flag',
+                        'feature_flag_name': FeatureNames.TEST_FEATURE_2.value,
+                        'force_enable_for_all_users': False,
+                        'rollout_percentage': 200,
+                        'user_group_ids': []
+                    },
+                    csrf_token=csrf_token,
+                    expected_status_int=400
+                )
+        self.assertEqual(
+            response['error'],
+            'Schema validation for \'rollout_percentage\' failed: '
+            'Validation failed: is_at_most ({\'max_value\': 100}) '
+            'for object 200')
+
         self.logout()
