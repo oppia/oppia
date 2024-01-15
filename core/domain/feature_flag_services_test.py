@@ -28,7 +28,7 @@ from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
 from core.tests import test_utils
 
-from typing import Iterator, Tuple
+from typing import Tuple
 
 
 class FeatureNames(enum.Enum):
