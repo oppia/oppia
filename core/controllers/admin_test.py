@@ -154,27 +154,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_generate_dummy_blog_in_prod_mode(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'Cannot load blog in production.')
-
-        with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_blog',
-                    'blog_title': 'Education',
-                }, csrf_token=csrf_token)
-
-        blog_count = (
-            blog_services.get_total_number_of_published_blog_post_summaries()
-        )
-        self.assertEqual(blog_count, 0)
-        self.logout()
-
     def test_without_exp_id_reload_exp_action_is_not_performed(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -634,41 +613,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
-        self.logout()
-
-    def test_generate_dummy_blog(self) -> None:
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminhandler', {
-                'action': 'generate_dummy_blog',
-                'blog_title': 'Education',
-            }, csrf_token=csrf_token)
-        blog_count = (
-            blog_services.get_total_number_of_published_blog_post_summaries()
-        )
-        self.assertEqual(blog_count, 1)
-
-        self.post_json(
-            '/adminhandler', {
-                'action': 'generate_dummy_blog',
-                'blog_title': 'Testing types of Text formatting',
-            }, csrf_token=csrf_token)
-        blog_count = (
-            blog_services.get_total_number_of_published_blog_post_summaries()
-        )
-        self.assertEqual(blog_count, 2)
-
-        self.post_json(
-            '/adminhandler', {
-                'action': 'generate_dummy_blog',
-                'blog_title': 'Leading The Arabic Translations Team',
-            }, csrf_token=csrf_token)
-        blog_count = (
-            blog_services.get_total_number_of_published_blog_post_summaries()
-        )
-        self.assertEqual(blog_count, 3)
         self.logout()
 
     def test_regenerate_topic_related_opportunities_action(self) -> None:
@@ -3108,3 +3052,87 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
                 'published_on': '05/09/2000'
             },
             csrf_token=csrf_token)
+
+
+class GenerateDummyBlogTest(test_utils.GenericTestBase):
+    """Tests Generate Dummy data"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+    def test_cannot_generate_dummy_blog_in_prod_mode(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load blog in production.')
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_blog',
+                    'blog_title': 'Education',
+                }, csrf_token=csrf_token)
+
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 0)
+        self.logout()
+
+    def test_generate_dummy_blog(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Education',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 1)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Testing types of Text formatting',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 2)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'Leading The Arabic Translations Team',
+            }, csrf_token=csrf_token)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 3)
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_blog_title(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog',
+                'blog_title': 'blog title',
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+                        'The \"blog_title\" is not valid. It should be '
+                        '\"Education\", \"Testing types of Text '
+                        'formatting\", \"Leading The Arabic Translations'
+                        ' Team\".')
+        self.assertEqual(response['error'], error_msg)
+        blog_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_count, 0)
+        self.logout()
