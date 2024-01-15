@@ -1262,7 +1262,8 @@ describe('Admin backend api service', () => {
     req.flush({
       error: 'Failed to get data.'
     }, {
-      status: 500, statusText: 'Internal Server Error'
+      status: 500,
+      statusText: 'Internal Server Error',
     });
     flushMicrotasks();
 

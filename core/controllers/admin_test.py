@@ -3055,7 +3055,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
 
 
 class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
-    """Tests Generate Dummy data"""
+    """Tests the generation of dummy blog post data."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -3067,7 +3067,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'Cannot load blog in production.')
+            Exception, 'Cannot load new blog post in production mode.')
 
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
