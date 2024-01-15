@@ -1439,7 +1439,7 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled = exploration.correctness_feedback_enabled,
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
         next_content_id_index=exploration.next_content_id_index
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]

@@ -165,7 +165,7 @@ ALGEBRAIC_MATH_INTERACTIONS: Final = [
 MATH_INTERACTION_DEPRECATED_RULES: Final = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
-# DEPRECATED: This property is deprecated. Please do not use
+# DEPRECATED: This property is deprecated. Please do not use.
 DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED: Final = 'correctness_feedback_enabled'
 
 
@@ -842,6 +842,7 @@ class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
     property_name: Literal['auto_tts_enabled']
     new_value: bool
     old_value: bool
+
 
 # DEPRECATED: This command is deprecated. Please do not use.
 # The command stays here for interpreting historical data.
@@ -1769,12 +1770,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
 
-
         if not isinstance(self.correctness_feedback_enabled, bool):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
-
 
         if not isinstance(self.next_content_id_index, int):
             raise utils.ValidationError(
@@ -2355,7 +2354,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.auto_tts_enabled = auto_tts_enabled
 
-
     def update_correctness_feedback_enabled(
         self, correctness_feedback_enabled: bool
     ) -> None:
@@ -2366,7 +2364,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
-
 
     def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
