@@ -2499,6 +2499,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -2603,6 +2604,7 @@ version: 2
 auto_tts_enabled: false
 blurb: ''
 category: Algebra
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en

@@ -165,6 +165,9 @@ ALGEBRAIC_MATH_INTERACTIONS: Final = [
 MATH_INTERACTION_DEPRECATED_RULES: Final = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
+# DEPRECATED: This property is deprecated. Please do not use
+DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED: Final = 'correctness_feedback_enabled'
+
 
 def clean_math_expression(math_expression: str) -> str:
     """Cleans a given math expression and formats it so that it is compatible
@@ -322,7 +325,10 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled',
-        'next_content_id_index', 'edits_allowed']
+        'next_content_id_index', 'edits_allowed',
+        # Deprecated exploration properties.
+        DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED
+        ]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
@@ -837,6 +843,18 @@ class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
     new_value: bool
     old_value: bool
 
+# DEPRECATED: This command is deprecated. Please do not use.
+# The command stays here for interpreting historical data.
+class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'correctness_feedback_enabled' as allowed value.
+    """
+
+    property_name: Literal['correctness_feedback_enabled']
+    new_value: bool
+    old_value: bool
+
 
 class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
     """Class representing the ExplorationChange's
@@ -1239,6 +1257,7 @@ class ExplorationDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
+    correctness_feedback_enabled: bool
     edits_allowed: bool
     next_content_id_index: int
     version: int
@@ -1260,6 +1279,7 @@ class ExplorationPlayerDict(TypedDict):
     title: str
     objective: str
     language_code: str
+    correctness_feedback_enabled: bool
     next_content_id_index: int
 
 
@@ -1385,6 +1405,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.created_on = created_on
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
+        self.correctness_feedback_enabled = True
         self.next_content_id_index = next_content_id_index
         self.edits_allowed = edits_allowed
 
@@ -1499,6 +1520,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.next_content_id_index = exploration_dict[
             'next_content_id_index']
+        exploration.correctness_feedback_enabled = True
         exploration.edits_allowed = exploration_dict['edits_allowed']
 
         exploration.param_specs = {
@@ -1746,6 +1768,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
+
+
+        if not isinstance(self.correctness_feedback_enabled, bool):
+            raise utils.ValidationError(
+                'Expected correctness_feedback_enabled to be a bool, received '
+                '%s' % self.correctness_feedback_enabled)
+
 
         if not isinstance(self.next_content_id_index, int):
             raise utils.ValidationError(
@@ -2325,6 +2354,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
+
+
+    def update_correctness_feedback_enabled(
+        self, correctness_feedback_enabled: bool
+    ) -> None:
+        """Update whether correctness feedback is enabled.
+
+        Args:
+            correctness_feedback_enabled: bool. Whether correctness feedback
+                is enabled or not.
+        """
+        self.correctness_feedback_enabled = correctness_feedback_enabled
+
 
     def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
@@ -5678,6 +5720,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
@@ -5782,6 +5825,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'title': self.title,
             'objective': self.objective,
             'language_code': self.language_code,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -6475,6 +6519,7 @@ class ExplorationMetadataDict(TypedDict):
     param_specs: Dict[str, param_domain.ParamSpecDict]
     param_changes: List[param_domain.ParamChangeDict]
     auto_tts_enabled: bool
+    correctness_feedback_enabled: Optional[bool]
     edits_allowed: bool
 
 
@@ -6531,6 +6576,7 @@ class ExplorationMetadata:
         self.param_specs = param_specs
         self.param_changes = param_changes
         self.auto_tts_enabled = auto_tts_enabled
+        self.correctness_feedback_enabled = True
         self.edits_allowed = edits_allowed
 
     def to_dict(self) -> ExplorationMetadataDict:
@@ -6558,6 +6604,7 @@ class ExplorationMetadata:
                 p_change.to_dict() for p_change in self.param_changes
             ],
             'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'edits_allowed': self.edits_allowed
         }
 

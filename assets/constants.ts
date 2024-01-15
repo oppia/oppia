@@ -7195,7 +7195,8 @@ export default {
     "edits_allowed"
   ],
   "NON_METADATA_PROPERTIES": [
-    "id", "states", "next_content_id_index", "version"
+    "id", "states", "next_content_id_index", "version",
+    "correctness_feedback_enabled"
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,

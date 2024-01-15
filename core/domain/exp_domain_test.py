@@ -3645,6 +3645,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'param_specs': {},
             'param_changes': [],
             'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
             'edits_allowed': exploration.edits_allowed
         }
 
@@ -3913,6 +3915,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.auto_tts_enabled = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_correctness_feedback_enabled(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.correctness_feedback_enabled = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -4653,6 +4670,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 auto_tts_enabled: false
 blurb: ''
 category: Category
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -4737,6 +4755,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -4976,6 +4995,7 @@ class SchemaMigrationUnitTests(test_utils.GenericTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5120,6 +5140,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5264,6 +5285,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5408,6 +5430,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5554,6 +5577,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5703,6 +5727,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -5852,6 +5877,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6001,6 +6027,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6150,6 +6177,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6288,6 +6316,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6425,6 +6454,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6569,6 +6599,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6715,6 +6746,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -6865,6 +6897,7 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -6983,6 +7016,7 @@ title: Title
 auto_tts_enabled: false
 blurb: ''
 category: Category
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7102,6 +7136,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7230,6 +7265,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7358,6 +7394,7 @@ version: 0
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: false
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7448,6 +7485,7 @@ title: Title
 auto_tts_enabled: true
 blurb: ''
 category: Category
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: (untitled state)
 language_code: en
@@ -7535,6 +7573,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7642,6 +7681,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7746,6 +7786,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -7898,6 +7939,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8037,6 +8079,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8144,6 +8187,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8240,6 +8284,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: hi
@@ -8329,6 +8374,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: hi
@@ -8424,6 +8470,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8722,6 +8769,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -8889,6 +8937,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9139,6 +9188,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9308,6 +9358,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9434,6 +9485,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9551,6 +9603,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9723,6 +9776,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -9862,6 +9916,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10027,6 +10082,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10179,6 +10235,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10377,6 +10434,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10496,6 +10554,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10637,6 +10696,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10752,6 +10812,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10865,6 +10926,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -10980,6 +11042,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11202,6 +11265,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11338,6 +11402,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11484,6 +11549,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11617,6 +11683,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11769,6 +11836,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -11895,6 +11963,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12169,6 +12238,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12369,6 +12439,7 @@ version: 0
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12480,6 +12551,7 @@ title: ''
 auto_tts_enabled: false
 blurb: ''
 category: ''
+correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: Introduction
 language_code: en
@@ -12660,6 +12732,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
+            'correctness_feedback_enabled': True,
             'next_content_id_index': content_id_generator.next_content_id_index
         })
 
@@ -16411,6 +16484,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'auto_tts_enabled',
             'new_value': False
         }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'correctness_feedback_enabled',
+            'new_value': True
+        }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'confirmed_unclassified_answers',
             'state_name': 'Introduction',
@@ -18394,6 +18471,8 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 ).to_dict()
             ],
             'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
             'edits_allowed': exploration.edits_allowed
         }
 
@@ -18407,7 +18486,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 'title', 'category', 'objective', 'language_code',
                 'blurb', 'author_notes', 'states_schema_version',
                 'init_state_name', 'param_specs', 'param_changes',
-                'auto_tts_enabled',
+                'auto_tts_enabled', 'correctness_feedback_enabled',
                 'edits_allowed'
             ]
         )
@@ -18429,7 +18508,8 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 'title', 'category', 'objective', 'language_code', 'tags',
                 'blurb', 'author_notes', 'states_schema_version',
                 'init_state_name', 'param_specs', 'param_changes',
-                'auto_tts_enabled', 'edits_allowed', 'new_property'
+                'auto_tts_enabled', 'correctness_feedback_enabled',
+                'edits_allowed', 'new_property'
             ]
         )
         error_message = (
