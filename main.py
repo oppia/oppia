@@ -298,7 +298,7 @@ URLS = [
         contributor_dashboard_admin.ContributionRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
-        contributor_dashboard_admin.ContributorDashboardAdminPage),
+        oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
