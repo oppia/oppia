@@ -363,6 +363,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
             ' received %s' % self.user_settings.email):
             self.user_settings.validate()
 
+    def test_validation_empty_email_raises_error(self) -> None:
+        self.user_settings.email = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No user email specified.'
+        ):
+            self.user_settings.validate()
+
     def test_validation_wrong_email_raises_error(self) -> None:
         invalid_emails_list = [
             'testemail.com', '@testemail.com', 'testemail.com@']
@@ -402,6 +409,99 @@ class UserSettingsTests(test_utils.GenericTestBase):
             user_services.create_new_profiles(
                 auth_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
             )
+
+    def test_validate_invalid_subject_interests_are_not_accepted(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.subject_interests = 'not a list'  # type: ignore[assignment]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
+            self.user_settings.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.subject_interests = ['ab', 'de', 1]  # type: ignore[list-item]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
+            self.user_settings.validate()
+
+        self.user_settings.subject_interests = ['ab', '']
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
+            self.user_settings.validate()
+
+        self.user_settings.subject_interests = ['!']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.validate()
+
+        self.user_settings.subject_interests = ['has-hyphens']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.validate()
+
+        self.user_settings.subject_interests = ['HasCapitalLetters']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
+            self.user_settings.validate()
+
+        self.user_settings.subject_interests = ['a', 'a']
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
+            self.user_settings.validate()
+
+        # The following cases are all valid.
+        self.user_settings.subject_interests = []
+        self.user_settings.validate()
+        self.user_settings.subject_interests = ['singleword', 'has spaces']
+        self.user_settings.validate()
+
+    def test_validate_invalid_user_bio_is_not_accepted(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.user_bio = 123 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected user_bio to be a string.'):
+            self.user_settings.validate()
+
+        self.user_settings.user_bio = (
+                'a' * (feconf.MAX_BIO_LENGTH_IN_CHARS + 1))
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS
+            ):
+            self.user_settings.validate()
+
+    def test_validate_invalid_preferred_language_codes_are_not_accepted(
+        self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.preferred_language_codes = 'not a list' # type: ignore[assignment]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
+            self.user_settings.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.preferred_language_codes = ['en', 'hi', 1] # type: ignore[list-item]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
+            self.user_settings.validate()
+
+        self.user_settings.preferred_language_codes = ['en', '']
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
+            self.user_settings.validate()
+
+        self.user_settings.preferred_language_codes = ['en', 'en']
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
+            self.user_settings.validate()
 
     def test_has_not_fully_registered_for_guest_user_is_false(
         self
@@ -498,8 +598,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
+        user_settings.created_on = time_of_creation
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+        user_settings.user_bio = 'New bio.'
+        user_services.save_user_settings(user_settings)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)

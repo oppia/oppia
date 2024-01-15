@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Contributor dashboard page root component.
+ * @fileoverview Moderator page root component.
  */
 
 import { Component } from '@angular/core';
@@ -21,15 +21,12 @@ import { AppConstants } from 'app.constants';
 import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-contributor-dashboard-page-root',
-  templateUrl: './contributor-dashboard-page-root.component.html',
+  selector: 'oppia-moderator-page-root',
+  templateUrl: './moderator-page-root.component.html',
 })
-export class ContributorDashboardPageRootComponent extends BaseRootComponent {
-  title: string = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CONTRIBUTOR_DASHBOARD.TITLE);
-
+export class ModeratorPageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE;
   meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD.META as
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
     unknown as Readonly<MetaTagData>[];
 }
