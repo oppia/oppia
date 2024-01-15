@@ -3225,6 +3225,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.reviewer_id)
         user_settings.preferred_translation_language_code = 'hi'
         user_services.save_user_settings(user_settings)
+
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': self.EXP_ID,
