@@ -18,6 +18,7 @@
 
 import { Type } from '@angular/core';
 
+import { ContributorDashboardAdminAuthGuard } from 'pages/contributor-dashboard-admin-page/contributor-dashboard-admin-auth.guard';
 import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
 import { PlatformFeatureService } from './platform-feature.service';
@@ -447,6 +448,7 @@ import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
+  ['ContributorDashboardAdminAuthGuard', ContributorDashboardAdminAuthGuard],
   ['AdminAuthGuard', AdminAuthGuard],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],

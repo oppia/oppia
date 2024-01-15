@@ -374,4 +374,3 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     }
   }
 }
-
