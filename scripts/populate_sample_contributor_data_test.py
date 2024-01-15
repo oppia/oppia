@@ -188,7 +188,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
     def _assert_generate_sample_new_structures_data(self) -> None:
         """Asserts that the sample new structures data is generated."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        self.assertEqual(len(topic_summaries), 2)
+        self.assertEqual(len(topic_summaries), 1)
 
         topic = topic_fetchers.get_topic_by_name('Dummy Topic 1')
         assert topic is not None

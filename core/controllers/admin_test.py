@@ -543,13 +543,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        self.assertEqual(len(topic_summaries), 2)
-        for summary in topic_summaries:
-            if summary.name == 'Dummy Topic 1':
-                topic_id = summary.id
-        story_id = (
-            topic_fetchers.get_topic_by_id(
-                topic_id).canonical_story_references[0].story_id)
+        self.assertEqual(len(topic_summaries), 1)
+        story_id = topic_fetchers.get_topic_by_id(
+            topic_summaries[0].id).canonical_story_references[0].story_id
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
         skill_summaries = skill_services.get_all_skill_summaries()
