@@ -1226,13 +1226,14 @@ describe('Admin backend api service', () => {
   ));
 
   it('should generate dummy blogs', fakeAsync(()=> {
-    let action = 'generate_dummy_blog';
-    let blogTitle = 'Education';
+    let action = 'generate_dummy_blog_post';
+    let blogPostTitle = 'Education';
     let payload = {
       action,
-      blog_title: blogTitle,
+      blog_post_title: blogPostTitle,
     };
-    abas.generateDummyBlogAsync(blogTitle).then(successHandler, failHandler);
+    abas.generateDummyBlogPostAsync(blogPostTitle)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
@@ -1246,13 +1247,14 @@ describe('Admin backend api service', () => {
   ));
 
   it('should handle generate dummy blog request failure', fakeAsync(() => {
-    let action = 'generate_dummy_blog';
-    let blogTitle = 'Education';
+    let action = 'generate_dummy_blog_post';
+    let blogPostTitle = 'Education';
     let payload = {
       action,
-      blog_title: blogTitle,
+      blog_post_title: blogPostTitle,
     };
-    abas.generateDummyBlogAsync(blogTitle).then(successHandler, failHandler);
+    abas.generateDummyBlogPostAsync(blogPostTitle)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');

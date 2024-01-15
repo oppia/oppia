@@ -539,10 +539,10 @@ export class AdminBackendApiService {
     });
   }
 
-  async generateDummyBlogAsync(blog: string): Promise<void> {
+  async generateDummyBlogPostAsync(blogPostTitle: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_blog',
-      blog_title: blog,
+      action: 'generate_dummy_blog_post',
+      blog_post_title: blogPostTitle,
     });
   }
 }

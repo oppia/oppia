@@ -330,30 +330,30 @@ describe('Admin dev mode activities tab', () => {
     }));
   });
 
-  describe('.generateDummyBlog', () => {
-    it('should generate dummy blog', async(() => {
-      spyOn(adminBackendApiService, 'generateDummyBlogAsync')
+  describe('.generateDummyBlogPost', () => {
+    it('should generate dummy blog post', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyBlogPostAsync')
         .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
 
-      component.generateNewBlog('Education');
+      component.generateNewBlogPost('Education');
 
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Processing...');
 
       fixture.whenStable().then(() => {
         expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
-          'Dummy Blog generated successfully.');
+          'Dummy Blog Post generated successfully.');
       });
     }));
 
-    it('should show error message if new dummy blog ' +
+    it('should show error message if new dummy blog post ' +
       'is not generated', async(() => {
-      spyOn(adminBackendApiService, 'generateDummyBlogAsync')
+      spyOn(adminBackendApiService, 'generateDummyBlogPostAsync')
         .and.returnValue(Promise.reject('Dummy Blog not generated.'));
       spyOn(component.setStatusMessage, 'emit');
 
-      component.generateNewBlog('Education');
+      component.generateNewBlogPost('Education');
 
       expect(component.setStatusMessage.emit)
         .toHaveBeenCalledWith('Processing...');

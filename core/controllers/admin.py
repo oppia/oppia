@@ -119,7 +119,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
-    blog_title: Optional[str]
+    blog_post_title: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -141,7 +141,7 @@ class AdminHandler(
                         'generate_dummy_explorations', 'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
-                        'generate_dummy_blog',
+                        'generate_dummy_blog_post',
                         'generate_dummy_classroom',
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
@@ -227,7 +227,7 @@ class AdminHandler(
                 },
                 'default_value': None
             },
-            'blog_title': {
+            'blog_post_title': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -367,14 +367,14 @@ class AdminHandler(
 
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
-            elif action == 'generate_dummy_blog':
-                blog_title = self.normalized_payload.get('blog_title')
-                if blog_title is None:
+            elif action == 'generate_dummy_blog_post':
+                blog_post_title = self.normalized_payload.get('blog_post_title')
+                if blog_post_title is None:
                     raise Exception(
-                        'The \'blog_title\' must be provided when the'
-                        ' action is generate_dummy_blog.'
+                        'The \'blog_post_title\' must be provided when the'
+                        ' action is generate_dummy_blog_post.'
                     )
-                self._load_dummy_blog(blog_title)
+                self._load_dummy_blog_post(blog_post_title)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
@@ -622,8 +622,8 @@ class AdminHandler(
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
-    def _load_dummy_blog(self, blog_title: str) -> None:
-        """Loads the database with a blog
+    def _load_dummy_blog_post(self, blog_post_title: str) -> None:
+        """Loads the database with a blog post
 
         Raises:
             Exception. Cannot load new blog in production mode.
@@ -651,7 +651,7 @@ class AdminHandler(
                 )
 
             try:
-                if blog_title == 'Education':
+                if blog_post_title == 'Education':
                     blog_services.update_blog_post(blog_post.id, {
                         'title': 'Education',
                         'thumbnail_filename': 'blog_thumbnail.png',
@@ -686,7 +686,7 @@ class AdminHandler(
                         """,
                         'tags': ['Community']
                     })
-                elif blog_title == 'Testing types of Text formatting':
+                elif blog_post_title == 'Testing types of Text formatting':
                     blog_services.update_blog_post(blog_post.id, {
                         'title': 'Blog with different font formatting',
                         'content': """
@@ -704,7 +704,7 @@ class AdminHandler(
                         'tags': ['Learners', 'Languages'],
                         'thumbnail_filename': 'blog_thumbnail.png'
                     })
-                elif blog_title == 'Leading The Arabic Translations Team':
+                elif blog_post_title == 'Leading The Arabic Translations Team':
                     blog_services.update_blog_post(blog_post.id, {
                         'title': 'Leading The Arabic Translations Team',
                         'content': """
@@ -741,10 +741,10 @@ class AdminHandler(
                     })
                 else:
                     raise self.InvalidInputException(
-                                'The \"blog_title\" is not valid. It should be '
-                                '\"Education\", \"Testing types of Text '
-                                'formatting\", \"Leading The Arabic '
-                                'Translations Team\".')
+                        'The \"blog_post_title\" is not valid. It should be '
+                        '\"Education\", \"Testing types of Text '
+                        'formatting\", \"Leading The Arabic '
+                        'Translations Team\".')
             except Exception as e:
                 blog_services.delete_blog_post(blog_post.id)
                 raise e
