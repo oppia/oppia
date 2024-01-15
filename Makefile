@@ -94,19 +94,22 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
 
-# Define a custom signal handler
-SIGINT_HANDLER = $(SHELL_PREFIX) dev-server sh -c 'echo "Received Ctrl+C, stopping containers..." && $(MAKE) stop'
-
 run_tests.backend: ## Runs the backend tests
-	@trap '$(SIGINT_HANDLER)' EXIT INT; \
-	docker compose up datastore dev-server redis firebase -d --no-deps; \
-	@echo '------------------------------------------------------'; \
-	@echo '  Backend tests started....'; \
-	@echo '------------------------------------------------------'; \
-	$(SHELL_PREFIX) dev-server sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)'; \
-	@echo '------------------------------------------------------'; \
-	@echo '  Backend tests has been executed successfully....'; \
-	@echo '------------------------------------------------------'; \
+	docker compose up datastore dev-server redis firebase -d --no-deps;
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests started....';
+	@echo '------------------------------------------------------';
+	( \
+		$(SHELL_PREFIX) dev-server sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)'; \
+		EXIT_CODE=$$?; \
+		echo '------------------------------------------------------'; \
+		if [ $$EXIT_CODE -eq 0 ]; then \
+			echo '  Backend tests have been executed successfully....'; \
+		else \
+			echo '  Backend tests failed with exit code $$EXIT_CODE....'; \
+		fi; \
+		echo '------------------------------------------------------' \
+	) || true
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
