@@ -100,7 +100,7 @@ run_tests.backend: ## Runs the backend tests
 	@echo '  Backend tests started....';
 	@echo '------------------------------------------------------';
 	( \
-		$(SHELL_PREFIX) dev-server sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)'; \
+		$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS); \
 		EXIT_CODE=$$?; \
 		echo '------------------------------------------------------'; \
 		if [ $$EXIT_CODE -eq 0 ]; then \
