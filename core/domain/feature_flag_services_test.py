@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import enum
 
 from core import feconf
@@ -49,7 +50,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
     def _swap_name_to_description_feature_stage_registry(
-        self) -> Iterator[None]:
+        self) -> contextlib._GeneratorContextManager[None]:
         """Returns swap iterator for the registry variable."""
         return self.swap(
             registry,
@@ -67,7 +68,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             }
         )
 
-    def _swap_feature_flags_list(self) -> Tuple[Iterator[None]]:
+    def _swap_feature_flags_list(self) -> Tuple[
+        contextlib._GeneratorContextManager[None],
+        contextlib._GeneratorContextManager[None]
+    ]:
         """Returns the tuple of swap iterator of feature flags."""
         swap_all_feature_flags = self.swap(
             feature_services,
