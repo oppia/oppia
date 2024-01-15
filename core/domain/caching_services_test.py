@@ -55,7 +55,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'id': 'h51Bu72rDIqO',
         'category': '',
         'auto_tts_enabled': True,
-        'correctness_feedback_enabled': True,
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,
@@ -141,6 +140,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         },
+        'correctness_feedback_enabled': True,
         'next_content_id_index': 7,
         'edits_allowed': True,
         'language_code': 'en',
@@ -180,7 +180,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '{"content_id": "content_0", "html": "<p>Unicode Characters '
         '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, '
         '"solicit_answer_details": false}}, "version": 0, '
-        '"edits_allowed": true, "l'
+        '"correctness_feedback_enabled": true, "edits_allowed": true, "l'
         'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
         '", "blurb": "", "author_notes": ""}'
     )
