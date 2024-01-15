@@ -34,14 +34,14 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class VoiceoverPolicyModel(base_models.BaseModel):
+class VoiceoverLangPolicyModel(base_models.BaseModel):
     """Model for storing language accent codes for Oppia-supported voiceovers.
     """
 
     # A dict with language_code as the key and a nested dict as the value.
-    # The nested dict contains language_accent_code as the key and a boolean
+    # Each nested dict contains language_accent_code as the key and a boolean
     # value indicating whether it's possible to generate automatic voiceovers
-    # for this language-accent code.
+    # for this language-accent code as value.
     language_code_mapping = datastore_services.JsonProperty(required=True)
 
     @staticmethod
@@ -63,16 +63,16 @@ class VoiceoverPolicyModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_model(cls) -> Optional[VoiceoverPolicyModel]:
-        """Gets a VoiceoverPolicyModel instance. Since there will be only one
-        model for storing language accent code, this method returns only
-        one instance.
+    def get_model(cls) -> Optional[VoiceoverLangPolicyModel]:
+        """Gets a VoiceoverLangPolicyModel instance. Since there will be only
+        one model for storing language accent code, this method returns only
+        one instance of the model if it exists.
 
         Returns:
-            VoiceoverPolicyModel|None. An instance of
-            VoiceoverPolicyModel class.
+            VoiceoverLangPolicyModel|None. An instance of
+            VoiceoverLangPolicyModel class.
         """
-        voiceover_policy_model_list: Sequence[VoiceoverPolicyModel] = (
+        voiceover_policy_model_list: Sequence[VoiceoverLangPolicyModel] = (
             cls.get_all().fetch())
         return (
             voiceover_policy_model_list[0]

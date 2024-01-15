@@ -31,12 +31,12 @@ if MYPY: # pragma: no cover
 ])
 
 
-class VoiceoverPolicyModelTest(test_utils.GenericTestBase):
-    """Unit tests for VoiceoverPolicyModel class."""
+class VoiceoverLanguagePolicyModelTest(test_utils.GenericTestBase):
+    """Unit tests for VoiceoverLanguagePolicyModelTest class."""
 
     def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
-            voice_policy_models.VoiceoverPolicyModel.get_export_policy(),
+            voice_policy_models.VoiceoverLangPolicyModel.get_export_policy(),
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -48,7 +48,7 @@ class VoiceoverPolicyModelTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_not_applicable(self) -> None:
         self.assertEqual(
-            voice_policy_models.VoiceoverPolicyModel.get_deletion_policy(),
+            voice_policy_models.VoiceoverLangPolicyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user_not_corresponding_to_user(
@@ -56,7 +56,7 @@ class VoiceoverPolicyModelTest(test_utils.GenericTestBase):
     ) -> None:
         self.assertEqual(
             (
-                voice_policy_models.VoiceoverPolicyModel
+                voice_policy_models.VoiceoverLangPolicyModel
                 .get_model_association_to_user()
             ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
@@ -67,14 +67,14 @@ class VoiceoverPolicyModelTest(test_utils.GenericTestBase):
                 'en-US': False
             },
             'hi': {
-                'hi-In': False
+                'hi-In': True
             }
         }
-        voice_policy_models.VoiceoverPolicyModel(
+        voice_policy_models.VoiceoverLangPolicyModel(
             language_code_mapping=language_code_mapping_dict).put()
 
         voice_policy_model = (
-            voice_policy_models.VoiceoverPolicyModel.get_model())
+            voice_policy_models.VoiceoverLangPolicyModel.get_model())
         assert voice_policy_model is not None
 
         self.assertDictEqual(
