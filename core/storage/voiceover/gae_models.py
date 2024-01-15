@@ -29,8 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([
-    models.Names.BASE_MODEL
-])
+    models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -128,8 +127,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 fetched.
             entity_version: int. The version of the entity whose voiceovers
                 are to be fetched.
-            language_accent_code: str. The language accent code whose
-                voiceovers are to be fetched.
+            language_accent_code: str. The language accent code of the
+                voiceovers.
 
         Returns:
             EntityVoiceoversModel. The EntityVoiceoversModel instance

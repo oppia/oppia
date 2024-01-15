@@ -130,9 +130,7 @@ class EntityVoiceoversModelTest(test_utils.GenericEmailTestBase):
     def test_get_model_association_to_user_not_corresponding_to_user(
         self
     ) -> None:
+        model = voiceover_models.EntityVoiceoversModel
         self.assertEqual(
-            (
-                voiceover_models.EntityVoiceoversModel
-                .get_model_association_to_user()
-            ),
+            model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)

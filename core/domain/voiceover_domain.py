@@ -39,8 +39,8 @@ class EntityVoiceoversDict(TypedDict):
 
 
 class EntityVoiceovers:
-    """A domain object for the entity voiceovers for a given versioned entity
-    in a given language accent pair.
+    """A domain object for the entity voiceovers instance for a given
+    versioned entity in a given language accent pair.
 
     NOTE: This domain object corresponds to EntityVoiceoversModel in the
     storage layer.
@@ -111,14 +111,14 @@ class EntityVoiceovers:
     def from_dict(
         cls, entity_voiceovers_dict: EntityVoiceoversDict
     ) -> EntityVoiceovers:
-        """Creates the EntityVoiceovers from the given dict.
+        """Creates the EntityVoiceovers instance from the given dict.
 
         Args:
             entity_voiceovers_dict: EntityVoiceoversDict. The dict
                 representation of the EntityVoiceovers object.
 
         Returns:
-            EntityVoiceovers. The EntityVoiceovers object created using the
+            EntityVoiceovers. The EntityVoiceovers instance created using the
             given dict.
         """
         content_id_to_voiceovers = {}
@@ -184,7 +184,8 @@ class EntityVoiceovers:
                 being added.
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
-            voiceover: Voiceover. The voiceover to be added.
+            voiceover: Voiceover. The voiceover instance to be added to the
+                entity voiceovers object.
         """
         self.voiceovers[content_id][voiceover_type] = voiceover
 
@@ -197,7 +198,7 @@ class EntityVoiceovers:
 
         Args:
             content_id: str. The ID of the content for which the voiceover is
-                being added.
+                being removed.
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
         """

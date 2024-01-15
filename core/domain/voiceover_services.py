@@ -86,9 +86,8 @@ def get_voiceovers_for_given_language_accent_code(
             entity_type, entity_id, entity_version, language_accent_code))
 
     if entity_voiceovers_model:
-        domain_object = _get_entity_voiceovers_from_model(
+        return _get_entity_voiceovers_from_model(
             entity_voiceovers_model)
-        return domain_object
     return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,

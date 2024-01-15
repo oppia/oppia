@@ -26,7 +26,7 @@ from core.tests import test_utils
 
 
 class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
-    """Test for EntityVoiceovers."""
+    """Test for EntityVoiceovers domain class."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -62,7 +62,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         )
         self.entity_voiceovers_instance.validate()
 
-    def test_to_dict_method_entity_voiceovers_class(self) -> None:
+    def test_to_dict_method_of_entity_voiceovers_class(self) -> None:
         expected_entity_voiceovers_dict = {
             'entity_id': 'exp_id',
             'entity_type': 'exploration',
@@ -79,7 +79,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             self.entity_voiceovers_instance.to_dict(),
             expected_entity_voiceovers_dict)
 
-    def test_from_dict_method_entity_voiceover_class(self) -> None:
+    def test_from_dict_method_of_entity_voiceovers_class(self) -> None:
         entity_voiceovers_dict: voiceover_domain.EntityVoiceoversDict = {
             'entity_id': 'exp_id',
             'entity_type': 'exploration',
@@ -118,8 +118,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'entity_version must be an int'
         ):
-            self.entity_voiceovers_instance.entity_version = (
-                'version')  # type: ignore[assignment]
+            self.entity_voiceovers_instance.entity_version = 'version'  # type: ignore[assignment]
             self.entity_voiceovers_instance.validate()
 
     def test_validate_entity_type(self) -> None:
@@ -204,6 +203,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             content_id='content_id_0',
             voiceover_type=feconf.VoiceoverType.MANUAL,
             voiceover=new_voiceover_object)
+
         self.assertDictEqual(
             self.entity_voiceovers_instance.voiceovers['content_id_0'][
                 feconf.VoiceoverType.MANUAL].to_dict(),
@@ -211,6 +211,10 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         )
 
     def test_removes_voiceover_correctly(self) -> None:
+        self.assertIn(
+            feconf.VoiceoverType.MANUAL,
+            self.entity_voiceovers_instance.voiceovers['content_id_0'].keys())
+
         self.entity_voiceovers_instance.remove_voiceover(
             content_id='content_id_0',
             voiceover_type=feconf.VoiceoverType.MANUAL
