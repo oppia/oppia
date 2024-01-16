@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
