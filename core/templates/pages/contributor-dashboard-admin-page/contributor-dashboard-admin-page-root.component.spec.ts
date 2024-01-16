@@ -50,7 +50,7 @@ describe('AdminPageRootComponent', () => {
     );
     expect(component.meta).toEqual(
       AppConstants.
-      CONTRIBUTOR_DASHBOARD_ADMIN.META
+        PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.META
     );
   });
 });
