@@ -352,8 +352,10 @@ class CreatorDashboardHandler(
         assert self.normalized_payload is not None
         creator_dashboard_display_pref = self.normalized_payload[
             'display_preference']
-        user_services.update_user_creator_dashboard_display(
-            self.user_id, creator_dashboard_display_pref)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.creator_dashboard_display_pref = (
+            creator_dashboard_display_pref)
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 

@@ -46,13 +46,12 @@ def _get_entity_voiceovers_from_model(
         its model.
     """
     content_id_to_voiceovers_dict = {}
-    for content_id, voiceover_type_to_voiceover in (
+    for content_id, voiceover_type_to_voiceover_dict in (
             entity_voiceovers_model.voiceovers.items()):
         content_id_to_voiceovers_dict[content_id] = {
-            feconf.VoiceoverType.MANUAL: state_domain.Voiceover.from_dict(
-                voiceover_type_to_voiceover[feconf.VoiceoverType.MANUAL.value]),
-            feconf.VoiceoverType.AUTO: state_domain.Voiceover.from_dict(
-                voiceover_type_to_voiceover[feconf.VoiceoverType.AUTO.value])
+            voiceover_type: state_domain.Voiceover.from_dict(
+                    voiceover_type_to_voiceover_dict[voiceover_type.value])
+                for voiceover_type in feconf.VoiceoverType
         }
 
     entity_voiceovers_instance = voiceover_domain.EntityVoiceovers(
@@ -87,9 +86,8 @@ def get_voiceovers_for_given_language_accent_code(
             entity_type, entity_id, entity_version, language_accent_code))
 
     if entity_voiceovers_model:
-        domain_object = _get_entity_voiceovers_from_model(
+        return _get_entity_voiceovers_from_model(
             entity_voiceovers_model)
-        return domain_object
     return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,
