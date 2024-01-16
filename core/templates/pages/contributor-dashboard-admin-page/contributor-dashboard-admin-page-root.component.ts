@@ -30,5 +30,6 @@ export class ContributorDashboardAdminPageRootComponent
     .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CONTRIBUTOR_DASHBOARD_ADMIN.META as unknown as Readonly<MetaTagData>[];
+    .CONTRIBUTOR_DASHBOARD_ADMIN.META as 
+    unknown as Readonly<MetaTagData>[];
 }
