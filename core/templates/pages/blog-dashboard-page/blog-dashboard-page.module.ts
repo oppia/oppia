@@ -63,7 +63,7 @@ import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detai
   entryComponents: [
     BlogDashboardPageComponent,
     BlogAuthorDetailsEditorComponent
-  
+
   ],
 })
 export class BlogDashboardPageModule {}

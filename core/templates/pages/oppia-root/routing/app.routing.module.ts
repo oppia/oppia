@@ -234,10 +234,10 @@ const routes: Route[] = [
   {
     path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .BLOG_DASHBOARD.ROUTE),                       
-    loadChildren: () => import(    
-      'pages/blog-dashboard-page/blog-dashboard-page.module')     
-      .then(m => m.BlogDashboardPageModule) 
+        .BLOG_DASHBOARD.ROUTE),
+    loadChildren: () => import(
+      'pages/blog-dashboard-page/blog-dashboard-page.module')
+      .then(m => m.BlogDashboardPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
