@@ -43,7 +43,7 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
 
     def test_admin_get(self) -> None:
         """Test `/contributor-dashboard-admin` returns a 200 response."""
-        self.get_html_response('/contributor-dashboard-admin', 
+        self.get_html_response('/contributor-dashboard-admin',
             expected_status_int=200)
 
 
