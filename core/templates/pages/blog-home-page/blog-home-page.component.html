@@ -86,7 +86,7 @@
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-          <img  [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+          <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
         </picture>
         <p class="text-center">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
@@ -113,8 +113,7 @@
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
           <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
-            <div class="form-group d-flex"
-                 >
+            <div class="form-group d-flex">
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
