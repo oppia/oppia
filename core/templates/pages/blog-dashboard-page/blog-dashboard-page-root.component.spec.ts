@@ -22,7 +22,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AppConstants } from 'app.constants';
-import { PageHeadService } from '/services/blog-dashboard-page.service';
+import { PageHeadService } from 'services/page-head.service';
 import { BlogDashboardPageRootComponent } from './blog-dashboard-page-root.component';
 
 describe('BlogDashboardPageRootComponent', () => {
