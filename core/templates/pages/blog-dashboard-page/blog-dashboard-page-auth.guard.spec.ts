@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Blog-DashboardAuthGuard
+ * @fileoverview Tests for BlogDashboardAuthGuard
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

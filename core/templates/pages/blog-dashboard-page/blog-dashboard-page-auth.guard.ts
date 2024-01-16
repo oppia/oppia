@@ -15,7 +15,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a super admin.
+ * if the user is not a Blog Admin.
  */
 
 import { Location } from '@angular/common';
@@ -45,7 +45,7 @@ export class BlogDashboardAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isBlogAdmin()) {
+    if (userInfo.isBlogAdmin() || userInfo.isBlogPostEditor()) {
       return true;
     }
 
