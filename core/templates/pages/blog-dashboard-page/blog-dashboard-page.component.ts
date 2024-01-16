@@ -194,5 +194,3 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 }
-
-
