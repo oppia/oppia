@@ -167,6 +167,7 @@ class ValidModelNames(enum.Enum):
     TOPIC = 'topic'
     TRANSLATION = 'translation'
     USER = 'user'
+    VOICEOVER = 'voiceover'
 
 
 # A mapping of interaction ids to classifier properties.
@@ -492,6 +493,9 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
+
+# A regular expression for language accent code.
+LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-z]+)-)+([A-Z]+)$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
@@ -1693,3 +1697,10 @@ class TranslatedContentDict(TypedDict):
     content_value: ContentValueType
     needs_update: bool
     content_format: str
+
+
+class VoiceoverType(enum.Enum):
+    """Represents all possible voicever types."""
+
+    AUTO = 'auto'
+    MANUAL = 'manual'
