@@ -40,9 +40,11 @@ if MYPY:  # pragma: no cover
 
 class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
     """Test for ContributorDashboardAdminPage."""
+
     def test_admin_get(self) -> None:
         """Test `/contributor-dashboard-admin` returns a 200 response."""
-        self.get_html_response('/contributor-dashboard-admin', expected_status_int=200)
+        self.get_html_response('/contributor-dashboard-admin', 
+            expected_status_int=200)
 
 
 class ContributionRightsHandlerTest(test_utils.GenericTestBase):
