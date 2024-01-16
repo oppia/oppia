@@ -32,11 +32,6 @@ if MYPY:  # pragma: no cover
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
-def test_blog_dashboard_get(self) -> None:
-    """Test `/blog` returns a 200 response."""
-    self.get_html_response('/blog-dashboard', expected_status_int=200)
-
-
 class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     username = 'user'
