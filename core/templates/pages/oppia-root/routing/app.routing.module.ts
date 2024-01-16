@@ -46,7 +46,7 @@ const routes: Route[] = [
       '/contributor-dashboard-admin-page.module')
       .then(m => m.ContributorDashboardAdminPageModule),
     canActivate: [IsLoggedInGuard]
-  },  
+  },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',

@@ -449,7 +449,7 @@ import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminAuthGuard', AdminAuthGuard],
-  ['ContributorDashboardAdminAuthGuard', ContributorDashboardAdminAuthGuard],  
+  ['ContributorDashboardAdminAuthGuard', ContributorDashboardAdminAuthGuard],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],

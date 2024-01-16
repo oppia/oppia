@@ -48,7 +48,7 @@ import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admi
         component: ContributorDashboardAdminPageRootComponent,
         canActivate: [ContributorDashboardAdminAuthGuard],
       },
-    ]),    
+    ]),
     RouterModule.forRoot([]),
     ReactiveFormsModule,
     SharedComponentsModule,
