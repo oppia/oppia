@@ -62,8 +62,6 @@ module.exports = {
   entry: {
     blog_admin:
       commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     classroom_admin:
       commonPrefix + '/pages/classroom-admin-page/' +
       'classroom-admin-page.import.ts',
@@ -208,17 +206,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/diagnostic-test-player-page/' +
         'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['blog_dashboard'],
-      filename: 'blog-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/blog-dashboard-page/' +
-        'blog-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
