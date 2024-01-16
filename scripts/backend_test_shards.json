@@ -392,6 +392,9 @@
         "core.jobs.io.gcs_io_test",
         "core.domain.android_services_test",
         "core.jobs.batch_jobs.contributor_admin_stats_jobs_test",
-        "core.jobs.batch_jobs.story_node_jobs_test"
+        "core.jobs.batch_jobs.story_node_jobs_test",
+        "core.storage.voiceover.gae_models_test",
+        "core.domain.voiceover_domain_test",
+        "core.domain.voiceover_services_test"
     ]
 }

@@ -111,6 +111,10 @@
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 
 
+# Audio Voiceover project
+/core/domain/voiceover*.py @oppia/lace-backend-reviewers
+
+
 # Blog project
 /core/domain/blog*.py @oppia/lace-backend-reviewers
 /core/controllers/blog_dashboard*.py @oppia/lace-backend-reviewers
