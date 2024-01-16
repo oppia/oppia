@@ -26,9 +26,8 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 })
 export class ContributorDashboardAdminPageRootComponent 
   extends BaseRootComponent {
-    title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
-    meta: MetaTagData[] =
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .CONTRIBUTOR_DASHBOARD_ADMIN.META as unknown as Readonly<MetaTagData>[];
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .CONTRIBUTOR_DASHBOARD_ADMIN.META as unknown as Readonly<MetaTagData>[];
 }
