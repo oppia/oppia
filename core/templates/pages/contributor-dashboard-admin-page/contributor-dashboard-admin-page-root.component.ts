@@ -24,10 +24,11 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   selector: 'oppia-contributor-dashboard-admin-page-root',
   templateUrl: './contributor-dashboard-admin-page-root.component.html',
 })
-export class ContributorDashboardAdminPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN.META as
-    unknown as Readonly<MetaTagData>[];
+export class ContributorDashboardAdminPageRootComponent 
+  extends BaseRootComponent {
+    title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
+    meta: MetaTagData[] =
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .CONTRIBUTOR_DASHBOARD_ADMIN.META as unknown as Readonly<MetaTagData>[];
 }
-
