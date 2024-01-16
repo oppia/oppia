@@ -29,7 +29,6 @@ export class ContributorDashboardAdminPageRootComponent
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
 
-  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CONTRIBUTOR_DASHBOARD_ADMIN.META as
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
     unknown as Readonly<MetaTagData>[];
 }
