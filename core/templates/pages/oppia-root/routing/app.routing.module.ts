@@ -42,8 +42,8 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
     loadChildren: () => import(
-      'pages/contributor-dashboard-admin-page'
-      + '/contributor-dashboard-admin-page.module')
+      'pages/contributor-dashboard-admin-page' +
+      '/contributor-dashboard-admin-page.module')
       .then(m => m.ContributorDashboardAdminPageModule),
     canActivate: [IsLoggedInGuard]
   },
