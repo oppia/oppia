@@ -44,7 +44,7 @@ export class ContributorDashboardAdminAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isTranslationAdmin()) {
+    if (userInfo.isTranslationAdmin() || userInfo.isQuestionAdmin()) {
       return true;
     }
 
