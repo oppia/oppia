@@ -50,51 +50,94 @@ export class HtmlLengthService {
     }
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
-    let totalWeight = this.calculateBaselineLength(sanitizedHtml);
-
+    let totalWords = this.calculateBaselineLength(sanitizedHtml, 'word');
     // Identify custom tags using regex on the original HTML string.
     const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
     const customTags = htmlString.match(customTagRegex);
 
     if (customTags) {
       for (const customTag of customTags) {
-        totalWeight += this.getWeightForNonTextNodes(customTag);
+        totalWords += this.getWeightForNonTextNodes(customTag, 'word');
       }
     }
-    return totalWeight;
+    return totalWords;
   }
 
-  private calculateBaselineLength(sanitizedHtml: string): number {
+  computeHtmlLengthInCharacters(htmlString: string): number {
+    if (!htmlString) {
+      this.loggerService.error('Empty string was passed to compute length');
+      return 0;
+    }
+    const sanitizedHtml = this.sanitizer.sanitize(
+      SecurityContext.HTML, htmlString) as string;
+    let totalCharacters =
+    this.calculateBaselineLength(sanitizedHtml, 'character');
+    // Identify custom tags using regex on the original HTML string.
+    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
+    const customTags = htmlString.match(customTagRegex);
+
+    if (customTags) {
+      for (const customTag of customTags) {
+        totalCharacters += this.getWeightForNonTextNodes(
+          customTag, 'character');
+      }
+    }
+    return totalCharacters;
+  }
+
+  private calculateBaselineLength(
+      sanitizedHtml: string, wordOrCharacter: string): number {
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
       const ltag = tag.tagName.toLowerCase();
       if (this.textTags.includes(ltag)) {
-        totalWeight += this.getWeightForTextNodes(tag as HTMLElement);
+        totalWeight +=
+        this.getWeightForTextNodes(tag as HTMLElement, wordOrCharacter);
       }
     }
     return totalWeight;
   }
 
-  private getWeightForTextNodes(textNode: HTMLElement): number {
+  private getWeightForTextNodes(
+      textNode: HTMLElement, wordOrCharacter: string): number {
     const textContent = textNode.textContent || '';
-    const words = textContent.trim().split(' ');
-    const wordCount = words.length;
 
-    return wordCount;
+    if (wordOrCharacter === 'word') {
+      const words = textContent.trim().split(' ');
+      const wordCount = words.length;
+      return wordCount;
+    } else if (wordOrCharacter === 'character') {
+      const characters = textContent.trim().split('\n').join('').split('');
+      let characterCount = characters.length;
+      return characterCount;
+    }
+    return 0;
   }
 
-  private getWeightForNonTextNodes(nonTextNode: string): number {
+  private getWeightForNonTextNodes(
+      nonTextNode: string, wordOrCharacter: string): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;
     }
-    const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
-    let words = [];
-    if (altTextMatch && altTextMatch[1]) {
-      const altText = altTextMatch[1];
-      words = altText.trim().split(' ');
+    const altTextMatch = nonTextNode
+      .match(/alt-with-value="&amp;quot;([^&]*)&amp;quot;"/);
+    if (wordOrCharacter === 'character') {
+      let chars = [];
+      if (altTextMatch && altTextMatch[1]) {
+        const altText = altTextMatch[1];
+        chars = altText.trim().split(' ').join('').split('');
+      }
+      return chars.length + 2; // +2 as a bonus for images with text.
+    } else if (wordOrCharacter === 'word') {
+      let words = [];
+      if (altTextMatch && altTextMatch[1]) {
+        const altText = altTextMatch[1];
+        words = altText.trim().split(' ');
+      }
+      return words.length + 2; // +2 as a bonus for images with text.
     }
-    return words.length + 2; // +2 as a bonus for images with text.
+    return 0;
   }
 }

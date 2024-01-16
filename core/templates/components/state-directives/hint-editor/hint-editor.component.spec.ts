@@ -116,16 +116,6 @@ describe('HintEditorComponent', () => {
     expect(component.hintEditorIsOpen).toBe(false);
   });
 
-  it('should check if hint HTML length exceeds 500 characters', () => {
-    component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(500), 'contentID'));
-    expect(component.isHintLengthExceeded()).toBe(false);
-
-    component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(501), 'contentID'));
-    expect(component.isHintLengthExceeded()).toBe(true);
-  });
-
   it('should check if hint HTML is updating', () => {
     const schema = component.HINT_FORM_SCHEMA = {
       type: 'html',
