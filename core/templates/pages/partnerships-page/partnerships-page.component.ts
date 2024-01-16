@@ -33,6 +33,7 @@ import { UrlInterpolationService } from
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  formLink: string = '';
   partnershipsImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
@@ -68,56 +69,16 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   }
 
   getFormLink(): string {
-    let userLanguage = this.translateService.currentLang;
-    const englishLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
-    const portugueseLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const arabicLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=ar&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const hindiLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=hi&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const spanishLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const bengaliLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=bn&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const frenchLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const indonesianLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const ukranianLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=uk&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const slovakLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=sk&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const dutchLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=nl&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const vietnameseLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=vi&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const turkishLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=tr&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const chineseSimplified = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=zh-hans&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    const chineseTraditional = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=zh-hant&_x_tr_hl=en-US&_x_tr_pto=wapp';
-    switch (userLanguage) {
-      case 'en':
-        return englishLink;
-      case 'pt-br':
-        return portugueseLink;
-      case 'ar':
-        return arabicLink;
-      case 'hi':
-        return hindiLink;
-      case 'es':
-        return spanishLink;
-      case 'bn':
-        return bengaliLink;
-      case 'fr':
-        return frenchLink;
-      case 'id':
-        return indonesianLink;
-      case 'uk':
-        return ukranianLink;
-      case 'sk':
-        return slovakLink;
-      case 'nl':
-        return dutchLink;
-      case 'vi':
-        return vietnameseLink;
-      case 'tr':
-        return turkishLink;
-      case 'zh-hans':
-        return chineseSimplified;
-      case 'zh-hant':
-        return chineseTraditional;
-      default:
-        return englishLink;
+    let userLang = this.translateService.currentLang;
+
+    if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
+      this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    } else if (userLang === 'pt-br') {
+      this.formLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
+    } else {
+      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${userLang}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
     }
+    return this.formLink;
   }
 
   ngOnInit(): void {
