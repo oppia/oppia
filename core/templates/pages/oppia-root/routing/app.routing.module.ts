@@ -39,6 +39,15 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
+    loadChildren: () => import(
+      'pages/contributor-dashboard-admin-page' +
+      '/contributor-dashboard-admin-page.module')
+      .then(m => m.ContributorDashboardAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },  
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
