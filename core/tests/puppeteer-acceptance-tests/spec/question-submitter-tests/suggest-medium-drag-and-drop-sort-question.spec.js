@@ -32,16 +32,15 @@ describe('Practice Question Submitter', function() {
   const hardDifficultyRubricNotes = [''];
   const questionText = 'Question 1: Test Question';
   const correctAnswer = 'Correct';
-  const incorrectAnswer = 'Incorrect answer'
+  const incorrectAnswer = 'Incorrect answer';
   const misconception = {
     name: '3 before 2',
     feedback: '2 to 3 (two to three)',
     mustBeTaggedToQuestion: false
   };
-  const hintText = 'Sort by number';
   const acceptedQuestionsPercentage = 30;
 
-  let practiceQuestionSubmitter = null;
+  let questionSubmitter = null;
   const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
   const ROLE_QUESTION_ADMIN = 'question admin';
   const DIFFICULTY_MEDIUM = 'Medium';
@@ -89,96 +88,101 @@ describe('Practice Question Submitter', function() {
     const topicId = await superAdmin.getTopicId();
 
     await superAdmin.editClassroom({ topics: [topicId] });
- 
-    practiceQuestionSubmitter = (
-      await userFactory.createNewPracticeQuestionSubmitter('questionsubmitter')); 
+
+    questionSubmitter = (
+      await userFactory.createNewQuestionSubmitter('questionsubmitter'));
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should suggest questions by selecting the difficulty to a lesson' +
     ' in a topic', async function() {
-    await practiceQuestionSubmitter.navigateToContributorDashboard();
-    await practiceQuestionSubmitter.navigateToSubmitQuestions();
-    await practiceQuestionSubmitter.expectSkillOpportunityToExist({
+    await questionSubmitter.navigateToContributorDashboard();
+    await questionSubmitter.navigateToSubmitQuestions();
+    await questionSubmitter.expectSkillOpportunityToExist({
       topicName, skillDescription, suggestable: true
     });
 
-    await practiceQuestionSubmitter.suggestQuestionForSkillOpportunity(
+    await questionSubmitter.suggestQuestionForSkillOpportunity(
       { topicName, skillDescription });
-    await practiceQuestionSubmitter.expectQuestionDifficultyChoices(
-      { difficulty: DIFFICULTY_MEDIUM, rubricNotes: mediumDifficultyRubricNotes },
-      { difficulty: DIFFICULTY_HARD, rubricNotes: hardDifficultyRubricNotes });
-    
-    await practiceQuestionSubmitter.chooseDifficulty(DIFFICULTY_MEDIUM);
-    await practiceQuestionSubmitter.expectChosenDifficultyToBe(
+    await questionSubmitter.expectQuestionDifficultyChoices(
+      {
+        difficulty: DIFFICULTY_MEDIUM,
+        rubricNotes: mediumDifficultyRubricNotes
+      },
+      {
+        difficulty: DIFFICULTY_HARD,
+        rubricNotes: hardDifficultyRubricNotes
+      });
+
+    await questionSubmitter.chooseDifficulty(DIFFICULTY_MEDIUM);
+    await questionSubmitter.expectChosenDifficultyToBe(
       DIFFICULTY_MEDIUM);
-    await practiceQuestionSubmitter.expectSkillRubricNotesToHave(
+    await questionSubmitter.expectSkillRubricNotesToHave(
       mediumDifficultyRubricNotes);
-    await practiceQuestionSubmitter.expectQuestionTextSection();
+    await questionSubmitter.expectQuestionTextSection();
 
-    await practiceQuestionSubmitter.writeQuestionText(questionText);
-    await practiceQuestionSubmitter.expectQuestionTextToBe(questionText);
+    await questionSubmitter.writeQuestionText(questionText);
+    await questionSubmitter.expectQuestionTextToBe(questionText);
 
-    await practiceQuestionSubmitter.addInteraction();
-    await practiceQuestionSubmitter.expectInteractionChoices();
-    await practiceQuestionSubmitter.navigateToCommonInteractions();
-    await practiceQuestionSubmitter.chooseInteraction(
+    await questionSubmitter.addInteraction();
+    await questionSubmitter.expectInteractionChoices();
+    await questionSubmitter.navigateToCommonInteractions();
+    await questionSubmitter.chooseInteraction(
       INTERACTION_DRAG_AND_DROP_SORT);
-    await practiceQuestionSubmitter.expectDragAndDropSortInteractionEditor();
-    (
-      await practiceQuestionSubmitter
-      .expectUnmetMinimumDragAndDropSortItemCount());
-    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBe(1);
+    await questionSubmitter.expectDragAndDropSortInteractionEditor();
+    await (
+      questionSubmitter.expectUnmetMinimumDragAndDropSortItemCount());
+    await questionSubmitter.expectDragAndDropSortItemCountToBe(1);
 
-    await practiceQuestionSubmitter.writeDragAndDropSortItems(['3', '1', '2']);
-    await practiceQuestionSubmitter.expectDragAndDropSortItemCountToBe(3);
-    await practiceQuestionSubmitter.allowMultipleSortItemsInSamePosition();
-    await practiceQuestionSubmitter.saveInteraction();
-    await practiceQuestionSubmitter.expectResponseEditor();
+    await questionSubmitter.writeDragAndDropSortItems(['3', '1', '2']);
+    await questionSubmitter.expectDragAndDropSortItemCountToBe(3);
+    await questionSubmitter.allowMultipleSortItemsInSamePosition();
+    await questionSubmitter.saveInteraction();
+    await questionSubmitter.expectResponseEditor();
 
-    await practiceQuestionSubmitter.chooseResponseAssertion(
+    await questionSubmitter.chooseResponseAssertion(
       RESPONSE_EQUAL_TO_ORDERING);
-    await practiceQuestionSubmitter.writeResponseFeedback(correctAnswer);
-    await practiceQuestionSubmitter.saveResponseAndAddAnother();
-    await practiceQuestionSubmitter.expectResponseEditor();
-    await practiceQuestionSubmitter.chooseResponseAssertion(
+    await questionSubmitter.writeResponseFeedback(correctAnswer);
+    await questionSubmitter.saveResponseAndAddAnother();
+    await questionSubmitter.expectResponseEditor();
+    await questionSubmitter.chooseResponseAssertion(
       RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION);
-    await practiceQuestionSubmitter.tagResponseWithMisconception(
+    await questionSubmitter.tagResponseWithMisconception(
       misconception);
-    await practiceQuestionSubmitter.saveResponse();
-    await practiceQuestionSubmitter.expectResponseToExist({
+    await questionSubmitter.saveResponse();
+    await questionSubmitter.expectResponseToExist({
       assertion: RESPONSE_EQUAL_TO_ORDERING,
       feedback: correctAnswer
     });
-    await practiceQuestionSubmitter.expectResponseToExist({
+    await questionSubmitter.expectResponseToExist({
       assertion: RESPONSE_EQUAL_TO_ORDERING_WITH_ONE_ITEM_AT_INCORRECT_POSITION,
       feedback: misconception.feedback
     });
-    await practiceQuestionSubmitter.expectResponseToExist({
+    await questionSubmitter.expectResponseToExist({
       assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG,
       feedback: ''
     });
-    await practiceQuestionSubmitter.addHint(hint);
-    await practiceQuestionSubmitter.expectHint(hint);
-    await practiceQuestionSubmitter.expectMissingSolution();
-    await practiceQuestionSubmitter.addSolution({
+    await questionSubmitter.addHint(hint);
+    await questionSubmitter.expectHint(hint);
+    await questionSubmitter.expectMissingSolution();
+    await questionSubmitter.addSolution({
       quantity: SOLUTION_QUANTITY_ONLY_ONE, solution, explanation
     });
-    await practiceQuestionSubmitter.expectSolutionToExist({
+    await questionSubmitter.expectSolutionToExist({
       solution, explanation });
-    await practiceQuestionSubmitter.expectDefaultOutcomeWithNoFeedback();
+    await questionSubmitter.expectDefaultOutcomeWithNoFeedback();
 
-    await practiceQuestionSubmitter.editResponse(
+    await questionSubmitter.editResponse(
       { assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG, feedback: '' },
       { feedback: incorrectAnswer });
-    await practiceQuestionSubmitter.expectResponseToExist({
+    await questionSubmitter.expectResponseToExist({
       assertion: RESPONSE_ALL_OTHER_ANSWERS_ARE_WRONG,
       feedback: incorrectAnswer
     });
-    await practiceQuestionSubmitter.suggestQuestion();
-    await practiceQuestionSubmitter.expectSuggestionSubmittedForReview();
-    // TODO #19075: After solving the aforementioned issue, change the following
-    // expectation so that expected progressbar reflects said changes 
-    await practiceQuestionSubmitter.expectSkillOpportunityToExist({
+    await questionSubmitter.suggestQuestion();
+    await questionSubmitter.expectSuggestionSubmittedForReview();
+    // TODO(#19075): After solving the aforementioned issue, change the
+    // following expectation so that expected progressbar reflects said changes.
+    await questionSubmitter.expectSkillOpportunityToExist({
       topicName, skillDescription,
       progress: { acceptedQuestionsPercentage }
     });

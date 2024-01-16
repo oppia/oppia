@@ -124,32 +124,33 @@ module.exports = class e2eSuperAdmin extends baseUser {
       const errorHeader = document.querySelector(
         'div.e2e-test-error-container div');
       if (errorHeader.innerText === '401 - Unauthorized') {
-        throw new Error('User does not have the proper roles to access the ' +
-          'contributor dashboard admin page.');
+        throw new Error(
+          'User does not have the proper roles to access the contributor ' +
+          'dashboard admin page.');
       }
       showMessage('Error text: ' + errorHeader.innerText);
     });
 
     await this.type('input#add-contribution-rights-user-input', username);
-    await this.page.evaluate(async (right) => {
+    await this.page.evaluate(async(right) => {
       const availableRights = document.querySelectorAll(
         `${addContributionRightsCategorySelectDropdown} option`);
       for (const availableRight in availableRights) {
         if (availableRight.innerText === right) {
           await this.select(addContributionRightsCategorySelectDropdown, right);
           return;
-	}
+        }
       }
       throw new Error(
-	`Contribution right ${right} is not one of the available rights.` +
+        `Contribution right ${right} is not one of the available rights.` +
         ' Ensure that the text is spelled correctly and that the user has ' +
         'the proper role to add said right.');
     }, right);
 
     if (right === testConstants.ContributorRights.ReviewTranslation) {
-      await this.page.evaluate(async (language) => {
+      await this.page.evaluate(async(language) => {
         const availableLanguages = document.querySelectorAll(
-          `${addContributionRightsLanguageSelectDropdown} option`); 
+          `${addContributionRightsLanguageSelectDropdown} option`);
         for (const availableLanguage in availableLanguages) {
           if (availableLanguage.innerText === language) {
             await this.select(
@@ -161,7 +162,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           `Language ${language} is not one of the available languages.` +
           ' Ensure that the text is spelled correctly.');
       }, language);
-    } 
+    }
 
     await this.clickOn('button#add-contribution-rights-submit-button');
     await this.page.evaluate(() => {
@@ -197,7 +198,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.type('input.e2e-test-new-topic-name-field', name);
     await this.type('input.e2e-test-new-topic-url-fragment-field', urlFragment);
     await this.type(
-      'input.e2e-test-new-page-title-fragm-field', webTitleFragment);  
+      'input.e2e-test-new-page-title-fragm-field', webTitleFragment);
     await this.type(
       'textarea.e2e-test-new-topic-description-field', description);
 
@@ -216,23 +217,23 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('button.e2e-test-close-save-modal-button');
 
     const topicEditorUrl = await this.page.url();
-    // Assign skills
+    // Assign skills.
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
     await this.clickOn('.e2e-test-assign-skill-to-topic-button');
-    await this.page.evaluate(async (name) => {
+    await this.page.evaluate(async(name) => {
       const topicNames = document.getElementsByClassName(
         'e2e-test-topic-name-in-topic-select-modal');
       for (let i = 0; i < topicNames.length; i++) {
         if (topicName === name) {
           await this.clickOn(`.e2e-test-topics-list-item:nth-child(${i + 1})`);
           return;
-	}
+        }
       }
     }, name);
     await this.clickOn('.e2e-test-confirm-move-button');
     await this.goto(topicEditorUrl);
- 
-    // Add subtopics
+
+    // Add subtopics.
     await this.clickOn('.puppeteer-test-add-subtopic-button');
     await this.type('.e2e-test-new-subtopic-title-field', subtopics[0].title);
     await this.type(
@@ -246,7 +247,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('button.e2e-test-photo-upload-submit');
 
     await this.clickOn('button.e2e-test-confirm-subtopic-creation-button');
-    
+
     await this.goto(topicEditorUrl);
     await this.clickOn('.e2e-test-skill-item-edit-btn');
     await this.clickOn('.e2e-test-assign-subtopic');
@@ -258,8 +259,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
       'textarea.e2e-test-commit-message-input', 'Create subtopic');
     await this.clickOn('button.e2e-test-close-save-modal-button');
 
-    // Assign diagnostic test skills
-    // Reload page is needed which is a bug to fix
+    // Assign diagnostic test skills.
+    // Reload page is needed which is a bug to fix.
     await this.reloadPage();
     await this.clickOn('button.e2e-test-add-diagnostic-test-skill');
     await this.select(
@@ -280,14 +281,14 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
     await this.clickOn('a.e2e-test-topics-tab');
 
-    await this.page.evaluate(async (name) => {
+    await this.page.evaluate(async(name) => {
       const topicNames = document.getElementsByClassName(
         'e2e-test-topic-name');
       for (let i = 0; i < topicNames.length; i++) {
         if (topicNames[i] === name) {
           await this.clickOn(`a.e2e-test-topic-name:nth-child(${i + 1})`);
           return;
-	}
+        }
       }
     }, name);
 
@@ -316,7 +317,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-confirm-skill-creation-button');
 
     await this.page.waitForNetworkIdle();
-    const pages = await this.browserObject.pages(); 
+    const pages = await this.browserObject.pages();
     this.page = pages[pages.length - 1];
 
     if (misconception) {
@@ -335,28 +336,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-confirm-add-misconception-button');
     }
 
-    /* for (const [difficulty, { rubricNotes }] of Object.entries(difficulties)) {
-      await this.select('select.e2e-test-select-rubric-difficulty',
-        difficulty == 'Medium' ? '1' :
-        difficulty == 'Hard' ? '2' : '0');
+    // Configure difficulties here.
 
-      await this.page.evaluate(async (difficulty, rubricNotes) => {
-        const noteCount = document.getElementsByClassName(
-          `e2e-test-edit-rubric-explanation-${difficulty}`).length;
-        for (let i = 0; i < rubricNotes.length; i++) {
-          await this.clickOn(
-	    i < noteCount ?
-            `i.e2e-test-edit-rubric-explanation-${difficulty}` +
-               `:nth-child(${i + 1})` :
-            `button.e2e-test-add-explanation-button-${difficulty}`);
-          await this.type(
-            '.e2e-test-rubric-explanation-text .e2e-test-rte',
-            rubricNotes[i]);
-	  await this.clickOn('button.e2e-test-save-rubric-explanation-button');
-	}
-      }, difficulty, rubricNotes); 
-    }*/
-
+    // Save skill changes.
     await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
     await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
     await this.page.waitForSelector(
@@ -365,7 +347,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-close-save-modal-button');
     await this.page.waitForSelector('.e2e-test-save-or-publish-skill:disabled');
 
-    // Create dummy questions under the skill
+    // Create dummy questions under the skill.
     await this.clickOn('.e2e-test-questions-tab');
     for (let i = 0; i < questionCount; i++) {
       await this.page.waitForNetworkIdle();

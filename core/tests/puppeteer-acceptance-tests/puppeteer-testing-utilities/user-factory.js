@@ -38,8 +38,6 @@ const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 const ROLE_TRANSLATION_ADMIN = 'translation admin';
 const ROLE_QUESTION_ADMIN = 'question admin';
 
-const CONTRIBUTION_RIGHT_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
-
 /**
  * The function creates a new super admin user and returns the instance
  * of that user.
@@ -147,31 +145,26 @@ let createNewTranslationAdmin = async function(username, email) {
 };
 
 /**
- * The function creates a new practice question submitter user and returns the
+ * The function creates a new question submitter user and returns the
  * instance of that user.
- * @param {string} username - The username of the practice question submitter.
- * @returns The practice question submitter instance created.
+ * @param {string} username - The username of the question submitter.
+ * @returns The question submitter instance created.
  */
-const createNewPracticeQuestionSubmitter = async function(username) {
+const createNewQuestionSubmitter = async function(username) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
-  // const practiceQuestionAdmin = createPracticeQuestionAdmin('questionAdm');
 
-  const practiceQuestionSubmitter = new e2ePracticeQuestionSubmitter();
-  await practiceQuestionSubmitter.openBrowser();
-  await practiceQuestionSubmitter.signUpNewUser(
+  const questionSubmitter = new e2ePracticeQuestionSubmitter();
+  await questionSubmitter.openBrowser();
+  await questionSubmitter.signUpNewUser(
     username, 'questionsubmitter@example.com');
 
-  /* await practiceQuestionAdmin.assignContributionRightToUser(
-    username, testConstants.ContributorRights.SubmitQuestion); */
   await superAdminInstance.assignContributionRightToUser(
     username, testConstants.ContributorRights.SubmitQuestion);
-  /* await practiceQuestionAdmin.expectUserToHaveContributionRight(
-    username, testConstants.ContributorRights.SubmitQuestion); */
 
-  activeUsers.push(practiceQuestionSubmitter);
-  return practiceQuestionSubmitter;
+  activeUsers.push(questionSubmitter);
+  return questionSubmitter;
 };
 
 /**
@@ -227,6 +220,7 @@ module.exports = {
   createNewGuestUser,
   createNewTranslationAdmin,
   createNewQuestionAdmin,
+  createNewQuestionSubmitter,
   closeAllBrowsers,
   closeBrowserForUser
 };
