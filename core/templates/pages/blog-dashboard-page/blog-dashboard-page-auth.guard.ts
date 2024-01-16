@@ -45,8 +45,7 @@ export class BlogDashboardAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isBlogAdmin() || userInfo.isBlogPostEditor() ||
-    userInfo.isSuperAdmin()) {
+    if (userInfo.isBlogPostEditor()) {
       return true;
     }
 
