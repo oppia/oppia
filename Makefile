@@ -98,9 +98,10 @@ run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 	docker compose up datastore dev-server redis firebase -d --no-deps;
 	@echo '------------------------------------------------------'
-	@echo '  Backend tests started....';
-	@echo '------------------------------------------------------';
+	@echo '  Backend tests started....'
+	@echo '------------------------------------------------------'
 	( \
+		trap '$(MAKE) stop' EXIT; \
 		$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS); \
 		EXIT_CODE=$$?; \
 		echo '------------------------------------------------------'; \
@@ -108,10 +109,10 @@ run_tests.backend: ## Runs the backend tests
 			echo '  Backend tests have been executed successfully....'; \
 		else \
 			echo '  Backend tests failed with exit code $$EXIT_CODE....'; \
+			exit $$EXIT_CODE; \
 		fi; \
-		echo '------------------------------------------------------' \
-	) || true
-	$(MAKE) stop
+		echo '------------------------------------------------------'; \
+	)
 
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
