@@ -208,7 +208,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -238,7 +238,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -333,7 +333,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'add_question',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -468,7 +468,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -528,7 +528,7 @@ describe('Contributions and review component', () => {
       } as NgbModalRef);
 
       let suggestion = {
-        change: {
+        change_cmd: {
           skill_id: 'skill1',
           question_dict: null,
           skill_difficulty: null,
@@ -749,7 +749,7 @@ describe('Contributions and review component', () => {
               suggestion_type: 'SUGGESTION',
               suggestion_id: '',
               target_id: 'target_id',
-              change: {
+              change_cmd: {
                 content_html: '',
                 translation_html: '',
               },
@@ -927,7 +927,7 @@ describe('Contributions and review component', () => {
       };
 
       let suggestion = {
-        change: {
+        change_cmd: {
           skill_id: 'string',
           question_dict: questionDict,
           skill_difficulty: null,
@@ -953,7 +953,7 @@ describe('Contributions and review component', () => {
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
-            change: {
+            change_cmd: {
               cmd: null,
               content_html: null,
               content_id: null,
@@ -1108,7 +1108,7 @@ describe('Contributions and review component', () => {
                   suggestion_id: 'suggestion_1',
                   target_id: '1',
                   suggestion_type: 'translate_content',
-                  change: {
+                  change_cmd: {
                     state_name: null,
                     new_value: null,
                     old_value: null,
@@ -1158,7 +1158,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: 'state',
                 new_value: 'new',
                 old_value: 'old',
@@ -1224,7 +1224,7 @@ describe('Contributions and review component', () => {
           suggestion_id: 'suggestion_2',
           target_id: '1',
           suggestion_type: 'add_question',
-          change: {
+          change_cmd: {
             state_name: 'state',
             new_value: 'new',
             old_value: 'old',
@@ -1536,7 +1536,7 @@ describe('Contributions and review component', () => {
       let suggestion = {
         key: {
           suggestion: {
-            change: {
+            change_cmd: {
               skill_id: 'string',
               content_html: 'string',
               translation_html: 'html',
@@ -1594,7 +1594,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'id',
               suggestion_type: 'translate_content',
               status: 'review',
-              change: {
+              change_cmd: {
                 content_html: '<p>This is test para</p>',
                 translation_html: '<p>Traducáú &amp;</p>'
               }
@@ -1634,7 +1634,7 @@ describe('Contributions and review component', () => {
               target_id: null,
               suggestion_id: 'id',
               status: 'review',
-              change: {
+              change_cmd: {
                 question_dict: {
                   question_state_data: {
                     content: {
@@ -1686,7 +1686,7 @@ describe('Contributions and review component', () => {
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
-            change: {
+            change_cmd: {
               content_html: 'Translation',
               translation_html: 'Tradução'
             },
