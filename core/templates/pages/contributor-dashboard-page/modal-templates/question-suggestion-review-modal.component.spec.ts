@@ -92,7 +92,7 @@ describe('Question Suggestion Review Modal component', () => {
         suggestion_id: null,
         status: '',
         author_name: authorName,
-        change: {
+        change_cmd: {
           data_format: null,
           language_code: null,
           state_name: null,
@@ -202,7 +202,7 @@ describe('Question Suggestion Review Modal component', () => {
         last_updated_msecs: null,
         status: 'rejected',
         author_name: authorName,
-        change: {
+        change_cmd: {
           data_format: null,
           language_code: null,
           state_name: null,
@@ -402,7 +402,7 @@ describe('Question Suggestion Review Modal component', () => {
 
       const questionDict = cloneDeep(
         component.suggestionIdToContribution[suggestionId]
-          .suggestion.change.question_dict
+          .suggestion.change_cmd.question_dict
       );
 
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -414,7 +414,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.suggestion.change.skill_id = 'skill_1';
+      component.suggestion.change_cmd.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -440,7 +440,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.suggestion.change.skill_id = undefined;
+      component.suggestion.change_cmd.skill_id = undefined;
       expect(() => {
         component.edit();
         tick();
@@ -468,7 +468,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.suggestion.change.skill_id = 'skill_1';
+      component.suggestion.change_cmd.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -493,7 +493,8 @@ describe('Question Suggestion Review Modal component', () => {
       const newSkillDifficulty = 1;
 
       const suggestionChange = (
-        component.suggestionIdToContribution[suggestionId].suggestion.change);
+        component.suggestionIdToContribution[suggestionId].suggestion.
+          change_cmd);
       const newQuestionDict = cloneDeep(suggestionChange.question_dict);
       newQuestionDict.question_state_data.content.html = newContentHtml;
 
@@ -516,7 +517,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.suggestion.change.skill_id = 'skill_1';
+      component.suggestion.change_cmd.skill_id = 'skill_1';
       component.edit();
       tick();
 

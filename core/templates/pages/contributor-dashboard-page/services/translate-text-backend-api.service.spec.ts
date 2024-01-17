@@ -140,7 +140,7 @@ describe('TranslateTextBackendApiService', () => {
         description: 'Adds translation',
         target_id: 'activeExpId',
         target_version_at_submission: 'activeExpVersion',
-        change: {
+        change_cmd: {
           cmd: 'add_written_translation',
           content_id: 'activeContentId',
           state_name: 'activeStateName',

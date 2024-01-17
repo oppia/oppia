@@ -4335,7 +4335,7 @@ def get_decorator_for_accepting_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if user_services.can_review_translation_suggestions(
                         self.user_id,
-                        language_code=suggestion.change.language_code):
+                        language_code=suggestion.change_cmd.language_code):
                     return handler(self, target_id, suggestion_id, **kwargs)
             elif suggestion.suggestion_type == (
                     feconf.SUGGESTION_TYPE_ADD_QUESTION):
@@ -4673,7 +4673,7 @@ def can_update_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(
                     self.user_id,
-                    language_code=suggestion.change.language_code):
+                    language_code=suggestion.change_cmd.language_code):
                 return handler(self, suggestion_id, **kwargs)
         elif suggestion.suggestion_type == (
                 feconf.SUGGESTION_TYPE_ADD_QUESTION):

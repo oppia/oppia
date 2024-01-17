@@ -95,7 +95,7 @@ describe('retrieving threads service', () => {
     mockSuggestions = [
       {
         author_name: 'author_1',
-        change: {
+        change_cmd: {
           skill_id: 'skill_id',
           new_value: {
             html: 'new content html'

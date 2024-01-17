@@ -147,7 +147,7 @@ describe('Feedback Tab Component', () => {
       target_id: '',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
@@ -212,7 +212,7 @@ describe('Feedback Tab Component', () => {
         target_id: '',
         status: '',
         author_name: '',
-        change: {
+        change_cmd: {
           state_name: '',
           new_value: {html: ''},
           old_value: {html: ''},
@@ -264,7 +264,7 @@ describe('Feedback Tab Component', () => {
           target_id: '',
           status: '',
           author_name: '',
-          change: {
+          change_cmd: {
             state_name: '',
             new_value: {html: ''},
             old_value: {html: ''},
@@ -307,7 +307,7 @@ describe('Feedback Tab Component', () => {
       target_id: '',
       status: 'open',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
@@ -344,7 +344,7 @@ describe('Feedback Tab Component', () => {
       target_id: '',
       status: 'review',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
@@ -384,7 +384,7 @@ describe('Feedback Tab Component', () => {
       target_id: '2',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},

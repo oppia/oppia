@@ -36,7 +36,7 @@ describe('Creator Dashboard backend API service', () => {
       target_id: '',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: '',
         old_value: '',
@@ -49,7 +49,7 @@ describe('Creator Dashboard backend API service', () => {
       target_id: '',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: '',
         old_value: '',
@@ -120,7 +120,7 @@ describe('Creator Dashboard backend API service', () => {
       target_id: '',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: '',
         old_value: '',
@@ -133,7 +133,7 @@ describe('Creator Dashboard backend API service', () => {
       target_id: '',
       status: '',
       author_name: '',
-      change: {
+      change_cmd: {
         state_name: '',
         new_value: '',
         old_value: '',

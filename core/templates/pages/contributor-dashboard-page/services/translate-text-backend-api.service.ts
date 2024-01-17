@@ -28,7 +28,7 @@ interface Data {
   description: string;
   'target_id': string;
   'target_version_at_submission': string;
-  change: object;
+  change_cmd: object;
   files?: Record<string, string>;
 }
 @Injectable({
@@ -65,7 +65,7 @@ export class TranslateTextBackendApiService {
       description: 'Adds translation',
       target_id: expId,
       target_version_at_submission: expVersion,
-      change: {
+      change_cmd: {
         cmd: 'add_written_translation',
         content_id: contentId,
         state_name: stateName,

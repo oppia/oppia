@@ -316,7 +316,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
         current_content_html = (
             exploration.states[
-                suggestion.change.state_name].content.html)
+                suggestion.change_cmd.state_name].content.html)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
         first_suggestion = feedback_services.get_messages(thread_id)[0]
