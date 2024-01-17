@@ -716,12 +716,11 @@ class AdminHandler(
                 image.read(),
                 'image/svg+xml'
             )
-        random_string = utils.generate_random_string(6)
         try:
             if blog_post_title == EDUCTION_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
-                        '%s-%s' % (EDUCTION_BLOG_POST_TITLE, random_string),
+                        '%s-%s' % (EDUCTION_BLOG_POST_TITLE, blog_post.id),
                     'thumbnail_filename': 'blog_thumbnail.png',
                     'content': EDUCTION_BLOG_POST_CONTENT,
                     'tags': ['Community']
@@ -729,7 +728,7 @@ class AdminHandler(
             elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
-                        '%s-%s' % (FORMATTING_BLOG_POST_TITLE, random_string),
+                        '%s-%s' % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
                     'content': FORMATTING_BLOG_POST_CONTENT,
                     'tags': ['Learners', 'Languages'],
                     'thumbnail_filename': 'blog_thumbnail.png'
@@ -737,7 +736,7 @@ class AdminHandler(
             elif blog_post_title == ARABIC_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
-                        '%s-%s' % (ARABIC_BLOG_POST_TITLE, random_string),
+                        '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
                     'content': ARABIC_BLOG_POST_CONTENT,
                     'tags': [
                         'Learners',
