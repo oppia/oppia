@@ -70,7 +70,8 @@ class VoiceoverLangPolicyModel(base_models.BaseModel):
 
         Returns:
             VoiceoverLangPolicyModel|None. An instance of
-            VoiceoverLangPolicyModel class.
+            VoiceoverLangPolicyModel class, if such model exists, or None
+            if no model is found.
         """
         voiceover_policy_model_list: Sequence[VoiceoverLangPolicyModel] = (
             cls.get_all().fetch())
