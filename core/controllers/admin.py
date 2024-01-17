@@ -623,7 +623,7 @@ class AdminHandler(
         return skill
 
     def _load_dummy_blog_post(self, blog_post_title: str) -> None:
-        """Loads the database with a blog post
+        """Loads the database with a blog post.
 
         Raises:
             Exception. Cannot load new blog post in production mode.
