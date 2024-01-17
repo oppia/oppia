@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Constants for Storing language accent codes information for
+"""Constants for storing language accent codes information for
 Oppia's voiceovers.
 """
 
