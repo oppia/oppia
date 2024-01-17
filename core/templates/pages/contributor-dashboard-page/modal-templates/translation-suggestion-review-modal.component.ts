@@ -63,7 +63,7 @@ interface SuggestionChangeDict {
 
 interface ActiveSuggestionDict {
   'author_name': string;
-  'change': SuggestionChangeDict;
+  'change_cmd': SuggestionChangeDict;
   'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
@@ -245,7 +245,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
-    this.languageCode = this.activeSuggestion.change.
+    this.languageCode = this.activeSuggestion.change_cmd.
       language_code;
     this.userService.getUserInfoAsync().then(userInfo => {
       const username = userInfo.getUsername();
@@ -278,22 +278,22 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.lastSuggestionToReview = (
       Object.keys(this.allContributions).length <= 1);
     this.translationHtml = (
-      this.activeSuggestion.change.translation_html);
+      this.activeSuggestion.change_cmd.translation_html);
     this.status = this.activeSuggestion.status;
     this.contentHtml = (
-      this.activeSuggestion.change.content_html);
+      this.activeSuggestion.change_cmd.content_html);
     this.explorationContentHtml = (
       this.activeSuggestion.exploration_content_html);
     this.contentTypeIsHtml = (
-      this.activeSuggestion.change.data_format === 'html'
+      this.activeSuggestion.change_cmd.data_format === 'html'
     );
     this.contentTypeIsUnicode = (
-      this.activeSuggestion.change.data_format === 'unicode'
+      this.activeSuggestion.change_cmd.data_format === 'unicode'
     );
     this.contentTypeIsSetOfStrings = (
-      this.activeSuggestion.change.data_format ===
+      this.activeSuggestion.change_cmd.data_format ===
         'set_of_normalized_string' ||
-      this.activeSuggestion.change.data_format ===
+      this.activeSuggestion.change_cmd.data_format ===
         'set_of_unicode_string'
     );
     this.reviewMessage = '';
@@ -362,8 +362,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   // The length of the commit message should not exceed 375 characters,
   // since this is the maximum allowed commit message size.
   generateCommitMessage(): string {
-    const contentId = this.activeSuggestion.change.content_id;
-    const stateName = this.activeSuggestion.change.state_name;
+    const contentId = this.activeSuggestion.change_cmd.content_id;
+    const stateName = this.activeSuggestion.change_cmd.state_name;
     const contentType = contentId.split('_')[0];
     const commitMessage = `${contentType} section of "${stateName}" card`;
 
@@ -538,7 +538,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   isDeprecatedTranslationSuggestionCommand(): boolean {
-    return this.activeSuggestion.change.cmd === 'add_translation';
+    return this.activeSuggestion.change_cmd.cmd === 'add_translation';
   }
 
   doesTranslationContainTags(): boolean {
