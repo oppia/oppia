@@ -1,0 +1,97 @@
+Requirement already satisfied: pip==23.1.2 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (23.1.2)
+Requirement already satisfied: pip-tools==6.13.0 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (6.13.0)
+Requirement already satisfied: build in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from pip-tools==6.13.0) (1.0.3)
+Requirement already satisfied: click>=8 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from pip-tools==6.13.0) (8.1.7)
+Requirement already satisfied: pip>=22.2 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from pip-tools==6.13.0) (23.1.2)
+Requirement already satisfied: setuptools in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from pip-tools==6.13.0) (67.7.1)
+Requirement already satisfied: wheel in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from pip-tools==6.13.0) (0.38.4)
+Requirement already satisfied: packaging>=19.0 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from build->pip-tools==6.13.0) (23.2)
+Requirement already satisfied: pyproject_hooks in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from build->pip-tools==6.13.0) (1.0.0)
+Requirement already satisfied: importlib-metadata>=4.6 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from build->pip-tools==6.13.0) (6.8.0)
+Requirement already satisfied: tomli>=1.1.0 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from build->pip-tools==6.13.0) (2.0.1)
+Requirement already satisfied: zipp>=0.5 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (from importlib-metadata>=4.6->build->pip-tools==6.13.0) (3.17.0)
+Requirement already satisfied: setuptools==67.7.1 in ./.direnv/python-3.8.15/lib/python3.8/site-packages (67.7.1)
+Everything up-to-date
+yarn install v1.22.15
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 2.21s.
+[1m[33m⚠  emulators:[39m[22m You are not currently authenticated so some features may not work correctly. Please run [1mfirebase login[22m to authenticate the CLI.
+[1m[36mi  emulators:[39m[22m Starting emulators: auth
+[1m[36mi  ui:[39m[22m Emulator UI logging to [1mui-debug.log[22m
+
+┌─────────────────────────────────────────────────────────────┐
+│ [32m✔[39m  [1mAll emulators ready! It is now safe to connect your app.[22m │
+│ [36mi[39m  View Emulator UI at [4m[1mhttp://localhost:4000[22m[24m                │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI        │
+├────────────────┼────────────────┼────────────────────────────┤
+│ Authentication │ localhost:9099 │ [4m[1mhttp://localhost:4000/auth[22m[24m │
+└────────────────┴────────────────┴────────────────────────────┘
+[90m  Emulator Hub running at [39mlocalhost:4400
+[90m  Other reserved ports:[39m 4500
+
+Issues? Report them at [4m[1mhttps://github.com/firebase/firebase-tools/issues[22m[24m and attach the *-debug.log files.
+ 
+ 
+[1m[36mi  emulators:[39m[22m Received SIGINT (Ctrl-C) for the first time. Starting a clean shutdown.
+[1m[36mi  emulators:[39m[22m Please wait for a clean shutdown or send the SIGINT (Ctrl-C) signal again to stop right now.
+[1m[36mi [39m[22m Automatically exporting data using --export-on-exit "/home/internet-user/Desktop/oppia_docker/oppia/../firebase_emulator_cache" please wait for the export to finish...
+[1m[36mi [39m[22m Found running emulator hub for project [1mdev-project-id[22m at http://localhost:4400
+[1m[36mi [39m[22m Exporting data to: /home/internet-user/Desktop/oppia_docker/firebase_emulator_cache
+[1m[36mi  emulators:[39m[22m Received export request. Exporting data to /home/internet-user/Desktop/oppia_docker/firebase_emulator_cache.
+[1m[32m✔  emulators:[39m[22m Export complete.
+[1m[32m✔ [39m[22m Export complete
+[1m[36mi  emulators:[39m[22m Shutting down emulators.
+[1m[36mi  ui:[39m[22m Stopping Emulator UI
+[1m[33m⚠ [39m[22m Emulator UI has exited upon receiving signal: SIGINT
+[1m[36mi  auth:[39m[22m Stopping Authentication Emulator
+[1m[36mi  hub:[39m[22m Stopping emulator hub
+[1m[36mi  logging:[39m[22m Stopping Logging Emulator
+Checking if node.js is installed in /home/internet-user/Desktop/oppia_docker/oppia/../oppia_tools
+Checking if yarn is installed in /home/internet-user/Desktop/oppia_docker/oppia/../oppia_tools
+Environment setup completed.
+Checking whether google-cloud-sdk is installed in /home/internet-user/Desktop/oppia_docker/oppia_tools/google-cloud-sdk-364.0.0/google-cloud-sdk
+Installing third-party JS libraries and zip files.
+Checking if pip is installed on the local machine
+Regenerating "requirements.txt" file...
+All third-party Python libraries are already installed correctly.
+Redis-cli is already installed.
+ElasticSearch is already installed.
+Copying Google Cloud SDK modules to third_party/python_libs...
+Checking that all google library modules contain __init__.py files...
+Installing buf and protoc binary.
+Compiling protobuf files.
+b''
+Installing pre-commit hook for git
+Symlink already exists
+Making pre-commit hook file executable ...
+pre-commit hook file is now executable!
+Installing pre-push hook for git
+Symlink already exists
+Making pre-push hook file executable ...
+pre-push hook file is now executable!
+Building third party libs at third_party/generated/
+Starting new Redis Server: /home/internet-user/Desktop/oppia_docker/oppia/../oppia_tools/redis-cli-6.2.4/src/redis-server redis.conf
+Starting new ElasticSearch Server: /home/internet-user/Desktop/oppia_docker/oppia/../oppia_tools/elasticsearch-7.17.0/bin/elasticsearch -q
+Starting new Firebase Emulator: /home/internet-user/Desktop/oppia_docker/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config .firebase.json --export-on-exit /home/internet-user/Desktop/oppia_docker/oppia/../firebase_emulator_cache
+Starting new Cloud Datastore Emulator: /home/internet-user/Desktop/oppia_docker/oppia_tools/google-cloud-sdk-364.0.0/google-cloud-sdk/bin/gcloud beta emulators datastore start --project dev-project-id --data-dir /home/internet-user/Desktop/oppia_docker/oppia/../cloud_datastore_emulator_cache --host-port localhost:8089 --consistency=1.0 --quiet --no-store-on-disk
+Starting new Angular Compiler: /home/internet-user/Desktop/oppia_docker/oppia/node_modules/.bin/ng build --watch
+Stopping Angular Compiler(name="sh", pid=8658)...
+
+
+[93m[1mServers are shutting down, please wait for them to end gracefully![0m
+
+
+Stopping Cloud Datastore Emulator(name="sh", pid=8603)...
+Stopping Firebase Emulator(name="sh", pid=8565)...
+Stopping ElasticSearch Server(name="sh", pid=8318)...
+Stopping Redis Server(name="sh", pid=8311)...
+[94mExtending index.yaml...[0m
+
+
+[92m[1mDone! Thank you for waiting.[0m
+
+
