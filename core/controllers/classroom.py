@@ -151,7 +151,7 @@ class ClassroomAdminPage(
         self.render_template('classroom-admin-page.mainpage.html')
 
 
-class ClassroomAdminDataHandler(
+class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Fetches relevant data for the classroom admin page."""
@@ -160,7 +160,6 @@ class ClassroomAdminDataHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
         classroom_id_to_classroom_name = (

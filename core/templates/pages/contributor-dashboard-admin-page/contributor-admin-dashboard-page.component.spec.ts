@@ -135,10 +135,10 @@ describe('Contributor dashboard Admin page', () => {
     spyOn(
       contributorDashboardAdminStatsBackendApiService,
       'fetchTopicChoices')
-      .and.returnValue(Promise.resolve([
+      .and.returnValue(Promise.resolve([[
         { id: '1', topic: 'Science' },
         { id: '2', topic: 'Technology' },
-      ]));
+      ]]));
 
     ContAdminStatsSpy = spyOn(
       ContributorAdminStatsTable.prototype,

@@ -22,10 +22,12 @@ import { ContributorDashboardAdminStatsBackendApiService } from './contributor-d
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 
-describe('Contribution Admin dasboard stats service', () => {
+describe('Contribution Admin dashboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
   let http: HttpTestingController;
+  let crbas: ClassroomBackendApiService;
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
@@ -110,12 +112,13 @@ describe('Contribution Admin dasboard stats service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        ContributorDashboardAdminStatsBackendApiService
+        ContributorDashboardAdminStatsBackendApiService,
+        ClassroomBackendApiService
       ]
     });
     cdasbas = TestBed.inject(ContributorDashboardAdminStatsBackendApiService);
     http = TestBed.inject(HttpTestingController);
-
+    crbas = TestBed.inject(ClassroomBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
@@ -404,25 +407,75 @@ describe('Contribution Admin dasboard stats service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-  it('should return topics data in math classroom', fakeAsync(
+  it('should return topic data from classrooms for a url fragment', fakeAsync(
     () => {
-      const url = '/classroom_data_handler/math';
+      spyOn(cdasbas, 'fetchTopics').and.callThrough();
+      const url = '/classroom_data_handler/mat';
 
-      cdasbas.fetchTopicChoices().then(
+      cdasbas.fetchTopics('mat').then(
         successHandler, failHandler);
       let req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
-      req.flush({topic_summary_dicts: [
-        { id: '1', topic: 'Science' },
-        { id: '2', topic: 'Technology' },
-      ]},
-      { status: 200, statusText: 'Success.'});
+      req.flush(
+        [{ id: '0', topic: 'Math' }],
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+      expect(cdasbas.fetchTopics).toHaveBeenCalledWith('mat');
+    }));
+
+  it('should return a url fragment for a classroom id', fakeAsync(
+    () => {
+      spyOn(cdasbas, 'fetchClassroomFragment').and.callThrough();
+      let response = {
+        classroomDict: {
+          classroomId: 'mathClassroomId',
+          name: 'math',
+          urlFragment: 'mat',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }
+      };
+      spyOn(crbas, 'getClassroomDataAsync')
+        .and.returnValue(Promise.resolve(response));
+
+      spyOn(cdasbas, 'fetchTopics')
+        .and.returnValue(Promise.resolve([]));
+
+      cdasbas.fetchClassroomFragment('0').then(
+        successHandler, failHandler
+      );
       flushMicrotasks();
 
-      spyOn(cdasbas, 'fetchTopicChoices').and.returnValue(Promise.resolve([
-        { id: '1', topic: 'Science' },
-        { id: '2', topic: 'Technology' },
-      ]));
+      expect(crbas.getClassroomDataAsync).
+        toHaveBeenCalledWith('0');
+      expect(cdasbas.fetchTopics).
+        toHaveBeenCalledWith('mat');
+    }));
+
+  it('should return topics for all classrooms', fakeAsync(
+    () => {
+      spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
+      spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
+        .and.returnValue(Promise.resolve([{mathclassroomId: 'math'}]));
+      spyOn(cdasbas, 'fetchClassroomFragment')
+        .and.returnValue(Promise.resolve([
+          { id: '1', topic: 'Science' },
+          { id: '2', topic: 'Technology' },
+        ]));
+
+      cdasbas.fetchTopicChoices().then(
+        successHandler, failHandler
+      );
+      flushMicrotasks();
+
+      expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
+        toHaveBeenCalled();
+      expect(cdasbas.fetchClassroomFragment).
+        toHaveBeenCalledWith('0');
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     }));
 
   it('should return empty stats if contribution type is invalid', fakeAsync(

@@ -216,7 +216,7 @@ describe('Classroom backend API service', function() {
     service.getAllClassroomIdToClassroomNameDictAsync().then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/classroom_admin_data_handler');
+      '/classroom_id_to_name_handler');
     expect(req.request.method).toEqual('GET');
 
     let classroomIdToClassroomNameDict = {
@@ -244,7 +244,7 @@ describe('Classroom backend API service', function() {
       service.getAllClassroomIdToClassroomNameDictAsync().then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/classroom_admin_data_handler');
+        '/classroom_id_to_name_handler');
       expect(req.request.method).toEqual('GET');
 
       req.flush('Invalid request', {

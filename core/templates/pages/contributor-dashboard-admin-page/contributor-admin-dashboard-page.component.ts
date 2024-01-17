@@ -89,6 +89,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
   topics: TopicChoice[] = [];
+  topicsFetched: string = 'false';
   filter: ContributorAdminDashboardFilter = (
     ContributorAdminDashboardFilter.createDefault());
 
@@ -177,13 +178,34 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.contributorDashboardAdminStatsBackendApiService
               .fetchTopicChoices().then(
                 response => {
-                  this.topics = response;
-                  this.allTopicNames = response.map(topic => topic.topic);
+                  this.topics = response.flat();
+                  this.topics = this.filterTopicChoices(this.topics);
+                  this.allTopicNames = this.topics.map(
+                    topic => topic.topic);
                   this.applyTopicFilter();
+                  this.topicsFetched = 'true';
                 }
               );
           });
         });
+  }
+
+  filterTopicChoices(topic: TopicChoice[]): TopicChoice[] {
+    let filteredTopic: TopicChoice[] = [];
+
+    topic.forEach((topicItem) => {
+      let isTopicPresent: boolean = false;
+      filteredTopic.forEach((filteredTopicItem) => {
+        if (filteredTopicItem.id === topicItem.id) {
+          isTopicPresent = true;
+        }
+      });
+      if (!isTopicPresent) {
+        filteredTopic.push(topicItem);
+      }
+    });
+
+    return filteredTopic;
   }
 
   toggleLanguageDropdown(): void {

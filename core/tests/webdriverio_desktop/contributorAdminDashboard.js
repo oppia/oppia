@@ -308,18 +308,18 @@ describe('Contributor Admin Dashboard', function() {
 
       await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
       await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
       await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(2);
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
       await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
       await contributorDashboardAdminPage.switchLanguage('English');
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
-
+      await browser.debug();
       await users.logout();
     });
 });

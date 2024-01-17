@@ -223,7 +223,7 @@ export class ClassroomBackendApiService {
   ): Promise<ClassroomIdToClassroomNameResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ClassroomIdToClassroomNameBackendDict>(
-        '/classroom_admin_data_handler').toPromise().then(response => {
+        '/classroom_id_to_name_handler').toPromise().then(response => {
         resolve(response.classroom_id_to_classroom_name);
       }, errorResponse => {
         reject(errorResponse?.error?.error);

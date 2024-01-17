@@ -107,7 +107,7 @@
           </div>
           <div class="topic-selector-container">
             <oppia-topic-filter
-              *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+              *ngIf="topicsFetched==='true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
               [(defaultTopicNames)]="allTopicNames"
               [(selectedTopicNames)]="selectedTopicNames"
               (selectionsChange)="applyTopicFilter()">

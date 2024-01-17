@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
 import { TopicChoice } from '../contributor-admin-dashboard-page.component';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { ClassroomDataBackendDict } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomBackendApiService, ClassroomDataBackendDict } from 'domain/classroom/classroom-backend-api.service';
 import { UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 
 export interface TranslationSubmitterBackendDict {
@@ -154,7 +154,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
   params!: {};
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private classroomBackendApiService: ClassroomBackendApiService
   ) {}
 
   async fetchCommunityStats():
@@ -316,20 +317,44 @@ export class ContributorDashboardAdminStatsBackendApiService {
     });
   }
 
-  async fetchTopicChoices(): Promise<TopicChoice[]> {
-    let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
+  async fetchTopics(classroomUrlFragment: string): Promise<TopicChoice[]> {
+    { let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
-        classroom_url_fragment: 'math'
+        classroom_url_fragment: classroomUrlFragment
       });
     const response = await this.http
       .get<ClassroomDataBackendDict>(classroomDataUrl)
       .toPromise();
-    const topicChoices: TopicChoice[] = response.topic_summary_dicts.map(
+    return response.topic_summary_dicts.map(
       (obj) => ({
         id: obj.id,
         topic: obj.name
       }));
-    return topicChoices;
+    }
+  }
+
+  async fetchClassroomFragment(classroomId: string): Promise<TopicChoice[]> {
+    return this.classroomBackendApiService.
+      getClassroomDataAsync(classroomId).then(
+        classResponse => {
+          return this.fetchTopics(classResponse.classroomDict.urlFragment);
+        });
+  }
+
+  async fetchTopicChoices(): Promise<TopicChoice[][]> {
+    let topicPromises: Promise<TopicChoice[]>[] = [];
+    return this.classroomBackendApiService
+      .getAllClassroomIdToClassroomNameDictAsync().then(classResponse => {
+        if (classResponse !== undefined &&
+          classResponse !== null) {
+          const existingClassroomNames = (
+            Object.keys(classResponse));
+          existingClassroomNames.forEach(
+            classroomId =>
+              topicPromises.push(this.fetchClassroomFragment(classroomId)));
+          return Promise.all(topicPromises);
+        }
+      });
   }
 }
 
