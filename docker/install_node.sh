@@ -24,7 +24,7 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
+if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then  # uname in Windows 11 also adds version, so uname -o is used.
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
