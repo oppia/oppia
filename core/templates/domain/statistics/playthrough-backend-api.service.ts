@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Playthrough } from
-  'domain/statistics/PlaythroughObjectFactory';
+  'domain/statistics/playthrough.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
