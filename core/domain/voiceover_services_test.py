@@ -24,6 +24,7 @@ from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -88,3 +89,32 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             entity_voiceovers_instance.language_accent_code, 'en-US')
         self.assertDictEqual(entity_voiceovers_instance.voiceovers, {})
+
+
+class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
+    """Unit tests to validate the saving and fetching behavior in the
+    VoiceoverAutogenerationPolicyModel.
+    """
+
+    def test_save_and_get_language_accent_codes_works_correctly(self) -> None:
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {
+                'en-US': True
+            },
+            'hi': {
+                'hi-IN': False
+            }
+        }
+        retrieved_language_codes_mapping: Dict[str, Dict[str, bool]] = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        expected_language_codes_mapping: Dict[str, Dict[str, bool]] = {}
+        self.assertDictEqual(
+            retrieved_language_codes_mapping, expected_language_codes_mapping)
+
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping)
+
+        retrieved_language_codes_mapping = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        self.assertDictEqual(
+            retrieved_language_codes_mapping, language_codes_mapping)

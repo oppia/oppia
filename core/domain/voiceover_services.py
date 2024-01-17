@@ -23,6 +23,8 @@ from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.platform import models
 
+from typing import Dict
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
@@ -93,3 +95,60 @@ def get_voiceovers_for_given_language_accent_code(
         entity_id=entity_id,
         entity_version=entity_version,
         language_accent_code=language_accent_code)
+
+
+def get_all_language_accent_codes_for_voiceovers(
+) -> Dict[str, Dict[str, bool]]:
+    """The method returns the language accent codes, which are supported by
+    Oppia's voiceovers.
+
+    Returns:
+        Dict[str, Dict[str, bool]]. Returns a dict with language_codes as keys
+        and nested dicts as values. Each nested dict contains
+        language_accent_codes as keys and booleans indicating whether it's
+        possible to generate automatic voiceovers for this language accent code
+        as values.
+    """
+
+    voiceover_autogeneration_policy_model = (
+        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+    )
+    language_codes_mapping: Dict[str, Dict[str, bool]] = {}
+    if voiceover_autogeneration_policy_model is None:
+        return language_codes_mapping
+
+    language_codes_mapping = (
+        voiceover_autogeneration_policy_model.language_codes_mapping)
+    return language_codes_mapping
+
+
+def save_language_accent_support(
+    language_codes_mapping: Dict[str, Dict[str, bool]]
+) -> None:
+    """The method saves the language accent codes into the
+    VoiceoverAutogenerationPolicyModel, which will be supported by
+    Oppia's voiceovers.
+
+    Args:
+        language_codes_mapping: Dict[str, Dict[str, bool]]. A dict with
+            language_codes as keys and nested dicts as values. Each nested dict
+            contains language_accent_codes as keys and booleans indicating
+            whether it's possible to generate automatic voiceovers for this
+            language accent code as values.
+    """
+    retrieved_voiceover_autogeneration_policy_model = (
+        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+    )
+    voiceover_autogeneration_policy_model = (
+        retrieved_voiceover_autogeneration_policy_model
+        if retrieved_voiceover_autogeneration_policy_model is not None
+        else voiceover_models.VoiceoverAutogenerationPolicyModel(
+            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+    )
+
+    voiceover_autogeneration_policy_model.language_codes_mapping = (
+        language_codes_mapping)
+    voiceover_autogeneration_policy_model.update_timestamps()
+    voiceover_autogeneration_policy_model.put()
