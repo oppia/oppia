@@ -83,6 +83,66 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
 supported_languages: List[str] = [
     lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
 
+EDUCTION_BLOG_POST_CONTENT = """
+    <p>
+        Education is a constantly evolving landscape, and innovation lies at its core. 
+        This summer, Oppia had the privilege of hosting a group of exceptional minds 
+        through the prestigious Google Summer of Code (GSoC) program. These talented 
+        individuals embarked on a journey to transform learning, one code at a time.
+    </p>\n
+    <p>
+        You should check out main 
+        <oppia-noninteractive-link 
+            text-with-value=\"&amp;quot;website.&amp;quot;\" 
+            url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
+        </oppia-noninteractive-link><br>\n&nbsp;
+    </p>\n\n
+    <p>Introduction to Oppia - Youtube Video</p>
+    <oppia-noninteractive-video 
+        autoplay-with-value=\"false\" 
+        end-with-value=\"0\" 
+        start-with-value=\"0\" 
+        video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
+    </oppia-noninteractive-video>
+"""
+
+FORMATTING_BLOG_POST_CONTENT = """
+    <h1>Heading</h1>\n\n
+    <p>This is the normal text.</p>\n\n
+    <p><strong>Bold Text.</strong></p>\n\n
+    <p><em>Italic Text.</em></p>\n\n
+    <p><em><strong>Bold Italic.</strong></em></p>\n\n
+    Numbered List:</div>\n\n<ol>\n\t<li>List item&nbsp;</li>\n\t<li>List item\n\t<ol>\n\t\t<li>Sub list item</li>\n\t</ol>\n\t</li>\n</ol>\n\n
+    <p>Bullet List:</p>\n\n<ul>\n\t<li>List item</li>\n\t<li>List item\n\t<ul>\n\t\t<li>Sub list item</li>\n\t</ul>\n\t</li>\n</ul>\n\n
+    <pre>This is content in pre.</pre>\n\n
+    <blockquote>\n<p>Quote from some famous person. Two empty lines after this quote.</p>\n</blockquote>\n\n
+    <p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>End of blog.</p>
+"""
+
+ARABIC_BLOG_POST_CONTENT = """
+    <h1>Introduction:</h1>\n
+    <oppia-noninteractive-image alt-with-value=\"Oppia Arabic Blogpost Graphic\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;blog_post_image_height_326_width_490.svg&amp;quot;\"></oppia-noninteractive-image>\n\n
+    <p><strong>Editor’s note:</strong> <em>The Arabic team at Oppia plays a pivotal role in breaking down language barriers and making educational content accessible to Arabic-speaking learners. One of the primary challenges lies in finding a suitable tone and language that can resonate with all Arabic-speaking regions, each of which has its unique dialects.</em></p>\n\n
+    <p><em>In this blog post, our team lead, Sarah, explains how teamwork can lead not only to professional accomplishments but also personal growth and lasting connections. The Arabic team's journey exemplifies the transformative power of collaboration, cultural exchange, and the profound impact of education on individuals and communities.</em></p>\n\n<p>Translating educational lessons presents a unique set of challenges, particularly when it comes to bridging language barriers and adapting content to suit diverse regional dialects. In this blog post, we will delve into the experiences of our dedicated team and explore how we tackled these obstacles head-on. We will also highlight the inspiring stories of past members, shedding light on their motivations and the invaluable skills they acquired through their contributions.</p>\n\n<p>&nbsp;</p>\n\n<h1>Finding the Right Tone and Language</h1>\n\n\n
+    <p>Contributing to this project offered more than just an opportunity to make a difference. For many of us, it served as a valuable stepping stone in our career paths. As an example, some of our team members were students, and through their involvement, they received practical experience and exposure to real-world challenges. This helped them develop essential skills such as teamwork, project management, and time management. We expect these acquired competencies to prove beneficial in their future professional endeavors.</p>\n\n
+    <h1>Conclusion</h1>\n\n
+    <p>Overcoming the challenges associated with translating lessons into Arabic required a dedicated and passionate team. By focusing on finding the right tone and language, our team members collaborated to ensure that educational content reached a wider audience across diverse Arabic-speaking regions. Through their contributions, they not only empowered learners but also experienced personal growth and acquired valuable skills. With this blog post, I would like to thank and celebrate the contributions of all the members of Oppia’s Arabic translation team. Our journey together stands as a testament to the power of teamwork, cultural exchange, and the positive impact of education on individuals and communities.</p>\n\n
+    <h1>Arabic hashtags:</h1>\n\n
+    <p>&nbsp;#تحديات_الترجمة</p>\n\n
+    <p>&nbsp;#حاجز_اللغة</p>\n\n
+    <p>&nbsp;#محتوى_تعليمي</p>\n\n
+    <p>&nbsp;#ترجمة_عربية</p>\n\n
+    <p>&nbsp;#تبادل_ثقافي</p>\n\n
+    <p>&nbsp;#العمل_الجماعي</p>\n\n
+    <p>&nbsp;#مسار_المهنة</p>\n\n
+    <p>&nbsp;#التعليم_مهم</p>\n\n
+    <h1>Credit:</h1>\n\n
+    <ul>\n\t
+    <li>This blogpost was written by Sarah Bendiff who currently leads Oppia's Arabic Translations Team.</li>\n\t
+    <li>Edits were done by all of the marketing team! (Thanks to the best teammates)</li>
+    </ul>
+"""
+
 
 class ClassroomPageDataDict(TypedDict):
     """Dict representation of classroom page's data dictionary."""
@@ -657,46 +717,14 @@ class AdminHandler(
                 blog_services.update_blog_post(blog_post.id, {
                     'title': 'Education-' + random_string,
                     'thumbnail_filename': 'blog_thumbnail.png',
-                    'content': """
-                        <p>
-                            Education is a constantly evolving landscape, and innovation lies at its core. 
-                            This summer, Oppia had the privilege of hosting a group of exceptional minds 
-                            through the prestigious Google Summer of Code (GSoC) program. These talented 
-                            individuals embarked on a journey to transform learning, one code at a time.
-                        </p>\n
-                        <p>
-                            You should check out main 
-                            <oppia-noninteractive-link 
-                                text-with-value=\"&amp;quot;website.&amp;quot;\" 
-                                url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
-                            </oppia-noninteractive-link><br>\n&nbsp;
-                        </p>\n\n
-                        <p>Introduction to Oppia - Youtube Video</p>
-                        <oppia-noninteractive-video 
-                            autoplay-with-value=\"false\" 
-                            end-with-value=\"0\" 
-                            start-with-value=\"0\" 
-                            video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
-                        </oppia-noninteractive-video>
-                    """,
+                    'content': EDUCTION_BLOG_POST_CONTENT,
                     'tags': ['Community']
                 })
             elif blog_post_title == 'Testing types of Text formatting':
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
                         'Blog with different font formatting-' + random_string,
-                    'content': """
-                        <h1>Heading</h1>\n\n
-                        <p>This is the normal text.</p>\n\n
-                        <p><strong>Bold Text.</strong></p>\n\n
-                        <p><em>Italic Text.</em></p>\n\n
-                        <p><em><strong>Bold Italic.</strong></em></p>\n\n
-                        Numbered List:</div>\n\n<ol>\n\t<li>List item&nbsp;</li>\n\t<li>List item\n\t<ol>\n\t\t<li>Sub list item</li>\n\t</ol>\n\t</li>\n</ol>\n\n
-                        <p>Bullet List:</p>\n\n<ul>\n\t<li>List item</li>\n\t<li>List item\n\t<ul>\n\t\t<li>Sub list item</li>\n\t</ul>\n\t</li>\n</ul>\n\n
-                        <pre>This is content in pre.</pre>\n\n
-                        <blockquote>\n<p>Quote from some famous person. Two empty lines after this quote.</p>\n</blockquote>\n\n
-                        <p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>End of blog.</p>
-                    """,
+                    'content': FORMATTING_BLOG_POST_CONTENT,
                     'tags': ['Learners', 'Languages'],
                     'thumbnail_filename': 'blog_thumbnail.png'
                 })
@@ -704,29 +732,7 @@ class AdminHandler(
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
                         'Leading The Arabic Translations Team-' + random_string,
-                    'content': """
-                                <h1>Introduction:</h1>\n
-                                <oppia-noninteractive-image alt-with-value=\"Oppia Arabic Blogpost Graphic\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;blog_post_image_height_326_width_490.svg&amp;quot;\"></oppia-noninteractive-image>\n\n
-                                <p><strong>Editor’s note:</strong> <em>The Arabic team at Oppia plays a pivotal role in breaking down language barriers and making educational content accessible to Arabic-speaking learners. One of the primary challenges lies in finding a suitable tone and language that can resonate with all Arabic-speaking regions, each of which has its unique dialects.</em></p>\n\n
-                                <p><em>In this blog post, our team lead, Sarah, explains how teamwork can lead not only to professional accomplishments but also personal growth and lasting connections. The Arabic team's journey exemplifies the transformative power of collaboration, cultural exchange, and the profound impact of education on individuals and communities.</em></p>\n\n<p>Translating educational lessons presents a unique set of challenges, particularly when it comes to bridging language barriers and adapting content to suit diverse regional dialects. In this blog post, we will delve into the experiences of our dedicated team and explore how we tackled these obstacles head-on. We will also highlight the inspiring stories of past members, shedding light on their motivations and the invaluable skills they acquired through their contributions.</p>\n\n<p>&nbsp;</p>\n\n<h1>Finding the Right Tone and Language</h1>\n\n\n
-                                <p>Contributing to this project offered more than just an opportunity to make a difference. For many of us, it served as a valuable stepping stone in our career paths. As an example, some of our team members were students, and through their involvement, they received practical experience and exposure to real-world challenges. This helped them develop essential skills such as teamwork, project management, and time management. We expect these acquired competencies to prove beneficial in their future professional endeavors.</p>\n\n
-                                <h1>Conclusion</h1>\n\n
-                                <p>Overcoming the challenges associated with translating lessons into Arabic required a dedicated and passionate team. By focusing on finding the right tone and language, our team members collaborated to ensure that educational content reached a wider audience across diverse Arabic-speaking regions. Through their contributions, they not only empowered learners but also experienced personal growth and acquired valuable skills. With this blog post, I would like to thank and celebrate the contributions of all the members of Oppia’s Arabic translation team. Our journey together stands as a testament to the power of teamwork, cultural exchange, and the positive impact of education on individuals and communities.</p>\n\n
-                                <h1>Arabic hashtags:</h1>\n\n
-                                <p>&nbsp;#تحديات_الترجمة</p>\n\n
-                                <p>&nbsp;#حاجز_اللغة</p>\n\n
-                                <p>&nbsp;#محتوى_تعليمي</p>\n\n
-                                <p>&nbsp;#ترجمة_عربية</p>\n\n
-                                <p>&nbsp;#تبادل_ثقافي</p>\n\n
-                                <p>&nbsp;#العمل_الجماعي</p>\n\n
-                                <p>&nbsp;#مسار_المهنة</p>\n\n
-                                <p>&nbsp;#التعليم_مهم</p>\n\n
-                                <h1>Credit:</h1>\n\n
-                                <ul>\n\t
-                                <li>This blogpost was written by Sarah Bendiff who currently leads Oppia's Arabic Translations Team.</li>\n\t
-                                <li>Edits were done by all of the marketing team! (Thanks to the best teammates)</li>
-                                </ul>
-                    """,
+                    'content': ARABIC_BLOG_POST_CONTENT,
                     'tags': [
                         'Learners',
                         'Volunteer',
