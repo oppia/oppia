@@ -23,7 +23,7 @@ from core.tests import test_utils
 
 
 class VoiceoverLanguageAccentInfoListTests(test_utils.GenericTestBase):
-    """Test to validate the information stored for language accent code."""
+    """Tests to validate the constants stored for language accent codes."""
 
     def test_validate_all_auto_lang_accent_code_is_subset_of_master_list(
         self

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing language accent codes for Oppia-supported voiceovers."""
+"""Models for storing language accent codes for Oppia supported voiceovers."""
 
 from __future__ import annotations
 
@@ -28,21 +28,20 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([
-    models.Names.BASE_MODEL
-])
+    models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class VoiceoverLangPolicyModel(base_models.BaseModel):
-    """Model for storing language accent codes for Oppia-supported voiceovers.
+    """Model for storing language accent codes for Oppia supported voiceovers.
     """
 
-    # A dict with language_code as the key and a nested dict as the value.
-    # Each nested dict contains language_accent_code as the key and a boolean
+    # A dict with language_codes as keys and nested dicts as values.
+    # Each nested dict contains language_accent_codes as keys and boolean
     # value indicating whether it's possible to generate automatic voiceovers
-    # for this language-accent code as value.
-    language_code_mapping = datastore_services.JsonProperty(required=True)
+    # for this language accent code as values.
+    language_codes_mapping = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -59,13 +58,13 @@ class VoiceoverLangPolicyModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'language_code_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
     def get_model(cls) -> Optional[VoiceoverLangPolicyModel]:
         """Gets a VoiceoverLangPolicyModel instance. Since there will be only
-        one model for storing language accent code, this method returns only
+        one model for storing language accent codes, this method returns only
         one instance of the model if it exists.
 
         Returns:

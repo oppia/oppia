@@ -14,13 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Stores language accent code information for Oppia's voiceovers."""
+"""Constants for Storing language accent codes information for
+Oppia's voiceovers.
+"""
 
 from __future__ import annotations
 
 
 # A dict with language code as keys and nested dicts as values. Each nested dict
-# contains a language accent code as a key and its description as a value.
+# contains language accent code as keys and its description as values.
 # This is an exhaustive list of language accent pairs that Oppia may support
 # for voiceovers (manual and auto).
 VOICEOVER_LANGUAGE_CODES_AND_ACCENT_INFO_MASTER_LIST = {

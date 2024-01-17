@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing language accent codes for Oppia-supported voiceovers."""
+"""Tests for VoiceoverLangPolicyModel models."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ class VoiceoverLanguagePolicyModelTest(test_utils.GenericTestBase):
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'language_code_mapping': (
+                'language_codes_mapping': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE)
             }
         )
@@ -54,15 +54,13 @@ class VoiceoverLanguagePolicyModelTest(test_utils.GenericTestBase):
     def test_get_model_association_to_user_not_corresponding_to_user(
         self
     ) -> None:
+        model_cls = voice_policy_models.VoiceoverLangPolicyModel
         self.assertEqual(
-            (
-                voice_policy_models.VoiceoverLangPolicyModel
-                .get_model_association_to_user()
-            ),
+            model_cls.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_voiceover_policy_model_returns_correctly(self) -> None:
-        language_code_mapping_dict = {
+        language_codes_mapping_dict = {
             'en': {
                 'en-US': False
             },
@@ -71,12 +69,12 @@ class VoiceoverLanguagePolicyModelTest(test_utils.GenericTestBase):
             }
         }
         voice_policy_models.VoiceoverLangPolicyModel(
-            language_code_mapping=language_code_mapping_dict).put()
+            language_codes_mapping=language_codes_mapping_dict).put()
 
         voice_policy_model = (
             voice_policy_models.VoiceoverLangPolicyModel.get_model())
         assert voice_policy_model is not None
 
         self.assertDictEqual(
-            voice_policy_model.language_code_mapping,
-            language_code_mapping_dict)
+            voice_policy_model.language_codes_mapping,
+            language_codes_mapping_dict)
