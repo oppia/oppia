@@ -55,22 +55,26 @@
     <i class="fas fa-ellipsis-v exploration-player-navbar-icons"></i>
   </button>
   <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
-    <span ngbDropdownItem tabindex="0" placement="bottom" (click)="toggleAttributionModal()" (keydown.enter)="toggleAttributionModal()">
+    <span ngbDropdownItem tabindex="0" placement="bottom" (click)="toggleAttributionModal()" (keydown.enter)="toggleAttributionModal()" class="custom-dropdown-item">
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
+      <b class="icon-text">Share</b>
       <span class="oppia-icon-accessibility-label">Share</span>
     </span>
-    <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" #feedbackPopOver="ngbPopover" [autoClose]="false">
+    <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" #feedbackPopOver="ngbPopover" [autoClose]="false" class="custom-dropdown-item">
       <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
+      <b class="icon-text">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</b>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
     </span>
-    <a ngbDropdownItem *ngIf="canEdit" href="/create/{{explorationId}}" tabindex="0" target="_blank" rel="noopener">
+    <a ngbDropdownItem *ngIf="canEdit" href="/create/{{explorationId}}" tabindex="0" target="_blank" rel="noopener" class="custom-dropdown-item">
       <i class="fas fa-pen exploration-player-navbar-icons"></i>
+      <b class="icon-text">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</b>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</span>
     </a>
-    <div ngbDropdownItem *ngIf="username" tabindex="0" (click)="showFlagExplorationModal()" (keydown.enter)="showFlagExplorationModal()">
+    <span ngbDropdownItem *ngIf="username" tabindex="0" (click)="showFlagExplorationModal()" (keydown.enter)="showFlagExplorationModal()" class="custom-dropdown-item">
       <i class="fas fa-flag exploration-player-navbar-icons"></i>
+      <b class="icon-text">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</b>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
-    </div>
+    </span>
   </div>
 </div>
 
@@ -80,7 +84,23 @@
     margin: 3px;
   }
 
+  .custom-dropdown-item {
+    align-items: center;
+    display: flex;
+  }
+
+  .icon-text {
+    font-size: 14px;
+    margin-left: 10px;
+  }
+
   .mobile-option-btn {
+    border: none !important;
     margin: .7em 0;
+    outline: none !important;
+  }
+
+  .mobile-option-btn:focus {
+  box-shadow: none;
   }
 </style>
