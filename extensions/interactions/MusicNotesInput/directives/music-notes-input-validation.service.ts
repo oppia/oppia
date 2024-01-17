@@ -48,24 +48,6 @@ import { Outcome } from
       ['sequenceToGuess', 'initialSequence']);
 
     let gSeq = customizationArgs.sequenceToGuess.value; 
-    let initSeq = customizationArgs.initialSequence.value;
-
-    // check if the input exists
-    if (gSeq === undefined || gSeq.length === 0){
-      warningsList.push({
-        type: AppConstants.WARNING_TYPES.ERROR,
-        type: 'sequence to guess is undefined'
-      });
-
-    }
-
-    if (initSeq === undefined || initSeq.length === 0){
-      warningsList.push({
-        type: AppConstants.WARNING_TYPES.ERROR,
-        type: 'sequence to guess is undefined'
-      });
-
-    }
 
     let noteName = gSeq[0].noteName;
     let noteDuration = gSeq[0].noteName;
