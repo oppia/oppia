@@ -185,7 +185,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
-    blog_post_title: str
+    blog_post_title: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -438,8 +438,9 @@ class AdminHandler(
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_blog_post':
-                blog_post_title = self.normalized_payload['blog_post_title']
-                self._load_dummy_blog_post(blog_post_title)
+                blog_post_title = self.normalized_payload.get('blog_post_title')
+                if blog_post_title is not None:
+                    self._load_dummy_blog_post(blog_post_title)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
