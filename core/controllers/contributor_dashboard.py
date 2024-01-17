@@ -372,15 +372,15 @@ class ReviewableOpportunitiesHandler(
         #    explorations.
         # 5. If there's a pinned lesson, move the pinned lesson's summary to
         #    the top.
-        if topic_name:
+        if topic_name is None or topic_name == 'undefined':
+            topic_exp_ids = topic_services.get_published_story_exploration_ids()
+        else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
             topic_exp_ids = topic_services.get_published_story_exploration_ids(
                 topic_id=topic.id)
-        else:
-            topic_exp_ids = topic_services.get_published_story_exploration_ids()
 
         in_review_suggestions, _ = (
             suggestion_services
