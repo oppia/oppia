@@ -36,19 +36,6 @@ BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 
 
-class BlogAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Blog Admin Page  Handler to render the frontend template."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_blog_admin_page
-    def get(self) -> None:
-        """Handles GET requests."""
-
-        self.render_template('blog-admin-page.mainpage.html')
-
-
 class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of BlogAdminHandler's normalized_payload
     dictionary.

@@ -21,28 +21,6 @@ from core.domain import platform_parameter_list
 from core.tests import test_utils
 
 
-class BlogAdminPageTests(test_utils.GenericTestBase):
-    """Checks the access to the blog admin page and its rendering."""
-
-    def test_blog_admin_page_access_without_logging_in(self) -> None:
-        """Tests access to the Blog Admin page."""
-        self.get_html_response('/blog-admin', expected_status_int=302)
-
-    def test_blog_admin_page_acess_without_being_blog_admin(self) -> None:
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-        self.get_html_response('/blog-admin', expected_status_int=401)
-        self.logout()
-
-    def test_blog_admin_page_acess_as_blog_admin(self) -> None:
-        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.add_user_role(
-            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.login(self.BLOG_ADMIN_EMAIL)
-        self.get_html_response('/blog-admin')
-        self.logout()
-
-
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
 

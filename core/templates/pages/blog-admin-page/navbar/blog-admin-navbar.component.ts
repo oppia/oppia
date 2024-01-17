@@ -18,8 +18,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
@@ -82,7 +80,3 @@ export class BlogAdminNavbarComponent implements OnInit {
       '/logo/288x128_logo_white.webp');
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogAdminNavbar', downgradeComponent(
-    {component: BlogAdminNavbarComponent}));
