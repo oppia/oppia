@@ -73,10 +73,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
 
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
       this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
-    } else if (userLang === 'pt-br') {
-      this.formLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
     } else {
-      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${userLang}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
+      let interpolatedLanguage = (userLang === 'pt-br') ? 'pt' : userLang;
+      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
     }
     return this.formLink;
   }
