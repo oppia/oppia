@@ -3076,10 +3076,10 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
                     'blog_post_title': 'Education',
                 }, csrf_token=csrf_token)
 
-        blog_count = (
+        blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
-        self.assertEqual(blog_count, 0)
+        self.assertEqual(blog_post_count, 0)
         self.logout()
 
     def test_generate_dummy_blog_post(self) -> None:
@@ -3090,30 +3090,30 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_blog_post',
                 'blog_post_title': 'Education',
             }, csrf_token=csrf_token)
-        blog_count = (
+        blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
-        self.assertEqual(blog_count, 1)
+        self.assertEqual(blog_post_count, 1)
 
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_blog_post',
                 'blog_post_title': 'Testing types of Text formatting',
             }, csrf_token=csrf_token)
-        blog_count = (
+        blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
-        self.assertEqual(blog_count, 2)
+        self.assertEqual(blog_post_count, 2)
 
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_blog_post',
                 'blog_post_title': 'Leading The Arabic Translations Team',
             }, csrf_token=csrf_token)
-        blog_count = (
+        blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
-        self.assertEqual(blog_count, 3)
+        self.assertEqual(blog_post_count, 3)
         self.logout()
 
     def test_handler_raises_error_with_invalid_blog_post_title(self) -> None:
@@ -3131,8 +3131,8 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             'formatting\", \"Leading The Arabic Translations'
             ' Team\".')
         self.assertEqual(response['error'], error_msg)
-        blog_count = (
+        blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
         )
-        self.assertEqual(blog_count, 0)
+        self.assertEqual(blog_post_count, 0)
         self.logout()
