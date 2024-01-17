@@ -56,7 +56,7 @@ describe('Html Length Service', () => {
     expect(htmlLengthService).toBeTruthy();
   });
 
-  it('should compute length for empty string', () => {
+  it('should compute word count for empty string', () => {
     const htmlString = '';
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
@@ -64,7 +64,7 @@ describe('Html Length Service', () => {
     expect(result).toBe(0);
   });
 
-  it('should compute length for strings with only paragraph tag', () => {
+  it('should compute word count for strings with only paragraph tag', () => {
     const htmlString = '<p>Earth Our home planet is the third planet' +
       ' from the sun.</p>';
 
@@ -73,7 +73,7 @@ describe('Html Length Service', () => {
     expect(result).toBe(11);
   });
 
-  it('should compute length for strings with paragraph tag and' +
+  it('should compute word count for strings with paragraph tag and' +
     'descendants text nodes', () => {
     const testCases = [
       {
@@ -109,7 +109,7 @@ describe('Html Length Service', () => {
     }
   });
 
-  it('should compute length of content with text and non-text ' +
+  it('should compute word count of content with text and non-text ' +
   '(math tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
@@ -123,7 +123,7 @@ describe('Html Length Service', () => {
     expect(result).toBe(14);
   });
 
-  it('should compute length of content with both text and non-text' +
+  it('should compute word count of content with both text and non-text' +
   '(image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
@@ -137,7 +137,7 @@ describe('Html Length Service', () => {
     expect(result).toBe(9);
   });
 
-  it('should compute length of content of ordered lists', () => {
+  it('should compute word count of content of ordered lists', () => {
     const htmlString = '<ol><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ol>';
 
@@ -146,12 +146,114 @@ describe('Html Length Service', () => {
     expect(result).toBe(14);
   });
 
-  it('should compute length of content of unordered lists', () => {
+  it('should compute word count of content of unordered lists', () => {
     const htmlString = '<ul><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ul>';
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
     expect(result).toBe(14);
+  });
+
+  it('should compute character count for empty string', () => {
+    const htmlString = '';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(0);
+  });
+
+  it('should compute character count for strings with only paragraph tag',
+    () => {
+      const htmlString = '<p>Earth Our home planet is the third planet' +
+      ' from the sun.</p>';
+
+      const result = htmlLengthService
+        .computeHtmlLengthInCharacters(htmlString);
+
+      expect(result).toBe(55);
+    });
+
+  it('should compute character count for strings with paragraph tag and' +
+    ' descendants text nodes', () => {
+    const testCases = [
+      {
+        input: '<p><em>This is a brief exploration about conjugations' +
+          'in Spanish.</em></p>',
+        expected: 57
+      },
+      {
+        input: '<p>This is a test.</p>',
+        expected: 15
+      },
+      {
+        input: '<p><b>This text is bolded.</b><em> This is italic</em></p>',
+        expected: 35
+      },
+      {
+        input: '<p> Check out below<br><br><b> "Text is bolded"</b></p>',
+        expected: 32
+      },
+      {
+        input: '<p>🙂 Hello, how are you?</p>',
+        expected: 22
+      },
+      {
+        input: '<p>مر حبا كيف حالك؟</p>',
+        expected: 16
+      },
+    ];
+
+    for (const testCase of testCases) {
+      const result = htmlLengthService
+        .computeHtmlLengthInCharacters(testCase.input);
+      expect(result).toBe(testCase.expected);
+    }
+  });
+
+  it('should compute character count of content with text and non-text ' +
+  '(math tag)', () => {
+    const htmlString = '<p>Hi this seems too good to be true but what' +
+      ' to do man<oppia-noninteractive-math math_content-with-value="' +
+      '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
+      ';quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_2023' +
+      '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
+      'svg&amp;quot;}\"></oppia-noninteractive-math></p>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(53);
+  });
+
+  it('should compute character count of content with both text and non-text' +
+  '(image tag)', () => {
+    const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
+      '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
+      'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
+      'h&amp;quot;" filepath-with-value="&amp;quot;img_20230602_111340' +
+      '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
+      '.14"></oppia-noninteractive-image>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(34);
+  });
+
+  it('should compute character count of content of ordered lists', () => {
+    const htmlString = '<ol><li>This is the first item</li><li> This is' +
+      ' second item</li><li> This is the third item</li></ol>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(65);
+  });
+
+  it('should compute character count of content of unordered lists', () => {
+    const htmlString = '<ul><li>This is the first item</li><li> This is' +
+      ' second item</li><li> This is the third item</li></ul>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(65);
   });
 });
