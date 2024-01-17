@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { DonatePageComponent } from './donate-page.component';
@@ -50,6 +50,7 @@ class MockWindowRef {
 }
 
 describe('Donate page', () => {
+  let fixture: ComponentFixture<DonatePageComponent>;
   let component: DonatePageComponent;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
@@ -71,8 +72,8 @@ describe('Donate page', () => {
   });
 
   beforeEach(() => {
-    const donatePageComponent = TestBed.createComponent(DonatePageComponent);
-    component = donatePageComponent.componentInstance;
+    fixture = TestBed.createComponent(DonatePageComponent);
+    component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ngbModal, 'open');
@@ -117,5 +118,17 @@ describe('Donate page', () => {
         windowClass: 'donation-box-modal',
       }
     );
+  });
+
+  it('should change learner tile in carousel', () => {
+    fixture.detectChanges();
+    const randomVal = Math.floor(Math.random() * 5);
+    const allTiles = fixture.debugElement.componentInstance.tiles.toArray();
+    const nativeElem = allTiles[randomVal].nativeElement;
+    spyOn(nativeElem, 'scrollIntoView').and.callThrough();
+
+    component.nextTile(randomVal);
+    expect(component.tileShown).toEqual(randomVal);
+    expect(nativeElem.scrollIntoView).toHaveBeenCalled();
   });
 });
