@@ -348,6 +348,16 @@ describe('Admin dev mode activities tab', () => {
     }));
 
     it('should show error message if new dummy blog post ' +
+      'title is empty', async(() => {
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlogPost('');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Internal error: blogPostTitle is empty');
+    }));
+
+    it('should show error message if new dummy blog post ' +
       'is not generated', async(() => {
       spyOn(adminBackendApiService, 'generateDummyBlogPostAsync')
         .and.returnValue(Promise.reject('Dummy Blog not generated.'));

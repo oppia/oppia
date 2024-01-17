@@ -83,6 +83,8 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
 supported_languages: List[str] = [
     lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
 
+EDUCTION_BLOG_POST_TITLE = 'Education'
+
 EDUCTION_BLOG_POST_CONTENT = """
     <p>
         Education is a constantly evolving landscape, and innovation lies at its core. 
@@ -106,6 +108,8 @@ EDUCTION_BLOG_POST_CONTENT = """
     </oppia-noninteractive-video>
 """
 
+FORMATTING_BLOG_POST_TITLE = 'Blog with different font formatting'
+
 FORMATTING_BLOG_POST_CONTENT = """
     <h1>Heading</h1>\n\n
     <p>This is the normal text.</p>\n\n
@@ -118,6 +122,8 @@ FORMATTING_BLOG_POST_CONTENT = """
     <blockquote>\n<p>Quote from some famous person. Two empty lines after this quote.</p>\n</blockquote>\n\n
     <p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>End of blog.</p>
 """
+
+ARABIC_BLOG_POST_TITLE = 'Leading The Arabic Translations Team'
 
 ARABIC_BLOG_POST_CONTENT = """
     <h1>Introduction:</h1>\n
@@ -179,7 +185,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
-    blog_post_title: Optional[str]
+    blog_post_title: str
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
 
 
@@ -289,9 +295,13 @@ class AdminHandler(
             },
             'blog_post_title': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': [
+                        ARABIC_BLOG_POST_TITLE,
+                        EDUCTION_BLOG_POST_TITLE,
+                        FORMATTING_BLOG_POST_TITLE,
+                    ]
                 },
-                'default_value': None
             },
             'exp_id': {
                 'schema': {
@@ -428,12 +438,7 @@ class AdminHandler(
                 self._generate_dummy_explorations(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_blog_post':
-                blog_post_title = self.normalized_payload.get('blog_post_title')
-                if blog_post_title is None:
-                    raise Exception(
-                        'The \'blog_post_title\' must be provided when the'
-                        ' action is generate_dummy_blog_post.'
-                    )
+                blog_post_title = self.normalized_payload['blog_post_title']
                 self._load_dummy_blog_post(blog_post_title)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
@@ -713,25 +718,26 @@ class AdminHandler(
             )
         random_string = utils.generate_random_string(6)
         try:
-            if blog_post_title == 'Education':
+            if blog_post_title == EDUCTION_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
-                    'title': 'Education-' + random_string,
+                    'title':
+                        '%s-%s' % (EDUCTION_BLOG_POST_TITLE, random_string),
                     'thumbnail_filename': 'blog_thumbnail.png',
                     'content': EDUCTION_BLOG_POST_CONTENT,
                     'tags': ['Community']
                 })
-            elif blog_post_title == 'Testing types of Text formatting':
+            elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
-                        'Blog with different font formatting-' + random_string,
+                        '%s-%s' % (FORMATTING_BLOG_POST_TITLE, random_string),
                     'content': FORMATTING_BLOG_POST_CONTENT,
                     'tags': ['Learners', 'Languages'],
                     'thumbnail_filename': 'blog_thumbnail.png'
                 })
-            elif blog_post_title == 'Leading The Arabic Translations Team':
+            elif blog_post_title == ARABIC_BLOG_POST_TITLE:
                 blog_services.update_blog_post(blog_post.id, {
                     'title':
-                        'Leading The Arabic Translations Team-' + random_string,
+                        '%s-%s' % (ARABIC_BLOG_POST_TITLE, random_string),
                     'content': ARABIC_BLOG_POST_CONTENT,
                     'tags': [
                         'Learners',

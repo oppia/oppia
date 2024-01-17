@@ -39,7 +39,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   DUMMY_BLOG_POST_TITLES = [
     'Education',
     'Leading The Arabic Translations Team',
-    'Testing types of Text formatting',
+    'Blog with different font formatting',
   ];
 
   constructor(
@@ -176,6 +176,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   }
 
   generateNewBlogPost(blogPostTitle: string): void {
+    if (!blogPostTitle) {
+      this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
+    }
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService.generateDummyBlogPostAsync(blogPostTitle)

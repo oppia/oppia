@@ -3098,7 +3098,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_blog_post',
-                'blog_post_title': 'Testing types of Text formatting',
+                'blog_post_title': 'Blog with different font formatting',
             }, csrf_token=csrf_token)
         blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
@@ -3116,20 +3116,36 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.assertEqual(blog_post_count, 3)
         self.logout()
 
-    def test_handler_raises_error_with_invalid_blog_post_title(self) -> None:
+    def test_handler_raises_error_with_no_blog_post_title(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_blog_post',
-                'blog_post_title': 'blog title',
+            }, csrf_token=csrf_token, expected_status_int=400)
+        error_msg = 'Missing key in handler args: blog_post_title.'
+        self.assertEqual(response['error'], error_msg)
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 0)
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_blog_post_title(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        invalid_blog_post_title = 'blog_title'
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog_post',
+                'blog_post_title': invalid_blog_post_title,
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-            'The \"blog_post_title\" is not valid. It should be '
-            '\"Education\", \"Testing types of Text '
-            'formatting\", \"Leading The Arabic Translations'
-            ' Team\".')
+            'Schema validation for \'blog_post_title\' failed: Received %s '
+            'which is not in the allowed range of choices: [\'Leading The '
+            'Arabic Translations Team\', \'Education\', \'Blog with different'
+            ' font formatting\']' % invalid_blog_post_title) 
         self.assertEqual(response['error'], error_msg)
         blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()
