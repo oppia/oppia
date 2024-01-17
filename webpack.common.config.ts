@@ -60,8 +60,6 @@ module.exports = {
     }
   },
   entry: {
-    blog_admin:
-      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     classroom_admin:
@@ -155,23 +153,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['blog_admin'],
-      filename: 'blog-admin-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template:
-        commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['classroom_admin'],
