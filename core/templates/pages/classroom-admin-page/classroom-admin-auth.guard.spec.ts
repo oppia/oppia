@@ -47,39 +47,40 @@ describe('ClassroomAdminAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not curriculum admin', (done) => {
-    const getUserInfoAsyncSpy = spyOn(
-      userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(UserInfo.createDefault())
-    );
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+  it('should redirect user to 401 page if user is not curriculum admin',
+    (done) => {
+      const getUserInfoAsyncSpy = spyOn(
+        userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(UserInfo.createDefault())
+      );
+      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
-        expect(canActivate).toBeFalse();
-        expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
-        done();
-      });
-  });
+      guard.canActivate(
+        new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
+        (canActivate) => {
+          expect(canActivate).toBeFalse();
+          expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+          expect(navigateSpy).toHaveBeenCalledWith([
+            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
+          done();
+        });
+    });
+  it('should not redirect user to 401 page if user is curriculum admin',
+    (done) => {
+      const getUserInfoAsyncSpy = spyOn(
+        userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(new UserInfo(
+          [], false, true, false, false, false, '', '', '', true))
+      );
+      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-  it('should not redirect user to 401 page if user is curriculum admin', (done) => {
-    const getUserInfoAsyncSpy = spyOn(
-      userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(new UserInfo(
-        [], false, true, false, false, false, '', '', '', true))
-    );
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
-
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
-        expect(canActivate).toBeTrue();
-        expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).not.toHaveBeenCalled();
-        done();
-      });
-  });
+      guard.canActivate(
+        new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
+        (canActivate) => {
+          expect(canActivate).toBeTrue();
+          expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+          expect(navigateSpy).not.toHaveBeenCalled();
+          done();
+        });
+    });
 });

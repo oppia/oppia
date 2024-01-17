@@ -25,7 +25,9 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './classroom-admin-page-root.component.html',
 })
 export class ClassroomAdminPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.TITLE;
+
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.META as
     unknown as Readonly<MetaTagData>[];

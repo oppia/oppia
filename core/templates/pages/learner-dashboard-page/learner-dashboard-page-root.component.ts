@@ -25,7 +25,9 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './learner-dashboard-page-root.component.html',
 })
 export class LearnerDashboardPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.TITLE;
+
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.META as
     unknown as Readonly<MetaTagData>[];
