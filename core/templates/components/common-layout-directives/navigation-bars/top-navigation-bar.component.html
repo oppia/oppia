@@ -159,10 +159,12 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">
-                        {{ 'I18N_TOPNAV_LIBRARY' | translate }}
-                      </span>
-                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                      <a class="underline nav-item-bottom-link" tabindex="0" href="/community-library">
+                        <span class="link">
+                          {{ 'I18N_TOPNAV_LIBRARY' | translate }}
+                        </span>
+                        <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+                      </a>
                     </div>
                   </a>
                   <a
