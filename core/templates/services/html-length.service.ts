@@ -108,12 +108,10 @@ export class HtmlLengthService {
       const words = textContent.trim().split(' ');
       const wordCount = words.length;
       return wordCount;
-    } else if (wordOrCharacter === 'character') {
-      const characters = textContent.trim().split('\n').join('').split('');
-      let characterCount = characters.length;
-      return characterCount;
     }
-    return 0;
+    const characters = textContent.trim().split('\n').join('').split('');
+    let characterCount = characters.length;
+    return characterCount;
   }
 
   private getWeightForNonTextNodes(
@@ -123,14 +121,8 @@ export class HtmlLengthService {
     }
     const altTextMatch = nonTextNode
       .match(/alt-with-value="&amp;quot;([^&]*)&amp;quot;"/);
-    if (wordOrCharacter === 'character') {
-      let chars = [];
-      if (altTextMatch && altTextMatch[1]) {
-        const altText = altTextMatch[1];
-        chars = altText.trim().split(' ').join('').split('');
-      }
-      return chars.length + 2; // +2 as a bonus for images with text.
-    } else if (wordOrCharacter === 'word') {
+
+    if (wordOrCharacter === 'word') {
       let words = [];
       if (altTextMatch && altTextMatch[1]) {
         const altText = altTextMatch[1];
@@ -138,6 +130,11 @@ export class HtmlLengthService {
       }
       return words.length + 2; // +2 as a bonus for images with text.
     }
-    return 0;
+    let chars = [];
+    if (altTextMatch && altTextMatch[1]) {
+      const altText = altTextMatch[1];
+      chars = altText.trim().split(' ').join('').split('');
+    }
+    return chars.length + 2; // +2 as a bonus for images with text.
   }
 }
