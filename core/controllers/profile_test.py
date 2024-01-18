@@ -1144,6 +1144,13 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
+                    'tag': 'Web',
+                    'name': ''
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/mailinglistsubscriptionhandler', {
+                    'email': 'email@example.com',
                     'tag': '',
                     'name': 'Name'
                 }, csrf_token=csrf_token, expected_status_int=400)
