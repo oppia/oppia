@@ -52,13 +52,13 @@
   background: #0003;
 }
 
-.oppia-android-updates-button:hover:disabled {
-  background: #0003;
+.oppia-android-updates-button:hover {
+  background-color: #3d9991;
+  color: #fff;
 }
 
-.oppia-android-updates-button:hover {
-  color: #fff;
-  background-color: #3d9991;
+.oppia-android-updates-button:hover:disabled {
+  background: #0003;
 }
 
 .oppia-android-updates-checkbox-label {
