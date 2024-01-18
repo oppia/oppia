@@ -53,6 +53,7 @@
 }
 
 .oppia-android-updates-button:hover {
+  /* changing color for aesthetics */
   background-color: #3d9991;
   color: #fff;
 }
