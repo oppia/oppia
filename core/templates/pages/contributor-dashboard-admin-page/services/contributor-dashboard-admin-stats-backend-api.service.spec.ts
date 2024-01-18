@@ -457,7 +457,7 @@ describe('Contribution Admin dashboard stats service', () => {
     () => {
       spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
       spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
-        .and.returnValue(Promise.resolve([{mathclassroomId: 'math'}]));
+        .and.returnValue(Promise.resolve({mathclassroomId: 'math'}));
       spyOn(cdasbas, 'fetchClassroomFragment')
         .and.returnValue(Promise.resolve([
           { id: '1', topic: 'Science' },
@@ -472,7 +472,7 @@ describe('Contribution Admin dashboard stats service', () => {
       expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
         toHaveBeenCalled();
       expect(cdasbas.fetchClassroomFragment).
-        toHaveBeenCalledWith('0');
+        toHaveBeenCalledWith('mathclassroomId');
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
