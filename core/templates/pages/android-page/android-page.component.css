@@ -251,8 +251,8 @@
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
-  padding: 15px 20px;
   cursor: pointer;
+  padding: 15px 20px;
   position: relative;
   z-index: 100;
 }
