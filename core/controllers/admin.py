@@ -753,12 +753,6 @@ class AdminHandler(
                     ],
                     'thumbnail_filename': 'blog_thumbnail.png'
                 })
-            else:
-                raise self.InvalidInputException(
-                    'The \"blog_post_title\" is not valid. It should be '
-                    '\"Education\", \"Testing types of Text '
-                    'formatting\", \"Leading The Arabic '
-                    'Translations Team\".')
         except Exception as e:
             blog_services.delete_blog_post(blog_post.id)
             raise e
