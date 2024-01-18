@@ -3,13 +3,6 @@
   <h1 class="oppia-preferences-page-heading e2e-test-preferences-title" tabindex="0">
       {{ 'I18N_PREFERENCES_HEADING' | translate }}
   </h1>
-  <em>
-    <div>
-      <h2 class="oppia-preferences-page-heading-subtext" tabindex="0">
-        {{ 'I18N_PREFERENCES_HEADING_SUBTEXT' | translate }}
-      </h2>
-    </div>
-  </em>
   <mat-card class="oppia-page-card">
     <div class="container">
       <div class="form-group row">
@@ -407,7 +400,6 @@
           class="btn oppia-save-button e2e-test-save-preferences-button"
           [disabled]="!hasPageLoaded || !hasUnsavedChanges"
           (click)="savePreferences()">
-    <!-- {{ 'I18N_PREFERENCES_SAVE_PREFERENCES' | translate }} -->
-    Save Changes
+    {{ 'I18N_PREFERENCES_SAVE_CHANGES' | translate }}
   </button>
 </div>

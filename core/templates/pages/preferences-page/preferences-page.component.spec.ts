@@ -155,9 +155,7 @@ describe('Preferences Page Component', () => {
       preventPageUnloadEventService = TestBed.inject(
         PreventPageUnloadEventService);
       alertsService = TestBed.inject(AlertsService);
-      i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
-      mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
@@ -362,9 +360,7 @@ describe('Preferences Page Component', () => {
       }).compileComponents();
       fixture = TestBed.createComponent(PreferencesPageComponent);
       componentInstance = fixture.componentInstance;
-      userService = TestBed.inject(UserService);
       httpTestingController = TestBed.inject(HttpTestingController);
-      mockWindowRef = TestBed.inject(WindowRef);
       ngbModal = TestBed.inject(NgbModal);
     });
 
