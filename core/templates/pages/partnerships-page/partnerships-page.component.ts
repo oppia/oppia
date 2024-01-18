@@ -68,7 +68,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  getFormLink(): void {
+  setFormLink(): void {
     let userLang = this.translateService.currentLang;
 
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
@@ -83,7 +83,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
-        this.getFormLink();
+        this.setFormLink();
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(

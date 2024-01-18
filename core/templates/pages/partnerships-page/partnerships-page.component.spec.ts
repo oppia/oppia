@@ -103,33 +103,46 @@ describe('Partnerships page', () => {
       'I18N_PARTNERSHIPS_PAGE_TITLE');
   });
 
-  it('should return the correct form link for English language', () => {
+  it('should obtain new form link whenever the selected' +
+  'language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setFormLink');
+    translateService.onLangChange.emit();
+
+    expect(component.setFormLink).toHaveBeenCalled();
+  });
+
+  it('should set the correct form link for English language', () => {
     translateService.currentLang = 'en';
     const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    component.setFormLink();
 
-    expect(component.getFormLink()).toBe(formLink);
+    expect(component.formLink).toBe(formLink);
   });
 
-  it('should return the correct form link for Portuguese language', () => {
+  it('should set the correct form link for Portuguese language', () => {
     translateService.currentLang = 'pt-br';
     const formLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=en-US&_x_tr_pto=wapp';
+    component.setFormLink();
 
-    expect(component.getFormLink()).toBe(formLink);
+    expect(component.formLink).toBe(formLink);
   });
 
-  it('should return the correct form link for general languages', () => {
+  it('should set the correct form link for general languages', () => {
     translateService.currentLang = 'fr';
     const formLink = 'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en-US&_x_tr_pto=wapp';
+    component.setFormLink();
 
-    expect(component.getFormLink()).toBe(formLink);
+    expect(component.formLink).toBe(formLink);
   });
 
-  it('should return english link for languages not supported by' +
+  it('should set english link for languages not supported by' +
   ' google forms', () => {
     translateService.currentLang = 'pcm';
     const formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    component.setFormLink();
 
-    expect(component.getFormLink()).toBe(formLink);
+    expect(component.formLink).toBe(formLink);
   });
 
   it('should unsubscribe on component destruction', () => {
