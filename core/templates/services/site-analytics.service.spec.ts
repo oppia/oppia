@@ -25,6 +25,7 @@ describe('Site Analytics Service', () => {
   let ws: WindowRef;
   let gtagSpy: jasmine.Spy;
   let pathname = 'pathname';
+  const explorationId = 'abc1';
 
   class MockWindowRef {
     nativeWindow = {
@@ -132,7 +133,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register create new exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCreateNewExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
@@ -142,7 +142,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register create new exploration in collection event', () => {
-      const explorationId = 'abc1';
       sas.registerCreateNewExplorationInCollectionEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith(
@@ -163,7 +162,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register commit changes to private exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCommitChangesToPrivateExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith(
@@ -204,7 +202,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register open embed info event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenEmbedInfoEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
@@ -214,7 +211,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register commit changes to public exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCommitChangesToPublicExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -224,7 +220,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register tutorial modal open event', () => {
-      const explorationId = 'abc1';
       sas.registerTutorialModalOpenEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
@@ -234,7 +229,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register decline tutorial modal event', () => {
-      const explorationId = 'abc1';
       sas.registerDeclineTutorialModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -244,7 +238,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register accept tutorial modal event', () => {
-      const explorationId = 'abc1';
       sas.registerAcceptTutorialModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -254,7 +247,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register click help button event', () => {
-      const explorationId = 'abc1';
       sas.registerClickHelpButtonEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -264,7 +256,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register visit help center event', () => {
-      const explorationId = 'abc1';
       sas.registerVisitHelpCenterEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -274,7 +265,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register open tutorial from help center event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenTutorialFromHelpCenterEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -284,7 +274,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register skip tutorial event', () => {
-      const explorationId = 'abc1';
       sas.registerSkipTutorialEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -294,7 +283,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register finish tutorial event', () => {
-      const explorationId = 'abc1';
       sas.registerFinishTutorialEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -304,7 +292,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register editor first entry event', () => {
-      const explorationId = 'abc1';
       sas.registerEditorFirstEntryEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
@@ -314,7 +301,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first open content box event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstOpenContentBoxEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
@@ -324,7 +310,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first save content event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveContentEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -334,7 +319,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first click add interaction event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstClickAddInteractionEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -344,7 +328,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register select interaction type event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSelectInteractionTypeEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -354,7 +337,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first save interaction event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveInteractionEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -364,7 +346,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first save rule event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveRuleEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -374,7 +355,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register first create second state event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstCreateSecondStateEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
@@ -384,7 +364,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register save playable exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerSavePlayableExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'save', {
@@ -394,7 +373,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register open publish exploration modal event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenPublishExplorationModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
@@ -404,7 +382,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register publish exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerPublishExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -414,7 +391,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register visit oppia from iframe event', () => {
-      const explorationId = 'abc1';
       sas.registerVisitOppiaFromIframeEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -510,7 +486,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register save recorded audio event', () => {
-      const explorationId = 'abc1';
       sas.registerSaveRecordedAudioEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -520,7 +495,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register audio recording event', () => {
-      const explorationId = 'abc1';
       sas.registerStartAudioRecordingEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -530,7 +504,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register upload audio event', () => {
-      const explorationId = 'abc1';
       sas.registerUploadAudioEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
@@ -601,7 +574,6 @@ describe('Site Analytics Service', () => {
     });
 
     it('should register exploration start', () => {
-      const explorationId = 'abc1';
       sas.registerStartExploration(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
@@ -723,6 +695,18 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event', 'discovery_start_learning', {}
+      );
+    });
+
+    it('should register submitted answer', () => {
+      const answerIsCorrect = true;
+      sas.registerAnswerSubmitted(explorationId, answerIsCorrect);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event', 'answer_submitted', {
+          exploration_id: explorationId,
+          answer_is_correct: answerIsCorrect,
+        }
       );
     });
   });
