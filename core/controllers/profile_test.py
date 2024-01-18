@@ -67,18 +67,18 @@ class ProfilePageTests(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
             self.put_json(
-                '/preferenceshandler/data',
-                {
+                feconf.PREFERENCES_DATA_URL,
+                {'updates': [{
                     'update_type': 'user_bio',
-                    'data': 'Bio data of the editor'
+                    'data': 'Bio data of the editor'}]
                 },
                 csrf_token=csrf_token
             )
             self.put_json(
-                '/preferenceshandler/data',
-                {
+                feconf.PREFERENCES_DATA_URL,
+                {'updates': [{
                     'update_type': 'subject_interests',
-                    'data': ['editor', 'writing']
+                    'data': ['editor', 'writing']}]
                 },
                 csrf_token=csrf_token
             )
@@ -129,7 +129,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        original_preferences = self.get_json('/preferenceshandler/data')
+        original_preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(
             ['en'], original_preferences['preferred_language_codes'])
         self.assertIsNone(original_preferences['preferred_site_language_code'])
@@ -137,24 +137,34 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(
             original_preferences['preferred_translation_language_code'])
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'preferred_site_language_code', 'data': 'en'},
-            csrf_token=csrf_token)
-        self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'preferred_audio_language_code', 'data': 'hi-en'},
-            csrf_token=csrf_token)
-        self.put_json(
-            '/preferenceshandler/data', {
-                'update_type': 'preferred_translation_language_code',
-                'data': 'en'
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'preferred_site_language_code', 
+                'data': 'en'}]
             },
             csrf_token=csrf_token)
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'preferred_audio_language_code', 
+                'data': 'hi-en'}]
+            },
             csrf_token=csrf_token)
-        new_preferences = self.get_json('/preferenceshandler/data')
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'preferred_translation_language_code',
+                'data': 'en'}]
+            },
+            csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'preferred_language_codes',
+                'data': ['de']}]
+            },
+            csrf_token=csrf_token)
+        new_preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
         self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
         self.assertEqual(
@@ -169,12 +179,18 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'user_bio', 'data': 'My new editor bio'},
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'user_bio',
+                'data': 'My new editor bio'}]
+            },
             csrf_token=csrf_token)
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'subject_interests', 'data': ['editor', 'editing']},
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'subject_interests',
+                'data': ['editor', 'editing']}]
+            },
             csrf_token=csrf_token)
         self.logout()
 
@@ -182,12 +198,18 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'user_bio', 'data': 'My new viewer bio'},
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'user_bio',
+                'data': 'My new viewer bio'}]
+            },
             csrf_token=csrf_token)
         self.put_json(
-            '/preferenceshandler/data',
-            {'update_type': 'subject_interests', 'data': ['viewer', 'viewing']},
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
+                'update_type': 'subject_interests',
+                'data': ['viewer', 'viewing']}]
+            },
             csrf_token=csrf_token)
         self.logout()
 
@@ -397,9 +419,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         fs.commit('profile_picture.png', raw_image, mimetype='image/png')
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {
+            {'updates': [{
                 'update_type': 'profile_picture_data_url',
-                'data': user_services.DEFAULT_IDENTICON_DATA_URL},
+                'data': user_services.DEFAULT_IDENTICON_DATA_URL}]
+            },
             csrf_token=csrf_token)
         profile_data = utils.convert_image_binary_to_data_url(
             fs.get('profile_picture.png'), 'png')
@@ -412,9 +435,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {
+            {'updates': [{
                 'update_type': 'default_dashboard',
-                'data': constants.DASHBOARD_TYPE_CREATOR},
+                'data': constants.DASHBOARD_TYPE_CREATOR}]
+            },
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
@@ -429,7 +453,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid update type:'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'invalid_update_type'},
+                {'updates': [{'update_type': 'invalid_update_type'}]},
                 csrf_token=csrf_token)
         self.logout()
 
@@ -441,7 +465,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             Exception, 'Expected subject_interests to be a list'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'subject_interests', 'data': 'not a list'},
+                {'updates': [{
+                    'update_type': 'subject_interests',
+                    'data': 'not a list'}]
+                },
                 csrf_token=csrf_token)
         self.logout()
 
@@ -453,7 +480,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             Exception, 'Expected preferred_language_codes to be a list'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'preferred_language_codes', 'data': 'en'},
+                {'updates': [{
+                    'update_type': 'preferred_language_codes',
+                    'data': 'en'}]
+                },
                 csrf_token=csrf_token)
         self.logout()
 
@@ -470,7 +500,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             Exception, 'Expected data to contain the fields,'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'email_preferences', 'data': data},
+                {'updates': [{
+                    'update_type': 'email_preferences',
+                    'data': data}]
+                },
                 csrf_token=csrf_token)
         self.logout()
 
@@ -486,7 +519,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             Exception, 'Expected data to contain the fields'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'email_preferences', 'data': data},
+                {'updates': [{
+                    'update_type': 'email_preferences',
+                    'data': data}]
+                },
                 csrf_token=csrf_token)
         self.logout()
 
@@ -504,7 +540,10 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             Exception, 'Expected all values of data to be boolean'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                {'update_type': 'email_preferences', 'data': data},
+                {'updates': [{
+                    'update_type': 'email_preferences',
+                    'data': data}]
+                },
                 csrf_token=csrf_token)
         self.logout()
 
@@ -521,7 +560,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 Exception, 'Expected %s to be a str' % update_type):
                 self.put_json(
                     feconf.PREFERENCES_DATA_URL,
-                    {'update_type': update_type, 'data': 1},
+                    {'updates': [{'update_type': update_type, 'data': 1}]},
                     csrf_token=csrf_token)
         self.logout()
 
@@ -537,11 +576,12 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.login(self.EMAIL_A)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/preferenceshandler/data', {
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
                 'update_type': 'user_bio',
-                'data': 'I am within 2000 char limit',
+                'data': 'I am within 2000 char limit'}]
             }, csrf_token=csrf_token)
-        preferences = self.get_json('/preferenceshandler/data')
+        preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertIsNotNone(preferences)
         self.assertEqual(
             preferences['user_bio'], 'I am within 2000 char limit')
@@ -552,9 +592,10 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.login(self.EMAIL_B)
         csrf_token = self.get_new_csrf_token()
         user_bio_response = self.put_json(
-            '/preferenceshandler/data', {
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
                 'update_type': 'user_bio',
-                'data': 'I am not within 2000 char limit' * 200
+                'data': 'I am not within 2000 char limit' * 200}]
             },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
@@ -724,18 +765,19 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         payload = {
+            'updates': [{
             'update_type': 'email_preferences',
             'data': {
                 'can_receive_email_updates': True,
                 'can_receive_editor_role_email': True,
                 'can_receive_feedback_message_email': True,
                 'can_receive_subscription_email': True
-            }
+            }}]
         }
 
         # Allow all emails.
         self.put_json(
-            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token)
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertTrue(email_preferences.can_receive_email_updates)
@@ -744,18 +786,19 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.can_receive_subscription_email)
 
         payload = {
+            'updates': [{
             'update_type': 'email_preferences',
             'data': {
                 'can_receive_email_updates': False,
                 'can_receive_editor_role_email': False,
                 'can_receive_feedback_message_email': False,
                 'can_receive_subscription_email': False
-            }
+            }}]
         }
 
         # Disallow all emails.
         self.put_json(
-            '/preferenceshandler/data', payload, csrf_token=csrf_token)
+            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token)
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertFalse(email_preferences.can_receive_email_updates)
@@ -1489,12 +1532,13 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/preferenceshandler/data', {
+            feconf.PREFERENCES_DATA_URL,
+            {'updates': [{
                 'update_type': 'preferred_site_language_code',
-                'data': language_code,
+                'data': language_code}]
             }, csrf_token=csrf_token)
 
-        preferences = self.get_json('/preferenceshandler/data')
+        preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertIsNotNone(preferences)
         self.assertEqual(
             preferences['preferred_site_language_code'], language_code)

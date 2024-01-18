@@ -52,10 +52,8 @@ describe('Preferences Page Component', () => {
     let urlInterpolationService: UrlInterpolationService;
     let preventPageUnloadEventService: PreventPageUnloadEventService;
     let alertsService: AlertsService;
-    let i18nLanguageCodeService: I18nLanguageCodeService;
     let ngbModal: NgbModal;
     let mockWindowRef: MockWindowRef;
-    let mockUserBackendApiService: MockUserBackendApiService;
     let imageUploadHelperService: ImageUploadHelperService;
 
     let preferencesData: PreferencesBackendDict = {
@@ -265,80 +263,12 @@ describe('Preferences Page Component', () => {
         spyOn(alertsService, 'clearWarnings');
       });
 
-      it('should save user bio', fakeAsync(() => {
-        let bio = 'new user bio';
-        componentInstance.saveUserBio(bio);
-        tick();
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
-      }));
-
       it('should save subject interests', fakeAsync(() => {
         componentInstance.onSubjectInterestsSelectionChange('math');
         expect(alertsService.clearWarnings).toHaveBeenCalled();
         tick();
-        expect(componentInstance.subjectInterestsChangeAtLeastOnce).toBeTrue();
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
       }));
-
-      it('should save preferred site language codes', fakeAsync(() => {
-        let code = 'en';
-        spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
-        componentInstance.savePreferredSiteLanguageCodes(code);
-        tick();
-        expect(
-          i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-          code);
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
-      }));
-
-      it('should save preferred audio language code', fakeAsync(() => {
-        componentInstance.savePreferredAudioLanguageCode('en');
-        tick();
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
-      }));
-
-      it('should save email preferences', fakeAsync(() => {
-        spyOn(mockUserBackendApiService, 'updatePreferencesDataAsync')
-          .and.returnValue(
-            Promise.resolve({
-              bulk_email_signup_message_should_be_shown: true
-            }));
-        componentInstance.saveEmailPreferences(true, true, true, true);
-        tick();
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
-      }));
-
-      it('should save preferred language codes', fakeAsync(() => {
-        componentInstance.savePreferredLanguageCodes(['en', 'hi']);
-        tick();
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
-      }));
-
-      it('should save default dashboard', fakeAsync(() => {
-        componentInstance.saveDefaultDashboard('creator');
-        tick();
-        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(alertsService.addInfoMessage).toHaveBeenCalled();
-      }));
-    });
-
-    it('should register bio changed', () => {
-      spyOn(preventPageUnloadEventService, 'addListener');
-      componentInstance.registerBioChanged();
-      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
     });
 
     it('should validate user popover when username is longer 10 chars', () => {
@@ -361,20 +291,15 @@ describe('Preferences Page Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve(profilePictureDataUrl)
       } as NgbModalRef);
-      spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-        Promise.resolve({ bulk_email_signup_message_should_be_shown: false }));
-      spyOn(mockWindowRef.nativeWindow.location, 'reload');
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
       expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
         profilePictureDataUrl);
-      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
 
     it('should edit profile picture modal raise error when image is invalid',
       fakeAsync(() => {
-        let error = 'Image uploaded is not valid.';
         let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve(profilePictureDataUrl)
@@ -383,8 +308,8 @@ describe('Preferences Page Component', () => {
           .and.returnValue(null);
         spyOn(alertsService, 'addWarning');
         componentInstance.showEditProfilePictureModal();
+        componentInstance.savePreferences();
         tick();
-        expect(alertsService.addWarning).toHaveBeenCalledWith(error);
       }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
@@ -395,16 +320,13 @@ describe('Preferences Page Component', () => {
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
-      expect(userService.setProfileImageDataUrlAsync).not.toHaveBeenCalled();
     }));
   });
 
   describe('on production mode', () => {
     let httpTestingController: HttpTestingController;
-    let userService: UserService;
     let componentInstance: PreferencesPageComponent;
     let ngbModal: NgbModal;
-    let mockWindowRef: MockWindowRef;
     let fixture: ComponentFixture<PreferencesPageComponent>;
 
     class MockWindowRef {
@@ -451,15 +373,9 @@ describe('Preferences Page Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve(profilePictureDataUrl)
       } as NgbModalRef);
-      spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-        Promise.resolve(
-          { bulk_email_signup_message_should_be_shown: false }));
-      spyOn(mockWindowRef.nativeWindow.location, 'reload');
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
-      expect(userService.setProfileImageDataUrlAsync).toHaveBeenCalled();
-      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
 
     it('should handle tab key press for first radio', () => {

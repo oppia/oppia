@@ -75,8 +75,7 @@
                     class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
                     [attr.value]="userBio"
-                    (blur)="saveUserBio(userBio)"
-                    (change)="registerBioChanged()"
+                    (change)="handleBioChange()"
                     rows="5"
                     maxlength="2000">
           </textarea>
@@ -100,7 +99,7 @@
                  (keydown)="handleTabForFirstRadio($event)"
                  [(ngModel)]="defaultDashboard"
                  value="{{ DASHBOARD_TYPE_CREATOR }}"
-                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 (change)="handleDefaultDashboardChange()"
                  class="e2e-test-creator-dashboard-radio"
                  attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
           <span aria-hidden="true">
@@ -113,7 +112,7 @@
                  (keydown)="handleTabForSecondRadio($event)"
                  [(ngModel)]="defaultDashboard"
                  value="{{ DASHBOARD_TYPE_LEARNER }}"
-                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 (change)="handleDefaultDashboardChange()"
                  class="e2e-test-learner-dashboard-radio"
                  attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
           <span aria-hidden="true">
@@ -126,7 +125,7 @@
                  (keydown)="handleTabForThirdRadio($event)"
                  [(ngModel)]="defaultDashboard"
                  value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
-                 (change)="saveDefaultDashboard(defaultDashboard)"
+                 (change)="handleDefaultDashboardChange()"
                  class="e2e-test-contributor-dashboard-radio"
                  attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
           <span aria-hidden="true">
@@ -222,7 +221,7 @@
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-languages [preferredLanguages]="preferredLanguageCodes"
                                      [choices]="LANGUAGE_CHOICES"
-                                     (preferredLanguagesChange)="savePreferredLanguageCodes($event)">
+                                     (preferredLanguagesChange)="handleLanguageCodesChange($event)">
           </oppia-preferred-languages>
         </div>
         <span class="form-text oppia-form-text">
@@ -246,7 +245,7 @@
           <oppia-preferred-language-selector [choices]="SITE_LANGUAGE_CHOICES"
                                              entity="{{ 'I18N_PREFERENCES_SITE_LANGUAGE_LABEL' | translate }}"
                                              [preferredLanguageCode]="preferredSiteLanguageCode"
-                                             (preferredLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
+                                             (preferredLanguageCodeChange)="handleSiteLanguageCodeChange($event)">
           </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
@@ -270,7 +269,7 @@
           <oppia-preferred-language-selector [choices]="AUDIO_LANGUAGE_CHOICES"
                                              entity="{{ 'I18N_PREFERENCES_AUDIO_LANGUAGE_LABEL' | translate }}"
                                              [preferredLanguageCode]="preferredAudioLanguageCode"
-                                             (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
+                                             (preferredLanguageCodeChange)="handleAudioLanguageCodeChange($event)">
           </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
@@ -299,7 +298,7 @@
             <input type="checkbox"
                    class="e2e-test-email-updates-checkbox"
                    [(ngModel)]="canReceiveEmailUpdates"
-                   (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                   (change)="handleEmailPreferencesChange()">
             <span>
               {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_NEWS' | translate }}
             </span>
@@ -321,7 +320,7 @@
             <input type="checkbox"
                    class="e2e-test-editor-role-email-checkbox"
                    [(ngModel)]="canReceiveEditorRoleEmail"
-                   (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                   (change)="handleEmailPreferencesChange()">
             <span>
               {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS' | translate }}
             </span>
@@ -332,7 +331,7 @@
             <input type="checkbox"
                    class="e2e-test-subscription-email-checkbox"
                    [(ngModel)]="canReceiveSubscriptionEmail"
-                   (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                   (change)="handleEmailPreferencesChange()">
             <span>
               {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS' | translate }}
             </span>
@@ -343,7 +342,7 @@
             <input type="checkbox"
                    class="e2e-test-feedback-message-email-checkbox"
                    [(ngModel)]="canReceiveFeedbackMessageEmail"
-                   (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                   (change)="handleEmailPreferencesChange()">
             <span>
               {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS' | translate }}
             </span>
@@ -402,4 +401,13 @@
     </div>
 
   </mat-card>
+</div>
+<div class="oppia-save-btn-container">
+  <button type="button"
+          class="btn oppia-save-button e2e-test-save-preferences-button"
+          [disabled]="!hasPageLoaded || !hasUnsavedChanges"
+          (click)="savePreferences()">
+    <!-- {{ 'I18N_PREFERENCES_SAVE_PREFERENCES' | translate }} -->
+    Save Changes
+  </button>
 </div>

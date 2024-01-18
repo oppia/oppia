@@ -64,6 +64,11 @@ interface LoginUrlResponseDict {
   'login_url': string;
 }
 
+interface UpdatePreferenceDict {
+  update_type: string;
+  data: boolean | string | string[] | EmailPreferencesBackendDict;
+}
+
 export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': string[];
   'can_review_voiceover_for_language_codes': string[];
@@ -139,6 +144,15 @@ export class UserBackendApiService {
       update_type: updateType,
       data: data
     }).toPromise();
+  }
+
+  async updateMultiplePreferencesDataAsync(
+      updates: UpdatePreferenceDict[]
+  ): Promise<UpdatePreferencesResponse> {
+    return this.http.put<UpdatePreferencesResponse>(
+      this.PREFERENCES_DATA_URL,
+      { updates: updates }
+    ).toPromise();
   }
 }
 angular.module('oppia').factory(

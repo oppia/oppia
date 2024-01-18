@@ -413,7 +413,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         # Change the user's preferred language to de.
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            {'updates': [{
+                'update_type': 'preferred_language_codes',
+                'data': ['de']}]
+            },
             csrf_token=csrf_token)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -544,7 +547,10 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            {'updates': [{
+                'update_type': 'preferred_language_codes',
+                'data': ['de']}]
+            },
             csrf_token=csrf_token)
 
         response_dict = self.get_json(

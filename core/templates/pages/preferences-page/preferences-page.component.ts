@@ -73,7 +73,6 @@ export class PreferencesPageComponent {
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
   DASHBOARD_TYPE_CONTRIBUTOR = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
-  subjectInterestsChangeAtLeastOnce: boolean = false;
   exportingData: boolean = false;
   hasPageLoaded: boolean = false;
   canReceiveEmailUpdates: boolean = false;
@@ -84,6 +83,20 @@ export class PreferencesPageComponent {
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+
+  newProfilePictureDataUrl!: string;
+  pageShouldBeReloaded: boolean = false;
+  hasUnsavedChanges = false;
+  unsavedChanges: { [key: string]: boolean } = {
+    profile_picture_data_url: false,
+    user_bio: false,
+    default_dashboard: false,
+    subject_interests: false,
+    preferred_language_codes: false,
+    preferred_site_language_code: false,
+    preferred_audio_language_code: false,
+    email_preferences: false
+  };
 
   @ViewChild('firstRadio') firstRadio!: ElementRef;
 
@@ -110,68 +123,51 @@ export class PreferencesPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  private _saveDataItem(
-      updateType: string,
-      data: string | string[] | EmailPreferencesBackendDict
-  ): void {
+  handleBioChange(): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.user_bio = true;
     this.preventPageUnloadEventService.addListener();
-    this.userBackendApiService.updatePreferencesDataAsync(
-      updateType, data).then((returnData) => {
-      this.preventPageUnloadEventService.removeListener();
-      if (returnData.bulk_email_signup_message_should_be_shown) {
-        this.canReceiveEmailUpdates = false;
-        this.showEmailSignupLink = true;
-      } else {
-        this.alertsService.addInfoMessage('Saved!', 1000);
-      }
-    });
   }
 
-  saveUserBio(userBio: string): void {
-    this._saveDataItem('user_bio', userBio);
-  }
-
-  registerBioChanged(): void {
+  handleDefaultDashboardChange(): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.default_dashboard = true;
     this.preventPageUnloadEventService.addListener();
   }
 
   onSubjectInterestsSelectionChange(subjectInterests: string): void {
     this.alertsService.clearWarnings();
-    this.subjectInterestsChangeAtLeastOnce = true;
-    this._saveDataItem('subject_interests', subjectInterests);
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.subject_interests = true;
+    this.subjectInterests = subjectInterests;
+    this.preventPageUnloadEventService.addListener();
   }
 
-  savePreferredSiteLanguageCodes(preferredSiteLanguageCode: string): void {
-    this.i18nLanguageCodeService.setI18nLanguageCode(preferredSiteLanguageCode);
-    this._saveDataItem(
-      'preferred_site_language_code', preferredSiteLanguageCode);
+  handleLanguageCodesChange(preferredLanguageCodes: string[]): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.preferred_language_codes = true;
+    this.preferredLanguageCodes = preferredLanguageCodes;
+    this.preventPageUnloadEventService.addListener();
   }
 
-  savePreferredAudioLanguageCode(preferredAudioLanguageCode: string): void {
-    this._saveDataItem(
-      'preferred_audio_language_code', preferredAudioLanguageCode);
+  handleSiteLanguageCodeChange(preferredSiteLanguageCode: string): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.preferred_site_language_code = true;
+    this.preferredSiteLanguageCode = preferredSiteLanguageCode;
+    this.preventPageUnloadEventService.addListener();
   }
 
-  saveEmailPreferences(
-      canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
-      canReceiveFeedbackMessageEmail: boolean,
-      canReceiveSubscriptionEmail: boolean): void {
-    let data: EmailPreferencesBackendDict = {
-      can_receive_email_updates: canReceiveEmailUpdates,
-      can_receive_editor_role_email: canReceiveEditorRoleEmail,
-      can_receive_feedback_message_email: (
-        canReceiveFeedbackMessageEmail),
-      can_receive_subscription_email: canReceiveSubscriptionEmail
-    };
-    this._saveDataItem('email_preferences', data);
+  handleAudioLanguageCodeChange(preferredAudioLanguageCode: string): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.preferred_audio_language_code = true;
+    this.preferredAudioLanguageCode = preferredAudioLanguageCode;
+    this.preventPageUnloadEventService.addListener();
   }
 
-  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
-    this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
-  }
-
-  saveDefaultDashboard(defaultDashboard: string): void {
-    this._saveDataItem('default_dashboard', defaultDashboard);
+  handleEmailPreferencesChange(): void {
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.email_preferences = true;
+    this.preventPageUnloadEventService.addListener();
   }
 
   showUsernamePopover(creatorUsername: string): string {
@@ -191,12 +187,11 @@ export class PreferencesPageComponent {
     }
   }
 
-  private saveProfileImage(newProfilePictureDataUrl: string): void {
-    if (AssetsBackendApiService.EMULATOR_MODE) {
-      this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
-    } else {
-      this._postProfileImageToServer(newProfilePictureDataUrl);
-    }
+  private handleProfileImageChange(newProfilePictureDataUrl: string): void {
+    this.pageShouldBeReloaded = true;
+    this.hasUnsavedChanges = true;
+    this.unsavedChanges.profile_picture_data_url = true;
+    this.newProfilePictureDataUrl = newProfilePictureDataUrl;
   }
 
   private _saveProfileImageToLocalStorage(image: string): void {
@@ -218,21 +213,13 @@ export class PreferencesPageComponent {
     this.windowRef.nativeWindow.location.reload();
   }
 
-  private _postProfileImageToServer(image: string): void {
-    this.userService.setProfileImageDataUrlAsync(image).then(() => {
-      // The reload is needed in order to update the profile picture
-      // in the top-right corner.
-      this.windowRef.nativeWindow.location.reload();
-    });
-  }
-
   showEditProfilePictureModal(): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
       backdrop: 'static'
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      this.saveProfileImage(newProfilePictureDataUrl);
+      this.handleProfileImageChange(newProfilePictureDataUrl);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -331,10 +318,91 @@ export class PreferencesPageComponent {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();
     this.SITE_LANGUAGE_CHOICES = AppConstants.SUPPORTED_SITE_LANGUAGES;
+  }
+
+  savePreferences(): void {
+    if (!this.hasUnsavedChanges) {
+      return;
+    }
+    this.preventPageUnloadEventService.addListener();
+    this.alertsService.clearWarnings();
+    let emailData: EmailPreferencesBackendDict = {
+      can_receive_email_updates: this.canReceiveEmailUpdates,
+      can_receive_editor_role_email: this.canReceiveEditorRoleEmail,
+      can_receive_feedback_message_email: this.canReceiveFeedbackMessageEmail,
+      can_receive_subscription_email: this.canReceiveSubscriptionEmail
+    };
+    let updates = [
+      {
+        update_type: 'profile_picture_data_url',
+        data: this.newProfilePictureDataUrl
+      },
+      { update_type: 'user_bio', data: this.userBio },
+      { update_type: 'default_dashboard', data: this.defaultDashboard },
+      { update_type: 'subject_interests', data: this.subjectInterests },
+      {
+        update_type: 'preferred_language_codes',
+        data: this.preferredLanguageCodes
+      },
+      {
+        update_type: 'preferred_site_language_code',
+        data: this.preferredSiteLanguageCode
+      },
+      {
+        update_type: 'preferred_audio_language_code',
+        data: this.preferredAudioLanguageCode
+      },
+      { update_type: 'email_preferences', data: emailData }
+    ];
+    updates = updates.filter((update) => {
+      return this.unsavedChanges[update.update_type] === true;
+    });
+
+    if (AssetsBackendApiService.EMULATOR_MODE) {
+      // Remove 'profile_picture_data_url' from updates if the emulator mode is
+      // on because the backend doesn't support updating profile picture in
+      // emulator mode.
+      updates = updates.filter((update) => {
+        return update.update_type !== 'profile_picture_data_url';
+      });
+    }
+
+    this.userBackendApiService.updateMultiplePreferencesDataAsync(updates)
+      .then((returnData) => {
+        this.preventPageUnloadEventService.removeListener();
+        if (this.unsavedChanges.preferred_site_language_code) {
+          this.i18nLanguageCodeService.setI18nLanguageCode(
+            this.preferredSiteLanguageCode);
+        }
+        if (returnData.bulk_email_signup_message_should_be_shown) {
+          this.canReceiveEmailUpdates = false;
+          this.showEmailSignupLink = true;
+        } else {
+          this.alertsService.addInfoMessage('Saved!', 1000);
+        }
+        if (this.unsavedChanges.profile_picture_data_url &&
+          AssetsBackendApiService.EMULATOR_MODE) {
+          this._saveProfileImageToLocalStorage(
+            this.newProfilePictureDataUrl);
+        }
+        if (this.pageShouldBeReloaded) {
+          // The reload is needed in order to update the profile picture
+          // in the top-right corner(Nav Bar).
+          this.windowRef.nativeWindow.location.reload();
+        }
+        this.hasUnsavedChanges = false;
+        for (let key in this.unsavedChanges) {
+          this.unsavedChanges[key] = false;
+        }
+      })
+      .catch((error) => {
+        this.preventPageUnloadEventService.removeListener();
+        this.alertsService.addWarning(
+          'Failed to save changes');
+      });
   }
 }
 
