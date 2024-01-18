@@ -154,12 +154,12 @@ class ClassroomAdminPage(
 class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Fetches relevant data for the classroom admin page."""
+    """Fetches a list of classroom names corresponding to the given classroom ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
         classroom_id_to_classroom_name = (
