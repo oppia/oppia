@@ -319,7 +319,6 @@ describe('Contributor Admin Dashboard', function() {
       await contributorDashboardAdminPage.switchLanguage('English');
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
-      await browser.debug();
       await users.logout();
     });
 });
