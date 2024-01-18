@@ -230,10 +230,8 @@ class MailingListSubscriptionHandler(
             'name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
-                }
+                },
+                'default_value': None
             },
             'tag': {
                 'schema': {
