@@ -353,6 +353,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
             classroomId =>
               topicPromises.push(this.fetchClassroomFragment(classroomId)));
           return Promise.all(topicPromises);
+        } else {
+          return [];
         }
       });
   }
