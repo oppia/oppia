@@ -13,21 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Classroom admin component.
+ * @fileoverview Voiceover admin component.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AlertsService } from 'services/alerts.service';
-import { AppConstants } from 'app.constants';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-
-export interface TopicNameToPrerequisiteTopicNames {
-  [topicName: string]: string[];
-}
 
 @Component({
   selector: 'oppia-voiceover-admin-page',
@@ -40,7 +31,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log('Hello');
   }
 }
 

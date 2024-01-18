@@ -39,6 +39,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
+import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
 
 
 
@@ -61,10 +62,12 @@ declare var angular: ng.IAngularStatic;
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    VoiceoverAdminPageComponent
+    VoiceoverAdminPageComponent,
+    VoiceoverAdminNavbarComponent
   ],
   entryComponents: [
-    VoiceoverAdminPageComponent
+    VoiceoverAdminPageComponent,
+    VoiceoverAdminNavbarComponent
   ],
   providers: [
     {
