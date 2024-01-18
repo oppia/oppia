@@ -364,7 +364,7 @@ export class PreferencesPageComponent {
     if (AssetsBackendApiService.EMULATOR_MODE) {
       // Remove 'profile_picture_data_url' from updates if the emulator mode is
       // on because the backend doesn't support updating profile picture in
-      // emulator mode.
+      // emulator(DEV) mode.
       updates = updates.filter((update) => {
         return update.update_type !== 'profile_picture_data_url';
       });
