@@ -698,7 +698,6 @@ class AdminHandler(
 
         Raises:
             Exception. Cannot load new blog post in production mode.
-            Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
         if not constants.DEV_MODE:
@@ -722,40 +721,37 @@ class AdminHandler(
                 image.read(),
                 'image/svg+xml'
             )
-        try:
-            if blog_post_title == EDUCTION_BLOG_POST_TITLE:
-                blog_services.update_blog_post(blog_post.id, {
-                    'title':
-                        '%s-%s' % (EDUCTION_BLOG_POST_TITLE, blog_post.id),
-                    'thumbnail_filename': 'blog_thumbnail.png',
-                    'content': EDUCTION_BLOG_POST_CONTENT,
-                    'tags': ['Community']
-                })
-            elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
-                blog_services.update_blog_post(blog_post.id, {
-                    'title':
-                        '%s-%s' % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
-                    'content': FORMATTING_BLOG_POST_CONTENT,
-                    'tags': ['Learners', 'Languages'],
-                    'thumbnail_filename': 'blog_thumbnail.png'
-                })
-            elif blog_post_title == ARABIC_BLOG_POST_TITLE:
-                blog_services.update_blog_post(blog_post.id, {
-                    'title':
-                        '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
-                    'content': ARABIC_BLOG_POST_CONTENT,
-                    'tags': [
-                        'Learners',
-                        'Volunteer',
-                        'New features',
-                        'Community',
-                        'Languages'
-                    ],
-                    'thumbnail_filename': 'blog_thumbnail.png'
-                })
-        except Exception as e:
-            blog_services.delete_blog_post(blog_post.id)
-            raise e
+
+        if blog_post_title == EDUCTION_BLOG_POST_TITLE:
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (EDUCTION_BLOG_POST_TITLE, blog_post.id),
+                'thumbnail_filename': 'blog_thumbnail.png',
+                'content': EDUCTION_BLOG_POST_CONTENT,
+                'tags': ['Community']
+            })
+        elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
+                'content': FORMATTING_BLOG_POST_CONTENT,
+                'tags': ['Learners', 'Languages'],
+                'thumbnail_filename': 'blog_thumbnail.png'
+            })
+        elif blog_post_title == ARABIC_BLOG_POST_TITLE:
+            blog_services.update_blog_post(blog_post.id, {
+                'title':
+                    '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
+                'content': ARABIC_BLOG_POST_CONTENT,
+                'tags': [
+                    'Learners',
+                    'Volunteer',
+                    'New features',
+                    'Community',
+                    'Languages'
+                ],
+                'thumbnail_filename': 'blog_thumbnail.png'
+            })
         blog_services.publish_blog_post(blog_post.id)
 
     def _load_dummy_new_structures_data(self) -> None:
