@@ -1594,7 +1594,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
 def add_user_to_mailing_list(
     email: str,
     tag: str,
-    name: Union[str, None]=None
+    name: Optional[str]=None
 ) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
