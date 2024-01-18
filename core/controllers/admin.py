@@ -302,6 +302,7 @@ class AdminHandler(
                         FORMATTING_BLOG_POST_TITLE,
                     ]
                 },
+                'default_value': None
             },
             'exp_id': {
                 'schema': {
@@ -439,8 +440,12 @@ class AdminHandler(
                     num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif action == 'generate_dummy_blog_post':
                 blog_post_title = self.normalized_payload.get('blog_post_title')
-                if blog_post_title is not None:
-                    self._load_dummy_blog_post(blog_post_title)
+                if blog_post_title is None:
+                    raise Exception(
+                        'The \'blog_post_title\' must be provided when the'
+                        ' action is generate_dummy_blog_post.'
+                    )
+                self._load_dummy_blog_post(blog_post_title)
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()

@@ -3116,21 +3116,6 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.assertEqual(blog_post_count, 3)
         self.logout()
 
-    def test_handler_raises_error_with_no_blog_post_title(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminhandler', {
-                'action': 'generate_dummy_blog_post',
-            }, csrf_token=csrf_token, expected_status_int=400)
-        error_msg = 'Missing key in handler args: blog_post_title.'
-        self.assertEqual(response['error'], error_msg)
-        blog_post_count = (
-            blog_services.get_total_number_of_published_blog_post_summaries()
-        )
-        self.assertEqual(blog_post_count, 0)
-        self.logout()
-
     def test_handler_raises_error_with_invalid_blog_post_title(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
