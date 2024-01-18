@@ -254,6 +254,7 @@
   padding: 15px 20px;
   position: relative;
   z-index: 100;
+  cursor: pointer;
 }
 
 .oppia-android-carousel-item-container {
