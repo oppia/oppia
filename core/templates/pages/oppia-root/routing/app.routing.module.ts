@@ -33,6 +33,18 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
+    loadChildren: () => import('pages/moderator-page/moderator-page.module')
+      .then(m => m.ModeratorPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
+    loadChildren: () => import('pages/blog-admin-page/blog-admin-page.module')
+      .then(m => m.BlogAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
