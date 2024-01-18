@@ -248,12 +248,12 @@
 }
 
 .oppia-android-carousel-chevron {
+  cursor: pointer;
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
   padding: 15px 20px;
   position: relative;
-  cursor: pointer;
   z-index: 100;
 }
 
