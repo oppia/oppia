@@ -41,7 +41,7 @@ import requests
 
 from typing import (
     Dict, Final, List, Literal, Optional, Sequence, TypedDict,
-    Union, overload)
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
