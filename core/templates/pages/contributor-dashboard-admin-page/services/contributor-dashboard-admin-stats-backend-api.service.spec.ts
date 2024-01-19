@@ -22,7 +22,7 @@ import { ContributorDashboardAdminStatsBackendApiService } from './contributor-d
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { ClassroomBackendApiService, ClassroomIdToClassroomNameResponse } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
@@ -524,29 +524,6 @@ describe('Contribution Admin dashboard stats service', () => {
         toHaveBeenCalled();
       expect(cdasbas.fetchTopics).
         toHaveBeenCalledWith('mathclassroomId');
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-
-  it('should return no data if there are no classrooms', fakeAsync(
-    () => {
-      let response: ClassroomIdToClassroomNameResponse = undefined;
-      spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
-      spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
-        .and.returnValue(Promise.resolve(response));
-      spyOn(cdasbas, 'fetchTopics')
-        .and.returnValue(Promise.resolve([]));
-
-      cdasbas.fetchTopicChoices().then(
-        successHandler, failHandler
-      );
-      flushMicrotasks();
-
-      expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
-        toHaveBeenCalled();
-      expect(cdasbas.fetchTopics).not.
-        toHaveBeenCalled();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();

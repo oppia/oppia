@@ -334,16 +334,10 @@ export class ContributorDashboardAdminStatsBackendApiService {
     let topicPromises: Promise<TopicChoice[]>[] = [];
     return this.classroomBackendApiService
       .getAllClassroomIdToClassroomNameDictAsync().then(classResponse => {
-        if (classResponse !== undefined) {
-          const existingClassroomNames = (
-            Object.keys(classResponse));
-          existingClassroomNames.forEach(
-            classroomId =>
-              topicPromises.push(this.fetchTopics(classroomId)));
-          return Promise.all(topicPromises);
-        } else {
-          return [];
-        }
+        Object.keys(classResponse).forEach(
+          classroomId =>
+            topicPromises.push(this.fetchTopics(classroomId)));
+        return Promise.all(topicPromises);
       });
   }
 }
