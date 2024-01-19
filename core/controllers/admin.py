@@ -738,7 +738,13 @@ class AdminHandler(
                 'tags': ['Learners', 'Languages'],
                 'thumbnail_filename': 'blog_thumbnail.png'
             })
-        elif blog_post_title == ARABIC_BLOG_POST_TITLE:
+        else:
+            # The handler schema defines the possible values of
+            # 'blog_post_title'. If 'blog_post_title' has a value other than
+            # those defined in the schema, a Bad Request error will be thrown.
+            # Hence, 'blog_post_title' must be 'ARABIC_BLOG_POST_TITLE' if
+            # this branch is executed.
+            assert blog_post_title == ARABIC_BLOG_POST_TITLE
             blog_services.update_blog_post(blog_post.id, {
                 'title':
                     '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
