@@ -17,13 +17,13 @@
     </div>
   </div>
 
-  <div class="oppia-about-foundation-info-card-white">
+  <div class="bg-white oppia-about-foundation-info-card">
     <div class="mx-auto row w-75">
-      <div class="col-lg-8 d-flex flex-column justify-content-center">
+      <div class="col d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF' | translate }}</h1>
         <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT' | translate"></p>
       </div>
-      <div class="col-lg-4 oppia-about-foundation-image-with-caption text-center">
+      <div class="oppia-about-foundation-image-with-caption text-center">
         <figure>
           <picture>
             <source type="image/webp"
@@ -44,9 +44,9 @@
     </div>
   </div>
 
-  <div class="oppia-about-foundation-info-card-white">
+  <div class="bg-white oppia-about-foundation-info-card">
     <div class="mx-auto row w-75"> 
-      <div class="col-lg-4 oppia-about-foundation-image-with-caption text-center">
+      <div class="oppia-about-foundation-image-with-caption text-center">
         <picture>
           <source type="image/webp"
                   [srcset]="'/assets/images/about_foundation/20180826_161603.webp'">
@@ -57,16 +57,16 @@
               src="/assets/images/about_foundation/20180826_161603.jpg">
         </picture>
       </div>
-      <div class="col-lg-8 d-flex flex-column justify-content-center info-right">
+      <div class="col d-flex flex-column justify-content-center pl-5 info-right">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
         <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
       </div>
     </div>
   </div>
 
-  <div class="oppia-about-foundation-info-card-gray">
+  <div class="card-gray oppia-about-foundation-info-card">
     <div class="mx-auto row w-75"> 
-      <div class="col-lg-8 d-flex flex-column justify-content-center">
+      <div class="col d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
         <button class="btn">
@@ -77,7 +77,7 @@
           </a>
         </button>
       </div>
-      <div class="col-lg-4 oppia-about-foundation-image-with-caption text-center">
+      <div class="oppia-about-foundation-image-with-caption text-center">
         <picture>
           <source type="image/webp"
                   [srcset]="'/assets/images/about_foundation/home_partner.webp'">
@@ -91,9 +91,9 @@
     </div>
   </div>
 
-  <div class="oppia-about-foundation-info-card-white">
+  <div class="bg-white oppia-about-foundation-info-card">
     <div class="mx-auto row w-75"> 
-      <div class="col-lg-4 oppia-about-foundation-image-with-caption text-center">
+      <div class="oppia-about-foundation-image-with-caption text-center">
         <picture>
           <source type="image/webp"
                   [srcset]="'/assets/images/about_foundation/home_get_involved.webp'">
@@ -104,7 +104,7 @@
               src="/assets/images/about_foundation/home_get_involved.png">
         </picture>
       </div>
-      <div class="col-lg-8 d-flex flex-column justify-content-center info-right">
+      <div class="col d-flex flex-column justify-content-center pl-5 info-right ">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
         <button class="btn">
@@ -118,8 +118,8 @@
     </div>
   </div>
 
-  <div class="oppia-about-foundation-info-card-gray oppia-about-foundation-cta">
-    <div class="d-flex flex-column justify-content-center mx-auto row info-wide">
+  <div class="card-gray oppia-about-foundation-info-card oppia-about-foundation-cta">
+    <div class="d-flex flex-column justify-content-center mx-auto w-75">
       <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX' | translate }}</h1>
       <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
       <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
@@ -130,6 +130,10 @@
 <style>
   .about-foundation-page {
     user-select: text;
+  }
+
+  .card-gray {
+    background-color: #f4f4f4;
   }
 
   .oppia-about-foundation-hero-card {
@@ -179,61 +183,44 @@
     }
   }
 
-  .oppia-about-foundation-page-oppia-logo {
-    margin-bottom: 2em;
-    width: 10em;
-  }
-
-  .oppia-about-foundation-info-card-white {
-    background-color: #fff;
-    padding: 5em 0;
-  }
-
-  .info-wide {
-    width: 75%;
-  }
-
-  @media only screen and (max-width: 992px) {
-    .oppia-about-foundation-image-with-caption {
-      padding: 2em 0;
-    }
-  }
-
-  @media only screen and (min-width: 992px) and (max-width: 1333px) {
-    /*Shift back to center the items*/
-    .oppia-about-foundation-info-card-gray .row,
-    .oppia-about-foundation-info-card-white .row {
-      right: calc((320px - (100vw * .75 * .33)) / 2);
-      position: relative;
-    }
-
-    /*Adjust text on the right to prevent overlap*/
-    .oppia-about-foundation-info-card-white .info-right {
-      left: calc(320px - (100vw * .75 * .33) + 45px);
-      position: relative;
-    }
-    /*Adjust section six to have the same width and pad left only to start at the same*/
-    .info-wide {
-      padding-left: calc((320px - (100vw * .75 * .33) + 45px) / 2);
-      width: calc(100vw * .75 + (320px - (100vw * .75 * .33) + 45px));
-    }
-  }
-
   @media only screen and (max-width: 768px) {
     .oppia-about-foundation-hero-content h3 {
       width: 75%;
     }
   }
 
-  .oppia-about-foundation-info-card-gray p,
-  .oppia-about-foundation-info-card-white p {
+  .oppia-about-foundation-page-oppia-logo {
+    margin-bottom: 2em;
+    width: 10em;
+  }
+
+  .oppia-about-foundation-info-card {
+    padding: 5em 0;
+  }
+
+  @media only screen and (max-width: 992px) {
+    .info-right {
+      padding: 0 !important;
+    }
+
+    .oppia-about-foundation-info-card .row {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .oppia-about-foundation-image-with-caption {
+      padding: 2em 0;
+    }
+  }
+
+  .oppia-about-foundation-info-card p {
     font-size: 17px;
     line-height: 1.7;
     padding-top: 1em;
   }
 
-  .oppia-about-foundation-info-card-gray a,
-  .oppia-about-foundation-info-card-white a {
+  .oppia-about-foundation-info-card a {
     color: #009688;
     text-decoration: none;
   }
@@ -247,8 +234,7 @@
     text-decoration: none;
   }
 
-  .oppia-about-foundation-info-card-gray a:hover,
-  .oppia-about-foundation-info-card-white a:hover {
+  .oppia-about-foundation-info-card a:hover {
     text-decoration: underline;
   }
 
@@ -260,11 +246,6 @@
     margin-bottom: 10px;
     max-height: 320px;
     max-width: 320px;
-  }
-
-  .oppia-about-foundation-info-card-gray {
-    background-color: #f4f4f4;
-    padding: 5em 0;
   }
 
   .about-foundation-page button {
@@ -293,8 +274,7 @@
   }
 
   @media screen and (max-width: 575px) {
-    .oppia-about-foundation-info-card-gray h1,
-    .oppia-about-foundation-info-card-white h1 {
+    .oppia-about-foundation-info-card h1 {
       font-size: 1.5em;
     }
 
