@@ -113,7 +113,6 @@
 
 # Audio Voiceover project
 /core/domain/voiceover*.py @oppia/lace-backend-reviewers
-/core/voiceover_lang_accent_constants* @oppia/lace-backend-reviewers
 
 
 # Blog project
