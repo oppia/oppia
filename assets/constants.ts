@@ -5111,7 +5111,9 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": ["tabs", "skillreview"],
+  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
+    "tabs", "math", "collapsible", "skillreview"
+  ],
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
