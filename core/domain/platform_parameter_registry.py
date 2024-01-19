@@ -458,6 +458,11 @@ Registry.create_feature_flag(
     'Enable learner groups feature',
     platform_parameter_domain.FeatureStages.PROD)
 
+Registry.create_feature_flag(
+    ParamNames.NEW_LESSON_PLAYER,
+    'This flag is to enable the exploration player redesign.',
+    platform_parameter_domain.FeatureStages.DEV)
+
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,
     'Whether the promo bar should be enabled for all users',
