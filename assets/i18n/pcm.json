@@ -1085,7 +1085,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "This one go commot your Oppia account data as a JSON formatted text file wey you go fit download.",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "Abeg no commot for on top this page. Your data bin dey load now as JSON formatted text file wey you go fit download when e don finish. If anything go wrong, abeg make you contact.",
 	"I18N_PREFERENCES_HEADING": "The things them wey you like.",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Any change wey you bin make on top this page go save by himself.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "You never subscribe to any creator yet. You fit go di profile page of any author wey you like go click subscribe for dere. If you subscribe for any author, you o get email notification when di author drop new lesson.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Impact",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Wetin you like dem | Oppia",

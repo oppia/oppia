@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { EmailPreferencesBackendDict, PreferencesBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, UpdatePreferenceDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -52,8 +52,10 @@ describe('Preferences Page Component', () => {
     let urlInterpolationService: UrlInterpolationService;
     let preventPageUnloadEventService: PreventPageUnloadEventService;
     let alertsService: AlertsService;
+    let i18nLanguageCodeService: I18nLanguageCodeService;
     let ngbModal: NgbModal;
     let mockWindowRef: MockWindowRef;
+    let mockUserBackendApiService: MockUserBackendApiService;
     let imageUploadHelperService: ImageUploadHelperService;
 
     let preferencesData: PreferencesBackendDict = {
@@ -102,9 +104,8 @@ describe('Preferences Page Component', () => {
         return Promise.resolve(preferencesData);
       }
 
-      async updatePreferencesDataAsync(
-          updateType: string,
-          data: boolean | string | string[] | EmailPreferencesBackendDict
+      async updateMultiplePreferencesDataAsync(
+          updates: UpdatePreferenceDict[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
           bulk_email_signup_message_should_be_shown: false
@@ -155,7 +156,9 @@ describe('Preferences Page Component', () => {
       preventPageUnloadEventService = TestBed.inject(
         PreventPageUnloadEventService);
       alertsService = TestBed.inject(AlertsService);
+      i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
+      mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
@@ -261,11 +264,83 @@ describe('Preferences Page Component', () => {
         spyOn(alertsService, 'clearWarnings');
       });
 
-      it('should save subject interests', fakeAsync(() => {
-        componentInstance.onSubjectInterestsSelectionChange('math');
-        expect(alertsService.clearWarnings).toHaveBeenCalled();
+      it('should save user bio', fakeAsync(() => {
+        componentInstance.handleBioChange();
+        componentInstance.savePreferences();
         tick();
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save default dashboard', fakeAsync(() => {
+        componentInstance.handleDefaultDashboardChange();
+        componentInstance.savePreferences();
+        tick();
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save subject interests', fakeAsync(() => {
+        componentInstance.onSubjectInterestsSelectionChange('math');
+        componentInstance.savePreferences();
+        tick();
+        expect(alertsService.clearWarnings).toHaveBeenCalled();
+        expect(componentInstance.subjectInterests).toEqual('math');
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save preferred language codes', fakeAsync(() => {
+        componentInstance.handleLanguageCodesChange(['en', 'hi']);
+        componentInstance.savePreferences();
+        tick();
+        expect(componentInstance.preferredLanguageCodes).toEqual(['en', 'hi']);
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save preferred site languauge code', fakeAsync(() => {
+        let code = 'en';
+        spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+        componentInstance.handleSiteLanguageCodeChange(code);
+        componentInstance.savePreferences();
+        tick();
+        tick();
+        expect(componentInstance.preferredSiteLanguageCode).toEqual(code);
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(
+          i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
+          code);
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save preferred audio languauge code', fakeAsync(() => {
+        componentInstance.handleAudioLanguageCodeChange('en');
+        componentInstance.savePreferences();
+        tick();
+        expect(componentInstance.preferredAudioLanguageCode).toEqual('en');
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      }));
+
+      it('should save email preferences', fakeAsync(() => {
+        spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync')
+          .and.returnValue(
+            Promise.resolve({
+              bulk_email_signup_message_should_be_shown: true
+            }));
+        componentInstance.handleEmailPreferencesChange();
+        componentInstance.savePreferences();
+        tick();
+        expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+        expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+        expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
       }));
     });
 
@@ -289,15 +364,19 @@ describe('Preferences Page Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve(profilePictureDataUrl)
       } as NgbModalRef);
+      spyOn(mockWindowRef.nativeWindow.location, 'reload');
       componentInstance.showEditProfilePictureModal();
       tick();
+      componentInstance.savePreferences();
       tick();
       expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
         profilePictureDataUrl);
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
 
     it('should edit profile picture modal raise error when image is invalid',
       fakeAsync(() => {
+        let error = 'Image uploaded is not valid.';
         let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve(profilePictureDataUrl)
@@ -306,8 +385,10 @@ describe('Preferences Page Component', () => {
           .and.returnValue(null);
         spyOn(alertsService, 'addWarning');
         componentInstance.showEditProfilePictureModal();
+        tick();
         componentInstance.savePreferences();
         tick();
+        expect(alertsService.addWarning).toHaveBeenCalledWith(error);
       }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
@@ -315,9 +396,39 @@ describe('Preferences Page Component', () => {
         result: Promise.reject()
       } as NgbModalRef);
       spyOn(userService, 'setProfileImageDataUrlAsync');
+      let previousProfilePictureDataUrl = (
+        componentInstance.newProfilePictureDataUrl);
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
+      expect(componentInstance.newProfilePictureDataUrl)
+        .toEqual(previousProfilePictureDataUrl);
+    }));
+
+    it('should handle when there are no unsaved changes', fakeAsync(() => {
+      spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync');
+      componentInstance.savePreferences();
+      tick();
+      expect(mockUserBackendApiService.updateMultiplePreferencesDataAsync)
+        .not.toHaveBeenCalled();
+    }));
+
+    it('should handle invalid subject interests', fakeAsync(() => {
+      spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync')
+        .and.returnValue(
+          Promise.reject());
+      spyOn(preventPageUnloadEventService, 'addListener');
+      spyOn(preventPageUnloadEventService, 'removeListener');
+      spyOn(alertsService, 'addWarning');
+      spyOn(alertsService, 'clearWarnings');
+      componentInstance.onSubjectInterestsSelectionChange('123');
+      componentInstance.savePreferences();
+      tick();
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to save changes');
     }));
   });
 
@@ -325,6 +436,8 @@ describe('Preferences Page Component', () => {
     let httpTestingController: HttpTestingController;
     let componentInstance: PreferencesPageComponent;
     let ngbModal: NgbModal;
+    let mockUserBackendApiService: MockUserBackendApiService;
+    let mockWindowRef: MockWindowRef;
     let fixture: ComponentFixture<PreferencesPageComponent>;
 
     class MockWindowRef {
@@ -333,6 +446,16 @@ describe('Preferences Page Component', () => {
           reload: () => {}
         }
       };
+    }
+
+    class MockUserBackendApiService {
+      async updateMultiplePreferencesDataAsync(
+          updates: UpdatePreferenceDict[]
+      ): Promise<UpdatePreferencesResponse> {
+        return Promise.resolve({
+          bulk_email_signup_message_should_be_shown: false
+        });
+      }
     }
 
     beforeEach(() => {
@@ -354,6 +477,10 @@ describe('Preferences Page Component', () => {
           {
             provide: WindowRef,
             useClass: MockWindowRef
+          },
+          {
+            provide: UserBackendApiService,
+            useClass: MockUserBackendApiService
           }
         ],
         schemas: [NO_ERRORS_SCHEMA]
@@ -361,17 +488,32 @@ describe('Preferences Page Component', () => {
       fixture = TestBed.createComponent(PreferencesPageComponent);
       componentInstance = fixture.componentInstance;
       httpTestingController = TestBed.inject(HttpTestingController);
+      mockWindowRef = TestBed.inject(WindowRef);
       ngbModal = TestBed.inject(NgbModal);
     });
 
     it('should show edit profile picture modal', fakeAsync(() => {
+      mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       let profilePictureDataUrl = 'data:image/png;base64,JUMzJTg3JTJD';
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve(profilePictureDataUrl)
       } as NgbModalRef);
+      spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync')
+        .and.returnValue(
+          Promise.resolve({
+            bulk_email_signup_message_should_be_shown: false
+          }));
+      spyOn(mockWindowRef.nativeWindow.location, 'reload');
+
       componentInstance.showEditProfilePictureModal();
       tick();
+      componentInstance.savePreferences();
       tick();
+      expect(componentInstance.newProfilePictureDataUrl).toEqual(
+        profilePictureDataUrl);
+      expect(mockUserBackendApiService.updateMultiplePreferencesDataAsync)
+        .toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
 
     it('should handle tab key press for first radio', () => {

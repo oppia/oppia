@@ -327,7 +327,6 @@ export class PreferencesPageComponent {
     if (!this.hasUnsavedChanges) {
       return;
     }
-    this.preventPageUnloadEventService.addListener();
     this.alertsService.clearWarnings();
     let emailData: EmailPreferencesBackendDict = {
       can_receive_email_updates: this.canReceiveEmailUpdates,

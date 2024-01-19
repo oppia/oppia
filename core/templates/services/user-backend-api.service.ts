@@ -102,8 +102,9 @@ export class UserBackendApiService {
 
   async setProfileImageDataUrlAsync(
       newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-    return this.updatePreferencesDataAsync(
-      'profile_picture_data_url', newProfileImageDataUrl);
+    return this.updateMultiplePreferencesDataAsync([{
+      update_type: 'profile_picture_data_url',
+      data: newProfileImageDataUrl}]);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -134,16 +135,6 @@ export class UserBackendApiService {
   async getPreferencesAsync(): Promise<PreferencesBackendDict> {
     return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
       .toPromise();
-  }
-
-  async updatePreferencesDataAsync(
-      updateType: string,
-      data: boolean | string | string[] | EmailPreferencesBackendDict
-  ): Promise<UpdatePreferencesResponse> {
-    return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
-      update_type: updateType,
-      data: data
-    }).toPromise();
   }
 
   async updateMultiplePreferencesDataAsync(
