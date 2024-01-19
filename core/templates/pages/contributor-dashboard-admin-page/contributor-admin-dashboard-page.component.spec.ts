@@ -138,6 +138,9 @@ describe('Contributor dashboard Admin page', () => {
       .and.returnValue(Promise.resolve([[
         { id: '1', topic: 'Science' },
         { id: '2', topic: 'Technology' },
+      ], [
+        { id: '1', topic: 'Science' },
+        { id: '2', topic: 'Technology' },
       ]]));
 
     ContAdminStatsSpy = spyOn(
@@ -282,7 +285,7 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.selectedLastActivity).toEqual(0);
     }));
 
-    it('should apply topic filter', fakeAsync(() => {
+    it('should remove duplicates and apply topic filter', fakeAsync(() => {
       component.ngOnInit();
       tick();
       component.selectedTopicNames = ['Science', 'Technology'];
