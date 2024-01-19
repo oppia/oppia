@@ -300,6 +300,10 @@
   border: none;
   background: none;
 }
+.oppia-android-carousel-button-reset:active,
+.oppia-android-carousel-button-reset:focus {
+  outline: none; 
+}
 
 .oppia-android-carousel-item-container {
   display: flex;
