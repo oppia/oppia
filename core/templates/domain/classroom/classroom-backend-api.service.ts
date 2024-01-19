@@ -43,7 +43,7 @@ interface ClassroomIdToClassroomNameBackendDict {
   };
 }
 
-interface ClassroomIdToClassroomNameResponse {
+export interface ClassroomIdToClassroomNameResponse {
   [classroomId: string]: string;
 }
 

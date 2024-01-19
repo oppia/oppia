@@ -22,7 +22,10 @@ import { ContributorDashboardAdminStatsBackendApiService } from './contributor-d
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { AppConstants } from 'app.constants';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomBackendApiService, ClassroomIdToClassroomNameResponse } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
+
 
 describe('Contribution Admin dashboard stats service', () => {
   let cdasbas: ContributorDashboardAdminStatsBackendApiService;
@@ -31,6 +34,64 @@ describe('Contribution Admin dashboard stats service', () => {
   let csrfService: CsrfTokenService;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
+
+  let firstTopicSummaryDict: CreatorTopicSummaryBackendDict = {
+    id: 'topic1',
+    name: 'Topic name',
+    canonical_story_count: 4,
+    subtopic_count: 5,
+    total_skill_count: 20,
+    total_published_node_count: 3,
+    uncategorized_skill_count: 5,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354,
+    url_fragment: 'topic-name-one',
+    can_edit_topic: false,
+    is_published: false,
+    total_upcoming_chapters_count: 1,
+    total_overdue_chapters_count: 1,
+    total_chapter_counts_for_each_story: [5, 4],
+    published_chapter_counts_for_each_story: [3, 4]
+  };
+  let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
+    id: 'topic2',
+    name: 'Topic name 2',
+    canonical_story_count: 3,
+    subtopic_count: 2,
+    total_skill_count: 10,
+    total_published_node_count: 3,
+    uncategorized_skill_count: 3,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354,
+    url_fragment: 'topic-name-two',
+    can_edit_topic: false,
+    is_published: false,
+    total_upcoming_chapters_count: 1,
+    total_overdue_chapters_count: 1,
+    total_chapter_counts_for_each_story: [5, 4],
+    published_chapter_counts_for_each_story: [3, 4]
+  };
+
+  let responseDictionaries = {
+    name: 'Math',
+    topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
+    course_details: 'Course Details',
+    topic_list_intro: 'Topics Covered'
+  };
+
+  let sampleClassroomDataObject: ClassroomData;
 
   const translationSubmitterStat = {
     language_code: 'en',
@@ -110,11 +171,7 @@ describe('Contribution Admin dashboard stats service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
-        ContributorDashboardAdminStatsBackendApiService,
-        ClassroomBackendApiService
-      ]
+      imports: [HttpClientTestingModule]
     });
     cdasbas = TestBed.inject(ContributorDashboardAdminStatsBackendApiService);
     http = TestBed.inject(HttpTestingController);
@@ -122,6 +179,14 @@ describe('Contribution Admin dashboard stats service', () => {
     csrfService = TestBed.get(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+
+    // Sample topic object returnable from the backend.
+    sampleClassroomDataObject = (
+      ClassroomData.createFromBackendData(
+        responseDictionaries.name,
+        responseDictionaries.topic_summary_dicts,
+        responseDictionaries.course_details,
+        responseDictionaries.topic_list_intro));
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
@@ -407,25 +472,9 @@ describe('Contribution Admin dashboard stats service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-  it('should return topic data from classrooms for a url fragment', fakeAsync(
+  it('should return classroom data for a classroom id', fakeAsync(
     () => {
       spyOn(cdasbas, 'fetchTopics').and.callThrough();
-      const url = '/classroom_data_handler/mat';
-
-      cdasbas.fetchTopics('mat').then(
-        successHandler, failHandler);
-      let req = http.expectOne(url);
-      expect(req.request.method).toEqual('GET');
-      req.flush(
-        [{ id: '0', topic: 'Math' }],
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-      expect(cdasbas.fetchTopics).toHaveBeenCalledWith('mat');
-    }));
-
-  it('should return a url fragment for a classroom id', fakeAsync(
-    () => {
-      spyOn(cdasbas, 'fetchClassroomFragment').and.callThrough();
       let response = {
         classroomDict: {
           classroomId: 'mathClassroomId',
@@ -439,26 +488,28 @@ describe('Contribution Admin dashboard stats service', () => {
       spyOn(crbas, 'getClassroomDataAsync')
         .and.returnValue(Promise.resolve(response));
 
-      spyOn(cdasbas, 'fetchTopics')
-        .and.returnValue(Promise.resolve([]));
+      spyOn(crbas, 'fetchClassroomDataAsync')
+        .and.returnValue(Promise.resolve(sampleClassroomDataObject));
 
-      cdasbas.fetchClassroomFragment('0').then(
+      cdasbas.fetchTopics('0').then(
         successHandler, failHandler
       );
       flushMicrotasks();
 
       expect(crbas.getClassroomDataAsync).
         toHaveBeenCalledWith('0');
-      expect(cdasbas.fetchTopics).
+      expect(crbas.fetchClassroomDataAsync).
         toHaveBeenCalledWith('mat');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     }));
 
-  it('should return topics for all classrooms', fakeAsync(
+  it('should return data for all classrooms', fakeAsync(
     () => {
       spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
       spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
         .and.returnValue(Promise.resolve({mathclassroomId: 'math'}));
-      spyOn(cdasbas, 'fetchClassroomFragment')
+      spyOn(cdasbas, 'fetchTopics')
         .and.returnValue(Promise.resolve([
           { id: '1', topic: 'Science' },
           { id: '2', topic: 'Technology' },
@@ -471,8 +522,31 @@ describe('Contribution Admin dashboard stats service', () => {
 
       expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
         toHaveBeenCalled();
-      expect(cdasbas.fetchClassroomFragment).
+      expect(cdasbas.fetchTopics).
         toHaveBeenCalledWith('mathclassroomId');
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should return no data if there are no classrooms', fakeAsync(
+    () => {
+      let response: ClassroomIdToClassroomNameResponse = undefined;
+      spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
+      spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
+        .and.returnValue(Promise.resolve(response));
+      spyOn(cdasbas, 'fetchTopics')
+        .and.returnValue(Promise.resolve([]));
+
+      cdasbas.fetchTopicChoices().then(
+        successHandler, failHandler
+      );
+      flushMicrotasks();
+
+      expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
+        toHaveBeenCalled();
+      expect(cdasbas.fetchTopics).not.
+        toHaveBeenCalled();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
