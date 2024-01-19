@@ -1323,7 +1323,6 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.story_id)
-        
 
         self.exp_id_1 = 'expid1'
         self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
