@@ -18,7 +18,11 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
+from core import utils
 from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.platform import models
@@ -152,3 +156,42 @@ def save_language_accent_support(
         language_codes_mapping)
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
+
+
+def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
+    """The method returns the lanaguage accent master list stored in the
+    JSON file.
+
+    Returns:
+        Dict[str, Dict[str, str]]. A dict with with language code as keys and
+        nested dicts as values. Each nested dict contains language accent code
+        as keys and its description as values. This is an exhaustive list of
+        language accent pairs that Oppia may support for
+        voiceovers (manual and auto).
+    """
+    file_path = os.path.join(
+        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json')
+    with utils.open_file(file_path, 'r') as f:
+        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
+            f.read())
+        return language_accent_master_list
+
+
+def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
+    """The method returns the autogeneratable lanaguage accent list stored
+    in the JSON file.
+
+    Returns:
+        Dict[str, Dict[str, str]]. A dict with language accent codes as keys
+        and nested dicts as values. Each nested dict contains 'service' and
+        'voice_code' as keys and their respective field values as values. This
+        is an exhaustive list of language accent pairs that Oppia may support
+        for automatic voiceovers, and this should be a subset of
+        language accent master list.
+    """
+    file_path = os.path.join(
+        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json')
+    with utils.open_file(file_path, 'r') as f:
+        autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+            json.loads(f.read()))
+        return autogeneratable_language_accent_list
