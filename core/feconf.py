@@ -88,6 +88,7 @@ TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
+VOICEOVERS_DATA_DIR = os.path.join('data', 'voiceovers')
 
 EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
