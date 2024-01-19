@@ -330,6 +330,51 @@ describe('Admin dev mode activities tab', () => {
     }));
   });
 
+  describe('.generateDummyBlogPost', () => {
+    it('should generate dummy blog post', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyBlogPostAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlogPost('Education');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Dummy Blog Post generated successfully.');
+      });
+    }));
+
+    it('should show error message if new dummy blog post ' +
+      'title is empty', async(() => {
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlogPost('');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Internal error: blogPostTitle is empty');
+    }));
+
+    it('should show error message if new dummy blog post ' +
+      'is not generated', async(() => {
+      spyOn(adminBackendApiService, 'generateDummyBlogPostAsync')
+        .and.returnValue(Promise.reject('Dummy Blog not generated.'));
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateNewBlogPost('Education');
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith('Processing...');
+
+      fixture.whenStable().then(() => {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          'Server error: Dummy Blog not generated.');
+      });
+    }));
+  });
+
   describe('.loadNewStructuresData', () => {
     it('should generate structures data', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewStructuresDataAsync')

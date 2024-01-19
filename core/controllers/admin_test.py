@@ -192,6 +192,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_blog_post_title_generate_dummy_blog_post_is_not_performed(
+        self
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'blog_post_title\' must be provided when the action '
+            'is generate_dummy_blog_post.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_blog_post',
+                    'blog_post_title': None
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_without_num_dummy_exps_generate_dummy_exp_action_is_not_performed(
         self
     ) -> None:
@@ -3032,3 +3052,88 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
                 'published_on': '05/09/2000'
             },
             csrf_token=csrf_token)
+
+
+class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
+    """Tests the generation of dummy blog post data."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+    def test_cannot_generate_dummy_blog_post_in_prod_mode(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new blog post in production mode.')
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_blog_post',
+                    'blog_post_title': 'Education',
+                }, csrf_token=csrf_token)
+
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 0)
+        self.logout()
+
+    def test_generate_dummy_blog_post(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog_post',
+                'blog_post_title': 'Education',
+            }, csrf_token=csrf_token)
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 1)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog_post',
+                'blog_post_title': 'Blog with different font formatting',
+            }, csrf_token=csrf_token)
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 2)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog_post',
+                'blog_post_title': 'Leading The Arabic Translations Team',
+            }, csrf_token=csrf_token)
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 3)
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_blog_post_title(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        invalid_blog_post_title = 'blog_title'
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_blog_post',
+                'blog_post_title': invalid_blog_post_title,
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+            'Schema validation for \'blog_post_title\' failed: Received %s '
+            'which is not in the allowed range of choices: [\'Leading The '
+            'Arabic Translations Team\', \'Education\', \'Blog with different'
+            ' font formatting\']' % invalid_blog_post_title) 
+        self.assertEqual(response['error'], error_msg)
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(blog_post_count, 0)
+        self.logout()

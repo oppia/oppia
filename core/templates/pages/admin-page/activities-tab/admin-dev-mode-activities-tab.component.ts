@@ -36,6 +36,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
+  DUMMY_BLOG_POST_TITLES = [
+    'Education',
+    'Leading The Arabic Translations Team',
+    'Blog with different font formatting',
+  ];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -166,6 +171,21 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       }, (errorResponse) => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse);
+      });
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateNewBlogPost(blogPostTitle: string): void {
+    if (!blogPostTitle) {
+      this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
+    }
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService.generateDummyBlogPostAsync(blogPostTitle)
+      .then(() => {
+        this.setStatusMessage.emit('Dummy Blog Post generated successfully.');
+      }, (errorResponse) => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
       });
     this.adminTaskManagerService.finishTask();
   }
