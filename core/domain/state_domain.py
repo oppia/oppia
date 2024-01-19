@@ -2641,7 +2641,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                     ca_dict[spec['name']],
                     spec['schema']
                 )
-            ) for spec in ca_specs_dict
+            ) for spec in ca_specs_dict if spec['name'] in ca_dict
         }
 
 
