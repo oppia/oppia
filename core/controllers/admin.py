@@ -83,9 +83,9 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
 supported_languages: List[str] = [
     lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
 
-EDUCTION_BLOG_POST_TITLE = 'Education'
+EDUCATION_BLOG_POST_TITLE = 'Education'
 
-EDUCTION_BLOG_POST_CONTENT = """
+EDUCATION_BLOG_POST_CONTENT = """
     <p>
         Education is a constantly evolving landscape, and innovation lies at its core. 
         This summer, Oppia had the privilege of hosting a group of exceptional minds 
@@ -298,7 +298,7 @@ class AdminHandler(
                     'type': 'basestring',
                     'choices': [
                         ARABIC_BLOG_POST_TITLE,
-                        EDUCTION_BLOG_POST_TITLE,
+                        EDUCATION_BLOG_POST_TITLE,
                         FORMATTING_BLOG_POST_TITLE,
                     ]
                 },
@@ -722,12 +722,12 @@ class AdminHandler(
                 'image/svg+xml'
             )
 
-        if blog_post_title == EDUCTION_BLOG_POST_TITLE:
+        if blog_post_title == EDUCATION_BLOG_POST_TITLE:
             blog_services.update_blog_post(blog_post.id, {
                 'title':
-                    '%s-%s' % (EDUCTION_BLOG_POST_TITLE, blog_post.id),
+                    '%s-%s' % (EDUCATION_BLOG_POST_TITLE, blog_post.id),
                 'thumbnail_filename': 'blog_thumbnail.png',
-                'content': EDUCTION_BLOG_POST_CONTENT,
+                'content': EDUCATION_BLOG_POST_CONTENT,
                 'tags': ['Community']
             })
         elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
