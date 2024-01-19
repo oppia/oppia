@@ -24,7 +24,8 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then  # uname in Windows 11 also adds version, so uname -o is used.
+# We are using uname -o because output of uname in Windows 11 contains version which keeps changing.
+if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
@@ -56,7 +57,7 @@ else
     rm node-download
 
     # Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/v16.x/BUILDING.md#building-nodejs-1).
-    # Building from source code is used for non-x64 linux/darwin systems.
+    # The process of building from source code is intended for non-x64 Linux/Darwin systems.
     if [ "$node_file_name" = "node-v16.13.0" ]; then
         cd ../oppia_tools/node-16.13.0
         ./configure
