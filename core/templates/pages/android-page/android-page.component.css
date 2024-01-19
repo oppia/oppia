@@ -53,13 +53,7 @@
 }
 
 .oppia-android-updates-button:hover {
-  /* changing color for aesthetics */
-  background-color: #3d9991;
   color: #fff;
-}
-
-.oppia-android-updates-button:hover:disabled {
-  background: #0003;
 }
 
 .oppia-android-updates-checkbox-label {
@@ -257,7 +251,6 @@
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
-  cursor: pointer;
   padding: 15px 20px;
   position: relative;
   z-index: 100;
