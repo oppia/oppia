@@ -64,7 +64,7 @@ interface LoginUrlResponseDict {
   'login_url': string;
 }
 
-interface UpdatePreferenceDict {
+export interface UpdatePreferenceDict {
   update_type: string;
   data: boolean | string | string[] | EmailPreferencesBackendDict;
 }
