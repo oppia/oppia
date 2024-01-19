@@ -23,7 +23,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
 import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import { InsertScriptService } from 'services/insert-script.service';
 import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
 
 interface ImpactStat {
@@ -176,8 +175,7 @@ export class DonatePageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal,
-    private insertScriptService: InsertScriptService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {

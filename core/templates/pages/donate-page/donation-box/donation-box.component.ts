@@ -30,7 +30,7 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
       allow="payment"
       seamless="seamless"
       frameborder="0"
-      scrolling="yes"
+      scrolling="no"
       width="100%"
       title="donorbox">
     </iframe>
