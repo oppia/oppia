@@ -17,8 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
 import { BlogAdminBackendApiService, PlatformParameterBackendResponse, PlatformParameterValues }
   from 'domain/blog-admin/blog-admin-backend-api.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
@@ -182,7 +180,3 @@ export class BlogAdminPageComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogAdminPage', downgradeComponent(
-    {component: BlogAdminPageComponent}));
