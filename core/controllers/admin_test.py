@@ -543,13 +543,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        self.assertEqual(len(topic_summaries), 2)
-        for summary in topic_summaries:
-            if summary.name == 'Dummy Topic 1':
-                topic_id = summary.id
-        story_id = (
-            topic_fetchers.get_topic_by_id(
-                topic_id).canonical_story_references[0].story_id)
+        self.assertEqual(len(topic_summaries), 1)
+        story_id = topic_fetchers.get_topic_by_id(
+            topic_summaries[0].id).canonical_story_references[0].story_id
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -560,7 +556,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[0].id, skill_summaries[1].id,
                     skill_summaries[2].id], 0)
         )
-        self.assertEqual(len(questions), 3)
+        self.assertEqual(len(questions), 5)
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations

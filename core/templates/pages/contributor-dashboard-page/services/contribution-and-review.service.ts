@@ -133,7 +133,8 @@ export class ContributionAndReviewService {
   private async fetchSuggestionsAsync(
       fetcher: SuggestionFetcher,
       shouldResetOffset: boolean,
-      explorationId?: string
+      explorationId: string | null,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     if (shouldResetOffset) {
       // Handle the case where we need to fetch starting from the beginning.
@@ -151,7 +152,8 @@ export class ContributionAndReviewService {
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
         fetcher.offset,
         fetcher.sortKey,
-        explorationId
+        explorationId,
+        topicName,
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
@@ -195,7 +197,8 @@ export class ContributionAndReviewService {
           null,
           0,
           AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-          explorationId
+          explorationId,
+          null,
         ).then((fetchSuggestionsResponse) => {
           const exploration: Exploration = this.explorationObjectFactory.
             createFromExplorationBackendResponse(
@@ -261,7 +264,7 @@ export class ContributionAndReviewService {
     string, SuggestionBackendDict[]>();
 
     for (const translationSuggestion of translationSuggestions) {
-      const stateName = translationSuggestion.change.state_name;
+      const stateName = translationSuggestion.change_cmd.state_name;
       const suggestionsForState = translationSuggestionsByState.get(
         stateName) || [];
       suggestionsForState.push(translationSuggestion);
@@ -276,17 +279,17 @@ export class ContributionAndReviewService {
       cardB: SuggestionBackendDict
   ): number {
     const cardATypeOrder = ContributionAndReviewService.
-      getTranslationContentTypeOrder(cardA.change.content_id);
+      getTranslationContentTypeOrder(cardA.change_cmd.content_id);
     const cardBTypeOrder = ContributionAndReviewService
-      .getTranslationContentTypeOrder(cardB.change.content_id);
+      .getTranslationContentTypeOrder(cardB.change_cmd.content_id);
 
     if (cardATypeOrder !== cardBTypeOrder) {
       return cardATypeOrder - cardBTypeOrder;
     } else {
       const cardAIndex = ContributionAndReviewService
-        .getTranslationContentIndex(cardA.change.content_id);
+        .getTranslationContentIndex(cardA.change_cmd.content_id);
       const cardBIndex = ContributionAndReviewService
-        .getTranslationContentIndex(cardB.change.content_id);
+        .getTranslationContentIndex(cardB.change_cmd.content_id);
       return cardAIndex - cardBIndex;
     }
   }
@@ -318,17 +321,19 @@ export class ContributionAndReviewService {
     this.userCreatedQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
-      shouldResetOffset);
+      shouldResetOffset, null, null);
   }
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string
+      sortKey: string,
+      topicName: string | null,
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
-      shouldResetOffset);
+      shouldResetOffset, null,
+      topicName);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
@@ -338,7 +343,7 @@ export class ContributionAndReviewService {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
-      shouldResetOffset);
+      shouldResetOffset, null, null);
   }
 
   async getReviewableTranslationSuggestionsAsync(
@@ -353,7 +358,7 @@ export class ContributionAndReviewService {
     }
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
-      shouldResetOffset);
+      shouldResetOffset, null, null);
   }
 
   reviewExplorationSuggestion(

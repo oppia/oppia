@@ -11,25 +11,31 @@
         <img id="donate" src="assets/images/contact_page/Donate img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_DONATE_HEADING' | translate"></h2>
         <p [innerHTML]="'I18N_CONTACT_PAGE_DONATE_PARAGRAPH' | translate"></p>
-        <a href="https://www.oppia.org/donate">
-          <button tabindex="-1" class="hover-button">{{ 'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate }}</button>
-        </a>
+        <oppia-primary-button
+          buttonHref="/donate"
+          [customClasses]="['btn']"
+          buttonText="{{ 'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate }}">
+        </oppia-primary-button>
       </div>
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="Partner" src="assets/images/contact_page/Partner img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_HEADING' | translate"></h2>
         <p [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_PARAGRAPH' | translate"></p>
-        <a href="https://www.oppia.org/partnership">
-          <button class="hover-button" tabindex="-1">{{ 'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate }}</button>
-        </a>
+        <oppia-primary-button
+          buttonHref="/partnerships"
+          [customClasses]="['btn']"
+          buttonText="{{ 'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate }}">
+        </oppia-primary-button>
       </div>
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_HEADING' | translate"></h2>
         <p [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_PARAGRAPH' | translate"></p>
-        <a href="https://www.oppia.org/volunteer">
-          <button class="hover-button" tabindex="-1">{{ 'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate }}</button>
-        </a>
+        <oppia-primary-button
+          buttonHref="/volunteer"
+          [customClasses]="['btn']"
+          buttonText="{{ 'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate }}">
+        </oppia-primary-button>
       </div>
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="">
@@ -115,6 +121,30 @@
 
   }
 
+  :host {
+    .oppia-contact-page-content button {
+      font-size: 100%;
+      font-weight: bold;
+      height: 40px;
+      width: 250px;
+    }
+
+    @media (max-width: 1010px) and (min-width: 843px) {
+      .oppia-contact-page-content button {
+        height: auto;
+        padding: 5px 30px;
+        width: auto;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .oppia-contact-page-content button {
+        width: 225px;
+      }
+    }
+
+  }
+
   .oppia-contact-page-content button {
     background-color: #00645c;
     border-radius: 5px;
@@ -136,27 +166,6 @@
     margin-bottom: 15px;
   }
 
-  .hover-button {
-    background-color: #00645c;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    transition: background-color 0.3s ease;
-    z-index: 1;
-  }
-
-  .hover-button:hover::before {
-    background-color: rgba(128, 128, 128, 0.3);
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: -1;
-  }
-
   @media (max-width: 1154px) {
     .oppia-contact-page-content p {
       margin: 20px 0 50px 0;
@@ -164,23 +173,9 @@
     }
   }
 
-  @media (max-width: 1010px) and (min-width: 843px) {
-    .oppia-contact-page-content button {
-      height: auto;
-      padding: 5px 30px;
-      width: auto;
-    }
-  }
-
   @media (max-width: 475px) {
     .oppia-contact-page-content p {
       margin: 20px 20px 30px 20px;
-    }
-  }
-
-  @media (max-width: 375px) {
-    .oppia-contact-page-content button {
-      width: 225px;
     }
   }
 
