@@ -24,7 +24,7 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-# We are using uname -o because output of uname in Windows 11 contains version which keeps changing.
+# We need to check for Msys because, from Windows 11 uname returns Msys instead of Windows.
 if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
