@@ -3,11 +3,11 @@
   <div *ngIf="isLoadingExploration" class="loader-container">
     <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
   </div>
-  <background-banner *ngIf="!isLoadingExploration"></background-banner>
-  <div class="embedded-body" *ngIf="pageIsIframed">
-    <oppia-conversation-skin></oppia-conversation-skin>
+  <div class="oppia-new-player-content">
+    <oppia-player-sidebar></oppia-player-sidebar>
+    <div class="oppia-new-player-main-content">
+    </div>
   </div>
-  <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
   <attribution-guide></attribution-guide>
   <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
 </div>

@@ -27,12 +27,14 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { UrlService } from 'services/contextual/url.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
+import './lesson-player-page.component.css'
 
 require('interactions/interactionsRequires.ts');
 
 @Component({
   selector: 'oppia-new-lesson-player-page',
-  templateUrl: './lesson-player-page.component.html'
+  templateUrl: './lesson-player-page.component.html',
+  styleUrls: ['./lesson-player-page.component.css']
 })
 export class NewLessonPlayerPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
