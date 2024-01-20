@@ -44,6 +44,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { PlayerHeaderComponent } from './new-lesson-player-components/player-header.component';
 import { PlayerSidebarComponent } from './new-lesson-player-components/player-sidebar.component';
+import { PlayerFooterComponent } from './new-lesson-player-components/player-footer.component';
 
 @NgModule({
   imports: [
@@ -71,6 +72,7 @@ import { PlayerSidebarComponent } from './new-lesson-player-components/player-si
     RefresherExplorationConfirmationModal,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
+    PlayerFooterComponent,
   ],
   entryComponents: [
     NewLessonPlayerPageComponent,
@@ -84,6 +86,7 @@ import { PlayerSidebarComponent } from './new-lesson-player-components/player-si
     RefresherExplorationConfirmationModal,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
+    PlayerFooterComponent,
   ],
   providers: [
     HintAndSolutionModalService,

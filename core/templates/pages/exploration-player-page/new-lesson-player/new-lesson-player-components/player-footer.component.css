@@ -4,12 +4,10 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-new-player-content {
-  display: flex;
-  height: calc(100vh - 96px);
-  background-color: #aed2e9;
-}
-
-.oppia-new-player-main-content {
+.oppia-lesson-player-footer {
+  position: absolute;
+  height: 40px;
   width: 100%;
+  background-color: #fff;
+  bottom: 0;
 }
