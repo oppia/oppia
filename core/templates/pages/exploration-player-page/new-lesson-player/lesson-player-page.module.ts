@@ -42,6 +42,7 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
+import { PlayerHeaderComponent } from './new-lesson-player-components/player-header.component';
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
+    PlayerHeaderComponent
   ],
   entryComponents: [
     NewLessonPlayerPageComponent,
@@ -78,6 +80,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
+    PlayerHeaderComponent
   ],
   providers: [
     HintAndSolutionModalService,
