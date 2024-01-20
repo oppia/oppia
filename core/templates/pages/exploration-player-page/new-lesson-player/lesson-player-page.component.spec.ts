@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { NewLessonPlayerPageComponent } from './lesson-player-page.component';
 
 /**
- * @fileoverview Unit tests for exploration player page component.
+ * @fileoverview Unit tests for new lesson player page component.
  */
 
 class MockTranslateService {
