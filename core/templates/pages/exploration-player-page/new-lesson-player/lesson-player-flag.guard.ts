@@ -43,7 +43,6 @@ export class IsNewLessonPlayerGuard implements CanActivate {
       route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
   ): Promise<boolean> {
-
     if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
       return true;
     }

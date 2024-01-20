@@ -27,7 +27,7 @@ import { MetaTagCustomizationService } from 'services/contextual/meta-tag-custom
 import { UrlService } from 'services/contextual/url.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
-import './lesson-player-page.component.css'
+import './lesson-player-page.component.css';
 
 require('interactions/interactionsRequires.ts');
 

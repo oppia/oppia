@@ -25,10 +25,10 @@ import './player-sidebar.component.css';
   templateUrl: './player-sidebar.component.html',
   styleUrls: ['./player-sidebar.component.css'],
 })
-export class PlayerSidebarComponent { 
+export class PlayerSidebarComponent {
   isExpanded = false;
 
-  toggleSidebar() {
+  toggleSidebar(): void {
     this.isExpanded = !this.isExpanded;
   }
 }

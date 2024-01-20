@@ -17,13 +17,13 @@
  */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerSidebarComponent } from './player-sidebar.component'
+import { PlayerSidebarComponent } from './player-sidebar.component';
 
 describe('SidebarComponent', () => {
   let component: PlayerSidebarComponent;
   let fixture: ComponentFixture<PlayerSidebarComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async() => {
     await TestBed.configureTestingModule({
       declarations: [PlayerSidebarComponent],
     }).compileComponents();
@@ -42,9 +42,10 @@ describe('SidebarComponent', () => {
   it('should toggle width between 75px and 250px when clicked', () => {
     const sidebarElement: HTMLElement = fixture.nativeElement;
     const sidebarDiv =
-      sidebarElement.querySelector('.oppia-lesson-player-sidebar') as HTMLElement;
+      sidebarElement.querySelector(
+        '.oppia-lesson-player-sidebar'
+      ) as HTMLElement;
 
-    // Initial state
     expect(sidebarDiv.style.width).toBe('75px');
 
     component.toggleSidebar();

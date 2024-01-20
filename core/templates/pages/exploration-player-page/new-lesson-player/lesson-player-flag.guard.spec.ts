@@ -60,7 +60,7 @@ describe('IsNewLessonPlayerGuard', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
       {
         NewLessonPlayer: {
-          isEnabled: false // or true, depending on the test
+          isEnabled: false
         }
       }
     );

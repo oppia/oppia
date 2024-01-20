@@ -78,7 +78,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NEW_LESSON_PLAYER.ROUTE,
     loadChildren: () => import(
-      'pages/exploration-player-page/new-lesson-player' + 
+      'pages/exploration-player-page/new-lesson-player' +
       '/lesson-player-page.module')
       .then(m => m.NewLessonPlayerPageModule),
     canActivate: [IsNewLessonPlayerGuard]
