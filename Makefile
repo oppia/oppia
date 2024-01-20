@@ -92,7 +92,7 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
 run_tests.lint: ## Runs the linter tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server || (echo "Linting failed" && $(MAKE) stop )
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
 
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
@@ -100,26 +100,26 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS) || ($(MAKE) stop)
+	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS) || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || (echo "Frontend tests failed" && $(MAKE) stop)
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server || (echo "Typescript checks failed" && $(MAKE) stop)
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || (echo "Custom eslint tests failed" && $(MAKE) stop)
+	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop
 
 run_tests.mypy: ## Runs mypy checks
-	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server || (echo "Mypy checks failed" && $(MAKE) stop)
+	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server || $(MAKE) stop
 
 run_tests.check_backend_associated_tests: ## Runs the backend associate tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server || (echo "Backend associate tests failed" && $(MAKE) stop)
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server || $(MAKE) stop
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
@@ -137,7 +137,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite) || (echo "Acceptance tests failed" && $(MAKE) stop)
+	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite) || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -168,7 +168,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
 	sharding_instances := 3
-	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG} || (echo "E2E tests failed" && $(MAKE) stop)
+	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG} || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -191,7 +191,7 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
 	@echo '-----------------------------------------------------------------------'
 	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || (echo "Lighthouse Accessibility tests failed" && $(MAKE) stop)
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
@@ -214,7 +214,7 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
 	@echo '-----------------------------------------------------------------------'
 	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
-	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || (echo "Lighthouse Performance tests failed" && $(MAKE) stop)
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
