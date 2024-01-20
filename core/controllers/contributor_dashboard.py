@@ -666,8 +666,8 @@ class TranslatableTextHandler(
         content_id: str,
         suggestions: List[suggestion_registry.BaseSuggestion]
     ) -> bool:
-        """Returns whether a suggestion exists in suggestions with a change dict
-        matching the supplied state_name and content_id.
+        """Returns whether a suggestion exists in suggestions with a
+        change_cmd dict matching the supplied state_name and content_id.
 
         Args:
             state_name: str. Exploration state name.
@@ -675,12 +675,12 @@ class TranslatableTextHandler(
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            bool. True if suggestion exists in suggestions with a change dict
-            matching state_name and content_id, False otherwise.
+            bool. True if suggestion exists in suggestions with a change_cmd
+            dict matching state_name and content_id, False otherwise.
         """
         return any(
-            s.change.state_name == state_name and
-            s.change.content_id == content_id for s in suggestions)
+            s.change_cmd.state_name == state_name and
+            s.change_cmd.content_id == content_id for s in suggestions)
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
