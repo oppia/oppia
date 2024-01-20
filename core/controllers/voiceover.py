@@ -38,3 +38,33 @@ class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self) -> None:
         """Renders the voiceover admin page."""
         self.render_template('voiceover-admin-page.mainpage.html')
+
+
+class VoiceoverAdminDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Fetches relevant data for the voiceover admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self) -> None:
+        """Retrieves relevant data for the voiceover admin page."""
+
+        language_accent_code_to_description: Dict[str, str] = {
+            'en-US': 'English (US)',
+            'hi-IN': 'Hindi (India)'
+        }
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {
+                'en-US': True
+            }
+        }
+        self.values.update({
+            'language_accent_code_to_description':
+                language_accent_code_to_description,
+            'language_codes_mapping': language_codes_mapping
+        })
+        self.render_json(self.values)

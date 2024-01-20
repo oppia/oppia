@@ -462,6 +462,10 @@ URLS = [
         r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
         voiceover.VoiceoverAdminPage
     ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
+        voiceover.VoiceoverAdminDataHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'

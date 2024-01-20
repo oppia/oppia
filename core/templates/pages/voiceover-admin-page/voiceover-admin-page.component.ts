@@ -19,6 +19,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { VoiceoverBackendApiService } from  'domain/voiceover/voiceover-backend-api.service';
+
 
 @Component({
   selector: 'oppia-voiceover-admin-page',
@@ -28,9 +30,12 @@ export class VoiceoverAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  constructor() {}
+  constructor(
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+  ) {}
 
   ngOnInit(): void {
+    this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync();
   }
 }
 
