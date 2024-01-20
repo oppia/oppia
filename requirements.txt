@@ -43,10 +43,6 @@ apache-beam[gcp]==2.38.0 \
     --hash=sha256:f66f643fd0518d1e675aea2579d2408de95379dbfe378ff8ea3cefe862300f14 \
     --hash=sha256:f7db8fe24d479683ff978b67491799d40b04c24f2f52a9752e8caeb7b4b98be2
     # via -r requirements.in
-attrs==20.3.0 \
-    --hash=sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6 \
-    --hash=sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700
-    # via pytest
 beautifulsoup4==4.10.0 \
     --hash=sha256:9a315ce70049920ea4572a4055bc4bd700c940521d36fc858205ad4fcde149bf \
     --hash=sha256:c23ad23c521d818955a4151a67d81580319d4bf548d3d49f4223ae041ff98891
@@ -494,10 +490,6 @@ idna==2.10 \
     --hash=sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6 \
     --hash=sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0
     # via requests
-iniconfig==1.1.1 \
-    --hash=sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3 \
-    --hash=sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32
-    # via pytest
 libcst==0.3.21 \
     --hash=sha256:4302a8f09cd9e5ab5962f8e126d032bba98541893dd38cce6b4770969fed059d \
     --hash=sha256:a9c6fea4fa3bf92f87e40c6850dec099aaa7aaf963a934c763844544b32d3a1e
@@ -624,7 +616,6 @@ packaging==20.4 \
     # via
     #   bleach
     #   google-cloud-appengine-logging
-    #   pytest
 pillow==10.1.0 \
     --hash=sha256:00f438bb841382b15d7deb9a05cc946ee0f2c352653c7aa659e75e592f6fa17d \
     --hash=sha256:0248f86b3ea061e67817c47ecbe82c23f9dd5d5226200eb9090b3873d3ca32de \
@@ -681,10 +672,6 @@ pillow==10.1.0 \
     --hash=sha256:fa1d323703cfdac2036af05191b969b910d8f115cf53093125e4058f62012c9a \
     --hash=sha256:fe1e26e1ffc38be097f0ba1d0d07fcade2bcfd1d023cda5b29935ae8052bd793
     # via -r requirements.in
-pluggy==0.13.1 \
-    --hash=sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0 \
-    --hash=sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d
-    # via pytest
 proto-google-cloud-datastore-v1==0.90.4 \
     --hash=sha256:a431bb6a286107900c9ce3c48d316378867293c50a4d8a6c7393264600e916f9
     # via googledatastore
@@ -736,10 +723,6 @@ protobuf==3.20.2 \
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-py==1.10.0 \
-    --hash=sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3 \
-    --hash=sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a
-    # via pytest
 pyarrow==0.17.1 \
     --hash=sha256:18f65739d1d8ed8ad0d88228fd9ab76558a9c808c01dca2f24be2c72b875f43b \
     --hash=sha256:21b4d31a2813e81ed6664c37decb548618fd93838f983c3d634e3eae1d91a597 \
@@ -862,10 +845,6 @@ pyparsing==2.4.7 \
     # via
     #   packaging
     #   pydot
-pytest==6.2.5 \
-    --hash=sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89 \
-    --hash=sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134
-    # via -r requirements.in
 python-dateutil==2.8.1 \
     --hash=sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c \
     --hash=sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a
@@ -1038,10 +1017,6 @@ soupsieve==2.3.1 \
     # via
     #   -r requirements.in
     #   beautifulsoup4
-toml==0.10.2 \
-    --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
-    --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
-    # via pytest
 typing-extensions==4.5.0 \
     --hash=sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb \
     --hash=sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4
