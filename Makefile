@@ -95,24 +95,16 @@ run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
 
 run_tests.backend: ## Runs the backend tests
-	$(MAKE) stop
-	docker compose up datastore dev-server redis firebase -d --no-deps;
+	-$(MAKE) stop || true
+	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	( \
-		trap '$(MAKE) stop' EXIT; \
-		$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS); \
-		EXIT_CODE=$$?; \
-		echo '------------------------------------------------------'; \
-		if [ $$EXIT_CODE -eq 0 ]; then \
-			echo '  Backend tests have been executed successfully....'; \
-		else \
-			echo '  Backend tests failed with exit code $$EXIT_CODE....'; \
-			exit $$EXIT_CODE; \
-		fi; \
-		echo '------------------------------------------------------'; \
-	)
+	-$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS) || $(MAKE) stop
+	@echo '------------------------------------------------------'
+	@echo '  Backend tests have been executed successfully....'
+	@echo '------------------------------------------------------'
+	$(MAKE) stop
 
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
