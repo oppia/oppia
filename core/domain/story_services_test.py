@@ -1340,7 +1340,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         })]
 
         with self.assertRaisesRegex(
-            Exception, 'No exploration_id found for the node_id node_1'):
+            Exception, 'Expected exploration ID to not be None'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
