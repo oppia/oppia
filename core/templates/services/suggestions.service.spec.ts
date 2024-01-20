@@ -36,7 +36,7 @@ describe('SuggestionsService', () => {
         target_id: '1',
         status: 'pending',
         author_name: 'someone',
-        change: {
+        change_cmd: {
           skill_id: 'skill_id',
           state_name: 'State 1',
           new_value: {
