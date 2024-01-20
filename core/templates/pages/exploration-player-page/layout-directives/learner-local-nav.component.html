@@ -50,7 +50,7 @@
     </div>
   </li>
 </ul>
-<div ngbDropdown class="dropdown d-lg-none d-flex justify-content-end">
+<div ngbDropdown class="dropdown d-lg-none d-flex justify-content-end" [ngClass]="{'dropdown-border-active': isDropdownOpen}" (openChange)="toggleDropdown()">
   <button type="button" class="mobile-option-btn btn btn-sm border border-white text-white" id="dropdownBasic1" ngbDropdownToggle>
     <i class="fas fa-ellipsis-v exploration-player-navbar-icons"></i>
   </button>
@@ -102,5 +102,10 @@
 
   .mobile-option-btn:focus {
   box-shadow: none;
+  }
+
+  .dropdown-border-active .mobile-option-btn {
+    border: solid #fff !important;
+    outline: #fff !important;
   }
 </style>

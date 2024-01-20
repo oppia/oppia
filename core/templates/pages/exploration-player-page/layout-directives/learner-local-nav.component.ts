@@ -43,6 +43,7 @@ export class LearnerLocalNavComponent implements OnInit {
   feedbackOptionIsShown: boolean = true;
   explorationId!: string;
   @ViewChild('feedbackPopOver') feedbackPopOver!: NgbPopover;
+  isDropdownOpen = false;
 
   constructor(
     private ngbModal: NgbModal,
@@ -128,6 +129,10 @@ export class LearnerLocalNavComponent implements OnInit {
 
   closePopover(): void {
     this.feedbackPopOver.close();
+  }
+
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
   }
 }
 
