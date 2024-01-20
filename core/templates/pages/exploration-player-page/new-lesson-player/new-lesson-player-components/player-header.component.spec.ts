@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for learner view info component.
+ * @fileoverview Unit tests for new lesson player header component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -31,7 +31,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StatsReportingService } from '../../services/stats-reporting.service';
 import { LearnerViewInfoComponent } from './player-header.component';
 
-describe('Learner view info component', () => {
+describe('Lesson player header component', () => {
   let fixture: ComponentFixture<LearnerViewInfoComponent>;
   let componentInstance: LearnerViewInfoComponent;
   let contextService: ContextService;
