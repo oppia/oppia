@@ -20,6 +20,11 @@
     width: 335px
   }
 
+  @media (max-width: 470px) {
+    oppia-blog-home-page mat-card.oppia-blog-home-page-card {
+      width: 410px;
+    }
+  }
 
   @media (max-width: 440px) {
     oppia-blog-home-page mat-card.oppia-blog-home-page-card {
