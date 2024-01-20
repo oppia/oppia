@@ -24,9 +24,15 @@ import './player-sidebar.component.css';
 @Component({
   selector: 'oppia-player-sidebar',
   templateUrl: './player-sidebar.component.html',
-  styleUrls: ['./player-sidebar.component.css']
+  styleUrls: ['./player-sidebar.component.css'],
 })
-export class PlayerSidebarComponent { }
+export class PlayerSidebarComponent { 
+  isExpanded = false;
+
+  toggleSidebar() {
+    this.isExpanded = !this.isExpanded;
+  }
+}
 
 angular.module('oppia').directive('oppiaPlayerHeader',
   downgradeComponent({
