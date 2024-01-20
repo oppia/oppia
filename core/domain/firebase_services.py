@@ -20,10 +20,13 @@ from __future__ import annotations
 
 from core.platform import models
 
+from typing import Dict
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
 secrets_services = models.Registry.import_secrets_services()
+
 
 def get_firebase_config() -> Dict[str, str]:
     """Retrieves the Firebase config values from Cloud secrets."""

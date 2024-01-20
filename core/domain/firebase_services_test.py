@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core.platform import models
 from core.domain import firebase_services
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Optional

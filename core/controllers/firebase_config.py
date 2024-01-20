@@ -25,6 +25,7 @@ from core.domain import firebase_services
 
 from typing import Dict
 
+
 class FirebaseConfigValuesHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
