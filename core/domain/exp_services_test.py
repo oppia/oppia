@@ -2123,8 +2123,7 @@ title: Title
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
-        category: Category
-    
+        category: Category    
         edits_allowed: true
         init_state_name: Introduction
         language_code: en
