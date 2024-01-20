@@ -14,44 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for an exploration, its states, and their constituents.
-
-Domain objects capture domain-specific logic and are agnostic of how the
-objects they represent are stored. All methods and properties in this file
-should therefore be independent of the specific storage models used.
-"""
+"""Tests for exploration domain objects and methods defined on them."""
 
 from __future__ import annotations
 
-import collections
 import copy
-import datetime
-import json
-import re
-import string
+import os
 
 from core import feconf
-from core import schema_utils
 from core import utils
 from core.constants import constants
-from core.domain import change_domain
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import exp_services_test
 from core.domain import param_domain
+from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
-from extensions.objects.models import objects
+from core.platform import models
+from core.tests import test_utils
 
-import bs4
-from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
-    Tuple, TypedDict, Union, cast, overload)
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
+from typing import Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,6681 +44,18458 @@ if MYPY:  # pragma: no cover
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
-# Do not modify the values of these constants. This is to preserve backwards
-# compatibility with previous change dicts.
-# TODO(bhenning): Prior to July 2015, exploration changes involving rules were
-# logged using the key 'widget_handlers'. These need to be migrated to
-# 'answer_groups' and 'default_outcome'.
-STATE_PROPERTY_PARAM_CHANGES: Final = 'param_changes'
-STATE_PROPERTY_CONTENT: Final = 'content'
-STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
-STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
-STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
-DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
-STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
-DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
-STATE_PROPERTY_LINKED_SKILL_ID: Final = 'linked_skill_id'
-STATE_PROPERTY_INTERACTION_CUST_ARGS: Final = 'widget_customization_args'
-STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: Final = 'answer_groups'
-STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: Final = 'default_outcome'
-STATE_PROPERTY_UNCLASSIFIED_ANSWERS: Final = (
-    'confirmed_unclassified_answers')
-STATE_PROPERTY_INTERACTION_HINTS: Final = 'hints'
-STATE_PROPERTY_INTERACTION_SOLUTION: Final = 'solution'
-# Deprecated state properties.
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED: Final = (
-    # Deprecated in state schema v27.
-    'content_ids_to_audio_translations')
-STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED: Final = 'written_translations'
-STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED: Final = 'next_content_id_index'
+class ExplorationChangeTests(test_utils.GenericTestBase):
 
-# These four properties are kept for legacy purposes and are not used anymore.
-STATE_PROPERTY_INTERACTION_HANDLERS: Final = 'widget_handlers'
-STATE_PROPERTY_INTERACTION_STICKY: Final = 'widget_sticky'
-GADGET_PROPERTY_VISIBILITY: Final = 'gadget_visibility'
-GADGET_PROPERTY_CUST_ARGS: Final = 'gadget_customization_args'
+    def test_exp_change_object_with_missing_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            exp_domain.ExplorationChange({'invalid': 'data'})
 
-# This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW: Final = 'create_new'
-# This takes an additional 'state_name' parameter.
-CMD_ADD_STATE: Final = 'add_state'
-# This takes additional 'old_state_name' and 'new_state_name' parameters.
-CMD_RENAME_STATE: Final = 'rename_state'
-# This takes an additional 'state_name' parameter.
-CMD_DELETE_STATE: Final = 'delete_state'
-# TODO(#12981): Write a one-off job to modify all existing translation
-# suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
-# CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will only use
-# CMD_ADD_WRITTEN_TRANSLATION.
-# DEPRECATED: This command is deprecated. Please do not use. The command remains
-# here to support old suggestions. This takes additional 'state_name',
-# 'content_id', 'language_code' and 'content_html' and 'translation_html'
-# parameters.
-DEPRECATED_CMD_ADD_TRANSLATION: Final = 'add_translation'
-# This takes additional 'state_name', 'content_id', 'language_code',
-# 'data_format', 'content_html' and 'translation_html' parameters.
-CMD_ADD_WRITTEN_TRANSLATION: Final = 'add_written_translation'
-# This takes additional 'content_id', 'language_code' and 'state_name'
-# parameters.
-DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
-    'mark_written_translation_as_needing_update')
-# This takes additional 'content_id' and 'state_name' parameters.
-DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
-    'mark_written_translations_as_needing_update')
-CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
-CMD_EDIT_TRANSLATION: Final = 'edit_translation'
-# This takes additional 'content_id' parameters.
-CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
-# This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
-# This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_EXPLORATION_PROPERTY: Final = 'edit_exploration_property'
-# This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION: Final = (
-    'migrate_states_schema_to_latest_version')
+    def test_exp_change_object_with_invalid_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            exp_domain.ExplorationChange({'cmd': 'invalid'})
 
-# These are categories to which answers may be classified. These values should
-# not be changed because they are persisted in the data store within answer
-# logs.
+    def test_exp_change_object_with_deprecated_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            utils.DeprecatedCommandError, 'Command clone is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'clone',
+                'property_name': 'content',
+                'old_value': 'old_value'
+            })
 
-# Represents answers classified using rules defined as part of an interaction.
-EXPLICIT_CLASSIFICATION: Final = 'explicit'
-# Represents answers which are contained within the training data of an answer
-# group.
-TRAINING_DATA_CLASSIFICATION: Final = 'training_data_match'
-# Represents answers which were predicted using a statistical training model
-# from training data within an answer group.
-STATISTICAL_CLASSIFICATION: Final = 'statistical_classifier'
-# Represents answers which led to the 'default outcome' of an interaction,
-# rather than belonging to a specific answer group.
-DEFAULT_OUTCOME_CLASSIFICATION: Final = 'default_outcome'
+    def test_exp_change_object_with_deprecated_cmd_argument(self) -> None:
+        with self.assertRaisesRegex(
+            utils.DeprecatedCommandError,
+            'Value for property_name in cmd edit_state_property: '
+            'fallbacks is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Introduction',
+                'property_name': 'fallbacks',
+                'new_value': 'foo',
+            })
 
-TYPE_INVALID_EXPRESSION: Final = 'Invalid'
-TYPE_VALID_ALGEBRAIC_EXPRESSION: Final = 'AlgebraicExpressionInput'
-TYPE_VALID_NUMERIC_EXPRESSION: Final = 'NumericExpressionInput'
-TYPE_VALID_MATH_EQUATION: Final = 'MathEquationInput'
-MATH_INTERACTION_TYPES: Final = [
-    TYPE_VALID_ALGEBRAIC_EXPRESSION,
-    TYPE_VALID_NUMERIC_EXPRESSION,
-    TYPE_VALID_MATH_EQUATION
-]
-ALGEBRAIC_MATH_INTERACTIONS: Final = [
-    TYPE_VALID_ALGEBRAIC_EXPRESSION,
-    TYPE_VALID_MATH_EQUATION
-]
-MATH_INTERACTION_DEPRECATED_RULES: Final = [
-    'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
+    def test_exp_change_object_with_missing_attribute_in_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'old_value': 'old_value'
+            })
 
-# DEPRECATED: This property is deprecated. Please do not use.
-DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED: Final = 'correctness_feedback_enabled' # pylint: disable=line-too-long
+    def test_exp_change_object_with_extra_attribute_in_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'old_state_name',
+                'new_state_name': 'new_state_name',
+                'invalid': 'invalid'
+            })
 
+    def test_exp_change_object_with_invalid_exploration_property(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_exploration_property: '
+                'invalid is not allowed')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
-def clean_math_expression(math_expression: str) -> str:
-    """Cleans a given math expression and formats it so that it is compatible
-    with the new interactions' validators.
+    def test_exp_change_object_with_invalid_state_property(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_state_property: '
+                'invalid is not allowed')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'state_name',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
 
-    Args:
-        math_expression: str. The string representing the math expression.
+    def test_exp_change_object_with_create_new(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'create_new',
+            'category': 'category',
+            'title': 'title'
+        })
 
-    Returns:
-        str. The correctly formatted string representing the math expression.
-    """
-    unicode_to_text = {
-        u'\u221a': 'sqrt',
-        u'\xb7': '*',
-        u'\u03b1': 'alpha',
-        u'\u03b2': 'beta',
-        u'\u03b3': 'gamma',
-        u'\u03b4': 'delta',
-        u'\u03b5': 'epsilon',
-        u'\u03b6': 'zeta',
-        u'\u03b7': 'eta',
-        u'\u03b8': 'theta',
-        u'\u03b9': 'iota',
-        u'\u03ba': 'kappa',
-        u'\u03bb': 'lambda',
-        u'\u03bc': 'mu',
-        u'\u03bd': 'nu',
-        u'\u03be': 'xi',
-        u'\u03c0': 'pi',
-        u'\u03c1': 'rho',
-        u'\u03c3': 'sigma',
-        u'\u03c4': 'tau',
-        u'\u03c5': 'upsilon',
-        u'\u03c6': 'phi',
-        u'\u03c7': 'chi',
-        u'\u03c8': 'psi',
-        u'\u03c9': 'omega',
-    }
-    inverse_trig_fns_mapping = {
-        'asin': 'arcsin',
-        'acos': 'arccos',
-        'atan': 'arctan'
-    }
-    trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+        self.assertEqual(exp_change_object.cmd, 'create_new')
+        self.assertEqual(exp_change_object.category, 'category')
+        self.assertEqual(exp_change_object.title, 'title')
 
-    # Shifting powers in trig functions to the end.
-    # For eg. 'sin^2(x)' -> '(sin(x))^2'.
-    for trig_fn in trig_fns:
-        math_expression = re.sub(
-            r'%s(\^\d)\((.)\)' % trig_fn,
-            r'(%s(\2))\1' % trig_fn, math_expression)
+    def test_exp_change_object_with_add_state(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'state_name',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        })
 
-    # Adding parens to trig functions that don't have
-    # any. For eg. 'cosA' -> 'cos(A)'.
-    for trig_fn in trig_fns:
-        math_expression = re.sub(
-            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+        self.assertEqual(exp_change_object.cmd, 'add_state')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
 
-    # The pylatexenc lib outputs the unicode values of special characters like
-    # sqrt and pi, which is why they need to be replaced with their
-    # corresponding text values before performing validation. Other unicode
-    # characters will be left in the string as-is, and will be rejected by the
-    # expression parser.
-    for unicode_char, text in unicode_to_text.items():
-        math_expression = math_expression.replace(unicode_char, text)
+    def test_exp_change_object_with_rename_state(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'old_state_name',
+            'new_state_name': 'new_state_name'
+        })
 
-    # Replacing trig functions that have format which is
-    # incompatible with the validations.
-    for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
-        math_expression = math_expression.replace(
-            invalid_trig_fn, valid_trig_fn)
+        self.assertEqual(exp_change_object.cmd, 'rename_state')
+        self.assertEqual(exp_change_object.old_state_name, 'old_state_name')
+        self.assertEqual(exp_change_object.new_state_name, 'new_state_name')
 
-    # Replacing comma used in place of a decimal point with a decimal point.
-    if re.match(r'\d+,\d+', math_expression):
-        math_expression = math_expression.replace(',', '.')
+    def test_exp_change_object_with_delete_state(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'state_name',
+        })
 
-    # Replacing \cdot with *.
-    math_expression = re.sub(r'\\cdot', '*', math_expression)
+        self.assertEqual(exp_change_object.cmd, 'delete_state')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
 
-    return math_expression
+    def test_exp_change_object_with_edit_state_property(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'state_name',
+            'property_name': 'content',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'edit_state_property')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
+        self.assertEqual(exp_change_object.property_name, 'content')
+        self.assertEqual(exp_change_object.new_value, 'new_value')
+        self.assertEqual(exp_change_object.old_value, 'old_value')
+
+    def test_exp_change_object_with_edit_exploration_property(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'edit_exploration_property')
+        self.assertEqual(exp_change_object.property_name, 'title')
+        self.assertEqual(exp_change_object.new_value, 'new_value')
+        self.assertEqual(exp_change_object.old_value, 'old_value')
+
+    def test_exp_change_object_with_migrate_states_schema_to_latest_version(
+        self
+    ) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'migrate_states_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            exp_change_object.cmd, 'migrate_states_schema_to_latest_version')
+        self.assertEqual(exp_change_object.from_version, 'from_version')
+        self.assertEqual(exp_change_object.to_version, 'to_version')
+
+    def test_exp_change_object_with_revert_commit(self) -> None:
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 'version_number'
+        })
+
+        self.assertEqual(
+            exp_change_object.cmd,
+            exp_models.ExplorationModel.CMD_REVERT_COMMIT)
+        self.assertEqual(exp_change_object.version_number, 'version_number')
+
+    def test_to_dict(self) -> None:
+        exp_change_dict = {
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category'
+        }
+        exp_change_object = exp_domain.ExplorationChange(exp_change_dict)
+        self.assertEqual(exp_change_object.to_dict(), exp_change_dict)
 
 
-class MetadataVersionHistoryDict(TypedDict):
-    """Dictionary representing MetadataVersionHistory object."""
+class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
+    """Test the exploration versions difference domain object."""
 
-    last_edited_version_number: Optional[int]
-    last_edited_committer_id: str
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
+            assets_list)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+
+    def test_correct_creation_of_version_diffs(self) -> None:
+        # Rename a state.
+        self.exploration.rename_state('Home', 'Renamed state')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, [])
+        self.assertEqual(exp_versions_diff.deleted_state_names, [])
+        self.assertEqual(
+            exp_versions_diff.old_to_new_state_names, {
+                'Home': 'Renamed state'
+            })
+        self.exploration.version += 1
+
+        # Add a state.
+        self.exploration.add_states(['New state'])
+        self.exploration.states['New state'] = copy.deepcopy(
+            self.exploration.states['Renamed state'])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, ['New state'])
+        self.assertEqual(exp_versions_diff.deleted_state_names, [])
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
+        self.exploration.version += 1
+
+        # Delete state.
+        self.exploration.delete_state('New state')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, [])
+        self.assertEqual(exp_versions_diff.deleted_state_names, ['New state'])
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
+        self.exploration.version += 1
+
+        # Test addition and multiple renames.
+        self.exploration.add_states(['New state'])
+        self.exploration.states['New state'] = copy.deepcopy(
+            self.exploration.states['Renamed state'])
+        self.exploration.rename_state('New state', 'New state2')
+        self.exploration.rename_state('New state2', 'New state3')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, ['New state3'])
+        self.assertEqual(exp_versions_diff.deleted_state_names, [])
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
+        self.exploration.version += 1
+
+        # Test addition, rename and deletion.
+        self.exploration.add_states(['New state 2'])
+        self.exploration.rename_state('New state 2', 'Renamed state 2')
+        self.exploration.delete_state('Renamed state 2')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state 2',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'Renamed state 2'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'Renamed state 2'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, [])
+        self.assertEqual(exp_versions_diff.deleted_state_names, [])
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
+        self.exploration.version += 1
+
+        # Test multiple renames and deletion.
+        self.exploration.rename_state('New state3', 'Renamed state 3')
+        self.exploration.rename_state('Renamed state 3', 'Renamed state 4')
+        self.exploration.delete_state('Renamed state 4')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state3',
+            'new_state_name': 'Renamed state 3'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'Renamed state 3',
+            'new_state_name': 'Renamed state 4'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'Renamed state 4'
+        })]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.added_state_names, [])
+        self.assertEqual(
+            exp_versions_diff.deleted_state_names, ['New state3'])
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
+        self.exploration.version += 1
+
+    def test_cannot_create_exploration_change_with_invalid_change_dict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Missing cmd key in change dict'):
+            exp_domain.ExplorationChange({
+                'invalid_cmd': 'invalid'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_cmd(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Command invalid_cmd is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_state_property(
+        self
+    ) -> None:
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'state_name': '',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Value for property_name in cmd edit_state_property: '
+            'invalid_property is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'invalid_property',
+                'state_name': '',
+                'new_value': ''
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_exploration_property(
+        self
+    ) -> None:
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Value for property_name in cmd edit_exploration_property: '
+            'invalid_property is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'invalid_property',
+                'new_value': ''
+            })
+
+    def test_revert_exploration_commit(self) -> None:
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 1
+        })
+
+        self.assertEqual(exp_change.version_number, 1)
+
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 2
+        })
+
+        self.assertEqual(exp_change.version_number, 2)
 
 
-class ExplorationVersionHistoryDict(TypedDict):
-    """Dictionary representing ExplorationVersionHistory object."""
+class ExpVersionReferenceTests(test_utils.GenericTestBase):
 
-    exploration_id: str
-    exploration_version: int
-    state_version_history: Dict[str, state_domain.StateVersionHistoryDict]
-    metadata_version_history: MetadataVersionHistoryDict
-    committer_ids: List[str]
+    def test_create_exp_version_reference_object(self) -> None:
+        exp_version_reference = exp_domain.ExpVersionReference('exp_id', 1)
+
+        self.assertEqual(
+            exp_version_reference.to_dict(), {
+                'exp_id': 'exp_id',
+                'version': 1
+            })
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exp_version(self) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected version to be an int, received invalid_version'):
+            exp_domain.ExpVersionReference('exp_id', 'invalid_version')  # type: ignore[arg-type]
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exp_id(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Expected exp_id to be a str, received 0'):
+            exp_domain.ExpVersionReference(0, 1)  # type: ignore[arg-type]
 
 
-class ExplorationChange(change_domain.BaseChange):
-    """Domain object class for an exploration change.
+class TransientCheckpointUrlTests(test_utils.GenericTestBase):
+    """Testing TransientCheckpointUrl domain object."""
 
-    IMPORTANT: Ensure that all changes to this class (and how these cmds are
-    interpreted in general) preserve backward-compatibility with the
-    exploration snapshots in the datastore. Do not modify the definitions of
-    cmd keys that already exist.
+    def setUp(self) -> None:
+        super().setUp()
+        self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
+            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
 
-    NOTE TO DEVELOPERS: Please note that, for a brief period around
-    Feb - Apr 2017, change dicts related to editing of answer groups
-    accidentally stored the old_value using a ruleSpecs key instead of a
-    rule_specs key. So, if you are making use of this data, make sure to
-    verify the format of the old_value before doing any processing.
+    def test_initialization(self) -> None:
+        """Testing init method."""
 
-    The allowed commands, together with the attributes:
-        - 'add_state' (with state_name)
-        - 'rename_state' (with old_state_name and new_state_name)
-        - 'delete_state' (with state_name)
-        - 'edit_state_property' (with state_name, property_name,
-            new_value and, optionally, old_value)
-        - 'edit_exploration_property' (with property_name,
-            new_value and, optionally, old_value)
-        - 'migrate_states_schema' (with from_version, to_version)
-    For a state, property_name must be one of STATE_PROPERTIES.
-    For an exploration, property_name must be one of
-    EXPLORATION_PROPERTIES.
-    """
+        self.assertEqual(self.transient_checkpoint_url.exploration_id, 'exp_id')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .furthest_reached_checkpoint_state_name,
+            'frcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url.
+            furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_state_name, 'mrrcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_exp_version, 1)
 
-    # The allowed list of state properties which can be used in
-    # edit_state_property command.
-    STATE_PROPERTIES: List[str] = [
-        STATE_PROPERTY_PARAM_CHANGES,
-        STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
-        STATE_PROPERTY_CARD_IS_CHECKPOINT,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_ID,
-        STATE_PROPERTY_LINKED_SKILL_ID,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-        STATE_PROPERTY_INTERACTION_STICKY,
-        STATE_PROPERTY_INTERACTION_HANDLERS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_HINTS,
-        STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-        # Deprecated state properties.
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED
-    ]
+    def test_to_dict(self) -> None:
+        logged_out_learner_progress_dict = {
+            'exploration_id': 'exploration_id',
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': (
+                'furthest_reached_checkpoint_state_name'),
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': (
+                'most_recently_reached_checkpoint_state_name')
+        }
+        logged_out_learner_progress_object = exp_domain.TransientCheckpointUrl(
+            'exploration_id',
+            'furthest_reached_checkpoint_state_name', 1,
+            'most_recently_reached_checkpoint_state_name', 1
+        )
+        self.assertEqual(
+            logged_out_learner_progress_object.to_dict(),
+            logged_out_learner_progress_dict)
 
-    # The allowed list of exploration properties which can be used in
-    # edit_exploration_property command.
-    EXPLORATION_PROPERTIES: List[str] = [
-        'title', 'category', 'objective', 'language_code', 'tags',
-        'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled',
-        'next_content_id_index', 'edits_allowed',
-        # Deprecated exploration properties.
-        DEPRECATED_EXPLORATION_PROPERTY_CORRECTNESS_FEEDBACK_ENABLED
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_exploration_id_incorrect_type(self) -> None:
+        self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exploration_id to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_furthest_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_state_name to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_furthest_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_exp_version to be an int'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_most_recently_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_state_name to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_exp_version to be an int'
+        ):
+            self.transient_checkpoint_url.validate()
+
+
+class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
+    """Test checkpoints validations in an exploration. """
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exploration = (
+            exp_domain.Exploration.create_default_exploration('eid'))
+        self.content_id_generator = translation_domain.ContentIdGenerator(
+            self.exploration.next_content_id_index
+        )
+
+        self.new_state = state_domain.State.create_default_state(
+            'Introduction',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
+        self.set_interaction_for_state(
+            self.new_state, 'TextInput', self.content_id_generator)
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state
+        }
+        self.set_interaction_for_state(
+            self.exploration.states[self.exploration.init_state_name],
+            'TextInput', self.content_id_generator)
+        self.init_state = (
+            self.exploration.states[self.exploration.init_state_name])
+
+        self.end_state = state_domain.State.create_default_state(
+            'End',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            self.end_state, 'EndExploration', self.content_id_generator)
+        self.end_state.update_interaction_default_outcome(None)
+
+        self.exploration.next_content_id_index = (
+            self.content_id_generator.next_content_id_index)
+
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
+        self.init_state.update_card_is_checkpoint(False)
+        with self.assertRaisesRegex(
+            Exception, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False'):
+            self.exploration.validate(strict=True)
+        self.init_state.update_card_is_checkpoint(True)
+
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self) -> None:
+        default_outcome = self.init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+        default_outcome.dest = self.exploration.init_state_name
+        self.init_state.update_interaction_default_outcome(default_outcome)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        with self.assertRaisesRegex(
+            Exception, 'Expected card_is_checkpoint of terminal state '
+            'to be False but found it to be True'):
+            self.exploration.validate(strict=True)
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(
+        self
+    ) -> None:
+        self.exploration.init_state_name = 'End'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.end_state
+        }
+        self.exploration.objective = 'Objective'
+        self.exploration.title = 'Title'
+        self.exploration.category = 'Category'
+        self.end_state.update_card_is_checkpoint(True)
+        self.exploration.validate(strict=True)
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self) -> None:
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        for i in range(8):
+            self.exploration.add_states(['State%s' % i])
+            self.exploration.states['State%s' % i].card_is_checkpoint = True
+            self.set_interaction_for_state(
+                self.exploration.states['State%s' % i],
+                'Continue', self.content_id_generator)
+        with self.assertRaisesRegex(
+            Exception, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
+            ):
+            self.exploration.validate(strict=True)
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(
+        self
+    ) -> None:
+        # Note: In the graphs below, states with the * symbol are checkpoints.
+
+        # Exploration to test a checkpoint state which has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │   Second* │      │   Third   │
+        # └───────────┘      └─┬─────────┘
+        #                      │
+        #        ┌─────────────┴─┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        second_state = state_domain.State.create_default_state(
+            'Second',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            second_state, 'TextInput', self.content_id_generator)
+        third_state = state_domain.State.create_default_state(
+            'Third',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            third_state, 'TextInput', self.content_id_generator)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state,
+            'Second': second_state,
+            'Third': third_state,
+        }
+
+        # Answer group dicts to connect init_state to second_state and
+        # third_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Second', None, state_domain.SubtitledHtml(
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input')),
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Third', None, state_domain.SubtitledHtml(
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input')),
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
         ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['category', 'title'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_STATE,
-        'required_attribute_names': [
-            'state_name',
-            'content_id_for_state_content',
-            'content_id_for_default_outcome'
-        ],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_STATE,
-        'required_attribute_names': ['state_name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_RENAME_STATE,
-        'required_attribute_names': ['new_state_name', 'old_state_name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': DEPRECATED_CMD_ADD_TRANSLATION,
-        'required_attribute_names': [
-            'state_name', 'content_id', 'language_code', 'content_html',
-            'translation_html'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_WRITTEN_TRANSLATION,
-        'required_attribute_names': [
-            'state_name', 'content_id', 'language_code', 'content_html',
-            'translation_html', 'data_format'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
-        'required_attribute_names': [
-            'content_id',
-            'language_code',
-            'state_name'
-        ],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
-        'required_attribute_names': ['content_id', 'state_name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-        'required_attribute_names': ['content_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_EDIT_TRANSLATION,
-        'required_attribute_names': [
-            'content_id', 'language_code', 'translation'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_TRANSLATIONS,
-        'required_attribute_names': ['content_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_EDIT_STATE_PROPERTY,
-        'required_attribute_names': [
-            'property_name', 'state_name', 'new_value'],
-        'optional_attribute_names': ['old_value'],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': STATE_PROPERTIES},
-        # TODO(#12991): Remove this once once we use the migration jobs to
-        # remove the deprecated values from the server data.
-        'deprecated_values': {'property_name': ['fallbacks']}
-    }, {
-        'name': CMD_EDIT_EXPLORATION_PROPERTY,
-        'required_attribute_names': ['property_name', 'new_value'],
-        'optional_attribute_names': ['old_value'],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': EXPLORATION_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
-        'required_attribute_names': ['version_number'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }]
-
-    # TODO(#12991): Remove this once once we use the migration jobs to remove
-    # the deprecated commands from the server data.
-    DEPRECATED_COMMANDS: List[str] = [
-        'clone', 'add_gadget', 'edit_gadget_property',
-        'delete_gadget', 'rename_gadget']
-
-
-class CreateNewExplorationCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_CREATE_NEW command.
-    """
-
-    category: str
-    title: str
-
-
-class AddExplorationStateCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_ADD_STATE command.
-    """
-
-    state_name: str
-    content_id_for_state_content: str
-    content_id_for_default_outcome: str
-
-
-class DeleteExplorationStateCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_DELETE_STATE command.
-    """
-
-    state_name: str
-
-
-class RenameExplorationStateCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_RENAME_STATE command.
-    """
-
-    new_state_name: str
-    old_state_name: str
-
-
-class AddWrittenTranslationCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_ADD_WRITTEN_TRANSLATION command.
-    """
-
-    state_name: str
-    content_id: str
-    language_code: str
-    content_html: str
-    translation_html: str
-    data_format: str
-
-
-class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE command.
-    """
-
-    content_id: str
-    language_code: str
-    state_name: str
-
-
-class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE command.
-    """
-
-    content_id: str
-    state_name: str
-
-
-class EditExpStatePropertyParamChangesCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_PARAM_CHANGES as allowed value.
-    """
-
-    property_name: Literal['param_changes']
-    state_name: str
-    new_value: List[param_domain.ParamChangeDict]
-    old_value: List[param_domain.ParamChangeDict]
-
-
-class EditExpStatePropertyContentCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_CONTENT as allowed value.
-    """
-
-    property_name: Literal['content']
-    state_name: str
-    new_value: state_domain.SubtitledHtmlDict
-    old_value: Optional[state_domain.SubtitledHtmlDict]
-
-
-class EditExpStatePropertySolicitAnswerDetailsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_SOLICIT_ANSWER_DETAILS as allowed value.
-    """
-
-    property_name: Literal['solicit_answer_details']
-    state_name: str
-    new_value: bool
-    old_value: bool
-
-
-class EditExpStatePropertyCardIsCheckpointCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_CARD_IS_CHECKPOINT as allowed value.
-    """
-
-    property_name: Literal['card_is_checkpoint']
-    state_name: str
-    new_value: bool
-    old_value: bool
-
-
-class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_RECORDED_VOICEOVERS as allowed value.
-    """
-
-    property_name: Literal['recorded_voiceovers']
-    state_name: str
-    new_value: state_domain.RecordedVoiceoversDict
-    old_value: state_domain.RecordedVoiceoversDict
-
-
-class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_ID as allowed value.
-    """
-
-    property_name: Literal['widget_id']
-    state_name: str
-    new_value: str
-    old_value: str
-
-
-class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_LINKED_SKILL_ID as allowed value.
-    """
-
-    property_name: Literal['linked_skill_id']
-    state_name: str
-    new_value: str
-    old_value: str
-
-
-class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_CUST_ARGS as allowed value.
-    """
-
-    property_name: Literal['widget_customization_args']
-    state_name: str
-    new_value: state_domain.CustomizationArgsDictType
-    old_value: state_domain.CustomizationArgsDictType
-
-
-class EditExpStatePropertyInteractionStickyCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_STICKY as allowed value.
-    """
-
-    property_name: Literal['widget_sticky']
-    state_name: str
-    new_value: bool
-    old_value: bool
-
-
-class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_HANDLERS as allowed value.
-    """
-
-    property_name: Literal['widget_handlers']
-    state_name: str
-    new_value: List[state_domain.AnswerGroupDict]
-    old_value: List[state_domain.AnswerGroupDict]
-
-
-class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS as allowed value.
-    """
-
-    property_name: Literal['answer_groups']
-    state_name: str
-    new_value: List[state_domain.AnswerGroupDict]
-    old_value: List[state_domain.AnswerGroupDict]
-
-
-class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME as allowed value.
-    """
-
-    property_name: Literal['default_outcome']
-    state_name: str
-    new_value: state_domain.OutcomeDict
-    old_value: state_domain.OutcomeDict
-
-
-class EditExpStatePropertyInteractionHintsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_HINTS as allowed value.
-    """
-
-    property_name: Literal['hints']
-    state_name: str
-    new_value: List[state_domain.HintDict]
-    old_value: List[state_domain.HintDict]
-
-
-class EditExpStatePropertyInteractionSolutionCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_INTERACTION_SOLUTION as allowed value.
-    """
-
-    property_name: Literal['solution']
-    state_name: str
-    new_value: state_domain.SolutionDict
-    old_value: state_domain.SolutionDict
-
-
-class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_UNCLASSIFIED_ANSWERS as allowed value.
-    """
-
-    property_name: Literal['confirmed_unclassified_answers']
-    state_name: str
-    new_value: List[state_domain.AnswerGroup]
-    old_value: List[state_domain.AnswerGroup]
-
-
-class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
-    ExplorationChange
-):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
-    as allowed value.
-    """
-
-    property_name: Literal['content_ids_to_audio_translations']
-    state_name: str
-    new_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
-    old_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
-
-
-class EditExplorationPropertyTitleCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'title' as allowed value.
-    """
-
-    property_name: Literal['title']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyCategoryCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'category' as allowed value.
-    """
-
-    property_name: Literal['category']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyObjectiveCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'objective' as allowed value.
-    """
-
-    property_name: Literal['objective']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyLanguageCodeCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'language_code' as allowed value.
-    """
-
-    property_name: Literal['language_code']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyTagsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'tags' as allowed value.
-    """
-
-    property_name: Literal['tags']
-    new_value: List[str]
-    old_value: List[str]
-
-
-class EditExplorationPropertyBlurbCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'blurb' as allowed value.
-    """
-
-    property_name: Literal['blurb']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyAuthorNotesCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'author_notes' as allowed value.
-    """
-
-    property_name: Literal['author_notes']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyParamSpecsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'param_specs' as allowed value.
-    """
-
-    property_name: Literal['param_specs']
-    new_value: Dict[str, param_domain.ParamSpecDict]
-    old_value: Dict[str, param_domain.ParamSpecDict]
-
-
-class EditExplorationPropertyParamChangesCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'param_changes' as allowed value.
-    """
-
-    property_name: Literal['param_changes']
-    new_value: List[param_domain.ParamChangeDict]
-    old_value: List[param_domain.ParamChangeDict]
-
-
-class EditExplorationPropertyInitStateNameCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'init_state_name' as allowed value.
-    """
-
-    property_name: Literal['init_state_name']
-    new_value: str
-    old_value: str
-
-
-class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'auto_tts_enabled' as allowed value.
-    """
-
-    property_name: Literal['auto_tts_enabled']
-    new_value: bool
-    old_value: bool
-
-
-# DEPRECATED: This command is deprecated. Please do not use.
-# The command stays here for interpreting historical data.
-class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'correctness_feedback_enabled' as allowed value.
-    """
-
-    property_name: Literal['correctness_feedback_enabled']
-    new_value: bool
-    old_value: bool
-
-
-class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'next_content_id_index' as allowed value.
-    """
-
-    property_name: Literal['next_content_id_index']
-    new_value: int
-    old_value: int
-
-
-class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'edits_allowed' as allowed value.
-    """
-
-    property_name: Literal['edits_allowed']
-    new_value: bool
-    old_value: bool
-
-
-class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
-    """
-
-    from_version: str
-    to_version: str
-
-
-class RevertExplorationCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_REVERT_COMMIT command.
-    """
-
-    version_number: int
-
-
-class TransientCheckpointUrlDict(TypedDict):
-    """Dictionary representing the TransientCheckpointUrl object."""
-
-    exploration_id: str
-    furthest_reached_checkpoint_state_name: str
-    furthest_reached_checkpoint_exp_version: int
-    most_recently_reached_checkpoint_state_name: str
-    most_recently_reached_checkpoint_exp_version: int
-
-
-class EditTranslationsChangesCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_TRANSLATION command.
-    """
-
-    language_code: str
-    content_id: str
-    translation: feconf.TranslatedContentDict
-
-
-class TransientCheckpointUrl:
-    """Domain object representing the checkpoint progress of a
-    logged-out user.
-    """
-
-    def __init__(
-        self,
-        exploration_id: str,
-        furthest_reached_checkpoint_state_name: str,
-        furthest_reached_checkpoint_exp_version: int,
-        most_recently_reached_checkpoint_state_name: str,
-        most_recently_reached_checkpoint_exp_version: int
-    ) -> None:
-        """Initializes a TransientCheckpointUrl domain object.
-
-        Args:
-            exploration_id: str. Id of the exploration.
-            furthest_reached_checkpoint_state_name: str. State name of the
-                furthest reached checkpoint in the exploration.
-            furthest_reached_checkpoint_exp_version: int. Exploration version
-                in which the user has completed most checkpoints.
-            most_recently_reached_checkpoint_state_name: str. State name of
-                the most recently reached checkpoint in the exploration.
-            most_recently_reached_checkpoint_exp_version: int. Exploration
-                version in which a checkpoint was most recently reached.
-        """
-        self.exploration_id = exploration_id
-        self.furthest_reached_checkpoint_state_name = (
-            furthest_reached_checkpoint_state_name)
-        self.furthest_reached_checkpoint_exp_version = (
-            furthest_reached_checkpoint_exp_version)
-        self.most_recently_reached_checkpoint_state_name = (
-            most_recently_reached_checkpoint_state_name)
-        self.most_recently_reached_checkpoint_exp_version = (
-            most_recently_reached_checkpoint_exp_version)
-
-    def to_dict(self) -> TransientCheckpointUrlDict:
-        """Convert the TransientCheckpointUrl domain instance into a dictionary
-        form with its keys as the attributes of this class.
-
-        Returns:
-            dict. A dictionary containing the TransientCheckpointUrl class
-            information in a dictionary form.
-        """
-
-        return {
-            'exploration_id': self.exploration_id,
-            'furthest_reached_checkpoint_exp_version': (
-                self.furthest_reached_checkpoint_exp_version),
-            'furthest_reached_checkpoint_state_name': (
-                self.furthest_reached_checkpoint_state_name),
-            'most_recently_reached_checkpoint_exp_version': (
-                self.most_recently_reached_checkpoint_exp_version),
-            'most_recently_reached_checkpoint_state_name': (
-                self.most_recently_reached_checkpoint_state_name)
+        # Answer group dict to connect third_state to end_state.
+        third_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', None, state_domain.SubtitledHtml(
+                        self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.RULE,
+                                        extra_prefix='input')),
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        third_state.update_interaction_answer_groups(
+            third_state_answer_groups)
+
+        self.exploration.next_content_id_index = (
+            self.content_id_generator.next_content_id_index)
+
+        # The exploration can be completed via third_state. Hence, making
+        # second_state a checkpoint raises a validation error.
+        second_state.card_is_checkpoint = True
+        with self.assertRaisesRegex(
+            Exception, 'Cannot make Second a checkpoint as it is'
+            ' bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        second_state.card_is_checkpoint = False
+
+        # Exploration to test a checkpoint state when the state in the other
+        # path has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │  Second*  │      │   Third   │
+        # └────────┬──┘      └───────────┘
+        #          │
+        #        ┌─┴─────────────┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        # Answer group dicts to connect second_state to end_state.
+        second_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        second_state.update_interaction_answer_groups(
+            second_state_answer_groups)
+
+        # Reset the answer group dicts of third_state.
+        third_state.update_interaction_answer_groups([])
+
+        # As second_state is now connected to end_state and third_state has no
+        # outcome, second_state has become non-bypassable.
+        second_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Reset the exploration.
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
         }
 
-    def validate(self) -> None:
-        """Validates properties of the TransientCheckpointUrl object.
+        # Exploration to test a bypassable state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └─────┬──────┘
+        #      │            ┌────┴─────┐            │
+        #      │            │    B     │            │
+        #      │            └──┬───────┘            │
+        #      └─────────┐     │                    │
+        #         ┌──────┴─────┴─┐    ┌─────────────┘
+        #         │      D*      │    │
+        #         └─────────────┬┘    │
+        #                       │     │
+        #                    ┌──┴─────┴──┐
+        #                    │    End    │
+        #                    └───────────┘.
 
-        Raises:
-            ValidationError. One or more attributes of the
-                TransientCheckpointUrl are invalid.
-        """
-        if not isinstance(self.exploration_id, str):
-            raise utils.ValidationError(
-            'Expected exploration_id to be a str, received %s'
-                % self.exploration_id)
+        a_state = state_domain.State.create_default_state(
+            'A',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            a_state, 'TextInput', self.content_id_generator)
+        b_state = state_domain.State.create_default_state(
+            'B',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            b_state, 'TextInput', self.content_id_generator)
+        c_state = state_domain.State.create_default_state(
+            'C',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            c_state, 'TextInput', self.content_id_generator)
+        d_state = state_domain.State.create_default_state(
+            'D',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            d_state, 'TextInput', self.content_id_generator)
 
-        if not isinstance(self.furthest_reached_checkpoint_state_name, str):
-            raise utils.ValidationError(
-                'Expected furthest_reached_checkpoint_state_name to be a str,'
-                'received %s' % self.furthest_reached_checkpoint_state_name
-            )
-
-        if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
-            raise utils.ValidationError(
-                'Expected furthest_reached_checkpoint_exp_version to be an int'
-            )
-
-        if not isinstance(
-            self.most_recently_reached_checkpoint_state_name, str
-        ):
-            raise utils.ValidationError(
-                'Expected most_recently_reached_checkpoint_state_name to be a'
-                ' str, received %s'
-                % self.most_recently_reached_checkpoint_state_name
-            )
-
-        if not isinstance(
-            self.most_recently_reached_checkpoint_exp_version, int
-        ):
-            raise utils.ValidationError(
-                'Expected most_recently_reached_checkpoint_exp_version'
-                ' to be an int'
-            )
-
-
-class ExplorationCommitLogEntryDict(TypedDict):
-    """Dictionary representing the ExplorationCommitLogEntry object."""
-
-    last_updated: float
-    exploration_id: str
-    commit_type: str
-    commit_message: str
-    version: int
-    post_commit_status: str
-    post_commit_community_owned: bool
-    post_commit_is_private: bool
-
-
-class ExplorationCommitLogEntry:
-    """Value object representing a commit to an exploration."""
-
-    def __init__(
-        self,
-        created_on: datetime.datetime,
-        last_updated: datetime.datetime,
-        user_id: str,
-        exploration_id: str,
-        commit_type: str,
-        commit_message: str,
-        commit_cmds: Sequence[
-            Mapping[str, change_domain.AcceptableChangeDictTypes]
-        ],
-        version: int,
-        post_commit_status: str,
-        post_commit_community_owned: bool,
-        post_commit_is_private: bool
-    ) -> None:
-        """Initializes a ExplorationCommitLogEntry domain object.
-
-        Args:
-            created_on: datetime.datetime. Date and time when the exploration
-                commit was created.
-            last_updated: datetime.datetime. Date and time when the exploration
-                commit was last updated.
-            user_id: str. User id of the user who has made the commit.
-            exploration_id: str. Id of the exploration.
-            commit_type: str. The type of commit.
-            commit_message: str. A description of changes made to the
-                exploration.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains the following
-                key:
-                    - cmd: str. Unique command.
-                and then additional arguments for that command.
-            version: int. The version of the exploration after the commit.
-            post_commit_status: str. The new exploration status after the
-                commit.
-            post_commit_community_owned: bool. Whether the exploration is
-                community-owned after the edit event.
-            post_commit_is_private: bool. Whether the exploration is private
-                after the edit event.
-        """
-        self.created_on = created_on
-        self.last_updated = last_updated
-        self.user_id = user_id
-        self.exploration_id = exploration_id
-        self.commit_type = commit_type
-        self.commit_message = commit_message
-        self.commit_cmds = commit_cmds
-        self.version = version
-        self.post_commit_status = post_commit_status
-        self.post_commit_community_owned = post_commit_community_owned
-        self.post_commit_is_private = post_commit_is_private
-
-    def to_dict(self) -> ExplorationCommitLogEntryDict:
-        """Returns a dict representing this ExplorationCommitLogEntry domain
-        object. This omits created_on, user_id and commit_cmds and adds username
-        (derived from user_id).
-
-        Returns:
-            dict. A dict, mapping all fields of ExplorationCommitLogEntry
-            instance, except created_on, user_id and commit_cmds fields and
-            adding username (derived from user_id).
-        """
-        return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'exploration_id': self.exploration_id,
-            'commit_type': self.commit_type,
-            'commit_message': self.commit_message,
-            'version': self.version,
-            'post_commit_status': self.post_commit_status,
-            'post_commit_community_owned': self.post_commit_community_owned,
-            'post_commit_is_private': self.post_commit_is_private,
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state
         }
 
-
-class ExpVersionReferenceDict(TypedDict):
-    """Dictionary representing the ExpVersionReference object."""
-
-    exp_id: str
-    version: int
-
-
-class ExpVersionReference:
-    """Value object representing an exploration ID and a version number."""
-
-    def __init__(self, exp_id: str, version: int) -> None:
-        """Initializes an ExpVersionReference domain object.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            version: int. Version of the exploration.
-        """
-        self.exp_id = exp_id
-        self.version = version
-        self.validate()
-
-    def to_dict(self) -> ExpVersionReferenceDict:
-        """Returns a dict representing this ExpVersionReference domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of ExpVersionReference instance.
-        """
-        return {
-            'exp_id': self.exp_id,
-            'version': self.version
-        }
-
-    def validate(self) -> None:
-        """Validates properties of the ExpVersionReference.
-
-        Raises:
-            ValidationError. One or more attributes of the ExpVersionReference
-                are invalid.
-        """
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exp_id to be a str, received %s' % self.exp_id)
-
-        if not isinstance(self.version, int):
-            raise utils.ValidationError(
-                'Expected version to be an int, received %s' % self.version)
-
-
-class ExplorationVersionsDiff:
-    """Domain object for the difference between two versions of an Oppia
-    exploration.
-
-    Attributes:
-        added_state_names: list(str). Names of the states added to the
-            exploration from prev_exp_version to current_exp_version. It stores
-            the newest names of the added states.
-        deleted_state_names: list(str). Name sof the states deleted from the
-            exploration from prev_exp_version to current_exp_version. It stores
-            the initial names of the deleted states from pre_exp_version.
-        new_to_old_state_names: dict. Dictionary mapping state names of
-            current_exp_version to the state names of prev_exp_version.
-            It doesn't include the name changes of added/deleted states.
-        old_to_new_state_names: dict. Dictionary mapping state names of
-            prev_exp_version to the state names of current_exp_version.
-            It doesn't include the name changes of added/deleted states.
-    """
-
-    def __init__(self, change_list: Sequence[ExplorationChange]) -> None:
-        """Constructs an ExplorationVersionsDiff domain object.
-
-        Args:
-            change_list: list(ExplorationChange). A list of all of the commit
-                cmds from the old version of the exploration up to the next
-                version.
-        """
-
-        added_state_names: List[str] = []
-        deleted_state_names: List[str] = []
-        new_to_old_state_names: Dict[str, str] = {}
-
-        for change in change_list:
-            if change.cmd == CMD_ADD_STATE:
-                added_state_names.append(change.state_name)
-            elif change.cmd == CMD_DELETE_STATE:
-                state_name = change.state_name
-                if state_name in added_state_names:
-                    added_state_names.remove(state_name)
-                else:
-                    original_state_name = state_name
-                    if original_state_name in new_to_old_state_names:
-                        original_state_name = new_to_old_state_names.pop(
-                            original_state_name)
-                    deleted_state_names.append(original_state_name)
-            elif change.cmd == CMD_RENAME_STATE:
-                old_state_name = change.old_state_name
-                new_state_name = change.new_state_name
-                if old_state_name in added_state_names:
-                    added_state_names.remove(old_state_name)
-                    added_state_names.append(new_state_name)
-                elif old_state_name in new_to_old_state_names:
-                    new_to_old_state_names[new_state_name] = (
-                        new_to_old_state_names.pop(old_state_name))
-                else:
-                    new_to_old_state_names[new_state_name] = old_state_name
-
-        self.added_state_names = added_state_names
-        self.deleted_state_names = deleted_state_names
-        self.new_to_old_state_names = new_to_old_state_names
-        self.old_to_new_state_names = {
-            value: key for key, value in new_to_old_state_names.items()
-        }
-
-
-class VersionedExplorationInteractionIdsMapping:
-    """Domain object representing the mapping of state names to interaction ids
-    in an exploration.
-    """
-
-    def __init__(
-        self,
-        version: int,
-        state_interaction_ids_dict: Dict[str, str]
-    ) -> None:
-        """Initialises an VersionedExplorationInteractionIdsMapping domain
-        object.
-
-        Args:
-            version: int. The version of the exploration.
-            state_interaction_ids_dict: dict. A dict where each key-value pair
-                represents, respectively, a state name and an interaction id.
-        """
-        self.version = version
-        self.state_interaction_ids_dict = state_interaction_ids_dict
-
-
-class ExplorationDict(TypedDict):
-    """Dictionary representing the Exploration object."""
-
-    id: str
-    title: str
-    category: str
-    objective: str
-    language_code: str
-    tags: List[str]
-    blurb: str
-    author_notes: str
-    states_schema_version: int
-    init_state_name: str
-    states: Dict[str, state_domain.StateDict]
-    param_specs: Dict[str, param_domain.ParamSpecDict]
-    param_changes: List[param_domain.ParamChangeDict]
-    auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
-    edits_allowed: bool
-    next_content_id_index: int
-    version: int
-
-
-class VersionedExplorationDict(ExplorationDict):
-    """Dictionary representing versioned Exploration object."""
-
-    schema_version: int
-
-
-class ExplorationPlayerDict(TypedDict):
-    """Dictionary representing Exploration for learner view."""
-
-    init_state_name: str
-    param_changes: List[param_domain.ParamChangeDict]
-    param_specs: Dict[str, param_domain.ParamSpecDict]
-    states: Dict[str, state_domain.StateDict]
-    title: str
-    objective: str
-    language_code: str
-    correctness_feedback_enabled: bool
-    next_content_id_index: int
-
-
-class VersionedExplorationStatesDict(TypedDict):
-    """Dictionary representing the versioned Exploration state."""
-
-    states_schema_version: int
-    states: Dict[str, state_domain.StateDict]
-
-
-class SerializableExplorationDict(ExplorationDict):
-    """Dictionary representing the serializable Exploration object."""
-
-    created_on: str
-    last_updated: str
-
-
-class RangeVariableDict(TypedDict):
-    """Dictionary representing the range variable for the NumericInput
-    interaction.
-    """
-
-    ans_group_index: int
-    rule_spec_index: int
-    lower_bound: Optional[float]
-    upper_bound: Optional[float]
-    lb_inclusive: bool
-    ub_inclusive: bool
-
-
-class MatchedDenominatorDict(TypedDict):
-    """Dictionary representing the matched denominator variable for the
-    FractionInput interaction.
-    """
-
-    ans_group_index: int
-    rule_spec_index: int
-    denominator: int
-
-
-class Exploration(translation_domain.BaseTranslatableObject):
-    """Domain object for an Oppia exploration."""
-
-    def __init__(
-        self,
-        exploration_id: str,
-        title: str,
-        category: str,
-        objective: str,
-        language_code: str,
-        tags: List[str],
-        blurb: str,
-        author_notes: str,
-        states_schema_version: int,
-        init_state_name: str,
-        states_dict: Dict[str, state_domain.StateDict],
-        param_specs_dict: Dict[str, param_domain.ParamSpecDict],
-        param_changes_list: List[param_domain.ParamChangeDict],
-        version: int,
-        auto_tts_enabled: bool,
-        next_content_id_index: int,
-        edits_allowed: bool,
-        created_on: Optional[datetime.datetime] = None,
-        last_updated: Optional[datetime.datetime] = None
-    ) -> None:
-        """Initializes an Exploration domain object.
-
-        Args:
-            exploration_id: str. The exploration id.
-            title: str. The exploration title.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
-            tags: list(str). The tags given to the exploration.
-            blurb: str. The blurb of the exploration.
-            author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
-            init_state_name: str. The name for the initial state of the
-                exploration.
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-            param_specs_dict: dict. A dict where each key-value pair represents
-                respectively, a param spec name and a dict used to initialize a
-                ParamSpec domain object.
-            param_changes_list: list(dict). List of dict where each dict is
-                used to initialize a ParamChange domain object.
-            version: int. The version of the exploration.
-            auto_tts_enabled: bool. True if automatic text-to-speech is
-                enabled.
-            next_content_id_index: int. The next content_id index to use for
-                generation of new content_ids.
-            edits_allowed: bool. True when edits to the exploration is allowed.
-            created_on: datetime.datetime. Date and time when the exploration
-                is created.
-            last_updated: datetime.datetime. Date and time when the exploration
-                was last updated.
-        """
-        self.id = exploration_id
-        self.title = title
-        self.category = category
-        self.objective = objective
-        self.language_code = language_code
-        self.tags = tags
-        self.blurb = blurb
-        self.author_notes = author_notes
-        self.states_schema_version = states_schema_version
-        self.init_state_name = init_state_name
-
-        self.states: Dict[str, state_domain.State] = {}
-        for (state_name, state_dict) in states_dict.items():
-            self.states[state_name] = state_domain.State.from_dict(state_dict)
-
-        self.param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in param_specs_dict.items()
-        }
-        self.param_changes = [
-            param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in param_changes_list]
-
-        self.version = version
-        self.created_on = created_on
-        self.last_updated = last_updated
-        self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = True
-        self.next_content_id_index = next_content_id_index
-        self.edits_allowed = edits_allowed
-
-    def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
-    ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the exploration.
-
-        Returns:
-            TranslatableContentsCollection. An instance of
-            TranslatableContentsCollection class.
-        """
-        translatable_contents_collection = (
-            translation_domain.TranslatableContentsCollection())
-
-        for state in self.states.values():
-            (
-                translatable_contents_collection
-                .add_fields_from_translatable_object(state)
+        # Answer group dicts to connect init_state to a_state, b_state and
+        # c_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'A', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'B', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'C', None, state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_2',
+                                'normalizedStrSet': ['Test2']
+                            }
+                        })
+                ],
+                [],
+                None
             )
-        return translatable_contents_collection
+        ]
 
-    @classmethod
-    def create_default_exploration(
-        cls,
-        exploration_id: str,
-        title: str = feconf.DEFAULT_EXPLORATION_TITLE,
-        init_state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        category: str = feconf.DEFAULT_EXPLORATION_CATEGORY,
-        objective: str = feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE
-    ) -> Exploration:
-        """Returns a Exploration domain object with default values.
+        # Answer group dict to connect a_state and b_state to d_state.
+        a_and_b_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
 
-        'title', 'init_state_name', 'category', 'objective' if not provided are
-        taken from feconf; 'tags' and 'param_changes_list' are initialized to
-        empty list; 'states_schema_version' is taken from feconf; 'states_dict'
-        is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
-        'author_notes' are initialized to empty string; 'version' is
-        initializated to 0.
+        # Answer group dict to connect c_state and d_state to end_state.
+        c_and_d_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
 
-        Args:
-            exploration_id: str. The id of the exploration.
-            title: str. The exploration title.
-            init_state_name: str. The name of the initial state.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        a_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        b_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        c_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
+        d_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
 
-        Returns:
-            Exploration. The Exploration domain object with default
-            values.
-        """
+        # As a user can complete the exploration by going through c_state,
+        # d_state becomes bypassable. Hence, making d_state a checkpoint raises
+        # validation error.
+        d_state.update_card_is_checkpoint(True)
+        self.exploration.update_next_content_id_index(
+            self.content_id_generator.next_content_id_index)
+        with self.assertRaisesRegex(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        d_state.update_card_is_checkpoint(False)
+
+        # Modifying the graph to make D non-bypassable.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬─────┘
+        #      │            ┌────┴─────┐             │
+        #      │            │    B     │             │
+        #      │            └────┬─────┘             │
+        #      │                 │                   │
+        #      │          ┌──────┴───────┐           │
+        #      └──────────┤      D*      ├───────────┘
+        #                 └──────┬───────┘
+        #                        │
+        #                  ┌─────┴─────┐
+        #                  │    End    │
+        #                  └───────────┘.
+
+        # Answer group dict to connect c_state to d_state. Hence, making d_state
+        # non-bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        d_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Modifying the graph to add another EndExploration state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬───┬─┘
+        #      │            ┌────┴─────┐             │   │
+        #      │            │    B     │             │   │
+        #      │            └────┬─────┘             │   │
+        #      │                 │                   │   │
+        #      │          ┌──────┴───────┐           │   │
+        #      └──────────┤      D*      ├───────────┘   │
+        #                 └──────┬───────┘               │
+        #                        │                       │
+        #                  ┌─────┴─────┐           ┌─────┴─────┐
+        #                  │    End    │           │    End 2  │
+        #                  └───────────┘           └───────────┘.
+
+        new_end_state = state_domain.State.create_default_state(
+            'End 2',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(
+            new_end_state, 'EndExploration', self.content_id_generator)
+        new_end_state.update_interaction_default_outcome(None)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state,
+            'End 2': new_end_state
+        }
+
+        # Answer group dicts to connect c_state to d_state and new_end_state,
+        # making d_state bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', None, state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End 2', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        with self.assertRaisesRegex(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        d_state.update_card_is_checkpoint(False)
+
+
+class ExplorationDomainUnitTests(test_utils.GenericTestBase):
+    """Test the exploration domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        translation_dict = {
+            'content_id_3': translation_domain.TranslatedContent(
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True
+            )
+        }
+        self.dummy_entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict)
+        self.new_exploration = (
+            exp_domain.Exploration.create_default_exploration('test_id'))
+        self.content_id_generator = translation_domain.ContentIdGenerator(
+            self.new_exploration.next_content_id_index
+        )
+        self.state = self.new_exploration.states['Introduction']
+        self.set_interaction_for_state(
+            self.state, 'Continue', self.content_id_generator)
+
+    def test_image_rte_tag(self) -> None:
+        """Validate image tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'alt-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+            'caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            'aaaaaa&amp;quot;\"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag \'caption-with-value\' attribute '
+                'should not be greater than 500 characters.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'caption-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image filepath-with-value="&quot;&quot;'
+            '" caption-with-value="&quot;&quot;" alt-with-value="&quot;'
+            'Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag \'filepath-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-image caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            self.new_exploration, 'Image tag does not have \'filepath-with'
+            '-value\' attribute.')
+
+    def test_skill_review_rte_tag(self) -> None:
+        """Validate SkillReview tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" ></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag does not have \'text-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            '&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag \'text-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag does not have '
+            '\'skill_id-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-skillreview skill_id-with-value='
+            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'SkillReview tag \'skill_id-with-value\' '
+            'attribute should not be empty.')
+
+    def test_video_rte_tag(self) -> None:
+        """Validate Video tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'start-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'start-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'end-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'end-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Start value should not be greater than End '
+            'value in Video tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'autoplay-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"not valid\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'autoplay-with-value\' attribute '
+            'should be a boolean value.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\">'
+            '</oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag does not have \'video_id-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\" start-with-value=\"9\"'
+            ' video_id-with-value=\"&amp;quot;&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        self._assert_validation_error(
+            self.new_exploration, 'Video tag \'video_id-with-value\' attribute '
+            'should not be empty.')
+
+    def test_link_rte_tag(self) -> None:
+        """Validate Link tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-link '
+            'url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag does not have \'text-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\">'
+            '</oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag does not have \'url-with-value\' '
+            'attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-link'
+            ' text-with-value=\"&amp;quot;something&amp;quot;\"'
+            ' url-with-value=\"\"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Link tag \'url-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+          '<oppia-noninteractive-link text-with-value="&amp;quot;Google'
+          '&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;'
+          'quot;"></oppia-noninteractive-link>'
+        )
+        self._assert_validation_error(
+          self.new_exploration, (
+            'Link should be prefix with acceptable schemas '
+            'which are \\[\'https\', \'\']')
+        )
+
+    def test_math_rte_tag(self) -> None:
+        """Validate Math tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have '
+            '\'math_content-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math'
+            ' math_content-with-value=\"\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'math_content-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have \'raw_latex-with'
+            '-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'raw_latex-with-value\' attribute '
+            'should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;not empty'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag does not have '
+            '\'svg_filename-with-value\' attribute.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            '&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'svg_filename-with-value\' '
+            'attribute should not be empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-math math_content-with-value='
+            '\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;something'
+            '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+            'image.png&amp;quot;}\"></oppia-noninteractive-math>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Math tag \'svg_filename-with-value\' '
+            'attribute should have svg extension.')
+
+    def test_tabs_rte_tag(self) -> None:
+        """Validate Tabs tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No tabs are present inside the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No title attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;content&amp;quot;:'
+            '&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'title present inside tabs tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute is present inside '
+            'the tabs tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;}]\'></oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'content present inside tabs tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-'
+            'noninteractive-tabs&amp;gt;&amp;lt;/oppia-noninteractive-tabs'
+            '&amp;gt;&amp;lt;/p&amp;gt;&amp;quot;}]\'>'
+            '</oppia-noninteractive-tabs>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Tabs tag should not be present inside '
+            'another Tabs or Collapsible tag.')
+
+    def test_collapsible_rte_tag(self) -> None:
+        """Validate Collapsible tag."""
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No collapsible content is present '
+            'inside the tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible heading-with-value='
+            '\'&amp;quot;head&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No content attribute present in '
+            'collapsible tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;Content&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Heading attribute inside the collapsible '
+            'tag is empty.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value=\'&amp;'
+            'quot;Content&amp;quot;\'></oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'No heading attribute present in '
+            'collapsible tag.')
+
+        self.state.content.html = (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '\'&amp;quot;<oppia-noninteractive-collapsible>'
+            '</oppia-noninteractive-collapsible>&amp;quot;\' heading-with-value'
+            '=\'&amp;quot;heading&amp;quot;\'>'
+            '</oppia-noninteractive-collapsible>'
+        )
+        self._assert_validation_error(
+            self.new_exploration, 'Collapsible tag should not be present '
+            'inside another Tabs or Collapsible tag.')
+        self.state.content.html = 'Valid content'
+
+    def test_continue_interaction(self) -> None:
+        """Tests Continue interaction."""
+        self.set_interaction_for_state(
+          self.state, 'Continue', self.content_id_generator)
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_continue_ca_arg = cast(
+            state_domain.SubtitledUnicode,
+            self.state.interaction.customization_args[
+                'buttonText'
+            ].value
+        )
+        subtitled_unicode_continue_ca_arg.unicode_str = (
+            'Continueeeeeeeeeeeeeeeeee'
+        )
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The `continue` interaction text length should be atmost '
+            '20 characters.')
+        )
+
+    def test_end_interaction(self) -> None:
+        """Tests End interaction."""
+        self.set_interaction_for_state(
+          self.state, 'EndExploration', self.content_id_generator)
+        self.state.interaction.customization_args[
+          'recommendedExplorationIds'].value = ['id1', 'id2', 'id3', 'id4']
+        self.state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
+          self.new_exploration, (
+            'The total number of recommended explorations inside End '
+            'interaction should be atmost 3.')
+        )
+
+    def test_numeric_interaction(self) -> None:
+        """Tests Numeric interaction."""
         content_id_generator = translation_domain.ContentIdGenerator()
-        init_state_dict = state_domain.State.create_default_state(
-            init_state_name,
+        self.set_interaction_for_state(
+            self.state, 'NumericInput', content_id_generator)
+        test_ans_group_for_numeric_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 3,
+                        'b': 5
+                    }
+                },
+                {
+                    'rule_type': 'IsWithinTolerance',
+                    'inputs': {
+                        'x': 1,
+                        'tol': -1
+                    }
+                },
+                {
+                    'rule_type': 'IsInclusivelyBetween',
+                    'inputs': {
+                        'a': 8,
+                        'b': 8
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 7
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 10
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 15
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_numeric_interaction)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'1\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\' of answer group \'0\' having '
+            'rule type \'IsWithinTolerance\' have \'tol\' value less than or '
+            'equal to zero in NumericInput interaction.')
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' '
+            'having rule type \'IsInclusivelyBetween\' have `a` value greater '
+            'than `b` value in NumericInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'NumericInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'2\' from answer group \'0\' will '
+            'never be matched because it is made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
+
+    def test_fraction_interaction(self) -> None:
+        """Tests Fraction interaction."""
+        state = self.new_exploration.states['Introduction']
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            state, 'FractionInput', content_id_generator)
+        test_ans_group_for_fraction_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 4,
+                            'denominator': 6
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 1,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 3,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 2,
+                            'numerator': 2,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsGreaterThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 10,
+                            'denominator': 3
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 27,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'HasDenominatorEqualTo',
+                    'inputs': {
+                        'x': 4
+                    }
+                },
+                {
+                    'rule_type': 'HasFractionalPartExactlyEqualTo',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 9,
+                            'denominator': 4
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 7,
+                            'denominator': 2
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsLessThan',
+                    'inputs': {
+                        'f': {
+                            'isNegative': False,
+                            'wholeNumber': 0,
+                            'numerator': 5,
+                            'denominator': 2
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        state.interaction.answer_groups = (
+            test_ans_group_for_fraction_interaction)
+        state.interaction.customization_args[
+            'allowNonzeroIntegerPart'].value = False
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = False
+        state.interaction.customization_args[
+            'requireSimplestForm'].value = True
+        rule_specs = state.interaction.answer_groups[0].rule_specs
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'FractionInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in simple form '
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' do '
+            'not have value in proper fraction '
+            'in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        state.interaction.customization_args[
+            'allowImproperFraction'].value = True
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' has '
+            'non zero integer part in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'2\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction having rule type HasFractionalPart'
+            'ExactlyEqualTo will never be matched because it is '
+            'made redundant by the above rules')
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule \'3\' from answer group \'0\' of '
+            'FractionInput interaction will never be matched because it is '
+            'made redundant by the above rules'
+        ):
+            self.new_exploration.validate(strict=True)
+
+    def test_number_with_units_interaction(self) -> None:
+        """Tests NumberWithUnits interaction."""
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'NumberWithUnits', content_id_generator)
+        test_ans_group_for_number_with_units_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'IsEquivalentTo',
+                    'inputs': {
+                        'f': {
+
+                            'type': 'real',
+                            'real': 2,
+                            'fraction': {
+                                'isNegative': False,
+                                'wholeNumber': 0,
+                                'numerator': 0,
+                                'denominator': 1
+                            },
+                            'units': [
+                                {
+                                    'unit': 'km',
+                                    'exponent': 1
+                                },
+                                {
+                                    'unit': 'hr',
+                                    'exponent': -1
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_number_with_units_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' has '
+            'rule type equal is coming after rule type equivalent having '
+            'same value in FractionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+        rule_specs.remove(rule_specs[1])
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'NumberWithUnitsInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+    def test_multiple_choice_interaction(self) -> None:
+        """Tests MultipleChoice interaction."""
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'MultipleChoiceInput', content_id_generator)
+        test_ans_group_for_multiple_choice_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': 0
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_multiple_choice_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'MultipleChoiceInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+        rule_specs.remove(rule_specs[1])
+        self.state.interaction.customization_args[
+            'choices'].value[2].html = '<p>2</p>'
+
+    def test_item_selection_choice_interaction(self) -> None:
+        """Tests ItemSelection interaction."""
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'ItemSelectionInput', content_id_generator)
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        test_ans_group_for_item_selection_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': ['ca_choices_0', 'ca_choices_1', 'ca_choices_2']
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.update_interaction_answer_groups(
+            test_ans_group_for_item_selection_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 3
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 1
+
+        self._assert_validation_error(
+            self.new_exploration, 'Min value which is 3 is greater than max '
+            'value which is 1 in ItemSelectionInput interaction.'
+        )
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 4
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 4
+        self._assert_validation_error(
+            self.new_exploration, 'Number of choices which is 3 is lesser '
+                'than the min value selection which is 4 in ItemSelectionInput '
+                'interaction.')
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule 1 of answer group 0 of '
+            'ItemSelectionInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 2
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Selected choices of rule \'0\' of answer '
+            'group \'0\' either less than min_selection_value or greater than '
+            'max_selection_value in ItemSelectionInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+        self.state.interaction.customization_args[
+            'minAllowableSelectionCount'].value = 1
+        self.state.interaction.customization_args[
+            'maxAllowableSelectionCount'].value = 3
+
+    def test_drag_and_drop_interaction(self) -> None:
+        """Tests DragAndDrop interaction."""
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_2')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'DragAndDropSortInput', content_id_generator)
+        empty_list: List[str] = []
+        test_ans_group_for_drag_and_drop_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 4
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0', 'ca_choices_1', 'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXBeforeElementY',
+                    'inputs': {
+                    'x': 'ca_choices_0',
+                    'y': 'ca_choices_0'
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': empty_list
+                    }
+                },
+                {
+                    'rule_type': 'HasElementXAtPositionY',
+                    'inputs': {
+                        'x': 'ca_choices_0',
+                        'y': 1
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_1', 'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': (
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1', 'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ],
+                            [
+                            'ca_choices_2', 'ca_choices_3'
+                            ]
+                        ]
+                    }
+                },
+                {
+                    'rule_type': 'IsEqualToOrdering',
+                    'inputs': {
+                        'x': [
+                            [
+                            'ca_choices_3'
+                            ],
+                            [
+                            'ca_choices_2'
+                            ],
+                            [
+                            'ca_choices_1'
+                            ],
+                            [
+                            'ca_choices_0'
+                            ]
+                        ]
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                    'content_id': 'feedback_0',
+                    'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_drag_and_drop_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>')
+        ]
+        self._assert_validation_error(
+            self.new_exploration, (
+              'There should be atleast 2 values inside DragAndDrop '
+              'interaction.')
+        )
+
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p> </p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = False
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be non empty.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>2</p>')
+        ]
+
+        self._assert_validation_error(
+            self.new_exploration, 'Choices should be unique.'
+        )
+        self.state.interaction.customization_args['choices'].value = [
+            state_domain.SubtitledHtml('ca_choices_0', '<p>1</p>'),
+            state_domain.SubtitledHtml('ca_choices_1', '<p>2</p>'),
+            state_domain.SubtitledHtml('ca_choices_2', '<p>3</p>')
+        ]
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
+            'having rule type - IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ' should not be there when the multiple items in same position '
+            'setting is turned off in DragAndDropSortInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'0\' of answer group \'0\' '
+            'have multiple items at same place when multiple items in same '
+            'position settings is turned off in DragAndDropSortInput '
+            'interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+        self.state.interaction.customization_args[
+            'allowMultipleItemsInSamePosition'].value = True
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'3\' of answer group \'0\', '
+            'the value 1 and value 2 cannot be same when rule type is '
+            'HasElementXBeforeElementY of DragAndDropSortInput interaction.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
+        rule_specs.remove(rule_specs[1])
+
+        self._assert_validation_error(
+            self.new_exploration, 'The rule \'1\'of answer group \'0\', '
+            'having rule type IsEqualToOrdering should not have empty values.')
+        rule_specs.remove(rule_specs[1])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'2\' of answer group \'0\' of '
+            'DragAndDropInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 '
+            'will never be match because it is made redundant by the '
+            'HasElementXAtPositionY rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - 1 of answer group 0 will never '
+            'be match because it is made redundant by the '
+            'IsEqualToOrderingWithOneItemAtIncorrectPosition rule above.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[1])
+
+    def test_text_interaction(self) -> None:
+        """Tests Text interaction."""
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'feedback_0')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'rule_input_27')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_0')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_1')
+        self.state.recorded_voiceovers.add_content_id_for_voiceover(
+            'ca_choices_2')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.set_interaction_for_state(
+            self.state, 'TextInput', content_id_generator)
+        test_ans_group_for_text_interaction = [
+            state_domain.AnswerGroup.from_dict({
+            'rule_specs': [
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                          'x': {
+                              'contentId': 'rule_input_27',
+                              'normalizedStrSet': [
+                                'hello',
+                                'abc',
+                                'def'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'helloooooo'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'exci'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'excitement'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Contains',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'he'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                },
+                {
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_27',
+                            'normalizedStrSet': [
+                                'hello'
+                            ]
+                        }
+                    }
+                }
+            ],
+            'outcome': {
+                'dest': 'EXP_1_STATE_1',
+                'feedback': {
+                'content_id': 'feedback_0',
+                'html': '<p>good</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest_if_really_stuck': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            })
+        ]
+        self.state.interaction.answer_groups = (
+            test_ans_group_for_text_interaction)
+        rule_specs = self.state.interaction.answer_groups[0].rule_specs
+
+        self.state.interaction.customization_args['rows'].value = 15
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rows value in Text interaction should '
+            'be between 1 and 10.'
+        ):
+            self.new_exploration.validate()
+
+        self.state.interaction.customization_args['rows'].value = 5
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Contains\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'StartsWith\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'contains\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Rule - \'1\' of answer group - \'0\' '
+            'having rule type \'Equals\' will never be matched because it '
+            'is made redundant by the above \'StartsWith\' rule.'
+        ):
+            self.new_exploration.validate(strict=True)
+        rule_specs.remove(rule_specs[0])
+
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'The rule \'1\' of answer group \'0\' of '
+            'TextInput interaction is already present.'
+        ):
+            self.new_exploration.validate(strict=True)
+
+    # TODO(bhenning): The validation tests below should be split into separate
+    # unit tests. Also, all validation errors should be covered in the tests.
+    def test_validation(self) -> None:
+        """Test validation of explorations."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        exploration.init_state_name = ''
+        exploration.states = {}
+
+        exploration.title = 'Hello #'
+        self._assert_validation_error(exploration, 'Invalid character #')
+
+        exploration.title = 'Title'
+        exploration.category = 'Category'
+
+        # Note: If '/' ever becomes a valid state name, ensure that the rule
+        # editor frontend tenplate is fixed -- it currently uses '/' as a
+        # sentinel for an invalid state name.
+        bad_state = state_domain.State.create_default_state(
+            '/',
             content_id_generator.generate(
                 translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True).to_dict()
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        exploration.states = {'/': bad_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character / in a state name')
 
-        states_dict = {
-            init_state_name: init_state_dict
+        new_state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.set_interaction_for_state(
+            new_state, 'TextInput', content_id_generator)
+        second_state = state_domain.State.create_default_state(
+            'BCD',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.set_interaction_for_state(
+            second_state, 'TextInput', content_id_generator)
+
+        # The 'states' property must be a non-empty dict of states.
+        exploration.states = {}
+        self._assert_validation_error(
+            exploration, 'exploration has no states')
+        exploration.states = {'A string #': new_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character # in a state name')
+        exploration.states = {'A string _': new_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character _ in a state name')
+
+        exploration.states = {
+            'ABC': new_state,
+            'BCD': second_state
         }
 
-        return cls(
-            exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_STATE_SCHEMA_VERSION,
-            init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED,
-            content_id_generator.next_content_id_index, True)
+        self._assert_validation_error(
+            exploration, 'has no initial state name')
 
-    @classmethod
-    def from_dict(
-        cls,
-        exploration_dict: ExplorationDict,
-        exploration_version: int = 0,
-        exploration_created_on: Optional[datetime.datetime] = None,
-        exploration_last_updated: Optional[datetime.datetime] = None
-    ) -> Exploration:
-        """Return a Exploration domain object from a dict.
+        exploration.init_state_name = 'initname'
 
-        Args:
-            exploration_dict: dict. The dict representation of Exploration
-                object.
-            exploration_version: int. The version of the exploration.
-            exploration_created_on: datetime.datetime. Date and time when the
-                exploration is created.
-            exploration_last_updated: datetime.datetime. Date and time when the
-                exploration was last updated.
+        self._assert_validation_error(
+            exploration,
+            r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
+            'the exploration\'s initial state name initname.')
 
-        Returns:
-            Exploration. The corresponding Exploration domain object.
-
-        Raises:
-            Exception. Some parameter was used in a state but not declared
-                in the Exploration dict.
-        """
-        # NOTE TO DEVELOPERS: It is absolutely ESSENTIAL this conversion to and
-        # from an ExplorationModel/dictionary MUST be exhaustive and complete.
-        exploration = cls.create_default_exploration(
-            exploration_dict['id'],
-            title=exploration_dict['title'],
-            category=exploration_dict['category'],
-            objective=exploration_dict['objective'],
-            language_code=exploration_dict['language_code'])
-        exploration.tags = exploration_dict['tags']
-        exploration.blurb = exploration_dict['blurb']
-        exploration.author_notes = exploration_dict['author_notes']
-        exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
-        exploration.next_content_id_index = exploration_dict[
-            'next_content_id_index']
-        exploration.correctness_feedback_enabled = True
-        exploration.edits_allowed = exploration_dict['edits_allowed']
-
-        exploration.param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val) for
-            (ps_name, ps_val) in exploration_dict['param_specs'].items()
+        # Test whether a default outcome to a non-existing state is invalid.
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'BCD': second_state
         }
-
-        exploration.states_schema_version = exploration_dict[
-            'states_schema_version']
-        init_state_name = exploration_dict['init_state_name']
-        exploration.rename_state(exploration.init_state_name, init_state_name)
-
-        for (state_name, sdict) in exploration_dict['states'].items():
-            if state_name != init_state_name:
-                exploration.add_state(
-                    state_name,
-                    # These are placeholder values which will be repalced with
-                    # correct values below.
-                    '<placeholder1>', '<placeholder2>')
-
-            state = exploration.states[state_name]
-
-            state.content = state_domain.SubtitledHtml(
-                sdict['content']['content_id'], sdict['content']['html'])
-            state.content.validate()
-
-            state.param_changes = [param_domain.ParamChange(
-                pc['name'], pc['generator_id'], pc['customization_args']
-            ) for pc in sdict['param_changes']]
-
-            for pc in state.param_changes:
-                if pc.name not in exploration.param_specs:
-                    raise Exception(
-                        'Parameter %s was used in a state but not '
-                        'declared in the exploration param_specs.' % pc.name)
-
-            idict = sdict['interaction']
-            interaction_answer_groups = [
-                state_domain.AnswerGroup.from_dict(group)
-                for group in idict['answer_groups']]
-
-            default_outcome = (
-                state_domain.Outcome.from_dict(idict['default_outcome'])
-                if idict['default_outcome'] is not None else None)
-
-            solution = (
-                state_domain.Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] is not None and idict['id'] is not None
-                else None
-            )
-
-            customization_args = (
-                state_domain.InteractionInstance.
-                convert_customization_args_dict_to_customization_args(
-                    idict['id'],
-                    idict['customization_args']
-                )
-            )
-            state.interaction = state_domain.InteractionInstance(
-                idict['id'], customization_args,
-                interaction_answer_groups, default_outcome,
-                idict['confirmed_unclassified_answers'],
-                [state_domain.Hint.from_dict(h) for h in idict['hints']],
-                solution)
-
-            state.recorded_voiceovers = (
-                state_domain.RecordedVoiceovers.from_dict(
-                    sdict['recorded_voiceovers']))
-
-            state.linked_skill_id = sdict['linked_skill_id']
-
-            state.solicit_answer_details = sdict['solicit_answer_details']
-
-            state.card_is_checkpoint = sdict['card_is_checkpoint']
-
-            exploration.states[state_name] = state
-
-        exploration.param_changes = [
-            param_domain.ParamChange.from_dict(pc)
-            for pc in exploration_dict['param_changes']]
-
-        exploration.version = exploration_version
-        exploration.created_on = exploration_created_on
-        exploration.last_updated = exploration_last_updated
-
-        return exploration
-
-    @classmethod
-    def _validate_state_name(cls, name: str) -> None:
-        """Validates name string.
-
-        Args:
-            name: str. The name to validate.
-        """
-        utils.require_valid_name(name, 'a state name')
-
-    def validate(self, strict: bool = False) -> None:
-        """Validates various properties of the Exploration.
-
-        Args:
-            strict: bool. If True, the exploration is assumed to be published,
-                and the validation checks are stricter.
-
-        Raises:
-            ValidationError. One or more attributes of the Exploration are
-                invalid.
-        """
-        if not isinstance(self.title, str):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(
-            self.title, 'the exploration title', allow_empty=True)
-
-        if not isinstance(self.category, str):
-            raise utils.ValidationError(
-                'Expected category to be a string, received %s'
-                % self.category)
-        utils.require_valid_name(
-            self.category, 'the exploration category', allow_empty=True)
-
-        if not isinstance(self.objective, str):
-            raise utils.ValidationError(
-                'Expected objective to be a string, received %s' %
-                self.objective)
-
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-        if not utils.is_valid_language_code(self.language_code):
-            raise utils.ValidationError(
-                'Invalid language_code: %s' % self.language_code)
-
-        if not isinstance(self.tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received %s' % self.tags)
-        for tag in self.tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received '
-                    '\'%s\'' % tag)
-
-            if not tag:
-                raise utils.ValidationError('Tags should be non-empty.')
-
-            if not re.match(constants.TAG_REGEX, tag):
-                raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag)
-
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
-                raise utils.ValidationError(
-                    'Tags should not start or end with whitespace, received '
-                    ' \'%s\'' % tag)
-
-            if re.search(r'\s\s+', tag):
-                raise utils.ValidationError(
-                    'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag)
-
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
-
-        if not isinstance(self.blurb, str):
-            raise utils.ValidationError(
-                'Expected blurb to be a string, received %s' % self.blurb)
-
-        if not isinstance(self.author_notes, str):
-            raise utils.ValidationError(
-                'Expected author_notes to be a string, received %s' %
-                self.author_notes)
-
-        if not isinstance(self.states, dict):
-            raise utils.ValidationError(
-                'Expected states to be a dict, received %s' % self.states)
-        if not self.states:
-            raise utils.ValidationError('This exploration has no states.')
-        for state_name, state in self.states.items():
-            self._validate_state_name(state_name)
-            state.validate(
-                self.param_specs,
-                allow_null_interaction=not strict,
-                tagged_skill_misconception_id_required=False,
-                strict=strict)
-            # The checks below perform validation on the Outcome domain object
-            # that is specific to answer groups in explorations, but not
-            # questions. This logic is here because the validation checks in
-            # the Outcome domain object are used by both explorations and
-            # questions.
-            for answer_group in state.interaction.answer_groups:
-                if not answer_group.outcome.dest:
-                    raise utils.ValidationError(
-                        'Every outcome should have a destination.')
-                if not isinstance(answer_group.outcome.dest, str):
-                    raise utils.ValidationError(
-                        'Expected outcome dest to be a string, received %s'
-                        % answer_group.outcome.dest)
-
-                outcome = answer_group.outcome
-                if outcome.dest_if_really_stuck is not None:
-                    if not isinstance(outcome.dest_if_really_stuck, str):
-                        raise utils.ValidationError(
-                            'Expected dest_if_really_stuck to be a '
-                            'string, received %s' %
-                            outcome.dest_if_really_stuck)
-
-            if state.interaction.default_outcome is not None:
-                if not state.interaction.default_outcome.dest:
-                    raise utils.ValidationError(
-                        'Every outcome should have a destination.')
-                if not isinstance(state.interaction.default_outcome.dest, str):
-                    raise utils.ValidationError(
-                        'Expected outcome dest to be a string, received %s'
-                        % state.interaction.default_outcome.dest)
-
-                interaction_default_outcome = state.interaction.default_outcome
-                if interaction_default_outcome.dest_if_really_stuck is not None:
-                    if not isinstance(
-                        interaction_default_outcome.dest_if_really_stuck, str
-                    ):
-                        raise utils.ValidationError(
-                            'Expected dest_if_really_stuck to be a '
-                            'string, received %s'
-                            % interaction_default_outcome.dest_if_really_stuck)
-
-        if self.states_schema_version is None:
-            raise utils.ValidationError(
-                'This exploration has no states schema version.')
-        if not self.init_state_name:
-            raise utils.ValidationError(
-                'This exploration has no initial state name specified.')
-        if self.init_state_name not in self.states:
-            raise utils.ValidationError(
-                'There is no state in %s corresponding to the exploration\'s '
-                'initial state name %s.' %
-                (list(self.states.keys()), self.init_state_name))
-
-        if not isinstance(self.param_specs, dict):
-            raise utils.ValidationError(
-                'Expected param_specs to be a dict, received %s'
-                % self.param_specs)
-
-        if not isinstance(self.auto_tts_enabled, bool):
-            raise utils.ValidationError(
-                'Expected auto_tts_enabled to be a bool, received %s'
-                % self.auto_tts_enabled)
-
-        if not isinstance(self.correctness_feedback_enabled, bool):
-            raise utils.ValidationError(
-                'Expected correctness_feedback_enabled to be a bool, received '
-                '%s' % self.correctness_feedback_enabled)
-
-        if not isinstance(self.next_content_id_index, int):
-            raise utils.ValidationError(
-                'Expected next_content_id_index to be an int, received '
-                '%s' % self.next_content_id_index)
-
-        # Validates translatable contents in the exploration.
-        self.validate_translatable_contents(self.next_content_id_index)
-
-        if not isinstance(self.edits_allowed, bool):
-            raise utils.ValidationError(
-                'Expected edits_allowed to be a bool, received '
-                '%s' % self.edits_allowed)
-
-        for param_name in self.param_specs:
-            if not isinstance(param_name, str):
-                raise utils.ValidationError(
-                    'Expected parameter name to be a string, received %s (%s).'
-                    % (param_name, type(param_name)))
-            if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
-                raise utils.ValidationError(
-                    'Only parameter names with characters in [a-zA-Z0-9] are '
-                    'accepted.')
-            self.param_specs[param_name].validate()
-
-        if not isinstance(self.param_changes, list):
-            raise utils.ValidationError(
-                'Expected param_changes to be a list, received %s'
-                % self.param_changes)
-        for param_change in self.param_changes:
-            param_change.validate()
-
-            if param_change.name in constants.INVALID_PARAMETER_NAMES:
-                raise utils.ValidationError(
-                    'The exploration-level parameter with name \'%s\' is '
-                    'reserved. Please choose a different name.'
-                    % param_change.name)
-            if param_change.name not in self.param_specs:
-                raise utils.ValidationError(
-                    'No parameter named \'%s\' exists in this exploration'
-                    % param_change.name)
-
-        # TODO(sll): Find a way to verify the param change customization args
-        # when they depend on exploration/state parameters (e.g. the generated
-        # values must have the correct obj_type). Can we get sample values for
-        # the reader's answer and these parameters by looking at states that
-        # link to this one?
-
-        # Check that all state param changes are valid.
-        for state_name, state in self.states.items():
-            for param_change in state.param_changes:
-                param_change.validate()
-                if param_change.name in constants.INVALID_PARAMETER_NAMES:
-                    raise utils.ValidationError(
-                        'The parameter name \'%s\' is reserved. Please choose '
-                        'a different name for the parameter being set in '
-                        'state \'%s\'.' % (param_change.name, state_name))
-                if param_change.name not in self.param_specs:
-                    raise utils.ValidationError(
-                        'The parameter with name \'%s\' was set in state '
-                        '\'%s\', but it does not exist in the list of '
-                        'parameter specifications for this exploration.'
-                        % (param_change.name, state_name))
-
-        # Check that all answer groups, outcomes, and param_changes are valid.
-        all_state_names = list(self.states.keys())
-        for state_name, state in self.states.items():
-            interaction = state.interaction
-            default_outcome = interaction.default_outcome
-
-            if default_outcome is not None:
-                # Check the default destination, if any.
-                if default_outcome.dest not in all_state_names:
-                    raise utils.ValidationError(
-                        'The destination %s is not a valid state.'
-                        % default_outcome.dest)
-
-                # Check default if-stuck destinations.
-                if (
-                    default_outcome.dest_if_really_stuck is not None and
-                    default_outcome.dest_if_really_stuck not in all_state_names
-                ):
-                    raise utils.ValidationError(
-                        'The destination for the stuck learner %s '
-                        'is not a valid state.'
-                        % default_outcome.dest_if_really_stuck)
-
-                # Check that, if the outcome is a non-self-loop, then the
-                # refresher_exploration_id is None.
-                if (
-                    default_outcome.refresher_exploration_id is not None and
-                    default_outcome.dest != state_name
-                ):
-                    raise utils.ValidationError(
-                        'The default outcome for state %s has a refresher '
-                        'exploration ID, but is not a self-loop.' % state_name)
-
-            for group in interaction.answer_groups:
-                # Check group destinations.
-                if group.outcome.dest not in all_state_names:
-                    raise utils.ValidationError(
-                        'The destination %s is not a valid state.'
-                        % group.outcome.dest)
-
-                # Check group if-stuck destinations.
-                if (
-                    group.outcome.dest_if_really_stuck is not None and
-                    group.outcome.dest_if_really_stuck not in all_state_names
-                ):
-                    raise utils.ValidationError(
-                        'The destination for the stuck learner %s '
-                        'is not a valid state.'
-                        % group.outcome.dest_if_really_stuck)
-
-                # Check that, if the outcome is a non-self-loop, then the
-                # refresher_exploration_id is None.
-                if (
-                    group.outcome.refresher_exploration_id is not None and
-                    group.outcome.dest != state_name
-                ):
-                    raise utils.ValidationError(
-                        'The outcome for an answer group in state %s has a '
-                        'refresher exploration ID, but is not a self-loop.'
-                        % state_name)
-
-                for param_change in group.outcome.param_changes:
-                    if param_change.name not in self.param_specs:
-                        raise utils.ValidationError(
-                            'The parameter %s was used in an answer group, '
-                            'but it does not exist in this exploration'
-                            % param_change.name)
-
-        if strict:
-            warnings_list = []
-
-            # Check if first state is a checkpoint or not.
-            if not self.states[self.init_state_name].card_is_checkpoint:
-                raise utils.ValidationError(
-                    'Expected card_is_checkpoint of first state to be True'
-                    ' but found it to be %s'
-                    % (self.states[self.init_state_name].card_is_checkpoint)
-                )
-
-            # Check if terminal states are checkpoints.
-            for state_name, state in self.states.items():
-                interaction = state.interaction
-                if interaction.is_terminal:
-                    if state_name != self.init_state_name:
-                        if state.card_is_checkpoint:
-                            raise utils.ValidationError(
-                                'Expected card_is_checkpoint of terminal state '
-                                'to be False but found it to be %s'
-                                % state.card_is_checkpoint
-                            )
-
-            # Check if checkpoint count is between 1 and 8, inclusive.
-            checkpoint_count = 0
-            for state_name, state in self.states.items():
-                if state.card_is_checkpoint:
-                    checkpoint_count = checkpoint_count + 1
-            if not 1 <= checkpoint_count <= 8:
-                raise utils.ValidationError(
-                    'Expected checkpoint count to be between 1 and 8 inclusive '
-                    'but found it to be %s'
-                    % checkpoint_count
-                )
-
-            # Check if a state marked as a checkpoint is bypassable.
-            non_initial_checkpoint_state_names = []
-            for state_name, state in self.states.items():
-                if (state_name != self.init_state_name
-                        and state.card_is_checkpoint):
-                    non_initial_checkpoint_state_names.append(state_name)
-
-            # For every non-initial checkpoint state we remove it from the
-            # states dict. Then we check if we can reach a terminal state after
-            # removing the state with checkpoint. As soon as we find a terminal
-            # state, we break out of the loop and raise a validation error.
-            # Since, we reached a terminal state, this implies that the user was
-            # not required to go through the checkpoint. Hence, the checkpoint
-            # is bypassable.
-            for state_name_to_exclude in non_initial_checkpoint_state_names:
-                new_states = copy.deepcopy(self.states)
-                new_states.pop(state_name_to_exclude)
-                processed_state_names = set()
-                curr_queue = [self.init_state_name]
-                excluded_state_is_bypassable = False
-                while curr_queue:
-                    if curr_queue[0] == state_name_to_exclude:
-                        curr_queue.pop(0)
-                        continue
-                    curr_state_name = curr_queue[0]
-                    curr_queue = curr_queue[1:]
-                    if not curr_state_name in processed_state_names:
-                        processed_state_names.add(curr_state_name)
-                        curr_state = new_states[curr_state_name]
-
-                        # We do not need to check if the current state is
-                        # terminal or not before getting all outcomes, as when
-                        # we find a terminal state in an outcome, we break out
-                        # of the for loop and raise a validation error.
-                        all_outcomes = (
-                            curr_state.interaction.get_all_outcomes())
-                        for outcome in all_outcomes:
-                            dest_state = outcome.dest
-                            # Ruling out the possibility of None for mypy type
-                            # checking, because above we are already validating
-                            # if outcome exists then it should have destination.
-                            assert dest_state is not None
-                            if self.states[dest_state].interaction.is_terminal:
-                                excluded_state_is_bypassable = True
-                                break
-                            if (dest_state not in curr_queue and
-                                    dest_state not in processed_state_names):
-                                curr_queue.append(dest_state)
-                    if excluded_state_is_bypassable:
-                        raise utils.ValidationError(
-                            'Cannot make %s a checkpoint as it is bypassable'
-                            % state_name_to_exclude)
-
-            try:
-                self._verify_all_states_reachable()
-            except utils.ValidationError as e:
-                warnings_list.append(str(e))
-
-            try:
-                self._verify_no_dead_ends()
-            except utils.ValidationError as e:
-                warnings_list.append(str(e))
-
-            if not self.title:
-                warnings_list.append(
-                    'A title must be specified (in the \'Settings\' tab).')
-
-            if not self.category:
-                warnings_list.append(
-                    'A category must be specified (in the \'Settings\' tab).')
-
-            if not self.objective:
-                warnings_list.append(
-                    'An objective must be specified (in the \'Settings\' tab).'
-                )
-
-            # Check that self-loop outcomes are not labelled as correct.
-            all_state_names = list(self.states.keys())
-            for state_name, state in self.states.items():
-                interaction = state.interaction
-                default_outcome = interaction.default_outcome
-
-                if default_outcome is not None:
-                    # Check that, if the outcome is a self-loop, then the
-                    # outcome is not labelled as correct.
-                    if (
-                        default_outcome.dest == state_name and
-                        default_outcome.labelled_as_correct
-                    ):
-                        raise utils.ValidationError(
-                            'The default outcome for state %s is labelled '
-                            'correct but is a self-loop.' % state_name)
-
-                for group in interaction.answer_groups:
-                    # Check that, if the outcome is a self-loop, then the
-                    # outcome is not labelled as correct.
-                    if (
-                        group.outcome.dest == state_name and
-                        group.outcome.labelled_as_correct
-                    ):
-                        raise utils.ValidationError(
-                            'The outcome for an answer group in state %s is '
-                            'labelled correct but is a self-loop.' % state_name)
-
-                    if (
-                        group.outcome.labelled_as_correct and
-                        group.outcome.dest_if_really_stuck is not None
-                    ):
-                        raise utils.ValidationError(
-                            'The outcome for the state is labelled '
-                            'correct but a destination for the stuck learner '
-                            'is specified.')
-
-            if len(warnings_list) > 0:
-                warning_str = ''
-                for ind, warning in enumerate(warnings_list):
-                    warning_str += '%s. %s ' % (ind + 1, warning)
-                raise utils.ValidationError(
-                    'Please fix the following issues before saving this '
-                    'exploration: %s' % warning_str)
-
-    def _verify_all_states_reachable(self) -> None:
-        """Verifies that all states are reachable from the initial state.
-
-        Raises:
-            ValidationError. One or more states are not reachable from the
-                initial state of the Exploration.
-        """
-        # This queue stores state names.
-        processed_queue = []
-        curr_queue = [self.init_state_name]
-
-        while curr_queue:
-            curr_state_name = curr_queue[0]
-            curr_queue = curr_queue[1:]
-
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
-
-                curr_state = self.states[curr_state_name]
-
-                if not curr_state.interaction.is_terminal:
-                    all_outcomes = curr_state.interaction.get_all_outcomes()
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        dest_if_stuck_state = outcome.dest_if_really_stuck
-                        if (
-                            dest_state is not None and
-                            dest_state not in curr_queue and
-                            dest_state not in processed_queue
-                        ):
-                            curr_queue.append(dest_state)
-                        if (
-                            dest_if_stuck_state is not None and
-                            dest_if_stuck_state not in curr_queue and
-                            dest_if_stuck_state not in processed_queue
-                        ):
-                            curr_queue.append(dest_if_stuck_state)
-
-        if len(self.states) != len(processed_queue):
-            unseen_states = sorted(list(
-                set(self.states.keys()) - set(processed_queue)))
-            raise utils.ValidationError(
-                'The following states are not reachable from the initial '
-                'state: %s' % ', '.join(unseen_states))
-
-    def _verify_no_dead_ends(self) -> None:
-        """Verifies that all states can reach a terminal state.
-
-        Raises:
-            ValidationError. If is impossible to complete the exploration from
-                a state.
-        """
-        # This queue stores state names.
-        processed_queue = []
-        curr_queue = []
-
-        for (state_name, state) in self.states.items():
-            if state.interaction.is_terminal:
-                curr_queue.append(state_name)
-
-        while curr_queue:
-            curr_state_name = curr_queue[0]
-            curr_queue = curr_queue[1:]
-
-            if not curr_state_name in processed_queue:
-                processed_queue.append(curr_state_name)
-
-                for (state_name, state) in self.states.items():
-                    if (state_name not in curr_queue
-                            and state_name not in processed_queue):
-                        all_outcomes = (
-                            state.interaction.get_all_outcomes())
-                        for outcome in all_outcomes:
-                            if outcome.dest == curr_state_name:
-                                curr_queue.append(state_name)
-                                break
-
-        if len(self.states) != len(processed_queue):
-            dead_end_states = list(
-                set(self.states.keys()) - set(processed_queue))
-            sorted_dead_end_states = sorted(dead_end_states)
-            raise utils.ValidationError(
-                'It is impossible to complete the exploration from the '
-                'following states: %s' % ', '.join(sorted_dead_end_states)
-            )
-
-    def get_content_html(
-        self, state_name: str, content_id: str
-    ) -> Union[str, List[str]]:
-        """Return the content for a given content id of a state.
-
-        Args:
-            state_name: str. The name of the state.
-            content_id: str. The id of the content.
-
-        Returns:
-            str. The html content corresponding to the given content id of a
-            state.
-
-        Raises:
-            ValueError. The given state_name does not exist.
-        """
-        if state_name not in self.states:
-            raise ValueError('State %s does not exist' % state_name)
-
-        return self.states[state_name].get_content_html(content_id)
-
-    # Derived attributes of an exploration.
-    @property
-    def init_state(self) -> state_domain.State:
-        """The state which forms the start of this exploration.
-
-        Returns:
-            State. The corresponding State domain object.
-        """
-        return self.states[self.init_state_name]
-
-    @property
-    def param_specs_dict(self) -> Dict[str, param_domain.ParamSpecDict]:
-        """A dict of param specs, each represented as Python dicts.
-
-        Returns:
-            dict. Dict of parameter specs.
-        """
-        return {ps_name: ps_val.to_dict()
-                for (ps_name, ps_val) in self.param_specs.items()}
-
-    @property
-    def param_change_dicts(self) -> List[param_domain.ParamChangeDict]:
-        """A list of param changes, represented as JSONifiable Python dicts.
-
-        Returns:
-            list(dict). List of dicts, each representing a parameter change.
-        """
-        return [param_change.to_dict() for param_change in self.param_changes]
-
-    @classmethod
-    def is_demo_exploration_id(cls, exploration_id: str) -> bool:
-        """Whether the given exploration id is a demo exploration.
-
-        Args:
-            exploration_id: str. The exploration id.
-
-        Returns:
-            bool. Whether the corresponding exploration is a demo exploration.
-        """
-        return exploration_id in feconf.DEMO_EXPLORATIONS
-
-    @property
-    def is_demo(self) -> bool:
-        """Whether the exploration is one of the demo explorations.
-
-        Returns:
-            bool. True is the current exploration is a demo exploration.
-        """
-        return self.is_demo_exploration_id(self.id)
-
-    def has_state_name(self, state_name: str) -> bool:
-        """Whether the exploration has a state with the given state name.
-
-        Args:
-            state_name: str. The name of the state.
-
-        Returns:
-            bool. Returns true if the exploration has the given state name.
-        """
-        state_names = list(self.states.keys())
-        return state_name in state_names
-
-    def get_interaction_id_by_state_name(
-        self, state_name: str
-    ) -> Optional[str]:
-        """Returns the interaction id of the state.
-
-        Args:
-            state_name: str. The name of the state.
-
-        Returns:
-            str|None. The ID of the interaction.
-        """
-        return self.states[state_name].interaction.id
-
-    def update_title(self, title: str) -> None:
-        """Update the exploration title.
-
-        Args:
-            title: str. The exploration title to set.
-        """
-        self.title = title
-
-    def update_category(self, category: str) -> None:
-        """Update the exploration category.
-
-        Args:
-            category: str. The exploration category to set.
-        """
-        self.category = category
-
-    def update_objective(self, objective: str) -> None:
-        """Update the exploration objective.
-
-        Args:
-            objective: str. The exploration objective to set.
-        """
-        self.objective = objective
-
-    def update_language_code(self, language_code: str) -> None:
-        """Update the exploration language code.
-
-        Args:
-            language_code: str. The exploration language code to set.
-        """
-        self.language_code = language_code
-
-    def update_tags(self, tags: List[str]) -> None:
-        """Update the tags of the exploration.
-
-        Args:
-            tags: list(str). List of tags to set.
-        """
-        self.tags = tags
-
-    def update_blurb(self, blurb: str) -> None:
-        """Update the blurb of the exploration.
-
-        Args:
-            blurb: str. The blurb to set.
-        """
-        self.blurb = blurb
-
-    def update_author_notes(self, author_notes: str) -> None:
-        """Update the author notes of the exploration.
-
-        Args:
-            author_notes: str. The author notes to set.
-        """
-        self.author_notes = author_notes
-
-    def update_param_specs(
-        self, param_specs_dict: Dict[str, param_domain.ParamSpecDict]
-    ) -> None:
-        """Update the param spec dict.
-
-        Args:
-            param_specs_dict: dict. A dict where each key-value pair represents
-                respectively, a param spec name and a dict used to initialize a
-                ParamSpec domain object.
-        """
-        self.param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in param_specs_dict.items()
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
+        self._assert_validation_error(
+            exploration, 'destination ABC is not a valid')
+
+        # Restore a valid exploration.
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+        default_outcome.dest = exploration.init_state_name
+        init_state.update_interaction_default_outcome(default_outcome)
+        init_state.update_card_is_checkpoint(True)
+        exploration.validate()
+
+        # Ensure an invalid destination can also be detected for answer groups.
+        # Note: The state must keep its default_outcome, otherwise it will
+        # trigger a validation error for non-terminal states needing to have a
+        # default outcome. To validate the outcome of the answer group, this
+        # default outcome must point to a valid state.
+        init_state = exploration.states[exploration.init_state_name]
+        default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+        default_outcome.dest = exploration.init_state_name
+        old_answer_groups: List[state_domain.AnswerGroupDict] = [
+            {
+                'outcome': {
+                    'dest': exploration.init_state_name,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+
+        exploration.validate()
+
+        interaction = init_state.interaction
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
+
+        default_outcome.dest_if_really_stuck = 'ABD'
+        self._assert_validation_error(
+            exploration, 'The destination for the stuck learner '
+            'ABD is not a valid state')
+
+        default_outcome.dest_if_really_stuck = None
+
+        answer_group.outcome.dest = 'DEF'
+        self._assert_validation_error(
+            exploration, 'destination DEF is not a valid')
+        answer_group.outcome.dest = exploration.init_state_name
+
+        answer_group.outcome.dest_if_really_stuck = 'XYZ'
+        self._assert_validation_error(
+            exploration, 'The destination for the stuck learner '
+            'XYZ is not a valid state')
+
+        answer_group.outcome.dest_if_really_stuck = None
+
+        # Restore a valid exploration.
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
+        answer_group.outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {}
+        self._assert_validation_error(
+            exploration, 'RuleSpec \'Contains\' is missing inputs')
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected inputs to be a dict')
+
+        rule_spec.inputs = {'x': 'Test'}
+        rule_spec.rule_type = 'FakeRuleType'
+        self._assert_validation_error(exploration, 'Unrecognized rule type')
+
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': 15
+        }}
+        rule_spec.rule_type = 'Contains'
+        with self.assertRaisesRegex(
+            AssertionError, 'Expected list, received 15'
+        ):
+            exploration.validate()
+
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name],
+            'PencilCodeEditor', content_id_generator)
+        temp_rule = old_answer_groups[0]['rule_specs'][0]
+        old_answer_groups[0]['rule_specs'][0] = {
+            'rule_type': 'ErrorContains',
+            'inputs': {'x': '{{ExampleParam}}'}
         }
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        old_answer_groups[0]['rule_specs'][0] = temp_rule
 
-    def update_param_changes(
-        self, param_changes: List[param_domain.ParamChange]
-    ) -> None:
-        """Update the param change dict.
+        self._assert_validation_error(
+            exploration,
+            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
+            'refers to an unknown parameter within the exploration: '
+            'ExampleParam')
 
-        Args:
-            param_changes: list(ParamChange). List of ParamChange objects.
-        """
-        self.param_changes = param_changes
+        # Restore a valid exploration.
+        exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
+            'UnicodeString')
+        exploration.validate()
 
-    def update_init_state_name(self, init_state_name: str) -> None:
-        """Update the name for the initial state of the exploration.
+        # Validate Outcome.
+        outcome = init_state.interaction.answer_groups[0].outcome
+        destination = exploration.init_state_name
 
-        Args:
-            init_state_name: str. The new name of the initial state.
+        outcome.dest = None
+        self._assert_validation_error(
+            exploration, 'Every outcome should have a destination.')
 
-        Raises:
-            Exception. Invalid initial state name.
-        """
-        old_init_state_name = self.init_state_name
-        if init_state_name not in self.states:
-            raise Exception(
-                'Invalid new initial state name: %s; '
-                'it is not in the list of states %s for this '
-                'exploration.' % (init_state_name, list(self.states.keys())))
-        self.init_state_name = init_state_name
-        if old_init_state_name in self.states:
-            self.states[old_init_state_name].card_is_checkpoint = False
-        self.init_state.card_is_checkpoint = True
+        outcome.dest = destination
 
-    def update_auto_tts_enabled(self, auto_tts_enabled: bool) -> None:
-        """Update whether automatic text-to-speech is enabled.
+        default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
 
-        Args:
-            auto_tts_enabled: bool. Whether automatic text-to-speech
-                is enabled or not.
-        """
-        self.auto_tts_enabled = auto_tts_enabled
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
 
-    def update_correctness_feedback_enabled(
-        self, correctness_feedback_enabled: bool
-    ) -> None:
-        """Update whether correctness feedback is enabled.
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string')
 
-        Args:
-            correctness_feedback_enabled: bool. Whether correctness feedback
-                is enabled or not.
-        """
-        self.correctness_feedback_enabled = correctness_feedback_enabled
+        default_outcome.dest_if_really_stuck = None
 
-    def update_next_content_id_index(self, next_content_id_index: int) -> None:
-        """Update the interaction next content id index attribute.
+        # Try setting the outcome destination to something other than a string.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest = 15  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected outcome dest to be a string')
 
-        Args:
-            next_content_id_index: int. The new next content id index to set.
-        """
-        self.next_content_id_index = next_content_id_index
+        outcome.dest = destination
 
-    def add_states(self, state_names: List[str]) -> None:
-        """Adds new states in the exploration with the given state names.
+        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
+        exploration.validate()
 
-        Args:
-            state_names: list(str). The new state name.
-        """
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'The "labelled_as_correct" field should be a boolean')
+
+        # Test that labelled_as_correct must be False for self-loops, and that
+        # this causes a strict validation failure but not a normal validation
+        # failure.
+        outcome.labelled_as_correct = True
+        with self.assertRaisesRegex(
+            Exception, 'is labelled correct but is a self-loop.'
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
+        exploration.validate()
+
+        # Try setting the outcome destination if stuck to something other
+        # than a string.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string')
+
+        outcome.dest_if_really_stuck = 'BCD'
+        outcome.dest = 'BCD'
+
+        # Test that no destination for the stuck learner is specified when
+        # the outcome is labelled correct.
+        outcome.labelled_as_correct = True
+
+        with self.assertRaisesRegex(
+            Exception, 'The outcome for the state is labelled '
+            'correct but a destination for the stuck learner '
+            'is specified.'
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
+        exploration.validate()
+
+        outcome.dest = destination
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.param_changes = 'Changes'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected outcome param_changes to be a list')
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.param_changes = [param_domain.ParamChange(
+            0, 'generator_id', {})]  # type: ignore[arg-type]
+        self._assert_validation_error(
+            exploration,
+            'Expected param_change name to be a string, received 0')
+
+        outcome.param_changes = []
+        exploration.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome refresher_exploration_id to be a string')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome missing_prerequisite_skill_id to be a string')
+
+        outcome.missing_prerequisite_skill_id = None
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 'valid_string'
+        exploration.validate()
+
+        # Test that refresher_exploration_id must be None for non-self-loops.
+        new_state_name = 'New state'
+        exploration.add_states([new_state_name])
+
+        outcome.dest = new_state_name
+        outcome.refresher_exploration_id = 'another_string'
+        self._assert_validation_error(
+            exploration,
+            'has a refresher exploration ID, but is not a self-loop')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+        exploration.delete_state(new_state_name)
+
+        # Validate InteractionInstance.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.id = 15  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected interaction id to be a string')
+
+        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
+        self._assert_validation_error(exploration, 'Invalid interaction id')
+        interaction.id = 'PencilCodeEditor'
         content_id_generator = translation_domain.ContentIdGenerator(
-            self.next_content_id_index)
-        for state_name in state_names:
-            self.add_state(
-                state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME))
-        self.next_content_id_index = content_id_generator.next_content_id_index
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        valid_text_input_cust_args = init_state.interaction.customization_args
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': ['Test']
+        }}
+        rule_spec.rule_type = 'Contains'
+        exploration.validate()
 
-    def add_state(
-        self,
-        state_name: str,
-        content_id_for_state_content: str,
-        content_id_for_default_outcome: str
-    ) -> None:
-        """Adds new state in the exploration with the given state name.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.customization_args = []  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected customization args to be a dict')
 
-        Args:
-            state_name: str. The new state name.
-            content_id_for_state_content: str. The content_id for the new state
-                content.
-            content_id_for_default_outcome: str. The content_id for the default
-                outcome of the new state.
-
-        Raises:
-            ValueError. State names cannot be duplicate.
-        """
-        if state_name in self.states:
-            raise ValueError('Duplicate state name %s' % state_name)
-
-        self.states[state_name] = state_domain.State.create_default_state(
-            state_name, content_id_for_state_content,
-            content_id_for_default_outcome)
-
-    def rename_state(self, old_state_name: str, new_state_name: str) -> None:
-        """Renames the given state.
-
-        Args:
-            old_state_name: str. The old name of state to rename.
-            new_state_name: str. The new state name.
-
-        Raises:
-            ValueError. The old state name does not exist or the new state name
-                is already in states dict.
-        """
-        if old_state_name not in self.states:
-            raise ValueError('State %s does not exist' % old_state_name)
-        if (old_state_name != new_state_name and
-                new_state_name in self.states):
-            raise ValueError('Duplicate state name: %s' % new_state_name)
-
-        if old_state_name == new_state_name:
-            return
-
-        self._validate_state_name(new_state_name)
-
-        self.states[new_state_name] = copy.deepcopy(
-            self.states[old_state_name])
-        del self.states[old_state_name]
-
-        if self.init_state_name == old_state_name:
-            self.update_init_state_name(new_state_name)
-        # Find all destinations in the exploration which equal the renamed
-        # state, and change the name appropriately.
-        for other_state in self.states.values():
-            other_outcomes = other_state.interaction.get_all_outcomes()
-            for outcome in other_outcomes:
-                if outcome.dest == old_state_name:
-                    outcome.dest = new_state_name
-
-    def delete_state(self, state_name: str) -> None:
-        """Deletes the given state.
-
-        Args:
-            state_name: str. The state name to be deleted.
-
-        Raises:
-            ValueError. The state does not exist or is the initial state of the
-                exploration.
-        """
-        if state_name not in self.states:
-            raise ValueError('State %s does not exist' % state_name)
-
-        # Do not allow deletion of initial states.
-        if self.init_state_name == state_name:
-            raise ValueError('Cannot delete initial state of an exploration.')
-
-        # Find all destinations in the exploration which equal the deleted
-        # state, and change them to loop back to their containing state.
-        for other_state_name, other_state in self.states.items():
-            all_outcomes = other_state.interaction.get_all_outcomes()
-            for outcome in all_outcomes:
-                if outcome.dest == state_name:
-                    outcome.dest = other_state_name
-                if outcome and outcome.dest_if_really_stuck == state_name:
-                    outcome.dest_if_really_stuck = other_state_name
-
-        del self.states[state_name]
-
-    def get_trainable_states_dict(
-        self,
-        old_states: Dict[str, state_domain.State],
-        exp_versions_diff: ExplorationVersionsDiff
-    ) -> Dict[str, List[str]]:
-        """Retrieves the state names of all trainable states in an exploration
-        segregated into state names with changed and unchanged answer groups.
-        In this method, the new_state_name refers to the name of the state in
-        the current version of the exploration whereas the old_state_name refers
-        to the name of the state in the previous version of the exploration.
-
-        Args:
-            old_states: dict. Dictionary containing all State domain objects.
-            exp_versions_diff: ExplorationVersionsDiff. An instance of the
-                exploration versions diff class.
-
-        Returns:
-            dict. The trainable states dict. This dict has three keys
-            representing state names with changed answer groups and
-            unchanged answer groups respectively.
-        """
-        trainable_states_dict: Dict[str, List[str]] = {
-            'state_names_with_changed_answer_groups': [],
-            'state_names_with_unchanged_answer_groups': []
-        }
-        new_states = self.states
-
-        for new_state_name, new_state in new_states.items():
-            if not new_state.can_undergo_classification():
-                continue
-
-            old_state_name = new_state_name
-            if new_state_name in exp_versions_diff.new_to_old_state_names:
-                old_state_name = exp_versions_diff.new_to_old_state_names[
-                    new_state_name]
-
-            # The case where a new state is added. When this happens, the
-            # old_state_name will be equal to the new_state_name and it will not
-            # be present in the exploration's older version.
-            if old_state_name not in old_states:
-                trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(
-                        new_state_name)
-                continue
-            old_state = old_states[old_state_name]
-            old_training_data = old_state.get_training_data()
-            new_training_data = new_state.get_training_data()
-
-            # Check if the training data and interaction_id of the state in the
-            # previous version of the exploration and the state in the new
-            # version of the exploration match. If any of them are not equal,
-            # we create a new job for the state in the current version.
-            if new_training_data == old_training_data and (
-                    new_state.interaction.id == old_state.interaction.id):
-                trainable_states_dict[
-                    'state_names_with_unchanged_answer_groups'].append(
-                        new_state_name)
-            else:
-                trainable_states_dict[
-                    'state_names_with_changed_answer_groups'].append(
-                        new_state_name)
-
-        return trainable_states_dict
-
-    def get_metadata(self) -> ExplorationMetadata:
-        """Gets the ExplorationMetadata domain object for the exploration."""
-        return ExplorationMetadata(
-            self.title, self. category, self.objective, self.language_code,
-            self.tags, self.blurb, self.author_notes,
-            self.states_schema_version, self.init_state_name,
-            self.param_specs, self.param_changes, self.auto_tts_enabled,
-            self.edits_allowed
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.customization_args = {15: ''}  # type: ignore[dict-item]
+        self._assert_validation_error(
+            exploration,
+            (
+                'Expected customization arg value to be a '
+                'InteractionCustomizationArg'
+            )
         )
 
-    @classmethod
-    def _convert_states_v41_dict_to_v42_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 41 to 42. Version 42 changes rule input types
-        for DragAndDropSortInput and ItemSelectionInput interactions to better
-        support translations. Specifically, the rule inputs will store content
-        ids of the html rather than the raw html. Solution answers for
-        DragAndDropSortInput and ItemSelectionInput interactions are also
-        updated.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.customization_args = {
+            15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item, no-untyped-call]
+                'type': 'unicode'
+            })
+        }
+        self._assert_validation_error(
+            exploration, 'Invalid customization arg name')
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+        interaction.customization_args = valid_text_input_cust_args
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        exploration.validate()
 
-        Returns:
-            dict. The converted states_dict.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.answer_groups = {}  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected answer groups to be a list')
+
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        self._assert_validation_error(
+            exploration,
+            'Terminal interactions must not have a default outcome.')
+
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        init_state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
+            exploration,
+            'Non-terminal interactions must have a default outcome.')
+
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator
+        )
+        init_state.interaction.answer_groups = answer_groups
+        self._assert_validation_error(
+            exploration,
+            'Terminal interactions must not have any answer groups.')
+
+        init_state.interaction.answer_groups = []
+        self.set_interaction_for_state(
+            init_state, 'Continue', content_id_generator)
+        init_state.interaction.answer_groups = answer_groups
+        init_state.update_interaction_default_outcome(default_outcome)
+        self._assert_validation_error(
+            exploration,
+            'Linear interactions must not have any answer groups.')
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
+        # A terminal interaction without a default outcome or answer group is
+        # valid. This resets the exploration back to a valid state.
+        init_state.interaction.answer_groups = []
+        exploration.validate()
+
+        # Restore a valid exploration.
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        init_state.update_interaction_answer_groups(answer_groups)
+        init_state.update_interaction_default_outcome(default_outcome)
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
+        exploration.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.hints = {}  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected hints to be a list')
+        interaction.hints = []
+
+        # Validate AnswerGroup.
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            1  # type: ignore[arg-type]
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
+
+        self._assert_validation_error(
+            exploration,
+            'Expected tagged skill misconception id to be None, received 1')
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received 1'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            'invalid_tagged_skill_misconception_id'
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
+
+        self._assert_validation_error(
+            exploration,
+            'Expected tagged skill misconception id to be None, received '
+            'invalid_tagged_skill_misconception_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected tagged skill misconception id to be None, received '
+            'invalid_tagged_skill_misconception_id'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        init_state.interaction.answer_groups[0].rule_specs = {}  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected answer group rules to be a list')
+
+        first_answer_group = init_state.interaction.answer_groups[0]
+        first_answer_group.tagged_skill_misconception_id = None
+        first_answer_group.rule_specs = []
+        self._assert_validation_error(
+            exploration,
+            'There must be at least one rule for each answer group.')
+        with self.assertRaisesRegex(
+            Exception,
+            'There must be at least one rule for each answer group.'
+        ):
+            exploration.init_state.validate(
+                exploration.param_specs,
+                allow_null_interaction=False,
+                tagged_skill_misconception_id_required=False)
+
+        exploration.states = {
+            exploration.init_state_name: (
+                state_domain.State.create_default_state(
+                    exploration.init_state_name,
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    is_initial_state=True))
+        }
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'TextInput',
+            content_id_generator)
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index)
+        exploration.validate()
+
+        exploration.language_code = 'fake_code'
+        self._assert_validation_error(exploration, 'Invalid language_code')
+        exploration.language_code = 'English'
+        self._assert_validation_error(exploration, 'Invalid language_code')
+        exploration.language_code = 'en'
+        exploration.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.param_specs = 'A string'  # type: ignore[assignment]
+        self._assert_validation_error(exploration, 'param_specs to be a dict')
+
+        exploration.param_specs = {
+            '@': param_domain.ParamSpec.from_dict({
+                'obj_type': 'UnicodeString'
+            })
+        }
+        self._assert_validation_error(
+            exploration, 'Only parameter names with characters')
+
+        exploration.param_specs = {
+            'notAParamSpec': param_domain.ParamSpec.from_dict(
+                {'obj_type': 'UnicodeString'})
+        }
+        exploration.validate()
+
+    def test_tag_validation(self) -> None:
+        """Test validation of exploration tags."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)
+        init_state.update_interaction_default_outcome(None)
+        exploration.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = 'this should be a list'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected \'tags\' to be a list')
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = [123]  # type: ignore[list-item]
+        self._assert_validation_error(exploration, 'to be a string')
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = ['abc', 123]  # type: ignore[list-item]
+        self._assert_validation_error(exploration, 'to be a string')
+
+        exploration.tags = ['']
+        self._assert_validation_error(exploration, 'Tags should be non-empty')
+
+        exploration.tags = ['123']
+        self._assert_validation_error(
+            exploration, 'should only contain lowercase letters and spaces')
+        exploration.tags = ['ABC']
+        self._assert_validation_error(
+            exploration, 'should only contain lowercase letters and spaces')
+
+        exploration.tags = [' a b']
+        self._assert_validation_error(
+            exploration, 'Tags should not start or end with whitespace')
+        exploration.tags = ['a b ']
+        self._assert_validation_error(
+            exploration, 'Tags should not start or end with whitespace')
+
+        exploration.tags = ['a    b']
+        self._assert_validation_error(
+            exploration, 'Adjacent whitespace in tags should be collapsed')
+
+        exploration.tags = ['abc', 'abc']
+        self._assert_validation_error(
+            exploration, 'Some tags duplicate each other')
+
+        exploration.tags = ['computer science', 'analysis', 'a b c']
+        exploration.validate()
+
+    def test_title_category_and_objective_validation(self) -> None:
+        """Test that titles, categories and objectives are validated only in
+        'strict' mode.
         """
+        self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        exploration.validate()
 
-        @overload
-        def migrate_rule_inputs_and_answers(
-            new_type: str,
-            value: str,
-            choices: List[state_domain.SubtitledHtmlDict]
-        ) -> str: ...
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'title must be specified'
+            ):
+            exploration.validate(strict=True)
+        exploration.title = 'A title'
 
-        @overload
-        def migrate_rule_inputs_and_answers(
-            new_type: str,
-            value: List[str],
-            choices: List[state_domain.SubtitledHtmlDict]
-        ) -> List[str]: ...
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'category must be specified'
+            ):
+            exploration.validate(strict=True)
+        exploration.category = 'A category'
 
-        @overload
-        def migrate_rule_inputs_and_answers(
-            new_type: str,
-            value: List[List[str]],
-            choices: List[state_domain.SubtitledHtmlDict]
-        ) -> List[List[str]]: ...
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'objective must be specified'
+            ):
+            exploration.validate(strict=True)
 
-        # Here we use MyPy ignore because MyPy expects a return value in
-        # every condition when we define a return type but here we are
-        # returning only in if-else conditions and we are not returning
-        # when none of the condition matches which causes MyPy to throw
-        # a 'Missing return statement' error. Thus to avoid the error,
-        # we used ignore here.
-        def migrate_rule_inputs_and_answers(  # type: ignore[return]
-            new_type: str,
-            value: Union[List[List[str]], List[str], str],
-            choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Union[List[List[str]], List[str], str]:
-            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
-            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
-            and DragAndDropHtmlString to TranslatableHtmlContentId. These
-            migrations are necessary to have rules work easily for multiple
-            languages; instead of comparing html for equality, we compare
-            content_ids for equality.
+        exploration.objective = 'An objective'
 
-            Args:
-                new_type: str. The type to migrate to.
-                value: *. The value to migrate.
-                choices: list(dict). The list of subtitled html dicts to extract
-                    content ids from.
+        exploration.validate(strict=True)
 
-            Returns:
-                *. The migrated rule input.
-            """
+    def test_get_trainable_states_dict(self) -> None:
+        """Test the get_trainable_states_dict() method."""
+        exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
 
-            def extract_content_id_from_choices(html: str) -> str:
-                """Given a html, find its associated content id in choices,
-                which is a list of subtitled html dicts.
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=True)
+        old_states = exp_fetchers.get_exploration_from_model(
+            exploration_model).states
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
-                Args:
-                    html: str. The html to find the content id of.
+        # Rename a state to add it in unchanged answer group.
+        exploration.rename_state('Home', 'Renamed state')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        })]
 
-                Returns:
-                    str. The content id of html.
-                """
-                for subtitled_html_dict in choices:
-                    if subtitled_html_dict['html'] == html:
-                        return subtitled_html_dict['content_id']
-                # If there is no match, we discard the rule input. The frontend
-                # will handle invalid content ids similar to how it handled
-                # non-matching html.
-                return feconf.INVALID_CONTENT_ID
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': ['Renamed state']
+        }
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        self.assertEqual(actual_dict, expected_dict)
 
-            if new_type == 'TranslatableHtmlContentId':
-                # Here 'TranslatableHtmlContentId' can only be of str type, thus
-                # to narrow down the type we used assert here.
-                assert isinstance(value, str)
-                return extract_content_id_from_choices(value)
-            elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here we use cast because this 'elif' condition forces value
-                # to have type List[str].
-                set_of_content_ids = cast(List[str], value)
-                return [
-                    migrate_rule_inputs_and_answers(
-                        'TranslatableHtmlContentId', html, choices
-                    ) for html in set_of_content_ids
-                ]
-            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here we use cast because this 'elif' condition forces value
-                # to have type List[List[str]].
-                list_of_set_of_content_ids = cast(
-                    List[List[str]], value
-                )
-                return [
-                    migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentIds', html_set, choices
-                    ) for html_set in list_of_set_of_content_ids
-                ]
+        # Modify answer groups to trigger change in answer groups.
+        state = exploration.states['Renamed state']
+        exploration.states['Renamed state'].interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[3])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Renamed state',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        })]
 
-        for state_dict in states_dict.values():
-            interaction_id = state_dict['interaction']['id']
-            if interaction_id not in [
-                    'DragAndDropSortInput', 'ItemSelectionInput']:
-                continue
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        self.assertEqual(actual_dict, expected_dict)
 
-            solution = state_dict['interaction']['solution']
-            # Here we use cast because we are narrowing down the type from
-            # various customization args value types to List[SubtitledHtmlDict]
-            # type, and this is done because here we are accessing 'choices' key
-            # over 'DragAndDropSortInput' and 'ItemSelectionInput' customization
-            # args and in these customization args 'choices' key will only have
-            # values of type List[SubtitledHtmlDict].
-            choices = cast(
-                List[state_domain.SubtitledHtmlDict],
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'
-                ]
+        # Add new state to trigger change in answer groups.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        })]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'Renamed state', 'New state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Delete state.
+        exploration.delete_state('New state')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        })]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': ['Renamed state'],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        self.assertEqual(actual_dict, expected_dict)
+
+        # Test addition and multiple renames.
+        exploration.add_states(['New state'])
+        exploration.states['New state'] = copy.deepcopy(
+            exploration.states['Renamed state'])
+        exploration.rename_state('New state', 'New state2')
+        exploration.rename_state('New state2', 'New state3')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        })]
+
+        expected_dict = {
+            'state_names_with_changed_answer_groups': [
+                'Renamed state', 'New state3'
+            ],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        actual_dict = exploration.get_trainable_states_dict(
+            old_states, exp_versions_diff)
+        self.assertEqual(actual_dict, expected_dict)
+
+    def test_get_metadata(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        actual_metadata_dict = exploration.get_metadata().to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
+            'param_specs': {},
+            'param_changes': [],
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'edits_allowed': exploration.edits_allowed
+        }
+
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)
+
+    def test_get_content_with_correct_state_name_returns_html(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
-            if interaction_id == 'ItemSelectionInput':
-                # The solution type will be migrated from SetOfHtmlString to
-                # SetOfTranslatableHtmlContentIds.
-                if solution is not None:
-                    # Ruling out the possibility of any other type for MyPy type
-                    # checking because for interaction 'ItemSelectionInput',
-                    # the correct_answer is formatted as List[str] type.
-                    assert isinstance(solution['correct_answer'], list)
-                    list_of_html_contents = []
-                    for html_content in solution['correct_answer']:
-                        assert isinstance(html_content, str)
-                        list_of_html_contents.append(html_content)
-                    solution['correct_answer'] = (
-                        migrate_rule_inputs_and_answers(
-                            'SetOfTranslatableHtmlContentIds',
-                            list_of_html_contents,
-                            choices)
-                    )
-            if interaction_id == 'DragAndDropSortInput':
-                # The solution type will be migrated from ListOfSetsOfHtmlString
-                # to ListOfSetsOfTranslatableHtmlContentIds.
-                if solution is not None:
-                    # Ruling out the possibility of any other type for MyPy type
-                    # checking because for interaction 'DragAndDropSortInput',
-                    # the correct_answer is formatted as List[List[str]] type.
-                    assert isinstance(solution['correct_answer'], list)
-                    list_of_html_content_list = []
-                    for html_content_list in solution['correct_answer']:
-                        assert isinstance(html_content_list, list)
-                        list_of_html_content_list.append(html_content_list)
-                    solution['correct_answer'] = (
-                        migrate_rule_inputs_and_answers(
-                            'ListOfSetsOfTranslatableHtmlContentIds',
-                            list_of_html_content_list,
-                            choices)
-                    )
+        ]
+        init_state.update_interaction_hints(hints_list)
 
-            for answer_group_dict in state_dict['interaction']['answer_groups']:
-                for rule_spec_dict in answer_group_dict['rule_specs']:
-                    rule_type = rule_spec_dict['rule_type']
-                    rule_inputs = rule_spec_dict['inputs']
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>hint one</p>')
 
-                    if interaction_id == 'ItemSelectionInput':
-                        # All rule inputs for ItemSelectionInput will be
-                        # migrated from SetOfHtmlString to
-                        # SetOfTranslatableHtmlContentIds.
-                        # Ruling out the possibility of any other type
-                        # for MyPy type checking because for interaction
-                        # 'ItemSelectionInput', the rule inputs are formatted
-                        # as List[str] type.
-                        assert isinstance(rule_inputs['x'], list)
-                        list_of_html_contents = []
-                        for html_content in rule_inputs['x']:
-                            assert isinstance(html_content, str)
-                            list_of_html_contents.append(html_content)
-                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                            'SetOfTranslatableHtmlContentIds',
-                            list_of_html_contents,
-                            choices)
-                    if interaction_id == 'DragAndDropSortInput':
-                        rule_types_with_list_of_sets = [
-                            'IsEqualToOrdering',
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                        ]
-                        if rule_type in rule_types_with_list_of_sets:
-                            # For rule type IsEqualToOrdering and
-                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
-                            # the x input will be migrated from
-                            # ListOfSetsOfHtmlStrings to
-                            # ListOfSetsOfTranslatableHtmlContentIds.
-                            # Ruling out the possibility of any other type
-                            # for MyPy type checking because for interaction
-                            # 'DragAndDropSortInput', the rule inputs are
-                            # formatted as List[List[str]] type.
-                            assert isinstance(rule_inputs['x'], list)
-                            list_of_html_content_list = []
-                            for html_content_list in rule_inputs['x']:
-                                assert isinstance(html_content_list, list)
-                                list_of_html_content_list.append(
-                                    html_content_list
-                                )
-                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                                'ListOfSetsOfTranslatableHtmlContentIds',
-                                list_of_html_content_list,
-                                choices)
-                        elif rule_type == 'HasElementXAtPositionY':
-                            # For rule type HasElementXAtPositionY,
-                            # the x input will be migrated from
-                            # DragAndDropHtmlString to
-                            # TranslatableHtmlContentId, and the y input will
-                            # remain as DragAndDropPositiveInt.
-                            # Ruling out the possibility of any other type
-                            # for MyPy type checking because for interaction
-                            # 'HasElementXAtPositionY', the rule inputs are
-                            # formatted as str type.
-                            assert isinstance(rule_inputs['x'], str)
-                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                                'TranslatableHtmlContentId',
-                                rule_inputs['x'],
-                                choices)
-                        elif rule_type == 'HasElementXBeforeElementY':
-                            # For rule type HasElementXBeforeElementY,
-                            # the x and y inputs will be migrated from
-                            # DragAndDropHtmlString to
-                            # TranslatableHtmlContentId.
-                            for rule_input_name in ['x', 'y']:
-                                rule_input_value = rule_inputs[rule_input_name]
-                                # Ruling out the possibility of any other type
-                                # for MyPy type checking because for interaction
-                                # 'HasElementXBeforeElementY', the rule inputs
-                                # are formatted as str type.
-                                assert isinstance(rule_input_value, str)
-                                rule_inputs[rule_input_name] = (
-                                    migrate_rule_inputs_and_answers(
-                                        'TranslatableHtmlContentId',
-                                        rule_input_value,
-                                        choices))
+        hints_list[0].hint_content.html = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
 
-        return states_dict
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>Changed hint one</p>')
 
-    @classmethod
-    def _convert_states_v42_dict_to_v43_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 42 to 43. Version 43 adds a new customization
-        arg to NumericExpressionInput, AlgebraicExpressionInput, and
-        MathEquationInput. The customization arg will allow creators to choose
-        whether to render the division sign (÷) instead of a fraction for the
-        division operation.
+    def test_get_content_with_incorrect_state_name_raise_error(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+        self.assertEqual(
+            exploration.get_content_html(exploration.init_state_name, 'hint_1'),
+            '<p>hint one</p>')
 
-        Returns:
-            dict. The converted states_dict.
+        with self.assertRaisesRegex(
+            ValueError, 'State Invalid state does not exist'):
+            exploration.get_content_html('Invalid state', 'hint_1')
+
+    def test_is_demo_property(self) -> None:
+        """Test the is_demo property."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(demo.is_demo, True)
+
+        notdemo1 = exp_domain.Exploration.create_default_exploration('a')
+        self.assertEqual(notdemo1.is_demo, False)
+
+        notdemo2 = exp_domain.Exploration.create_default_exploration('abcd')
+        self.assertEqual(notdemo2.is_demo, False)
+
+    def test_has_state_name(self) -> None:
+        """Test for has_state_name."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        state_names = list(demo.states.keys())
+        self.assertEqual(state_names, ['Introduction'])
+        self.assertEqual(demo.has_state_name('Introduction'), True)
+        self.assertEqual(demo.has_state_name('Fake state name'), False)
+
+    def test_get_interaction_id_by_state_name(self) -> None:
+        """Test for get_interaction_id_by_state_name."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            demo.get_interaction_id_by_state_name('Introduction'), None)
+
+    def test_exploration_export_import(self) -> None:
+        """Test that to_dict and from_dict preserve all data within an
+        exploration.
         """
-        for state_dict in states_dict.values():
-            interaction_id = state_dict['interaction']['id']
-            if interaction_id not in [
-                    'NumericExpressionInput', 'AlgebraicExpressionInput',
-                    'MathEquationInput']:
-                continue
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        demo_dict = demo.to_dict()
+        exp_from_dict = exp_domain.Exploration.from_dict(demo_dict)
+        self.assertEqual(exp_from_dict.to_dict(), demo_dict)
 
-            customization_args = state_dict['interaction']['customization_args']
-            customization_args.update({
-                'useFractionForDivision': {
+    def test_interaction_with_none_id_is_not_terminal(self) -> None:
+        """Test that an interaction with an id of None leads to is_terminal
+        being false.
+        """
+        # Default exploration has a default interaction with an ID of None.
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
+        self.assertFalse(init_state.interaction.is_terminal)
+
+    def test_cannot_create_demo_exp_with_invalid_param_changes(self) -> None:
+        demo_exp = exp_domain.Exploration.create_default_exploration('0')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            demo_exp.next_content_id_index
+        )
+        demo_dict = demo_exp.to_dict()
+        new_state = state_domain.State.create_default_state(
+            'new_state_name',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ))
+        new_state.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        })]
+
+        demo_dict['states']['new_state_name'] = new_state.to_dict()
+        demo_dict['param_specs'] = {
+            'ParamSpec': {'obj_type': 'UnicodeString'}
+        }
+        with self.assertRaisesRegex(
+            Exception,
+            'Parameter myParam was used in a state but not '
+            'declared in the exploration param_specs.'):
+            exp_domain.Exploration.from_dict(demo_dict)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_category(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.category = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected category to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_objective(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.objective = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected objective to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_blurb(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.blurb = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected blurb to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_language_code(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.language_code = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected language_code to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_author_notes(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.author_notes = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected author_notes to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_states(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.states = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected states to be a dict, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_outcome_dest(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
+        exploration.init_state.interaction.default_outcome.dest = None
+        with self.assertRaisesRegex(
+            Exception, 'Every outcome should have a destination.'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_outcome_dest_type(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
+        exploration.init_state.interaction.default_outcome.dest = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected outcome dest to be a string, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_states_schema_version(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.states_schema_version = None  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'This exploration has no states schema version.'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_auto_tts_enabled(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.auto_tts_enabled = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_next_content_id_index(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.next_content_id_index = '5'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected next_content_id_index to be an int, received 5'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_edits_allowed(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.edits_allowed = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected edits_allowed to be a bool, received 1'):
+            exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validate_exploration_param_specs(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_specs = {
+            1: param_domain.ParamSpec.from_dict(  # type: ignore[dict-item]
+                {'obj_type': 'UnicodeString'})
+        }
+        with self.assertRaisesRegex(
+            Exception, 'Expected parameter name to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_param_changes_type(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+        exploration.param_changes = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected param_changes to be a list, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_param_name(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'invalid',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegex(
+            Exception,
+            'No parameter named \'invalid\' exists in this '
+            'exploration'):
+            exploration.validate()
+
+    def test_validate_exploration_reserved_param_name(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'all',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegex(
+            Exception,
+            'The exploration-level parameter with name \'all\' is '
+            'reserved. Please choose a different name.'):
+            exploration.validate()
+
+    def test_validate_exploration_is_non_self_loop(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.add_states(['DEF'])
+
+        default_outcome = state_domain.Outcome(
+            'DEF', None, state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], 'refresher_exploration_id', None,
+        )
+        exploration.init_state.update_interaction_default_outcome(
+            default_outcome
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The default outcome for state Introduction has a refresher '
+            'exploration ID, but is not a self-loop.'):
+            exploration.validate()
+
+    def test_validate_exploration_answer_group_parameter(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        param_changes = [param_domain.ParamChange(
+            'ParamChange', 'RandomSelector', {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            }
+        )]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, param_changes, None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
+        exploration.init_state.update_interaction_answer_groups(
+            [state_answer_group])
+        with self.assertRaisesRegex(
+            Exception,
+            'The parameter ParamChange was used in an answer group, '
+            'but it does not exist in this exploration'):
+            exploration.validate()
+
+    def test_verify_all_states_reachable(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        exploration.validate()
+
+        exploration.add_states(['End', 'Stuck State'])
+        end_state = exploration.states['End']
+        init_state = exploration.states['Introduction']
+        stuck_state = exploration.states['Stuck State']
+        state_default_outcome = state_domain.Outcome(
+            'Introduction', 'Stuck State', state_domain.SubtitledHtml(
+                'default_outcome_1', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(state_default_outcome)
+        self.set_interaction_for_state(
+          stuck_state, 'TextInput', content_id_generator)
+        self.set_interaction_for_state(
+          end_state, 'EndExploration', content_id_generator)
+        end_state.update_interaction_default_outcome(None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Please fix the following issues before saving this exploration: '
+            '1. The following states are not reachable from the initial state: '
+            'End 2. It is impossible to complete the exploration from the '
+            'following states: Introduction, Stuck State'):
+            exploration.validate(strict=True)
+
+    def test_update_init_state_name_with_invalid_state(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        exploration.update_init_state_name('End')
+        self.assertEqual(exploration.init_state_name, 'End')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid new initial state name: invalid_state;'):
+            exploration.update_init_state_name('invalid_state')
+
+    def test_rename_state_with_invalid_state(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        self.assertTrue(exploration.states.get('End'))
+        self.assertFalse(exploration.states.get('new state name'))
+
+        exploration.rename_state('End', 'new state name')
+        self.assertFalse(exploration.states.get('End'))
+        self.assertTrue(exploration.states.get('new state name'))
+
+        with self.assertRaisesRegex(
+            Exception, 'State invalid_state does not exist'):
+            exploration.rename_state('invalid_state', 'new state name')
+
+    def test_default_outcome_is_labelled_incorrect_for_self_loop(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+        exploration.validate(strict=True)
+        # Ruling out the possibility of None for mypy type checking.
+        assert (
+            exploration.init_state.interaction.default_outcome is not None
+        )
+
+        (
+            exploration.init_state.interaction.default_outcome
+            .labelled_as_correct) = True
+
+        (
+            exploration.init_state.interaction.default_outcome
+            .dest) = exploration.init_state_name
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The default outcome for state Introduction is labelled '
+            'correct but is a self-loop'):
+            exploration.validate(strict=True)
+
+    def test_serialize_and_deserialize_returns_unchanged_exploration(
+        self
+    ) -> None:
+        """Checks that serializing and then deserializing a default exploration
+        works as intended by leaving the exploration unchanged.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        self.assertEqual(
+            exploration.to_dict(),
+            exp_domain.Exploration.deserialize(
+                exploration.serialize()).to_dict())
+
+    def test_get_all_translatable_content_for_exp(self) -> None:
+        """Get all translatable fields from exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_content_dict: state_domain.SubtitledHtmlDict = {
+            'content_id': 'content_0',
+            'html': '<p>state content html</p>'
+        }
+        state_answer_group = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }})
+            ],
+            [],
+            None
+        )]
+        state_default_outcome = state_domain.Outcome(
+            'State1', None, state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for State1</p>'),
+            False, [], None, None
+        )
+        state_hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
+        state_solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
+        ] = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
+        }
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict(state_content_dict))
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        state.update_interaction_answer_groups(
+            state_answer_group)
+        state.update_interaction_default_outcome(state_default_outcome)
+        state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, state_solution_dict)
+        state.update_interaction_solution(solution)
+        translatable_contents = [
+            translatable_content.content_value
+            for translatable_content in
+            exploration.get_all_contents_which_need_translations(
+                self.dummy_entity_translations).values()
+        ]
+
+        self.assertItemsEqual(
+            translatable_contents,
+            [
+                '<p>state outcome html</p>',
+                '<p>Default outcome for State1</p>',
+                '<p>Hello, this is html1 for state1</p>',
+                ['Test'],
+                '<p>Hello, this is html2 for state1</p>',
+                '<p>This is solution for state1</p>',
+                '<p>state content html</p>'
+            ])
+
+
+class ExplorationSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        self.exp_summary = exp_fetchers.get_exploration_summary_by_id('eid')
+        self.exp_summary.editor_ids = ['editor_id']
+        self.exp_summary.voice_artist_ids = ['voice_artist_id']
+        self.exp_summary.viewer_ids = ['viewer_id']
+        self.exp_summary.contributor_ids = ['contributor_id']
+
+    def test_validation_passes_with_valid_properties(self) -> None:
+        self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_title(self) -> None:
+        self.exp_summary.title = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected title to be a string, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_category(self) -> None:
+        self.exp_summary.category = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected category to be a string, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_objective(self) -> None:
+        self.exp_summary.objective = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected objective to be a string, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_language_code(self) -> None:
+        self.exp_summary.language_code = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected language_code to be a string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self) -> None:
+        self.exp_summary.language_code = 'invalid'
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code: invalid'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_tags(self) -> None:
+        self.exp_summary.tags = 'tags'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected \'tags\' to be a list, received tags'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_tag_in_tags(self) -> None:
+        self.exp_summary.tags = ['tag', 2]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each tag in \'tags\' to be a string, received \'2\''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_empty_tag_in_tags(self) -> None:
+        self.exp_summary.tags = ['', 'abc']
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Tags should be non-empty'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
+        self.exp_summary.tags = ['123', 'abc']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\'')):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
+        self.exp_summary.tags = [' ab', 'abc']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \' ab\''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
+        self.exp_summary.tags = ['ab ', 'abc']
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \'ab \''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
+        self.exp_summary.tags = ['a   b', 'abc']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Adjacent whitespace in tags should '
+                'be collapsed, received \'a   b\'')):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_duplicate_tags(self) -> None:
+        self.exp_summary.tags = ['abc', 'abc', 'ab']
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Some tags duplicate each other'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_rating_type(self) -> None:
+        self.exp_summary.ratings = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected ratings to be a dict, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_rating_keys(self) -> None:
+        self.exp_summary.ratings = {'1': 0, '10': 1}
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_value_type_for_ratings(self) -> None:
+        self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}  # type: ignore[dict-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected value to be int, received one'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_value_for_ratings(self) -> None:
+        self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected value to be non-negative, received -1'):
+            self.exp_summary.validate()
+
+    def test_validation_passes_with_int_scaled_average_rating(self) -> None:
+        self.exp_summary.scaled_average_rating = 1
+        self.exp_summary.validate()
+        self.assertEqual(self.exp_summary.scaled_average_rating, 1)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_scaled_average_rating(self) -> None:
+        self.exp_summary.scaled_average_rating = 'one'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected scaled_average_rating to be float, received one'
+        ):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_status(self) -> None:
+        self.exp_summary.status = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected status to be string, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_community_owned(self) -> None:
+        self.exp_summary.community_owned = '1'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected community_owned to be bool, received 1'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_contributors_summary(self) -> None:
+        self.exp_summary.contributors_summary = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected contributors_summary to be dict, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_owner_ids_type(self) -> None:
+        self.exp_summary.owner_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected owner_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self) -> None:
+        self.exp_summary.owner_ids = ['1', 2, '3']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each id in owner_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_editor_ids_type(self) -> None:
+        self.exp_summary.editor_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected editor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_editor_id_in_editor_ids(
+        self
+    ) -> None:
+        self.exp_summary.editor_ids = ['1', 2, '3']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each id in editor_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_voice_artist_ids_type(self) -> None:
+        self.exp_summary.voice_artist_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected voice_artist_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
+        self
+    ) -> None:
+        self.exp_summary.voice_artist_ids = ['1', 2, '3']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each id in voice_artist_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_viewer_ids_type(self) -> None:
+        self.exp_summary.viewer_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected viewer_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(
+        self
+    ) -> None:
+        self.exp_summary.viewer_ids = ['1', 2, '3']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each id in viewer_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_duplicate_user_role(self) -> None:
+        self.exp_summary.owner_ids = ['1']
+        self.exp_summary.editor_ids = ['2', '3']
+        self.exp_summary.voice_artist_ids = ['4']
+        self.exp_summary.viewer_ids = ['2']
+        with self.assertRaisesRegex(
+            utils.ValidationError, (
+                'Users should not be assigned to multiple roles at once, '
+                'received users: 1, 2, 3, 4, 2')
+        ):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_contributor_ids_type(self) -> None:
+        self.exp_summary.contributor_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected contributor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
+        self
+    ) -> None:
+        self.exp_summary.contributor_ids = ['1', 2, '3']  # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each id in contributor_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_is_private(self) -> None:
+        self.assertTrue(self.exp_summary.is_private())
+        self.exp_summary.status = constants.ACTIVITY_STATUS_PUBLIC
+        self.assertFalse(self.exp_summary.is_private())
+
+    def test_is_solely_owned_by_user_one_owner(self) -> None:
+        self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+        self.exp_summary.owner_ids = ['other_id']
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.assertTrue(self.exp_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_multiple_owners(self) -> None:
+        self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+        self.exp_summary.owner_ids = [self.owner_id, 'other_id']
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_other_users(self) -> None:
+        self.assertFalse(self.exp_summary.is_solely_owned_by_user('editor_id'))
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user('voice_artist_id'))
+        self.assertFalse(self.exp_summary.is_solely_owned_by_user('viewer_id'))
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user('contributor_id'))
+
+    def test_add_new_contribution_for_user_adds_user_to_contributors(
+        self
+    ) -> None:
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 1)
+        self.assertIn('user_id', self.exp_summary.contributor_ids)
+
+    def test_add_new_contribution_for_user_increases_score_in_contributors(
+        self
+    ) -> None:
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 2)
+
+    def test_add_new_contribution_for_user_does_not_add_system_user(
+        self
+    ) -> None:
+        self.exp_summary.add_contribution_by_user(
+            feconf.SYSTEM_COMMITTER_ID)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributors_summary)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids)
+
+
+class YamlCreationUnitTests(test_utils.GenericTestBase):
+    """Test creation of explorations from YAML files."""
+
+    SAMPLE_YAML_CONTENT: str = (
+        """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: %s
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  New state:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_2
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_3
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_2: {}
+        default_outcome_3: {}
+    solicit_answer_details: false
+states_schema_version: %d
+tags: []
+title: Title
+version: 0
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+    YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 10000
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 10000
+tags: []
+title: Title
+""")
+
+    EXP_ID: Final = 'An exploration_id'
+
+    def test_creation_with_invalid_yaml_schema_version(self) -> None:
+        """Test that a schema version that is too big is detected."""
+        with self.assertRaisesRegex(
+            Exception,
+            'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
+            'at present.'):
+            exp_domain.Exploration.from_yaml(
+                'bad_exp', self.YAML_CONTENT_INVALID_SCHEMA_VERSION)
+
+    def test_yaml_import_and_export(self) -> None:
+        """Test the from_yaml() and to_yaml() methods."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='Title', category='Category')
+        exploration.add_states(['New state'])
+        self.assertEqual(len(exploration.states), 2)
+
+        exploration.validate()
+
+        yaml_content = exploration.to_yaml()
+        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
+
+        exploration2 = exp_domain.Exploration.from_yaml('exp2', yaml_content)
+        self.assertEqual(len(exploration2.states), 2)
+        yaml_content_2 = exploration2.to_yaml()
+        self.assertEqual(yaml_content_2, yaml_content)
+
+        with self.assertRaisesRegex(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
+            exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
+            exp_domain.Exploration.from_yaml(
+                'exp4', 'Invalid\ninit_state_name:\nMore stuff')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
+            exp_domain.Exploration.from_yaml(
+                'exp4', 'State1:\n(\nInvalid yaml')
+
+
+class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
+    """Tests the presence of appropriate schema migration methods in the
+    Exploration domain object class.
+    """
+
+    def test_correct_states_schema_conversion_methods_exist(self) -> None:
+        """Test that the right states schema conversion methods exist."""
+        current_states_schema_version = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        for version_num in range(
+                feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
+                current_states_schema_version):
+            self.assertTrue(hasattr(
+                exp_domain.Exploration,
+                '_convert_states_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            exp_domain.Exploration,
+            '_convert_states_v%s_dict_to_v%s_dict' % (
+                current_states_schema_version,
+                current_states_schema_version + 1)))
+
+    def test_correct_exploration_schema_conversion_methods_exist(self) -> None:
+        """Test that the right exploration schema conversion methods exist."""
+        current_exp_schema_version = (
+            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+
+        for version_num in range(
+                exp_domain.Exploration.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
+                current_exp_schema_version):
+            self.assertTrue(hasattr(
+                exp_domain.Exploration,
+                '_convert_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            exp_domain.Exploration,
+            '_convert_v%s_dict_to_v%s_dict' % (
+                current_exp_schema_version, current_exp_schema_version + 1)))
+
+
+class SchemaMigrationUnitTests(test_utils.GenericTestBase):
+    """Test migration methods for yaml content."""
+
+    YAML_CONTENT_V46: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V47: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V48: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 48
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 43
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V49: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 49
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 44
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V50: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 45
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V51: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 51
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 46
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V52: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 52
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 47
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V53: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 48
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V54: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 54
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 49
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V55: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 55
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 50
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V56: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 56
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 51
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V58: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 58
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 53
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V59: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+        catchMisspellings:
+          value: false
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 55
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V59
+
+    def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
+        """Tests the migration of ItemSelectionInput rule inputs."""
+        sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 1</p>
+            - <p>Choice 2</p>
+            - <p>Choice Invalid</p>
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>Choice 1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+next_content_id_index: 7
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_4
+            - ca_choices_5
+            - invalid_content_id
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_5
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 3
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - ca_choices_4
+        explanation:
+          content_id: solution_3
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
+    solicit_answer_details: false
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_6
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_6: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: Title
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_load_from_v46_with_drag_and_drop_sort_input_interaction(
+        self
+    ) -> None:
+        """Tests the migration of DragAndDropSortInput rule inputs."""
+        sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+              - <p>Choice 2</p>
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: <p>Choice 1</p>
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: <p>Choice 1</p>
+            y: <p>Choice 2</p>
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - <p>Choice 1</p>
+          - <p>Choice 2</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+next_content_id_index: 7
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_4
+              - ca_choices_5
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_4
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_4
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: ca_choices_4
+            y: ca_choices_5
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_5
+            html: <p>Choice 2</p>
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_4
+          - ca_choices_5
+        explanation:
+          content_id: solution_3
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
+    solicit_answer_details: false
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_6
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_6: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: Title
+version: 0
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_load_from_v46_with_invalid_unicode_written_translations(
+        self
+    ) -> None:
+        """Tests the migration of unicode written translations rule inputs."""
+        sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText:
+          bn:
+            data_format: html
+            needs_update: false
+            translation: <p>hello</p>
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Continue
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_3: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: Title
+version: 0
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_fixing_invalid_labeled_as_correct_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests if the answer group's destination is state itself then
+        `labelled_as_correct` should be false. Migrates the invalid data.
+        """
+
+        sample_yaml_content_for_lab_as_correct: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>fdfdf</p>
+          labelled_as_correct: true
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_2: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content:
+          hi:
+            data_format: html
+            translation:
+            - <p>choicewa</p>
+            needs_update: false
+        default_outcome: {}
+        feedback_2: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_lab_as_correct: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>fdfdf</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_3: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_lab_as_correct)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_lab_as_correct)
+
+    def test_fixing_of_rte_content_by_migrating_to_v_58(
+        self
+    ) -> None:
+        """Tests the fixing of RTE content data from version less than 58."""
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_rte: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quotLink;&amp;quot;" url-with-value="&amp;quot;mailto:example@example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;http://www.google.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link url-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-math></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value=""></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-skillreview text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="5" start-with-value="10" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0" start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="&amp;quot;&amp;quot;" end-with-value="&amp;quot;&amp;quot;" start-with-value="&amp;quot;&amp;quot;" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\\"&amp;quot;&amp;quot;\\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-tabs&amp;gt;&amp;lt;/oppia-noninteractive-tabs&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\\&amp;quot;\\&amp;quot; autoplay-with-value=\\&amp;quot;true\\&amp;quot; end-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; ng-version=\\&amp;quot;11.2.14\\&amp;quot; start-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; video_id-with-value=\\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value=\"&amp;quot;&amp;quot;\" heading-with-value=\"&amp;quot;heading&amp;quot;\"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-image filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-noninteractive-collapsible&amp;gt;&amp;lt;/oppia-noninteractive-collapsible&amp;gt;&amp;quot;}]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value=\"[]\"></oppia-noninteractive-tabs>
+        <oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+        {&amp;quot;content&amp;quot;: &amp;quot;&amp;quot;,
+        &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+        &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+        #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            translation: '<p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>'
+            needs_update: false
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+# pylint: disable=anomalous-backslash-in-string
+        latest_sample_yaml_content_for_rte: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: '<p>Content of RTE</p>
+
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Google&amp;quot;" url-with-value="&amp;quot;https://www.google.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;Link value&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-link text-with-value="&amp;quot;https://www.example.com&amp;quot;"
+        url-with-value="&amp;quot;https://www.example.com&amp;quot;"></oppia-noninteractive-link>
+        <oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220923_043725_4riv8t66q8_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}"></oppia-noninteractive-math>
+        <oppia-noninteractive-skillreview skill_id-with-value="&amp;quot;skill id&amp;quot;"
+        text-with-value="&amp;quot;concept card&amp;quot;"></oppia-noninteractive-skillreview>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>
+        <oppia-noninteractive-video autoplay-with-value="false" end-with-value="0"
+        start-with-value="0" video_id-with-value="&amp;quot;mhlEfHv-LHo&amp;quot;"></oppia-noninteractive-video>   <oppia-noninteractive-collapsible
+        content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have opened the collapsible
+        block.&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-video _nghost-ovd-c35=\&amp;quot;\&amp;quot;
+        autoplay-with-value=\&amp;quot;true\&amp;quot; end-with-value=\&amp;quot;0\&amp;quot;
+        ng-version=\&amp;quot;11.2.14\&amp;quot; start-with-value=\&amp;quot;0\&amp;quot;
+        video_id-with-value=\&amp;quot;&amp;amp;amp;quot;hfnv-dfbv5h&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-video&amp;gt;&amp;quot;"
+        heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>
+        <oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;You
+        have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;heading&amp;quot;"></oppia-noninteractive-collapsible>     <oppia-noninteractive-tabs
+        tab_contents-with-value="[{&amp;quot;title&amp;quot;: &amp;quot;Title1&amp;quot;,
+        &amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},
+        {&amp;quot;title&amp;quot;: &amp;quot;Title2&amp;quot;, &amp;quot;content&amp;quot;:
+        &amp;quot;&amp;lt;p&amp;gt;Content2&amp;lt;/p&amp;gt;&amp;lt;oppia-noninteractive-image
+        alt-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot;
+        filepath-with-value=\&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>     '
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_3: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_rte)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_rte)
+
+    def test_fixing_invalid_continue_and_end_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid continue and end exploration data
+        from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_cont_and_end_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_cont_and_end_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_3: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac_1)
+
+        sample_yaml_content_for_cont_and_end_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: hi
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_0
+            unicode_str: Continueeeeeeeeeeeeeeeeeeeeeee
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_0: {}
+        content: {}
+        default_outcome: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+          - id4
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_cont_and_end_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: hi
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Continue and End interaction validation</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: Continue
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_3
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value:
+          - id1
+          - id2
+          - id3
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_3: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_cont_and_end_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_cont_and_end_interac_2)
+
+    def test_fixing_invalid_numeric_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid NumericInput interaction exploration
+        data from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>fdfdf</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+            {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+            place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+            is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+            #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            a: 18.0
+            b: 18.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            tol: -5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 30.0
+            b: 39.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            a: 17.0
+            b: 15.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: IsLessThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>cc</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 15.0
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: 10.0
+          rule_type: Equals
+        - inputs:
+            x: 5.0
+          rule_type: IsLessThan
+        - inputs:
+            a: 9.0
+            b: 5.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: 2.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_5
+            html: <p>cv</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: 50.0
+          rule_type: Equals
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_6
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: string
+          rule_type: IsLessThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: Equals
+        - inputs:
+            x: string
+          rule_type: IsLessThan
+        - inputs:
+            a: string
+            b: 9.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            tol: string
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            x: string
+          rule_type: IsGreaterThanOrEqualTo
+        - inputs:
+            x: string
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_7
+            html: <p>vb</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            tol: string
+            x: 60.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: string
+            b: 10.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+        - hint_content:
+            content_id: hint
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint introduction&amp;quot;},
+              {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;A noun is a person,
+              place, or thing.  A noun can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;One of these words is an animal.  Which word
+              is the noun?&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint
+              #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+        - hint_content:
+            content_id: hint_2
+            html: '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 7
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        hint: {}
+        hint_2: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        hint: {}
+        hint_2: {}
+        feedback_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+        feedback_6: {}
+        feedback_7: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_numeric_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 7
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+              &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+              can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+              &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+              of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+              &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 18.0
+          rule_type: Equals
+        - inputs:
+            x: 25.0
+          rule_type: Equals
+        - inputs:
+            tol: 5.0
+            x: 5.0
+          rule_type: IsWithinTolerance
+        - inputs:
+            a: 30.0
+            b: 39.0
+          rule_type: IsInclusivelyBetween
+        - inputs:
+            a: 15.0
+            b: 17.0
+          rule_type: IsInclusivelyBetween
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 25.0
+          rule_type: IsLessThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>cv</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 40.0
+          rule_type: IsGreaterThanOrEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_5
+          html: '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:
+            &amp;quot;&amp;lt;p&amp;gt;A noun is a person, place, or thing.  A noun
+            can also be an animal.  &amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;:
+            &amp;quot;Hint #1&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;One
+            of these words is an animal.  Which word is the noun?&amp;lt;/p&amp;gt;&amp;quot;,
+            &amp;quot;title&amp;quot;: &amp;quot;Hint #2&amp;quot;}]"></oppia-noninteractive-tabs>'
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        hint_5: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_6
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_6: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_numeric_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_numeric_interac)
+
+    def test_fixing_invalid_fraction_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid FractionInput interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_9
+            html: <p>dfd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_10
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 14
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_11
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 7
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_12
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: HasFractionalPartExactlyEqualTo
+        - inputs:
+            x: string
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_13
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 19
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_8: {}
+        feedback_9: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_13: {}
+        feedback_8: {}
+        feedback_9: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 8
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsGreaterThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>hj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 11
+              wholeNumber: 0
+          rule_type: IsLessThan
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_5
+            html: <p>ll</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: HasDenominatorEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_6
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        feedback_4: {}
+        feedback_5: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_7
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_7: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac)
+
+        sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 3
+              isNegative: false
+              numerator: 17
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        - inputs:
+            f:
+              denominator: 17
+              isNegative: false
+              numerator: 3
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: false
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_7
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 14
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_customPlaceholder_7: {}
+        content: {}
+        default_outcome: {}
+        feedback_10: {}
+        feedback_11: {}
+        feedback_12: {}
+        feedback_8: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_fraction_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 5
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>jj</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 17
+              isNegative: false
+              numerator: 3
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: false
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value:
+            content_id: ca_customPlaceholder_3
+            unicode_str: ''
+        requireSimplestForm:
+          value: false
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_customPlaceholder_3: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_4
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_4: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_fraction_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_fraction_interac_2)
+
+    def test_fixing_invalid_multiple_choice_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid MultipleChoice interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_17
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_18
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_19
+            html: <p>aa</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_13
+            html: ''
+          - content_id: ca_choices_14
+            html: ''
+          - content_id: ca_choices_15
+            html: <p>1</p>
+          - content_id: ca_choices_16
+            html: <p>1</p>
+          - content_id: ca_choices_17
+            html: <p>Choice 2</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 20
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_13:
+          hi:
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            file_size_bytes: 37198
+            needs_update: false
+            duration_secs: 2.324875
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_13:
+          hi:
+            data_format: html
+            translation: <p>choicewa</p>
+            needs_update: false
+        ca_choices_14: {}
+        ca_choices_15: {}
+        ca_choices_16: {}
+        ca_choices_17: {}
+        content: {}
+        default_outcome: {}
+        feedback_17: {}
+        feedback_18: {}
+        feedback_19: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_multiple_choice_interac: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 8
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_5
+            html: <p>1</p>
+          - content_id: ca_choices_6
+            html: <p>Choice 2</p>
+        showChoicesInShuffledOrder:
+          value: true
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4:
+          hi:
+            duration_secs: 2.324875
+            file_size_bytes: 37198
+            filename: default_outcome-hi-en-7hl9iw3az8.mp3
+            needs_update: true
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_7
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_7: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_multiple_choice_interac)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_multiple_choice_interac)
+
+    def test_fixing_invalid_item_selec_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid ItemSelection interaction exploration
+        data from version less than 58.
+        """
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        sample_yaml_content_for_item_selection_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: ContainsAtLeastOneOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+            - ca_choices_22
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_21
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 3
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - ca_choices_20
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+# pylint: disable=single-line-pragma
+# pylint: disable=line-too-long
+        latest_sample_yaml_content_for_item_selection_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 10
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_5
+            - ca_choices_6
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_5
+          rule_type: ContainsAtLeastOneOf
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_5
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_5
+            - ca_choices_6
+            - ca_choices_7
+            - ca_choices_8
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_5
+            html: <p>1</p>
+          - content_id: ca_choices_6
+            html: <p>2<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;img_20220923_043536_g7mr3k59oa_height_374_width_490.svg&amp;quot;"></oppia-noninteractive-image></p>
+          - content_id: ca_choices_7
+            html: <p>3</p>
+          - content_id: ca_choices_8
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - ca_choices_5
+        explanation:
+          content_id: solution_4
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        ca_choices_8: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+        solution_4: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_9
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_9: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_1)
+
+        sample_yaml_content_for_item_selection_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_26
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_22
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_27
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>  </p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - ca_choices_23
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 28
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        solution: {}
+        feedback_24: {}
+        feedback_25: {}
+        feedback_26: {}
+        feedback_27: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+version: 0
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 7
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>gg</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_5
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_3
+          rule_type: Equals
+        - inputs:
+            x:
+            - ca_choices_4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_3
+            html: <p>1</p>
+          - content_id: ca_choices_4
+            html: <p>2</p>
+          - content_id: ca_choices_5
+            html: <p>3</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_6
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_6: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_2)
+
+        sample_yaml_content_for_item_selection_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_23
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_25
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+            - ca_choices_21
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+          - content_id: ca_choices_22
+            html: <p>3</p>
+          - content_id: ca_choices_23
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        ca_choices_22: {}
+        ca_choices_23: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+        feedback_25: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+version: 0
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 8
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_3
+            - ca_choices_4
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_3
+            html: <p>1</p>
+          - content_id: ca_choices_4
+            html: <p>2</p>
+          - content_id: ca_choices_5
+            html: <p>3</p>
+          - content_id: ca_choices_6
+            html: <p>4</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_7
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_7: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_3)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_3)
+
+        sample_yaml_content_for_item_selection_interac_4: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_24
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_20
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_20
+            html: <p>1</p>
+          - content_id: ca_choices_21
+            html: <p>2</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 3
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 26
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_20: {}
+        ca_choices_21: {}
+        content: {}
+        default_outcome: {}
+        feedback_24: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+version: 0
+""")
+
+        latest_sample_yaml_content_for_item_selection_interac_4: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 6
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: <p>dff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_3
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_3
+            html: <p>1</p>
+          - content_id: ca_choices_4
+            html: <p>2</p>
+        maxAllowableSelectionCount:
+          value: 4
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_5
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_5: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_item_selection_interac_4)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_item_selection_interac_4)
+
+    def test_fixing_invalid_drag_and_drop_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid DragAndDrop interaction exploration
+        data from version less than 58.
+        """
+
+        sample_yaml_content_for_drag_and_drop_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_30
+            html: <p>as</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_26
+              - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_31
+            html: <p>ff</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_32
+            html: <p>a</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: []
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_26
+            - []
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_30: {}
+        feedback_31: {}
+        feedback_32: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 9
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_5
+            y: 2
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_7
+            - - ca_choices_6
+            - - ca_choices_5
+            - - ca_choices_4
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_3
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: ca_choices_5
+            y: 4
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: false
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>1</p>
+          - content_id: ca_choices_5
+            html: <p>2</p>
+          - content_id: ca_choices_6
+            html: <p>3</p>
+          - content_id: ca_choices_7
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        ca_choices_7: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        feedback_3: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_8
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_8: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_1)
+
+        sample_yaml_content_for_drag_and_drop_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_28
+            - - ca_choices_27
+            - - ca_choices_26
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_27
+              - ca_choices_28
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_27
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_29
+              - ca_choices_27
+              - ca_choices_28
+              - ca_choices_26
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p>1</p>
+          - content_id: ca_choices_27
+            html: <p>2</p>
+          - content_id: ca_choices_28
+            html: <p>3</p>
+          - content_id: ca_choices_29
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 8
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_6
+              - ca_choices_5
+            - - ca_choices_4
+            - - ca_choices_3
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_3
+            - - ca_choices_4
+            - - ca_choices_5
+            - - ca_choices_6
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_4
+            y: 4
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x:
+            - - ca_choices_6
+              - ca_choices_4
+              - ca_choices_5
+              - ca_choices_3
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_3
+            html: <p>1</p>
+          - content_id: ca_choices_4
+            html: <p>2</p>
+          - content_id: ca_choices_5
+            html: <p>3</p>
+          - content_id: ca_choices_6
+            html: <p>4</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_3: {}
+        ca_choices_4: {}
+        ca_choices_5: {}
+        ca_choices_6: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_7
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_7: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_2)
+
+        sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 57
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_33
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_26
+            - - ca_choices_27
+            - - ca_choices_28
+            - - ca_choices_29
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_29
+            - - ca_choices_27
+              - ca_choices_28
+            - - ca_choices_26
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x: ca_choices_28
+            y: ca_choices_26
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_26
+            y: ca_choices_28
+          rule_type: HasElementXBeforeElementY
+        - inputs:
+            x: ca_choices_27
+            y: 2
+          rule_type: HasElementXAtPositionY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_26
+            html: <p></p>
+          - content_id: ca_choices_27
+            html: <p>  </p>
+          - content_id: ca_choices_28
+            html: <p>1</p>
+          - content_id: ca_choices_29
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_29
+        - - ca_choices_27
+          - ca_choices_28
+        - - ca_choices_26
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 34
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_26: {}
+        ca_choices_27: {}
+        ca_choices_28: {}
+        ca_choices_29: {}
+        content: {}
+        solution: {}
+        default_outcome: {}
+        feedback_33: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+version: 0
+""")
+
+        latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 7
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_4
+            - - ca_choices_5
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x:
+            - - ca_choices_5
+            - - ca_choices_4
+          rule_type: IsEqualToOrdering
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_4
+            html: <p>1</p>
+          - content_id: ca_choices_5
+            html: <p>2</p>
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_5
+        - - ca_choices_4
+        explanation:
+          content_id: solution_3
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_4: {}
+        ca_choices_5: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        solution_3: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_6
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_6: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_drag_and_drop_interac_3)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_drag_and_drop_interac_3)
+
+    def test_fixing_invalid_text_exp_data_by_migrating_to_v58(
+        self
+    ) -> None:
+        """Tests the migration of invalid TextInput interaction exploration
+        data from version less than 58.
+        """
+        sample_yaml_content_for_text_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_37
+              normalizedStrSet:
+              - Draganddrop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_38
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_39
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_40
+              normalizedStrSet:
+              - zebra
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_41
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_42
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_43
+              normalizedStrSet:
+              - hello
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_44
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_45
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        - inputs:
+            x:
+              contentId: rule_input_46
+              normalizedStrSet:
+              - abcd
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_47
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_48
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_49
+              normalizedStrSet:
+              - dogs
+          rule_type: Equals
+        - inputs:
+            x:
+              contentId: rule_input_50
+              normalizedStrSet:
+              - beautiful
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_48
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_51
+              normalizedStrSet:
+              - doggies
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 15
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        feedback_48: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
+        rule_input_50: {}
+        rule_input_51: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        feedback_38: {}
+        feedback_41: {}
+        feedback_44: {}
+        feedback_47: {}
+        feedback_48: {}
+        rule_input_36: {}
+        rule_input_37: {}
+        rule_input_39: {}
+        rule_input_40: {}
+        rule_input_42: {}
+        rule_input_43: {}
+        rule_input_45: {}
+        rule_input_46: {}
+        rule_input_48: {}
+        rule_input_49: {}
+        rule_input_50: {}
+        rule_input_51: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_text_interac_1: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 15
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_4
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_5
+              normalizedStrSet:
+              - ze
+          rule_type: StartsWith
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_6
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_7
+              normalizedStrSet:
+              - he
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_8
+            html: <p>ssd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_9
+              normalizedStrSet:
+              - abc
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
+          dest: Introduction
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_10
+            html: <p>sd</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_11
+              normalizedStrSet:
+              - dog
+          rule_type: StartsWith
+        - inputs:
+            x:
+              contentId: rule_input_12
+              normalizedStrSet:
+              - beautiful
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        catchMisspellings:
+          value: false
+        placeholder:
+          value:
+            content_id: ca_placeholder_13
+            unicode_str: ''
+        rows:
+          value: 10
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_13: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_10: {}
+        feedback_2: {}
+        feedback_4: {}
+        feedback_6: {}
+        feedback_8: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_3: {}
+        rule_input_5: {}
+        rule_input_7: {}
+        rule_input_9: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_14
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_14: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_text_interac_1)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_text_interac_1)
+
+        sample_yaml_content_for_text_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 53
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_35
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_36
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_34
+            unicode_str: ''
+        rows:
+          value: 0
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 50
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_34: {}
+        content: {}
+        default_outcome: {}
+        feedback_35: {}
+        rule_input_36: {}
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 52
+tags: []
+title: ''
+""")
+
+        latest_sample_yaml_content_for_text_interac_2: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: ''
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+next_content_id_index: 6
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 60
+states:
+  Introduction:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: <p>Numeric interaction validation</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: end
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_2
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - and
+              - drop
+          rule_type: Contains
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        catchMisspellings:
+          value: false
+        placeholder:
+          value:
+            content_id: ca_placeholder_4
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: end
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: <p>df</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_4: {}
+        content_0: {}
+        default_outcome_1: {}
+        feedback_2: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+  end:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_5
+      html: <p>End interaction</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_5: {}
+    solicit_answer_details: false
+states_schema_version: 55
+tags: []
+title: ''
+version: 0
+""")
+
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content_for_text_interac_2)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_sample_yaml_content_for_text_interac_2)
+
+
+class ConversionUnitTests(test_utils.GenericTestBase):
+    """Test conversion methods."""
+
+    def test_convert_exploration_to_player_dict(self) -> None:
+        exp_title = 'Title'
+        second_state_name = 'first state'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title=exp_title, category='Category')
+        exploration.add_states([second_state_name])
+
+        def _get_default_state_dict(
+            content_str: str,
+            dest_name: str,
+            is_init_state: bool,
+            content_id_generator: translation_domain.ContentIdGenerator
+        ) -> state_domain.StateDict:
+            """Gets the default state dict of the exploration."""
+            content_id_for_content = content_id_generator.generate(
+                translation_domain.ContentType.CONTENT)
+            content_id_for_default_outcome = content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+            return {
+                'linked_skill_id': None,
+                'classifier_model_id': None,
+                'content': {
+                    'content_id': content_id_for_content,
+                    'html': content_str,
+                },
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        content_id_for_content: {},
+                        content_id_for_default_outcome: {}
+                    }
+                },
+                'solicit_answer_details': False,
+                'card_is_checkpoint': is_init_state,
+                'interaction': {
+                    'answer_groups': [],
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
+                    'default_outcome': {
+                        'dest': dest_name,
+                        'dest_if_really_stuck': None,
+                        'feedback': {
+                            'content_id': content_id_for_default_outcome,
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'hints': [],
+                    'id': None,
+                    'solution': None,
+                },
+                'param_changes': [],
+            }
+
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.assertEqual(exploration.to_player_dict(), {
+            'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'title': exp_title,
+            'objective': feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            'states': {
+                feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
+                    feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+                    feconf.DEFAULT_INIT_STATE_NAME, True, content_id_generator),
+                second_state_name: _get_default_state_dict(
+                    '', second_state_name, False, content_id_generator),
+            },
+            'param_changes': [],
+            'param_specs': {},
+            'language_code': 'en',
+            'next_content_id_index': content_id_generator.next_content_id_index
+        })
+
+
+class StateOperationsUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on states."""
+
+    def test_delete_state(self) -> None:
+        """Test deletion of states."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.add_states(['first state'])
+
+        with self.assertRaisesRegex(
+            ValueError, 'Cannot delete initial state'
+            ):
+            exploration.delete_state(exploration.init_state_name)
+
+        exploration.add_states(['second state'])
+
+        interaction = exploration.states['first state'].interaction
+
+        default_outcome_for_first_state = interaction.default_outcome
+        assert default_outcome_for_first_state is not None
+        default_outcome_for_first_state.dest_if_really_stuck = 'second state'
+
+        exploration.delete_state('second state')
+        self.assertEqual(
+            default_outcome_for_first_state.dest_if_really_stuck, 'first state')
+
+        with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
+            exploration.delete_state('fake state')
+
+
+class HtmlCollectionTests(test_utils.GenericTestBase):
+    """Test method to obtain all html strings."""
+
+    def test_all_html_strings_are_collected(self) -> None:
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title='title', category='category')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        exploration.add_states(['state1', 'state2', 'state3', 'state4'])
+        state1 = exploration.states['state1']
+        state2 = exploration.states['state2']
+        state3 = exploration.states['state3']
+        state4 = exploration.states['state4']
+        content1_dict: state_domain.SubtitledHtmlDict = {
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            'html': '<blockquote>Hello, this is state1</blockquote>'
+        }
+        content2_dict: state_domain.SubtitledHtmlDict = {
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            'html': '<pre>Hello, this is state2</pre>'
+        }
+        content3_dict: state_domain.SubtitledHtmlDict = {
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            'html': '<p>Hello, this is state3</p>'
+        }
+        content4_dict: state_domain.SubtitledHtmlDict = {
+            'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            'html': '<p>Hello, this is state4</p>'
+        }
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
+        state4.update_content(
+            state_domain.SubtitledHtml.from_dict(content4_dict))
+
+        self.set_interaction_for_state(
+            state1, 'TextInput', content_id_generator)
+        self.set_interaction_for_state(
+            state2, 'MultipleChoiceInput', content_id_generator)
+        self.set_interaction_for_state(
+            state3, 'ItemSelectionInput', content_id_generator)
+        self.set_interaction_for_state(
+            state4, 'DragAndDropSortInput', content_id_generator)
+
+        ca_placeholder_value_dict: state_domain.SubtitledUnicodeDict = {
+            'content_id': content_id_generator.generate(
+              translation_domain.ContentType.CUSTOMIZATION_ARG,
+              extra_prefix='placeholder'),
+            'unicode_str': 'Enter here.'
+        }
+        customization_args_dict1: Dict[
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
+        ] = {
+            'placeholder': {
+                'value': ca_placeholder_value_dict
+            },
+            'rows': {'value': 1},
+            'catchMisspellings': {
+                'value': False
+            }
+        }
+
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': content_id_generator.generate(
+                  translation_domain.ContentType.CUSTOMIZATION_ARG,
+                  extra_prefix='choices'),
+                'html': '<p>This is value1 for MultipleChoice</p>'
+            },
+            {
+                'content_id': content_id_generator.generate(
+                  translation_domain.ContentType.CUSTOMIZATION_ARG,
+                  extra_prefix='choices'),
+                'html': '<p>This is value2 for MultipleChoice</p>'
+            }
+        ]
+        customization_args_dict2: Dict[
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
+        ] = {
+            'choices': {'value': choices_subtitled_html_dicts},
+            'showChoicesInShuffledOrder': {'value': True}
+        }
+
+        choices_subtitled_html_dicts = [
+            {
+                'content_id': content_id_generator.generate(
+                  translation_domain.ContentType.CUSTOMIZATION_ARG,
+                  extra_prefix='choices'),
+                'html': '<p>This is value1 for ItemSelection</p>'
+            },
+            {
+                'content_id': content_id_generator.generate(
+                  translation_domain.ContentType.CUSTOMIZATION_ARG,
+                  extra_prefix='choices'),
+                'html': '<p>This is value2 for ItemSelection</p>'
+            },
+            {
+                'content_id': content_id_generator.generate(
+                  translation_domain.ContentType.CUSTOMIZATION_ARG,
+                  extra_prefix='choices'),
+                'html': '<p>This is value3 for ItemSelection</p>'
+            }
+        ]
+        customization_args_dict3: Dict[
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
+        ] = {
+            'choices': {'value': choices_subtitled_html_dicts},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 2}
+        }
+
+        choices_subtitled_html_dicts = [
+          {
+              'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CUSTOMIZATION_ARG,
+                extra_prefix='choices'),
+              'html': '<p>This is value1 for DragAndDropSortInput</p>'
+          },
+          {
+              'content_id': content_id_generator.generate(
+                translation_domain.ContentType.CUSTOMIZATION_ARG,
+                extra_prefix='choices'),
+              'html': '<p>This is value2 for DragAndDropSortInput</p>'
+          }
+        ]
+        customization_args_dict4: Dict[
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
+        ] = {
+            'choices': {'value': choices_subtitled_html_dicts},
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state3.update_interaction_customization_args(customization_args_dict3)
+        state4.update_interaction_customization_args(customization_args_dict4)
+
+        default_outcome = state_domain.Outcome(
+            'state2', None, state_domain.SubtitledHtml(
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME),
+                '<p>Default outcome for state1</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
+
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>Hello, this is html1 for state2</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>Hello, this is html2 for state2</p>'
+                )
+            ),
+        ]
+        state2.update_interaction_hints(hint_list2)
+
+        solution_dict: state_domain.SolutionDict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
+                'html': '<p>This is solution for state1</p>'
+            }
+        }
+        # Ruling out the possibility of None for mypy type checking.
+        assert state1.interaction.id is not None
+        solution = state_domain.Solution.from_dict(
+            state1.interaction.id, solution_dict)
+        state1.update_interaction_solution(solution)
+
+        state_answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1', None, state_domain.SubtitledHtml(
+                        content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Outcome2 for state2</p>'
+                    ), False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        }),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 1
+                        })
+                ],
+                [],
+                None),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state3', None, state_domain.SubtitledHtml(
+                        content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        '<p>Outcome1 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        })
+                ],
+                [],
+                None
+            )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', None, state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                    '<p>Outcome for state3</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_0']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_2']
+                    })
+            ],
+            [],
+            None
+        )]
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
+
+        expected_html_list = [
+            '',
+            '',
+            '<pre>Hello, this is state2</pre>',
+            '<p>Outcome1 for state2</p>',
+            '<p>Outcome2 for state2</p>',
+            '',
+            '<p>Hello, this is html1 for state2</p>',
+            '<p>Hello, this is html2 for state2</p>',
+            '<p>This is value1 for MultipleChoice</p>',
+            '<p>This is value2 for MultipleChoice</p>',
+            '<blockquote>Hello, this is state1</blockquote>',
+            '<p>Default outcome for state1</p>',
+            '<p>This is solution for state1</p>',
+            '<p>Hello, this is state3</p>',
+            '<p>Outcome for state3</p>',
+            '',
+            '<p>This is value1 for ItemSelection</p>',
+            '<p>This is value2 for ItemSelection</p>',
+            '<p>This is value3 for ItemSelection</p>',
+            '<p>Hello, this is state4</p>',
+            '',
+            '<p>This is value1 for DragAndDropSortInput</p>',
+            '<p>This is value2 for DragAndDropSortInput</p>'
+        ]
+
+        actual_outcome_list = exploration.get_all_html_content_strings()
+        self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))
+
+
+class ExplorationChangesMergeabilityUnitTests(
+        exp_services_test.ExplorationServicesUnitTests,
+        test_utils.EmailTestBase):
+    """Test methods related to exploration changes mergeability."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+        self.content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+    def append_next_content_id_index_change(
+        self, change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Appends the next_content_id_index change in the change list."""
+        change_list.append(exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'next_content_id_index',
+            'new_value': self.content_id_generator.next_content_id_index,
+            'old_value': 0
+        }))
+        return change_list
+
+    def test_changes_are_mergeable_when_content_changes_do_not_conflict(
+        self
+    ) -> None:
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'First title'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed title.')
+
+        test_dict: Dict[str, str] = {}
+        # Making changes to properties except content.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'old_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'Continue',
+            'old_value': None
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'buttonText': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Continue'
+                    }
+                }
+            },
+            'old_value': test_dict
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Interaction.')
+
+        # Changing content of second state.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            },
+            'new_value': {
+                'html': '<p>Congratulations, you have finished!</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            }
+        })]
+
+        # Checking that the changes can be applied when
+        # changing to same version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Changed content of End state.')
+
+        # Changing content of first state.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Renamed state',
+            'new_state_name': 'Renamed state again'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Renamed state again',
+            'new_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            },
+            'new_value': {
+                'html': '<p>Hello</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            }
+        })]
+
+        # Checking for the mergability of the fourth change list.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Checking for the mergability when working on latest version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(changes_are_mergeable, True)
+
+    def test_changes_are_not_mergeable_when_content_changes_conflict(
+        self
+    ) -> None:
+        # Making changes to content of the first state.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            },
+            'new_value': {
+                'html': '<p>Content 1.</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed Content.')
+
+        # Changing content of the same state to check that
+        # changes are not mergeable.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            },
+            'new_value': {
+                'html': '<p>Content 2.</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            }
+        })]
+
+        # Checking for the mergability of the second change list.
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_mergeable_when_interaction_id_changes_do_not_conflict(
+        self
+    ) -> None:
+        # Making changes in the properties which are
+        # not related to the interaction id.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                'html': '<p>This is the first state.</p>'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is the second hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                'html': '<p>Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Contents and Hint')
+
+        test_dict: Dict[str, str] = {}
+        # Changes to the properties affected by or affecting
+        # interaction id and in interaction_id itself.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'new_value': None,
+            'state_name': 'Introduction',
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': test_dict,
+            'state_name': 'Introduction',
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        }), exp_domain.ExplorationChange({
+            'new_value': 'Continue',
+            'state_name': 'Introduction',
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'buttonText': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Continue'
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'old_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
+        self.save_new_valid_exploration(
+            self.EXP_1_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
+
+        # Using the old change_list_3 here because they already covers
+        # the changes related to interaction in first state.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Changed Interaction')
+
+        # Changes related to interaction in the second state
+        # to check for mergeability.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': None,
+            'old_value': 'EndExploration',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': test_dict,
+            'old_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'property_name': 'widget_customization_args'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': 'NumericInput',
+            'old_value': None,
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'feedback': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                }
+            },
+            'old_value': None,
+            'property_name': 'default_outcome'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': [{
+                'outcome': {
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'feedback': {
+                        'html': '<p>Feedback</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                    }
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 60
+                    },
+                    'rule_type': 'IsLessThanOrEqualTo'
+                }],
+                'tagged_skill_misconception_id': None,
+                'training_data': []
+            }],
+            'old_value': ['old_value'],
+            'property_name': 'answer_groups'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'End',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
+        })]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_1_ID, 1, change_list_4)
+        self.assertEqual(changes_are_mergeable_1, True)
+
+    def test_changes_are_not_mergeable_when_interaction_id_changes_conflict(
+        self
+    ) -> None:
+        test_dict: Dict[str, str] = {}
+        # Changes to the properties affected by or affecting
+        # interaction id and in interaction_id itself.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_value': None,
+            'state_name': 'Introduction',
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': test_dict,
+            'state_name': 'Introduction',
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        }), exp_domain.ExplorationChange({
+            'new_value': 'Continue',
+            'state_name': 'Introduction',
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'buttonText': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Continue'
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'old_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Contents and Hint')
+
+        # Changes to the properties affected by or affecting
+        # interaction id and in interaction_id itself again
+        # to check that changes are not mergeable.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'new_value': None,
+            'state_name': 'Introduction',
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': test_dict,
+            'state_name': 'Introduction',
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        }), exp_domain.ExplorationChange({
+            'new_value': 'Continue',
+            'state_name': 'Introduction',
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'buttonText': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Continue'
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'old_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args'
+        })]
+
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_mergeable_when_customization_args_changes_do_not_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        test_dict: Dict[str, str] = {}
+        # Changes in the properties which aren't affected by
+        # customization args or doesn't affects customization_args.
+        change_list = [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>This is the first state.</p>'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
+                    'html': '<p>This is the second hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed Contents and Hints')
+
+        # Changes to the properties affecting customization_args
+        # or are affected by customization_args in the same state.
+        # This includes changes related to renaming a state in
+        # order to check that changes are applied even if states
+        # are renamed.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'new_state_name': 'Intro-rename',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': 'Introduction',
+            'property_name': 'init_state_name',
+            'new_value': 'Intro-rename',
+            'cmd': 'edit_exploration_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Placeholder text'
+                    }
+                },
+                'rows':
+                {
+                    'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': 'TextInput',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': 'Placeholder text'
+                    }
+                },
+                'rows':
+                {
+                    'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': None,
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
                     'value': True
                 }
-            })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v43_dict_to_v44_dict(
-        cls,
-        states_dict: Dict[str, state_domain.StateDict],
-        init_state_name: str
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 43 to version 44. Version 44 adds
-        card_is_checkpoint boolean to the state, which allows creators to
-        mark a state as a checkpoint for the learners
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
-                State domain object.
-            init_state_name: str. Name of the first state.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for (state_name, state_dict) in states_dict.items():
-            state_dict['card_is_checkpoint'] = bool(
-                state_name == init_state_name)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v44_dict_to_v45_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 44 to 45. Version 45 contains
-        linked skill id.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            state_dict['linked_skill_id'] = None
-        return states_dict
-
-    @classmethod
-    def _convert_states_v45_dict_to_v46_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 45 to 46. Version 46 ensures that the written
-        translations in a state containing unicode content do not contain HTML
-        tags and the data_format is unicode.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            list_of_subtitled_unicode_content_ids = []
-            interaction_customisation_args = state_dict['interaction'][
-                'customization_args']
-            if interaction_customisation_args:
-                customisation_args = (
-                    state_domain.InteractionInstance
-                    .convert_customization_args_dict_to_customization_args(
-                        state_dict['interaction']['id'],
-                        state_dict['interaction']['customization_args'],
-                        state_schema_version=45))
-                for ca_name in customisation_args:
-                    list_of_subtitled_unicode_content_ids.extend(
-                        state_domain.InteractionCustomizationArg
-                        .traverse_by_schema_and_get(
-                            customisation_args[ca_name].schema,
-                            customisation_args[ca_name].value,
-                            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
-                            lambda subtitled_unicode:
-                            subtitled_unicode.content_id
-                        )
-                    )
-                translations_mapping = (
-                    # Here we use MyPy ignore because the latest schema of state
-                    # dict doesn't contains written_translations property.
-                    state_dict['written_translations']['translations_mapping']) # type: ignore[misc]
-                for content_id in translations_mapping:
-                    if content_id in list_of_subtitled_unicode_content_ids:
-                        for language_code in translations_mapping[content_id]:
-                            written_translation = (
-                                translations_mapping[content_id][language_code])
-                            written_translation['data_format'] = (
-                                schema_utils.SCHEMA_TYPE_UNICODE)
-                            # Here, we are narrowing down the type from
-                            # Union[List[str], str] to str.
-                            assert isinstance(
-                                written_translation['translation'],
-                                str
-                            )
-                            written_translation['translation'] = (
-                                html_cleaner.strip_html_tags(
-                                    written_translation['translation']))
-        return states_dict
-
-    @classmethod
-    def _convert_states_v46_dict_to_v47_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 46 to 47. Version 52 deprecates
-        oppia-noninteractive-svgdiagram tag and converts existing occurences of
-        it to oppia-noninteractive-image tag.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            interaction_customisation_args = state_dict['interaction'][
-                'customization_args']
-            if interaction_customisation_args:
-                state_domain.State.convert_html_fields_in_state(
-                    state_dict,
-                    html_validation_service
-                    .convert_svg_diagram_tags_to_image_tags, 46)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v47_dict_to_v48_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 47 to 48. Version 48 fixes encoding issues in
-        HTML fields.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            interaction_customisation_args = state_dict['interaction'][
-                'customization_args']
-            if interaction_customisation_args:
-                state_domain.State.convert_html_fields_in_state(
-                    state_dict,
-                    html_validation_service.fix_incorrectly_encoded_chars,
-                    state_schema_version=48)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v48_dict_to_v49_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 48 to 49. Version 49 adds
-        requireNonnegativeInput customization arg to NumericInput
-        interaction which allows creators to set input should be greater
-        than or equal to zero.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'NumericInput':
-                customization_args = state_dict['interaction'][
-                    'customization_args']
-                customization_args.update({
-                    'requireNonnegativeInput': {
-                        'value': False
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': ['old_value'],
+            'property_name': 'answer_groups',
+            'new_value':
+            [
+                {
+                    'rule_specs':
+                    [
+                        {
+                            'inputs':
+                            {
+                                'x': 50
+                            },
+                            'rule_type': 'IsLessThanOrEqualTo'
+                        }
+                    ],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None,
+                    'outcome':
+                    {
+                        'feedback':
+                        {
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK),
+                            'html': '<p>Next</p>'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False
                     }
-                })
+                }
+            ],
+            'cmd': 'edit_state_property'
+        })]
 
-        return states_dict
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_mergeable, True)
 
-    @classmethod
-    def _convert_states_v49_dict_to_v50_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 49 to 50. Version 50 removes rules from
-        explorations that use one of the following rules:
-        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
-        `customOskLetters` cust arg to `allowedVariables`.
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
+        self.save_new_valid_exploration(
+            self.EXP_1_ID, self.owner_id, end_state_name='End')
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
 
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] in MATH_INTERACTION_TYPES:
-                filtered_answer_groups = []
-                for answer_group_dict in state_dict[
-                        'interaction']['answer_groups']:
-                    filtered_rule_specs = []
-                    for rule_spec_dict in answer_group_dict['rule_specs']:
-                        rule_type = rule_spec_dict['rule_type']
-                        if rule_type not in MATH_INTERACTION_DEPRECATED_RULES:
-                            filtered_rule_specs.append(
-                                copy.deepcopy(rule_spec_dict))
-                    answer_group_dict['rule_specs'] = filtered_rule_specs
-                    if len(filtered_rule_specs) > 0:
-                        filtered_answer_groups.append(
-                            copy.deepcopy(answer_group_dict))
-                state_dict[
-                    'interaction']['answer_groups'] = filtered_answer_groups
+        # Using the old change_list_2 here because they already covers
+        # the changes related to customization args in first state.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Interactions and Customization_args in One State')
 
-                # Renaming cust arg.
-                if state_dict[
-                        'interaction']['id'] in ALGEBRAIC_MATH_INTERACTIONS:
-                    customization_args = state_dict[
-                        'interaction']['customization_args']
-                    customization_args['allowedVariables'] = copy.deepcopy(
-                        customization_args['customOskLetters'])
-                    del customization_args['customOskLetters']
+        # Changes to the properties related to the customization args
+        # in the second state to check for mergeability.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'old_value': 'EndExploration',
+            'state_name': 'End',
+            'property_name': 'widget_id',
+            'cmd': 'edit_state_property',
+            'new_value': None
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'state_name': 'End',
+            'property_name': 'widget_customization_args',
+            'cmd': 'edit_state_property',
+            'new_value': test_dict
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'state_name': 'End',
+            'property_name': 'widget_id',
+            'cmd': 'edit_state_property',
+            'new_value': 'ItemSelectionInput'
+        }), exp_domain.ExplorationChange({
+            'old_value': test_dict,
+            'state_name': 'End',
+            'property_name': 'widget_customization_args',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'minAllowableSelectionCount': {
+                    'value': 1
+                },
+                'choices': {
+                    'value': [{
+                        'html': '<p>A</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
+                    }, {
+                        'html': '<p>B</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
+                    }, {
+                        'html': '<p>C</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
+                    }, {
+                        'html': '<p>D</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.RULE)
+                    }]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'state_name': 'End',
+            'property_name': 'default_outcome',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'refresher_exploration_id': None,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'param_changes': [],
+                'labelled_as_correct': False
+            }
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'state_name': 'End',
+            'property_name': 'answer_groups',
+            'cmd': 'edit_state_property',
+            'new_value':
+            [
+                {
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None,
+                    'outcome':
+                    {
+                        'refresher_exploration_id': None,
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback':
+                        {
+                            'html': '<p>Good</p>',
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK)
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False
+                    },
+                    'rule_specs':
+                    [
+                        {
+                            'rule_type': 'Equals',
+                            'inputs':
+                            {
+                                'x':
+                                [
+                                    'ca_choices_1'
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        })]
 
-        return states_dict
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_1_ID, 1, change_list_3)
+        self.assertEqual(changes_are_mergeable_1, True)
 
-    @classmethod
-    def _convert_states_v50_dict_to_v51_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 50 to 51. Version 51 adds a new
-        dest_if_really_stuck field to Outcome class to redirect learners
-        to a state for strengthening concepts when they get really stuck.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['outcome']['dest_if_really_stuck'] = None
-
-            if state_dict['interaction']['default_outcome'] is not None:
-                state_dict['interaction'][
-                    'default_outcome']['dest_if_really_stuck'] = None
-
-        return states_dict
-
-    @classmethod
-    def _remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
-        cls, state_dict: state_domain.StateDict, state_schema: int
+    def test_changes_are_not_mergeable_when_customization_args_changes_conflict(
+        self
     ) -> None:
-        """Helper function to remove the content IDs from the translations
-        and voiceovers which are deleted from the state.
+        test_dict: Dict[str, str] = {}
+        # Changes in the properties which affected by or affecting
+        # customization_args.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'new_state_name': 'Intro-rename',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': 'Introduction',
+            'property_name': 'init_state_name',
+            'new_value': 'Intro-rename',
+            'cmd': 'edit_exploration_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'unicode_str': 'Placeholder text'
+                    }
+                },
+                'rows':
+                {
+                    'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': 'TextInput',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': 'Placeholder text'
+                    }
+                },
+                'rows':
+                {
+                    'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': None,
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value': ['old_value'],
+            'property_name': 'answer_groups',
+            'new_value':
+            [
+                {
+                    'rule_specs':
+                    [
+                        {
+                            'inputs':
+                            {
+                                'x': 50
+                            },
+                            'rule_type': 'IsLessThanOrEqualTo'
+                        }
+                    ],
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None,
+                    'outcome':
+                    {
+                        'feedback':
+                        {
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK),
+                            'html': '<p>Next</p>'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False
+                    }
+                }
+            ],
+            'cmd': 'edit_state_property'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed Customization Args and related properties again')
 
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary.
-            state_schema: int. The state schema from which we are using
-                this functionality.
-        """
-        interaction = state_dict['interaction']
-        content_id_list = [state_dict['content']['content_id']]
+        # Changes to the customization_args in same
+        # state again to check that changes are not mergeable.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value': {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'placeholder':
+                {
+                    'value':
+                    {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG),
+                        'unicode_str': 'Placeholder text 2.'
+                    }
+                },
+                'rows':
+                {
+                    'value': 2
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        })]
 
-        for answer_group in interaction['answer_groups']:
-            content_id_list.append(
-                answer_group['outcome']['feedback']['content_id']
-            )
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_not_mergeable, False)
 
-            for rule_spec in answer_group['rule_specs']:
-                for param_name, value in rule_spec['inputs'].items():
-                    interaction_id = interaction['id']
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(
-                            interaction_id
-                        ).get_rule_param_type(
-                            rule_spec['rule_type'], param_name
-                        )
-                    )
+    def test_changes_are_mergeable_when_answer_groups_changes_do_not_conflict(
+        self
+    ) -> None:
+        # Adding answer_groups and solutions to the existing state.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': self.content_id_generator.generate(
+                                translation_domain.ContentType.RULE),
+                            'normalizedStrSet': ['Hello', 'Hola']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'new_value': {
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': '<p>Explanation.</p>'
+                },
+                'answer_is_exclusive': False
+            }
+        })]
 
-                    if issubclass(
-                        param_type, objects.BaseTranslatableObject
-                    ):
-                        # We can assume that the value will be a dict,
-                        # as the param_type is BaseTranslatableObject.
-                        assert isinstance(value, dict)
-                        content_id = value['contentId']
-                        # We can assume the contentId will be str,
-                        # as the param_type is BaseTranslatableObject.
-                        assert isinstance(content_id, str)
-                        content_id_list.append(content_id)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added answer groups and solution')
 
-        default_outcome = interaction['default_outcome']
-        if default_outcome:
-            content_id_list.append(
-                default_outcome['feedback']['content_id'])
+        # Changes to the properties that are not related to
+        # the answer_groups. These changes are done to check
+        # when the changes are made in unrelated properties,
+        # they can be merged easily.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>This is the first state.</p>'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': [{
+                'hint_content': {
+                    'content_id': 'hint_3',
+                    'html': '<p>Hint 1.</p>'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                'html': '<p>Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Contents and Hint')
 
-        for hint in interaction['hints']:
-            content_id_list.append(hint['hint_content']['content_id'])
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [
 
-        interaction_solution = interaction['solution']
-        if interaction_solution:
-            content_id_list.append(
-                interaction_solution['explanation']['content_id'])
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK),
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
 
-        if interaction['id'] is not None:
-            customisation_args = (
-                state_domain.InteractionInstance
-                .convert_customization_args_dict_to_customization_args(
-                    interaction['id'],
-                    interaction['customization_args'],
-                    state_schema_version=state_schema
-                )
-            )
-            for ca_name in customisation_args:
-                content_id_list.extend(
-                    customisation_args[ca_name].get_content_ids()
-                )
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
 
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])  # type: ignore[misc]
-        new_translations_mapping = {
-             content_id: translation_item for
-             content_id, translation_item in translations_mapping.items()
-             if content_id in content_id_list
-        }
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
-            new_translations_mapping)
+        # Changes to the answer_groups and the properties that
+        # affects or are affected by answer_groups.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola',
+                                'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Oppia', 'GSoC'],
+                            'contentId': 'rule_input_5'
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Oppia is selected for GSoC.',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': 'solution_5',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
+        })]
 
-        voiceovers_mapping = (
-            state_dict['recorded_voiceovers']['voiceovers_mapping'])
-        new_voiceovers_mapping = {}
-        for content_id, voiceover_item in voiceovers_mapping.items():
-            if content_id in content_id_list:
-                new_voiceovers_mapping[content_id] = voiceover_item
-        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
-            new_voiceovers_mapping)
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(changes_are_mergeable, True)
 
-    @classmethod
-    def _convert_states_v51_dict_to_v52_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 51 to 52. Version 52 correctly updates
-        the content IDs for translations and for voiceovers. In the 49 to 50
-        conversion we removed some interaction rules and thus also some parts of
-        the exploration that had its content IDs, but then the content IDs in
-        translations and voiceovers were not updated.
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
+        self.save_new_valid_exploration(
+            self.EXP_1_ID, self.owner_id, end_state_name='End')
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
 
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
-                state_dict, state_schema=51)
+        # Using the old change_list_2 and change_list_3 here
+        # because they already covers the changes related to
+        # the answer_groups in the first state.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID, change_list_2,
+            'Added Answer Group and Solution in One state')
 
-        return states_dict
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID, change_list_3,
+            'Changed Answer Groups and Solutions in One State')
 
-    @classmethod
-    def _convert_states_v52_dict_to_v53_dict(
-        cls,
-        states_dict: Dict[str, state_domain.StateDict],
-        language_code: str
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 52 to 53. Version 53 fixes all the backend
-        validation checks for explorations errored data which are
-        categorized as:
-            - Exploration states
-            - Exploration interaction
-            - Exploration RTE
+        test_dict: Dict[str, str] = {}
+        # Changes to the properties related to the answer_groups
+        # in the second state to check for mergeability.
+        change_list_5 = [exp_domain.ExplorationChange({
+            'old_value': 'EndExploration',
+            'state_name': 'End',
+            'property_name': 'widget_id',
+            'cmd': 'edit_state_property',
+            'new_value': None
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'state_name': 'End',
+            'property_name': 'widget_customization_args',
+            'cmd': 'edit_state_property',
+            'new_value': test_dict
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'state_name': 'End',
+            'property_name': 'widget_id',
+            'cmd': 'edit_state_property',
+            'new_value': 'ItemSelectionInput'
+        }), exp_domain.ExplorationChange({
+            'old_value': test_dict,
+            'state_name': 'End',
+            'property_name': 'widget_customization_args',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'minAllowableSelectionCount': {
+                    'value': 1
+                },
+                'choices': {
+                    'value': [{
+                        'html': '<p>A</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
+                    }, {
+                        'html': '<p>B</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
+                    }, {
+                        'html': '<p>C</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
+                    }, {
+                        'html': '<p>D</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG)
+                    }]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'state_name': 'End',
+            'property_name': 'default_outcome',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'refresher_exploration_id': None,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+                },
+                'param_changes': [],
+                'labelled_as_correct': False
+            }
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'state_name': 'End',
+            'property_name': 'answer_groups',
+            'cmd': 'edit_state_property',
+            'new_value': [{
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'refresher_exploration_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'html': '<p>Good</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                    },
+                    'param_changes': [],
+                    'labelled_as_correct': False
+                },
+                'rule_specs': [{
+                    'rule_type': 'Equals',
+                    'inputs': {
+                        'x': ['ca_choices_1']
+                    }
+                }]
+            }]
+        })]
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-            language_code: str. The language code of the exploration.
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_1_ID, 2, change_list_5)
+        self.assertEqual(changes_are_mergeable_1, True)
 
-        Returns:
-            dict. The converted states_dict.
-        """
-        states_dict = cls._fix_labelled_as_correct_value_in_state_dict(
-            states_dict)
+    def test_changes_are_not_mergeable_when_answer_groups_changes_conflict(
+        self
+    ) -> None:
+        # Adding answer_groups and solutions to the existing state.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': ['Hello', 'Hola']
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'new_value': {
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                },
+                'answer_is_exclusive': False
+            }
+        })]
 
-        # Update state interaction validations.
-        states_dict = cls._update_state_interaction(
-            states_dict, language_code)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added answer groups and solution')
 
-        # Update state RTE validations.
-        states_dict = cls._update_state_rte(states_dict)
+        # Changes to the answer_groups and the properties that
+        # affects or are affected by answer_groups.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola',
+                                'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Oppia', 'GSoC'],
+                            'contentId': 'rule_input_5'
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Oppia is selected for GSoC.',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Answer Groups and related properties')
 
-        return states_dict
+        # Changes to the answer group in same state again
+        # to check that changes are not mergeable.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola',
+                                'Hey'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        })]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
 
-    @classmethod
-    def _convert_states_v53_dict_to_v54_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 53 to 54. Version 54 adds
-        catchMisspellings customization arg to TextInput
-        interaction which allows creators to detect misspellings.
+    def test_changes_are_mergeable_when_solutions_changes_do_not_conflict(
+        self
+    ) -> None:
+        # Adding new answer_groups and solutions.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'new_value': {
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                },
+                'answer_is_exclusive': False
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
+        })]
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added answer groups and solution')
 
-        Returns:
-            dict. The converted states_dict.
-        """
+        # Changes to the properties unrelated to the solutions.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT),
+                'html': '<p>This is the first state.</p>'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }, {
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>This is a first hint.</p>'
+                }
+            }],
+            'state_name': 'Introduction',
+            'old_value': [{
+                'hint_content': {
+                    'content_id': 'hint_3',
+                    'html': '<p>Hint 1.</p>'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints'
+        }), exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content_0',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Contents and Hint')
 
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'TextInput':
-                customization_args = state_dict['interaction'][
-                    'customization_args']
-                customization_args.update({
+        # Changes to the solutions and the properties that affects
+        # solutions to check for mergeability.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Oppia', 'GSoC'],
+                            'contentId': 'rule_input_5'
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Oppia is selected for GSoC.',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': False
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
+        self.save_new_valid_exploration(
+            self.EXP_1_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
+
+        # Using the old change_list_2 and change_list_3 here
+        # because they already covers the changes related to
+        # the solutions in the first state.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID, change_list_2,
+            'Added Answer Group and Solution in One state')
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Changed Answer Groups and Solutions in One State')
+
+        test_dict: Dict[str, str] = {}
+        # Changes to the properties related to the solutions
+        # in the second state to check for mergeability.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'old_value': 'EndExploration',
+            'new_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'new_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'new_value': 'NumericInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'new_value': {
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'new_value': [{
+                'outcome': {
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None,
+                    'feedback': {
+                        'html': '<p>Good</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                    }
+                },
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+                'rule_specs': [{
+                    'rule_type': 'IsGreaterThanOrEqualTo',
+                    'inputs': {
+                        'x': 20
+                    }
+                }]
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1. State 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'new_value': {
+                'correct_answer': 30,
+                'explanation': {
+                    'html': '<p>Explanation.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'correct_answer': 30,
+                'explanation': {
+                    'html': '<p>Explanation.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False
+            },
+            'new_value': {
+                'correct_answer': 10,
+                'explanation': {
+                    'html': '<p>Explanation.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'state_name': 'End'
+        })]
+
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_1_ID, 2, change_list_4)
+        self.assertEqual(changes_are_mergeable_1, True)
+
+    def test_changes_are_not_mergeable_when_solutions_changes_conflict(
+        self
+    ) -> None:
+        # Adding new answer_groups and solutions.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    'html': '<p>Hint 1.</p>'
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'new_value': {
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                },
+                'answer_is_exclusive': False
+            }
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added answer groups and solution')
+
+        # Changes to the solutions and the properties that affects
+        # solutions to check for mergeability.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }, {
+                'outcome': {
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Oppia', 'GSoC'],
+                            'contentId': 'rule_input_5'
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'tagged_skill_misconception_id': None
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [{
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'training_data': [],
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'normalizedStrSet': ['Hello', 'Hola', 'Hi'],
+                            'contentId': 'rule_input_2'
+                        }
+                    },
+                    'rule_type': 'StartsWith'
+                }],
+                'tagged_skill_misconception_id': None
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Oppia is selected for GSoC.',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hi Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                }
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changed Solutions and affected properties')
+
+        # Change to the solution of same state again
+        # to check that changes are not mergeable.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Changed Explanation.</p>'
+                }
+            }
+        })]
+
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_mergeable_when_hints_changes_do_not_conflict(
+        self
+    ) -> None:
+        change_list = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'property_name': 'hints',
+            'cmd': 'edit_state_property',
+            'old_value': ['old_value']
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'correct_answer': 'Hello'
+            },
+            'property_name': 'solution',
+            'cmd': 'edit_state_property',
+            'old_value': None
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added Hint and Solution in Introduction state')
+
+        test_dict: Dict[str, str] = {}
+        # Changes to all state propeties other than the hints.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            },
+            'new_value': {
+                'html': '<p>Content in Introduction.</p>',
+                'content_id': 'content_0'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': 'solution'
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello'
+            },
+            'new_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_id',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': 'TextInput',
+            'new_value': None
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'new_value': test_dict
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': 'solution'
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 'Hello Aryaman'
+            },
+            'new_value': None
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_id',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': None,
+            'new_value': 'NumericInput'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'answer_groups',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': ['old_value'],
+            'new_value': [{
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 46
+                    },
+                    'rule_type': 'IsLessThanOrEqualTo'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'html': '',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                    },
+                    'param_changes': []
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': None,
+            'new_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 42
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            },
+            'new_value': {
+                'html': '<p>Congratulations, you have finished!</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'title',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A title',
+            'new_value': 'First Title'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': 'solution'
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 42
+            },
+            'new_value': {
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'answer_is_exclusive': False,
+                'correct_answer': 40
+            }
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
+
+        # Changes to the old hints and also deleted and added
+        # new hints to take all the cases to check for mergeability.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': 'hint_2'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Changed hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Changed hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': 'hint_2'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'html': '<p>Hint 2.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }, {
+                    'hint_content': {
+                        'html': '<p>Changed hint 1.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+    def test_changes_are_not_mergeable_when_hints_changes_conflict(
+        self
+    ) -> None:
+        change_list = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'property_name': 'hints',
+            'cmd': 'edit_state_property',
+            'old_value': ['old_value']
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'html': '<p>Explanation</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                },
+                'correct_answer': 'Hello'
+            },
+            'property_name': 'solution',
+            'cmd': 'edit_state_property',
+            'old_value': None
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added Hint and Solution in Introduction state')
+
+        # Changes to the old hints and also deleted and added
+        # new hints to take all the cases to check for mergeability.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Changed hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Changed hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }, {
+                'hint_content': {
+                    'html': '<p>Hint 2.</p>',
+                    'content_id': 'hint_2'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'html': '<p>Hint 2.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }, {
+                    'hint_content': {
+                        'html': '<p>Changed hint 1.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Changes in the hints again.')
+
+        change_list_3 = [exp_domain.ExplorationChange({
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [{
+                'hint_content': {
+                    'html': '<p>Changed Hint 1.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.HINT)
+                }
+            }],
+            'state_name': 'Introduction'
+        })]
+
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        test_dict: Dict[str, str] = {}
+        # Changes to all the properties of both states other than
+        # exploration properties i.e. title, category, objective etc.
+        # Also included rename states changes to check that
+        # renaming states doesn't affect anything.
+        change_list = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'html': '<p>Content</p>',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'html': '<p>Hint 1.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }
+            ],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': ['old_value']
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'old_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': 'NumericInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'old_value': None
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [
+                {
+                    'outcome': {
+                        'refresher_exploration_id': None,
+                        'feedback': {
+                            'html': '<p>Good.</p>',
+                            'content_id': self.content_id_generator.generate(
+                                translation_domain.ContentType.FEEDBACK)
+                        },
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False,
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'param_changes': []
+                    },
+                    'training_data': [],
+                    'rule_specs': [
+                        {
+                            'inputs': {
+                                'x': 50
+                            },
+                            'rule_type': 'IsLessThanOrEqualTo'
+                        }
+                    ],
+                    'tagged_skill_misconception_id': None
+                }
+            ],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value']
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'html': '<p>Try Again.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+                },
+                'missing_prerequisite_skill_id': None,
+                'labelled_as_correct': False,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'param_changes': []
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'old_value': {
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'html': '',
+                    'content_id': 'default_outcome'
+                },
+                'missing_prerequisite_skill_id': None,
+                'labelled_as_correct': False,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'param_changes': [
+
+                ]
+            }
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'html': '<p>Try Again.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.FEEDBACK)
+                },
+                'missing_prerequisite_skill_id': None,
+                'labelled_as_correct': False,
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'param_changes': [
+
+                ]
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'old_value': {
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'html': '<p>Try Again.</p>',
+                    'content_id': 'default_outcome'
+                },
+                'missing_prerequisite_skill_id': None,
+                'labelled_as_correct': False,
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'param_changes': [
+
+                ]
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
+
+        # Changes to properties of second state.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'correct_answer': 25,
+                'explanation': {
+                    'html': '<p>Explanation.</p>',
+                    'content_id': self.content_id_generator.generate(
+                        translation_domain.ContentType.SOLUTION)
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'solution',
+            'old_value': None
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'html': '<p>Hint 1.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                },
+                {
+                    'hint_content': {
+                        'html': '<p>Hint 2.</p>',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT)
+                    }
+                }
+            ],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'old_value': [{
+                'hint_content': {
+                    'html': '<p>Hint 1.</p>',
+                    'content_id': 'hint_1'
+                }
+            }]
+        }), exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'new_value': {
+                'html': '<p>Congratulations, you have finished!</p>',
+                'content_id': self.content_id_generator.generate(
+                    translation_domain.ContentType.HINT)
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'old_value': {
+                'html': '',
+                'content_id': 'content_0'
+            }
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
+
+        # Changes to the exploration properties to check
+        # for mergeability.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'title',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A title',
+            'new_value': 'A changed title.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'objective',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'An objective',
+            'new_value': 'A changed objective.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'category',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A category',
+            'new_value': 'A changed category'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'auto_tts_enabled',
+            'cmd': 'edit_exploration_property',
+            'old_value': True,
+            'new_value': False
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': ['old_value'],
+            'new_value': [
+                'new'
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': [
+                'new'
+            ],
+            'new_value': [
+                'new',
+                'skill'
+            ]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'language_code',
+            'new_value': 'bn',
+            'old_value': 'en'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'author_notes',
+            'new_value': 'author_notes'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'blurb',
+            'new_value': 'blurb'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'init_state_name',
+            'new_value': 'End',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'init_state_name',
+            'new_value': 'Introduction',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'auto_tts_enabled',
+            'new_value': False
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'confirmed_unclassified_answers',
+            'state_name': 'Introduction',
+            'new_value': ['test']
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'linked_skill_id',
+            'new_value': 'string_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'card_is_checkpoint',
+            'new_value': True
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+    def test_changes_are_not_mergeable_when_exploration_properties_changes_conflict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Changes to the exploration properties to check
+        # for mergeability.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'title',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A title',
+            'new_value': 'A changed title.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'objective',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'An objective',
+            'new_value': 'A changed objective.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'category',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A category',
+            'new_value': 'A changed category'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'auto_tts_enabled',
+            'cmd': 'edit_exploration_property',
+            'old_value': True,
+            'new_value': False
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': ['old_value'],
+            'new_value': [
+                'new'
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': [
+                'new'
+            ],
+            'new_value': [
+                'new',
+                'skill'
+            ]
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changes in the Exploration Properties.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'title',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A title',
+            'new_value': 'A new title.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'objective',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'An objective',
+            'new_value': 'A new objective.'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'category',
+            'cmd': 'edit_exploration_property',
+            'old_value': 'A category',
+            'new_value': 'A new category'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'auto_tts_enabled',
+            'cmd': 'edit_exploration_property',
+            'old_value': True,
+            'new_value': False
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': ['old_value'],
+            'new_value': [
+                'new'
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'tags',
+            'cmd': 'edit_exploration_property',
+            'old_value': [
+                'new'
+            ],
+            'new_value': [
+                'new',
+                'skill'
+            ]
+        })]
+
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_mergeable_when_translations_changes_do_not_conflict(
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Adding content, feedbacks, solutions so that
+        # translations can be added later on.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added various contents.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2,
+            'Added answer group.')
+
+        # Adding some translations to the first state.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'cmd': 'mark_translations_needs_update',
+            'content_id': 'content',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'mark_translations_needs_update',
+            'content_id': 'default_outcome'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'remove_translations',
+            'content_id': 'default_outcome'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_3,
+            'Added some translations.')
+
+        # Adding translations again to the different contents
+        # of same state to check that they can be merged.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'new_state_name': 'Intro-Rename',
+            'cmd': 'rename_state',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'content_id': 'ca_placeholder_0',
+            'cmd': 'remove_translations'
+        }), exp_domain.ExplorationChange({
+            'content_id': 'hint_1',
+            'cmd': 'remove_translations'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'Introduction',
+            'cmd': 'rename_state',
+            'old_state_name': 'Intro-Rename'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(changes_are_mergeable, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_4,
+            'Resname state.')
+
+        # Adding translations to the second state to check
+        # that they can be merged even in the same property.
+        change_list_5 = [exp_domain.ExplorationChange({
+            'content_id': 'content',
+            'cmd': 'mark_translations_needs_update'
+        })]
+
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_5)
+        self.assertEqual(changes_are_mergeable_1, False)
+
+        # Add changes to the different content of first state to
+        # check that translation changes to some properties doesn't
+        # affects the changes of content of other properties.
+        change_list_6 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'rows': {
+                    'value': 1
+                },
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder Changed.',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': 'Feedback 1.'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 2.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_6,
+            'Changing Customization Args Placeholder in First State.')
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_5)
+        self.assertEqual(changes_are_mergeable_3, False)
+
+    def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
+        self
+    ) -> None:
+        # Adding content, feedbacks, solutions so that
+        # voiceovers can be added later on.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>First State Content.</p>'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'cust_arg_1'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder')
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'feedback_5',
+                    'html': ''
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content_6',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added various contents.')
+
+        # Adding change to the field which is neither
+        # affected by nor affects voiceovers.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'card_is_checkpoint',
+            'new_value': True
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Added single unrelated change.')
+
+        # Adding some voiceovers to the first state.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {}
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_8': {},
+                    'default_outcome_7': {},
+                    'solution_9': {},
+                    'ca_placeholder_6': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
+                            'file_size_bytes': 175542,
+                            'duration_secs': 10.971375
+                        }
+                    },
+                    'content_5': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Added some voiceovers.')
+
+        # Adding voiceovers again to the same first state
+        # to check if they can be applied. They will not
+        # be mergeable as the changes are in the same property
+        # i.e. recorded_voiceovers.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
+            },
+            'new_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {
+                        'en': {
+                            'needs_update': False,
+                            'duration_secs': 30.0669375,
+                            'filename': 'hint_1-en-ajclkw0cnz.mp3',
+                            'file_size_bytes': 481071
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(changes_are_mergeable, False)
+
+        # Adding voiceovers to the second state to check
+        # if they can be applied. They can be mergead as
+        # the changes are in the different states.
+        change_list_5 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
+            },
+            'property_name': 'recorded_voiceovers',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'duration_secs': 10.3183125,
+                            'filename': 'content-en-ar9zhd7edl.mp3',
+                            'file_size_bytes': 165093,
+                            'needs_update': False
+                        }
+                    }
+                }
+            },
+            'state_name': 'End'
+        })]
+
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_5)
+        self.assertEqual(changes_are_mergeable_1, True)
+
+        # Changes to the content of first state to check
+        # that the changes in the contents of first state
+        # doesn't affects the changes to the voiceovers in
+        # second state.
+        change_list_6 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>First State Content.</p>'
+            },
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>Changed First State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_6),
+            'Changing Content in First State.')
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_5)
+        self.assertEqual(changes_are_mergeable_3, True)
+
+        # Changes to the content of second state to check that
+        # the changes to the voiceovers can not be made in
+        # same state if the property which can be recorded is
+        # changed.
+        change_list_6 = [exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>Second State Content.</p>'
+            },
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>Changed Second State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_6),
+            'Changing Content in Second State.')
+
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_4)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_not_mergeable_when_voiceovers_changes_conflict(
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Adding content, feedbacks, solutions so that
+        # voiceovers can be added later on.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content_5',
+                'html': ''
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>First State Content.</p>'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'cust_arg_5'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            extra_prefix='placeholder')
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'feedback_7',
+                    'html': ''
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.DEFAULT_OUTCOME),
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest_if_really_stuck': None,
+                'dest': 'End'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': ['old_value'],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.HINT),
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.SOLUTION),
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.CONTENT),
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Added various contents.')
+
+        # Adding some voiceovers to the first state.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {}
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_8': {},
+                    'default_outcome_7': {},
+                    'solution_9': {},
+                    'ca_placeholder_6': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
+                            'file_size_bytes': 175542,
+                            'duration_secs': 10.971375
+                        }
+                    },
+                    'content_5': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_2),
+            'Added some voiceovers.')
+
+        # Adding voiceovers again to the same first state
+        # to check if they can be applied. They will not
+        # be mergeable as the changes are in the same property
+        # i.e. recorded_voiceovers.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
+            },
+            'new_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {
+                        'en': {
+                            'needs_update': False,
+                            'duration_secs': 30.0669375,
+                            'filename': 'hint_1-en-ajclkw0cnz.mp3',
+                            'file_size_bytes': 481071
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, False)
+
+    def test_changes_are_not_mergeable_when_state_added_or_deleted(
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        test_dict: Dict[str, str] = {}
+        # Changes to the various properties of the first and
+        # second state.
+        change_list = [exp_domain.ExplorationChange({
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value':
+            {
+                'requireNonnegativeInput':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [
+                {
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [
+                        {
+                            'rule_type': 'IsLessThanOrEqualTo',
+                            'inputs': {
+                                'x': 50
+                            }
+                        }
+                    ],
+                    'training_data': [],
+                    'outcome': {
+                        'param_changes': [],
+                        'dest_if_really_stuck': None,
+                        'dest': 'End',
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Hint.</p>'
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': 'Congratulations, you have finished!'
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>2Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list),
+            'Changed various properties in both states.')
+
+        # Change to the unrelated property to check that
+        # it can be merged.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'html': '',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+            },
+            'new_value': {
+                'html': '<p>Hello Aryaman!</p>',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+            },
+            'state_name': 'Introduction',
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Deleting and Adding states to check that when any
+        # state is deleted or added, then the changes can not be
+        # merged.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End-State'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'End',
+            'content_id_for_state_content': 'content_0',
+            'content_id_for_default_outcome': 'default_outcome_1'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End',
+            'cmd': 'rename_state',
+            'old_state_name': 'End-State'
+        }), exp_domain.ExplorationChange({
+            'old_value': [{
+                'tagged_skill_misconception_id': None,
+                'rule_specs': [{
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 50
+                    }
+                }],
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                }
+            }],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [{
+                'tagged_skill_misconception_id': None,
+                'rule_specs': [{
+                    'rule_type': 'IsLessThanOrEqualTo',
+                    'inputs': {
+                        'x': 50
+                    }
+                }],
+                'training_data': [],
+                'outcome': {
+                    'param_changes': [],
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                }
+            }],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'param_changes': [],
+                'dest': 'Introduction',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': ''
+                },
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'new_value': {
+                'param_changes': [],
+                'dest': 'End',
+                'dest_if_really_stuck': 'End',
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': ''
+                },
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': 'Congratulations, you have finished!'
+            },
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'EndExploration',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': test_dict,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'recommendedExplorationIds': {
+                    'value': []
+                }
+            },
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'param_changes': [],
+                'dest': 'End',
+                'dest_if_really_stuck': None,
+                'missing_prerequisite_skill_id': None,
+                'feedback': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': ''
+                },
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'default_outcome',
+            'new_value': None,
+            'state_name': 'End'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            self.append_next_content_id_index_change(change_list_3),
+            'Added and deleted states.')
+
+        # Checking that old changes that could be
+        # merged previously can not be merged after
+        # addition or deletion of state.
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list_2)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_not_mergeable_when_frontend_version_exceeds_backend_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        test_dict: Dict[str, str] = {}
+        # Changes to the various properties of the first and
+        # second state.
+        change_list = [exp_domain.ExplorationChange({
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                },
+                'catchMisspellings': {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': test_dict,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [
+                {
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [
+                        {
+                            'rule_type': 'IsLessThanOrEqualTo',
+                            'inputs': {
+                                'x': 50
+                            }
+                        }
+                    ],
+                    'training_data': [],
+                    'outcome': {
+                        'param_changes': [],
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': ['old_value'],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': '<p>Hint.</p>'
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': 'Congratulations, you have finished!'
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'html': '<p>2Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End'
+        })]
+
+        # Changes are mergeable when updating the same version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Changes are not mergeable when updating from version
+        # more than that on the backend.
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
+        self
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            self.save_new_valid_exploration(
+                self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+            rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+            test_dict: Dict[str, str] = {}
+            # Changes to the various properties of the first and
+            # second state.
+            change_list = [exp_domain.ExplorationChange({
+                'old_value': 'TextInput',
+                'cmd': 'edit_state_property',
+                'property_name': 'widget_id',
+                'new_value': None,
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {
+                        'value': 1
+                    },
                     'catchMisspellings': {
                         'value': False
                     }
-                })
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'widget_customization_args',
+                'new_value': test_dict,
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': None,
+                'cmd': 'edit_state_property',
+                'property_name': 'widget_id',
+                'new_value': 'NumericInput',
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'state_name': 'Introduction',
+                'old_value':
+                {
+                    'requireNonnegativeInput':
+                    {
+                        'value': True
+                    }
+                },
+                'property_name': 'widget_customization_args',
+                'new_value':
+                {
+                    'requireNonnegativeInput':
+                    {
+                        'value': False
+                    }
+                },
+                'cmd': 'edit_state_property'
+            }), exp_domain.ExplorationChange({
+                'old_value': ['old_value'],
+                'cmd': 'edit_state_property',
+                'property_name': 'answer_groups',
+                'new_value': [
+                    {
+                        'tagged_skill_misconception_id': None,
+                        'rule_specs': [
+                            {
+                                'rule_type': 'IsLessThanOrEqualTo',
+                                'inputs': {
+                                    'x': 50
+                                }
+                            }
+                        ],
+                        'training_data': [],
+                        'outcome': {
+                            'param_changes': [],
+                            'dest': 'End',
+                            'dest_if_really_stuck': None,
+                            'missing_prerequisite_skill_id': None,
+                            'feedback': {
+                                'content_id': (
+                                    self.content_id_generator.generate(
+                                        translation_domain.ContentType.FEEDBACK
+                                    )
+                                ),
+                                'html': ''
+                            },
+                            'labelled_as_correct': False,
+                            'refresher_exploration_id': None
+                        }
+                    }
+                ],
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': ['old_value'],
+                'cmd': 'edit_state_property',
+                'property_name': 'hints',
+                'new_value': [
+                    {
+                        'hint_content': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'html': '<p>Hint.</p>'
+                        }
+                    }
+                ],
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': 'Congratulations, you have finished!'
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': '<p>2Congratulations, you have finished!</p>'
+                },
+                'state_name': 'End'
+            })]
 
-        return states_dict
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list),
+                'Changed various properties in both states.')
 
-    @classmethod
-    def _fix_labelled_as_correct_value_in_state_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """If destination is `try again` and the value of labelled_as_correct
-            is True, replaces it with False
+            change_list_2 = [exp_domain.ExplorationChange({
+                'new_state_name': 'End-State',
+                'cmd': 'rename_state',
+                'old_state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'delete_state',
+                'state_name': 'End-State'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'add_state',
+                'state_name': 'End',
+                'content_id_for_state_content': 'content_0',
+                'content_id_for_default_outcome': 'default_outcome_1'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'delete_state',
+                'state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'add_state',
+                'state_name': 'End',
+                'content_id_for_state_content': 'content_0',
+                'content_id_for_default_outcome': 'default_outcome_1'
+            }), exp_domain.ExplorationChange({
+                'new_state_name': 'End-State',
+                'cmd': 'rename_state',
+                'old_state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'new_state_name': 'End',
+                'cmd': 'rename_state',
+                'old_state_name': 'End-State'
+            }), exp_domain.ExplorationChange({
+                'old_value': [{
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [{
+                        'rule_type': 'IsLessThanOrEqualTo',
+                        'inputs': {
+                            'x': 50
+                        }
+                    }],
+                    'training_data': [],
+                    'outcome': {
+                        'param_changes': [],
+                        'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    }
+                }],
+                'cmd': 'edit_state_property',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [{
+                        'rule_type': 'IsLessThanOrEqualTo',
+                        'inputs': {
+                            'x': 50
+                        }
+                    }],
+                    'training_data': [],
+                    'outcome': {
+                        'param_changes': [],
+                        'dest': 'End',
+                        'dest_if_really_stuck': None,
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    }
+                }],
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': {
+                    'param_changes': [],
+                    'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'old_value': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                    'html': 'Congratulations, you have finished!'
+                },
+                'state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'old_value': None,
+                'cmd': 'edit_state_property',
+                'property_name': 'widget_id',
+                'new_value': 'EndExploration',
+                'state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'old_value': test_dict,
+                'cmd': 'edit_state_property',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'recommendedExplorationIds': {
+                        'value': []
+                    }
+                },
+                'state_name': 'End'
+            }), exp_domain.ExplorationChange({
+                'old_value': {
+                    'param_changes': [],
+                    'dest': 'End',
+                    'dest_if_really_stuck': None,
+                    'missing_prerequisite_skill_id': None,
+                    'feedback': {
+                        'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                        'html': ''
+                    },
+                    'labelled_as_correct': False,
+                    'refresher_exploration_id': None
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'default_outcome',
+                'new_value': None,
+                'state_name': 'End'
+            })]
 
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_2),
+                'Added and deleted states.')
+            change_list_3 = [exp_domain.ExplorationChange({
+                'old_value': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'new_value': {
+                    'html': '<p>Hello Aryaman!</p>',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'cmd': 'edit_state_property'
+            })]
+            changes_are_not_mergeable = exp_services.are_changes_mergeable(
+                self.EXP_0_ID, 1, change_list_3)
+            self.assertEqual(changes_are_not_mergeable, False)
 
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_name, state_dict in states_dict.items():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                # labelled_as_correct should not be True if dest is try again.
-                if answer_group['outcome']['dest'] == state_name:
-                    answer_group['outcome']['labelled_as_correct'] = False
+            change_list_3_dict = [change.to_dict() for change in change_list_3]
 
-            state_dict['interaction']['answer_groups'] = answer_groups
-
-        return states_dict
-
-    # ########################################################.
-    # Fix validation errors for exploration state interaction.
-    # ########################################################.
-    @classmethod
-    def _choices_should_be_unique_and_non_empty(
-        cls,
-        choices: List[state_domain.SubtitledHtmlDict],
-        answer_groups: List[state_domain.AnswerGroupDict],
-        state_dict: state_domain.StateDict,
-        *,
-        is_item_selection_interaction: bool = False
-    ) -> None:
-        """Handles choices present in the ItemSelectionInput or
-        in MultipleChoiceInput interactions, implements the following:
-            - If only one choice is empty then simply removes it
-            - If multiple choices are empty replace them with `Choice 1` ,
-            `Choice 2` etc
-            - If choices are duplicate, removes the later choice
-            - Remove the rules whose choices has been deleted
-
-        Args:
-            choices: List[state_domain.SubtitledHtmlDict]. A list of choices.
-            answer_groups: List[state_domain.AnswerGroupDict]. The list of
-                answer groups.
-            state_dict: state_domain.StateDict. The exploration state.
-            is_item_selection_interaction: bool. If the answer group belongs
-                to ItemSelectionInput interaction or not.
-        """
-        empty_choices: List[state_domain.SubtitledHtmlDict] = []
-        seen_choices: List[str] = []
-        choices_to_remove: List[state_domain.SubtitledHtmlDict] = []
-        invalid_choices_index = []
-        invalid_choices_content_ids = []
-        content_ids_of_choices_to_update = []
-        choices_content = []
-        for choice in choices:
-            choices_content.append(choice['html'])
-            if html_cleaner.is_html_empty(choice['html']):
-                empty_choices.append(choice)
-
-        if len(empty_choices) == 1:
-            invalid_choices_index.append(choices.index(empty_choices[0]))
-            invalid_choices_content_ids.append(empty_choices[0]['content_id'])
-            choices_to_remove.append(empty_choices[0])
-        else:
-            for idx, empty_choice in enumerate(empty_choices):
-                valid_choice = (
-                    '<p>' + 'Choice ' + str(idx + 1) + '</p>'
-                )
-                if valid_choice in choices_content:
-                    choices_to_remove.append(empty_choice)
-                else:
-                    empty_choice['html'] = valid_choice
-                    content_ids_of_choices_to_update.append(
-                        empty_choice['content_id'])
-
-        # Duplicate choices.
-        for choice in choices:
-            if choice['html'] not in seen_choices:
-                seen_choices.append(choice['html'])
-            else:
-                choices_to_remove.append(choice)
-                invalid_choices_index.append(choices.index(choice))
-                invalid_choices_content_ids.append(choice['content_id'])
-
-        # Remove rules whose choice has been deleted.
-        empty_ans_groups = []
-        for answer_group in answer_groups:
-            invalid_rules = []
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec['rule_type'] == 'Equals':
-                    if rule_spec['inputs']['x'] in invalid_choices_index:
-                        invalid_rules.append(rule_spec)
-                    if is_item_selection_interaction:
-                        rule_inputs = rule_spec['inputs']
-                        assert isinstance(rule_inputs, dict)
-                        rule_values = rule_inputs['x']
-                        assert isinstance(rule_values, list)
-                        if any(
-                            item in rule_values for item in
-                            invalid_choices_content_ids
-                        ):
-                            invalid_rules.append(rule_spec)
-
-            for invalid_rule in invalid_rules:
-                answer_group['rule_specs'].remove(invalid_rule)
-            if (
-                len(answer_group['rule_specs']) == 0 and
-                answer_group not in empty_ans_groups
-            ):
-                empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        # Remove solution if invalid choice is present.
-        if state_dict['interaction']['solution'] is not None:
-            solution = state_dict['interaction']['solution']['correct_answer']
-            if isinstance(solution, list) and any(
-                invalid_choice['content_id'] in solution for invalid_choice in
-                choices_to_remove
-            ):
-                state_dict['interaction']['solution'] = None
-
-        for choice_to_remove in choices_to_remove:
-            choices.remove(choice_to_remove)
-
-        # Marking the content ids that needs update.
-        for content_id in content_ids_of_choices_to_update:
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            choice_translations = state_dict['written_translations'][  # type: ignore[misc]
-                'translations_mapping'][content_id]
-            for translation in choice_translations.values():
-                translation['needs_update'] = True
-
-            choice_voiceovers = state_dict['recorded_voiceovers'][
-                'voiceovers_mapping'][content_id]
-            for choice_voiceover in choice_voiceovers.values():
-                choice_voiceover['needs_update'] = True
-
-        # Fix RTE content present inside the choices.
-        for choice in choices:
-            choice_html = choice['html']
-            choice['html'] = cls.fix_content(choice_html)
-
-    @classmethod
-    def _set_lower_and_upper_bounds(
-        cls,
-        range_var: RangeVariableDict,
-        lower_bound: Optional[float],
-        upper_bound: Optional[float],
-        *,
-        lb_inclusive: bool,
-        ub_inclusive: bool
-    ) -> None:
-        """Sets the lower and upper bounds for the range_var.
-
-        Args:
-            range_var: dict[str, Any]. Variable used to keep track of each
-                range.
-            lower_bound: Optional[float]. The lower bound.
-            upper_bound: Optional[float]. The upper bound.
-            lb_inclusive: bool. If lower bound is inclusive.
-            ub_inclusive: bool. If upper bound is inclusive.
-        """
-        range_var['lower_bound'] = lower_bound
-        range_var['upper_bound'] = upper_bound
-        range_var['lb_inclusive'] = lb_inclusive
-        range_var['ub_inclusive'] = ub_inclusive
-
-    @classmethod
-    def _is_enclosed_by(
-        cls,
-        test_range: RangeVariableDict,
-        base_range: RangeVariableDict
-    ) -> bool:
-        """Checks whether the ranges of rules enclosed or not
-
-        Args:
-            test_range: RangeVariableDict. It represents the variable for
-                which we have to check the range.
-            base_range: RangeVariableDict. It is the variable to which
-                the range is compared.
-
-        Returns:
-            bool. Returns True if both rule's ranges are enclosed.
-        """
-        if (
-            base_range['lower_bound'] is None or
-            test_range['lower_bound'] is None or
-            base_range['upper_bound'] is None or
-            test_range['upper_bound'] is None
-        ):
-            return False
-
-        lb_satisfied = (
-            base_range['lower_bound'] < test_range['lower_bound'] or
-            (
-                base_range['lower_bound'] == test_range['lower_bound'] and
-                (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
+            expected_email_html_body = (
+                '(Sent from dev-project-id)<br/><br/>'
+                'Hi Admin,<br><br>'
+                'Some draft changes were rejected in exploration %s because '
+                'the changes were conflicting and could not be saved. Please '
+                'see the rejected change list below:<br>'
+                'Discarded change list: %s <br><br>'
+                'Frontend Version: %s<br>'
+                'Backend Version: %s<br><br>'
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 1, 3)
             )
-        )
-        ub_satisfied = (
-            base_range['upper_bound'] > test_range['upper_bound'] or
-            (
-                base_range['upper_bound'] == test_range['upper_bound'] and
-                (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+    def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
+        self
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            self.save_new_valid_exploration(
+                self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+            rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+            change_list = [exp_domain.ExplorationChange({
+                'old_value': {
+                    'html': '',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'new_value': {
+                    'html': '<p>End State</p>',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'state_name': 'End',
+                'property_name': 'content',
+                'cmd': 'edit_state_property'
+            })]
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list),
+                'Changed various properties in both states.')
+
+            # State name changed.
+            change_list_2 = [exp_domain.ExplorationChange({
+                'new_state_name': 'End-State',
+                'cmd': 'rename_state',
+                'old_state_name': 'End'
+            })]
+
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID,
+                self.append_next_content_id_index_change(change_list_2),
+                'Changed various properties in both states.')
+
+            change_list_3 = [exp_domain.ExplorationChange({
+                'old_value': {
+                    'html': 'End State',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'new_value': {
+                    'html': '<p>End State Changed</p>',
+                    'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK)
+                },
+                'state_name': 'End',
+                'property_name': 'content',
+                'cmd': 'edit_state_property'
+            })]
+            changes_are_not_mergeable = exp_services.are_changes_mergeable(
+                self.EXP_0_ID, 2, change_list_3)
+            self.assertEqual(changes_are_not_mergeable, False)
+
+            change_list_3_dict = [change.to_dict() for change in change_list_3]
+            expected_email_html_body = (
+                '(Sent from dev-project-id)<br/><br/>'
+                'Hi Admin,<br><br>'
+                'Some draft changes were rejected in exploration %s because '
+                'the changes were conflicting and could not be saved. Please '
+                'see the rejected change list below:<br>'
+                'Discarded change list: %s <br><br>'
+                'Frontend Version: %s<br>'
+                'Backend Version: %s<br><br>'
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
             )
-        )
-        return lb_satisfied and ub_satisfied
-
-    @classmethod
-    def _should_check_range_criteria(
-        cls,
-        earlier_rule: state_domain.RuleSpecDict,
-        later_rule: state_domain.RuleSpecDict
-    ) -> bool:
-        """Checks the range criteria between two rules by comparing their
-        rule type
-
-        Args:
-            earlier_rule: state_domain.RuleSpecDict. Previous rule.
-            later_rule: state_domain.RuleSpecDict. Current rule.
-
-        Returns:
-            bool. Returns True if the rules passes the range criteria check.
-        """
-        if earlier_rule['rule_type'] in (
-            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
-            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
-        ):
-            return True
-        return later_rule['rule_type'] in (
-            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
-        )
-
-    @classmethod
-    def _get_rule_value_of_fraction_interaction(
-        cls, rule_spec: state_domain.RuleSpecDict
-    ) -> float:
-        """Returns rule value of the rule_spec of FractionInput interaction so
-        that we can keep track of rule's range
-
-        Args:
-            rule_spec: state_domain.RuleSpecDict. Rule spec of an answer group.
-
-        Returns:
-            value: float. The value of the rule spec.
-        """
-        rule_input = rule_spec['inputs']
-        assert isinstance(rule_input, dict)
-        rule_value_f = rule_input['f']
-        assert isinstance(rule_value_f, dict)
-        value: float = (
-            rule_value_f['wholeNumber'] +
-            float(rule_value_f['numerator']) / rule_value_f['denominator']
-        )
-        return value
-
-    @classmethod
-    def _remove_duplicate_rules_inside_answer_groups(
-        cls,
-        answer_groups: List[state_domain.AnswerGroupDict],
-        state_name: str
-    ) -> None:
-        """Removes the duplicate rules present inside the answer groups. This
-        will simply removes the rule which do not point to another state
-        to avoid state disconnection. If both of them do not point to different
-        state we will simply remove the later one
-
-        Args:
-            answer_groups: List[state_domain.AnswerGroupDict]. The answer groups
-                present inside the state.
-            state_name: str. The state name.
-        """
-        rules_to_remove_with_diff_dest_node = []
-        rules_to_remove_with_try_again_dest_node = []
-        seen_rules_with_try_again_dest_node = []
-        seen_rules_with_diff_dest_node = []
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                if rule_spec in seen_rules_with_try_again_dest_node:
-                    if (
-                        answer_group['outcome']['dest'] != state_name and
-                        rule_spec not in seen_rules_with_diff_dest_node
-                    ):
-                        seen_rules_with_diff_dest_node.append(rule_spec)
-                        rules_to_remove_with_try_again_dest_node.append(
-                            rule_spec)
-                    elif (
-                        answer_group['outcome']['dest'] != state_name and
-                        rule_spec in seen_rules_with_diff_dest_node
-                    ):
-                        rules_to_remove_with_diff_dest_node.append(rule_spec)
-                    else:
-                        rules_to_remove_with_try_again_dest_node.append(
-                            rule_spec)
-
-                elif rule_spec in seen_rules_with_diff_dest_node:
-                    if answer_group['outcome']['dest'] != state_name:
-                        rules_to_remove_with_diff_dest_node.append(rule_spec)
-                    else:
-                        rules_to_remove_with_try_again_dest_node.append(
-                            rule_spec)
-
-                else:
-                    if (
-                        rule_spec not in seen_rules_with_try_again_dest_node and
-                        answer_group['outcome']['dest'] == state_name
-                    ):
-                        seen_rules_with_try_again_dest_node.append(rule_spec)
-                    if (
-                        rule_spec not in seen_rules_with_diff_dest_node and
-                        answer_group['outcome']['dest'] != state_name
-                    ):
-                        seen_rules_with_diff_dest_node.append(rule_spec)
-
-        empty_ans_groups = []
-        for rule_to_remove in rules_to_remove_with_try_again_dest_node:
-            removed_try_again_rule = False
-            for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove and
-                        answer_group['outcome']['dest'] == state_name
-                    ):
-                        removed_try_again_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_try_again_rule:
-                    break
-
-        for rule_to_remove in rules_to_remove_with_diff_dest_node:
-            removed_dest_rule = False
-            for answer_group in reversed(answer_groups):
-                for rule_spec in reversed(answer_group['rule_specs']):
-                    if (
-                        rule_spec == rule_to_remove and
-                        answer_group['outcome']['dest'] != state_name
-                    ):
-                        removed_dest_rule = True
-                        answer_group['rule_specs'].remove(rule_to_remove)
-                        break
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-                if removed_dest_rule:
-                    break
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-    @classmethod
-    def _fix_continue_interaction(
-        cls, state_dict: state_domain.StateDict, language_code: str
-    ) -> None:
-        """Fixes Continue interaction where the length of the text value
-        is more than 20. We simply replace them with the word `Continue`
-        according to the language code
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary.
-            language_code: str. The language code of the exploration.
-        """
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to SubtitledUnicodeDict type, and this
-        # is done because here we are accessing 'buttontext' key from continue
-        # customization arg whose value is always of SubtitledUnicodeDict type.
-        button_text_subtitled_unicode_dict = cast(
-            state_domain.SubtitledUnicodeDict,
-            state_dict['interaction']['customization_args']['buttonText'][
-                'value'
-            ]
-        )
-        text_value = button_text_subtitled_unicode_dict['unicode_str']
-        content_id = button_text_subtitled_unicode_dict['content_id']
-        lang_code_to_unicode_str_dict = {
-            'en': 'Continue',
-            'es': 'Continuar',
-            'nl': 'Doorgaan',
-            'ru': 'Продолжить',
-            'fr': 'Continuer',
-            'ca': 'Continua',
-            'hu': 'Folytatás',
-            'zh': '继续',
-            'it': 'Continua',
-            'fi': 'Jatka',
-            'pt': 'Continuar',
-            'de': 'Fortfahren',
-            'ar': 'استمرار',
-            'tr': 'İlerle'
-        }
-        if len(text_value) > 20:
-            if language_code in lang_code_to_unicode_str_dict:
-                button_text_subtitled_unicode_dict['unicode_str'] = (
-                    lang_code_to_unicode_str_dict[language_code]
-                )
-            else:
-                button_text_subtitled_unicode_dict['unicode_str'] = 'Continue'
-
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            continue_button_translations = state_dict['written_translations'][ # type: ignore[misc]
-                'translations_mapping'][content_id]
-            for translation in continue_button_translations.values():
-                translation['needs_update'] = True
-
-            choice_voiceovers = state_dict['recorded_voiceovers'][
-                'voiceovers_mapping'][content_id]
-            for choice_voiceover in choice_voiceovers.values():
-                choice_voiceover['needs_update'] = True
-
-    @classmethod
-    def _fix_end_interaction(cls, state_dict: state_domain.StateDict) -> None:
-        """Fixes the End exploration interaction where the recommended
-        explorations are more than 3. We simply slice them till the
-        length 3
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary.
-        """
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to List[str] type, and this is done
-        # because here we are accessing 'recommendedExplorationIds' key from
-        # EndExploration customization arg whose value is always of List[str]
-        # type.
-        recc_exp_ids = cast(
-            List[str],
-            state_dict['interaction']['customization_args'][
-                'recommendedExplorationIds'
-            ]['value']
-        )
-        # Should be at most 3 recommended explorations.
-        state_dict['interaction']['customization_args'][
-            'recommendedExplorationIds']['value'] = recc_exp_ids[:3]
-
-    @classmethod
-    def _fix_numeric_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes NumericInput interaction for the following cases:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - The rule should not match previous rules solution means it should
-        not be in the range of previous rules solution otherwise the later
-        answer group will be redundant and will never be matched. Simply the
-        invalid rule will be removed and if only one rule is present then the
-        complete answer group is removed
-        - As this interaction is only for the numeric values, all string values
-        will be considered as invalid and will be removed
-        - `tol` value in `IsWithinTolerance` rule must be positive else will be
-        converted to positive value
-        - `a` should not be greater than `b` in `IsInclusivelyBetween` rule else
-        we will simply swap them
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        answer_groups = state_dict['interaction']['answer_groups']
-        lower_infinity = float('-inf')
-        upper_infinity = float('inf')
-        invalid_rules = []
-        ranges: List[RangeVariableDict] = []
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-        # All rules should have solutions that do not match
-        # previous rules' solutions.
-        for ans_group_index, answer_group in enumerate(answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group['rule_specs']
-            ):
-                range_var: RangeVariableDict = {
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'lower_bound': None,
-                    'upper_bound': None,
-                    'lb_inclusive': False,
-                    'ub_inclusive': False
-                }
-                rule_inputs = rule_spec['inputs']
-                assert isinstance(rule_inputs, dict)
-                if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
-                    try:
-                        assert isinstance(rule_inputs['x'], float)
-                        rule_value = float(rule_inputs['x'])
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            lower_infinity,
-                            rule_value,
-                            lb_inclusive=False,
-                            ub_inclusive=True
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
-                    try:
-                        assert isinstance(rule_inputs['x'], float)
-                        rule_value = float(rule_inputs['x'])
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            rule_value,
-                            upper_infinity,
-                            lb_inclusive=True,
-                            ub_inclusive=False
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'Equals':
-                    try:
-                        assert isinstance(rule_inputs['x'], float)
-                        rule_value = float(rule_inputs['x'])
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            rule_value,
-                            rule_value,
-                            lb_inclusive=True,
-                            ub_inclusive=True
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'IsLessThan':
-                    try:
-                        assert isinstance(rule_inputs['x'], float)
-                        rule_value = float(rule_inputs['x'])
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            lower_infinity,
-                            rule_value,
-                            lb_inclusive=False,
-                            ub_inclusive=False
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'IsWithinTolerance':
-                    try:
-                        rule_value_x = rule_inputs['x']
-                        assert isinstance(rule_value_x, float)
-                        rule_value_tol = rule_inputs['tol']
-                        assert isinstance(rule_value_tol, float)
-                        # The `tolerance` value needs to be a positive value.
-                        if rule_value_tol <= 0:
-                            rule_spec['inputs']['tol'] = abs(rule_value_tol)
-                        rule_value_x = float(rule_value_x)
-                        rule_value_tol = float(rule_value_tol)
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            rule_value_x - rule_value_tol,
-                            rule_value_x + rule_value_tol,
-                            lb_inclusive=True,
-                            ub_inclusive=True
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'IsGreaterThan':
-                    try:
-                        assert isinstance(rule_inputs['x'], float)
-                        rule_value = float(rule_inputs['x'])
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            rule_value,
-                            upper_infinity,
-                            lb_inclusive=False,
-                            ub_inclusive=False
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
-                    try:
-                        value_a = rule_inputs['a']
-                        assert isinstance(value_a, float)
-                        value_b = rule_inputs['b']
-                        assert isinstance(value_b, float)
-                        # For x in [a, b], a must not be greater than b.
-                        if value_a > value_b:
-                            rule_spec['inputs']['a'] = value_b
-                            rule_spec['inputs']['b'] = value_a
-                        elif value_a == value_b:
-                            rule_spec['rule_type'] = 'Equals'
-                            rule_spec['inputs'] = {'x': value_a}
-                            assert isinstance(rule_spec['inputs']['x'], float)
-                            rule_value = float(rule_spec['inputs']['x'])
-                            cls._set_lower_and_upper_bounds(
-                                range_var,
-                                rule_value,
-                                rule_value,
-                                lb_inclusive=True,
-                                ub_inclusive=True
-                            )
-                            continue
-                        rule_value_a = float(value_a)
-                        rule_value_b = float(value_b)
-                        cls._set_lower_and_upper_bounds(
-                            range_var,
-                            rule_value_a,
-                            rule_value_b,
-                            lb_inclusive=True,
-                            ub_inclusive=True
-                        )
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                for range_ele in ranges:
-                    if cls._is_enclosed_by(range_var, range_ele):
-                        invalid_rules.append(rule_spec)
-                ranges.append(range_var)
-
-        # Removing all the invalid rules.
-        empty_ans_groups = []
-        for invalid_rule in invalid_rules:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == invalid_rule:
-                        answer_group['rule_specs'].remove(rule_spec)
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _fix_fraction_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes FractionInput interaction for the following cases:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - The rule should not match previous rules solution means it should
-        not be in the range of previous rules solution. Invalid rules will
-        be removed.
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        # All rules should have solutions that do not match
-        # previous rules' solutions.
-        answer_groups = state_dict['interaction']['answer_groups']
-        lower_infinity = float('-inf')
-        upper_infinity = float('inf')
-        ranges: List[RangeVariableDict] = []
-        invalid_rules = []
-        matched_denominator_list: List[MatchedDenominatorDict] = []
-        rules_that_can_have_improper_fractions = [
-            'IsExactlyEqualTo',
-            'HasFractionalPartExactlyEqualTo'
-        ]
-        allow_imp_frac = state_dict['interaction']['customization_args'][
-            'allowImproperFraction']['value']
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-        for ans_group_index, answer_group in enumerate(answer_groups):
-            for rule_spec_index, rule_spec in enumerate(
-                answer_group['rule_specs']
-            ):
-                range_var: RangeVariableDict = {
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'lower_bound': None,
-                    'upper_bound': None,
-                    'lb_inclusive': False,
-                    'ub_inclusive': False
-                }
-                matched_denominator: MatchedDenominatorDict = {
-                    'ans_group_index': int(ans_group_index),
-                    'rule_spec_index': int(rule_spec_index),
-                    'denominator': 0
-                }
-
-                if (
-                    rule_spec['rule_type'] in
-                    rules_that_can_have_improper_fractions
-                ):
-                    inputs = rule_spec['inputs']
-                    assert isinstance(inputs, dict)
-                    value_f = inputs['f']
-                    assert isinstance(value_f, dict)
-                    num = value_f['numerator']
-                    assert isinstance(num, int)
-                    deno = value_f['denominator']
-                    assert isinstance(deno, int)
-                    if not allow_imp_frac and deno <= num:
-                        invalid_rules.append(rule_spec)
-                        continue
-
-                if rule_spec['rule_type'] in (
-                    'IsEquivalentTo', 'IsExactlyEqualTo',
-                    'IsEquivalentToAndInSimplestForm'
-                ):
-                    rule_value_equal: float = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec))
-                    cls._set_lower_and_upper_bounds(
-                        range_var,
-                        rule_value_equal,
-                        rule_value_equal,
-                        lb_inclusive=True,
-                        ub_inclusive=True
-                    )
-
-                elif rule_spec['rule_type'] == 'IsGreaterThan':
-                    rule_value_greater: float = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec))
-
-                    cls._set_lower_and_upper_bounds(
-                        range_var,
-                        rule_value_greater,
-                        upper_infinity,
-                        lb_inclusive=False,
-                        ub_inclusive=False
-                    )
-
-                elif rule_spec['rule_type'] == 'IsLessThan':
-                    rule_value_less_than: float = (
-                        cls._get_rule_value_of_fraction_interaction(rule_spec))
-
-                    cls._set_lower_and_upper_bounds(
-                        range_var,
-                        lower_infinity,
-                        rule_value_less_than,
-                        lb_inclusive=False,
-                        ub_inclusive=False
-                    )
-
-                elif rule_spec['rule_type'] == 'HasDenominatorEqualTo':
-                    try:
-                        rule_inputs = rule_spec['inputs']
-                        assert isinstance(rule_inputs, dict)
-                        assert isinstance(rule_inputs['x'], int)
-                        rule_value_x = int(rule_inputs['x'])
-                        matched_denominator['denominator'] = rule_value_x
-                    except Exception:
-                        invalid_rules.append(rule_spec)
-
-                for range_ele in ranges:
-                    earlier_rule = answer_groups[range_ele[
-                        'ans_group_index']]['rule_specs'][
-                            range_ele['rule_spec_index']]
-                    if (
-                        cls._should_check_range_criteria(
-                            earlier_rule, rule_spec
-                        ) and cls._is_enclosed_by(range_var, range_ele)
-                    ):
-                        invalid_rules.append(rule_spec)
-
-                for den in matched_denominator_list:
-                    if (
-                        rule_spec['rule_type'] ==
-                        'HasFractionalPartExactlyEqualTo'
-                    ):
-                        rule_spec_f = rule_spec['inputs']['f']
-                        assert isinstance(rule_spec_f, dict)
-                        if den['denominator'] == rule_spec_f['denominator']:
-                            invalid_rules.append(rule_spec)
-
-                ranges.append(range_var)
-                matched_denominator_list.append(matched_denominator)
-
-        empty_ans_groups = []
-        for invalid_rule in invalid_rules:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == invalid_rule:
-                        answer_group['rule_specs'].remove(rule_spec)
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _fix_multiple_choice_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes MultipleChoiceInput interaction for the following cases:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - No answer choice should appear in more than one rule else the
-        latter rule will be removed
-        - Answer choices should be non-empty and unique else will be fixed
-        accordingly
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        answer_groups = state_dict['interaction']['answer_groups']
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to List[SubtitledHtmlDict] type,
-        # and this is done because here we are accessing 'choices' key from
-        # MultipleChoiceInput customization arg whose value is always of
-        # List[SubtitledHtmlDict] type.
-        choices = (
-            cast(
-                List[state_domain.SubtitledHtmlDict],
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'
-                ]
-            )
-        )
-        cls._choices_should_be_unique_and_non_empty(
-            choices,
-            answer_groups,
-            state_dict,
-            is_item_selection_interaction=False)
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-
-        state_dict['interaction']['customization_args']['choices'][
-            'value'] = choices
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _fix_item_selection_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes ItemSelectionInput interaction for the following cases:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - `Equals` rule should have value between min and max number
-        of selections else the rule will be removed
-        - Minimum number of selections should be no greater than
-        maximum number of selections else we will simply swap the values
-        - There should be enough choices to have minimum number of selections
-        else the minimum value will be set to 1
-        - All choices should be unique and non-empty else will be handled
-        accordingly
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to int type, and this is done because
-        # here we are accessing 'minAllowableSelectionCount' key from
-        # ItemSelectionInput Customization arg whose value is always of int
-        # type.
-        min_value = cast(
-            int,
-            state_dict['interaction']['customization_args'][
-                'minAllowableSelectionCount'
-            ]['value']
-        )
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to int type, and this is done because
-        # here we are accessing 'maxAllowableSelectionCount' key from
-        # ItemSelectionInput Customization arg whose value is always of int
-        # type.
-        max_value = cast(
-            int,
-            state_dict['interaction']['customization_args'][
-                'maxAllowableSelectionCount'
-            ]['value']
-        )
-        # Here we use cast because we are narrowing down the type from
-        # various customization args value types to List[SubtitledHtmlDict]
-        # type, and this is done because here we are accessing 'choices' key
-        # from ItemSelectionInput customization arg whose value is always of
-        # List[SubtitledHtmlDict] type.
-        choices = (
-            cast(
-                List[state_domain.SubtitledHtmlDict],
-                state_dict['interaction']['customization_args'][
-                    'choices'
-                ]['value']
-            )
-        )
-        answer_groups = state_dict['interaction']['answer_groups']
-
-        # Rules should not be duplicate.
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-
-        # Minimum number of selections should be no greater than maximum
-        # number of selections.
-        if min_value > max_value:
-            min_value, max_value = max_value, min_value
-
-        # There should be enough choices to have minimum number
-        # of selections.
-        if len(choices) < min_value:
-            min_value = 1
-
-        # All choices should be unique and non-empty.
-        cls._choices_should_be_unique_and_non_empty(
-            choices,
-            answer_groups,
-            state_dict,
-            is_item_selection_interaction=True)
-
-        empty_ans_groups = []
-        for answer_group in answer_groups:
-            invalid_rules = []
-            for rule_spec in answer_group['rule_specs']:
-                # `Equals` should have between min and max number of selections.
-                if rule_spec['rule_type'] == 'Equals':
-                    rule_value = rule_spec['inputs']['x']
-                    assert isinstance(rule_value, list)
-                    if (
-                        len(rule_value) < min_value or
-                        len(rule_value) > max_value
-                    ):
-                        if (
-                            answer_group['outcome']['dest'] == state_name or
-                            len(rule_value) == 0
-                        ):
-                            invalid_rules.append(rule_spec)
-                        else:
-                            min_value = min(min_value, len(rule_value))
-                            max_value = max(max_value, len(rule_value))
-
-            for invalid_rule in invalid_rules:
-                answer_group['rule_specs'].remove(invalid_rule)
-
-            if (
-                len(answer_group['rule_specs']) == 0 and
-                answer_group not in empty_ans_groups
-            ):
-                empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        state_dict['interaction']['customization_args'][
-            'minAllowableSelectionCount'
-        ]['value'] = min_value
-        state_dict['interaction']['customization_args'][
-            'maxAllowableSelectionCount'
-        ]['value'] = max_value
-        state_dict['interaction']['customization_args']['choices'][
-            'value'
-        ] = choices
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _update_rule_value_having_empty_choices(
-        cls,
-        empty_choices: List[state_domain.SubtitledHtmlDict],
-        rule_value_x: List[List[str]],
-        solution: Optional[List[List[str]]]
-    ) -> None:
-        """Removing empty choice from the rule values.
-
-        Args:
-            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
-                empty choices.
-            rule_value_x: List[List[str]]. The rule spec value.
-            solution: Optional[List[List[str]]]. The solution of the state.
-        """
-        for empty_choice in empty_choices:
-            for rule_value in rule_value_x:
-                for choice in rule_value:
-                    if choice == empty_choice['content_id']:
-                        rule_value.remove(choice)
-                        break
-                if len(rule_value) == 0:
-                    rule_value_x.remove(rule_value)
-                    break
-
-            if solution is not None and isinstance(solution, list):
-                for choice_list in solution:
-                    for choice in choice_list:
-                        if choice == empty_choice['content_id']:
-                            choice_list.remove(choice)
-                            break
-                    if len(choice_list) == 0:
-                        solution.remove(choice_list)
-                        break
-
-    @classmethod
-    def _is_empty_choice_in_rule_value(
-        cls,
-        empty_choices: List[state_domain.SubtitledHtmlDict],
-        value: str
-    ) -> bool:
-        """Returns True if the empty choice is present inside the value.
-
-        Args:
-            empty_choices: List[state_domain.SubtitledHtmlDict]. The list of
-                choices.
-            value: str. The value which needs to be checked.
-
-        Returns:
-            bool. Returns True if the empty choice is equal to the given value.
-        """
-        for empty_choice in empty_choices:
-            if value == empty_choice['content_id']:
-                return True
-
-        return False
-
-    @classmethod
-    def _fix_drag_and_drop_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes the DragAndDropInput interaction with following checks:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - Multiple items cannot be in the same place iff the setting is
-        turned off. Rule will simply be removed
-        - `IsEqualToOrderingWithOneItemAtIncorrectPosition` rule should
-        not be present when `multiple items at same place` setting
-        is turned off. Rule will simply be removed
-        - In `HasElementXBeforeElementY` rule, `X` value should not be
-        equal to `Y` value. Rule will simply be removed
-        - Rule `IsEqualToOrdering` having empty values is removed
-        - The `Equals` rule should always come before `HasElementXAtPositionY`
-        where the element `X` is present at position `Y` inside `Equals`
-        rule otherwise the rule will never going to match. We will simply remove
-        the `Equals` rule as it will never going to match
-        - The `Equals` rule should always come before
-        `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
-        rule will never going to match. We will simply remove
-        the `Equals` rule as it will never going to match
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        answer_groups = state_dict['interaction']['answer_groups']
-        multi_item_value = (
-            state_dict['interaction']['customization_args']
-            ['allowMultipleItemsInSamePosition']['value']
-        )
-        invalid_rules = []
-        ele_x_at_y_rules: List[Dict[str, Union[str, int]]] = []
-        off_by_one_rules: List[List[List[str]]] = []
-        # Here we use cast because we are narrowing down the type from
-        # various customization args value types to List[SubtitledHtmlDict]
-        # type, and this is done because here we are accessing 'choices' key
-        # from DragAndDropInput customization arg whose value is always of
-        # List[SubtitledHtmlDict] type.
-        choices_drag_drop = (
-            cast(
-                List[state_domain.SubtitledHtmlDict],
-                state_dict['interaction']['customization_args'][
-                    'choices'
-                ]['value']
-            )
-        )
-
-        if state_dict['interaction']['solution'] is not None:
-            solution = state_dict['interaction']['solution']['correct_answer']
-        else:
-            solution = None
-
-        # Here we use cast because we are certain with the type
-        # of the solution and to avoid the mypy type check failure.
-        state_sol = cast(Optional[List[List[str]]], solution)
-
-        # Check for empty choices.
-        empty_choices = []
-        for choice_drag in choices_drag_drop:
-            if html_cleaner.is_html_empty(choice_drag['html']):
-                empty_choices.append(choice_drag)
-
-        if len(empty_choices) > 0:
-            for empty_choice in empty_choices:
-                choices_drag_drop.remove(empty_choice)
-
-        # Fix content.
-        for choice_drag in choices_drag_drop:
-            choice_html = choice_drag['html']
-            choice_drag['html'] = cls.fix_content(choice_html)
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-        for answer_group in answer_groups:
-            for rule_spec in answer_group['rule_specs']:
-                rule_inputs = rule_spec['inputs']
-                assert isinstance(rule_inputs, dict)
-                rule_spec_x = rule_inputs['x']
-
-                if (
-                    rule_spec['rule_type'] ==
-                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                ):
-                    # Here we use cast because we are certain with the type
-                    # of the rule spec and to avoid the mypy type check failure.
-                    rule_spec_val = cast(List[List[str]], rule_spec_x)
-                    if len(empty_choices) > 0:
-                        cls._update_rule_value_having_empty_choices(
-                            empty_choices, rule_spec_val, state_sol)
-                    # `IsEqualToOrderingWithOneItemAtIncorrectPosition`
-                    # rule should not be present when `multiple items at same
-                    # place` setting is turned off.
-                    if not multi_item_value:
-                        invalid_rules.append(rule_spec)
-                    else:
-                        off_by_one_rules.append(rule_spec_val)
-
-                # In `HasElementXBeforeElementY` rule, `X` value
-                # should not be equal to `Y` value.
-                elif rule_spec['rule_type'] == 'HasElementXBeforeElementY':
-                    value_x = rule_spec['inputs']['x']
-                    value_y = rule_spec['inputs']['y']
-                    assert isinstance(value_x, str)
-                    assert isinstance(value_y, str)
-                    if value_x == value_y:
-                        invalid_rules.append(rule_spec)
-
-                    if len(empty_choices) > 0:
-                        if cls._is_empty_choice_in_rule_value(
-                            empty_choices, value_x
-                        ):
-                            invalid_rules.append(rule_spec)
-                            continue
-
-                        if cls._is_empty_choice_in_rule_value(
-                            empty_choices, value_y
-                        ):
-                            invalid_rules.append(rule_spec)
-                            continue
-
-                elif rule_spec['rule_type'] == 'HasElementXAtPositionY':
-                    element = rule_spec['inputs']['x']
-                    assert isinstance(element, str)
-                    position = rule_spec['inputs']['y']
-                    assert isinstance(position, int)
-
-                    if len(empty_choices) > 0:
-                        if cls._is_empty_choice_in_rule_value(
-                            empty_choices, element
-                        ):
-                            invalid_rules.append(rule_spec)
-                            continue
-
-                    ele_x_at_y_rules.append(
-                        {'element': element, 'position': position}
-                    )
-
-                elif rule_spec['rule_type'] == 'IsEqualToOrdering':
-                    # Here we use cast because we are certain with the type
-                    # of the rule spec and to avoid the mypy type check failure.
-                    rule_spec_val_x = cast(List[List[str]], rule_spec_x)
-                    if len(empty_choices) > 0:
-                        cls._update_rule_value_having_empty_choices(
-                            empty_choices, rule_spec_val_x, state_sol)
-
-                    # Multiple items cannot be in the same place iff the
-                    # setting is turned off.
-                    for ele in rule_spec_val_x:
-                        if not multi_item_value and len(ele) > 1:
-                            invalid_rules.append(rule_spec)
-
-                    # `IsEqualToOrdering` rule should not have empty values.
-                    if len(rule_spec_val_x) <= 0:
-                        invalid_rules.append(rule_spec)
-                    else:
-                        # `IsEqualToOrdering` rule should always come before
-                        # `HasElementXAtPositionY` where element `X` is present
-                        # at position `Y` in `IsEqualToOrdering` rule.
-                        for ele_x_at_y_rule in ele_x_at_y_rules:
-                            assert isinstance(ele_x_at_y_rule, dict)
-                            ele_position = ele_x_at_y_rule['position']
-                            ele_element = ele_x_at_y_rule['element']
-                            assert isinstance(ele_position, int)
-                            if ele_position > len(rule_spec_val_x):
-                                continue
-                            rule_choice = rule_spec_val_x[ele_position - 1]
-
-                            if len(rule_choice) == 0:
-                                invalid_rules.append(rule_spec)
-                            else:
-                                for choice in rule_choice:
-                                    if choice == ele_element:
-                                        invalid_rules.append(rule_spec)
-
-                        # `IsEqualToOrdering` should always come before
-                        # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
-                        # they are off by one value.
-                        item_to_layer_idx = {}
-                        for layer_idx, layer in enumerate(rule_spec_val_x):
-                            for item in layer:
-                                item_to_layer_idx[item] = layer_idx
-
-                        for off_by_one_rule in off_by_one_rules:
-                            assert isinstance(off_by_one_rule, list)
-                            wrong_positions = 0
-                            for layer_idx, layer in enumerate(off_by_one_rule):
-                                for item in layer:
-                                    if layer_idx != item_to_layer_idx[item]:
-                                        wrong_positions += 1
-                            if wrong_positions <= 1:
-                                invalid_rules.append(rule_spec)
-
-        empty_ans_groups = []
-        for invalid_rule in invalid_rules:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == invalid_rule:
-                        answer_group['rule_specs'].remove(rule_spec)
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _fix_text_input_interaction(
-        cls, state_dict: state_domain.StateDict, state_name: str
-    ) -> None:
-        """Fixes the TextInput interaction with following checks:
-        - The rules should not be duplicate else the one with not pointing to
-        different state will be deleted
-        - Text input height shoule be >= 1 and <= 10 else we will replace with
-        10
-        - `Contains` should always come after another `Contains` rule where
-        the first contains rule strings is a substring of the other contains
-        rule strings
-        - `StartsWith` rule should always come after another `StartsWith` rule
-        where the first starts-with string is the prefix of the other
-        starts-with string
-        - `Contains` should always come after `StartsWith` rule where the
-        contains rule strings is a substring of the `StartsWith` rule string
-        - `Contains` should always come after `Equals` rule where the contains
-        rule strings is a substring of the `Equals` rule string
-        - `Contains` should always come after `Equals` rule where the contains
-        rule strings is a substring of the `Equals` rule string
-        - `Startswith` should always come after the `Equals` rule where a
-        `starts-with` string is a prefix of the `Equals` rule's string.
-
-        Args:
-            state_dict: state_domain.StateDict. The state dictionary that needs
-                to be fixed.
-            state_name: str. The name of the state.
-        """
-        answer_groups = state_dict['interaction']['answer_groups']
-        seen_strings_contains: List[List[str]] = []
-        seen_strings_startswith: List[List[str]] = []
-        invalid_rules = []
-
-        cls._remove_duplicate_rules_inside_answer_groups(
-            answer_groups, state_name)
-        # Here we use cast because we are narrowing down the type from various
-        # customization args value types to int type, and this is done because
-        # here we are accessing 'rows' key from TextInput customization arg
-        # whose value is always of int type.
-        rows_value = cast(
-            int,
-            state_dict['interaction']['customization_args']['rows']['value']
-        )
-        # Text input height shoule be >= 1 and <= 10.
-        if rows_value < 1:
-            state_dict['interaction']['customization_args'][
-                'rows']['value'] = 1
-        if rows_value > 10:
-            state_dict['interaction']['customization_args'][
-                'rows']['value'] = 10
-        for answer_group in answer_groups:
-            assert isinstance(answer_group['rule_specs'], list)
-            for rule_spec in answer_group['rule_specs']:
-                rule_spec_text = rule_spec['inputs']['x']
-                assert isinstance(rule_spec_text, dict)
-                rule_values = rule_spec_text['normalizedStrSet']
-                assert isinstance(rule_values, list)
-                if rule_spec['rule_type'] == 'Contains':
-                    # `Contains` should always come after another
-                    # `Contains` rule where the first contains rule
-                    # strings is a substring of the other contains
-                    # rule strings.
-                    for contain_rule_ele in seen_strings_contains:
-                        for contain_rule_string in contain_rule_ele:
-                            for rule_value in rule_values:
-                                if contain_rule_string in rule_value:
-                                    invalid_rules.append(rule_spec)
-                    seen_strings_contains.append(rule_values)
-                elif rule_spec['rule_type'] == 'StartsWith':
-                    # `StartsWith` rule should always come after another
-                    # `StartsWith` rule where the first starts-with string
-                    # is the prefix of the other starts-with string.
-                    for start_with_rule_ele in seen_strings_startswith:
-                        for start_with_rule_string in start_with_rule_ele:
-                            for rule_value in rule_values:
-                                if rule_value.startswith(
-                                    start_with_rule_string
-                                ):
-                                    invalid_rules.append(rule_spec)
-                    # `Contains` should always come after `StartsWith` rule
-                    # where the contains rule strings is a substring
-                    # of the `StartsWith` rule string.
-                    for contain_rule_ele in seen_strings_contains:
-                        for contain_rule_string in contain_rule_ele:
-                            for rule_value in rule_values:
-                                if contain_rule_string in rule_value:
-                                    invalid_rules.append(rule_spec)
-                    seen_strings_startswith.append(rule_values)
-                elif rule_spec['rule_type'] == 'Equals':
-                    # `Contains` should always come after `Equals` rule
-                    # where the contains rule strings is a substring
-                    # of the `Equals` rule string.
-                    for contain_rule_ele in seen_strings_contains:
-                        for contain_rule_string in contain_rule_ele:
-                            for rule_value in rule_values:
-                                if contain_rule_string in rule_value:
-                                    invalid_rules.append(rule_spec)
-                    # `Startswith` should always come after the `Equals`
-                    # rule where a `starts-with` string is a prefix of the
-                    # `Equals` rule's string.
-                    for start_with_rule_ele in seen_strings_startswith:
-                        for start_with_rule_string in start_with_rule_ele:
-                            for rule_value in rule_values:
-                                if rule_value.startswith(
-                                    start_with_rule_string
-                                ):
-                                    invalid_rules.append(rule_spec)
-
-        empty_ans_groups = []
-        for invalid_rule in invalid_rules:
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == invalid_rule:
-                        answer_group['rule_specs'].remove(rule_spec)
-
-                if (
-                    len(answer_group['rule_specs']) == 0 and
-                    answer_group not in empty_ans_groups
-                ):
-                    empty_ans_groups.append(answer_group)
-
-        for empty_ans_group in empty_ans_groups:
-            answer_groups.remove(empty_ans_group)
-
-        state_dict['interaction']['answer_groups'] = answer_groups
-
-    @classmethod
-    def _update_state_interaction(
-        cls,
-        states_dict: Dict[str, state_domain.StateDict],
-        language_code: str
-    ) -> Dict[str, state_domain.StateDict]:
-        """Handles all the invalid general state interactions
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-            language_code: str. The language code of the exploration.
-
-        Returns:
-            states_dict: Dict[str, state_domain.StateDict]. The converted
-            state dictionary.
-        """
-        for state_name, state_dict in states_dict.items():
-            interaction_id_to_fix_func: Dict[str, Callable[..., None]] = {
-                'Continue': cls._fix_continue_interaction,
-                'EndExploration': cls._fix_end_interaction,
-                'NumericInput': cls._fix_numeric_input_interaction,
-                'FractionInput': cls._fix_fraction_input_interaction,
-                'MultipleChoiceInput': (
-                    cls._fix_multiple_choice_input_interaction),
-                'ItemSelectionInput': cls._fix_item_selection_input_interaction,
-                'DragAndDropSortInput': (
-                    cls._fix_drag_and_drop_input_interaction),
-                'TextInput': cls._fix_text_input_interaction
-            }
-            interaction_id = state_dict['interaction']['id']
-            if interaction_id in interaction_id_to_fix_func:
-                if interaction_id == 'Continue':
-                    interaction_id_to_fix_func[interaction_id](
-                        state_dict, language_code)
-                elif interaction_id == 'EndExploration':
-                    interaction_id_to_fix_func[interaction_id](state_dict)
-                else:
-                    interaction_id_to_fix_func[interaction_id](
-                        state_dict, state_name)
-
-            # Update translations and voiceovers.
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
-                state_dict, state_schema=52)
-
-        return states_dict
-
-    # ################################################.
-    # Fix validation errors for exploration state RTE.
-    # ################################################.
-
-    @classmethod
-    def _is_tag_removed_with_invalid_attributes(
-        cls, tag: bs4.BeautifulSoup, attr: str
-    ) -> bool:
-        """Returns True when the tag is removed due to invalid attribute.
-
-        Args:
-            tag: bs4.BeautifulSoup. The RTE tag.
-            attr: str. The attribute that needs to be checked.
-
-        Returns:
-            bool. Returns True when the tag has been deleted.
-        """
-        if not tag.has_attr(attr):
-            tag.decompose()
-            return True
-
-        if html_cleaner.is_html_empty(tag[attr]):
-            tag.decompose()
-            return True
-
-        return False
-
-    @classmethod
-    def _fix_rte_tags(
-        cls, html: str,
-        *,
-        is_tags_nested_inside_tabs_or_collapsible: bool = False
-    ) -> str:
-        """Handles all the invalid RTE tags, performs the following:
-            - `oppia-noninteractive-image`
-                - If `alt-with-value` attribute not in the image tag,
-                introduces the attribute and assign empty value
-                - If `filepath-with-value` attribute not in image tag,
-                removes the tag
-                - If `filepath-with-value` attribute empty then removes
-                the tag
-                - If `caption-with-value` attribute not in the image tag,
-                introduces the attribute and assign empty value
-            - `oppia-noninteractive-skillreview`
-                - If `text-with-value` attribute is not present or empty or
-                None, removes the tag
-                - If `skill_id-with-value` attribute is not present or empty or
-                None, removes the tag
-            - `oppia-noninteractive-math`
-                - If `math_content-with-value` attribute not in math tag,
-                removes the tag
-                - If `raw_latex` is not present or empty or None, removes
-                the tag
-            - `oppia-noninteractive-video`
-                - If `start-with-value` or `end-with-value` is not present,
-                introduce them to the tag and assign 0 to them
-                - If `autoplay-with-value` is not present or is not boolean,
-                introduce it to the tag and assign `false` to them
-                - If `video_id-with-value` is not present or empty, removes
-                the tag
-                - If `start-with-value` > `end-with-value`, set both to '0'
-            - `oppia-noninteractive-link`
-                - If `text-with-value` or `url-with-value` is not present,
-                or is empty simply removes the tag
-            - `oppia-noninteractive-tabs` and `oppia-noninteractive-collapsible`
-                - If these tags are nested inside tabs and collapsible tag, we
-                will simply remove the tag
-
-        Args:
-            html: str. The RTE tags.
-            is_tags_nested_inside_tabs_or_collapsible: bool. If the tag is
-                present inside the tabs or collapsible tag.
-
-        Returns:
-            str. Returns the updated html value.
-        """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-
-        for tag in soup.find_all('oppia-noninteractive-image'):
-            if not tag.has_attr('alt-with-value'):
-                tag['alt-with-value'] = '&quot;&quot;'
-
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'filepath-with-value'):
-                continue
-
-            if not tag.has_attr('caption-with-value'):
-                tag['caption-with-value'] = '&quot;&quot;'
-
-        for tag in soup.find_all('oppia-noninteractive-skillreview'):
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'text-with-value'):
-                continue
-
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'skill_id-with-value'):
-                continue
-
-        for tag in soup.find_all('oppia-noninteractive-video'):
-            if not tag.has_attr('start-with-value'):
-                tag['start-with-value'] = '0'
-            else:
-                if not tag['start-with-value'].isdigit():
-                    tag['start-with-value'] = '0'
-
-            if not tag.has_attr('end-with-value'):
-                tag['end-with-value'] = '0'
-            else:
-                if not tag['end-with-value'].isdigit():
-                    tag['end-with-value'] = '0'
-
-            if not tag.has_attr('autoplay-with-value'):
-                tag['autoplay-with-value'] = 'false'
-            else:
-                if tag['autoplay-with-value'].strip() not in (
-                    'true', 'false', '\'true\'', '\'false\'',
-                    '\"true\"', '\"false\"', True, False
-                ):
-                    tag['autoplay-with-value'] = 'false'
-
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'video_id-with-value'):
-                continue
-
-            start_value = float(tag['start-with-value'])
-            end_value = float(tag['end-with-value'])
-            if (
-                start_value > end_value and
-                start_value != 0 and
-                end_value != 0
-            ):
-                tag['end-with-value'] = '0'
-                tag['start-with-value'] = '0'
-
-        for tag in soup.find_all('oppia-noninteractive-link'):
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'url-with-value'
-            ):
-                continue
-
-            url = tag['url-with-value'].replace(
-                '&quot;', '').replace(' ', '')
-            if utils.get_url_scheme(url) == 'http':
-                url = url.replace('http', 'https')
-
-            if (
-                utils.get_url_scheme(url) not in
-                constants.ACCEPTABLE_SCHEMES
-            ):
-                tag.decompose()
-                continue
-
-            tag['url-with-value'] = '&quot;' + url + '&quot;'
-
-            if not tag.has_attr('text-with-value'):
-                tag['text-with-value'] = tag['url-with-value']
-            else:
-                if html_cleaner.is_html_empty(tag['text-with-value']):
-                    tag['text-with-value'] = tag['url-with-value']
-
-        for tag in soup.find_all('oppia-noninteractive-math'):
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'math_content-with-value'):
-                continue
-
-            math_content_json = utils.unescape_html(
-                tag['math_content-with-value'])
-            math_content_list = json.loads(math_content_json)
-            if 'raw_latex' not in math_content_list:
-                tag.decompose()
-                continue
-            if html_cleaner.is_html_empty(math_content_list['raw_latex']):
-                tag.decompose()
-                continue
-
-            if 'svg_filename' not in math_content_list:
-                tag.decompose()
-                continue
-            if html_cleaner.is_html_empty(math_content_list['svg_filename']):
-                tag.decompose()
-                continue
-
-        if is_tags_nested_inside_tabs_or_collapsible:
-            tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-            if len(tabs_tags) > 0:
-                for tabs_tag in tabs_tags:
-                    tabs_tag.decompose()
-                    continue
-            collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
-            if len(collapsible_tags) > 0:
-                for collapsible_tag in collapsible_tags:
-                    collapsible_tag.decompose()
-                    continue
-
-        return str(soup).replace('<br/>', '<br>')
-
-    @classmethod
-    def _is_tag_removed_with_empty_content(
-        cls,
-        tag: bs4.BeautifulSoup,
-        content: Union[str, List[str]],
-        *,
-        is_collapsible: bool = False
-    ) -> bool:
-        """Returns True when the tag is removed for having empty content.
-
-        Args:
-            tag: bs4.BeautifulSoup. The RTE tag.
-            content: Union[str, List[str]]. The content that needs to be
-                checked.
-            is_collapsible: bool. True if the tag is collapsible tag.
-
-        Returns:
-            bool. Returns True when the tag has been deleted.
-        """
-        if is_collapsible:
-            assert isinstance(content, str)
-            if html_cleaner.is_html_empty(content):
-                tag.decompose()
-                return True
-        else:
-            if len(content) == 0:
-                tag.decompose()
-                return True
-
-        return False
-
-    @classmethod
-    def _fix_tabs_and_collapsible_tags(cls, html: str) -> str:
-        """Fixes all tabs and collapsible tags, performs the following:
-        - `oppia-noninteractive-tabs`
-            - If no `tab_contents-with-value` attribute, tag will be removed
-            - If `tab_contents-with-value` is empty then the tag will be removed
-        - `oppia-noninteractive-collapsible`
-            - If no `content-with-value` attribute, tag will be removed
-            - If `content-with-value` is empty then the tag will be removed
-            - If no `heading-with-value` attribute, tag will be removed
-            - If `heading-with-value` is empty then the tag will be removed
-
-        Args:
-            html: str. The RTE tags.
-
-        Returns:
-            str. Returns the updated html value.
-        """
-        soup = bs4.BeautifulSoup(html, 'html.parser')
-        tabs_tags = soup.find_all('oppia-noninteractive-tabs')
-        for tag in tabs_tags:
-            if tag.has_attr('tab_contents-with-value'):
-                tab_content_json = utils.unescape_html(
-                    tag['tab_contents-with-value'])
-                tab_content_list = json.loads(tab_content_json)
-                if cls._is_tag_removed_with_empty_content(
-                    tag, tab_content_list, is_collapsible=False):
-                    continue
-
-                empty_tab_contents = []
-                for tab_content in tab_content_list:
-                    tab_content['content'] = cls._fix_rte_tags(
-                        tab_content['content'],
-                        is_tags_nested_inside_tabs_or_collapsible=True
-                    )
-                    if html_cleaner.is_html_empty(tab_content['content']):
-                        empty_tab_contents.append(tab_content)
-
-                # Remove empty tab content from the tag.
-                for empty_content in empty_tab_contents:
-                    tab_content_list.remove(empty_content)
-
-                if cls._is_tag_removed_with_empty_content(
-                    tag, tab_content_list, is_collapsible=False):
-                    continue
-
-                tab_content_json = json.dumps(tab_content_list)
-                tag['tab_contents-with-value'] = utils.escape_html(
-                    tab_content_json)
-            else:
-                tag.decompose()
-                continue
-
-        collapsibles_tags = soup.find_all(
-            'oppia-noninteractive-collapsible')
-        for tag in collapsibles_tags:
-            if tag.has_attr('content-with-value'):
-                collapsible_content_json = (
-                    utils.unescape_html(tag['content-with-value'])
-                )
-                collapsible_content = json.loads(
-                    collapsible_content_json)
-                if cls._is_tag_removed_with_empty_content(
-                    tag, collapsible_content, is_collapsible=True):
-                    continue
-
-                collapsible_content = cls._fix_rte_tags(
-                    collapsible_content,
-                    is_tags_nested_inside_tabs_or_collapsible=True
-                )
-                if cls._is_tag_removed_with_empty_content(
-                    tag, collapsible_content, is_collapsible=True):
-                    continue
-
-                collapsible_content_json = json.dumps(collapsible_content)
-                tag['content-with-value'] = utils.escape_html(
-                    collapsible_content_json)
-            else:
-                tag.decompose()
-                continue
-
-            if cls._is_tag_removed_with_invalid_attributes(
-                tag, 'heading-with-value'):
-                continue
-
-        return str(soup).replace('<br/>', '<br>')
-
-    @classmethod
-    def fix_content(cls, html: str) -> str:
-        """Helper function to fix the html.
-
-        Args:
-            html: str. The html data to fix.
-
-        Returns:
-            html: str. The fixed html data.
-        """
-        html = cls._fix_rte_tags(
-            html, is_tags_nested_inside_tabs_or_collapsible=False)
-        html = cls._fix_tabs_and_collapsible_tags(html)
-        return html.replace('\xa0', '&nbsp;')
-
-    @classmethod
-    def _update_state_rte(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Update the state RTE content and translations
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state in states_dict.values():
-            # Fix tags for state content.
-            html = state['content']['html']
-            state['content']['html'] = cls.fix_content(html)
-
-            # Fix tags for written translations.
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            written_translations = (
-                state['written_translations']['translations_mapping'])  # type: ignore[misc]
-            for translation_item in written_translations.values():
-                for translation in translation_item.values():
-                    if isinstance(translation['translation'], list):
-                        translated_element_list = []
-                        for element in translation['translation']:
-                            translated_element_list.append(
-                                cls.fix_content(element))
-                        translation['translation'] = translated_element_list
-                    else:
-                        html = translation['translation']
-                        translation['translation'] = cls.fix_content(html)
-
-            # Fix RTE content present inside the answer group's feedback.
-            for answer_group in state['interaction']['answer_groups']:
-                feedback = answer_group['outcome']['feedback']['html']
-                if not html_cleaner.is_html_empty(feedback):
-                    answer_group['outcome']['feedback']['html'] = (
-                        cls.fix_content(feedback))
-
-            # Fix RTE content present inside the default outcome.
-            if state['interaction']['default_outcome'] is not None:
-                default_feedback = state['interaction']['default_outcome'][
-                    'feedback']['html']
-                if not html_cleaner.is_html_empty(default_feedback):
-                    state['interaction']['default_outcome']['feedback'][
-                        'html'] = cls.fix_content(default_feedback)
-
-            # Fix RTE content present inside the Solution.
-            if state['interaction']['solution'] is not None:
-                solution = state['interaction']['solution']['explanation'][
-                    'html']
-                state['interaction']['solution']['explanation']['html'] = (
-                    cls.fix_content(solution))
-
-            # Fix RTE content present inside the Hint.
-            empty_hints = []
-            hints = state['interaction']['hints']
-            assert isinstance(hints, list)
-            for hint in hints:
-                hint_content = hint['hint_content']['html']
-                hint['hint_content']['html'] = cls.fix_content(hint_content)
-                if html_cleaner.is_html_empty(hint['hint_content']['html']):
-                    empty_hints.append(hint)
-
-            for empty_hint in empty_hints:
-                hints.remove(empty_hint)
-            state['interaction']['hints'] = hints
-
-            # Update translations and voiceovers.
-            cls._remove_unwanted_content_ids_from_translations_and_voiceovers_from_state_v51_or_v52( # pylint: disable=line-too-long
-                state, state_schema=52)
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v54_dict_to_v55_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Tuple[Dict[str, state_domain.StateDict], int]:
-        """Converts from v54 to v55. Version 55 removes next_content_id_index
-        and WrittenTranslation from State. This version also updates the
-        content-ids for each translatable field in the state with its new
-        content-id.
-        """
-        for _, state_dict in states_dict.items():
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains next_content_id_index property.
-            del state_dict['next_content_id_index'] # type: ignore[misc]
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            del state_dict['written_translations'] # type: ignore[misc]
-        states_dict, next_content_id_index = (
-            state_domain.State
-            .update_old_content_id_to_new_content_id_in_v54_states(states_dict)
-        )
-
-        return states_dict, next_content_id_index
-
-    @classmethod
-    def update_states_from_model(
-        cls,
-        versioned_exploration_states: VersionedExplorationStatesDict,
-        current_states_schema_version: int,
-        init_state_name: str,
-        language_code: str
-    ) -> Optional[int]:
-        """Converts the states blob contained in the given
-        versioned_exploration_states dict from current_states_schema_version to
-        current_states_schema_version + 1.
-        Note that the versioned_exploration_states being passed in is modified
-        in-place.
-
-        Args:
-            versioned_exploration_states: dict. A dict with two keys:
-                - states_schema_version: int. The states schema version for
-                    the exploration.
-                - states: dict. The dict of states which is contained in the
-                    exploration. The keys are state names and the values are
-                    dicts used to initialize a State domain object.
-            current_states_schema_version: int. The current states
-                schema version.
-            init_state_name: str. Name of initial state.
-            language_code: str. The language code of the exploration.
-
-        Returns:
-            None|int. The next content Id index for generating new content Id.
-        """
-        versioned_exploration_states['states_schema_version'] = (
-            current_states_schema_version + 1)
-
-        conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
-            current_states_schema_version, current_states_schema_version + 1))
-        if current_states_schema_version == 43:
-            versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states'], init_state_name)
-        elif current_states_schema_version == 52:
-            versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states'], language_code)
-        elif current_states_schema_version == 54:
-            versioned_exploration_states['states'], next_content_id_index = (
-                conversion_fn(versioned_exploration_states['states']))
-            assert isinstance(next_content_id_index, int)
-            return next_content_id_index
-        else:
-            versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states'])
-
-        return None
-
-    # The current version of the exploration YAML schema. If any backward-
-    # incompatible changes are made to the exploration schema in the YAML
-    # definitions, this version number must be changed and a migration process
-    # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 60
-    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
-
-    @classmethod
-    def _convert_v46_dict_to_v47_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v46 exploration dict into a v47 exploration dict.
-        Changes rule input types for DragAndDropSortInput and ItemSelectionInput
-        interactions to better support translations. Specifically, the rule
-        inputs will store content ids of html rather than the raw html.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v46.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v47.
-        """
-        exploration_dict['schema_version'] = 47
-
-        exploration_dict['states'] = cls._convert_states_v41_dict_to_v42_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 42
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v47_dict_to_v48_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v47 exploration dict into a v48 exploration dict.
-        Adds a new customization arg to NumericExpressionInput,
-        AlgebraicExpressionInput, and MathEquationInput. The customization arg
-        will allow creators to choose whether to render the division sign (÷)
-        instead of a fraction for the division operation.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v47.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v48.
-        """
-        exploration_dict['schema_version'] = 48
-
-        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 43
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v48_dict_to_v49_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v48 exploration dict into a v49 exploration dict.
-        Adds card_is_checkpoint to mark a state as a checkpoint for the
-        learners.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v48.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v49.
-        """
-        exploration_dict['schema_version'] = 49
-        exploration_dict['states'] = cls._convert_states_v43_dict_to_v44_dict(
-            exploration_dict['states'], exploration_dict['init_state_name'])
-        exploration_dict['states_schema_version'] = 44
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v49_dict_to_v50_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v49 exploration dict into a v50 exploration dict.
-        Version 50 contains linked skill id to exploration state.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v49.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v50.
-        """
-
-        exploration_dict['schema_version'] = 50
-
-        exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 45
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v50_dict_to_v51_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v50 exploration dict into a v51 exploration dict.
-        Version 51 ensures that unicode written_translations are stripped of
-        HTML tags and have data_format field set to unicode.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v50.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v51.
-        """
-
-        exploration_dict['schema_version'] = 51
-
-        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 46
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v51_dict_to_v52_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v51 exploration dict into a v52 exploration dict.
-        Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
-        existing occurences of it to oppia-noninteractive-image tag.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v51.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v52.
-        """
-
-        exploration_dict['schema_version'] = 52
-
-        exploration_dict['states'] = cls._convert_states_v46_dict_to_v47_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 47
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v52_dict_to_v53_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v52 exploration dict into a v53 exploration dict.
-        Version 53 fixes encoding issues in HTML fields.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v51.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v52.
-        """
-
-        exploration_dict['schema_version'] = 53
-
-        exploration_dict['states'] = cls._convert_states_v47_dict_to_v48_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 48
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v53_dict_to_v54_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v53 exploration dict into a v54 exploration dict.
-        Adds a new customization arg to NumericInput interaction
-        which allows creators to set input greator than or equal to zero.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v53.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v54.
-        """
-        exploration_dict['schema_version'] = 54
-
-        exploration_dict['states'] = cls._convert_states_v48_dict_to_v49_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 49
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v54_dict_to_v55_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v54 exploration dict into a v55 exploration dict.
-        Removes rules from explorations that use one of the following rules:
-        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
-        `customOskLetters` cust arg to `allowedVariables`.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v54.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v55.
-        """
-        exploration_dict['schema_version'] = 55
-
-        exploration_dict['states'] = cls._convert_states_v49_dict_to_v50_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 50
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v55_dict_to_v56_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v55 exploration dict into a v56 exploration dict.
-        Version 56 adds a new dest_if_really_stuck field to the Outcome class
-        to redirect the learners to a state for strengthening concepts when
-        they get really stuck.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v55.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v56.
-        """
-        exploration_dict['schema_version'] = 56
-
-        exploration_dict['states'] = cls._convert_states_v50_dict_to_v51_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 51
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v56_dict_to_v57_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v56 exploration dict into a v57 exploration dict.
-        Version 57 correctly updates the content IDs for translations and
-        for voiceovers.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v56.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v57.
-        """
-        exploration_dict['schema_version'] = 57
-
-        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 52
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v57_dict_to_v58_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v57 exploration dict into a v58 exploration dict.
-        Version 58 corrects exploration validation errors which are categorized
-        as General State Validation, General Interaction Validation
-        and General RTE Validation.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v56.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v57.
-        """
-        exploration_dict['schema_version'] = 58
-
-        exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
-            exploration_dict['states'], exploration_dict['language_code'])
-        exploration_dict['states_schema_version'] = 53
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v58_dict_to_v59_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v58 exploration dict into a v59 exploration dict.
-        Version 59 adds a new customization arg to TextInput allowing
-        creators to catch misspellings.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v58.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v59.
-        """
-        exploration_dict['schema_version'] = 59
-        exploration_dict['states'] = cls._convert_states_v53_dict_to_v54_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 54
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v59_dict_to_v60_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v59 exploration dict into a v60 exploration dict.
-        Removes written_translation, next_content_id_index from state properties
-        and also introduces next_content_id_index variable into
-        exploration level.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v59.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v60.
-        """
-        exploration_dict['schema_version'] = 60
-
-        exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v54_dict_to_v55_dict(
-                exploration_dict['states'])
-        )
-        exploration_dict['states_schema_version'] = 55
-        exploration_dict['next_content_id_index'] = next_content_id_index
-
-        return exploration_dict
-
-    @classmethod
-    def _migrate_to_latest_yaml_version(
-        cls, yaml_content: str
-    ) -> VersionedExplorationDict:
-        """Return the YAML content of the exploration in the latest schema
-        format.
-
-        Args:
-            yaml_content: str. The YAML representation of the exploration.
-
-        Returns:
-            exploration_dict. The dict 'exploration_dict' is the representation
-            of the Exploration.
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(expected_email_html_body, messages[0].html)
+
+            # Add a translation after state renames.
+            change_list_4 = [exp_domain.ExplorationChange({
+                'content_html': 'N/A',
+                'translation_html': '<p>State 2 Content Translation.</p>',
+                'state_name': 'End',
+                'language_code': 'de',
+                'content_id': self.content_id_generator.generate(
+                            translation_domain.ContentType.FEEDBACK),
+                'cmd': 'add_written_translation',
+                'data_format': 'html'
+            })]
+            changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(
+                self.EXP_0_ID, 2, change_list_4)
+            self.assertEqual(changes_are_not_mergeable_2, False)
+
+
+class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
+
+    def _require_metadata_properties_to_be_synced(self) -> None:
+        """Raises error if there is a new metadata property in the Exploration
+        object and it is not added in the ExplorationMetadata domain object.
 
         Raises:
-            InvalidInputException. The 'yaml_content' or the schema version
-                is not specified.
-            Exception. The exploration schema version is not valid.
+            Exception. All the metadata properties are not synced.
         """
-        # Here we use cast because we are narrowing down the return type of
-        # dict_from_yaml() from Dict[str, Any] to VersionedExplorationDict.
-        try:
-            exploration_dict = cast(
-                VersionedExplorationDict,
-                utils.dict_from_yaml(yaml_content)
-            )
-        except utils.InvalidInputException as e:
-            raise utils.InvalidInputException(
-                'Please ensure that you are uploading a YAML text file, not '
-                'a zip file. The YAML parser returned the following error: %s'
-                % e)
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration_dict = exploration.to_dict()
+        for key in exploration_dict:
+            if (
+                key not in constants.NON_METADATA_PROPERTIES and
+                key not in constants.METADATA_PROPERTIES
+            ):
+                raise Exception(
+                    'Looks like a new property %s was added to the Exploration'
+                    ' domain object. Please include this property in '
+                    'constants.METADATA_PROPERTIES if you want to use this '
+                    'as a metadata property. Otherwise, add this in the '
+                    'constants.NON_METADATA_PROPERTIES if you don\'t want '
+                    'to use this as a metadata property.' % (key)
+                )
 
-        exploration_schema_version = exploration_dict['schema_version']
-        if not (cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION <=
-                exploration_schema_version
-                <= cls.CURRENT_EXP_SCHEMA_VERSION):
-            raise Exception(
-                'Sorry, we can only process v%s to v%s exploration YAML files '
-                'at present.' % (
-                    cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
-                    cls.CURRENT_EXP_SCHEMA_VERSION))
+        exploration_metadata = exploration.get_metadata()
+        exploration_metadata_dict = exploration_metadata.to_dict()
+        for metadata_property in constants.METADATA_PROPERTIES:
+            if metadata_property not in exploration_metadata_dict:
+                raise Exception(
+                    'A new metadata property %s was added to the Exploration '
+                    'domain object but not included in the '
+                    'ExplorationMetadata domain object. Please include this '
+                    'new property in the ExplorationMetadata domain object '
+                    'also.' % (metadata_property)
+                )
 
-        if exploration_schema_version == 46:
-            exploration_dict = cls._convert_v46_dict_to_v47_dict(
-                exploration_dict)
-            exploration_schema_version = 47
-
-        if exploration_schema_version == 47:
-            exploration_dict = cls._convert_v47_dict_to_v48_dict(
-                exploration_dict)
-            exploration_schema_version = 48
-
-        if exploration_schema_version == 48:
-            exploration_dict = cls._convert_v48_dict_to_v49_dict(
-                exploration_dict)
-            exploration_schema_version = 49
-
-        if exploration_schema_version == 49:
-            exploration_dict = cls._convert_v49_dict_to_v50_dict(
-                exploration_dict)
-            exploration_schema_version = 50
-
-        if exploration_schema_version == 50:
-            exploration_dict = cls._convert_v50_dict_to_v51_dict(
-                exploration_dict)
-            exploration_schema_version = 51
-
-        if exploration_schema_version == 51:
-            exploration_dict = cls._convert_v51_dict_to_v52_dict(
-                exploration_dict)
-            exploration_schema_version = 52
-
-        if exploration_schema_version == 52:
-            exploration_dict = cls._convert_v52_dict_to_v53_dict(
-                exploration_dict)
-            exploration_schema_version = 53
-
-        if exploration_schema_version == 53:
-            exploration_dict = cls._convert_v53_dict_to_v54_dict(
-                exploration_dict)
-            exploration_schema_version = 54
-
-        if exploration_schema_version == 54:
-            exploration_dict = cls._convert_v54_dict_to_v55_dict(
-                exploration_dict)
-            exploration_schema_version = 55
-
-        if exploration_schema_version == 55:
-            exploration_dict = cls._convert_v55_dict_to_v56_dict(
-                exploration_dict)
-            exploration_schema_version = 56
-
-        if exploration_schema_version == 56:
-            exploration_dict = cls._convert_v56_dict_to_v57_dict(
-                exploration_dict)
-            exploration_schema_version = 57
-
-        if exploration_schema_version == 57:
-            exploration_dict = cls._convert_v57_dict_to_v58_dict(
-                exploration_dict)
-            exploration_schema_version = 58
-
-        if exploration_schema_version == 58:
-            exploration_dict = cls._convert_v58_dict_to_v59_dict(
-                exploration_dict)
-            exploration_schema_version = 59
-
-        if exploration_schema_version == 59:
-            exploration_dict = cls._convert_v59_dict_to_v60_dict(
-                exploration_dict)
-            exploration_schema_version = 60
-
-        return exploration_dict
-
-    @classmethod
-    def from_yaml(cls, exploration_id: str, yaml_content: str) -> Exploration:
-        """Creates and returns exploration from a YAML text string for YAML
-        schema versions 10 and later.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            yaml_content: str. The YAML representation of the exploration.
-
-        Returns:
-            Exploration. The corresponding exploration domain object.
-
-        Raises:
-            InvalidInputException. The initial schema version of exploration is
-                outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
-                CURRENT_EXP_SCHEMA_VERSION].
-        """
-        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
-        exploration_dict['id'] = exploration_id
-        return Exploration.from_dict(exploration_dict)
-
-    def to_yaml(self) -> str:
-        """Convert the exploration domain object into YAML string.
-
-        Returns:
-            str. The YAML representation of this exploration.
-        """
-        exp_dict = self.to_dict()
-        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
-        # method is ExplorationDict and ExplorationDict does not contain
-        # `schema_version` key, but here we are defining a `schema_version` key
-        # which causes MyPy to throw error 'TypedDict has no key schema_version'
-        # thus to silence the error, we used ignore here.
-        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
-
-        # The ID is the only property which should not be stored within the
-        # YAML representation.
-        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
-        # TypedDict.
-        del exp_dict['id']  # type: ignore[misc]
-
-        return utils.yaml_from_dict(exp_dict)
-
-    def to_dict(self) -> ExplorationDict:
-        """Returns a copy of the exploration as a dictionary. It includes all
-        necessary information to represent the exploration.
-
-        Returns:
-            dict. A dict mapping all fields of Exploration instance.
-        """
-        exploration_dict: ExplorationDict = ({
-            'id': self.id,
-            'title': self.title,
-            'category': self.category,
-            'author_notes': self.author_notes,
-            'blurb': self.blurb,
-            'states_schema_version': self.states_schema_version,
-            'init_state_name': self.init_state_name,
-            'language_code': self.language_code,
-            'objective': self.objective,
-            'param_changes': self.param_change_dicts,
-            'param_specs': self.param_specs_dict,
-            'tags': self.tags,
-            'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'next_content_id_index': self.next_content_id_index,
-            'edits_allowed': self.edits_allowed,
-            'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()},
-            'version': self.version
+    def test_exploration_metadata_gets_created(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.update_param_specs({
+            'ExampleParamOne': (
+                param_domain.ParamSpec('UnicodeString').to_dict())
         })
-        exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
-        return exploration_dict_deepcopy
-
-    def serialize(self) -> str:
-        """Returns the object serialized as a JSON string.
-
-        Returns:
-            str. JSON-encoded str encoding all of the information composing
-            the object.
-        """
-        # Here we use MyPy ignore because to_dict() method returns a general
-        # dictionary representation of domain object (ExplorationDict) which
-        # does not contain properties like created_on and last_updated but
-        # MyPy expects exploration_dict, a dictionary which contains all the
-        # properties of domain object. That's why we are explicitly changing
-        # the type of exploration_dict here, which causes MyPy to throw an
-        # error. Thus, to silence the error, we added an ignore here.
-        exploration_dict: SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
-        # The only reason we add the version parameter separately is that our
-        # yaml encoding/decoding of this object does not handle the version
-        # parameter.
-        # NOTE: If this changes in the future (i.e the version parameter is
-        # added as part of the yaml representation of this object), all YAML
-        # files must add a version parameter to their files with the correct
-        # version of this object. The line below must then be moved to
-        # to_dict().
-        exploration_dict['version'] = self.version
-
-        if self.created_on:
-            exploration_dict['created_on'] = (
-                utils.convert_naive_datetime_to_string(self.created_on))
-
-        if self.last_updated:
-            exploration_dict['last_updated'] = (
-                utils.convert_naive_datetime_to_string(self.last_updated))
-
-        return json.dumps(exploration_dict)
-
-    @classmethod
-    def deserialize(cls, json_string: str) -> Exploration:
-        """Returns an Exploration domain object decoded from a JSON string.
-
-        Args:
-            json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Exploration.
-                Only call on strings that were created using serialize().
-
-        Returns:
-            Exploration. The corresponding Exploration domain object.
-        """
-        exploration_dict = json.loads(json_string)
-        created_on = (
-            utils.convert_string_to_naive_datetime_object(
-                exploration_dict['created_on'])
-            if 'created_on' in exploration_dict else None)
-        last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                exploration_dict['last_updated'])
-            if 'last_updated' in exploration_dict else None)
-        exploration = cls.from_dict(
-            exploration_dict,
-            exploration_version=exploration_dict['version'],
-            exploration_created_on=created_on,
-            exploration_last_updated=last_updated)
-
-        return exploration
-
-    def to_player_dict(self) -> ExplorationPlayerDict:
-        """Returns a copy of the exploration suitable for inclusion in the
-        learner view.
-
-        Returns:
-            dict. A dict mapping some fields of Exploration instance. The
-            fields inserted in the dict (as key) are:
-                - init_state_name: str. The name for the initial state of the
-                    exploration.
-                - param_change. list(dict). List of param_change dicts that
-                    represent ParamChange domain object.
-                - param_specs: dict. A dict where each key-value pair
-                    represents respectively, a param spec name and a dict used
-                    to initialize a ParamSpec domain object.
-                - states: dict. Keys are states names and values are dict
-                    representation of State domain object.
-                - title: str. The exploration title.
-                - objective: str. The exploration objective.
-                - language_code: str. The language code of the exploration.
-        """
-        return {
-            'init_state_name': self.init_state_name,
-            'param_changes': self.param_change_dicts,
-            'param_specs': self.param_specs_dict,
-            'states': {
-                state_name: state.to_dict()
-                for (state_name, state) in self.states.items()
-            },
-            'title': self.title,
-            'objective': self.objective,
-            'language_code': self.language_code,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'next_content_id_index': self.next_content_id_index
-        }
-
-
-class ExplorationSummaryMetadataDict(TypedDict):
-    """Dictionary representing the meta data for exploration summary."""
-
-    id: str
-    title: str
-    objective: str
-
-
-class ExplorationSummary:
-    """Domain object for an Oppia exploration summary."""
-
-    def __init__(
-        self,
-        exploration_id: str,
-        title: str,
-        category: str,
-        objective: str,
-        language_code: str,
-        tags: List[str],
-        ratings: Dict[str, int],
-        scaled_average_rating: float,
-        status: str,
-        community_owned: bool,
-        owner_ids: List[str],
-        editor_ids: List[str],
-        voice_artist_ids: List[str],
-        viewer_ids: List[str],
-        contributor_ids: List[str],
-        contributors_summary: Dict[str, int],
-        version: int,
-        exploration_model_created_on: datetime.datetime,
-        exploration_model_last_updated: datetime.datetime,
-        first_published_msec: Optional[float],
-        deleted: bool = False
-    ) -> None:
-        """Initializes a ExplorationSummary domain object.
-
-        Args:
-            exploration_id: str. The exploration id.
-            title: str. The exploration title.
-            category: str. The exploration category.
-            objective: str. The exploration objective.
-            language_code: str. The code that represents the exploration
-                language.
-            tags: list(str). List of tags.
-            ratings: dict. Dict whose keys are '1', '2', '3', '4', '5' and
-                whose values are nonnegative integers representing frequency
-                counts. Note that the keys need to be strings in order for this
-                dict to be JSON-serializable.
-            scaled_average_rating: float. The average rating.
-            status: str. The status of the exploration.
-            community_owned: bool. Whether the exploration is community-owned.
-            owner_ids: list(str). List of the users ids who are the owners of
-                this exploration.
-            editor_ids: list(str). List of the users ids who have access to
-                edit this exploration.
-            voice_artist_ids: list(str). List of the users ids who have access
-                to voiceover this exploration.
-            viewer_ids: list(str). List of the users ids who have access to
-                view this exploration.
-            contributor_ids: list(str). List of the users ids of the user who
-                have contributed to this exploration.
-            contributors_summary: dict. A summary about contributors of current
-                exploration. The keys are user ids and the values are the
-                number of commits made by that user.
-            version: int. The version of the exploration.
-            exploration_model_created_on: datetime.datetime. Date and time when
-                the exploration model is created.
-            exploration_model_last_updated: datetime.datetime. Date and time
-                when the exploration model was last updated.
-            first_published_msec: float|None. Time in milliseconds since the
-                Epoch, when the exploration was first published, or None if
-                Exploration is not published yet.
-            deleted: bool. Whether the exploration is marked as deleted.
-        """
-        self.id = exploration_id
-        self.title = title
-        self.category = category
-        self.objective = objective
-        self.language_code = language_code
-        self.tags = tags
-        self.ratings = ratings
-        self.scaled_average_rating = scaled_average_rating
-        self.status = status
-        self.community_owned = community_owned
-        self.owner_ids = owner_ids
-        self.editor_ids = editor_ids
-        self.voice_artist_ids = voice_artist_ids
-        self.viewer_ids = viewer_ids
-        self.contributor_ids = contributor_ids
-        self.contributors_summary = contributors_summary
-        self.version = version
-        self.exploration_model_created_on = exploration_model_created_on
-        self.exploration_model_last_updated = exploration_model_last_updated
-        self.first_published_msec = first_published_msec
-        self.deleted = deleted
-
-    def validate(self) -> None:
-        """Validates various properties of the ExplorationSummary.
-
-        Raises:
-            ValidationError. One or more attributes of the ExplorationSummary
-                are invalid.
-        """
-        if not isinstance(self.title, str):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(
-            self.title, 'the exploration title', allow_empty=True)
-
-        if not isinstance(self.category, str):
-            raise utils.ValidationError(
-                'Expected category to be a string, received %s'
-                % self.category)
-        utils.require_valid_name(
-            self.category, 'the exploration category', allow_empty=True)
-
-        if not isinstance(self.objective, str):
-            raise utils.ValidationError(
-                'Expected objective to be a string, received %s' %
-                self.objective)
-
-        if not isinstance(self.language_code, str):
-            raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-        if not utils.is_valid_language_code(self.language_code):
-            raise utils.ValidationError(
-                'Invalid language_code: %s' % self.language_code)
-
-        if not isinstance(self.tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received %s' % self.tags)
-        for tag in self.tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received '
-                    '\'%s\'' % tag)
-
-            if not tag:
-                raise utils.ValidationError('Tags should be non-empty.')
-
-            if not re.match(constants.TAG_REGEX, tag):
-                raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag)
-
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
-                raise utils.ValidationError(
-                    'Tags should not start or end with whitespace, received '
-                    '\'%s\'' % tag)
-
-            if re.search(r'\s\s+', tag):
-                raise utils.ValidationError(
-                    'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag)
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
-
-        if not isinstance(self.ratings, dict):
-            raise utils.ValidationError(
-                'Expected ratings to be a dict, received %s' % self.ratings)
-
-        valid_rating_keys = ['1', '2', '3', '4', '5']
-        actual_rating_keys = sorted(self.ratings.keys())
-        if valid_rating_keys != actual_rating_keys:
-            raise utils.ValidationError(
-                'Expected ratings to have keys: %s, received %s' % (
-                    (', ').join(valid_rating_keys),
-                    (', ').join(actual_rating_keys)))
-        for value in self.ratings.values():
-            if not isinstance(value, int):
-                raise utils.ValidationError(
-                    'Expected value to be int, received %s' % value)
-            if value < 0:
-                raise utils.ValidationError(
-                    'Expected value to be non-negative, received %s' % (
-                        value))
-
-        if not isinstance(self.scaled_average_rating, (float, int)):
-            raise utils.ValidationError(
-                'Expected scaled_average_rating to be float, received %s' % (
-                    self.scaled_average_rating))
-
-        if not isinstance(self.status, str):
-            raise utils.ValidationError(
-                'Expected status to be string, received %s' % self.status)
-
-        if not isinstance(self.community_owned, bool):
-            raise utils.ValidationError(
-                'Expected community_owned to be bool, received %s' % (
-                    self.community_owned))
-
-        if not isinstance(self.owner_ids, list):
-            raise utils.ValidationError(
-                'Expected owner_ids to be list, received %s' % self.owner_ids)
-        for owner_id in self.owner_ids:
-            if not isinstance(owner_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in owner_ids to '
-                    'be string, received %s' % owner_id)
-
-        if not isinstance(self.editor_ids, list):
-            raise utils.ValidationError(
-                'Expected editor_ids to be list, received %s' % self.editor_ids)
-        for editor_id in self.editor_ids:
-            if not isinstance(editor_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in editor_ids to '
-                    'be string, received %s' % editor_id)
-
-        if not isinstance(self.voice_artist_ids, list):
-            raise utils.ValidationError(
-                'Expected voice_artist_ids to be list, received %s' % (
-                    self.voice_artist_ids))
-        for voice_artist_id in self.voice_artist_ids:
-            if not isinstance(voice_artist_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in voice_artist_ids to '
-                    'be string, received %s' % voice_artist_id)
-
-        if not isinstance(self.viewer_ids, list):
-            raise utils.ValidationError(
-                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
-        for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in viewer_ids to '
-                    'be string, received %s' % viewer_id)
-
-        all_user_ids_with_rights = (
-            self.owner_ids + self.editor_ids + self.voice_artist_ids +
-            self.viewer_ids)
-        if len(all_user_ids_with_rights) != len(set(all_user_ids_with_rights)):
-            raise utils.ValidationError(
-                'Users should not be assigned to multiple roles at once, '
-                'received users: %s' % ', '.join(all_user_ids_with_rights))
-
-        if not isinstance(self.contributor_ids, list):
-            raise utils.ValidationError(
-                'Expected contributor_ids to be list, received %s' % (
-                    self.contributor_ids))
-        for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, str):
-                raise utils.ValidationError(
-                    'Expected each id in contributor_ids to '
-                    'be string, received %s' % contributor_id)
-
-        if not isinstance(self.contributors_summary, dict):
-            raise utils.ValidationError(
-                'Expected contributors_summary to be dict, received %s' % (
-                    self.contributors_summary))
-
-    def to_metadata_dict(self) -> ExplorationSummaryMetadataDict:
-        """Given an exploration summary, this method returns a dict containing
-        id, title and objective of the exploration.
-
-        Returns:
-            dict. A metadata dict for the given exploration summary.
-            The metadata dict has three keys:
-                - 'id': str. The exploration ID.
-                - 'title': str. The exploration title.
-                - 'objective': str. The exploration objective.
-        """
-        return {
-            'id': self.id,
-            'title': self.title,
-            'objective': self.objective,
-        }
-
-    def is_private(self) -> bool:
-        """Checks whether the exploration is private.
-
-        Returns:
-            bool. Whether the exploration is private.
-        """
-        return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
-
-    def is_solely_owned_by_user(self, user_id: str) -> bool:
-        """Checks whether the exploration is solely owned by the user.
-
-        Args:
-            user_id: str. The id of the user.
-
-        Returns:
-            bool. Whether the exploration is solely owned by the user.
-        """
-        return user_id in self.owner_ids and len(self.owner_ids) == 1
-
-    def does_user_have_any_role(self, user_id: str) -> bool:
-        """Checks if a given user has any role within the exploration.
-
-        Args:
-            user_id: str. User id of the user.
-
-        Returns:
-            bool. Whether the given user has any role in the exploration.
-        """
-        return (
-            user_id in self.owner_ids or
-            user_id in self.editor_ids or
-            user_id in self.voice_artist_ids or
-            user_id in self.viewer_ids
-        )
-
-    def add_contribution_by_user(self, contributor_id: str) -> None:
-        """Add a new contributor to the contributors summary.
-
-        Args:
-            contributor_id: str. ID of the contributor to be added.
-        """
-        # We don't want to record the contributions of system users.
-        if contributor_id not in constants.SYSTEM_USER_IDS:
-            self.contributors_summary[contributor_id] = (
-                self.contributors_summary.get(contributor_id, 0) + 1)
-
-        self.contributor_ids = list(self.contributors_summary.keys())
-
-
-class ExplorationChangeMergeVerifier:
-    """Class to check for mergeability.
-
-    Attributes:
-        added_state_names: list(str). Names of the states added to the
-            exploration from prev_exp_version to current_exp_version. It
-            stores the latest name of the added state.
-        deleted_state_names: list(str). Names of the states deleted from
-            the exploration from prev_exp_version to current_exp_version.
-            It stores the initial name of the deleted state from
-            pre_exp_version.
-        new_to_old_state_names: dict. Dictionary mapping state names of
-            current_exp_version to the state names of prev_exp_version.
-            It doesn't include the name changes of added/deleted states.
-        changed_properties: dict. List of all the properties changed
-            according to the state and property name.
-        changed_translations: dict. List of all the translations changed
-            according to the state and content_id name.
-    """
-
-    # PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGE: List of the properties
-    # in which if there are any changes then interaction id
-    # changes can not be merged. This list can be changed when any
-    # new property is added or deleted which affects or is affected
-    # by interaction id and whose changes directly conflicts with
-    # interaction id changes.
-    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES: List[str] = [
-        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-        STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-    ]
-
-    # PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List of the properties
-    # in which if there are any changes then customization args
-    # changes can not be merged. This list can be changed when any
-    # new property is added or deleted which affects or is affected
-    # by customization args and whose changes directly conflicts with
-    # cust args changes.
-    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List[str] = [
-        STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-    ]
-
-    # PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List of the properties
-    # in which if there are any changes then answer groups
-    # changes can not be merged. This list can be changed when any
-    # new property is added or deleted which affects or is affected
-    # by answer groups and whose changes directly conflicts with
-    # answer groups changes.
-    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List[str] = [
-        STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS
-    ]
-
-    # PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List of the properties
-    # in which if there are any changes then solution
-    # changes can not be merged. This list can be changed when any
-    # new property is added or deleted which affects or is affected
-    # by solution and whose changes directly conflicts with
-    # solution changes.
-    PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List[str] = [
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS
-    ]
-
-    # PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List of the properties
-    # in which if there are any changes then voiceovers
-    # changes can not be merged. This list can be changed when any
-    # new property is added or deleted which affects or is affected
-    # by voiceovers and whose changes directly conflicts with
-    # voiceovers changes.
-    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List[str] = [
-        STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_INTERACTION_HINTS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS
-    ]
-
-    # NON_CONFLICTING_PROPERTIES: List of the properties
-    # in which if there are any changes then they are always mergeable.
-    NON_CONFLICTING_PROPERTIES: List[str] = [
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-        STATE_PROPERTY_LINKED_SKILL_ID,
-        STATE_PROPERTY_CARD_IS_CHECKPOINT
-    ]
-
-    def __init__(self, composite_change_list: List[ExplorationChange]) -> None:
-
-        self.added_state_names: List[str] = []
-        self.deleted_state_names: List[str] = []
-        self.new_to_old_state_names: Dict[str, str] = (
-            collections.defaultdict(str)
-        )
-        self.changed_properties: Dict[str, Set[str]] = (
-            collections.defaultdict(set)
-        )
-        self.changed_translations: Dict[str, Set[str]] = (
-            collections.defaultdict(set)
-        )
-
-        for change in composite_change_list:
-            self._parse_exp_change(change)
-
-    def _parse_exp_change(self, change: ExplorationChange) -> None:
-        """This function take the change and according to the cmd
-        add the property name in the lists defined above.
-
-        Args:
-            change: ExplorationChange. A change from the
-                composite_change_list.
-        """
-        if change.cmd == CMD_ADD_STATE:
-            self.added_state_names.append(change.state_name)
-        elif change.cmd == CMD_DELETE_STATE:
-            state_name = change.state_name
-            if state_name in self.added_state_names:
-                self.added_state_names.remove(state_name)
-            else:
-                original_state_name = state_name
-                if original_state_name in self.new_to_old_state_names:
-                    original_state_name = self.new_to_old_state_names.pop(
-                        original_state_name)
-                self.deleted_state_names.append(original_state_name)
-        elif change.cmd == CMD_RENAME_STATE:
-            old_state_name = change.old_state_name
-            new_state_name = change.new_state_name
-            if old_state_name in self.added_state_names:
-                self.added_state_names.remove(old_state_name)
-                self.added_state_names.append(new_state_name)
-            elif old_state_name in self.new_to_old_state_names:
-                self.new_to_old_state_names[new_state_name] = (
-                    self.new_to_old_state_names.pop(old_state_name))
-            else:
-                self.new_to_old_state_names[new_state_name] = old_state_name
-
-        elif change.cmd == CMD_EDIT_STATE_PROPERTY:
-            # A condition to store the name of the properties changed
-            # in changed_properties dict.
-            state_name = change.state_name
-            if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names[change.state_name]
-            self.changed_properties[state_name].add(
-                change.property_name)
-
-    def is_change_list_mergeable(
-        self,
-        change_list: List[ExplorationChange],
-        exp_at_change_list_version: Exploration,
-        current_exploration: Exploration
-    ) -> Tuple[bool, bool]:
-        """Checks whether the change list from the old version of an
-        exploration can be merged on the latest version of an exploration.
-
-        Args:
-            change_list: list(ExplorationChange). List of the changes made
-                by the user on the frontend, which needs to be checked
-                for mergeability.
-            exp_at_change_list_version: obj. Old version of an exploration.
-            current_exploration: obj. Exploration on which the change list
-                is to be applied.
-
-        Returns:
-            tuple(boolean, boolean). A tuple consisting of two fields.
-            1. boolean. Whether the given change list is mergeable on
-            the current_exploration or not.
-            2. boolean. Whether we need to send the change list to the
-            admin to review for the future improvement of the cases
-            to merge the change list.
-        """
-        old_to_new_state_names = {
-            value: key for key, value in self.new_to_old_state_names.items()
-        }
-
-        if self.added_state_names or self.deleted_state_names:
-            # In case of the addition and the deletion of the state,
-            # we are rejecting the mergebility because these cases
-            # change the flow of the exploration and are quite complex
-            # for now to handle. So in such cases, we are sending the
-            # changelist, frontend_version, backend_version and
-            # exploration id to the admin, so that we can look into the
-            # situations and can figure out the way if it’s possible to
-            # handle these cases.
-
-            return False, True
-
-        changes_are_mergeable = False
-
-        # state_names_of_renamed_states: dict. Stores the changes in
-        # states names in change_list where the key is the state name in
-        # frontend version and the value is the renamed name from the
-        # change list if there is any rename state change.
-        state_names_of_renamed_states: Dict[str, str] = {}
-        for change in change_list:
-            change_is_mergeable = False
-            if change.cmd == CMD_RENAME_STATE:
-                old_state_name = change.old_state_name
-                new_state_name = change.new_state_name
-                if old_state_name in state_names_of_renamed_states:
-                    state_names_of_renamed_states[new_state_name] = (
-                        state_names_of_renamed_states.pop(old_state_name))
-                else:
-                    state_names_of_renamed_states[new_state_name] = (
-                        old_state_name)
-                if (state_names_of_renamed_states[new_state_name] not in
-                        old_to_new_state_names):
-                    change_is_mergeable = True
-            elif change.cmd == CMD_EDIT_STATE_PROPERTY:
-                state_name = state_names_of_renamed_states.get(
-                    change.state_name) or change.state_name
-                if state_name in old_to_new_state_names:
-                    # Here we will send the changelist, frontend_version,
-                    # backend_version and exploration to the admin, so
-                    # that the changes related to state renames can be
-                    # reviewed and the proper conditions can be written
-                    # to handle those cases.
-                    return False, True
-                old_exp_states = (
-                    exp_at_change_list_version.states[state_name])
-                current_exp_states = (
-                    current_exploration.states[state_name])
-                if (change.property_name ==
-                        STATE_PROPERTY_CONTENT):
-                    if (old_exp_states.content.html ==
-                            current_exp_states.content.html):
-                        if (STATE_PROPERTY_CONTENT not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_RECORDED_VOICEOVERS not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_ID):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
-                        if not self.changed_properties[state_name].intersection(
-                                (self
-                                 .PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES
-                                )):
-                            change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                # Customization args differ for every interaction, so in
-                # case of different interactions merging is simply not
-                # possible, but in case of same interaction, the values in
-                # the customization_args are often lists so if someone
-                # changes even one item of that list then determining which
-                # item is changed is not feasible, so suppose there is long
-                # list of values in item selection interaction and one user
-                # deletes one value and another one edits another value,
-                # so after deletion the indices of all the values will be
-                # changed and it will not be possible to compare and know
-                # that which value is changed by second user.
-                # So we will not be handling the merge on the basis of
-                # individual fields.
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
-                        if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                                [STATE_PROPERTY_INTERACTION_CUST_ARGS]):
-                            if (change.property_name not in
-                                    self.changed_translations[state_name]):
-                                change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
-                        if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                                [STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]):
-                            if (change.property_name not in
-                                    self.changed_translations[state_name]):
-                                change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                     ):
-                    if (change.property_name not in
-                            self.changed_properties[state_name] and
-                            change.property_name not in
-                            self.changed_translations[state_name]):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif change.property_name in self.NON_CONFLICTING_PROPERTIES:
-                    change_is_mergeable = True
-                # We’ll not be able to handle the merge if changelists
-                # affect the different indices of the hint in the same
-                # state because whenever there is even a small change
-                # in one field of any hint, they treat the whole hints
-                # list as a new value.
-                # So it will not be possible to find out the exact change.
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_HINTS):
-                    if (change.property_name not in
-                            self.changed_properties[state_name] and
-                            change.property_name not in
-                            self.changed_translations[state_name]):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_INTERACTION_SOLUTION):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id):
-                        if not self.changed_properties[state_name].intersection(
-                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
-                                [STATE_PROPERTY_INTERACTION_SOLUTION]):
-                            if (change.property_name not in
-                                    self.changed_translations[state_name]):
-                                change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
-                    if (old_exp_states.interaction.id ==
-                            current_exp_states.interaction.id and
-                            old_exp_states.solicit_answer_details ==
-                            current_exp_states.solicit_answer_details):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not self.changed_properties[state_name].intersection(
-                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
-                            [STATE_PROPERTY_RECORDED_VOICEOVERS]):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-            elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
-                change_is_mergeable = (
-                    getattr(exp_at_change_list_version, change.property_name)
-                    == getattr(current_exploration, change.property_name))
-
-            if change_is_mergeable:
-                changes_are_mergeable = True
-                continue
-            changes_are_mergeable = False
-            break
-
-        return changes_are_mergeable, False
-
-
-class ExplorationMetadataDict(TypedDict):
-    """Dictionary representing the ExplorationMetadata object."""
-
-    title: str
-    category: str
-    objective: str
-    language_code: str
-    tags: List[str]
-    blurb: str
-    author_notes: str
-    states_schema_version: int
-    init_state_name: str
-    param_specs: Dict[str, param_domain.ParamSpecDict]
-    param_changes: List[param_domain.ParamChangeDict]
-    auto_tts_enabled: bool
-    correctness_feedback_enabled: Optional[bool]
-    edits_allowed: bool
-
-
-class ExplorationMetadata:
-    """Class to represent the exploration metadata properties."""
-
-    def __init__(
-        self,
-        title: str,
-        category: str,
-        objective: str,
-        language_code: str,
-        tags: List[str],
-        blurb: str,
-        author_notes: str,
-        states_schema_version: int,
-        init_state_name: str,
-        param_specs: Dict[str, param_domain.ParamSpec],
-        param_changes: List[param_domain.ParamChange],
-        auto_tts_enabled: bool,
-        edits_allowed: bool
-    ) -> None:
-        """Initializes an ExplorationMetadata domain object.
-
-        Args:
-            title: str. The exploration title.
-            category: str. The category of the exploration.
-            objective: str. The objective of the exploration.
-            language_code: str. The language code of the exploration.
-            tags: list(str). The tags given to the exploration.
-            blurb: str. The blurb of the exploration.
-            author_notes: str. The author notes.
-            states_schema_version: int. Tbe schema version of the exploration.
-            init_state_name: str. The name for the initial state of the
-                exploration.
-            param_specs: dict(str, ParamSpec). A dict where each key-value pair
-                represents respectively, a param spec name and a ParamSpec
-                domain object.
-            param_changes: list(ParamChange). List of ParamChange domain
-                objects.
-            auto_tts_enabled: bool. True if automatic text-to-speech is
-                enabled.
-            edits_allowed: bool. True when edits to the exploration is allowed.
-        """
-        self.title = title
-        self.category = category
-        self.objective = objective
-        self.language_code = language_code
-        self.tags = tags
-        self.blurb = blurb
-        self.author_notes = author_notes
-        self.states_schema_version = states_schema_version
-        self.init_state_name = init_state_name
-        self.param_specs = param_specs
-        self.param_changes = param_changes
-        self.auto_tts_enabled = auto_tts_enabled
-        self.correctness_feedback_enabled = True
-        self.edits_allowed = edits_allowed
-
-    def to_dict(self) -> ExplorationMetadataDict:
-        """Gets the dict representation of ExplorationMetadata domain object.
-
-        Returns:
-            dict. The dict representation of the ExplorationMetadata
-            domain object.
-        """
-        return {
-            'title': self.title,
-            'category': self.category,
-            'objective': self.objective,
-            'language_code': self.language_code,
-            'tags': self.tags,
-            'blurb': self.blurb,
-            'author_notes': self.author_notes,
-            'states_schema_version': self.states_schema_version,
-            'init_state_name': self.init_state_name,
+        exploration.update_param_changes([
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['3', '4'],
+                    'parse_with_jinja': True
+                }
+            ),
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector', {
+                    'list_of_values': ['5', '6'],
+                    'parse_with_jinja': True
+                }
+            )
+        ])
+        actual_metadata_dict = exp_domain.ExplorationMetadata(
+            exploration.title, exploration. category, exploration.objective,
+            exploration.language_code, exploration.tags, exploration.blurb,
+            exploration.author_notes, exploration.states_schema_version,
+            exploration.init_state_name, exploration.param_specs,
+            exploration.param_changes, exploration.auto_tts_enabled,
+            exploration.edits_allowed
+        ).to_dict()
+        expected_metadata_dict = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'objective': exploration.objective,
+            'language_code': exploration.language_code,
+            'tags': exploration.tags,
+            'blurb': exploration.blurb,
+            'author_notes': exploration.author_notes,
+            'states_schema_version': exploration.states_schema_version,
+            'init_state_name': exploration.init_state_name,
             'param_specs': {
-                ps_name: ps_value.to_dict()
-                for (ps_name, ps_value) in self.param_specs.items()
+                'ExampleParamOne': (
+                    param_domain.ParamSpec('UnicodeString').to_dict())
             },
             'param_changes': [
-                p_change.to_dict() for p_change in self.param_changes
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict(),
+                param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['5', '6'],
+                        'parse_with_jinja': True
+                    }
+                ).to_dict()
             ],
-            'auto_tts_enabled': self.auto_tts_enabled,
-            'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'edits_allowed': self.edits_allowed
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'edits_allowed': exploration.edits_allowed
         }
 
+        self.assertEqual(actual_metadata_dict, expected_metadata_dict)
 
-class MetadataVersionHistory:
-    """Class to represent an element of the version history list of the
-    exploration metadata.
+    def test_metadata_properties_are_synced(self) -> None:
+        self._require_metadata_properties_to_be_synced()
 
-    Attributes:
-        last_edited_version_number: int. The version number of the
-            exploration in which the metadata was last edited.
-        last_edited_committer_id: str. The user id of the user who committed
-            the latest changes to the exploration metadata.
-    """
-
-    def __init__(
-        self,
-        last_edited_version_number: Optional[int],
-        last_edited_committer_id: str
-    ):
-        """Initializes the MetadataVersionHistory domain object.
-
-        Args:
-            last_edited_version_number: int. The version number of the
-                exploration in which the metadata was last edited.
-            last_edited_committer_id: str. The user id of the user who
-                committed the latest changes to the exploration metadata.
-        """
-        self.last_edited_version_number = last_edited_version_number
-        self.last_edited_committer_id = last_edited_committer_id
-
-    def to_dict(self) -> MetadataVersionHistoryDict:
-        """Returns a dict representation of the MetadataVersionHistory domain
-        object.
-
-        Returns:
-            dict. The dict representation of the MetadataVersionHistory domain
-            object.
-        """
-        return {
-            'last_edited_version_number': self.last_edited_version_number,
-            'last_edited_committer_id': self.last_edited_committer_id
-        }
-
-    @classmethod
-    def from_dict(
-        cls, metadata_version_history_dict: MetadataVersionHistoryDict
-    ) -> MetadataVersionHistory:
-        """Returns an MetadataVersionHistory domain object from a dict.
-
-        Args:
-            metadata_version_history_dict: dict. The dict representation of
-                MetadataVersionHistory object.
-
-        Returns:
-            MetadataVersionHistory. The corresponding MetadataVersionHistory
-            domain object.
-        """
-        return cls(
-            metadata_version_history_dict['last_edited_version_number'],
-            metadata_version_history_dict['last_edited_committer_id']
+        swapped_metadata_properties = self.swap(
+            constants, 'METADATA_PROPERTIES', [
+                'title', 'category', 'objective', 'language_code',
+                'blurb', 'author_notes', 'states_schema_version',
+                'init_state_name', 'param_specs', 'param_changes',
+                'auto_tts_enabled',
+                'edits_allowed'
+            ]
         )
-
-
-class ExplorationVersionHistory:
-    """Class to represent the version history of an exploration at a
-    particular version.
-
-    Attributes:
-        exploration_id: str. The id of the exploration.
-        exploration_version: int. The version number of the exploration.
-        state_version_history: Dict[str, StateVersionHistory].
-            The mapping of state names and StateVersionHistory domain objects.
-        metadata_version_history: MetadataVersionHistory. The details of the
-            last commit on the exploration metadata.
-        committer_ids: List[str]. A list of user ids who made the
-            'previous commit' on each state and the exploration metadata.
-    """
-
-    def __init__(
-        self,
-        exploration_id: str,
-        exploration_version: int,
-        state_version_history_dict: Dict[
-            str, state_domain.StateVersionHistoryDict
-        ],
-        metadata_last_edited_version_number: Optional[int],
-        metadata_last_edited_committer_id: str,
-        committer_ids: List[str]
-    ) -> None:
-        """Initializes the ExplorationVersionHistory domain object.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            exploration_version: int. The version number of the exploration.
-            state_version_history_dict: dict. The mapping of state names and
-                dicts of StateVersionHistory domain objects.
-            metadata_last_edited_version_number: int. The version number of the
-                exploration in which the metadata was last edited.
-            metadata_last_edited_committer_id: str. The user id of the user who
-                committed the latest changes to the exploration metadata.
-            committer_ids: List[str]. A list of user ids who made the
-                'previous commit' on each state and the exploration metadata.
-        """
-        self.exploration_id = exploration_id
-        self.exploration_version = exploration_version
-        self.state_version_history = {
-            state_name: state_domain.StateVersionHistory.from_dict(vh_dict)
-            for state_name, vh_dict in state_version_history_dict.items()
-        }
-        self.metadata_version_history = MetadataVersionHistory(
-            metadata_last_edited_version_number,
-            metadata_last_edited_committer_id
+        error_message = (
+            'Looks like a new property tags was added to the Exploration'
+            ' domain object. Please include this property in '
+            'constants.METADATA_PROPERTIES if you want to use this '
+            'as a metadata property. Otherwise, add this in the '
+            'constants.NON_METADATA_PROPERTIES if you don\'t want '
+            'to use this as a metadata property.'
         )
-        self.committer_ids = committer_ids
+        with swapped_metadata_properties, self.assertRaisesRegex(
+            Exception, error_message
+        ):
+            self._require_metadata_properties_to_be_synced()
 
-    def to_dict(self) -> ExplorationVersionHistoryDict:
-        """Returns a dict representation of the ExplorationVersionHistory
-        domain object.
+        swapped_metadata_properties = self.swap(
+            constants, 'METADATA_PROPERTIES', [
+                'title', 'category', 'objective', 'language_code', 'tags',
+                'blurb', 'author_notes', 'states_schema_version',
+                'init_state_name', 'param_specs', 'param_changes',
+                'auto_tts_enabled', 'edits_allowed', 'new_property'
+            ]
+        )
+        error_message = (
+            'A new metadata property %s was added to the Exploration '
+            'domain object but not included in the '
+            'ExplorationMetadata domain object. Please include this '
+            'new property in the ExplorationMetadata domain object '
+            'also.' % ('new_property')
+        )
+        with swapped_metadata_properties, self.assertRaisesRegex(
+            Exception, error_message
+        ):
+            self._require_metadata_properties_to_be_synced()
 
-        Returns:
-            dict. A dict representation of the ExplorationVersionHistory
-            domain object.
-        """
-        return {
-            'exploration_id': self.exploration_id,
-            'exploration_version': self.exploration_version,
-            'state_version_history': {
-                state_name: state_vh.to_dict()
-                for state_name, state_vh in self.state_version_history.items()
-            },
-            'metadata_version_history': (
-                self.metadata_version_history.to_dict()
-            ),
-            'committer_ids': self.committer_ids
+
+class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_metadata_version_history_gets_created(self) -> None:
+        expected_dict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
         }
+        actual_dict = exp_domain.MetadataVersionHistory(1, 'user_1').to_dict()
+
+        self.assertEqual(expected_dict, actual_dict)
+
+    def test_metadata_version_history_gets_created_from_dict(self) -> None:
+        metadata_version_history_dict: exp_domain.MetadataVersionHistoryDict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
+        }
+        metadata_version_history = (
+            exp_domain.MetadataVersionHistory.from_dict(
+                metadata_version_history_dict))
+
+        self.assertEqual(
+            metadata_version_history.last_edited_version_number,
+            metadata_version_history_dict['last_edited_version_number'])
+        self.assertEqual(
+            metadata_version_history.last_edited_committer_id,
+            metadata_version_history_dict['last_edited_committer_id'])
+
+
+class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
+
+    def test_exploration_version_history_gets_created(self) -> None:
+        state_version_history_dict = {
+            'state 1': state_domain.StateVersionHistory(
+                1, 'state 1', 'user1'
+            ).to_dict()
+        }
+        metadata_version_history = exp_domain.MetadataVersionHistory(
+            None, 'user1'
+        )
+        expected_dict = {
+            'exploration_id': 'exp_1',
+            'exploration_version': 2,
+            'state_version_history': state_version_history_dict,
+            'metadata_version_history': metadata_version_history.to_dict(),
+            'committer_ids': ['user1']
+        }
+        actual_dict = exp_domain.ExplorationVersionHistory(
+            'exp_1', 2, state_version_history_dict,
+            metadata_version_history.last_edited_version_number,
+            metadata_version_history.last_edited_committer_id,
+            ['user1']
+        ).to_dict()
+
+        self.assertEqual(actual_dict, expected_dict)

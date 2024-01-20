@@ -46,7 +46,6 @@ export class ResponseHeaderComponent {
   @Input() outcome!: Outcome;
   @Input() numRules!: number;
   @Input() isResponse!: boolean;
-  @Input() correctnessFeedbackEnabled!: boolean;
   @Input() showWarning!: boolean;
   @Input() defaultOutcome!: boolean;
 
