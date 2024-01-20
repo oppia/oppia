@@ -180,7 +180,7 @@ describe('Context service', () => {
 
   describe('behavior in the topic editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -267,7 +267,7 @@ describe('Context service', () => {
 
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -308,7 +308,7 @@ describe('Context service', () => {
 
   describe('behavior in the skill editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -350,7 +350,7 @@ describe('Context service', () => {
 
   describe('behavior in the blog dashboard page', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -407,7 +407,7 @@ describe('Context service', () => {
 
   describe('behavior in the blog home pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       blogPostPageService = TestBed.get(BlogPostPageService);
       ecs.removeCustomEntityContext();
@@ -528,7 +528,7 @@ describe('Context service', () => {
 
   describe('behavior in other pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.inject(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       ecs.removeCustomEntityContext();
