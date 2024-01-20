@@ -95,7 +95,7 @@ run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server || (echo "Linting failed" && $(MAKE) stop && exit 1)
 
 run_tests.backend: ## Runs the backend tests
-	-$(MAKE) stop || true
+	-$(MAKE) stop 
 	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
@@ -104,7 +104,7 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || (echo "Frontend tests failed" && $(MAKE) stop && exit 1)
@@ -125,7 +125,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -141,7 +141,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 
 CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
@@ -153,7 +153,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## MOBILE: Run e2e test in mobile viewport.
 ## DEBUG: Runs the webdriverio test in debugging mode.
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -172,13 +172,13 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -195,13 +195,13 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -218,7 +218,7 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
-	$(MAKE) stop || true
+	$(MAKE) stop 
 
 OS_NAME := $(shell uname)
 
