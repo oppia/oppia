@@ -5,13 +5,13 @@
 */
 
 .oppia-lesson-player-sidebar {
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  width: 75px;
   background-color: #fff;
+  box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
+  height: 100%;
+  position: relative;
   transition: width 0.3s ease-in-out;
-  box-shadow: 1px 0px 0px 2px rgb(0 0 0 / 0.30);
+  width: 75px;
+  z-index: 1;
 }
 
 .oppia-lesson-player-sidebar.expanded {

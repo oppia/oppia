@@ -5,10 +5,9 @@
 */
 
 .oppia-lesson-player-header {
-  display: flex;
   align-items: center;
-  height: 40px;
-  color: #fff;
   background-color: #094142;
+  display: flex;
+  height: 40px;
   padding-left: 15px;
 }
