@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Optional
+from typing import Dict, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -32,7 +32,7 @@ secrets_services = models.Registry.import_secrets_services()
 class FirebaseConfigValuesHandlerTests(test_utils.GenericTestBase):
     """Tests for the Firebase configuration handler."""
 
-    def _mock_get_secret(self, name: str) -> Optional[str]:
+    def _mock_get_secret(self, name: str) -> Optional[Dict[str, str]]:
         """Mock for the get_secret function.
 
         Args:

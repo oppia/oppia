@@ -43,27 +43,27 @@ class FirebaseServicesTests(test_utils.GenericTestBase):
             Optional[str]. The value of the secret.
         """
         if name == 'FIREBASE_CONFIG_VALUES':
-            return {
-            'FIREBASE_CONFIG_API_KEY': 'test-value-1',
-            'FIREBASE_CONFIG_AUTH_DOMAIN': 'test-value-2',
-            'FIREBASE_CONFIG_PROJECT_ID': 'test-value-3',
-            'FIREBASE_CONFIG_STORAGE_BUCKET': 'test-value-4',
-            'FIREBASE_CONFIG_MESSAGING_SENDER_ID': 'test-value-5',
-            'FIREBASE_CONFIG_APP_ID': 'test-value-6',
-            'FIREBASE_CONFIG_GOOGLE_CLIENT_ID': 'test-value-7'
-            }
+            return '{\
+            \'FIREBASE_CONFIG_API_KEY\': \'test-value-1\',\
+            \'FIREBASE_CONFIG_AUTH_DOMAIN\': \'test-value-2\',\
+            \'FIREBASE_CONFIG_PROJECT_ID\': \'test-value-3\',\
+            \'FIREBASE_CONFIG_STORAGE_BUCKET\': \'test-value-4\',\
+            \'FIREBASE_CONFIG_MESSAGING_SENDER_ID\': \'test-value-5\',\
+            \'FIREBASE_CONFIG_APP_ID\': \'test-value-6\',\
+            \'FIREBASE_CONFIG_GOOGLE_CLIENT_ID\': \'test-value-7\'\
+            }'
         return None
 
     def test_get_firebase_config_returns_correct_secret(self) -> None:
-        expected_config_dict = {
-        'FIREBASE_CONFIG_API_KEY': 'test-value-1',
-        'FIREBASE_CONFIG_AUTH_DOMAIN': 'test-value-2',
-        'FIREBASE_CONFIG_PROJECT_ID': 'test-value-3',
-        'FIREBASE_CONFIG_STORAGE_BUCKET': 'test-value-4',
-        'FIREBASE_CONFIG_MESSAGING_SENDER_ID': 'test-value-5',
-        'FIREBASE_CONFIG_APP_ID': 'test-value-6',
-        'FIREBASE_CONFIG_GOOGLE_CLIENT_ID': 'test-value-7'
-        }
+        expected_config_dict = '{\
+            \'FIREBASE_CONFIG_API_KEY\': \'test-value-1\',\
+            \'FIREBASE_CONFIG_AUTH_DOMAIN\': \'test-value-2\',\
+            \'FIREBASE_CONFIG_PROJECT_ID\': \'test-value-3\',\
+            \'FIREBASE_CONFIG_STORAGE_BUCKET\': \'test-value-4\',\
+            \'FIREBASE_CONFIG_MESSAGING_SENDER_ID\': \'test-value-5\',\
+            \'FIREBASE_CONFIG_APP_ID\': \'test-value-6\',\
+            \'FIREBASE_CONFIG_GOOGLE_CLIENT_ID\': \'test-value-7\'\
+            }'
         with self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -71,7 +71,7 @@ class FirebaseServicesTests(test_utils.GenericTestBase):
             expected_args=[('FIREBASE_CONFIG_VALUES',)],
         ):
             firebase_config_values = firebase_services.get_firebase_config()
-        self.assertDictEqual(firebase_config_values, expected_config_dict)
+        self.assertEqual(firebase_config_values, expected_config_dict)
 
     def test_get_firebase_config_returns_none_when_secret_does_not_exist(
         self

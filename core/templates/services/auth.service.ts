@@ -39,13 +39,11 @@ var getConfig: () => FirebaseOptions = function() {
         request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
       config = jsonResponse;
     }
-
-    return JSON.parse(config);
   } catch (e) {
     console.error('Unable to fetch firebase config : ', e);
   }
 
-  return config;
+  return JSON.parse(JSON.parse(config));
 };
 
 abstract class AuthServiceImpl {

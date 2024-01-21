@@ -38,5 +38,7 @@ class FirebaseConfigValuesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves the Firebase config values."""
-        firebase_config_values = firebase_services.get_firebase_config()
+        secret_response = firebase_services.get_firebase_config()
+        if secret_response is not None:
+            firebase_config_values :str = secret_response
         self.render_json(firebase_config_values)
