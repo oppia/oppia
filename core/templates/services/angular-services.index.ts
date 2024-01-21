@@ -444,6 +444,7 @@ import { InsertScriptService } from './insert-script.service';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
 import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
+import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -475,6 +476,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['AutoplayedVideosService', AutoplayedVideosService],
   ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
+  ['BlogAdminAuthGuard', BlogAdminAuthGuard],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],

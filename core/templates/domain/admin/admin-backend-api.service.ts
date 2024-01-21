@@ -538,6 +538,13 @@ export class AdminBackendApiService {
         });
     });
   }
+
+  async generateDummyBlogPostAsync(blogPostTitle: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_blog_post',
+      blog_post_title: blogPostTitle,
+    });
+  }
 }
 
 angular.module('oppia').factory(
