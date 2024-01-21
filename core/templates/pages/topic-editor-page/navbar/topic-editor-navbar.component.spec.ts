@@ -259,6 +259,22 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.getActiveTabName()).toBe('topic_editor');
   });
 
+  it('should return the navbar text on mobile', () => {
+    componentInstance.selectQuestionsTab();
+    let routingSpy = spyOn(
+      topicEditorRoutingService, 'getActiveTabName');
+    routingSpy.and.returnValue('questions');
+    expect(componentInstance.getMobileNavigatorText()).toBe('Questions');
+    routingSpy.and.returnValue('subtopic_editor');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+    routingSpy.and.returnValue('subtopic_preview');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Preview');
+    routingSpy.and.returnValue('topic_preview');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Preview');
+    routingSpy.and.returnValue('main');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+  });
+
   it('should navigate to main tab when user clicks the \'Editor\' ' +
   'option', () => {
     spyOn(topicEditorRoutingService, 'navigateToMainTab');

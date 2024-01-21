@@ -220,6 +220,21 @@ export class TopicEditorNavbarComponent implements OnInit,
     return validationIssuesCount + prepublishValidationIssuesCount;
   }
 
+  getMobileNavigatorText(): string {
+    const activeTab = this.getActiveTabName();
+    if (activeTab === 'main') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_editor') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_preview') {
+      return 'Preview';
+    } else if (activeTab === 'questions') {
+      return 'Questions';
+    } else if (activeTab === 'topic_preview') {
+      return 'Preview';
+    }
+  }
+
   openTopicViewer(): void {
     this.showNavigationOptions = false;
     let activeTab = this.topicEditorRoutingService.getActiveTabName();
@@ -291,18 +306,7 @@ export class TopicEditorNavbarComponent implements OnInit,
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
-    const activeTabFromUrl = this.getActiveTabName();
-    if (activeTabFromUrl === 'main') {
-      this.activeTab = 'Editor';
-    } else if (activeTabFromUrl === 'subtopic_editor') {
-      this.activeTab = 'Editor';
-    } else if (activeTabFromUrl === 'subtopic_preview') {
-      this.activeTab = 'Preview';
-    } else if (activeTabFromUrl === 'questions') {
-      this.activeTab = 'Questions';
-    } else if (activeTabFromUrl === 'topic_preview') {
-      this.activeTab = 'Preview';
-    }
+    this.activeTab = this.getMobileNavigatorText();
     this.showNavigationOptions = false;
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
