@@ -57,14 +57,19 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     }[];
   };
 
-  learnerFeedback!: {
-    images: string[];
-    caption: { content: string; name: string; type: string}[];
+  growth!: {
+    images?: string[];
+    caption?: { content?: string; name?: string; type?: string}[];
   };
 
   lessonCreation!: {
     images: string[];
     caption: { content: string; name: string; type: string}[];
+  };
+
+  translation!: {
+    images?: string[];
+    caption?: { content?: string; name?: string; type?: string}[];
   };
 
   constructor(
@@ -101,7 +106,9 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     this.art = {
       images: [
         '/volunteer/profile_images/mark.jpg',
-        '/volunteer/profile_images/tuna.jpg',
+        '/volunteer/profile_images/liwei.jpg',
+        '/volunteer/profile_images/pearl.jpg',
+        '/volunteer/profile_images/molly.jpg'
       ],
       caption: [
         {
@@ -114,9 +121,28 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         },
         {
           content: (
-            '“Oppia turns my drawings into little seeds' +
-            ' for the better world.“'),
-          name: '- Tuna R. Terzi',
+            '“I joined Oppia driven by a deep passion for education. ' +
+            'With over five years of experience in edtech, I am committed to ' +
+            'leveraging technology to enhance and enrich the learning ' +
+            'experience, making education accessible and engaging for all.”'
+          ),
+          name: '- liwei zhang',
+          type: 'Artist'
+        },
+        {
+          content: (
+            '“Oppia is able to give education to those who need it, ' +
+            'nd knowing that the art we create helps learners  ' +
+            'means the world to me.“'),
+          name: '- Pearl Nunag',
+          type: 'Artist'
+        },
+        {
+          content: (
+            '“At Oppia, not only do I work with great people, but I\'m able ' +
+            'to contribute to their mission of bringing free, ' +
+            'quality education to everyone.“'),
+          name: '- Molly Rhodes',
           type: 'Artist'
         }
       ]
@@ -125,9 +151,8 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
     this.development = {
       images: [
         '/volunteer/profile_images/akshay.jpg',
-        '/volunteer/profile_images/diana.jpg',
         '/volunteer/profile_images/kevin-thomas.jpg',
-        '/volunteer/profile_images/nithesh.jpg',
+        '/volunteer/profile_images/jay.jpg',
       ],
       caption: [
         {
@@ -141,14 +166,6 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         },
         {
           content: (
-            '“I contribute to Oppia because seeing the community ' +
-            'and the impact it creates makes me hopeful for the future of ' +
-            'education, and I want to be a part of that change.“'),
-          name: '- Diana Chen',
-          type: 'Product Manager'
-        },
-        {
-          content: (
             '“Making quality education accessible and fun to ' +
             'experience is something that is important to me. ' +
             'I enjoy contributing to Oppia because it does exactly this.“'),
@@ -157,61 +174,77 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         },
         {
           content: (
-            '“The lessons are interesting, informative and ' +
-            'gripping for students. Being able to build tools to efficiently ' +
-            'create such lessons is what I enjoy.“'),
-          name: '- Nithesh Hariharan',
-          type: 'Full-Stack Developer and QA Lead'
+            '“I believe education is the route to social upliftment ' +
+            'and progress. At Oppia, I get to be a part of this' +
+            'movement to provide free and accessible education for all.“'),
+          name: '- Jay',
+          type: 'Full-Stack Developer?'
         }
       ]
     };
 
-    this.learnerFeedback = {
+    this.growth = {
       images: [
-        '/volunteer/profile_images/riya.png',
-        '/volunteer/profile_images/wala.jpg',
+        '/volunteer/profile_images/yiga.jpg',
+        '/volunteer/profile_images/jennifer.jpg',
+        '/volunteer/profile_images/erio.jpg',
+        '/volunteer/profile_images/diana.jpg'
       ],
       caption: [
         {
           content: (
-            '“Oppia has given me the opportunity to profoundly ' +
-            'impact the lives of many underprivileged children by ' +
-            'providing them with free quality education. ' +
-            'I am grateful to be a part of this venture.“'),
-          name: '- Riya Sogani',
-          type: 'Learner Feedback Program Volunteer, India'
+            'I contribute to Oppia because I believe in its cause. ' +
+            'I believe children everywhere deserve quality education ' +
+            'that comes at no additional cost to them. I believe every ' +
+            'child can do well at math if they’re taught in the right ' +
+            'way and it is broken down in a language they understand. I ' +
+            'also believe that no matter how good a product is, without ' +
+            'effective marketing, people will not know that it exists. ' +
+            'That is why I contribute to Oppia’s Translation & Marketing' +
+            'Teams.'),
+          name: '- Yiga',
+          type: 'Artist'
         },
         {
           content: (
-            '“Oppia has given me the chance to feel that I am ' +
-            'causing a positive ripple effect around me. ' +
-            'It is delightful to see underprivileged children\'s lives ' +
-            'improving because of Oppia\'s lessons. ' +
-            'These lessons taught them more than just mathematics in joyful ' +
-            'ways: they enhanced their confidence, technical skills, and ' +
-            'reading and writing skills!“'),
-          name: '- Wala Awad',
-          type: 'Learner Feedback Program Volunteer, Palestine'
+            '“Oppia\'s mission and values inspire me daily. I volunteer ' +
+            'because everyone deserves an education and helping to market ' +
+            'this opportunity is a privilege“'),
+          name: '- Jennifer',
+          type: 'Artist'
+        },
+        {
+          content: (
+            '“I love to tell stories through content creation because of ' +
+            'Oppia.This not only amplifies Oppia\'s mission of providing ' +
+            'This not only amplifies Oppia\'s mission of providing free' +
+            'accessible education but also fosters a sense of community ' +
+            'and inspiration, encouraging more individuals to engage with ' +
+            'Oppia\'s educational resources.”'
+          ),
+          name: '- Erio',
+          type: 'Artist'
+        },
+        {
+          content: (
+            '“I contribute to Oppia because seeing the community ' +
+            'and the impact it creates makes me hopeful for the future of ' +
+            'education, and I want to be a part of that change.“'),
+          name: '- Diana Chen',
+          type: 'Product Manager'
         }
       ]
     };
 
     this.lessonCreation = {
       images: [
-        '/volunteer/profile_images/anubhuti.jpg',
         '/volunteer/profile_images/anmol.jpg',
         '/volunteer/profile_images/nitya.jpg',
+        '/volunteer/profile_images/aanuoluwapo.jpg',
+        '/volunteer/profile_images/viksar.jpg',
+        '/volunteer/profile_images/jackson.jpg',
       ],
       caption: [
-        {
-          content: (
-            '“Volunteering with Oppia gives me immense ' +
-            'satisfaction because it aligns with a tenet ' +
-            'I firmly believe in: everyone should have access to basic ' +
-            'education. I\'m glad to be a part of the organization!“'),
-          name: '- Anubhuti Varshney',
-          type: 'Translations/Voiceovers Coordinator'
-        },
         {
           content: (
             '“I strongly identify with Oppia\'s objective of ' +
@@ -228,6 +261,89 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'I have the opportunity to make a difference.“'),
           name: '- Nitya Sunkad',
           type: 'Math Lesson Creator'
+        },
+        {
+          content: (
+            '“At Oppia, my love for writing stories as a ' +
+            'creative intertwines with my passion for ' +
+            'education. “'),
+          name: '- Aanuoluwapo Adeoti',
+          type: 'Math? Lesson Creator'
+        },
+        {
+          content: (
+            '“Contributing to Oppia has been incredibly rewarding. ' +
+            'I\'ve always loved helping others, so being able to use ' +
+            'such a great platform to provide quality education to ' +
+            'those in need is truly fulfilling.“'),
+          name: '- Viksar Dubey',
+          type: 'Math? Lesson Creator'
+        },
+        {
+          content: (
+            '“I feel so grateful to help children gain access to ' +
+            'educational resources. I feel proud when I contribute, ' +
+            'and excited when my team makes progress.“'),
+          name: '- Christopher Jackson Felton',
+          type: 'Math? Lesson Creator'
+        }
+      ]
+    };
+
+    this.translation = {
+      images: [
+        '/volunteer/profile_images/giovana.jpg',
+        '/volunteer/profile_images/kanupriya.jpg',
+        '/volunteer/profile_images/vanessa.jpg',
+        '/volunteer/profile_images/pretty.jpg',
+        '/volunteer/profile_images/anubhuti.jpg',
+      ],
+      caption: [
+        {
+          content: (
+            '“I was always told that quality education is only for those who ' +
+            'are privileged. But by volunteering at Oppia, I prove every day ' +
+            'hat a decent education is for everyone and I feel grateful to ' +
+            ' be able to help thousands of people worldwide on this journey.“'),
+          name: '- Giovana Alonso',
+          type: 'Translator'
+        },
+        {
+          content: (
+            '“Being a mother of 8 year old boy I understand that kids ....“'),
+          name: '- Kanupriya Goel',
+          type: 'Translator'
+        },
+        {
+          content: (
+            '“Every small voluntary effort, when done with love and ' +
+            'dedication, can achieve incredible results, and that\'s what ' +
+            'I\'m doing at Oppia, hoping to achieve more results and help ' +
+            'accomplish what many say is impossible. Alone we are nothing, ' +
+            'but together we change the world.'),
+          name: '- Vanessa Gelinski',
+          type: 'Translator'
+        },
+        {
+          content: (
+            '“Empowering learners with knowledge is not just a task; for me, ' +
+            'it\'s a passion. This passion is deeply rooted in my role as a ' +
+            'mother of three young kids, where I recognize that every ' +
+            'quality education a child receives is a thousand steps toward ' +
+            'a bright and successful future. Contributing to Oppia affords ' +
+            'me the opportunity to extend this impact to the lives of many ' +
+            'more children, and I am truly grateful for the privilege.“'),
+          name: '- Pretty',
+          type: 'Translator'
+        },
+        {
+          content: (
+            '“Volunteering with Oppia gives me immense ' +
+            'satisfaction because it aligns with a tenet ' +
+            'I firmly believe in: everyone should have access to basic ' +
+            'education. I\'m glad to be a part of the organization!“'),
+          name: '- Anubhuti Varshney',
+          type: 'Translations/Voiceovers Coordinator'
         }
       ]
     };
