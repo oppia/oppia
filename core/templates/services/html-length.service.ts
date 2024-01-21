@@ -16,6 +16,12 @@
  * @fileoverview Service for Computing length of HTML strings.
  */
 
+const CALCULATION_TYPE_WORD = 'word';
+const CALCULATION_TYPE_CHARACTER = 'character';
+const CUSTOM_TAG_REGEX = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
+
+type CalculationType = 'word' | 'character';
+
 import { Injectable, SecurityContext } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -50,14 +56,15 @@ export class HtmlLengthService {
     }
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
-    let totalWords = this.calculateBaselineLength(sanitizedHtml, 'word');
+    let totalWords = this.calculateBaselineLength(
+      sanitizedHtml, CALCULATION_TYPE_WORD);
     // Identify custom tags using regex on the original HTML string.
-    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
-    const customTags = htmlString.match(customTagRegex);
+    const customTags = htmlString.match(CUSTOM_TAG_REGEX);
 
     if (customTags) {
       for (const customTag of customTags) {
-        totalWords += this.getWeightForNonTextNodes(customTag, 'word');
+        totalWords += this.getWeightForNonTextNodes(
+          customTag, CALCULATION_TYPE_WORD);
       }
     }
     return totalWords;
@@ -71,22 +78,21 @@ export class HtmlLengthService {
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
     let totalCharacters =
-    this.calculateBaselineLength(sanitizedHtml, 'character');
+    this.calculateBaselineLength(sanitizedHtml, CALCULATION_TYPE_CHARACTER);
     // Identify custom tags using regex on the original HTML string.
-    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
-    const customTags = htmlString.match(customTagRegex);
+    const customTags = htmlString.match(CUSTOM_TAG_REGEX);
 
     if (customTags) {
       for (const customTag of customTags) {
         totalCharacters += this.getWeightForNonTextNodes(
-          customTag, 'character');
+          customTag, CALCULATION_TYPE_CHARACTER);
       }
     }
     return totalCharacters;
   }
 
   private calculateBaselineLength(
-      sanitizedHtml: string, wordOrCharacter: string): number {
+      sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
     let totalWeight = 0;
@@ -94,47 +100,45 @@ export class HtmlLengthService {
       const ltag = tag.tagName.toLowerCase();
       if (this.textTags.includes(ltag)) {
         totalWeight +=
-        this.getWeightForTextNodes(tag as HTMLElement, wordOrCharacter);
+        this.getWeightForTextNodes(tag as HTMLElement, calculationType);
       }
     }
     return totalWeight;
   }
 
   private getWeightForTextNodes(
-      textNode: HTMLElement, wordOrCharacter: string): number {
+      textNode: HTMLElement, calculationType: CalculationType): number {
     const textContent = textNode.textContent || '';
 
-    if (wordOrCharacter === 'word') {
-      const words = textContent.trim().split(' ');
-      const wordCount = words.length;
-      return wordCount;
+    let textContentTrimmed = textContent.trim();
+    let textContentCount: number;
+    if (calculationType === CALCULATION_TYPE_WORD) {
+      const words = textContentTrimmed.split(' ');
+      textContentCount = words.length;
+    } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
+      const characters = textContentTrimmed.split('\n').join('').split('');
+      textContentCount = characters.length;
     }
-    const characters = textContent.trim().split('\n').join('').split('');
-    let characterCount = characters.length;
-    return characterCount;
+    return textContentCount;
   }
 
   private getWeightForNonTextNodes(
-      nonTextNode: string, wordOrCharacter: string): number {
+      nonTextNode: string, calculationType: CalculationType): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;
     }
     const altTextMatch = nonTextNode
       .match(/alt-with-value="&amp;quot;([^&]*)&amp;quot;"/);
 
-    if (wordOrCharacter === 'word') {
-      let words = [];
-      if (altTextMatch && altTextMatch[1]) {
-        const altText = altTextMatch[1];
-        words = altText.trim().split(' ');
-      }
-      return words.length + 2; // +2 as a bonus for images with text.
-    }
-    let chars = [];
+    let text = [];
     if (altTextMatch && altTextMatch[1]) {
       const altText = altTextMatch[1];
-      chars = altText.trim().split(' ').join('').split('');
+      if (calculationType === CALCULATION_TYPE_WORD) {
+        text = altText.trim().split(' ');
+      } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
+        text = altText.trim().split(' ').join('').split('');
+      }
     }
-    return chars.length + 2; // +2 as a bonus for images with text.
+    return text.length + 10; // +10 as a bonus for images with text.
   }
 }

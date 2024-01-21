@@ -134,7 +134,7 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(9);
+    expect(result).toBe(17);
   });
 
   it('should compute word count of content of ordered lists', () => {
@@ -236,7 +236,7 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
 
-    expect(result).toBe(34);
+    expect(result).toBe(42);
   });
 
   it('should compute character count of content of ordered lists', () => {
