@@ -136,7 +136,7 @@
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
           <div class="row oppia-android-carousel-direction">
-            <button class="col-md-2 align-self-center oppia-android-carousel-button-reset" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
+            <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
               <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
             </button>
             
@@ -146,7 +146,7 @@
               <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="Image showing the lesson in different languages">
               <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
             </div>
-            <button class="col-md-2 align-self-center oppia-android-carousel-button-reset" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
+            <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
               <i class="fas fa-chevron-right oppia-android-carousel-chevron"></i>
             </button>
           </div>

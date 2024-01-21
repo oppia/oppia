@@ -296,12 +296,12 @@
 .oppia-android-carousel-chevron:hover {
   background-color: #3d9991;
 }
-.oppia-android-carousel-button-reset{
+.oppia-android-carousel-button{
   border: none;
   background: none;
 }
-.oppia-android-carousel-button-reset:active,
-.oppia-android-carousel-button-reset:focus {
+.oppia-android-carousel-button:active,
+.oppia-android-carousel-button:focus {
   outline: none; 
 }
 
