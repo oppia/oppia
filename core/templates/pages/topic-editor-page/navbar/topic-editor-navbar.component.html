@@ -79,8 +79,9 @@
         <div class="oppia-topic-nav-dropdown-option" (click)="selectMainTab()">
           <i class="fas fa-pen"></i><span>Editor</span>
         </div>
-        <div class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
-          <i class="fas fa-pen"></i><span>Questions</span>
+        <div *ngIf="getActiveTabName() !== 'subtopic_preview' && getActiveTabName() !== 'subtopic_editor'"
+             class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
+          <i class="fas fa-book-open"></i><span>Questions</span>
         </div>
         <div class="oppia-topic-nav-dropdown-option" (click)="openTopicViewer()">
           <i class="fas fa-play"></i><span>Preview</span>
