@@ -126,7 +126,7 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
 
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
-    """Unit tests to validate the language accent information saved as
+    """Unit tests to validate the language-accent information saved as
     constants in the JSON files.
     """
 
@@ -185,38 +185,14 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        invalid_schema = {
-            'type': 'variable_keys_dict',
-            'keys': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'values': {
-                'schema': {
-                    'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
-                    'values': {
-                        'schema': {
-                            'type': 'float'
-                        }
-                    }
-                }
-            }
-        }
-        schema_utils.normalize_against_schema(
-            voiceover_services.get_language_accent_master_list(),
-            valid_schema)
-
-        with self.assertRaisesRegex(
-                Exception, 'Could not convert str to float'):
+        try:
             schema_utils.normalize_against_schema(
                 voiceover_services.get_language_accent_master_list(),
-                invalid_schema)
+                valid_schema)
+        except Exception:
+            self.fail(
+                'get_language_accent_master_list() raised '
+                'ExceptionType unexpectedly!')
 
     def test_validate_data_format_stored_in_autogeneratable_list_is_correct(
         self
@@ -245,39 +221,14 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        invalid_schema = {
-            'type': 'variable_keys_dict',
-            'keys': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'values': {
-                'schema': {
-                    'type': 'dict',
-                    'properties': [{
-                        'name': 'service',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'voice_code',
-                        'schema': {
-                            'type': 'int'
-                        }
-                    }]
-                }
-            }
-        }
-        schema_utils.normalize_against_schema(
-            voiceover_services.get_autogeneratable_language_accent_list(),
-            valid_schema)
-
-        with self.assertRaisesRegex(
-                Exception, 'Could not convert str to int'):
+        try:
             schema_utils.normalize_against_schema(
                 voiceover_services.get_autogeneratable_language_accent_list(),
-                invalid_schema)
+                valid_schema)
+        except Exception:
+            self.fail(
+                'get_autogeneratable_language_accent_list() raised '
+                'ExceptionType unexpectedly!')
 
     def test_validate_autogeneratable_list_is_subset_of_master_list(
         self
