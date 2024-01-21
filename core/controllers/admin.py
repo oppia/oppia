@@ -2350,6 +2350,7 @@ class InteractionsByExplorationIdHandler(base.BaseHandler):
     """Handler for admin to retrive the list of interactions used in
     an exploration.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -2362,7 +2363,7 @@ class InteractionsByExplorationIdHandler(base.BaseHandler):
         }
     }
 
-    # @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_admin_page
     def get(self):
         exploration_id = self.normalized_request['exp_id']
         if exploration_id is None:
