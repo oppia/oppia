@@ -17,15 +17,11 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
+from core.domain import voiceover_services
 
-from typing import Dict, List, TypedDict
+from typing import Dict
 
 
 class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -53,15 +49,14 @@ class VoiceoverAdminDataHandler(
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
-        language_accent_code_to_description: Dict[str, str] = {
-            'en-US': 'English (US)',
-            'hi-IN': 'Hindi (India)'
-        }
-        language_codes_mapping: Dict[str, Dict[str, bool]] = {
-            'en': {
-                'en-US': True
-            }
-        }
+        language_accent_code_to_description: Dict[str, str] = {}
+        for language_accent_code_mapping in (
+                voiceover_services.get_language_accent_master_list().values()):
+            language_accent_code_to_description.update(
+                language_accent_code_mapping)
+
+        language_codes_mapping: Dict[str, Dict[str, bool]] = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
         self.values.update({
             'language_accent_code_to_description':
                 language_accent_code_to_description,
