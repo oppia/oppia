@@ -111,7 +111,7 @@ export class HtmlLengthService {
     const textContent = textNode.textContent || '';
 
     let textContentTrimmed = textContent.trim();
-    let textContentCount: number;
+    let textContentCount: number = 0;
     if (calculationType === CALCULATION_TYPE_WORD) {
       const words = textContentTrimmed.split(' ');
       textContentCount = words.length;
