@@ -163,8 +163,8 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
     JSON file.
 
     Returns:
-        Dict[str, Dict[str, str]]. A dict with with language code as keys and
-        nested dicts as values. Each nested dict contains language-accent code
+        Dict[str, Dict[str, str]]. A dict with with language codes as keys and
+        nested dicts as values. Each nested dict contains language-accent codes
         as keys and its description as values. This is an exhaustive list of
         language-accent pairs that Oppia may support for
         voiceovers (manual and auto).
@@ -183,11 +183,11 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 
     Returns:
         Dict[str, Dict[str, str]]. A dict with language-accent codes as keys
-        and nested dicts as values. Each nested dict contains 'service' and
-        'voice_code' as keys and their respective field values as values. This
-        is an exhaustive list of language-accent pairs that Oppia may support
-        for automatic voiceovers, and this should be a subset of
-        language-accent master list.
+        and nested dicts as values. Each nested dictionary includes 'service'
+        and 'voice_code' keys with their corresponding field values.
+        The 'service' field denotes the third-party service utilized by Oppia
+        for voiceover generation, while 'voice_code' signifies the desired
+        voice type.
     """
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json')
