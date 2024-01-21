@@ -2345,3 +2345,36 @@ class TranslationCoordinatorRoleHandler(
                 language_coordinator, language_id)
 
         self.render_json({})
+
+class InteractionsByExplorationIdHandler(base.BaseHandler):
+    """Handler for admin to retrive the list of interactions used in
+    an exploration.
+    """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    # @acl_decorators.can_access_admin_page
+    def get(self):
+        exploration_id = self.normalized_request['exp_id']
+        if exploration_id is None:
+            raise self.InvalidInputException(
+                'Exploration id must be a string, received None')
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
+            raise self.InvalidInputException('Exploration does not exist.')
+        interaction_ids = {
+            state.interaction.id for state in
+            exploration.states.values() if state.interaction.id is not None
+        }
+        self.render_json({'interactions': list(interaction_ids)})

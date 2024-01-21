@@ -58,6 +58,8 @@ export class AdminMiscTabComponent {
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   message: string = '';
+  expIdToGetInteractions!: string;
+  explorationInteractionIds: string[];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -282,6 +284,22 @@ export class AdminMiscTabComponent {
       this.numAnswers);
 
     this.windowRef.nativeWindow.open(downloadUrl);
+  }
+
+  retrieveExplorationInteractionIds(): void {
+    this.explorationInteractionIds = [];
+    this.setStatusMessage.emit('Retrieving interactions in exploration ...');
+    this.adminBackendApiService.retrieveExplorationInteractionIdsAsync(
+      this.expIdToGetInteractions)
+      .then(response => {
+        this.setStatusMessage.emit(
+          'Successfully fetched interactions in exploration.');
+        this.explorationInteractionIds = response.interactions;
+      }, errorResponse => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse);
+      }
+      );
   }
 
   resetForm(): void {
