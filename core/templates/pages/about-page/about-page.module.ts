@@ -31,7 +31,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
   ],
   declarations: [
     AboutPageComponent,
-    AboutPageRootComponent,
+    AboutPageRootComponent
   ],
 })
 export class AboutPageModule {}

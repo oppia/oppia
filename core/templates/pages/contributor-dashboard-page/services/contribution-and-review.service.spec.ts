@@ -549,7 +549,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'content_1'
           },
@@ -562,7 +562,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'content_3'
           },
@@ -575,7 +575,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'feedback_2'
           },
@@ -588,7 +588,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'content_2'
           },
@@ -601,7 +601,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'interaction_1'
           },
@@ -614,7 +614,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'hints_1'
           },
@@ -635,7 +635,7 @@ describe('Contribution and review service', () => {
                 target_id: '1',
                 status: 'review',
                 author_name: 'author',
-                change: {
+                change_cmd: {
                   state_name: 'End State',
                   content_id: 'hints_1',
                 },
@@ -926,7 +926,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'First State',
           content_id: 'feedback_2',
           new_value: {
@@ -946,7 +946,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'End State',
           content_id: 'hints_1',
           new_value: {
@@ -966,7 +966,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'First State',
           content_id: 'content_3',
           new_value: {
@@ -986,7 +986,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'End State',
           content_id: 'interaction_1',
           new_value: {
@@ -1006,7 +1006,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'First State',
           content_id: 'content_1',
           new_value: {
@@ -1026,7 +1026,7 @@ describe('Contribution and review service', () => {
         target_id: '1',
         status: 'review',
         author_name: 'author',
-        change: {
+        change_cmd: {
           state_name: 'End State',
           content_id: 'content_2',
           new_value: {
@@ -1131,7 +1131,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'content_1',
             new_value: {
@@ -1151,7 +1151,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'content_3',
             new_value: {
@@ -1171,7 +1171,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'First State',
             content_id: 'feedback_2',
             new_value: {
@@ -1191,7 +1191,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'content_2',
             new_value: {
@@ -1211,7 +1211,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'interaction_1',
             new_value: {
@@ -1231,7 +1231,7 @@ describe('Contribution and review service', () => {
           target_id: '1',
           status: 'review',
           author_name: 'author',
-          change: {
+          change_cmd: {
             state_name: 'End State',
             content_id: 'hints_1',
             new_value: {

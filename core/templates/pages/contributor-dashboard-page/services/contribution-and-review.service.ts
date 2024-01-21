@@ -264,7 +264,7 @@ export class ContributionAndReviewService {
     string, SuggestionBackendDict[]>();
 
     for (const translationSuggestion of translationSuggestions) {
-      const stateName = translationSuggestion.change.state_name;
+      const stateName = translationSuggestion.change_cmd.state_name;
       const suggestionsForState = translationSuggestionsByState.get(
         stateName) || [];
       suggestionsForState.push(translationSuggestion);
@@ -279,17 +279,17 @@ export class ContributionAndReviewService {
       cardB: SuggestionBackendDict
   ): number {
     const cardATypeOrder = ContributionAndReviewService.
-      getTranslationContentTypeOrder(cardA.change.content_id);
+      getTranslationContentTypeOrder(cardA.change_cmd.content_id);
     const cardBTypeOrder = ContributionAndReviewService
-      .getTranslationContentTypeOrder(cardB.change.content_id);
+      .getTranslationContentTypeOrder(cardB.change_cmd.content_id);
 
     if (cardATypeOrder !== cardBTypeOrder) {
       return cardATypeOrder - cardBTypeOrder;
     } else {
       const cardAIndex = ContributionAndReviewService
-        .getTranslationContentIndex(cardA.change.content_id);
+        .getTranslationContentIndex(cardA.change_cmd.content_id);
       const cardBIndex = ContributionAndReviewService
-        .getTranslationContentIndex(cardB.change.content_id);
+        .getTranslationContentIndex(cardB.change_cmd.content_id);
       return cardAIndex - cardBIndex;
     }
   }

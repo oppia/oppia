@@ -4940,12 +4940,15 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         ))
         with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
-            user_services.update_preferred_language_codes(
-                self.user_1_id, ['en'])
+            user_settings = user_services.get_user_settings(self.user_1_id)
+            user_settings.preferred_language_codes = ['en']
+            user_services.save_user_settings(user_settings)
         with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
-            user_services.update_preferred_language_codes(
-                self.profile_user_id, ['en'])
+            user_settings = user_services.get_user_settings(
+                self.profile_user_id)
+            user_settings.preferred_language_codes = ['en']
+            user_services.save_user_settings(user_settings)
 
 
 class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
