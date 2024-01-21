@@ -33,7 +33,7 @@ secrets_services = models.Registry.import_secrets_services()
 class FirebaseServicesTests(test_utils.GenericTestBase):
     """Tests for the Firebase services."""
 
-    def _mock_get_secret(self, name: str) -> Optional[str]:
+    def _mock_get_secret(self, name: str) -> Optional[Dict[str, str]]:
         """Mock for the get_secret function.
 
         Args:
@@ -43,27 +43,27 @@ class FirebaseServicesTests(test_utils.GenericTestBase):
             Optional[str]. The value of the secret.
         """
         if name == 'FIREBASE_CONFIG_VALUES':
-            return '{\
-            \'FIREBASE_CONFIG_API_KEY\': \'test-value-1\',\
-            \'FIREBASE_CONFIG_AUTH_DOMAIN\': \'test-value-2\',\
-            \'FIREBASE_CONFIG_PROJECT_ID\': \'test-value-3\',\
-            \'FIREBASE_CONFIG_STORAGE_BUCKET\': \'test-value-4\',\
-            \'FIREBASE_CONFIG_MESSAGING_SENDER_ID\': \'test-value-5\',\
-            \'FIREBASE_CONFIG_APP_ID\': \'test-value-6\',\
-            \'FIREBASE_CONFIG_GOOGLE_CLIENT_ID\': \'test-value-7\'\
-            }'
+            return {
+            'FIREBASE_CONFIG_API_KEY': 'test-value-1',
+            'FIREBASE_CONFIG_AUTH_DOMAIN': 'test-value-2',
+            'FIREBASE_CONFIG_PROJECT_ID': 'test-value-3',
+            'FIREBASE_CONFIG_STORAGE_BUCKET': 'test-value-4',
+            'FIREBASE_CONFIG_MESSAGING_SENDER_ID': 'test-value-5',
+            'FIREBASE_CONFIG_APP_ID': 'test-value-6',
+            'FIREBASE_CONFIG_GOOGLE_CLIENT_ID': 'test-value-7'
+            }
         return None
 
     def test_get_firebase_config_returns_correct_secret(self) -> None:
-        expected_config_dict = '{\
-            \'FIREBASE_CONFIG_API_KEY\': \'test-value-1\',\
-            \'FIREBASE_CONFIG_AUTH_DOMAIN\': \'test-value-2\',\
-            \'FIREBASE_CONFIG_PROJECT_ID\': \'test-value-3\',\
-            \'FIREBASE_CONFIG_STORAGE_BUCKET\': \'test-value-4\',\
-            \'FIREBASE_CONFIG_MESSAGING_SENDER_ID\': \'test-value-5\',\
-            \'FIREBASE_CONFIG_APP_ID\': \'test-value-6\',\
-            \'FIREBASE_CONFIG_GOOGLE_CLIENT_ID\': \'test-value-7\'\
-            }'
+        expected_config_dict = {
+            'FIREBASE_CONFIG_API_KEY': 'test-value-1',
+            'FIREBASE_CONFIG_AUTH_DOMAIN': 'test-value-2',
+            'FIREBASE_CONFIG_PROJECT_ID': 'test-value-3',
+            'FIREBASE_CONFIG_STORAGE_BUCKET': 'test-value-4',
+            'FIREBASE_CONFIG_MESSAGING_SENDER_ID': 'test-value-5',
+            'FIREBASE_CONFIG_APP_ID': 'test-value-6',
+            'FIREBASE_CONFIG_GOOGLE_CLIENT_ID': 'test-value-7'
+            }
         with self.swap_with_checks(
             secrets_services,
             'get_secret',

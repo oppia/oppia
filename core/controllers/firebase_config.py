@@ -40,5 +40,5 @@ class FirebaseConfigValuesHandler(
         """Retrieves the Firebase config values."""
         secret_response = firebase_services.get_firebase_config()
         if secret_response is not None:
-            firebase_config_values :str = secret_response
+            firebase_config_values: str = secret_response
         self.render_json(firebase_config_values)
