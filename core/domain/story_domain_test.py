@@ -1074,8 +1074,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         calculated_list = self.story.story_contents.get_ordered_nodes()
         self.assertEqual(calculated_list, [])
 
-    def test_get_all_linked_exp_ids(self) -> None:
-        self.story.story_contents.next_node_id = 'node_4'
+    def test_update_node_exploration_id_changes_node_exploration_id(
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -1116,53 +1118,239 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'first_publication_date_msecs': 100,
             'unpublishing_reason': None
         }
-        node_3: story_domain.StoryNodeDict = {
-            'id': 'node_3',
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+
+        self.story.update_node_exploration_id('node_1', 'exp_3')
+
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_3', 'exp_2'])
+
+    def test_update_node_exploration_id_with_same_exploration_id_does_nothing(
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
-            'title': 'Title 3',
-            'description': 'Description 3',
-            'destination_node_ids': [],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': 'exp_3',
-            'status': 'Ready To Publish',
+            'exploration_id': 'exp_1',
+            'status': 'Published',
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
-            'first_publication_date_msecs': None,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
             'unpublishing_reason': None
         }
         self.story.story_contents.initial_node_id = 'node_2'
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_2)
         ]
+
+        self.story.update_node_exploration_id('node_1', 'exp_1')
+
         self.assertEqual(
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2'])
-        self.story.story_contents.nodes.append(
-            story_domain.StoryNode.from_dict(node_3))
-        self.assertEqual(
-            self.story.story_contents.get_all_linked_exp_ids(),
-            ['exp_1', 'exp_2', 'exp_3'])
+
+    def test_update_node_exploration_id_raises_error_when_introducing_duplicate_exploration_id( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+
         with self.assertRaisesRegex(
-             ValueError, 'A node with exploration id exp_3 already exists.'
+             ValueError, 'A node with exploration id exp_2 already exists.'
         ):
-            self.story.update_node_exploration_id('node_2', 'exp_3')
-        self.story.update_node_exploration_id('node_3', 'exp_3')
-        self.assertEqual(
-            self.story.story_contents.get_all_linked_exp_ids(),
-            ['exp_1', 'exp_2', 'exp_3'])
-        self.story.update_node_exploration_id('node_3', 'exp_4')
-        self.assertEqual(
-            self.story.story_contents.get_all_linked_exp_ids(),
-            ['exp_1', 'exp_2', 'exp_4'])
+            self.story.update_node_exploration_id('node_1', 'exp_2')
+
+    def test_get_all_linked_exp_ids_lists_each_exp_id_linked_to_each_story_node(
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+
+        linked_exp_ids = self.story.story_contents.get_all_linked_exp_ids()
+
+        self.assertEqual(linked_exp_ids, ['exp_1', 'exp_2'])
+
+    def test_get_all_linked_exp_ids_ignores_nodes_without_linked_exp_id(
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None,
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': 100,
+            'unpublishing_reason': None
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+
+        linked_exp_ids = self.story.story_contents.get_all_linked_exp_ids()
+
+        self.assertEqual(linked_exp_ids, ['exp_2'])
 
     def test_get_linked_exp_ids_of_published_nodes(self) -> None:
+        self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -1234,9 +1422,64 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_ids, ['exp_1', 'exp_2'])
 
+    def test_get_published_node_count_counts_all_nodes_when_all_nodes_published( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.story.story_contents.next_node_id = 'node_3'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+
+        published_node_count = (
+            self.story.story_contents.get_published_node_count())
+
+        self.assertEqual(published_node_count, 2)
+
     def test_get_published_node_count_counts_only_published_nodes(
         self
     ) -> None:
+        self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
