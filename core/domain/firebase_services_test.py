@@ -22,7 +22,7 @@ from core.domain import firebase_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Optional
+from typing import Dict, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
