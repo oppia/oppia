@@ -151,15 +151,11 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
-    if (!outcome) {
-      return false;
-    }
-
     let currentStateName = this.stateName;
 
     return (
-      (outcome.dest === currentStateName) &&
-      outcome.labelledAsCorrect);
+      (outcome?.dest === currentStateName) &&
+      outcome?.labelledAsCorrect);
   }
 
   changeActiveAnswerGroupIndex(newIndex: number): void {
