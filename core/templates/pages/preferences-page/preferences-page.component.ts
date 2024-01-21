@@ -208,9 +208,6 @@ export class PreferencesPageComponent {
         this.username + '_profile_picture.png', imageData);
     };
     reader.readAsDataURL(newImageFile);
-    // The reload is needed in order to update the profile picture
-    // in the top-right corner.
-    this.windowRef.nativeWindow.location.reload();
   }
 
   showEditProfilePictureModal(): void {

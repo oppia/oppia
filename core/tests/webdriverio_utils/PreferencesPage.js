@@ -40,6 +40,7 @@ var PreferencesPage = function() {
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
   var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
   var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var saveChangesButton = $('.e2e-test-save-changes-button');
   var subscription = $('.e2e-test-subscription-name');
   var subscriptionsSelector = function() {
     return $$('.e2e-test-subscription-name');
@@ -53,6 +54,11 @@ var PreferencesPage = function() {
       `Info toast for saving ${fieldName} takes too long to appear.`);
     await waitFor.invisibilityOfInfoToast(
       'Info toast takes too long to disappear.');
+  };
+
+  var clickSaveChangesButton = async function() {
+    await action.click(
+      'Save Changes button', saveChangesButton);
   };
 
   this.get = async function() {
@@ -72,8 +78,12 @@ var PreferencesPage = function() {
   };
 
   this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
-    return await workflow.submitImage(
+    await workflow.submitImage(
       profilePhotoClickable, profilePhotoCropper, imgPath, resetExistingImage);
+    await clickSaveChangesButton();
+    await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Preferences page header', pageHeader);
   };
 
   this.getProfilePhotoSource = async function() {
@@ -82,22 +92,28 @@ var PreferencesPage = function() {
 
   this.editUserBio = async function(bio) {
     await action.addValue('User bio field', userBioElement, bio);
+    // Click on a neutral element to make User bio element out of focus.
+    await action.click('Preferences page header', pageHeader);
+    await clickSaveChangesButton();
     await saveNewChanges('User Bio');
   };
 
   this.toggleEmailUpdatesCheckbox = async function() {
     await action.click('Email Updates checkbox', emailUpdatesCheckbox);
+    await clickSaveChangesButton();
     await saveNewChanges('Email Updates');
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
+    await clickSaveChangesButton();
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await action.click(
       'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
+    await clickSaveChangesButton();
     await saveNewChanges('Feedback Emails');
   };
 
@@ -105,6 +121,7 @@ var PreferencesPage = function() {
     await action.click('system language selector', languageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
+    await clickSaveChangesButton();
     await saveNewChanges('System Language');
   };
 
@@ -112,14 +129,17 @@ var PreferencesPage = function() {
     await action.click('clickable', audioLanguageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
+    await clickSaveChangesButton();
     await saveNewChanges('Preferred Audio Language');
   };
 
   this.setUserBio = async function(bio) {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
-    await saveNewChanges('User Bio');
     await action.setValue(inputFieldName, userBioElement, bio);
+    // Click on a neutral element to make User bio element out of focus.
+    await action.click('Preferences page header', pageHeader);
+    await clickSaveChangesButton();
     await saveNewChanges('User Bio');
   };
 
@@ -129,6 +149,7 @@ var PreferencesPage = function() {
     for (var i = 0; i < interests.length; i++) {
       await action.setValue(
         'User Interest Input', userInterestsInput, interests[i] + '\n');
+      await clickSaveChangesButton();
       await saveNewChanges('User Interests');
     }
   };
@@ -209,18 +230,21 @@ var PreferencesPage = function() {
   this.selectCreatorDashboard = async function() {
     await action.click(
       'Creator Dashboard radio', creatorDashboardRadio);
+    await clickSaveChangesButton();
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectContributorDashboard = async function() {
     await action.click(
       'Contributor Dashboard radio', contributorDashboardRadio);
+    await clickSaveChangesButton();
     await saveNewChanges('Contributor Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await action.click(
       'Learner Dashboard radio', learnerDashboardRadio);
+    await clickSaveChangesButton();
     await saveNewChanges('Learner Dashboard Option');
   };
 
