@@ -646,6 +646,14 @@ describe('State Responses Component', () => {
       .toHaveBeenCalled();
   });
 
+  it('should check if outcome is null or undefined', () => {
+    expect(component.isSelfLoopThatIsMarkedCorrect(null as Outcome))
+      .toBe(false);
+
+    expect(component.isSelfLoopThatIsMarkedCorrect(undefined as Outcome))
+      .toBe(false);
+  });
+
   it('should check if outcome has no feedback with self loop', () => {
     component.stateName = 'State Name';
     let outcome1 = outcomeObjectFactory.createNew(
