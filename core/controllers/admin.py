@@ -2346,6 +2346,7 @@ class TranslationCoordinatorRoleHandler(
 
         self.render_json({})
 
+
 class InteractionsByExplorationIdHandler(base.BaseHandler):
     """Handler for admin to retrive the list of interactions used in
     an exploration.
