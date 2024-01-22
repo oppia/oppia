@@ -56,14 +56,11 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Versions of libraries used in backend.
-PILLOW_VERSION = '9.0.1'
-
 # Buf version.
 BUF_VERSION = '0.29.0'
 
 # Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.13.0'
+PROTOC_VERSION = '3.18.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -219,6 +216,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
     'duplicate-blog-post.spec.js',
+    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
 

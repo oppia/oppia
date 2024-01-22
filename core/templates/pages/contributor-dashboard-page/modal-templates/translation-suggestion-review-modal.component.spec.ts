@@ -113,7 +113,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       target_id: '1',
       target_type: 'target_type',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
@@ -133,7 +133,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       target_id: '2',
       target_type: 'target_type',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
@@ -153,7 +153,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       target_id: '3',
       target_type: 'target_type',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
@@ -252,7 +252,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       target_id: '1',
       target_type: 'target_type',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
@@ -273,7 +273,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       target_id: '2',
       target_type: 'target_type',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
@@ -734,7 +734,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_1',
       target_id: '1',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
@@ -754,7 +754,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_2',
       target_id: '2',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
@@ -774,7 +774,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_3',
       target_id: '3',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
@@ -942,7 +942,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_1',
       target_id: '1',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
@@ -962,7 +962,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_2',
       target_id: '2',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
@@ -1052,7 +1052,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_1',
       target_id: '1',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: ['Translation1', 'Translation2'],
         translation_html: 'Tradução',
@@ -1072,7 +1072,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_2',
       target_id: '2',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: 'Translation',
         translation_html: 'Tradução',
@@ -1229,7 +1229,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_1',
       target_id: '1',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p><p>&nbsp;</p>',
         translation_html: 'Tradução',
@@ -1249,7 +1249,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       suggestion_id: 'suggestion_2',
       target_id: '2',
       suggestion_type: 'translate_content',
-      change: {
+      change_cmd: {
         content_id: 'hint_1',
         content_html: '<p>content</p>',
         translation_html: 'Tradução',
@@ -1343,10 +1343,10 @@ describe('Translation Suggestion Review Modal Component', function() {
       const deprecatedCmd = 'add_translation';
       const validCmd = 'add_written_translation';
 
-      component.activeSuggestion.change.cmd = validCmd;
+      component.activeSuggestion.change_cmd.cmd = validCmd;
       expect(component.isDeprecatedTranslationSuggestionCommand()).toBeFalse();
 
-      component.activeSuggestion.change.cmd = deprecatedCmd;
+      component.activeSuggestion.change_cmd.cmd = deprecatedCmd;
       expect(component.isDeprecatedTranslationSuggestionCommand()).toBeTrue();
     });
 

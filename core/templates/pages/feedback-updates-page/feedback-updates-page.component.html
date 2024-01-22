@@ -45,8 +45,8 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-feedback-updates-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 href="/learn/math"
-                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE">
+                 href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+                 smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}">
               </a>
             </div>
           </mat-card>

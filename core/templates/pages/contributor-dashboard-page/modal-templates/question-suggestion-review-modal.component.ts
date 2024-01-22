@@ -75,7 +75,7 @@ interface SuggestionChangeDict {
 
 interface ActiveSuggestionDict {
   'author_name': string;
-  'change': SuggestionChangeDict;
+  'change_cmd': SuggestionChangeDict;
   'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
@@ -154,7 +154,7 @@ export class QuestionSuggestionReviewModalComponent
 
   edit(): void {
     this.ngbActiveModal.dismiss();
-    const skillId = this.suggestion.change.skill_id;
+    const skillId = this.suggestion.change_cmd.skill_id;
     if (!skillId) {
       throw new Error('Skill ID is null.');
     }
@@ -179,9 +179,9 @@ export class QuestionSuggestionReviewModalComponent
         // in that modal should also be reflected in the question suggestion
         // review modal. Then, the reviewers can see the changes they have made
         // and know that their changes have been saved successfully.
-        this.allContributions[this.suggestionId].suggestion.change
+        this.allContributions[this.suggestionId].suggestion.change_cmd
           .question_dict = change.questionDict;
-        this.allContributions[this.suggestionId].suggestion.change
+        this.allContributions[this.suggestionId].suggestion.change_cmd
           .skill_difficulty = change.skillDifficulty;
         this.refreshContributionState();
         this.editSuggestionEmitter.emit(
@@ -241,7 +241,7 @@ export class QuestionSuggestionReviewModalComponent
       return;
     }
 
-    const skillId = this.suggestion.change.skill_id;
+    const skillId = this.suggestion.change_cmd.skill_id;
     if (skillId) {
       this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
         let misconceptionsBySkill: Record<string, Misconception[]> = {};
@@ -332,7 +332,7 @@ export class QuestionSuggestionReviewModalComponent
     this.suggestion = (
       this.allContributions[this.currentSuggestionId].suggestion);
     this.question = this.questionObjectFactory.createFromBackendDict(
-      this.suggestion.change.question_dict);
+      this.suggestion.change_cmd.question_dict);
     this.authorName = this.suggestion.author_name;
     this.contentHtml = this.question.getStateData().content.html;
     this.questionHeader = (
@@ -344,7 +344,7 @@ export class QuestionSuggestionReviewModalComponent
     this.questionStateData = this.question.getStateData();
     this.questionId = this.question.getId();
     this.canEditQuestion = false;
-    this.skillDifficulty = this.suggestion.change.skill_difficulty;
+    this.skillDifficulty = this.suggestion.change_cmd.skill_difficulty;
     this.skillDifficultyLabel = this.getSkillDifficultyLabel();
     this.skillRubricExplanations = this.getRubricExplanation(
       this.skillDifficultyLabel);
@@ -352,7 +352,9 @@ export class QuestionSuggestionReviewModalComponent
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Question');
-    } else if (this.suggestionIsRejected) {
+    } else {
+      this.reviewMessage = ''; // Reset for next/prev.
+      this.reviewer = '';
       this._getThreadMessagesAsync(this.currentSuggestionId);
     }
     this.showQuestion = true;

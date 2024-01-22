@@ -693,7 +693,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with fn_swap:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
-                    'email@example.com', 'Name', 'Android'))
+                    'email@example.com', 'Android', name='Name'))
+
+    def test_add_user_to_mailing_list_no_name(self) -> None:
+        def _mock_add_or_update_user_status(
+            unused_email: str,
+            merge_fields: Dict[str, str],
+            unused_tag: str,
+            *,
+            can_receive_email_updates: bool
+        ) -> bool:
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            # 'NAME' key is not present in merge_fields.
+            self.assertNotIn('NAME', merge_fields)
+            return can_receive_email_updates
+
+        fn_swap = self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status)
+        with fn_swap:
+            self.assertTrue(
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -1019,102 +1040,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(set(system_user_action.roles), expected_roles)
         self.assertEqual(system_user_action.user_id, 'admin')
 
-    def test_update_user_bio(self) -> None:
-        auth_id = 'someUser'
-        user_email = 'user@example.com'
-        user_bio = 'new bio'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        pre_update_user_settings = user_services.get_user_settings(user_id)
-        self.assertNotEqual(pre_update_user_settings.user_bio, user_bio)
-
-        user_services.update_user_bio(user_id, user_bio)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(user_bio, user_settings.user_bio)
-
-    def test_update_preferred_language_codes(self) -> None:
-        language_codes = ['es']
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            language_codes,
-            user_settings.preferred_language_codes
-        )
-
-        user_services.update_preferred_language_codes(
-            user_id, language_codes)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            language_codes,
-            user_settings.preferred_language_codes
-        )
-
-    def test_update_preferred_site_language_code(self) -> None:
-        preferred_site_language_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            'es',
-            user_settings.preferred_site_language_code
-        )
-
-        user_services.update_preferred_site_language_code(
-            user_id, preferred_site_language_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            preferred_site_language_code,
-            user_settings.preferred_site_language_code
-        )
-
-    def test_update_preferred_audio_language_code(self) -> None:
-        audio_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser',
-            'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            'es',
-            user_settings.preferred_audio_language_code
-        )
-        user_services.update_preferred_audio_language_code(
-            user_id, audio_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            audio_code,
-            user_settings.preferred_audio_language_code
-        )
-
-    def test_update_preferred_translation_language_code(self) -> None:
-        language_code = 'es'
-
-        user_id = user_services.create_new_user(
-            'someUser', 'user@example.com').user_id
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertNotEqual(
-            user_settings.preferred_translation_language_code, 'es')
-
-        user_services.update_preferred_translation_language_code(
-            user_id, language_code)
-        user_settings = user_services.get_user_settings(user_id)
-
-        self.assertEqual(
-            language_code, user_settings.preferred_translation_language_code)
-
     def test_remove_user_role(self) -> None:
         user_id = user_services.create_new_user(
             'someUser',
@@ -1140,26 +1065,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'Removing a default role is not allowed.'
         ):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
-
-    def test_update_user_creator_dashboard_display(self) -> None:
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
-
-        user_services.update_user_creator_dashboard_display(
-            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
-        user_setting = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_setting.creator_dashboard_display_pref,
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
     def test_add_user_role(self) -> None:
         auth_id = 'test_id'
@@ -3126,64 +3031,6 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
             ):
                 user_services.update_dashboard_stats_log(self.owner_id)
-
-
-class SubjectInterestsUnitTests(test_utils.GenericTestBase):
-    """Test the update_subject_interests method."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.auth_id = 'someUser'
-        self.username = 'username'
-        self.user_email = 'user@example.com'
-
-        self.user_id = user_services.create_new_user(
-            self.auth_id, self.user_email).user_id
-        user_services.set_username(self.user_id, self.username)
-
-    def test_invalid_subject_interests_are_not_accepted(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
-            user_services.update_subject_interests(self.user_id, 'not a list')  # type: ignore[arg-type]
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
-            user_services.update_subject_interests(self.user_id, [1, 2, 3])  # type: ignore[list-item]
-
-        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
-            user_services.update_subject_interests(self.user_id, ['', 'ab'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(self.user_id, ['!'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(
-                self.user_id, ['has-hyphens'])
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'to consist only of lowercase alphabetic characters and spaces'
-            ):
-            user_services.update_subject_interests(
-                self.user_id, ['HasCapitalLetters'])
-
-        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
-            user_services.update_subject_interests(self.user_id, ['a', 'a'])
-
-        # The following cases are all valid.
-        user_services.update_subject_interests(self.user_id, [])
-        user_services.update_subject_interests(
-            self.user_id, ['singleword', 'has spaces'])
 
 
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
