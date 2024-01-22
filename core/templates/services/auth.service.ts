@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 var getConfig: () => FirebaseOptions = function() {
-  let config;
+  let config: string = '';
   let request = new XMLHttpRequest();
   try {
     request.open('GET', '/firebase_config', false);
