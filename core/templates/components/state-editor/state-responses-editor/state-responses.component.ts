@@ -150,7 +150,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  isSelfLoopThatIsMarkedCorrect(outcome: Outcome | null): boolean {
+  isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
     if (!outcome) {
       return false;
     }
