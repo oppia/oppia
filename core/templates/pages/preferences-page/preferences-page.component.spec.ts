@@ -412,24 +412,6 @@ describe('Preferences Page Component', () => {
       expect(mockUserBackendApiService.updateMultiplePreferencesDataAsync)
         .not.toHaveBeenCalled();
     }));
-
-    it('should handle invalid subject interests', fakeAsync(() => {
-      spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync')
-        .and.returnValue(
-          Promise.reject());
-      spyOn(preventPageUnloadEventService, 'addListener');
-      spyOn(preventPageUnloadEventService, 'removeListener');
-      spyOn(alertsService, 'addWarning');
-      spyOn(alertsService, 'clearWarnings');
-      componentInstance.onSubjectInterestsSelectionChange('123');
-      componentInstance.savePreferences();
-      tick();
-      expect(alertsService.clearWarnings).toHaveBeenCalled();
-      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to save changes');
-    }));
   });
 
   describe('on production mode', () => {

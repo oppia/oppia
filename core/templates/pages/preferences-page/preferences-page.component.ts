@@ -393,11 +393,6 @@ export class PreferencesPageComponent {
         for (let key in this.unsavedChanges) {
           this.unsavedChanges[key] = false;
         }
-      })
-      .catch((error) => {
-        this.preventPageUnloadEventService.removeListener();
-        this.alertsService.addWarning(
-          'Failed to save changes');
       });
   }
 }

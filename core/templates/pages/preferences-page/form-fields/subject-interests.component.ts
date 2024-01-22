@@ -65,8 +65,13 @@ export class SubjectInterestsComponent {
   }
 
   validInput(value: string): boolean {
+    // The following regex matches all the special characters and numbers.
+    let invalidRegex = new RegExp(
+      '[~`!@#$%^&*()_+={[}\\]|\\:;"\'<,>.?/\\-0-9]');
+
     return value === value.toLowerCase() &&
-      this.subjectInterests.indexOf(value) < 0 ? true : false;
+      this.subjectInterests.indexOf(value) < 0 &&
+      invalidRegex.test(value) === false ? true : false;
   }
 
   add(event: { value: string }): void {
