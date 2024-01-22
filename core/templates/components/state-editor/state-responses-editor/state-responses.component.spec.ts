@@ -657,8 +657,10 @@ describe('State Responses Component', () => {
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should rejects self-loop with null outcome', () => {
+  it('should reject self-loop with null or undefined outcome', () => {
     expect(component.isSelfLoopThatIsMarkedCorrect(null)).toBe(false);
+
+    expect(component.isSelfLoopThatIsMarkedCorrect(undefined)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop', () => {
