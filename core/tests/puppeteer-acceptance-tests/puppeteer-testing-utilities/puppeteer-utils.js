@@ -48,7 +48,8 @@ module.exports = class baseUser {
          * headless mode. As per the expected behavior we need to make sure
          * every test passes on both modes. */
         headless: false,
-        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
+        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream'],
+        defaultViewport: null
       })
       .then(async(browser) => {
         this.browserObject = browser;
@@ -103,6 +104,17 @@ module.exports = class baseUser {
    */
   async reloadPage() {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+  }
+
+  /**
+   * Function to switch the current page to the tab that was just opened by
+   * interacting with an element on the current page.
+   */
+  async switchToPageOpenedByElementInteraction() {
+    const newPage = await (await this.browserObject.waitForTarget(
+      target => target.opener() === this.page.target()
+    )).page();
+    this.page = newPage;
   }
 
   /**

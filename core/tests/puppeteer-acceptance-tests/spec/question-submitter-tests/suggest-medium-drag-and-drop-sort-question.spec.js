@@ -79,7 +79,7 @@ describe('Practice Question Submitter', function() {
         title: 'Brief & understandable description for subtopic',
         urlFragment: 'test-subtopic',
         description: 'Detailed explanation of subtopic',
-        thumbnail: '',
+        thumbnail: 'example-topic-thumbnail.svg',
         assignedSkills: [skill]
       }],
       diagnosticTestSkills: [skill],

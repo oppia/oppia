@@ -308,17 +308,16 @@ module.exports = class e2eSuperAdmin extends baseUser {
   }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
-    await this.clickOn('.e2e-test-create-skill-button');
+    await this.page.waitForSelector(
+      '.e2e-test-create-skill-button', { visible: true });
+    await this.page.click('.e2e-test-create-skill-button');
     await this.type(
       '.e2e-test-new-skill-description-field', description);
     await this.clickOn('.e2e-test-open-concept-card');
     await this.page.waitForSelector('.e2e-test-rte', { visible: true });
     await this.page.type('.e2e-test-rte', reviewMaterial);
     await this.clickOn('.e2e-test-confirm-skill-creation-button');
-
-    await this.page.waitForNetworkIdle();
-    const pages = await this.browserObject.pages();
-    this.page = pages[pages.length - 1];
+    await this.switchToPageOpenedByElementInteraction();
 
     if (misconception) {
       await this.page.waitForSelector(
@@ -339,13 +338,16 @@ module.exports = class e2eSuperAdmin extends baseUser {
     // Configure difficulties here.
 
     // Save skill changes.
-    await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
-    await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
+    await this.page.waitForSelector(
+      '.e2e-test-save-or-publish-skill:enabled');
+    await this.page.evaluate(() => document.querySelector(
+      '.e2e-test-save-or-publish-skill:enabled').click());
     await this.page.waitForSelector(
       '.e2e-test-commit-message-input', { visible: true });
     await this.page.type('.e2e-test-commit-message-input', 'test');
     await this.clickOn('.e2e-test-close-save-modal-button');
-    await this.page.waitForSelector('.e2e-test-save-or-publish-skill:disabled');
+    await this.page.waitForSelector(
+      '.e2e-test-save-or-publish-skill:disabled', { visible: true });
 
     // Create dummy questions under the skill.
     await this.clickOn('.e2e-test-questions-tab');
@@ -388,15 +390,21 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-editor-correctness-toggle');
       await this.clickOn('.e2e-test-add-new-response');
 
-      await this.page.waitForSelector(
-        '.e2e-test-default-response-tab', { visible: true });
-      await this.page.click('.e2e-test-default-response-tab');
-      await this.clickOn('.e2e-test-open-outcome-feedback-editor');
+      await this.page.evaluate(() => document.querySelector(
+        '.e2e-test-default-response-tab').click());
+      await this.page.evaluate(() => document.querySelector(
+        '.e2e-test-response-body-default ' +
+        '.e2e-test-open-outcome-feedback-editor').click());
       await this.page.waitForSelector(
         '.e2e-test-response-body-default .e2e-test-rte', { visible: true });
       await this.page.type(
         '.e2e-test-response-body-default .e2e-test-rte', 'Incorrect!');
       await this.clickOn('.e2e-test-save-outcome-feedback');
+
+      await this.clickOn('.e2e-test-misconception-0-0-options');
+      await this.page.waitForSelector(
+        '.e2e-test-mark-non-applicable-misconception-0-0', { visible: true });
+      await this.page.click('.e2e-test-mark-non-applicable-misconception-0-0');
 
       await this.page.waitForSelector(
         '.e2e-test-oppia-add-hint-button', { visible: true });
@@ -406,12 +414,13 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.page.type('.e2e-test-hint-text .e2e-test-rte', 'hint text');
       await this.clickOn('.e2e-test-save-hint');
 
+      await this.page.evaluate(() => document.querySelector(
+        '.e2e-test-oppia-add-solution-button').click());
       await this.page.waitForSelector(
-        '.e2e-test-oppia-add-solution-button', { visible: true });
-      await this.page.click('.e2e-test-oppia-add-solution-button');
-      await this.page.waitForSelector(
-        '.e2e-test-description-box', { visible: true });
-      await this.page.type('.e2e-test-description-box', 't');
+        '.modal-dialog .e2e-test-description-box',
+        { visible: true });
+      await this.page.type(
+        '.modal-dialog .e2e-test-description-box', 't');
       await this.clickOn('.e2e-test-submit-answer-button');
       await this.page.waitForSelector(
         '.e2e-test-explanation-textarea .e2e-test-rte', { visible: true });
@@ -419,9 +428,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation');
       await this.clickOn('.e2e-test-submit-solution-button');
 
-      await this.page.waitForSelector(
-        '.e2e-test-save-question-button', { visible: true });
-      await this.page.click('.e2e-test-save-question-button');
+      await this.page.evaluate(() => document.querySelector(
+        '.e2e-test-save-question-button').click());
     }
   }
 };
