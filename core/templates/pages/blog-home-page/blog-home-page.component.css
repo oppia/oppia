@@ -40,10 +40,11 @@ oppia-blog-home-page .posts-display-heading {
   font-weight: bold;
   line-height: 28px;
   text-align: left;
+  margin-top: 30px;
 }
 
-oppia-blog-home-page .text-center {
-  margin-top: 30px
+oppia-blog-home-page .no_result_found{
+  margin-top: 30px;
 }
 
 oppia-blog-home-page .blog-home-page-posts-number-display {

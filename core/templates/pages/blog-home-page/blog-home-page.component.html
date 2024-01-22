@@ -15,7 +15,7 @@
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                             [rotate]="true"
                             (pageChange)="onPageChange()"
-                            class="m-auto e2e-test-pagination">
+                            class="ml-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
                 <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
                    aria-hidden="true"
@@ -88,7 +88,7 @@
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
           <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
         </picture>
-        <p class="text-center">
+        <p class="text-center no_result_found">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
         </p>
       </div>
