@@ -2,15 +2,19 @@
   <div class="oppia-about-foundation-hero-card">
     <div class="oppia-about-foundation-image-overlay">
       <div class="oppia-about-foundation-hero-content">
-        <picture>
-          <source type="image/webp"
-                  [srcset]="'/assets/images/about_foundation/oppia_big_logo.webp'">
-          <source type="image/png"
-                  [srcset]="'/assets/images/about_foundation/oppia_big_logo.png'">
-          <img alt="Oppia logo"
-               class="oppia-about-foundation-page-oppia-logo"
-               src="/assets/images/about_foundation/oppia_big_logo.png">
-        </picture>
+        <div class="mx-auto oppia-about-foundation-page-oppia-logo">
+          <picture>
+            <source type="image/webp"
+                    [srcset]="'/assets/images/about_foundation/oppia_big_logo.webp'">
+            <source type="image/png"
+                    [srcset]="'/assets/images/about_foundation/oppia_big_logo.png'">
+            <img alt="Oppia logo"
+                class="h-auto w-100"
+                height="480"
+                src="/assets/images/about_foundation/oppia_big_logo.png"
+                width="480">
+          </picture>
+        </div>
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING' | translate }}</h1>
         <h3>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING_CONTENT' | translate }}</h3>
       </div>
@@ -31,8 +35,10 @@
             <source type="image/jpg"
                     [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
             <img alt="Education Equality Infographic"
-                 class="oppia-about-foundation-page-equality-infographic responsive"
-                 src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
+                 class="h-auto oppia-about-foundation-page-equality-infographic responsive w-100"
+                 height="640"
+                 src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg"
+                 width="640">
           </picture>
           <figcaption>
             <a class="text-center" href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
@@ -53,11 +59,13 @@
           <source type="image/jpg"
                   [srcset]="'/assets/images/20180826_161603.jpg'">
           <img alt="Education Equality Infographic"
-               class="oppia-about-foundation-page-equality-infographic responsive"
-               src="/assets/images/about_foundation/20180826_161603.jpg">
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-100"
+               height="640"
+               src="/assets/images/about_foundation/20180826_161603.jpg"
+               width="640">
         </picture>
       </div>
-      <div class="col-lg-8 d-flex flex-column justify-content-center info-right pl-5">
+      <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
         <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
       </div>
@@ -84,8 +92,10 @@
           <source type="image/png"
                   [srcset]="'/assets/images/home_partner.png'">
           <img alt="Education Equality Infographic"
-               class="oppia-about-foundation-page-equality-infographic responsive"
-               src="/assets/images/about_foundation/home_partner.png">
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-full"
+               height="640"
+               src="/assets/images/about_foundation/home_partner.png"
+               width="640">
         </picture>
       </div>
     </div>
@@ -100,11 +110,13 @@
           <source type="image/png"
                   [srcset]="'/assets/images/home_get_involved.png'">
           <img alt="Education Equality Infographic"
-               class="oppia-about-foundation-page-equality-infographic responsive"
-               src="/assets/images/about_foundation/home_get_involved.png">
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-full"
+               height="640"
+               src="/assets/images/about_foundation/home_get_involved.png"
+               width="640">
         </picture>
       </div>
-      <div class="col-lg-8 d-flex flex-column justify-content-center info-right pl-md-5">
+      <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
         <button class="btn">
