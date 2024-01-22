@@ -22,7 +22,7 @@ import json
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional
+from typing import Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
