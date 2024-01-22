@@ -40,7 +40,7 @@ class FirebaseConfigValuesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves the Firebase config values."""
-        firebase_config_values: Dict = None
+        firebase_config_values: Dict[str, str] = {}
         secret_response = firebase_services.get_firebase_config()
         if secret_response is not None:
             firebase_config_values = json.loads(secret_response)
