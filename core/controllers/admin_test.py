@@ -3137,3 +3137,62 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         )
         self.assertEqual(blog_post_count, 0)
         self.logout()
+
+class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
+    """Tests for interaction by exploration handler."""
+
+    EXP_ID = 'exp'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super().setUp()
+        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, end_state_name='End')
+
+    def test_interaction_by_exploration_id_handler(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        # Test that it returns all interaction ids.
+        payload = {
+            'exp_id': self.EXP_ID
+        }
+
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload)
+        interactions_list = response['interactions']
+        self.assertEqual(
+            sorted(interactions_list), ['EndExploration', 'TextInput'])
+
+    def test_handler_with_invalid_exploration_id_raise_error(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        payload = {
+            'exp_id': 'invalid' 
+        }
+
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')
+
+    def test_handler_with_without_exploration_id_in_payload_raise_error(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        response = self.get_json(
+            '/interactionsbyexplorationid', params={},
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Missing key in handler args: exp_id.')
+
+    def test_handler_with_non_string_exploration_id_raise_error(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        payload = {
+            'exp_id': 0
+        }
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')

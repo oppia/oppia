@@ -2380,14 +2380,16 @@ class InteractionsByExplorationIdHandler(
     def get(self) -> None:
         assert self.normalized_request is not None
         exploration_id = self.normalized_request['exp_id']
-        if exploration_id is None:
-            raise self.InvalidInputException(
-                'Exploration id must be a string, received None')
+
+        if not isinstance(exploration_id, str):
+            raise self.InvalidInputException('Exploration id must be a string, '
+                                             'received %s' % exploration_id)
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
             raise self.InvalidInputException('Exploration does not exist.')
+
         interaction_ids = {
             state.interaction.id for state in
             exploration.states.values() if state.interaction.id is not None
