@@ -35,11 +35,11 @@
 
 oppia-blog-home-page .posts-display-heading {
   color: #555;
-  margin-top: 30px;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 24px;
   font-weight: bold;
   line-height: 28px;
+  margin-top: 30px;
   text-align: left;
 }
 
