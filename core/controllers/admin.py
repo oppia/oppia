@@ -2347,7 +2347,19 @@ class TranslationCoordinatorRoleHandler(
         self.render_json({})
 
 
-class InteractionsByExplorationIdHandler(base.BaseHandler):
+class InteractionsByExplorationIdHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of InteractionsByExplorationIdHandler's
+    normalized_request dictionary.
+    """
+
+    exp_id: str
+
+
+class InteractionsByExplorationIdHandler(
+    base.BaseHandler[
+        Dict[str, str], InteractionsByExplorationIdHandlerNormalizedRequestDict
+    ]
+):
     """Handler for admin to retrive the list of interactions used in
     an exploration.
     """
@@ -2366,6 +2378,7 @@ class InteractionsByExplorationIdHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        assert self.normalized_request is not None
         exploration_id = self.normalized_request['exp_id']
         if exploration_id is None:
             raise self.InvalidInputException(
