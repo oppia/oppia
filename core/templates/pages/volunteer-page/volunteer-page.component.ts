@@ -127,7 +127,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'experience, making education accessible and engaging for all.”'
           ),
           name: '- liwei zhang',
-          type: 'Artist'
+          type: 'Design team'
         },
         {
           content: (
@@ -135,7 +135,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'nd knowing that the art we create helps learners  ' +
             'means the world to me.“'),
           name: '- Pearl Nunag',
-          type: 'Artist'
+          type: 'Graphics team'
         },
         {
           content: (
@@ -143,7 +143,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'to contribute to their mission of bringing free, ' +
             'quality education to everyone.“'),
           name: '- Molly Rhodes',
-          type: 'Artist'
+          type: 'Graphics team'
         }
       ]
     };
@@ -178,7 +178,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'and progress. At Oppia, I get to be a part of this' +
             'movement to provide free and accessible education for all.“'),
           name: '- Jay',
-          type: 'Full-Stack Developer?'
+          type: 'Web Developer'
         }
       ]
     };
@@ -194,16 +194,12 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         {
           content: (
             'I contribute to Oppia because I believe in its cause. ' +
-            'I believe children everywhere deserve quality education ' +
-            'that comes at no additional cost to them. I believe every ' +
-            'child can do well at math if they’re taught in the right ' +
-            'way and it is broken down in a language they understand. I ' +
-            'also believe that no matter how good a product is, without ' +
-            'effective marketing, people will not know that it exists. ' +
-            'That is why I contribute to Oppia’s Translation & Marketing' +
-            'Teams.'),
+            'I believe children everywhere deserve quality education that ' +
+            'comes at no additional cost to them. I believe every child ' +
+            'can do well at math if they’re taught in the right way and it ' +
+            'is broken down in a language they understand.'),
           name: '- Yiga',
-          type: 'Artist'
+          type: 'Marketing team'
         },
         {
           content: (
@@ -211,19 +207,17 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'because everyone deserves an education and helping to market ' +
             'this opportunity is a privilege“'),
           name: '- Jennifer',
-          type: 'Artist'
+          type: 'Marketing team'
         },
         {
           content: (
-            '“I love to tell stories through content creation because of ' +
-            'Oppia.This not only amplifies Oppia\'s mission of providing ' +
-            'This not only amplifies Oppia\'s mission of providing free' +
-            'accessible education but also fosters a sense of community ' +
-            'and inspiration, encouraging more individuals to engage with ' +
-            'Oppia\'s educational resources.”'
-          ),
+            '“I love to tell stories through content creation. This not only' +
+            'amplifies Oppia\'s mission of providing free accessible ' +
+            'education but also fosters a sense of community and inspiration,' +
+            'encouraging more individuals to engage with Oppia\'s ' +
+            'educational resources.”'),
           name: '- Erio',
-          type: 'Artist'
+          type: 'Video creation team'
         },
         {
           content: (
@@ -238,8 +232,6 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
     this.lessonCreation = {
       images: [
-        '/volunteer/profile_images/anmol.jpg',
-        '/volunteer/profile_images/nitya.jpg',
         '/volunteer/profile_images/aanuoluwapo.jpg',
         '/volunteer/profile_images/viksar.jpg',
         '/volunteer/profile_images/jackson.jpg',
@@ -247,28 +239,11 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
       caption: [
         {
           content: (
-            '“I strongly identify with Oppia\'s objective of ' +
-            'providing free, enjoyable and accessible education to all.“'),
-          name: '- Anmol Shukla',
-          type: 'Developer and Lesson Creator'
-        },
-        {
-          content: (
-            '“I love to write, and volunteering with Oppia as a ' +
-            'lesson creator has enabled me to apply my writing ' +
-            'skills towards a good cause. Every child should have access ' +
-            'to quality educational topics and, with Oppia, ' +
-            'I have the opportunity to make a difference.“'),
-          name: '- Nitya Sunkad',
-          type: 'Math Lesson Creator'
-        },
-        {
-          content: (
             '“At Oppia, my love for writing stories as a ' +
             'creative intertwines with my passion for ' +
             'education. “'),
           name: '- Aanuoluwapo Adeoti',
-          type: 'Math? Lesson Creator'
+          type: 'Lessons team'
         },
         {
           content: (
@@ -277,7 +252,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'such a great platform to provide quality education to ' +
             'those in need is truly fulfilling.“'),
           name: '- Viksar Dubey',
-          type: 'Math? Lesson Creator'
+          type: 'Practice questions team'
         },
         {
           content: (
@@ -285,7 +260,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'educational resources. I feel proud when I contribute, ' +
             'and excited when my team makes progress.“'),
           name: '- Christopher Jackson Felton',
-          type: 'Math? Lesson Creator'
+          type: 'Lessons team'
         }
       ]
     };
@@ -306,13 +281,17 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'hat a decent education is for everyone and I feel grateful to ' +
             ' be able to help thousands of people worldwide on this journey.“'),
           name: '- Giovana Alonso',
-          type: 'Translator'
+          type: 'Brazilian, Portuguese Translator'
         },
         {
           content: (
-            '“Being a mother of 8 year old boy I understand that kids ....“'),
+            '“Being a part of this magical world of online learning and ' +
+            'volunteering at Oppia makes me believe that when you give the ' +
+            'gift of education, you are giving happiness and smiles on ' +
+            'faces, and that is the biggest gift…and YES, as a volunteer I ' +
+            'am playing my part and helping kids all over the world.“'),
           name: '- Kanupriya Goel',
-          type: 'Translator'
+          type: 'Hindi Translator'
         },
         {
           content: (
@@ -320,21 +299,18 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'dedication, can achieve incredible results, and that\'s what ' +
             'I\'m doing at Oppia, hoping to achieve more results and help ' +
             'accomplish what many say is impossible. Alone we are nothing, ' +
-            'but together we change the world.'),
+            'but together we change the world."'),
           name: '- Vanessa Gelinski',
-          type: 'Translator'
+          type: 'Brazilian, Portuguese Translator'
         },
         {
           content: (
             '“Empowering learners with knowledge is not just a task; for me, ' +
-            'it\'s a passion. This passion is deeply rooted in my role as a ' +
-            'mother of three young kids, where I recognize that every ' +
-            'quality education a child receives is a thousand steps toward ' +
-            'a bright and successful future. Contributing to Oppia affords ' +
-            'me the opportunity to extend this impact to the lives of many ' +
-            'more children, and I am truly grateful for the privilege.“'),
+            'it\'s a passion. Contributing to Oppia affords to extend this ' +
+            'impact to the lives of many more children, and I am' +
+            'truly grateful for the privilege.“'),
           name: '- Pretty',
-          type: 'Translator'
+          type: 'Translations coordinator'
         },
         {
           content: (
