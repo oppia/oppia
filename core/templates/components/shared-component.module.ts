@@ -180,9 +180,9 @@ import { ComponentOverviewComponent } from './copy-url/copy-url.component';
 import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
-import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
 import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 import { DirectivesModule } from 'directives/directives.module';
+import { PrimaryButtonComponent } from './button-directives/primary-button.component';
 
 @NgModule({
   imports: [
@@ -297,7 +297,6 @@ import { DirectivesModule } from 'directives/directives.module';
     EditThumbnailModalComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
-    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -354,7 +353,8 @@ import { DirectivesModule } from 'directives/directives.module';
     ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
-    RteHelperModalComponent
+    RteHelperModalComponent,
+    PrimaryButtonComponent
   ],
 
   entryComponents: [
@@ -427,7 +427,6 @@ import { DirectivesModule } from 'directives/directives.module';
     SummaryListHeaderComponent,
     SupplementalCardComponent,
     ThanksForDonatingModalComponent,
-    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -485,7 +484,8 @@ import { DirectivesModule } from 'directives/directives.module';
     VisualizationSortedTilesComponent,
     CopierComponent,
     RandomSelectorComponent,
-    RteHelperModalComponent
+    RteHelperModalComponent,
+    PrimaryButtonComponent
   ],
 
   exports: [
@@ -571,7 +571,6 @@ import { DirectivesModule } from 'directives/directives.module';
     TakeBreakModalComponent,
     ThreadTableComponent,
     ThanksForDonatingModalComponent,
-    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
@@ -626,7 +625,8 @@ import { DirectivesModule } from 'directives/directives.module';
     ComponentOverviewComponent,
     TranslateModule,
     VisualizationSortedTilesComponent,
-    RteHelperModalComponent
+    RteHelperModalComponent,
+    PrimaryButtonComponent
   ],
 })
 
