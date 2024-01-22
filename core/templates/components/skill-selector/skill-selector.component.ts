@@ -59,8 +59,9 @@ export class SkillSelectorComponent implements OnInit {
 
   constructor(
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
-    private userService: UserService
-  ), private skillEditorStateService: SkillEditorStateService {}
+    private userService: UserService,
+    private skillEditorStateService: SkillEditorStateService 
+  ) {}   
 
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
