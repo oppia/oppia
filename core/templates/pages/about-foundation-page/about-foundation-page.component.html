@@ -127,13 +127,14 @@
     </div>
   </div>
 </div>
+
 <style>
   .about-foundation-page {
     user-select: text;
   }
 
-  .card-gray {
-    background-color: #f4f4f4;
+  figcaption {
+    width: 320px;
   }
 
   .oppia-about-foundation-hero-card {
@@ -198,15 +199,19 @@
     padding: 5em 0;
   }
 
+  .oppia-about-foundation-hero-card.card-gray {
+    background-color: #f4f4f4;
+  }
+
   @media only screen and (max-width: 992px) {
     .info-right {
       padding: 0 !important;
     }
 
     .oppia-about-foundation-info-card .row {
+      align-items: center;
       display: flex;
       flex-direction: column;
-      justify-content: center;
     }
 
     .oppia-about-foundation-image-with-caption {
@@ -236,10 +241,6 @@
 
   .oppia-about-foundation-info-card a:hover {
     text-decoration: underline;
-  }
-
-  figcaption {
-    width: 320px;
   }
 
   .oppia-about-foundation-page-equality-infographic {
