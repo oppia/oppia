@@ -59,6 +59,13 @@ export class SkillEditorStateService {
     private undoRedoService: UndoRedoService,
   ) {}
 
+  getActiveSkillId(): string | null {
+    return this._skill ? this._skill.getId() : null;
+  }
+  getPrerequisiteSkillIds(): string[] {
+    return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
+  }
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

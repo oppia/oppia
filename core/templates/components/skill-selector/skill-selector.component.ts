@@ -60,7 +60,7 @@ export class SkillSelectorComponent implements OnInit {
   constructor(
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
     private userService: UserService
-  ) {}
+  ), private skillEditorStateService: SkillEditorStateService {}
 
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
@@ -193,10 +193,26 @@ export class SkillSelectorComponent implements OnInit {
     });
   }
 
+  
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
-    let skills: string[] = this.untriagedSkillSummaries.map(val => {
-      return val.description;
-    });
+      let skills: string[] = this.untriagedSkillSummaries.map(val => {
+        return val.description;
+      });
+      let filteredSkills = this.filterForMatchingSubstringPipe
+          .transform(skills, searchText);
+      
+
+      let currentSkill = this.skillEditorStateService.getSkill();
+      // Get the ID of the current skill
+      let activeSkillId = currentSkill ? currentSkill.getId() : null;
+
+      return this.untriagedSkillSummaries.filter(val => {
+          // Exclude the current skill based on its ID
+          return filteredSkills.includes(val.description) &&
+                 val.id !== activeSkillId;
+      });
+  }
+);
     let filteredSkills = this.filterForMatchingSubstringPipe
       .transform(skills, searchText);
     return this.untriagedSkillSummaries.filter(val => {
