@@ -42,8 +42,7 @@ var getConfig: () => FirebaseOptions = function() {
   } catch (e) {
     console.error('Unable to fetch firebase config : ', e);
   }
-
-  return JSON.parse(JSON.parse(config));
+  return JSON.parse(config);
 };
 
 abstract class AuthServiceImpl {
@@ -119,7 +118,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
-  private static firebaseConfigDict;
+  private static firebaseConfigDict: FirebaseOptions;
 
   constructor(
       @Optional() private angularFireAuth: AngularFireAuth | null,

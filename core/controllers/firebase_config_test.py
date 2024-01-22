@@ -17,6 +17,7 @@
 """Tests for the Firebase configuration controllers."""
 
 from __future__ import annotations
+import json
 
 from core.platform import models
 from core.tests import test_utils
@@ -42,7 +43,7 @@ class FirebaseConfigValuesHandlerTests(test_utils.GenericTestBase):
             Optional[str]. The value of the secret.
         """
         if name == 'FIREBASE_CONFIG_VALUES':
-            return {
+            response_dict = {
             'FIREBASE_CONFIG_API_KEY': 'test-value-1',
             'FIREBASE_CONFIG_AUTH_DOMAIN': 'test-value-2',
             'FIREBASE_CONFIG_PROJECT_ID': 'test-value-3',
@@ -51,6 +52,7 @@ class FirebaseConfigValuesHandlerTests(test_utils.GenericTestBase):
             'FIREBASE_CONFIG_APP_ID': 'test-value-6',
             'FIREBASE_CONFIG_GOOGLE_CLIENT_ID': 'test-value-7'
             }
+            return json.dumps(response_dict)
         return None
 
     def test_get_returns_correct_secret(self) -> None:

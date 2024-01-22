@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import json
+
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -38,7 +40,8 @@ class FirebaseConfigValuesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves the Firebase config values."""
+        firebase_config_values: Dict = None
         secret_response = firebase_services.get_firebase_config()
         if secret_response is not None:
-            firebase_config_values: str = secret_response
+            firebase_config_values = json.loads(secret_response)
         self.render_json(firebase_config_values)
