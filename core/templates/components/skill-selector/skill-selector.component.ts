@@ -193,7 +193,6 @@ export class SkillSelectorComponent implements OnInit {
     });
   }
 
-  
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
       let skills: string[] = this.untriagedSkillSummaries.map(val => {
         return val.description;
