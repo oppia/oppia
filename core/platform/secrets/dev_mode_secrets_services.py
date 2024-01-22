@@ -21,7 +21,6 @@ from __future__ import annotations
 import functools
 import json
 import os
-import secrets
 
 from typing import Optional
 
@@ -39,9 +38,7 @@ def get_secret(name: str) -> Optional[str]:
     # In emulator mode we store secrets in environment variable.
     secret = json.loads(os.environ.get('SECRETS', '{}')).get(name)
     if isinstance(secret, dict):
-        print(secret)
         secret = json.dumps(secret)
-        print(secret)
     # The 'json.loads' returns 'Any' and we need to tighten the type.
     assert secret is None or isinstance(secret, str)
     return secret
