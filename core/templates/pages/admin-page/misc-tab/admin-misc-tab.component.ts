@@ -58,8 +58,8 @@ export class AdminMiscTabComponent {
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   message: string = '';
-  expIdToGetInteractions!: string;
-  explorationInteractionIds: string[];
+  expIdToGetInteractions!: string = '';
+  explorationInteractionIds: string[] = [];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
