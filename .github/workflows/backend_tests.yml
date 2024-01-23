@@ -1,5 +1,6 @@
 name: Backend tests
 on:
+  workflow_dispatch:  # <-- Add this line to enable manual triggering
   merge_group:
     types: [checks_requested]
   push:
