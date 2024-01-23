@@ -34,274 +34,6 @@ describe('Opportunities List Component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
-  const mockActiveLanguageEventEmitter = new EventEmitter();
-  const mockActiveTopicEventEmitter = new EventEmitter();
-  const mockReloadOpportunitiesEventEmitter = new EventEmitter();
-  const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
-  const mockPinOpportunitiesEventEmitter = new EventEmitter();
-  const mockUnpinOpportunitiesEventEmitter = new EventEmitter();
-
-  const explorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
-    id: 'id1',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id2',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id3',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id4',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id5',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id6',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id7',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id8',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id9',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id10',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id11',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id12',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id13',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id14',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id15',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id16',
-    labelText: 'text',
-    labelColor: 'blue',
-    progressPercentage: 30,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 30,
-    topicName: 'Topic 1'
-  }];
-
-  const explorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
-    id: 'id17',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id18',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id19',
-    labelText: 'text',
-    labelColor: 'blue',
-    progressPercentage: 30,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 30,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id20',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id21',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id22',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id23',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id24',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id25',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  },
-  {
-    id: 'id26',
-    labelText: 'text',
-    labelColor: 'red',
-    progressPercentage: 50,
-    inReviewCount: 20,
-    totalCount: 100,
-    translationsCount: 50,
-    topicName: 'Topic 1'
-  }];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -326,100 +58,301 @@ describe('Opportunities List Component', () => {
     translationTopicService = TestBed.inject(TranslationTopicService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService);
-
-    component.loadOpportunities = () => Promise.resolve({
-      opportunitiesDicts: explorationOpportunitiesLoad1,
-      more: true
-    });
-    component.loadMoreOpportunities = () => Promise.resolve({
-      opportunitiesDicts: explorationOpportunitiesLoad2,
-      more: false
-    });
-
-    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
-      .and.returnValue(mockActiveLanguageEventEmitter);
-    spyOnProperty(translationTopicService, 'onActiveTopicChanged')
-      .and.returnValue(mockActiveTopicEventEmitter);
-    spyOnProperty(
-      contributionOpportunitiesService, 'reloadOpportunitiesEventEmitter')
-      .and.returnValue(mockReloadOpportunitiesEventEmitter);
-    spyOnProperty(
-      contributionOpportunitiesService, 'removeOpportunitiesEventEmitter')
-      .and.returnValue(mockRemoveOpportunitiesEventEmitter);
   });
 
   afterEach(() => {
     component.ngOnDestroy();
   });
 
-  it('should load opportunities when initialized', fakeAsync(() => {
-    expect(component.opportunities).toEqual([]);
+  describe('when clicking on page number ', () => {
+    const mockActiveLanguageEventEmitter = new EventEmitter();
+    const mockActiveTopicEventEmitter = new EventEmitter();
+    const mockReloadOpportunitiesEventEmitter = new EventEmitter();
+    const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
+    const explorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
+      id: 'id1',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id2',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id3',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id4',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id5',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id6',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id7',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id8',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id9',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id10',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id11',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id12',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id13',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id14',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id15',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id16',
+      labelText: 'text',
+      labelColor: 'blue',
+      progressPercentage: 30,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 30,
+      topicName: 'Topic 1'
+    }];
 
-    // Since the constructor will be automatically called in unit tests, it
-    // is hard to test or spy on the constructor. So, we have created a
-    // function to manually trigger and tests different edge cases.
-    component.init();
-    component.onChangeLanguage('en');
-    tick();
+    const explorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
+      id: 'id17',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id18',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id19',
+      labelText: 'text',
+      labelColor: 'blue',
+      progressPercentage: 30,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 30,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id20',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id21',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id22',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id23',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id24',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id25',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id26',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    }];
 
-    // Added two opportunities with id's as 'id1' and 'id2'.
-    mockActiveLanguageEventEmitter.emit();
-    tick();
-    mockActiveTopicEventEmitter.emit();
-    tick();
-    mockReloadOpportunitiesEventEmitter.emit();
-    tick();
-    expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
-    expect(component.opportunities.length).toEqual(16);
-
-    // Removed opportunity with id as 'id2'.
-    mockRemoveOpportunitiesEventEmitter.emit(['id2']);
-    tick();
-
-    expect(component.opportunities.length).toEqual(15);
-
-    // RemoveOpportunitiesEvent with no opportunities, e.g. if a user closes a
-    // review modal without completing a review.
-    mockRemoveOpportunitiesEventEmitter.emit([]);
-    tick();
-
-    expect(component.opportunities.length).toEqual(15);
-  }));
-
-  it('should navigate to updated last page when current last page is removed',
-    fakeAsync(() => {
-      component.init();
-      component.onChangeLanguage('en');
-      tick();
-      component.ngOnInit();
-      tick();
-      expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
-      expect(component.opportunities.length).toEqual(16);
-      expect(component.activePageNumber).toBe(1);
-      // Navigate to the last page.
-      component.gotoPage(2);
-      tick();
-      component.gotoPage(3);
-      tick();
-      expect(component.activePageNumber).toBe(3);
-      // Reset the load method to return no more opportunities.
+    beforeEach(() => {
+      component.loadOpportunities = () => Promise.resolve({
+        opportunitiesDicts: explorationOpportunitiesLoad1,
+        more: true
+      });
       component.loadMoreOpportunities = () => Promise.resolve({
-        opportunitiesDicts: [],
+        opportunitiesDicts: explorationOpportunitiesLoad2,
         more: false
       });
 
-      // Remove all opportunities on the last page.
-      mockRemoveOpportunitiesEventEmitter.emit(
-        ['id20', 'id21', 'id22', 'id23', 'id24', 'id25', 'id26']);
-      tick();
+      spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
+        .and.returnValue(mockActiveLanguageEventEmitter);
+      spyOnProperty(translationTopicService, 'onActiveTopicChanged')
+        .and.returnValue(mockActiveTopicEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService, 'reloadOpportunitiesEventEmitter')
+        .and.returnValue(mockReloadOpportunitiesEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService, 'removeOpportunitiesEventEmitter')
+        .and.returnValue(mockRemoveOpportunitiesEventEmitter);
+    });
 
-      // Should navigate to new last page. Since there are no more opportunities
-      // to load, the new last page is page 2.
-      expect(component.opportunities.length).toEqual(19);
-      expect(component.activePageNumber).toBe(2);
-    }));
-
-  describe('when clicking on page number ', () => {
     it('should go to the new page when opportunities ' +
       'are greater then page length', fakeAsync(() => {
       expect(component.activePageNumber).toBe(1);
@@ -572,13 +505,305 @@ describe('Opportunities List Component', () => {
   });
 
   describe('when clicking on pin-unpin icon', () => {
+    const mockActiveLanguageEventEmitter = new EventEmitter();
+    const mockActiveTopicEventEmitter = new EventEmitter();
+    const mockReloadOpportunitiesEventEmitter = new EventEmitter();
+    const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
+    const explorationOpportunitiesLoad1: ExplorationOpportunity[] = [{
+      id: 'id1',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id2',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id3',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id4',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id5',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id6',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id7',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id8',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id9',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id10',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id11',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id12',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id13',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id14',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id15',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id16',
+      labelText: 'text',
+      labelColor: 'blue',
+      progressPercentage: 30,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 30,
+      topicName: 'Topic 1'
+    }];
+
+    const explorationOpportunitiesLoad2: ExplorationOpportunity[] = [{
+      id: 'id17',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id18',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id19',
+      labelText: 'text',
+      labelColor: 'blue',
+      progressPercentage: 30,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 30,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id20',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id21',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id22',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id23',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id24',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id25',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    },
+    {
+      id: 'id26',
+      labelText: 'text',
+      labelColor: 'red',
+      progressPercentage: 50,
+      inReviewCount: 20,
+      totalCount: 100,
+      translationsCount: 50,
+      topicName: 'Topic 1'
+    }];
+
+    let mockPinOpportunitiesEventEmitter = new EventEmitter();
+    let mockUnpinOpportunitiesEventEmitter = new EventEmitter();
+
     beforeEach(() => {
+      mockPinOpportunitiesEventEmitter = new EventEmitter();
+      mockUnpinOpportunitiesEventEmitter = new EventEmitter();
+
       spyOnProperty(
         contributionOpportunitiesService, 'pinnedOpportunitiesChanged')
         .and.returnValue(mockPinOpportunitiesEventEmitter);
       spyOnProperty(
         contributionOpportunitiesService, 'unpinnedOpportunitiesChanged')
         .and.returnValue(mockUnpinOpportunitiesEventEmitter);
+
+      component.loadOpportunities = () => Promise.resolve({
+        opportunitiesDicts: explorationOpportunitiesLoad1,
+        more: true
+      });
+      component.loadMoreOpportunities = () => Promise.resolve({
+        opportunitiesDicts: explorationOpportunitiesLoad2,
+        more: false
+      });
+
+      spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
+        .and.returnValue(mockActiveLanguageEventEmitter);
+      spyOnProperty(translationTopicService, 'onActiveTopicChanged')
+        .and.returnValue(mockActiveTopicEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService, 'reloadOpportunitiesEventEmitter')
+        .and.returnValue(mockReloadOpportunitiesEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService, 'removeOpportunitiesEventEmitter')
+        .and.returnValue(mockRemoveOpportunitiesEventEmitter);
     });
 
     it('should pin an opportunity', fakeAsync(() => {
