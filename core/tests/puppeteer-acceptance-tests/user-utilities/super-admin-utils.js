@@ -344,19 +344,18 @@ module.exports = class e2eSuperAdmin extends baseUser {
           const dropdown = document.querySelector(
             '.e2e-test-select-rubric-difficulty');
           for (const option of dropdown.options) {
-            console.log(option.text, option.value);
             if (option.text === difficulty) {
               return option.value;
-	    }
-	  }
+            }
+          }
           return '';
-	}, difficulty));
+        }, difficulty));
 
       await this.page.waitForSelector(
         `.e2e-test-add-explanation-button-${difficulty}`,
         { visible: true });
       const noteCount = await this.page.evaluate(() => document.querySelector(
-        `oppia-rubrics-editor > div > div:nth-child(3)`).childElementCount);
+        'oppia-rubrics-editor > div > div:nth-child(3)').childElementCount);
 
       for (let i = 0; i < rubricNotes.length; i++) {
         await this.clickOn(
