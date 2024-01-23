@@ -210,7 +210,7 @@ export class SkillSelectorComponent implements OnInit {
        // Exclude the current skill based on its ID
       return filteredSkills.includes(val.description) &&
              val.id !== activeSkillId;
-    });
+    );
   }
 
     let filteredSkills = this.filterForMatchingSubstringPipe
