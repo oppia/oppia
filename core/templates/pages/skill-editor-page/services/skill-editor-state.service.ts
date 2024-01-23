@@ -182,9 +182,11 @@ export class SkillEditorStateService {
   isLoadingSkill(): boolean {
     return this._skillIsBeingLoaded;
   }
+  
   getActiveSkillId(): string | null {
     return this._skill ? this._skill.getId() : null;
   }
+  
   getPrerequisiteSkillIds(): string[] {
     return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
   }
@@ -214,6 +216,7 @@ export class SkillEditorStateService {
    * return an empty skill object if the skill has not yet been
    * loaded for this editor instance.
    */
+   
   getSkill(): Skill {
     return this._skill;
   }
