@@ -216,7 +216,7 @@
     width: 50%;
   }
   .oppia-about-page-section-one .oppia-about-title {
-    padding-top: 5vh;
+    padding-top: 4vh;
   }
   .oppia-about-page-section-one .oppia-about-content {
     padding-right: 0;
@@ -277,14 +277,14 @@
   .oppia-about-page-section-one,
   .oppia-about-page-section-one .oppia-about-study-image img,
   .oppia-about-page-section-one .oppia-about-page-section-one-right {
-    height: 70vh;
+    height: 50vh;
   }
 }
 @media (orientation: landscape) and (max-width: 862px) {
   .oppia-about-page-section-one,
   .oppia-about-page-section-one .oppia-about-study-image img,
   .oppia-about-page-section-one .oppia-about-page-section-one-right {
-    height: 85vh;
+    height: 50vh;
   }
   .oppia-about-page-section-three,
   .oppia-about-page-section-five {
