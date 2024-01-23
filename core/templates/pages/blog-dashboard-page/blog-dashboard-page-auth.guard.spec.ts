@@ -69,7 +69,8 @@ describe('BlogDashboardAuthGuard', () => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
-        [UserRoles.BLOG_ADMIN], false, true, false, false, false, '', '', '', true))
+        [UserRoles.BLOG_ADMIN],
+        false, true, false, false, false, '', '', '', true))
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
