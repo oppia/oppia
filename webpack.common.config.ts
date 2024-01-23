@@ -60,13 +60,10 @@ module.exports = {
     }
   },
   entry: {
-<<<<<<< HEAD
     blog_admin:
       commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
-=======
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
->>>>>>> 3d19c1904f527b94a12c49686c4e7aeba37a5c90
     classroom_admin:
       commonPrefix + '/pages/classroom-admin-page/' +
       'classroom-admin-page.import.ts',
