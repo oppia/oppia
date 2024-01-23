@@ -335,7 +335,44 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-confirm-add-misconception-button');
     }
 
-    // Configure difficulties here.
+    // Configure difficulties and their rubric notes.
+    for (const [difficulty, { rubricNotes }] of Object.entries(difficulties)) {
+      await this.clickOn('.e2e-test-select-rubric-difficulty');
+      await this.select(
+        '.e2e-test-select-rubric-difficulty',
+        await this.page.evaluate((difficulty) => {
+          const dropdown = document.querySelector(
+            '.e2e-test-select-rubric-difficulty');
+          for (const option of dropdown.options) {
+            console.log(option.text, option.value);
+            if (option.text === difficulty) {
+              return option.value;
+	    }
+	  }
+          return '';
+	}, difficulty));
+
+      await this.page.waitForSelector(
+        `.e2e-test-add-explanation-button-${difficulty}`,
+        { visible: true });
+      const noteCount = await this.page.evaluate(() => document.querySelector(
+        `oppia-rubrics-editor > div > div:nth-child(3)`).childElementCount);
+
+      for (let i = 0; i < rubricNotes.length; i++) {
+        await this.clickOn(
+          'oppia-rubrics-editor > div > div:nth-child(3) > ' + i < noteCount ?
+            `div:nth-child(${i + 1}) ` +
+              `.e2e-test-edit-rubric-explanation-${difficulty}` :
+            `.e2e-test-add-explanation-button-${difficulty}`);
+        await this.page.waitForSelector(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          { visible: true });
+        await this.page.type(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          rubricNotes[i]);
+        await this.clickOn('.e2e-test-save-rubric-explanation-button');
+      }
+    }
 
     // Save skill changes.
     await this.page.waitForSelector(

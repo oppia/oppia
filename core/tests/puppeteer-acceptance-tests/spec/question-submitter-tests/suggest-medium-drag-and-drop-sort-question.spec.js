@@ -28,8 +28,8 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 describe('Practice Question Submitter', function() {
   const topicName = 'Test Topic';
   const skillDescription = 'Counting';
-  const mediumDifficultyRubricNotes = [''];
-  const hardDifficultyRubricNotes = [''];
+  const mediumDifficultyRubricNotes = ['1 to 10'];
+  const hardDifficultyRubricNotes = ['1 to 100'];
   const questionText = 'Question 1: Test Question';
   const correctAnswer = 'Correct';
   const incorrectAnswer = 'Incorrect answer';
@@ -72,7 +72,7 @@ describe('Practice Question Submitter', function() {
       urlFragment: 'test-topic',
       webTitleFragment: 'Between "topic name |" and "| Oppia"',
       description: 'describe the topic',
-      thumbnail: '',
+      thumbnail: 'example-topic-thumbnail.svg',
       metaContent: 'test',
       assignedSkills: [skill],
       subtopics: [{
