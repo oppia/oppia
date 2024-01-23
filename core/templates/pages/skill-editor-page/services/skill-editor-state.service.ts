@@ -182,11 +182,9 @@ export class SkillEditorStateService {
   isLoadingSkill(): boolean {
     return this._skillIsBeingLoaded;
   }
-  
   getActiveSkillId(): string | null {
     return this._skill ? this._skill.getId() : null;
   }
-
   getPrerequisiteSkillIds(): string[] {
     return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
   }
@@ -208,7 +206,6 @@ export class SkillEditorStateService {
   hasLoadedSkill(): boolean {
     return this._skillIsInitialized;
   }
-
   /**
    * Returns the current skill to be shared among the skill
    * editor. Please note any changes to this skill will be propogated
