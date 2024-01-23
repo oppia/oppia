@@ -62,7 +62,7 @@ export class SkillEditorStateService {
   getActiveSkillId(): string | null {
     return this._skill ? this._skill.getId() : null;
   }
-  
+
   getPrerequisiteSkillIds(): string[] {
     return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
   }
