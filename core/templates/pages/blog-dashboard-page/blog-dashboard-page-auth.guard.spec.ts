@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
-import { UserInfo } from 'domain/user/user-info.model';
+import { UserInfo, UserRoles } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { BlogDashboardAuthGuard } from './blog-dashboard-page-auth.guard';
 
@@ -47,7 +47,7 @@ describe('BlogDashboardAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not blog', (done) => {
+  it('should redirect user to 401 page if user is not blog admin', (done) => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(UserInfo.createDefault())
@@ -65,11 +65,11 @@ describe('BlogDashboardAuthGuard', () => {
       });
   });
 
-  it('should not redirect user to 401 page if user is blog', (done) => {
+  it('should not redirect user to 401 page if user is blog admin', (done) => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
-        [], false, true, false, false, false, '', '', '', true))
+        [UserRoles.BLOG_ADMIN], false, true, false, false, false, '', '', '', true))
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
