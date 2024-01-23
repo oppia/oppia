@@ -334,8 +334,7 @@ class ReviewableOpportunitiesHandler(
                 self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id, topic_name, language
             )):
-                if opp is not None:
-                    opportunity_dicts.append(opp.to_dict())
+                opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -343,7 +342,7 @@ class ReviewableOpportunitiesHandler(
 
     def _get_reviewable_exploration_opportunity_summaries(
         self, user_id: str, topic_name: Optional[str], language: Optional[str]
-    ) -> List[Optional[opportunity_domain.ExplorationOpportunitySummary]]:
+    ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
         sorted in descending order by topic, story, and story node order.

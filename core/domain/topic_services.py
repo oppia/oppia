@@ -802,15 +802,11 @@ def publish_story(
             story_nodes: list(dict(str, *)). The list of story nodes dicts.
 
         Raises:
-            Exception. The story node doesn't contain any exploration id or the
-                exploration id is invalid or isn't published yet.
+            Exception. The exploration id is invalid or isn't published yet.
         """
         exploration_id_list = []
         for node in story_nodes:
-            if not node.exploration_id:
-                raise Exception(
-                    'Story node with id %s does not contain an '
-                    'exploration id.' % node.id)
+            assert node.exploration_id is not None
             exploration_id_list.append(node.exploration_id)
         story_services.validate_explorations_for_story(
             exploration_id_list, True)
@@ -1113,15 +1109,10 @@ def compute_summary_of_topic(
         strict=False)
     topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {}
     for i, story in enumerate(stories):
-        if story is None:
-            exp_list = []
-        else:
-            exp_list = (
-                story.story_contents
-                .get_linked_exp_ids_of_published_nodes())
+        assert story is not None
         topic_model_published_story_exploration_mapping[
             published_story_references[i].story_id
-        ] = exp_list
+        ] = story.story_contents.get_linked_exp_ids_of_published_nodes()
 
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
