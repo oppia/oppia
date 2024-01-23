@@ -204,9 +204,7 @@ export class SkillSelectorComponent implements OnInit {
     let currentSkill = this.skillEditorStateService.getSkill();
 
     let activeSkillId = currentSkill ? currentSkill.getId() : null;
-
     return this.untriagedSkillSummaries.filter(val => {
-
       return filteredSkills.includes(val.description) &&
       val.id !== activeSkillId;
     });
