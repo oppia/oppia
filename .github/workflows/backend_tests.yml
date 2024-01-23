@@ -1,6 +1,5 @@
 name: Backend tests
 on:
-  workflow_dispatch:  # <-- Add this line to enable manual triggering
   merge_group:
     types: [checks_requested]
   push:
@@ -50,15 +49,6 @@ jobs:
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
-      - name: Build Oppia Docker image
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          docker build -t oppia:latest .
-      - name: Run Oppia Docker container
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          docker run -d --name oppia-container oppia:latest
-          docker exec oppia-container python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
