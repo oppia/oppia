@@ -206,6 +206,7 @@ export class SkillSelectorComponent implements OnInit {
     let activeSkillId = currentSkill ? currentSkill.getId() : null;
 
     return this.untriagedSkillSummaries.filter(val => {
+      // Exclude the current skill based on its ID
       return filteredSkills.includes(val.description) &&
       val.id !== activeSkillId;
     });
