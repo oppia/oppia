@@ -33,6 +33,7 @@ import { UrlInterpolationService } from
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  formLink: string = '';
   partnershipsImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
@@ -67,10 +68,22 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  setFormLink(): void {
+    let userLang = this.translateService.currentLang;
+
+    if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
+      this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    } else {
+      let interpolatedLanguage = (userLang === 'pt-br') ? 'pt' : userLang;
+      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
+    }
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
+        this.setFormLink();
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
