@@ -25,6 +25,7 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PrimaryButtonComponent } from 'components/button-directives/primary-button.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -50,7 +51,8 @@ describe('About Page', () => {
     TestBed.configureTestingModule({
       declarations: [
         AboutPageComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
+        PrimaryButtonComponent
       ],
       providers: [
         SiteAnalyticsService,

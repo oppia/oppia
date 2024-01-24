@@ -121,7 +121,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -444,6 +443,8 @@ import { ContributorDashboardAdminStatsBackendApiService } from 'pages/contribut
 import { InsertScriptService } from './insert-script.service';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
+import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
+import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -475,6 +476,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['AutoplayedVideosService', AutoplayedVideosService],
   ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
+  ['BlogAdminAuthGuard', BlogAdminAuthGuard],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
@@ -689,6 +691,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
+  ['ModeratorAuthGuard', ModeratorAuthGuard],
   ['MultipleChoiceInputOrderedChoicesService',
     MultipleChoiceInputOrderedChoicesService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
@@ -734,7 +737,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlayerTranscriptService', PlayerTranscriptService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
-  ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
   ['PreventPageUnloadEventService', PreventPageUnloadEventService],

@@ -288,10 +288,12 @@
                 cdkDrag>
               <div class="subtopics-list-item">
                 <div class="subtopic-name-header subtopic-name-card-header" tabindex="0" (click)="toggleSubtopicCard(subtopicIndex)" (focus)="toggleSubtopicCard(subtopicIndex)">
-                  <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                  <div class="subtopic-drag-and-title-container">
                     <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
-                    <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
-                  </span>
+                    <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                      <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
+                    </span>
+                  </div>
                   <div class="subtopic-edit-options-container edit-options-container" [attr.aria-label]="'Number of questions: ' + subtopicQuestionCountDict[subtopic.getId()]">
                     <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
                     <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
@@ -697,6 +699,10 @@
     margin: 7px 0;
   }
 
+  .topic-editor .subtopics-list-item .draggable-icon-indicator {
+    padding-right: 5px;
+  }
+
   .topic-editor .subtopic-name-header {
     align-items: center;
     background-color: #e3e3e3;
@@ -841,10 +847,6 @@
     width: fit-content;
   }
 
-  mat-icon.mat-default-theme, mat-icon {
-    color: #00695e;
-  }
-
   .oppia-button-text {
     margin-bottom: 0;
     padding: 10px;
@@ -856,6 +858,7 @@
 
   .oppia-remove-diagnostic-test-skill-button {
     border-radius: 25px;
+    color: #00695e;
     position: relative;
   }
 
@@ -924,8 +927,7 @@
       padding: 0;
     }
 
-    .topic-editor .entity-count,
-    .topic-editor .draggable-icon-indicator {
+    .topic-editor .entity-count {
       padding-right: 5px;
     }
 
