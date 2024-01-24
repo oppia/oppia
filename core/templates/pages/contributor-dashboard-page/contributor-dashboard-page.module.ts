@@ -46,6 +46,8 @@ import { CertificateDownloadModalComponent } from './modal-templates/certificate
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
 import { BadgeComponent } from './badge/badge.component';
 import { ContributorDashboardPageRootComponent } from './contributor-dashboard-page-root.component';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -61,6 +63,7 @@ import { ContributorDashboardPageRootComponent } from './contributor-dashboard-p
         component: ContributorDashboardPageRootComponent
       }
     ]),
+    MatSnackBarModule
   ],
   declarations: [
     CertificateDownloadModalComponent,

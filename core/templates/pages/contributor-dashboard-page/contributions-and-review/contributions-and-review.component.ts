@@ -20,7 +20,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -40,6 +40,8 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 export interface Suggestion {
   change_cmd: {
@@ -65,6 +67,7 @@ export interface ContributionsSummary {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
 }
 
 export interface Opportunity {
@@ -100,6 +103,10 @@ export interface TabDetails {
   tabSubType: string;
   text: string;
   enabled: boolean;
+}
+
+export interface CustomMatSnackBarRef {
+  onAction: () => Observable<void>;
 }
 
 @Component({
@@ -143,6 +150,8 @@ export class ContributionsAndReview
     };
   };
 
+  opportunities: ExplorationOpportunitySummary[] = [];
+
   /**
    * The feature flag state to gate the contributor_dashboard_accomplishments.
    * @type {boolean} - contributor_dashboard_accomplishments - A boolean value.
@@ -180,7 +189,8 @@ export class ContributionsAndReview
     private userService: UserService,
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
-    private htmlEscaperService: HtmlEscaperService
+    private htmlEscaperService: HtmlEscaperService,
+    private snackBar: MatSnackBar,
   ) {}
 
   getQuestionContributionsSummary(
@@ -473,15 +483,51 @@ export class ContributionsAndReview
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
+            isPinned: opportunity.isPinned,
+            topicName: opportunity.topicName
           };
           opportunitiesDicts.push(opportunityDict);
         });
-
+        this.opportunities = opportunitiesDicts;
         return {
           opportunitiesDicts: opportunitiesDicts,
           more: response.more
         };
       });
+  }
+
+  pinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    const topicName = dict.topic_name;
+    const explorationId = dict.exploration_id;
+    const existingPinnedOpportunity = Object.values(this.opportunities).find(
+      (opportunity: {
+        topicName: string;
+        isPinned: boolean;
+      }) => (
+        opportunity.topicName === topicName && opportunity.isPinned)
+    );
+
+    if (existingPinnedOpportunity) {
+      this.openSnackbarWithAction(
+        topicName, explorationId,
+        'A pinned opportunity already exists for this topic and language.',
+        'Pin Anyway'
+      );
+    } else {
+      this.contributionOpportunitiesService.
+        pinReviewableTranslationOpportunityAsync(
+          topicName, this.languageCode, explorationId);
+    }
+  }
+
+  unpinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    this.contributionOpportunitiesService.
+      unpinReviewableTranslationOpportunityAsync(
+        dict.topic_name, this.languageCode, dict.exploration_id);
   }
 
   onClickReviewableTranslations(explorationId: string): void {
@@ -702,6 +748,35 @@ export class ContributionsAndReview
     };
 
     $(document).on('click', this.closeDropdownWhenClickedOutside);
+  }
+
+  openSnackbarWithAction(
+      topicName: string,
+      explorationId: string,
+      message: string,
+      actionText: string
+  ): void {
+    const snackBarRef: CustomMatSnackBarRef = this.snackBar.open(
+      message, actionText, {
+        duration: 3000,
+      });
+
+    this.handleSnackbarAction(snackBarRef, topicName, explorationId);
+  }
+
+  private handleSnackbarAction(
+      snackBarRef: CustomMatSnackBarRef,
+      topicName: string,
+      explorationId: string
+  ): void {
+    snackBarRef.onAction().subscribe(() => {
+      this.contributionOpportunitiesService
+        .pinReviewableTranslationOpportunityAsync(
+          topicName,
+          this.languageCode,
+          explorationId
+        );
+    });
   }
 
   onChangeLanguage(languageCode: string): void {

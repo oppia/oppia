@@ -23,6 +23,7 @@ import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
+
 export interface ExplorationOpportunity {
   id: string;
   labelText: string;
@@ -35,6 +36,8 @@ export interface ExplorationOpportunity {
   heading?: string;
   actionButtonTitle?: string;
   translationWordCount?: number;
+  isPinned?: boolean;
+  topicName: string;
 }
 
 @Component({
@@ -56,6 +59,7 @@ export class OpportunitiesListItemComponent {
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
   @Input() showOpportunityButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = true;
 
   labelText!: string;
   labelStyle!: { 'background-color': string };
@@ -73,6 +77,32 @@ export class OpportunitiesListItemComponent {
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
+
+  @Output() clickPinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
+
+  @Output() clickUnpinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
+
+  pinOpportunity(): void {
+    this.clickPinButton.emit({
+      topic_name: this.opportunity.topicName,
+      exploration_id: this.opportunity.id
+    });
+  }
+
+  unpinOpportunity(): void {
+    this.clickUnpinButton.emit({
+      topic_name: this.opportunity.topicName,
+      exploration_id: this.opportunity.id
+    });
+  }
 
   opportunityDataIsLoading: boolean = true;
   correspondingOpportunityDeleted: boolean = false;
