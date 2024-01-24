@@ -183,14 +183,6 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  getActiveSkillId(): string | null {
-    return this._skill ? this._skill.getId() : null;
-  }
-
-  getPrerequisiteSkillIds(): string[] {
-    return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
-  }
-
   // 'getAssignedSkillTopicData()' will be return null if 'loadSkill()' did
   // not yet initialize '_assignedSkillTopicData' or failed to initialize it.
   getAssignedSkillTopicData(): AssignedSkillTopicData | null {
@@ -208,6 +200,7 @@ export class SkillEditorStateService {
   hasLoadedSkill(): boolean {
     return this._skillIsInitialized;
   }
+
   /**
    * Returns the current skill to be shared among the skill
    * editor. Please note any changes to this skill will be propogated
@@ -216,7 +209,6 @@ export class SkillEditorStateService {
    * return an empty skill object if the skill has not yet been
    * loaded for this editor instance.
    */
-
   getSkill(): Skill {
     return this._skill;
   }
