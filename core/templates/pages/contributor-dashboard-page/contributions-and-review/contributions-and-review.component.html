@@ -108,8 +108,11 @@
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
+                                (clickPinButton)="pinReviewableTranslationOpportunity($event)"
+                                (clickUnpinButton)="unpinReviewableTranslationOpportunity($event)"
                                 [labelRequired]="!activeReviewTab"
                                 [showOpportunityButton]="true"
+                                [showPinUnpinButton]="true"
                                 #opportunitiesList>
       </oppia-opportunities-list>
       <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
@@ -126,7 +129,8 @@
                                   (clickActionButton)="onClickViewSuggestion($event)"
                                   [labelRequired]="!isReviewTranslationsTab()"
                                   [opportunityHeadingTruncationLength]="30"
-                                  [showOpportunityButton]="false">
+                                  [showOpportunityButton]="false"
+                                  [showPinUnpinButton]="false">
         </oppia-opportunities-list>
       </div>
       <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">

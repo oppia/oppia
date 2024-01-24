@@ -101,6 +101,9 @@ def get_voiceovers_for_given_language_accent_code(
         language_accent_code=language_accent_code)
 
 
+# NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
+# model does not contain any data yet. Issue #19590 tracks the changes required
+# in order to use this function.
 def get_all_language_accent_codes_for_voiceovers(
 ) -> Dict[str, Dict[str, bool]]:
     """Returns all language-accent codes which are supported by
