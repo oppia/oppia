@@ -213,13 +213,11 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
-    for (let i = 0; i < this.customizationArgSpecs.length; i++) {
-      if (!this.defaultRTEComponent) {
-        this.ngbActiveModal.dismiss(false);
-        return;
-      }
+    if (this.defaultRTEComponent) {
+      this.ngbActiveModal.dismiss(true);
+    } else {
+      this.ngbActiveModal.dismiss(false);
     }
-    this.ngbActiveModal.dismiss(true);
   }
 
   delete(): void {
