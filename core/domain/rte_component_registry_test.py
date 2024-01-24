@@ -77,7 +77,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         for ca_spec in customization_arg_specs:
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value',
-                'default_value_is_highlighted']))
+                'default_value_obtainable_from_highlight']))
 
             self.assertTrue(
                 isinstance(ca_spec['name'], str))

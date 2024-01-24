@@ -38,7 +38,7 @@ describe('Rte Helper Service', () => {
         schema: {
           type: 'unicode'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: 'Sample Header'
       }, {
         name: 'content',
@@ -49,7 +49,7 @@ describe('Rte Helper Service', () => {
             hide_complex_extensions: true
           }
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: 'You have opened the collapsible block.'
       }],
       id: 'collapsible',
@@ -68,7 +68,7 @@ describe('Rte Helper Service', () => {
           type: 'custom',
           obj_type: 'Filepath'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }, {
         name: 'caption',
@@ -80,7 +80,7 @@ describe('Rte Helper Service', () => {
             max_value: 500
           }]
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }, {
         name: 'alt',
@@ -98,7 +98,7 @@ describe('Rte Helper Service', () => {
             rows: 3
           }
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }],
       id: 'image',
@@ -118,7 +118,7 @@ describe('Rte Helper Service', () => {
           type: 'custom',
           obj_type: 'SanitizedUrl'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }, {
         name: 'text',
@@ -126,7 +126,7 @@ describe('Rte Helper Service', () => {
         schema: {
           type: 'unicode'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }],
       id: 'link',
@@ -145,7 +145,7 @@ describe('Rte Helper Service', () => {
           type: 'custom',
           obj_type: 'MathExpressionContent'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: {
           raw_latex: '',
           svg_filename: ''
@@ -169,7 +169,7 @@ describe('Rte Helper Service', () => {
             id: 'is_nonempty'
           }]
         },
-        default_value_is_highlighted: true,
+        default_value_obtainable_from_highlight: true,
         default_value: 'concept card'
       }, {
         name: 'skill_id',
@@ -178,7 +178,7 @@ describe('Rte Helper Service', () => {
           type: 'custom',
           obj_type: 'SkillSelector'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }],
       id: 'skillreview',
@@ -197,7 +197,7 @@ describe('Rte Helper Service', () => {
           type: 'custom',
           obj_type: 'ListOfTabs'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: [{
           title: 'Hint introduction',
           content: 'This set of tabs shows some hints. Click on the other' +
@@ -225,7 +225,7 @@ describe('Rte Helper Service', () => {
         schema: {
           type: 'unicode'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: ''
       }, {
         name: 'start',
@@ -238,7 +238,7 @@ describe('Rte Helper Service', () => {
             min_value: 0
           }]
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: 0
       }, {
         name: 'end',
@@ -251,7 +251,7 @@ describe('Rte Helper Service', () => {
             min_value: 0
           }]
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: 0
       }, {
         name: 'autoplay',
@@ -259,7 +259,7 @@ describe('Rte Helper Service', () => {
         schema: {
           type: 'bool'
         },
-        default_value_is_highlighted: false,
+        default_value_obtainable_from_highlight: false,
         default_value: false
       }],
       id: 'video',

@@ -25,7 +25,7 @@ export interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
     name: string; value: string; 'default_value': string;
-    'default_value_is_highlighted': boolean;
+    'default_value_obtainable_from_highlight': boolean;
   }[];
   id: string;
   iconDataUrl: string;
@@ -156,7 +156,7 @@ export class CkEditorInitializerService {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
                       const highlighted = customizationArgSpecs
                         .some(function(spec) {
-                          return spec.default_value_is_highlighted;
+                          return spec.default_value_obtainable_from_highlight;
                         });
 
                       that.data.isCopied = false;
@@ -229,7 +229,8 @@ export class CkEditorInitializerService {
                   const selection = that.editor.getSelection()
                     .getSelectedText();
                   if (!that.data[spec.name]) {
-                    if (spec.default_value_is_highlighted && selection) {
+                    if (spec.default_value_obtainable_from_highlight &&
+                        selection) {
                       that.setData(spec.name, selection);
                     } else {
                       that.setData(spec.name, spec.default_value);
