@@ -40,7 +40,7 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    defaultRTEComponent, customizationArgSpecs, attrsCustomizationArgsDict,
+    isNewlyCreatedComponent, customizationArgSpecs, attrsCustomizationArgsDict,
     onSubmitCallback, onDismissCallback
   ) => void;
 }
@@ -111,10 +111,10 @@ export class CkEditorInitializerService {
                   customizationArgs[spec.name] = that.data[spec.name];
                 });
 
-                const defaultRTEComponent: boolean = !that.isReady();
+                const isNewlyCreatedComponent: boolean = !that.isReady();
 
                 rteHelperService.openCustomizationModal(
-                  defaultRTEComponent,
+                  isNewlyCreatedComponent,
                   customizationArgSpecs,
                   customizationArgs,
                   function(customizationArgsDict) {
@@ -130,7 +130,7 @@ export class CkEditorInitializerService {
                     * has already been inserted into the RTE, we do not
                     * need to finalizeCreation again).
                     */
-                    if (defaultRTEComponent) {
+                    if (isNewlyCreatedComponent) {
                       // Actually create the widget, if we have not already.
                       editor.widgets.finalizeCreation(container);
                     }
@@ -172,8 +172,8 @@ export class CkEditorInitializerService {
                         return;
                       }
 
-                      if ((!highlighted && defaultRTEComponent) ||
-                           !defaultRTEComponent) {
+                      if ((!highlighted && isNewlyCreatedComponent) ||
+                           !isNewlyCreatedComponent) {
                         widgetElement.remove();
                         editor.fire('change');
                       } else {

@@ -27,7 +27,7 @@
     <input type="submit"
            class="btn btn-danger e2e-test-delete-button"
            value="Delete"
-           *ngIf="!defaultRTEComponent"
+           *ngIf="!isNewlyCreatedComponent"
            (click)="delete()">
     <input class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
            value="Cancel"
