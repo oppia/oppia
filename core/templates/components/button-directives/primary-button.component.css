@@ -1,0 +1,19 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-primary-button {
+  background-color: #00645c;
+  color: rgba(255, 255, 255, 1.0);
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+}
+
+.oppia-primary-button:hover,
+.oppia-primary-button:focus {
+  background-color: #3d9991;
+  color: rgba(255, 255, 255, 1);
+}
