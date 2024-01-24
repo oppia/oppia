@@ -57,7 +57,8 @@ describe('Contribution Opportunities Service', () => {
       translation_in_review_counts: {
         hi: 20
       },
-      language_code: 'hi'
+      language_code: 'hi',
+      is_pinned: false
     }],
     next_cursor: '6',
     more: true
@@ -328,5 +329,47 @@ describe('Contribution Opportunities Service', () => {
 
     expect(getTranslatableTopicNamesSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+  }));
+
+  it('should successfully pin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let pinTranslationOpportunitySpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'pinTranslationOpportunity')
+      .and.returnValue(Promise.resolve<void>(undefined));
+
+    contributionOpportunitiesService
+      .pinReviewableTranslationOpportunityAsync(
+        'Topic 1', 'en', 'exp 1').then(
+        successHandler, failHandler
+      );
+    tick();
+
+    expect(pinTranslationOpportunitySpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
+  }));
+
+  it('should successfully unpin reviewable pinned translation' +
+  ' opportunities', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    let unpinTranslationOpportunitySpy = spyOn(
+      contributionOpportunitiesBackendApiService,
+      'unpinTranslationOpportunity')
+      .and.returnValue(Promise.resolve<void>(undefined));
+
+    contributionOpportunitiesService
+      .unpinReviewableTranslationOpportunityAsync(
+        'Topic 1', 'en', '1').then(
+        successHandler, failHandler
+      );
+    tick();
+
+    expect(unpinTranslationOpportunitySpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
   }));
 });

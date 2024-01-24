@@ -52,6 +52,7 @@ import { ContributionsAndReview } from './contributions-and-review/contributions
 import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
 import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     NgbModalModule,
     SharedFormsModule,
     OppiaCkEditorCopyToolBarModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    MatSnackBarModule,
   ],
   declarations: [
     CertificateDownloadModalComponent,

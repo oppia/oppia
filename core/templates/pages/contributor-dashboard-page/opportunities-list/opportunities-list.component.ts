@@ -49,11 +49,23 @@ export class OpportunitiesListComponent {
   @Input() progressBarRequired: boolean = false;
 
   @Input() showOpportunityButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = true;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
 
+  @Output() clickPinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
+
+  @Output() clickUnpinButton: EventEmitter<{
+    'topic_name': string;
+    'exploration_id': string;
+  }> = (
+      new EventEmitter());
 
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];
@@ -120,6 +132,88 @@ export class OpportunitiesListComponent {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
     this.fetchAndLoadOpportunities();
+    this.subscribeToPinnedOpportunities();
+  }
+
+  subscribeToPinnedOpportunities(): void {
+    this.contributionOpportunitiesService.pinnedOpportunitiesChanged.subscribe(
+      updatedData => {
+        this.pinOpportunity(updatedData);
+      });
+    this.contributionOpportunitiesService.
+      unpinnedOpportunitiesChanged.subscribe(
+        updatedData => {
+          this.unpinOpportunity(updatedData);
+        });
+  }
+
+  pinOpportunity(
+      updatedData: Record<string, string>
+  ): void {
+    const indexToModify = this.opportunities.findIndex(
+      opportunity => opportunity.id === updatedData.
+        explorationId && opportunity.topicName === updatedData.topicName
+    );
+
+    if (indexToModify !== -1) {
+      const opportunityToModify = this.opportunities[indexToModify];
+
+      const previouslyPinnedIndex = this.opportunities.findIndex(
+        opportunity => opportunity.isPinned && (
+          opportunity.id !== updatedData.
+            explorationId || opportunity.topicName !== updatedData.topicName)
+      );
+
+      if (previouslyPinnedIndex !== -1) {
+        this.opportunities[previouslyPinnedIndex].isPinned = false;
+      }
+
+      opportunityToModify.isPinned = true;
+
+      // Move the pinned item to the top.
+      this.opportunities.splice(indexToModify, 1);
+      this.opportunities.unshift(opportunityToModify);
+
+      // Update the visible opportunities.
+      const indexInVisible = this.visibleOpportunities.findIndex(
+        opportunity => opportunity.id === updatedData.
+          explorationId && opportunity.topicName === updatedData.topicName
+      );
+
+      if (indexInVisible !== -1) {
+        this.visibleOpportunities.splice(indexInVisible, 1);
+        this.visibleOpportunities.unshift(opportunityToModify);
+      }
+    }
+  }
+
+  unpinOpportunity(
+      updatedData: Record<string, string>
+  ): void {
+    const indexToModify = this.opportunities.findIndex(
+      opportunity => opportunity.id === updatedData.
+        explorationId && opportunity.topicName === updatedData.topicName
+    );
+
+    if (indexToModify !== -1) {
+      const opportunityToModify = this.opportunities[indexToModify];
+      opportunityToModify.isPinned = false;
+
+      // Move the unpinned item to the end.
+      this.opportunities.splice(indexToModify, 1);
+      this.opportunities.push(opportunityToModify);
+
+      // Update the visible opportunities.
+      const indexInVisible = this.visibleOpportunities.findIndex(
+        opportunity => opportunity.id === updatedData.
+          explorationId && opportunity.topicName === updatedData.topicName
+      );
+
+      if (indexInVisible !== -1) {
+        this.visibleOpportunities.splice(indexInVisible, 1);
+        this.visibleOpportunities.push(opportunityToModify);
+      }
+    }
   }
 
   fetchAndLoadOpportunities(): void {
