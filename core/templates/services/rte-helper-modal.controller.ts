@@ -106,7 +106,7 @@ type CustomizationArgsNameAndValueArray = {
 export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() isNewlyCreatedComponent: boolean;
+  @Input() componentIsNewlyCreated: boolean;
   modalIsLoading: boolean = true;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
@@ -213,7 +213,7 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
-    if (this.isNewlyCreatedComponent) {
+    if (this.componentIsNewlyCreated) {
       this.ngbActiveModal.dismiss(true);
     } else {
       this.ngbActiveModal.dismiss(false);
