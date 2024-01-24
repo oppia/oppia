@@ -31,6 +31,7 @@ import './primary-button.component.css';
 export class PrimaryButtonComponent {
   @Input() buttonText: string = '';
   @Input() customClasses?: string[];
+  @Input() disabled?: boolean = false;
   @Input() buttonHref: string | null = null;
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
