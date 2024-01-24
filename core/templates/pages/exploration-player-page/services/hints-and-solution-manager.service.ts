@@ -29,10 +29,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
   providedIn: 'root'
 })
 export class HintsAndSolutionManagerService {
-  // This in initialized using the the class methods
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  solutionForLatestCard!: Solution;
+  solutionForLatestCard: Solution | null = null;
   // The following are set to null when the timeouts are cleared
   // or when the service is reset.
   timeout: NodeJS.Timeout | null = null;
@@ -166,7 +163,7 @@ export class HintsAndSolutionManagerService {
     }
   }
 
-  reset(newHints: Hint[], newSolution: Solution): void {
+  reset(newHints: Hint[], newSolution: Solution | null): void {
     this.numHintsReleased = 0;
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
@@ -213,6 +210,9 @@ export class HintsAndSolutionManagerService {
   }
 
   displaySolution(): Solution {
+    if (!this.solutionForLatestCard) {
+      throw new Error('Solution must be not null to be displayed.');
+    }
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();
     if (this.solutionTooltipTimeout) {

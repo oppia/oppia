@@ -412,7 +412,7 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
-    platform_parameter_domain.FeatureStages.PROD)
+    platform_parameter_domain.FeatureStages.TEST)
 
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
@@ -457,6 +457,11 @@ Registry.create_feature_flag(
     ParamNames.LEARNER_GROUPS_ARE_ENABLED,
     'Enable learner groups feature',
     platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.NEW_LESSON_PLAYER,
+    'This flag is to enable the exploration player redesign.',
+    platform_parameter_domain.FeatureStages.DEV)
 
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,

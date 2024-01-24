@@ -502,7 +502,7 @@ describe('Translation Modal Component', () => {
         description: 'Adds translation',
         target_id: '1',
         target_version_at_submission: 1,
-        change: {
+        change_cmd: {
           cmd: 'add_written_translation',
           content_id: 'contentId1',
           state_name: 'stateName1',
@@ -702,7 +702,7 @@ describe('Translation Modal Component', () => {
           description: 'Adds translation',
           target_id: '1',
           target_version_at_submission: 1,
-          change: {
+          change_cmd: {
             cmd: 'add_written_translation',
             content_id: 'contentId4',
             state_name: 'stateName2',

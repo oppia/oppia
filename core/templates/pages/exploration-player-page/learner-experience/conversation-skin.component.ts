@@ -1526,6 +1526,16 @@ export class ConversationSkinComponent {
           null, this.audioTranslationLanguageService));
       return;
     }
+    if (this.isLearnAgainButton()) {
+      const indexOfRevisionCard =
+        this.playerTranscriptService.findIndexOfLatestStateWithName(
+          this.nextCard.getStateName());
+      if (indexOfRevisionCard !== null) {
+        this.displayedCard.markAsNotCompleted();
+        this.changeCard(indexOfRevisionCard);
+        return;
+      }
+    }
     /* This is for the following situation:
         if A->B->C is the arrangement of cards and C redirected to A,
         then after this, B and C are visited cards and hence

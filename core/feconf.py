@@ -167,6 +167,7 @@ class ValidModelNames(enum.Enum):
     TOPIC = 'topic'
     TRANSLATION = 'translation'
     USER = 'user'
+    VOICEOVER = 'voiceover'
 
 
 # A mapping of interaction ids to classifier properties.
@@ -493,6 +494,9 @@ XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
+# A regular expression for language accent code.
+LANGUAGE_ACCENT_CODE_REGEX = r'^(([a-z]+)-)+([A-Z]+)$'
+
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
 # TODO(Jacob): Refactor exp_services to remove this problem.
@@ -569,7 +573,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.2'
+OPPIA_VERSION = '3.3.4'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -652,8 +656,8 @@ EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
-EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
-EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
+EMAIL_INTENT_ONBOARD_CD_USER = 'onboard_cd_user'
+EMAIL_INTENT_REMOVE_CD_USER = 'remove_cd_user'
 EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
     'address_contributor_dashboard_suggestions'
 )
@@ -900,7 +904,6 @@ TASK_URL_DEFERRED = (
 ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-BLOG_ADMIN_PAGE_URL = '/blog-admin'
 CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
@@ -1693,3 +1696,10 @@ class TranslatedContentDict(TypedDict):
     content_value: ContentValueType
     needs_update: bool
     content_format: str
+
+
+class VoiceoverType(enum.Enum):
+    """Represents all possible voicever types."""
+
+    AUTO = 'auto'
+    MANUAL = 'manual'
