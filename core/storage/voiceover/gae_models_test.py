@@ -134,3 +134,34 @@ class EntityVoiceoversModelTest(test_utils.GenericEmailTestBase):
         self.assertEqual(
             model_cls.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+
+class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceoverAutogenerationPolicyModel class."""
+
+    def test_get_export_policy_not_applicable(self) -> None:
+        model_cls = voiceover_models.VoiceoverAutogenerationPolicyModel
+        self.assertEqual(
+            model_cls.get_export_policy(),
+            {
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_codes_mapping': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            }
+        )
+
+    def test_get_deletion_policy_not_applicable(self) -> None:
+        model_cls = voiceover_models.VoiceoverAutogenerationPolicyModel
+        self.assertEqual(
+            model_cls.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user_not_corresponding_to_user(
+        self
+    ) -> None:
+        model_cls = voiceover_models.VoiceoverAutogenerationPolicyModel
+        self.assertEqual(
+            model_cls.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)

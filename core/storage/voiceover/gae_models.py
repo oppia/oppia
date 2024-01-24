@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, TypedDict
+from typing import Dict, Final, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -32,6 +32,8 @@ if MYPY: # pragma: no cover
     models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
+
+VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
 
 class VoiceoverDict(TypedDict):
@@ -100,7 +102,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str.
-                The language accent code in which the voiceover is stored.
+                The language-accent code in which the voiceover is stored.
 
         Returns:
             str. Returns a unique id of the form
@@ -127,7 +129,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 fetched.
             entity_version: int. The version of the entity whose voiceovers
                 are to be fetched.
-            language_accent_code: str. The language accent code of the
+            language_accent_code: str. The language-accent code of the
                 voiceovers.
 
         Returns:
@@ -172,3 +174,35 @@ class EntityVoiceoversModel(base_models.BaseModel):
             language_accent_code=language_accent_code,
             voiceovers=voiceovers
         )
+
+
+class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
+    """Model for storing language-accent codes for Oppia supported voiceovers.
+
+    There should only be one instance of this class, and it is keyed by
+    VOICEOVER_AUTOGENERATION_POLICY_ID.
+    """
+
+    # A dict with language_codes as keys and nested dicts as values.
+    # Each nested dict contains language_accent_codes as keys and booleans
+    # indicating whether it's possible to generate automatic voiceovers
+    # for this language-accent code as values.
+    language_codes_mapping = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
