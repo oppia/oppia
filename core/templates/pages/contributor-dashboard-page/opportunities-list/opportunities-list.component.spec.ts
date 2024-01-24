@@ -502,6 +502,73 @@ describe('Opportunities List Component', () => {
 
         expect(component.activePageNumber).toBe(1);
       }));
+
+    it('should load opportunities when initialized', fakeAsync(() => {
+      expect(component.opportunities).toEqual([]);
+
+      // Since the constructor will be automatically called in unit tests, it
+      // is hard to test or spy on the constructor. So, we have created a
+      // function to manually trigger and tests different edge cases.
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      // Added two opportunities with id's as 'id1' and 'id2'.
+      mockActiveLanguageEventEmitter.emit();
+      tick();
+      mockActiveTopicEventEmitter.emit();
+      tick();
+      mockReloadOpportunitiesEventEmitter.emit();
+      tick();
+      expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
+      expect(component.opportunities.length).toEqual(16);
+
+      // Removed opportunity with id as 'id2'.
+      mockRemoveOpportunitiesEventEmitter.emit(['id2']);
+      tick();
+
+      expect(component.opportunities.length).toEqual(15);
+
+      // RemoveOpportunitiesEvent with no opportunities, e.g. if a user closes a
+      // review modal without completing a review.
+      mockRemoveOpportunitiesEventEmitter.emit([]);
+      tick();
+
+      expect(component.opportunities.length).toEqual(15);
+    }));
+
+    it('should navigate to updated last page when current last page is removed',
+      fakeAsync(() => {
+        component.init();
+        component.onChangeLanguage('en');
+        tick();
+        component.ngOnInit();
+        tick();
+        expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
+        expect(component.opportunities.length).toEqual(16);
+        expect(component.activePageNumber).toBe(1);
+        // Navigate to the last page.
+        component.gotoPage(2);
+        tick();
+        component.gotoPage(3);
+        tick();
+        expect(component.activePageNumber).toBe(3);
+        // Reset the load method to return no more opportunities.
+        component.loadMoreOpportunities = () => Promise.resolve({
+          opportunitiesDicts: [],
+          more: false
+        });
+
+        // Remove all opportunities on the last page.
+        mockRemoveOpportunitiesEventEmitter.emit(
+          ['id20', 'id21', 'id22', 'id23', 'id24', 'id25', 'id26']);
+        tick();
+
+        // Should navigate to new last page. Since there are no more opportunities
+        // to load, the new last page is page 2.
+        expect(component.opportunities.length).toEqual(19);
+        expect(component.activePageNumber).toBe(2);
+      }));
   });
 
   describe('when clicking on pin-unpin icon', () => {
