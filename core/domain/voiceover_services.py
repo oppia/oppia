@@ -18,10 +18,16 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
+from core import utils
 from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.platform import models
+
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -76,7 +82,7 @@ def get_voiceovers_for_given_language_accent_code(
         entity_type: str. The type of the entity.
         entity_id: str. The ID of the entity.
         entity_version: int. The version of the entity.
-        language_accent_code: str. The language accent code of the voiceover.
+        language_accent_code: str. The language-accent code of the voiceover.
 
     Returns:
         EntityVoiceovers. An instance of entity voiceover.
@@ -93,3 +99,102 @@ def get_voiceovers_for_given_language_accent_code(
         entity_id=entity_id,
         entity_version=entity_version,
         language_accent_code=language_accent_code)
+
+
+# NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
+# model does not contain any data yet. Issue #19590 tracks the changes required
+# in order to use this function.
+def get_all_language_accent_codes_for_voiceovers(
+) -> Dict[str, Dict[str, bool]]:
+    """Returns all language-accent codes which are supported by
+    Oppia's voiceovers.
+
+    Returns:
+        Dict[str, Dict[str, bool]]. Returns a dict with language_codes as keys
+        and nested dicts as values. Each nested dict contains
+        language_accent_codes as keys and booleans indicating whether it's
+        possible to generate automatic voiceovers for this language-accent code
+        as values.
+    """
+
+    voiceover_autogeneration_policy_model = (
+        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+    )
+    language_codes_mapping: Dict[str, Dict[str, bool]] = {}
+    if voiceover_autogeneration_policy_model is None:
+        return language_codes_mapping
+
+    language_codes_mapping = (
+        voiceover_autogeneration_policy_model.language_codes_mapping)
+    return language_codes_mapping
+
+
+def save_language_accent_support(
+    language_codes_mapping: Dict[str, Dict[str, bool]]
+) -> None:
+    """The method saves the language-accent codes into the
+    VoiceoverAutogenerationPolicyModel, which will be supported by
+    Oppia's voiceovers.
+
+    Args:
+        language_codes_mapping: Dict[str, Dict[str, bool]]. A dict with
+            language_codes as keys and nested dicts as values. Each nested dict
+            contains language_accent_codes as keys and booleans indicating
+            whether it's possible to generate automatic voiceovers for this
+            language-accent code as values.
+    """
+    retrieved_voiceover_autogeneration_policy_model = (
+        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False)
+    )
+    voiceover_autogeneration_policy_model = (
+        retrieved_voiceover_autogeneration_policy_model
+        if retrieved_voiceover_autogeneration_policy_model is not None
+        else voiceover_models.VoiceoverAutogenerationPolicyModel(
+            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+    )
+
+    voiceover_autogeneration_policy_model.language_codes_mapping = (
+        language_codes_mapping)
+    voiceover_autogeneration_policy_model.update_timestamps()
+    voiceover_autogeneration_policy_model.put()
+
+
+def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
+    """The method returns the lanaguage accent master list stored in the
+    JSON file.
+
+    Returns:
+        Dict[str, Dict[str, str]]. A dict with with language codes as keys and
+        nested dicts as values. Each nested dict contains language-accent codes
+        as keys and its description as values. This is an exhaustive list of
+        language-accent pairs that Oppia may support for
+        voiceovers (manual and auto).
+    """
+    file_path = os.path.join(
+        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json')
+    with utils.open_file(file_path, 'r') as f:
+        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
+            f.read())
+        return language_accent_master_list
+
+
+def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
+    """The method returns the autogeneratable lanaguage accent list stored
+    in the JSON file.
+
+    Returns:
+        Dict[str, Dict[str, str]]. A dict with language-accent codes as keys
+        and nested dicts as values. Each nested dictionary includes 'service'
+        and 'voice_code' keys with their corresponding field values.
+        The 'service' field denotes the third-party service utilized by Oppia
+        for voiceover generation, while 'voice_code' signifies the desired
+        voice type.
+    """
+    file_path = os.path.join(
+        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json')
+    with utils.open_file(file_path, 'r') as f:
+        autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+            json.loads(f.read()))
+        return autogeneratable_language_accent_list
