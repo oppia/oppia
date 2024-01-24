@@ -480,7 +480,7 @@ export class CustomizeInteractionModalComponent
 
       this.stateInteractionIdService.displayed = cloneDeep(
         this.stateInteractionIdService.savedMemento);
-      this.stateCustomizationArgsService.displayed = (
+      this.stateCustomizationArgsService.displayed = cloneDeep(
         this.stateCustomizationArgsService.savedMemento);
 
       // Ensure that StateCustomizationArgsService.displayed is
