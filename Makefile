@@ -1,14 +1,24 @@
 SHELL := /bin/bash
 
-SHELL_PREFIX=docker compose exec
+SHELL_PREFIX = docker compose exec
+
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
+OS_NAME := $(shell uname)
+
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
+
+ifeq ($(OS_NAME),Darwin)
+    CHROME_VERSION := $(shell /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{print $$3}')
+else
+    CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+endif
+
 $(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
 .PHONY: help run-devserver build clean terminal stop-devserver \
-	$(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
-	$(addsuffix restart., $(ALL_SERVICES))
+    $(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
+    $(addsuffix restart., $(ALL_SERVICES))
 
 echo_flags:
 	@echo "Flags:"
@@ -143,8 +153,6 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
-CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
-
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## Flags for the e2e tests
 ## suite: The suite to run the e2e tests
@@ -219,8 +227,6 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
-
-OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
 	sh ./docker/install_node.sh
