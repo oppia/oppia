@@ -564,8 +564,6 @@ describe('Opportunities List Component', () => {
           ['id20', 'id21', 'id22', 'id23', 'id24', 'id25', 'id26']);
         tick();
 
-        // Should navigate to new last page. Since there are no more opportunities
-        // to load, the new last page is page 2.
         expect(component.opportunities.length).toEqual(19);
         expect(component.activePageNumber).toBe(2);
       }));
