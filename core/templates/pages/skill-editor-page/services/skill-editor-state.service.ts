@@ -175,15 +175,6 @@ export class SkillEditorStateService {
       });
   }
 
-   getPrerequisiteSkillIds(): string[] {
-    return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
- }
- 
- 
-   get onSkillChange(): EventEmitter<string> {
-    return this._skillChangedEventEmitter;
- }
-
   /**
    * Returns whether this service is currently attempting to load the
    * skill maintained by this service.
@@ -304,6 +295,11 @@ export class SkillEditorStateService {
   setSkillRights(skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
   }
+  
+  getPrerequisiteSkillIds(): string[] {
+    return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
+  }
+
 }
 
 angular.module('oppia').factory('SkillEditorStateService',
