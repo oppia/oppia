@@ -243,7 +243,22 @@
     padding-top: 0;
   }
 
-  @media screen and (max-width: 575px) {
+  @media only screen and (max-width: 400px) {
+    .oppia-about-foundation-page-equality-infographic {
+      max-height: 275px;
+      max-width: 275px;
+    }
+  }
+
+  @media only screen and (min-width: 401px) and (max-width: 992px) {
+    .oppia-about-foundation-page-equality-infographic {
+      margin-bottom: .5em;
+      max-height: 300px;
+      max-width: 300px;
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
     .oppia-about-foundation-info-card h1 {
       font-size: 1.5em;
     }
@@ -288,19 +303,6 @@
 
     .oppia-about-foundation-image-with-caption {
       padding: 2em 0;
-    }
-
-    .oppia-about-foundation-page-equality-infographic {
-      margin-bottom: .5em;
-      max-height: 300px;
-      max-width: 300px;
-    }
-  }
-
-  @media only screen and (max-width: 400px) {
-    .oppia-about-foundation-page-equality-infographic {
-      max-height: 275px;
-      max-width: 275px;
     }
   }
 </style>
