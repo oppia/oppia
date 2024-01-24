@@ -194,7 +194,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     if (language.includes('(') && language.includes(')')) {
       // Split the language into parts using '(' and ')' as separators
       // filter(Boolean) removes empty strings from the array.
-      var parts = language.split(/[\(\)]/).filter(Boolean);
+      let parts = language.split(/[\(\)]/).filter(Boolean);
       // Check if there are exactly two parts.
       if (parts.length === 2) {
         let result = parts[1].trim() + ' (' + parts[0].trim() + ')';
