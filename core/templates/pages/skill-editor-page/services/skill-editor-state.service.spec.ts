@@ -487,7 +487,6 @@ describe('Skill editor state service', () => {
 
     expect(skillEditorStateService.getPrerequisiteSkillIds())
       .toEqual(['prerequisite_id_1', 'prerequisite_id_2']);
-      
     expect(skill.getPrerequisiteSkillIds).toHaveBeenCalled();
   }));
 
