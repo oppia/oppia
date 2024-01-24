@@ -49,17 +49,14 @@ class VoiceoverAdminDataHandler(
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
-        language_accent_code_to_description: Dict[str, str] = {}
-        for language_accent_code_mapping in (
-                voiceover_services.get_language_accent_master_list().values()):
-            language_accent_code_to_description.update(
-                language_accent_code_mapping)
+        language_accent_master_list: Dict[str, Dict[str, str]] = (
+            voiceover_services.get_language_accent_master_list())
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
         self.values.update({
-            'language_accent_code_to_description':
-                language_accent_code_to_description,
+            'language_accent_master_list':
+                language_accent_master_list,
             'language_codes_mapping': language_codes_mapping
         })
         self.render_json(self.values)

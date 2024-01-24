@@ -4,10 +4,42 @@
       <h3>Update language/accent pairs available for learners and voice artists</h3>
     </div>
     <hr>
+
     <div>
       <p>Supported language/accent pairs</p>
     </div>
-    <div>
+
+    <div *ngIf="pageIsInitialized">
+      <div>
+
+        <mat-list>
+          <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
+            <div>
+              <span>
+                {{languageAccentCodeToDescription.value}}
+              </span>
+              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+
+        <mat-list>
+          <mat-list-item>
+            <select (change)="addLanguageAccentCodeSupport($event.target.value)">
+              <option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+                      [ngValue]="languageAccentCodeToDescription.key">
+                <span>
+                  {{languageAccentCodeToDescription.value}}
+                </span>
+              </option>
+            </select>
+          </mat-list-item>
+        </mat-list>
+
+      </div>
+
       <button type="button" class="btn">+ Add new language accent support</button>
       <button class="btn oppia-update-button">Update</button>
     </div>

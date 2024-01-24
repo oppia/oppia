@@ -24,8 +24,10 @@ import { VoiceoverDomainConstants } from './voiceover-domain.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 interface VoiceoverAdminDataBackendDict {
-  'language_accent_code_to_description': {
-    [languageAccentCode: string]: string;
+  'language_accent_master_list': {
+    [languageCode: string]: {
+      [languageAccentCode: string]: string;
+    };
   };
   'language_codes_mapping': {
     [languageCode: string]: {
@@ -34,15 +36,23 @@ interface VoiceoverAdminDataBackendDict {
   };
 }
 
+export interface LanguageAccentToDescription {
+  [languageAccentCode: string]: string;
+}
+
+export interface LanguageAccentMasterList {
+  [languageCode: string]: LanguageAccentToDescription;
+}
+
+export interface LanguageCodesMapping {
+  [languageCode: string]: {
+    [languageAccentCode: string]: boolean;
+  };
+}
+
 export interface VoiceoverAdminDataResponse {
-  languageAccentCodeToDescription: {
-    [languageAccentCode: string]: string;
-  };
-  languageCodesMapping: {
-    [languageCode: string]: {
-      [languageAccentCode: string]: boolean;
-    };
-  };
+  languageAccentMasterList: LanguageAccentMasterList;
+  languageCodesMapping: LanguageCodesMapping;
 }
 
 @Injectable({
@@ -60,8 +70,8 @@ export class VoiceoverBackendApiService {
         VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL
       ).toPromise().then(response => {
         resolve({
-          languageAccentCodeToDescription: (
-            response.language_accent_code_to_description),
+          languageAccentMasterList: (
+            response.language_accent_master_list),
           languageCodesMapping: response.language_codes_mapping
         });
       }, errorResponse => {
