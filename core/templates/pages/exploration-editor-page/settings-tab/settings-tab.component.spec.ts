@@ -297,6 +297,40 @@ describe('Settings Tab Component', () => {
       flush();
     }));
 
+  it('should not create new category if it is not selected',
+    fakeAsync(() => {
+      spyOn(explorationCategoryService, 'saveDisplayedValue').and.stub();
+
+      explorationCategoryService.displayed = 'old';
+      component.newCategory = {
+        id: 'new',
+        text: 'new'
+      };
+
+      component.updateCategoryListWithUserData();
+      tick();
+
+      expect(explorationCategoryService.displayed).toBe('old');
+      expect(explorationCategoryService.saveDisplayedValue).toHaveBeenCalled();
+    }));
+
+  it('should be able to create new category if it is selected',
+    fakeAsync(() => {
+      spyOn(explorationCategoryService, 'saveDisplayedValue').and.stub();
+
+      explorationCategoryService.displayed = 'new';
+      component.newCategory = {
+        id: 'new',
+        text: 'new'
+      };
+
+      component.updateCategoryListWithUserData();
+      tick();
+
+      expect(explorationCategoryService.displayed).toBe('new');
+      expect(explorationCategoryService.saveDisplayedValue).toHaveBeenCalled();
+    }));
+
   it('should be able to add exploration editor tags',
     fakeAsync(() => {
       spyOn(component, 'saveExplorationTags').and.stub();
