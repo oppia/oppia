@@ -11,37 +11,55 @@
 
     <div *ngIf="pageIsInitialized">
       <div>
-
         <mat-list>
           <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
-            <div>
+            <div class="oppia-language-accent-list">
               <span>
                 {{languageAccentCodeToDescription.value}}
               </span>
-              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)">
+              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                      mat-icon-button
+                      mat-button>
                 <mat-icon>close</mat-icon>
               </button>
             </div>
           </mat-list-item>
         </mat-list>
-
-        <mat-list>
-          <mat-list-item>
-            <select [(ngModel)]="selectedLanguageAccentCode" (change)="addLanguageAccentCodeSupport($event.target.value)">
-              <option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
-                      [ngValue]="languageAccentCodeToDescription.key">
+        <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
+          <mat-form-field>
+            <mat-label>Language Accent pair</mat-label>
+            <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+              <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+                          [value]="languageAccentCodeToDescription.key">
                 <span>
                   {{languageAccentCodeToDescription.value}}
                 </span>
-              </option>
-            </select>
-          </mat-list-item>
-        </mat-list>
-
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button (click)="removeLanguageAccentDropdown()"
+                  mat-icon-button
+                  mat-button>
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
       </div>
 
-      <button type="button" class="btn">+ Add new language accent support</button>
-      <button class="btn oppia-update-button" (click)="saveUpdatedLanguageAccentSupport()">Update</button>
+      <div class="oppia-first-card-bottom-buttons">
+        <button type="button"
+                mat-button
+                (click)="showLanguageAccentDropdown()"
+                *ngIf="!languageAccentDropdownIsShown">
+          <mat-icon>add_circle</mat-icon>
+          <span>Add new language accent support</span>
+        </button>
+        <button class="btn oppia-update-button"
+                (click)="saveUpdatedLanguageAccentSupport()"
+                mat-button
+                [disabled]="!languageAccentListIsModified">
+          Update
+        </button>
+      </div>
     </div>
   </div>
 </mat-card>
@@ -51,11 +69,16 @@
     background-color: #00645c;
     border: solid 1px #00645c;
     color: #fff;
+    margin-right: 30px;
   }
-  .btn-primary:hover {
+  .oppia-update-button:hover {
     background-color: #00645c;
     border: solid 1px #00645c;
     color: #fff;
+  }
+  .oppia-update-button:disabled {
+    background-color: #00000061;
+    color: #00000061;
   }
   .card-content {
     padding: 20px
@@ -63,6 +86,29 @@
   .oppia-editor-card-with-avatar {
     margin-bottom: 200px;
     margin-top: 200px;
+  }
+  .oppia-language-accent-list {
+    align-items: center;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-dropdown {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-list:hover {
+    background-color: #d0cdcd;
+  }
+  .oppia-first-card-bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

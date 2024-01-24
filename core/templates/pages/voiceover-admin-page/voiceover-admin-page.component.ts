@@ -44,6 +44,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   pageIsInitialized: boolean = false;
   languageAccentListIsModified: boolean = false;
   selectedLanguageAccentCode!: string;
+  languageAccentDropdownIsShown: boolean = false;
 
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
@@ -88,11 +89,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     }
   }
 
-
-  addLanguageAccentCodeSupport(languageAccentCodeWithIndex: string): void {
-    let languageAccentCodeToAdd = (
-      languageAccentCodeWithIndex.split(':')[1].trim());
-
+  addLanguageAccentCodeSupport(languageAccentCodeToAdd: string): void {
     const languageDescription = (
       this.availableLanguageAccentCodesToDescriptions[languageAccentCodeToAdd]);
     this.supportedLanguageAccentCodesToDescriptions[
@@ -106,6 +103,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
 
     this.languageAccentListIsModified = true;
+    this.removeLanguageAccentDropdown();
   }
 
   removeLanguageAccentCodeSupport(languageAccentCodeToRemove: string): void {
@@ -128,6 +126,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
       this.languageCodesMapping).then(() => {
       this.languageAccentListIsModified = false;
     }, () => {});
+  }
+
+  showLanguageAccentDropdown(): void {
+    this.languageAccentDropdownIsShown = true;
+  }
+
+  removeLanguageAccentDropdown(): void {
+    this.languageAccentDropdownIsShown = false;
   }
 }
 
