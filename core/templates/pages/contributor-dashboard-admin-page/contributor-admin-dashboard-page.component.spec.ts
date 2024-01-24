@@ -171,8 +171,8 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
 
-    component.selectLanguage('العربية (Arabic)');
-    expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
+    component.selectLanguage('Arabic (العربية)');
+    expect(component.selectedLanguage.language).toBe('Arabic (العربية)');
     expect(component.selectedLanguage.id).toBe('ar');
   }));
 
@@ -246,8 +246,8 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
 
-    component.selectLanguage('العربية (Arabic)');
-    expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
+    component.selectLanguage('Arabic (العربية)');
+    expect(component.selectedLanguage.language).toBe('Arabic (العربية)');
     expect(component.selectedLanguage.id).toBe('ar');
     expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
@@ -540,4 +540,10 @@ describe('Contributor dashboard Admin page', () => {
     expect(modalSpy).toHaveBeenCalledWith(UsernameInputModal);
     expect(openRoleEditorSpy).toHaveBeenCalledWith('user1');
   }));
+
+  it('should rearrange language name', () => {
+    expect(component.rearrangeLanguageName('Hinglish')).toBe('Hinglish');
+    expect(component.rearrangeLanguageName('Azeri (Azerbaijani)'))
+      .toBe('Azerbaijani (Azeri)');
+  });
 });
