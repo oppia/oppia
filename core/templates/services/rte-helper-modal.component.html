@@ -37,9 +37,9 @@
             Cancel
     </button>
 
-    <button type="button"
+    <button *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
+            type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-            value="Done"
             (click)="save()"
             [disabled]="!customizationArgsForm.valid">
             Done
@@ -48,7 +48,6 @@
     <button *ngIf="currentRteIsLinkEditor"
             type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-            value="Done"
             (click)="save()"
             [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
             Done
@@ -57,7 +56,6 @@
     <button *ngIf="currentRteIsMathExpressionEditor"
             type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-            value="Done"
             (click)="save()"
             [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
             Done
