@@ -23,3 +23,7 @@ import { VoiceoverDomainConstants } from './voiceover-domain.constants';
 angular.module('oppia').constant(
   'VOICEOVER_ADMIN_DATA_HANDLER',
   VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL);
+
+angular.module('oppia').constant(
+  'VOICEOVER_LANGUAGE_CODES_MAPPING',
+  VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL);

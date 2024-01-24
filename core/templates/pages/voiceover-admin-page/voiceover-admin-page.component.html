@@ -27,7 +27,7 @@
 
         <mat-list>
           <mat-list-item>
-            <select (change)="addLanguageAccentCodeSupport($event.target.value)">
+            <select [(ngModel)]="selectedLanguageAccentCode" (change)="addLanguageAccentCodeSupport($event.target.value)">
               <option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
                       [ngValue]="languageAccentCodeToDescription.key">
                 <span>
@@ -41,7 +41,7 @@
       </div>
 
       <button type="button" class="btn">+ Add new language accent support</button>
-      <button class="btn oppia-update-button">Update</button>
+      <button class="btn oppia-update-button" (click)="saveUpdatedLanguageAccentSupport()">Update</button>
     </div>
   </div>
 </mat-card>

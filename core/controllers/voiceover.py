@@ -60,3 +60,54 @@ class VoiceoverAdminDataHandler(
             'language_codes_mapping': language_codes_mapping
         })
         self.render_json(self.values)
+
+
+class VoiceoverLanguageCodesMappingHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Updated the language codes mapping field in the backend."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'PUT': {
+            'language_codes_mapping': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'variable_keys_dict',
+                            'keys': {
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            },
+                            'values': {
+                                'schema': {
+                                    'type': 'bool'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def put(self) -> None:
+        """Updates the language codes mapping for the Oppia supported
+        voiceovers.
+        """
+        assert self.normalized_payload is not None
+        language_codes_mapping = (
+            self.normalized_payload['language_codes_mapping'])
+
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping)
+        self.render_json(self.values)

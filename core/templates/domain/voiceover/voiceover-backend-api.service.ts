@@ -79,6 +79,22 @@ export class VoiceoverBackendApiService {
       });
     });
   }
+
+  async updateVoiceoverLanguageCodesMappingAsync(
+      languageCodesMapping: LanguageCodesMapping): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
+        {language_codes_mapping: languageCodesMapping}
+      ).toPromise().then(
+        response => {
+          resolve(response);
+        }, errorResopnse => {
+          reject(errorResopnse?.error);
+        }
+      );
+    });
+  }
 }
 
 angular.module('oppia').factory(

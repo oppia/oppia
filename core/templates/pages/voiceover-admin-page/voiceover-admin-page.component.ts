@@ -20,7 +20,6 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { VoiceoverBackendApiService, LanguageAccentToDescription, LanguageCodesMapping, LanguageAccentMasterList } from 'domain/voiceover/voiceover-backend-api.service';
-import { typeOf } from 'mathjs';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -44,6 +43,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageCodesMapping!: LanguageCodesMapping;
   pageIsInitialized: boolean = false;
   languageAccentListIsModified: boolean = false;
+  selectedLanguageAccentCode!: string;
 
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
@@ -89,10 +89,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
 
-  addLanguageAccentCodeSupport(languageAccentCodeWithIndex): void {
-    // check this and remove.
-    console.log(typeOf(languageAccentCodeWithIndex));
-    const languageAccentCodeToAdd = (
+  addLanguageAccentCodeSupport(languageAccentCodeWithIndex: string): void {
+    let languageAccentCodeToAdd = (
       languageAccentCodeWithIndex.split(':')[1].trim());
 
     const languageDescription = (
@@ -126,7 +124,10 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   saveUpdatedLanguageAccentSupport(): void {
-    this.languageAccentListIsModified = false;
+    this.voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync(
+      this.languageCodesMapping).then(() => {
+      this.languageAccentListIsModified = false;
+    }, () => {});
   }
 }
 

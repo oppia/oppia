@@ -17,5 +17,6 @@
  */
 
 export const VoiceoverDomainConstants = {
-  VOICEOVER_ADMIN_DATA_HANDLER_URL: '/voiceover_admin_data_handler'
+  VOICEOVER_ADMIN_DATA_HANDLER_URL: '/voiceover_admin_data_handler',
+  VOICEOVER_LANGUAGE_CODES_MAPPING_URL: '/voiceover_language_codes_mapping',
 } as const;
