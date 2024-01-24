@@ -386,7 +386,7 @@
   </table>
   <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !checkMobileView()">
     <div class="dashboard-list-footer-count">
-      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of {{ more ? 'many' : getUpperLimitValueForPagination() }} </span>
     </div>
     <div class="dashboard-list-pagination">
       <div>
