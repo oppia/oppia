@@ -230,9 +230,9 @@ export class CkEditorInitializerService {
                     .getSelectedText();
                   if (!that.data[spec.name]) {
                     if (spec.default_value_is_highlighted && selection) {
-                      that.data[spec.name] = selection;
+                      that.setData(spec.name, selection);
                     } else {
-                      that.data[spec.name] = spec.default_value;
+                      that.setData(spec.name, spec.default_value);
                     }
                   }
 
