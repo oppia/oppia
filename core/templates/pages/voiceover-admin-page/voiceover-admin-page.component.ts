@@ -40,11 +40,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
   availableLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
+  languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
   pageIsInitialized: boolean = false;
   languageAccentListIsModified: boolean = false;
-  selectedLanguageAccentCode!: string;
   languageAccentDropdownIsShown: boolean = false;
+  initialLanguageCodes: string[] = [];
+  languageAccentPanelOpenState: boolean = false;
+  languageAccentCodeIsPresent: boolean = false;
 
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
@@ -53,6 +56,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageAccentCodeToLanguageCode = {};
         this.supportedLanguageAccentCodesToDescriptions = {};
         this.availableLanguageAccentCodesToDescriptions = {};
+        this.languageAccentCodesToDescriptionsMasterList = {};
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList);
         this.pageIsInitialized = true;
@@ -69,8 +73,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageAccentCodeToLanguageCode[
           languageAccentCode] = languageCode;
       }
-      this.availableLanguageAccentCodesToDescriptions = {
-        ...this.availableLanguageAccentCodesToDescriptions,
+      this.languageAccentCodesToDescriptionsMasterList = {
+        ...this.languageAccentCodesToDescriptionsMasterList,
         ...languageAccentCodesToDescriptions
       };
     }
@@ -78,22 +82,43 @@ export class VoiceoverAdminPageComponent implements OnInit {
     for (const languageCode in this.languageCodesMapping) {
       const languageAccentCodesToSupportsAutogeneration = (
         this.languageCodesMapping[languageCode]);
-
       for (const languageAccentCode of Object.keys(
         languageAccentCodesToSupportsAutogeneration)) {
         const languageDescription = (
-          this.availableLanguageAccentCodesToDescriptions[languageAccentCode]);
+          this.languageAccentCodesToDescriptionsMasterList[languageAccentCode]);
         this.supportedLanguageAccentCodesToDescriptions[
           languageAccentCode] = languageDescription;
       }
     }
+
+    for (let languageAccentCode in
+      this.languageAccentCodesToDescriptionsMasterList) {
+      let languageAccentDescription = (
+        this.languageAccentCodesToDescriptionsMasterList[languageAccentCode]);
+
+      if (!(languageAccentCode in
+        this.supportedLanguageAccentCodesToDescriptions)) {
+        this.availableLanguageAccentCodesToDescriptions[
+          languageAccentCode] = languageAccentDescription;
+      }
+    }
+
+    this.initialLanguageCodes = Object.keys(
+      this.supportedLanguageAccentCodesToDescriptions);
+
+    this.languageAccentCodeIsPresent = (
+      Object.keys(
+        this.supportedLanguageAccentCodesToDescriptions).length !== 0);
   }
 
   addLanguageAccentCodeSupport(languageAccentCodeToAdd: string): void {
     const languageDescription = (
-      this.availableLanguageAccentCodesToDescriptions[languageAccentCodeToAdd]);
+      this.languageAccentCodesToDescriptionsMasterList[
+        languageAccentCodeToAdd]);
     this.supportedLanguageAccentCodesToDescriptions[
       languageAccentCodeToAdd] = languageDescription;
+    delete this.availableLanguageAccentCodesToDescriptions[
+      languageAccentCodeToAdd];
 
     const languageCode = (
       this.languageAccentCodeToLanguageCode[languageAccentCodeToAdd]);
@@ -102,13 +127,30 @@ export class VoiceoverAdminPageComponent implements OnInit {
     }
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
 
-    this.languageAccentListIsModified = true;
+    let languageCodesAfterAddition = Object.keys(
+      this.supportedLanguageAccentCodesToDescriptions);
+    if (
+      JSON.stringify(this.initialLanguageCodes.sort()) !==
+      JSON.stringify(languageCodesAfterAddition.sort())
+    ) {
+      this.languageAccentListIsModified = true;
+    } else {
+      this.languageAccentListIsModified = false;
+    }
+
+    this.languageAccentCodeIsPresent = (
+      Object.keys(
+        this.supportedLanguageAccentCodesToDescriptions).length !== 0);
     this.removeLanguageAccentDropdown();
   }
 
   removeLanguageAccentCodeSupport(languageAccentCodeToRemove: string): void {
     delete this.supportedLanguageAccentCodesToDescriptions[
       languageAccentCodeToRemove];
+    this.availableLanguageAccentCodesToDescriptions[
+      languageAccentCodeToRemove] = (
+      this.languageAccentCodesToDescriptionsMasterList[
+        languageAccentCodeToRemove]);
 
     const languageCode = (
       this.languageAccentCodeToLanguageCode[languageAccentCodeToRemove]);
@@ -118,14 +160,30 @@ export class VoiceoverAdminPageComponent implements OnInit {
       delete this.languageCodesMapping[languageCode];
     }
 
-    this.languageAccentListIsModified = true;
+    let languageCodesAfterRemoval = Object.keys(
+      this.supportedLanguageAccentCodesToDescriptions);
+    if (
+      JSON.stringify(this.initialLanguageCodes.sort()) !==
+      JSON.stringify(languageCodesAfterRemoval.sort())
+    ) {
+      this.languageAccentListIsModified = true;
+    } else {
+      this.languageAccentListIsModified = false;
+    }
+
+    this.languageAccentCodeIsPresent = (
+      Object.keys(
+        this.supportedLanguageAccentCodesToDescriptions).length !== 0);
   }
 
   saveUpdatedLanguageAccentSupport(): void {
     this.voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync(
       this.languageCodesMapping).then(() => {
       this.languageAccentListIsModified = false;
-    }, () => {});
+      this.initialLanguageCodes = Object.keys(
+        this.supportedLanguageAccentCodesToDescriptions);
+      this.removeLanguageAccentDropdown();
+    });
   }
 
   showLanguageAccentDropdown(): void {

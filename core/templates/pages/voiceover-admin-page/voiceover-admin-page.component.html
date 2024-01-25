@@ -1,79 +1,90 @@
 <mat-card class="oppia-editor-card-with-avatar">
-  <div class="card-content">
-    <div>
-      <h3>Update language/accent pairs available for learners and voice artists</h3>
-    </div>
-    <hr>
+  <mat-accordion>
+    <mat-expansion-panel (opened)="languageAccentPanelOpenState = true"
+                         (closed)="languageAccentPanelOpenState = false">
+      <mat-expansion-panel-header class="oppia-expansion-panel-header">
+        <div>
+          <h3>Update language/accent pairs available for learners and voice artists</h3>
+        </div>
+      </mat-expansion-panel-header>
+      <div class="card-content">
+        <div>
+          <p class="oppia-supported-language-pair-heading"
+             *ngIf="!languageAccentCodeIsPresent">
+            No language/accent pairs added!
+          </p>
+          <p class="oppia-supported-language-pair-heading"
+          *ngIf="languageAccentCodeIsPresent">
+            Supported language/accent pairs
+          </p>
+        </div>
 
-    <div>
-      <p>Supported language/accent pairs</p>
-    </div>
-
-    <div *ngIf="pageIsInitialized">
-      <div>
-        <mat-list>
-          <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
-            <div class="oppia-language-accent-list">
-              <span>
-                {{languageAccentCodeToDescription.value}}
-              </span>
-              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+        <div *ngIf="pageIsInitialized">
+          <div>
+            <mat-list class="oppia-supported-language-list">
+              <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
+                <div class="oppia-language-accent-list">
+                  <span>
+                    {{languageAccentCodeToDescription.value}}
+                  </span>
+                  <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                          mat-icon-button
+                          mat-button>
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </mat-list-item>
+            </mat-list>
+            <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
+              <mat-form-field class="oppia-language-accent-dropdown-selector">
+                <mat-label>Language Accent pair</mat-label>
+                <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+                  <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+                              [value]="languageAccentCodeToDescription.key">
+                    <span>
+                      {{languageAccentCodeToDescription.value}}
+                    </span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button (click)="removeLanguageAccentDropdown()"
                       mat-icon-button
                       mat-button>
                 <mat-icon>close</mat-icon>
               </button>
             </div>
-          </mat-list-item>
-        </mat-list>
-        <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
-          <mat-form-field>
-            <mat-label>Language Accent pair</mat-label>
-            <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
-              <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
-                          [value]="languageAccentCodeToDescription.key">
-                <span>
-                  {{languageAccentCodeToDescription.value}}
-                </span>
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button (click)="removeLanguageAccentDropdown()"
-                  mat-icon-button
-                  mat-button>
-            <mat-icon>close</mat-icon>
-          </button>
+          </div>
+
+          <div class="oppia-first-card-bottom-buttons">
+            <button type="button"
+                    mat-button
+                    (click)="showLanguageAccentDropdown()"
+                    *ngIf="!languageAccentDropdownIsShown"
+                    class="oppia-add-language-accent-button">
+              <mat-icon>add_circle</mat-icon>
+              <span>Add new language accent support</span>
+            </button>
+            <button class="btn oppia-update-button"
+                    (click)="saveUpdatedLanguageAccentSupport()"
+                    mat-button
+                    [disabled]="!languageAccentListIsModified">
+              <span>Update</span>
+            </button>
+          </div>
         </div>
       </div>
-
-      <div class="oppia-first-card-bottom-buttons">
-        <button type="button"
-                mat-button
-                (click)="showLanguageAccentDropdown()"
-                *ngIf="!languageAccentDropdownIsShown">
-          <mat-icon>add_circle</mat-icon>
-          <span>Add new language accent support</span>
-        </button>
-        <button class="btn oppia-update-button"
-                (click)="saveUpdatedLanguageAccentSupport()"
-                mat-button
-                [disabled]="!languageAccentListIsModified">
-          Update
-        </button>
-      </div>
-    </div>
-  </div>
+    </mat-expansion-panel>
+  </mat-accordion>
 </mat-card>
 
 <style>
   .oppia-update-button {
     background-color: #00645c;
-    border: solid 1px #00645c;
     color: #fff;
     margin-right: 30px;
   }
   .oppia-update-button:hover {
     background-color: #00645c;
-    border: solid 1px #00645c;
     color: #fff;
   }
   .oppia-update-button:disabled {
@@ -84,8 +95,7 @@
     padding: 20px
   }
   .oppia-editor-card-with-avatar {
-    margin-bottom: 200px;
-    margin-top: 200px;
+    margin-top: 12%;
   }
   .oppia-language-accent-list {
     align-items: center;
@@ -109,6 +119,23 @@
     justify-content: space-between;
     padding: 0 10px;
     width: -webkit-fill-available;
+  }
+  .oppia-language-accent-dropdown-selector {
+    width: 400px;
+  }
+  .oppia-add-language-accent-button {
+    color: #00645c;
+  }
+  .oppia-supported-language-pair-heading {
+    font-weight: bold;
+    margin-left: 25px;
+  }
+  .oppia-supported-language-list {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+  .oppia-expansion-panel-header {
+    height: 90px;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
