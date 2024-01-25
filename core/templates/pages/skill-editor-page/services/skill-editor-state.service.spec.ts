@@ -476,4 +476,17 @@ describe('Skill editor state service', () => {
 
     expect(successCb).not.toHaveBeenCalled();
   }));
+
+  it('should return prerequisite skill IDs', fakeAsync(() => {
+    skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+
+    const skill = skillEditorStateService.getSkill();
+    spyOn(skill, 'getPrerequisiteSkillIds')
+      .and.returnValue(['prerequisite_id_1', 'prerequisite_id_2']);
+
+    expect(skillEditorStateService.getPrerequisiteSkillIds())
+      .toEqual(['prerequisite_id_1', 'prerequisite_id_2']);
+    expect(skill.getPrerequisiteSkillIds).toHaveBeenCalled();
+  }));
 });

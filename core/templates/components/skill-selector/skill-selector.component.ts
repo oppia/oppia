@@ -24,6 +24,7 @@ import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { UserService } from 'services/user.service';
 
 interface SubTopicFilterDict {
@@ -59,7 +60,8 @@ export class SkillSelectorComponent implements OnInit {
 
   constructor(
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
-    private userService: UserService
+    private userService: UserService,
+    private skillEditorStateService: SkillEditorStateService
   ) {}
 
   ngOnInit(): void {
@@ -199,8 +201,12 @@ export class SkillSelectorComponent implements OnInit {
     });
     let filteredSkills = this.filterForMatchingSubstringPipe
       .transform(skills, searchText);
+    let currentSkill = this.skillEditorStateService.getSkill();
+
+    let activeSkillId = currentSkill ? currentSkill.getId() : null;
     return this.untriagedSkillSummaries.filter(val => {
-      return filteredSkills.includes(val.description);
+      return filteredSkills.includes(val.description) &&
+      val.id !== activeSkillId;
     });
   }
 
