@@ -346,10 +346,10 @@ module.exports = class e2eSuperAdmin extends baseUser {
             for (const option of dropdown.options) {
               if (option.text === difficulty) {
                 return option.value;
-	      }
-	    }
+              }
+            }
             return '';
-	  },
+          },
           difficulty));
 
       await this.page.waitForSelector(
@@ -441,7 +441,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
         { visible: true });
       await this.page.hover(
         '.e2e-test-response-body-default ' +
-        '.e2e-test-open-outcome-feedback-editor')
+        '.e2e-test-open-outcome-feedback-editor');
       await this.page.click(
         '.e2e-test-response-body-default ' +
         '.e2e-test-open-outcome-feedback-editor');
