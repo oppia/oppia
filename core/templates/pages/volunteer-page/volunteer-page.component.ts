@@ -198,7 +198,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'way and it is broken down in a language they understand. Also, ' +
             'no matter how good a product is, people will not know it ' +
             'without effective marketing.'),
-          name: 'Yiga',
+          name: 'Yiga Ikpae',
           type: 'Marketing team'
         },
         {
