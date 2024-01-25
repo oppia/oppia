@@ -177,7 +177,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'I believe education is the route to social upliftment ' +
             'and progress. At Oppia, I get to be a part of this' +
             'movement to provide free and accessible education for all.'),
-          name: 'Jay',
+          name: 'Jay Vivarekar',
           type: 'Web Developer'
         }
       ]
@@ -206,7 +206,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'Oppia\'s mission and values inspire me daily. I volunteer ' +
             'because everyone deserves an education and helping to market ' +
             'this opportunity is a privilege'),
-          name: 'Jennifer',
+          name: 'Jennifer Nunez',
           type: 'Marketing team'
         },
         {
@@ -216,7 +216,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'education but also fosters a sense of community and inspiration,' +
             'encouraging more individuals to engage with Oppia\'s ' +
             'educational resources.'),
-          name: 'Erio',
+          name: 'Erio Crucecia',
           type: 'Video creation team'
         },
         {
@@ -300,7 +300,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'gift of education, you are giving happiness and smiles on ' +
             'faces, and that is the biggest gift…and YES, as a volunteer I ' +
             'am playing my part and helping kids all over the world.'),
-          name: 'Kanupriya Goel',
+          name: 'Kanupriya Gupta',
           type: 'Hindi Translator'
         },
         {
@@ -319,7 +319,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'it\'s a passion. Contributing to Oppia affords to extend this ' +
             'impact to the lives of many more children, and I am' +
             'truly grateful for the privilege.'),
-          name: 'Pretty',
+          name: 'Pretty Agu',
           type: 'Translations coordinator'
         },
         {
