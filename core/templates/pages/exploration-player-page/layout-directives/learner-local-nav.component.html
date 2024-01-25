@@ -5,12 +5,12 @@
   <li class="nav-item">
     <span tabindex="0"
           class="nav-link"
-          ngbTooltip="Share"
+          ngbTooltip="{{ 'I18N_PLAYER_SHARE_TOOLTIP' | translate }}"
           placement="bottom"
           (click)="toggleAttributionModal()"
           (keydown.enter)="toggleAttributionModal()">
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
-      <span class="oppia-icon-accessibility-label">Share</span>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_SHARE_TOOLTIP' | translate }}</span>
     </span>
   </li>
   <li *ngIf="feedbackOptionIsShown"
@@ -57,8 +57,8 @@
   <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
     <span ngbDropdownItem tabindex="0" placement="bottom" (click)="toggleAttributionModal()" (keydown.enter)="toggleAttributionModal()" class="custom-dropdown-item">
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
-      <b class="icon-text">Share</b>
-      <span class="oppia-icon-accessibility-label">Share</span>
+      <b class="icon-text">{{ 'I18N_PLAYER_SHARE_TOOLTIP' | translate }}</b>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_SHARE_TOOLTIP' | translate }}</span>
     </span>
     <span ngbDropdownItem *ngIf="feedbackOptionIsShown" tabindex="0" ngbPopover="popContent" triggers="manual" (click)="togglePopover()" (keydown.enter)="togglePopover()" #feedbackPopOver="ngbPopover" [autoClose]="false" class="custom-dropdown-item">
       <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
