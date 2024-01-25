@@ -127,10 +127,6 @@ export class LearnerLocalNavComponent implements OnInit {
     });
   }
 
-  closePopover(): void {
-    this.feedbackPopOver.close();
-  }
-
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }

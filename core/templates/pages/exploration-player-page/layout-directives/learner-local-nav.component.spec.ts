@@ -197,6 +197,18 @@ describe('Learner Local Nav Component ', () => {
         size: 'lg' });
   });
 
+  it('should toggle the dropdown state when toggleDropdown is called', () => {
+    expect(component.isDropdownOpen).toBeFalse();
+
+    component.toggleDropdown();
+
+    expect(component.isDropdownOpen).toBeTrue();
+
+    component.toggleDropdown();
+
+    expect(component.isDropdownOpen).toBeFalse();
+  });
+
   it('should hide attribution modal', () => {
     spyOn(attributionService, 'isAttributionModalShown').and.returnValue(true);
     const hideModalSpy = spyOn(
