@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -41,9 +41,11 @@ import { OpportunitiesListComponent } from '../opportunities-list/opportunities-
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 export interface Suggestion {
-  change: {
+  change_cmd: {
     skill_id: string;
     content_html: string;
     translation_html: string | string[];
@@ -66,6 +68,7 @@ export interface ContributionsSummary {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
 }
 
 export interface Opportunity {
@@ -101,6 +104,10 @@ export interface TabDetails {
   tabSubType: string;
   text: string;
   enabled: boolean;
+}
+
+export interface CustomMatSnackBarRef {
+  onAction: () => Observable<void>;
 }
 
 @Component({
@@ -144,6 +151,8 @@ export class ContributionsAndReview
     };
   };
 
+  opportunities: ExplorationOpportunitySummary[] = [];
+
   /**
    * The feature flag state to gate the contributor_dashboard_accomplishments.
    * @type {boolean} - contributor_dashboard_accomplishments - A boolean value.
@@ -181,7 +190,8 @@ export class ContributionsAndReview
     private userService: UserService,
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
-    private htmlEscaperService: HtmlEscaperService
+    private htmlEscaperService: HtmlEscaperService,
+    private snackBar: MatSnackBar,
   ) {}
 
   getQuestionContributionsSummary(
@@ -202,7 +212,7 @@ export class ContributionsAndReview
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          suggestion.change.question_dict.question_state_data.content.html),
+          suggestion.change_cmd.question_dict.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -250,7 +260,7 @@ export class ContributionsAndReview
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
             this.htmlLengthService.computeHtmlLengthInWords(
-              suggestion.change.content_html)) : undefined
+              suggestion.change_cmd.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -259,7 +269,7 @@ export class ContributionsAndReview
   }
 
   getTranslationSuggestionHeading(suggestion: Suggestion): string {
-    const changeTranslation = suggestion.change.translation_html;
+    const changeTranslation = suggestion.change_cmd.translation_html;
 
     return this.htmlEscaperService.escapedStrToUnescapedStr(
       this.formatRtePreviewPipe.transform(
@@ -284,7 +294,7 @@ export class ContributionsAndReview
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion = (
       question || this.questionObjectFactory.createFromBackendDict(
-        suggestion.change.question_dict));
+        suggestion.change_cmd.question_dict));
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent, {
@@ -382,7 +392,7 @@ export class ContributionsAndReview
       var contribution = this.contributions[suggestionId];
       suggestionIdToContribution[suggestionId] = contribution;
     }
-    const skillId = suggestion.change.skill_id;
+    const skillId = suggestion.change_cmd.skill_id;
 
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
@@ -448,9 +458,9 @@ export class ContributionsAndReview
       tabType, subType);
 
     this.activeTabSubtype = subType;
+    this.contributionAndReviewService.setActiveTabType(tabType);
+    this.contributionAndReviewService.setActiveSuggestionType(subType);
     if (!this.isAccomplishmentsTabActive()) {
-      this.contributionAndReviewService.setActiveTabType(tabType);
-      this.contributionAndReviewService.setActiveSuggestionType(subType);
       this.activeExplorationId = null;
       this.contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.emit();
@@ -474,15 +484,51 @@ export class ContributionsAndReview
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
+            isPinned: opportunity.isPinned,
+            topicName: opportunity.topicName
           };
           opportunitiesDicts.push(opportunityDict);
         });
-
+        this.opportunities = opportunitiesDicts;
         return {
           opportunitiesDicts: opportunitiesDicts,
           more: response.more
         };
       });
+  }
+
+  pinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    const topicName = dict.topic_name;
+    const explorationId = dict.exploration_id;
+    const existingPinnedOpportunity = Object.values(this.opportunities).find(
+      (opportunity: {
+        topicName: string;
+        isPinned: boolean;
+      }) => (
+        opportunity.topicName === topicName && opportunity.isPinned)
+    );
+
+    if (existingPinnedOpportunity) {
+      this.openSnackbarWithAction(
+        topicName, explorationId,
+        'A pinned opportunity already exists for this topic and language.',
+        'Pin Anyway'
+      );
+    } else {
+      this.contributionOpportunitiesService.
+        pinReviewableTranslationOpportunityAsync(
+          topicName, this.languageCode, explorationId);
+    }
+  }
+
+  unpinReviewableTranslationOpportunity(
+      dict: Record<string, string>
+  ): void {
+    this.contributionOpportunitiesService.
+      unpinReviewableTranslationOpportunityAsync(
+        dict.topic_name, this.languageCode, dict.exploration_id);
   }
 
   onClickReviewableTranslations(explorationId: string): void {
@@ -703,6 +749,35 @@ export class ContributionsAndReview
     };
 
     $(document).on('click', this.closeDropdownWhenClickedOutside);
+  }
+
+  openSnackbarWithAction(
+      topicName: string,
+      explorationId: string,
+      message: string,
+      actionText: string
+  ): void {
+    const snackBarRef: CustomMatSnackBarRef = this.snackBar.open(
+      message, actionText, {
+        duration: 3000,
+      });
+
+    this.handleSnackbarAction(snackBarRef, topicName, explorationId);
+  }
+
+  private handleSnackbarAction(
+      snackBarRef: CustomMatSnackBarRef,
+      topicName: string,
+      explorationId: string
+  ): void {
+    snackBarRef.onAction().subscribe(() => {
+      this.contributionOpportunitiesService
+        .pinReviewableTranslationOpportunityAsync(
+          topicName,
+          this.languageCode,
+          explorationId
+        );
+    });
   }
 
   onChangeLanguage(languageCode: string): void {

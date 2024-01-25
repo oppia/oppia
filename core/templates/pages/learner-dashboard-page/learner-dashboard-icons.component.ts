@@ -143,9 +143,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
     return false;
   }
 
-  addToLearnerPlaylist(activityId: string, activityType: string): void {
+  async addToLearnerPlaylist(
+      activityId: string, activityType: string): Promise<void> {
     var isSuccessfullyAdded = (
-      this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
+      await this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
     if (isSuccessfullyAdded) {
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
@@ -172,7 +173,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
     // injector used is the root injector and not the page module injector.
     // The entry components specified in page module won't be available when
     // we use the root injector.
-    // TODO(14290): Find a better way to refactor code that opens modals
+    // TODO(#14290): Find a better way to refactor code that opens modals
     // into new services that use the page specific injector rather than
     // the root injector.
     const modelRef = this.ngbModal.open(

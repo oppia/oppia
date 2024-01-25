@@ -23,7 +23,6 @@ import hashlib
 import imghdr
 import itertools
 import logging
-import re
 import urllib
 
 from core import feconf
@@ -41,7 +40,8 @@ from core.platform import models
 import requests
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, overload)
+    Dict, Final, List, Literal, Optional, Sequence, TypedDict,
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -351,18 +351,6 @@ def get_users_settings(
     return result
 
 
-def generate_initial_profile_picture(user_id: str) -> None:
-    """Generates a profile picture for a new user and
-    updates the user's settings in the datastore.
-
-    Args:
-        user_id: str. The unique ID of the user.
-    """
-    user_email = get_email_from_user_id(user_id)
-    user_gravatar = fetch_gravatar(user_email)
-    update_profile_picture_data_url(user_id, user_gravatar)
-
-
 def get_gravatar_url(email: str) -> str:
     """Returns the gravatar url for the specified email.
 
@@ -378,19 +366,19 @@ def get_gravatar_url(email: str) -> str:
         (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
-def fetch_gravatar(email: str) -> str:
+def fetch_gravatar(user_email: str) -> str:
     """Returns the gravatar corresponding to the user's email, or an
     identicon generated from the email if the gravatar doesn't exist.
 
     Args:
-        email: str. The user email.
+        user_email: str. The user email.
 
     Returns:
         str. The gravatar url corresponding to the given user email. If the call
         to the gravatar service fails, this returns DEFAULT_IDENTICON_DATA_URL
         and logs an error.
     """
-    gravatar_url = get_gravatar_url(email)
+    gravatar_url = get_gravatar_url(user_email)
     try:
         response = requests.get(
             gravatar_url, headers={b'Content-Type': b'image/png'},
@@ -1407,16 +1395,14 @@ def record_agreement_to_terms(user_id: str) -> None:
 
 
 def update_profile_picture_data_url(
-    user_id: str, profile_picture_data_url: str
+    username: str, profile_picture_data_url: str
 ) -> None:
-    """Updates profile_picture_data_url of user with given user_id.
+    """Updates profile_picture_data_url of user with given username.
 
     Args:
-        user_id: str. The unique ID of the user.
+        username: str. The username of the user.
         profile_picture_data_url: str. New profile picture url to be set.
     """
-    user_settings = get_user_settings(user_id, strict=True)
-    username = user_settings.username
     # Ruling out the possibility of different types for mypy type checking.
     assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
@@ -1428,145 +1414,6 @@ def update_profile_picture_data_url(
     webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
     filename_webp = 'profile_picture.webp'
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
-
-
-def update_user_bio(user_id: str, user_bio: str) -> None:
-    """Updates user_bio of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        user_bio: str. New user biography to be set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.user_bio = user_bio
-    save_user_settings(user_settings)
-
-
-def update_user_default_dashboard(
-    user_id: str, default_dashboard: str
-) -> None:
-    """Updates the default dashboard of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        default_dashboard: str. The dashboard the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.default_dashboard = default_dashboard
-    save_user_settings(user_settings)
-
-
-def update_user_creator_dashboard_display(
-    user_id: str, creator_dashboard_display_pref: str
-) -> None:
-    """Updates the creator dashboard preference of user with given user id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        creator_dashboard_display_pref: str. The creator dashboard preference
-            the user wants.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.creator_dashboard_display_pref = (
-        creator_dashboard_display_pref)
-    save_user_settings(user_settings)
-
-
-def update_subject_interests(
-    user_id: str, subject_interests: List[str]
-) -> None:
-    """Updates subject_interests of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        subject_interests: list(str). New subject interests to be set.
-    """
-    if not isinstance(subject_interests, list):
-        raise utils.ValidationError('Expected subject_interests to be a list.')
-
-    for interest in subject_interests:
-        if not isinstance(interest, str):
-            raise utils.ValidationError(
-                'Expected each subject interest to be a string.')
-        if not interest:
-            raise utils.ValidationError(
-                'Expected each subject interest to be non-empty.')
-        if not re.match(constants.TAG_REGEX, interest):
-            raise utils.ValidationError(
-                'Expected each subject interest to consist only of '
-                'lowercase alphabetic characters and spaces.')
-
-    if len(set(subject_interests)) != len(subject_interests):
-        raise utils.ValidationError(
-            'Expected each subject interest to be distinct.')
-
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.subject_interests = subject_interests
-    save_user_settings(user_settings)
-
-
-def update_preferred_language_codes(
-    user_id: str, preferred_language_codes: List[str]
-) -> None:
-    """Updates preferred_language_codes of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_language_codes: list(str). New exploration language
-            preferences to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_language_codes = preferred_language_codes
-    save_user_settings(user_settings)
-
-
-def update_preferred_site_language_code(
-    user_id: str, preferred_site_language_code: str
-) -> None:
-    """Updates preferred_site_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_site_language_code: str. New system language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_site_language_code = (
-        preferred_site_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_audio_language_code(
-    user_id: str, preferred_audio_language_code: str
-) -> None:
-    """Updates preferred_audio_language_code of user with given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_audio_language_code: str. New audio language preference
-            to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_audio_language_code = (
-        preferred_audio_language_code)
-    save_user_settings(user_settings)
-
-
-def update_preferred_translation_language_code(
-    user_id: str, preferred_translation_language_code: str
-) -> None:
-    """Updates preferred_translation_language_code of user with
-    given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        preferred_translation_language_code: str. New text translation
-            language preference to set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    user_settings.preferred_translation_language_code = (
-        preferred_translation_language_code)
-    save_user_settings(user_settings)
 
 
 def add_user_role(user_id: str, role: str) -> None:
@@ -1744,21 +1591,23 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_mailing_list(email: str, name: str, tag: str) -> bool:
+def add_user_to_mailing_list(
+    email: str,
+    tag: str,
+    name: Optional[str]=None
+) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
     Args:
         email: str. Email of the user.
-        name: str. Name of the user.
         tag: str. Tag for the mailing list.
+        name: str or None. Name of the user, or None if no name was supplied.
 
     Returns:
         bool. Whether the operation was successful or not.
     """
-    merge_fields = {
-        'NAME': name
-    }
+    merge_fields = {'NAME': name} if name is not None else {}
     return bulk_email_services.add_or_update_user_status(
         email, merge_fields, tag, can_receive_email_updates=True)
 

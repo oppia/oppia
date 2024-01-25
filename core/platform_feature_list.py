@@ -45,7 +45,8 @@ ParamNames = params.ParamNames
 DEV_FEATURES_LIST = [
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    params.ParamNames.SHOW_TRANSLATION_SIZE
+    params.ParamNames.SHOW_TRANSLATION_SIZE,
+    params.ParamNames.NEW_LESSON_PLAYER
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -53,6 +54,7 @@ DEV_FEATURES_LIST = [
 TEST_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
 ]
 
@@ -63,7 +65,6 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.END_CHAPTER_CELEBRATION,
     params.ParamNames.CHECKPOINT_CELEBRATION,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    params.ParamNames.DIAGNOSTIC_TEST,
     params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
 ]

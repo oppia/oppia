@@ -17,17 +17,16 @@
  */
 
 import {
-  PlaythroughIssueBackendDict,
-  PlaythroughIssueModel,
-  EarlyQuitPlaythroughIssue,
-  PlaythroughIssueType
+  PlaythroughIssue,
+  PlaythroughIssueType,
+  PlaythroughIssueBackendDict
 } from 'domain/statistics/playthrough-issue.model';
 
-describe('Playthrough Issue Object Factory', () => {
-  let playthroughIssueObject: EarlyQuitPlaythroughIssue;
+describe('Playthrough Issue Model Class', () => {
+  let playthroughIssueObject: PlaythroughIssue;
 
   it('should create a new exploration issue', () => {
-    playthroughIssueObject = new EarlyQuitPlaythroughIssue(
+    playthroughIssueObject = new PlaythroughIssue(
       PlaythroughIssueType.EarlyQuit, {
         state_name: {
           value: 'state'
@@ -54,7 +53,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should create a new exploration issue from a backend dict', () => {
-    const playthroughIssueObject = PlaythroughIssueModel.createFromBackendDict({
+    const playthroughIssueObject = PlaythroughIssue.createFromBackendDict({
       issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
@@ -99,7 +98,7 @@ describe('Playthrough Issue Object Factory', () => {
       schema_version: 1,
       is_valid: true
     };
-    const playthroughIssueObject = PlaythroughIssueModel
+    const playthroughIssueObject = PlaythroughIssue
       .createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
@@ -127,14 +126,14 @@ describe('Playthrough Issue Object Factory', () => {
       // 'playthroughDict' has an invalid value of 'issue_type' property. We
       // need to do that in order to test validations.
       // @ts-expect-error
-      PlaythroughIssueModel.createFromBackendDict(playthroughDict);
+      PlaythroughIssue.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
   });
 
   it('should return the state in which the issue appears', () => {
-    let eqPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+    let eqPlaythrough = PlaythroughIssue.createFromBackendDict({
       issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {value: 'state'},
@@ -146,7 +145,7 @@ describe('Playthrough Issue Object Factory', () => {
     });
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
-    let cstPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+    let cstPlaythrough = PlaythroughIssue.createFromBackendDict({
       issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
         state_names: {value: ['state3', 'state1']}
@@ -157,7 +156,7 @@ describe('Playthrough Issue Object Factory', () => {
     });
     expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state1');
 
-    let misPlaythrough = PlaythroughIssueModel.createFromBackendDict({
+    let misPlaythrough = PlaythroughIssue.createFromBackendDict({
       issue_type: PlaythroughIssueType.MultipleIncorrectSubmissions,
       issue_customization_args: {
         state_name: {value: 'state'},

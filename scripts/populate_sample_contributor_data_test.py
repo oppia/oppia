@@ -29,7 +29,6 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
-
 from scripts import populate_sample_contributor_data
 
 import requests
@@ -189,7 +188,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
     def _assert_generate_sample_new_structures_data(self) -> None:
         """Asserts that the sample new structures data is generated."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        self.assertEqual(len(topic_summaries), 2)
+        self.assertEqual(len(topic_summaries), 1)
 
         topic = topic_fetchers.get_topic_by_name('Dummy Topic 1')
         assert topic is not None
@@ -210,7 +209,7 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
                 ],
                 0)
         )
-        self.assertEqual(len(questions), 3)
+        self.assertEqual(len(questions), 5)
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', '', None))
@@ -221,11 +220,16 @@ class SampleDataInitializerTests(test_utils.GenericTestBase):
         classroom_dict = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, classroom_name))
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        for topic_summary in topic_summaries:
+        topic_summary_dicts_from_classroom = classroom_dict[
+            'topic_summary_dicts']
+        for index, topic_summary in enumerate(topic_summaries):
             topic_summary_dict = dict(topic_summary.to_dict())
-            topic_summary_dict['is_published'] = False
-            self.assertIn(
-                topic_summary_dict, classroom_dict['topic_summary_dicts'])
+            topic_summary_dict_from_classroom = (
+                topic_summary_dicts_from_classroom[index])
+            topic_summary_dict['is_published'] = (
+                topic_summary_dict_from_classroom['is_published'])
+            self.assertEqual(
+                topic_summary_dict, topic_summary_dict_from_classroom)
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
         """Asserts that the function _mock_firebase_auth_create_user() is called
