@@ -340,22 +340,24 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-select-rubric-difficulty');
       await this.select(
         '.e2e-test-select-rubric-difficulty',
-        await this.page.evaluate((difficulty) => {
-          const dropdown = document.querySelector(
-            '.e2e-test-select-rubric-difficulty');
-          for (const option of dropdown.options) {
-            if (option.text === difficulty) {
-              return option.value;
-            }
-          }
-          return '';
-        }, difficulty));
+        await this.page.$eval(
+          '.e2e-test-select-rubric-difficulty',
+          (dropdown, difficulty) => {
+            for (const option of dropdown.options) {
+              if (option.text === difficulty) {
+                return option.value;
+	      }
+	    }
+            return '';
+	  },
+          difficulty));
 
       await this.page.waitForSelector(
         `.e2e-test-add-explanation-button-${difficulty}`,
         { visible: true });
-      const noteCount = await this.page.evaluate(() => document.querySelector(
-        'oppia-rubrics-editor > div > div:nth-child(3)').childElementCount);
+      const noteCount = await this.page.$eval(
+        'oppia-rubrics-editor > div > div:nth-child(3)',
+        rubricNotes => rubricNotes.childElementCount);
 
       for (let i = 0; i < rubricNotes.length; i++) {
         await this.clickOn(
@@ -375,38 +377,39 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
     // Save skill changes.
     await this.page.waitForSelector(
-      '.e2e-test-save-or-publish-skill:enabled',
-      { visible: true });
-    await this.page.waitForTimeout('2000');
-    await this.page.click('.e2e-test-save-or-publish-skill:enabled');
+      '.e2e-test-save-or-publish-skill:enabled');
+    await this.page.click(
+      '.e2e-test-save-or-publish-skill');
     await this.page.waitForSelector(
       '.e2e-test-commit-message-input', { visible: true });
     await this.page.type('.e2e-test-commit-message-input', 'test');
     await this.clickOn('.e2e-test-close-save-modal-button');
     await this.page.waitForSelector(
-      '.e2e-test-save-or-publish-skill:disabled', { visible: true });
+      '.e2e-test-save-or-publish-skill:disabled');
 
     // Create dummy questions under the skill.
-    await this.clickOn('.e2e-test-questions-tab');
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn('.e2e-test-questions-tab')
+    ]);
     for (let i = 0; i < questionCount; i++) {
-      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(
         '.e2e-test-create-question-button', { visible: true });
       await this.page.click('.e2e-test-create-question-button');
       await this.page.waitForSelector(
         '.e2e-test-skill-difficulty-medium', { visible: true });
       await this.page.click('.e2e-test-skill-difficulty-medium');
-      await this.page.waitForNetworkIdle();
 
       await this.clickOn('.e2e-test-edit-content');
-      await this.type(
+      await this.page.waitForSelector(
+        '.e2e-test-state-content-editor .e2e-test-rte',
+        { visible: true });
+      await this.page.type(
         '.e2e-test-state-content-editor .e2e-test-rte',
         'Question created by Skill Owner');
       await this.clickOn('.e2e-test-save-state-content');
 
-      await this.page.waitForSelector(
-        '.e2e-test-open-add-interaction-modal', { visible: true });
-      await this.page.click('.e2e-test-open-add-interaction-modal');
+      await this.clickOn('.e2e-test-open-add-interaction-modal');
       await this.page.waitForSelector(
         '.e2e-test-interaction-tile-TextInput button', { visible: true });
       await this.page.click('.e2e-test-interaction-tile-TextInput button');
@@ -430,13 +433,15 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.page.waitForSelector(
         '.e2e-test-default-response-tab',
         { visible: true });
-      await this.page.waitForTimeout(2000);
+      await this.page.hover('.e2e-test-default-response-tab');
       await this.page.click('.e2e-test-default-response-tab');
       await this.page.waitForSelector(
         '.e2e-test-response-body-default ' +
         '.e2e-test-open-outcome-feedback-editor',
         { visible: true });
-      await this.page.waitForTimeout(2000);
+      await this.page.hover(
+        '.e2e-test-response-body-default ' +
+        '.e2e-test-open-outcome-feedback-editor')
       await this.page.click(
         '.e2e-test-response-body-default ' +
         '.e2e-test-open-outcome-feedback-editor');
@@ -451,18 +456,14 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-mark-non-applicable-misconception-0-0', { visible: true });
       await this.page.click('.e2e-test-mark-non-applicable-misconception-0-0');
 
-      await this.page.waitForSelector(
-        '.e2e-test-oppia-add-hint-button', { visible: true });
       await this.clickOn('.e2e-test-oppia-add-hint-button');
       await this.page.waitForSelector(
         '.e2e-test-hint-text .e2e-test-rte', { visible: true });
       await this.page.type('.e2e-test-hint-text .e2e-test-rte', 'hint text');
       await this.clickOn('.e2e-test-save-hint');
 
-      await this.page.waitForSelector(
-        '.e2e-test-oppia-add-solution-button',
-        { visible: true });
-      await this.page.waitForTimeout(2000);
+      await this.page.waitForSelector('.e2e-test-oppia-add-solution-button');
+      await this.page.hover('.e2e-test-oppia-add-solution-button');
       await this.page.click('.e2e-test-oppia-add-solution-button');
       await this.page.waitForSelector(
         '.modal-dialog .e2e-test-description-box',
@@ -476,10 +477,10 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation');
       await this.clickOn('.e2e-test-submit-solution-button');
 
-      await this.page.waitForSelector(
-        '.e2e-test-save-question-button:enabled', { visible: true });
-      await this.page.waitForTimeout(2000);
+      await this.page.waitForSelector('.e2e-test-save-question-button:enabled');
+      await this.page.waitForTimeout(1000);
       await this.page.click('.e2e-test-save-question-button');
+      await this.page.waitForNetworkIdle();
     }
   }
 };
