@@ -126,7 +126,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'leveraging technology to enhance and enrich the learning ' +
             'experience, making education accessible and engaging for all.”'
           ),
-          name: '- liwei zhang',
+          name: '- Liwei Zhang',
           type: 'Design team'
         },
         {
@@ -193,11 +193,11 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
       caption: [
         {
           content: (
-            'I contribute to Oppia because I believe in its cause. ' +
+            '"I contribute to Oppia because I believe in its cause. ' +
             'Every child can do well at math if they’re taught in the right ' +
             'way and it is broken down in a language they understand. Also, ' +
             'no matter how good a product is, people will not know it ' +
-            'without effective marketing.'),
+            'without effective marketing."'),
           name: '- Yiga',
           type: 'Marketing team'
         },
@@ -235,13 +235,14 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         '/volunteer/profile_images/aanuoluwapo.jpg',
         '/volunteer/profile_images/viksar.jpg',
         '/volunteer/profile_images/jackson.jpg',
+        '/volunteer/profile_images/abha.jpg'
       ],
       caption: [
         {
           content: (
             '“At Oppia, my love for writing stories as a ' +
             'creative intertwines with my passion for ' +
-            'education. “'),
+            'education.“'),
           name: '- Aanuoluwapo Adeoti',
           type: 'Lessons team'
         },
@@ -261,6 +262,15 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'and excited when my team makes progress.“'),
           name: '- Christopher Jackson Felton',
           type: 'Lessons team'
+        },
+        {
+          content: (
+            '“Oppia has provided a platform, through which I can share my ' +
+            'love of Maths with dedicated learners, around the world. I ' +
+            'contribute to Oppia because it helps students learn important ' +
+            'concepts in a fun and interactive way.“'),
+          name: '- Abha Barge',
+          type: 'Lessons team'
         }
       ]
     };
@@ -278,8 +288,8 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
           content: (
             '“I was always told that quality education is only for those who ' +
             'are privileged. But by volunteering at Oppia, I prove every day ' +
-            'hat a decent education is for everyone and I feel grateful to ' +
-            ' be able to help thousands of people worldwide on this journey.“'),
+            'that a decent education is for everyone and I feel grateful to ' +
+            'be able to help thousands of people worldwide on this journey.“'),
           name: '- Giovana Alonso',
           type: 'Brazilian, Portuguese Translator'
         },
