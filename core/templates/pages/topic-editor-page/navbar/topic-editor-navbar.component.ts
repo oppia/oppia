@@ -238,8 +238,7 @@ export class TopicEditorNavbarComponent implements OnInit,
   openTopicViewer(): void {
     this.showNavigationOptions = false;
     let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (
-      !(activeTab === 'subtopic_editor' || activeTab === 'subtopic_preview')) {
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
       if (this.getChangeListLength() > 0) {
         this.alertsService.addInfoMessage(
           'Please save all pending changes to preview the topic ' +
@@ -267,8 +266,7 @@ export class TopicEditorNavbarComponent implements OnInit,
   selectMainTab(): void {
     this.showNavigationOptions = false;
     let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (
-      !(activeTab === 'subtopic_editor' || activeTab === 'subtopic_preview')) {
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
       this.topicEditorRoutingService.navigateToMainTab();
       this.activeTab = 'Editor';
     } else {
