@@ -72,14 +72,14 @@ describe('Practice Question Submitter', function() {
       urlFragment: 'test-topic',
       webTitleFragment: 'Between "topic name |" and "| Oppia"',
       description: 'describe the topic',
-      thumbnail: 'example-topic-thumbnail.svg',
+      thumbnail: testConstants.images.exampleTopicThumbnailImage,
       metaContent: 'test',
       assignedSkills: [skill],
       subtopics: [{
         title: 'Brief & understandable description for subtopic',
         urlFragment: 'test-subtopic',
         description: 'Detailed explanation of subtopic',
-        thumbnail: 'example-topic-thumbnail.svg',
+        thumbnail: testConstants.images.exampleTopicThumbnailImage,
         assignedSkills: [skill]
       }],
       diagnosticTestSkills: [skill],

@@ -375,9 +375,10 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
     // Save skill changes.
     await this.page.waitForSelector(
-      '.e2e-test-save-or-publish-skill:enabled');
-    await this.page.evaluate(() => document.querySelector(
-      '.e2e-test-save-or-publish-skill:enabled').click());
+      '.e2e-test-save-or-publish-skill:enabled',
+      { visible: true });
+    await this.page.waitForTimeout('2000');
+    await this.page.click('.e2e-test-save-or-publish-skill:enabled');
     await this.page.waitForSelector(
       '.e2e-test-commit-message-input', { visible: true });
     await this.page.type('.e2e-test-commit-message-input', 'test');
@@ -426,11 +427,19 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-editor-correctness-toggle');
       await this.clickOn('.e2e-test-add-new-response');
 
-      await this.page.evaluate(() => document.querySelector(
-        '.e2e-test-default-response-tab').click());
-      await this.page.evaluate(() => document.querySelector(
+      await this.page.waitForSelector(
+        '.e2e-test-default-response-tab',
+        { visible: true });
+      await this.page.waitForTimeout(2000);
+      await this.page.click('.e2e-test-default-response-tab');
+      await this.page.waitForSelector(
         '.e2e-test-response-body-default ' +
-        '.e2e-test-open-outcome-feedback-editor').click());
+        '.e2e-test-open-outcome-feedback-editor',
+        { visible: true });
+      await this.page.waitForTimeout(2000);
+      await this.page.click(
+        '.e2e-test-response-body-default ' +
+        '.e2e-test-open-outcome-feedback-editor');
       await this.page.waitForSelector(
         '.e2e-test-response-body-default .e2e-test-rte', { visible: true });
       await this.page.type(
@@ -450,8 +459,11 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.page.type('.e2e-test-hint-text .e2e-test-rte', 'hint text');
       await this.clickOn('.e2e-test-save-hint');
 
-      await this.page.evaluate(() => document.querySelector(
-        '.e2e-test-oppia-add-solution-button').click());
+      await this.page.waitForSelector(
+        '.e2e-test-oppia-add-solution-button',
+        { visible: true });
+      await this.page.waitForTimeout(2000);
+      await this.page.click('.e2e-test-oppia-add-solution-button');
       await this.page.waitForSelector(
         '.modal-dialog .e2e-test-description-box',
         { visible: true });
@@ -464,8 +476,10 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation');
       await this.clickOn('.e2e-test-submit-solution-button');
 
-      await this.page.evaluate(() => document.querySelector(
-        '.e2e-test-save-question-button').click());
+      await this.page.waitForSelector(
+        '.e2e-test-save-question-button:enabled', { visible: true });
+      await this.page.waitForTimeout(2000);
+      await this.page.click('.e2e-test-save-question-button');
     }
   }
 };

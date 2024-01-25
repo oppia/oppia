@@ -38,7 +38,9 @@ let testConstants = {
   },
   images: {
     blogPostThumbnailImage: path.resolve(
-      __dirname, '../images/blog-post-thumbnail.svg')
+      __dirname, '../images/blog-post-thumbnail.svg'),
+    exampleTopicThumbnailImage: path.resolve(
+      __dirname, '../images/example-topic-thumbnail.svg')
   },
   ContributorRights: {
     ReviewTranslation: 'REVIEW_TRANSLATION',
