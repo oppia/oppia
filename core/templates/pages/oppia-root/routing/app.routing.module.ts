@@ -243,7 +243,8 @@ const routes: Route[] = [
         .BLOG_DASHBOARD.ROUTE),
     loadChildren: () => import(
       'pages/blog-dashboard-page/blog-dashboard-page.module')
-      .then(m => m.BlogDashboardPageModule)
+      .then(m => m.BlogDashboardPageModule),
+      canActivate: [IsLoggedInGuard]
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
