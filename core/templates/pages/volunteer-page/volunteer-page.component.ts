@@ -291,7 +291,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'that a decent education is for everyone and I feel grateful to ' +
             'be able to help thousands of people worldwide on this journey.“'),
           name: '- Giovana Alonso',
-          type: 'Brazilian, Portuguese Translator'
+          type: 'Brazilian Portuguese Translator'
         },
         {
           content: (
@@ -311,7 +311,7 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
             'accomplish what many say is impossible. Alone we are nothing, ' +
             'but together we change the world."'),
           name: '- Vanessa Gelinski',
-          type: 'Brazilian, Portuguese Translator'
+          type: 'Brazilian Portuguese Translator'
         },
         {
           content: (
