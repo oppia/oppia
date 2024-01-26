@@ -174,7 +174,7 @@ var ReleaseCoordinatorPage = function() {
       'rolloutPercentage',
       featureFlagElement.$(featureFlagRolloutPercentageInput),
       rolloutPercentage);
-    await this.saveChangeOfFeature(featureElement);
+    await this.saveChangeOfFeature(featureFlagElement);
   };
 
   this.expectRolloutPercentageToMatch = async function(
