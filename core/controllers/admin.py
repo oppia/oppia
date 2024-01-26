@@ -2383,7 +2383,7 @@ class InteractionsByExplorationIdHandler(
         }
     }
 
-    # @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_admin_page
     def get(self) -> None:
         assert self.normalized_request is not None
         exploration_id = self.normalized_request['exp_id']

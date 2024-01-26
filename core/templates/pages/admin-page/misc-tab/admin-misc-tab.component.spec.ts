@@ -643,4 +643,36 @@ describe('Admin misc tab component ', () => {
     expect(component.expVersion).toBe(0);
     expect(component.stateName).toBe('');
   });
+
+  describe('when clicking on the Lookup Exploration Interaction IDs button'
+    , () => {
+      it('should return interaction IDs if the exploration exists'
+        , fakeAsync(() => {
+          let intSpy = spyOn(
+            adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
+            .and.returnValue(Promise.resolve());
+
+          component.retrieveExplorationInteractionIds();
+          tick();
+
+          expect(intSpy).toHaveBeenCalled();
+          expect(statusMessageSpy).toHaveBeenCalledWith(
+            'Successfully fetched interactions in exploration.');
+        }));
+
+      it('should handle the case where the exploration does not exist' +
+      'or empty expIdToGetInteractions field'
+      , fakeAsync(() => {
+        let intSpy = spyOn(
+          adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
+          .and.rejectWith('Exploration does not exist');
+
+        component.retrieveExplorationInteractionIds();
+        tick();
+
+        expect(intSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Exploration does not exist');
+      }));
+    });
 });
