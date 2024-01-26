@@ -3144,7 +3144,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
@@ -3153,7 +3153,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, end_state_name='End')
 
-    def test_interaction_by_exploration_id_handler(self):
+    def test_interaction_by_exploration_id_handler(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         # Test that it returns all interaction ids.
@@ -3167,7 +3167,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(interactions_list), ['EndExploration', 'TextInput'])
 
-    def test_handler_with_invalid_exploration_id_raise_error(self):
+    def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         payload = {
@@ -3179,7 +3179,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(response['error'], 'Exploration does not exist.')
 
-    def test_handler_with_without_exploration_id_in_payload_raise_error(self):
+    def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
         response = self.get_json(
             '/interactionsbyexplorationid', params={},
