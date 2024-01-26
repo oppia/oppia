@@ -55,7 +55,7 @@ class Registry:
             cls.load_feature_flag_config_from_storage(name))
         feature_flag_spec_values = (
             FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE.get(name))
-        
+
         if feature_flag_spec_values is not None:
             feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
                 feature_flag_spec_values[0],
