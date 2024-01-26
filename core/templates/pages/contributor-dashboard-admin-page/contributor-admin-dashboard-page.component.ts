@@ -123,7 +123,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       languageItem => {
         return {
           id: languageItem.id,
-          language: this.rearrangeLanguageName(languageItem.description),
+          language:
+            this.putEnglishLanguageNameAtFront(languageItem.description),
         };
       }
     );
@@ -189,19 +190,11 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       );
   }
 
-  rearrangeLanguageName(language: string): string {
+  putEnglishLanguageNameAtFront(language: string): string {
     // Check if the language contains the expected format 'abc (something)'.
-    if (language.includes('(') && language.includes(')')) {
-      // Split the language into parts using '(' and ')' as separators
-      // filter(Boolean) removes empty strings from the array.
-      let parts = language.split(/[\(\)]/).filter(Boolean);
-      // Check if there are exactly two parts.
-      if (parts.length === 2) {
-        let result = parts[1].trim() + ' (' + parts[0].trim() + ')';
-        return result;
-      }
-    }
-    return language;
+    const pattern = new RegExp(/([\p{L}]+)\s*\(([\p{L}]+)\)/, 'u');
+    const result = language.replace(pattern, '$2 ($1)');
+    return result;
   }
 
   toggleLanguageDropdown(): void {
