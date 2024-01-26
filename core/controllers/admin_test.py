@@ -3138,6 +3138,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.assertEqual(blog_post_count, 0)
         self.logout()
 
+
 class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     """Tests for interaction by exploration handler."""
 
