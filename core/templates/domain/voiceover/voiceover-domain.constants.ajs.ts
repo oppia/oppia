@@ -18,12 +18,13 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { VoiceoverDomainConstants } from './voiceover-domain.constants';
+import { VoiceoverDomainConstants } from
+  'domain/voiceover/voiceover-domain.constants';
 
 angular.module('oppia').constant(
-  'VOICEOVER_ADMIN_DATA_HANDLER',
+  'VOICEOVER_ADMIN_DATA_HANDLER_URL',
   VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL);
 
 angular.module('oppia').constant(
-  'VOICEOVER_LANGUAGE_CODES_MAPPING',
+  'VOICEOVER_LANGUAGE_CODES_MAPPING_URL',
   VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL);

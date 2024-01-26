@@ -21,7 +21,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import voiceover_services
 
-from typing import Dict
+from typing import Dict, TypedDict
 
 
 class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -62,14 +62,25 @@ class VoiceoverAdminDataHandler(
         self.render_json(self.values)
 
 
+class PutLanguageCodesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of VoiceoverLanguageCodesMappingHandler's
+    normalized_request dictionary.
+    """
+
+    language_codes_mapping: Dict[str, Dict[str, bool]]
+
+
 class VoiceoverLanguageCodesMappingHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[
+        PutLanguageCodesHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
 ):
     """Updated the language codes mapping field in the backend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'language_codes_mapping': {
                 'schema': {
@@ -109,5 +120,5 @@ class VoiceoverLanguageCodesMappingHandler(
             self.normalized_payload['language_codes_mapping'])
 
         voiceover_services.save_language_accent_support(
-            language_codes_mapping=language_codes_mapping)
+            language_codes_mapping)
         self.render_json(self.values)

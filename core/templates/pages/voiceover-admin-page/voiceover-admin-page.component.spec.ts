@@ -58,9 +58,13 @@ describe('Voiceover Admin Page component ', () => {
   });
 
   it('should initialize the component', fakeAsync(() => {
-    let languageAccentCodeToDescription = {
-      'en-US': 'English (United State)',
-      'hi-IN': 'Hindi (India)'
+    let languageAccentMasterList = {
+      en: {
+        'en-US': 'English (United State)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)'
+      }
     };
     let languageCodesMapping = {
       en: {
@@ -71,7 +75,7 @@ describe('Voiceover Admin Page component ', () => {
       }
     };
     let voiceoverAdminDataResponse = {
-      languageAccentCodeToDescription: languageAccentCodeToDescription,
+      languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping
     };
     spyOn(
