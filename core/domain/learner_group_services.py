@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import platform_feature_list
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
 from core.domain import platform_feature_services
@@ -283,7 +283,8 @@ def get_matching_learner_group_syllabus_to_add(
         group_story_ids = learner_group_model.story_ids
 
     matching_topic_ids: List[str] = []
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
+    all_classrooms_dict = [classroom.to_dict() for classroom in classrooms]
 
     matching_subtopics_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []

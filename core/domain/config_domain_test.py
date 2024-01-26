@@ -120,26 +120,6 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
                 'Invalid_config_name', strict=True
             )
 
-    def test_get_exception_creating_new_config_property_with_existing_name(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Property with name classroom_pages_data '
-            'already exists'
-        ):
-            config_domain.ConfigProperty(
-                'classroom_pages_data',
-                config_domain.SET_OF_CLASSROOM_DICTS_SCHEMA,
-                'The details for each classroom page.',
-                [{
-                    'name': 'math',
-                    'url_fragment': 'math',
-                    'topic_ids': [],
-                    'course_details': '',
-                    'topic_list_intro': ''
-                }]
-            )
-
     def test_config_property_with_new_config_property_model(self) -> None:
         config_model = config_models.ConfigPropertyModel(
             id='config_model', value='new_value')

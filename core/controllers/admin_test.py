@@ -96,49 +96,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test `/admin` returns a 200 response."""
         self.get_html_response('/admin', expected_status_int=200)
 
-    def test_change_configuration_property(self) -> None:
-        """Test that configuration properties can be changed."""
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [],
-            'course_details': 'Detailed math classroom.',
-            'topic_list_intro': ''
-        }]
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-        self.assertDictContainsSubset({
-            'value': [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }],
-        }, response_config_properties[
-            config_domain.CLASSROOM_PAGES_DATA.name])
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: new_config_value,
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-        self.assertDictContainsSubset({
-            'value': new_config_value,
-        }, response_config_properties[
-            config_domain.CLASSROOM_PAGES_DATA.name])
-
-        self.logout()
-
     def test_cannot_reload_exploration_in_production_mode(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -807,58 +764,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             b'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
             b'Statistics,Welcome',
             response.body)
-
-        self.logout()
-
-    def test_revert_config_property(self) -> None:
-        observed_log_messages = []
-
-        def _mock_logging_function(msg: str, *args: str) -> None:
-            """Mocks logging.info()."""
-            observed_log_messages.append(msg % args)
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': 'Detailed math classroom.',
-                'topic_list_intro': ''
-            }]
-        )
-        self.assertEqual(
-            config_domain.CLASSROOM_PAGES_DATA.value, [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': 'Detailed math classroom.',
-                'topic_list_intro': ''
-            }]
-        )
-
-        with self.swap(logging, 'info', _mock_logging_function):
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'revert_config_property',
-                    'config_property_id': 'classroom_pages_data'
-                }, csrf_token=csrf_token)
-
-        self.assertEqual(
-            config_domain.CLASSROOM_PAGES_DATA.value, [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }]
-        )
-        self.assertEqual(
-            observed_log_messages,
-            ['[ADMIN] %s reverted config property: '
-             'classroom_pages_data' % self.admin_id])
 
         self.logout()
 
@@ -3130,7 +3035,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             'Schema validation for \'blog_post_title\' failed: Received %s '
             'which is not in the allowed range of choices: [\'Leading The '
             'Arabic Translations Team\', \'Education\', \'Blog with different'
-            ' font formatting\']' % invalid_blog_post_title) 
+            ' font formatting\']' % invalid_blog_post_title)
         self.assertEqual(response['error'], error_msg)
         blog_post_count = (
             blog_services.get_total_number_of_published_blog_post_summaries()

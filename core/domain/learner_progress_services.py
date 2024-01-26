@@ -1581,7 +1581,8 @@ def get_all_and_untracked_topic_ids_for_user(
         list(str). The ids of all the topics not tracked for the user.
     """
 
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
+    all_classrooms_dict = [classroom.to_dict() for classroom in classrooms]
     all_topic_ids = []
     for classroom in all_classrooms_dict:
         for topic_id in classroom['topic_ids']:
