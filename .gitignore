@@ -69,3 +69,5 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+# docker container logs and stats
+.dev/containers-health.json

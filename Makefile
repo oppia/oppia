@@ -31,17 +31,16 @@ build: ## Builds the all docker setup.
 
 run-devserver: ## Runs the dev-server
 # Add container label that it hasn't completed first run
-	COMPLETED_FIRST_RUN=0 docker compose up angular-build -d
+	docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
 	docker compose stop angular-build
-	COMPLETED_FIRST_RUN=0 docker compose up dev-server -d --no-deps
+	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
-	$(MAKE) run-offline
+	$(MAKE) start-devserver
 
 run-offline: ## Runs the dev-server in offline mode
-	$(MAKE) check.container-exists
-	$(MAKE) check.dev-server-started-once
+	$(MAKE) check.dev-container-healthy
 	$(MAKE) start-devserver
 
 start-devserver: ## Starts the development server for the tests
@@ -99,6 +98,20 @@ check.container-exists: ## Check if dev-server and angular-build containers exis
 	done; \
 	if [ -n "$$missing" ]; then \
 		echo "Missing containers: $$missing"; \
+		echo $$run_devserver_prompt; \
+		exit 1; \
+	fi
+
+check.dev-container-healthy:
+	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
+	if [ -f ".dev/containers-health.json" ]; then \
+		if jq -e ".devserver != true" ".dev/containers-health.json" > /dev/null; then \
+			echo "Container is unhealthy"; \
+			echo $$run_devserver_prompt; \
+			exit 1; \
+		fi \
+	else \
+		echo "Can't check container health!"; \
 		echo $$run_devserver_prompt; \
 		exit 1; \
 	fi

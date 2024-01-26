@@ -37,8 +37,8 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile.backend
     container_name: oppia-dev-server
-    labels:
-      - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-1}
+    # labels:
+    #   - COMPLETED_FIRST_RUN=${COMPLETED_FIRST_RUN:-1}
     ports:
       - "8181:8181"
       - "8000:8000"
@@ -76,7 +76,7 @@ services:
       - firebase
       - redis
     healthcheck:
-      test: curl -f http://localhost:8181/ || exit 1
+      test: ["CMD", "bash", "docker/dev-server.healthcheck.sh"]
       timeout: 10s
       interval: 30s
       retries: 5
