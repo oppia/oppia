@@ -3179,7 +3179,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(response['error'], 'Exploration does not exist.')
 
-    def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None:
+    def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
         response = self.get_json(
             '/interactionsbyexplorationid', params={},
