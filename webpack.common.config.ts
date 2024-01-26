@@ -522,11 +522,12 @@ module.exports = {
       hybrid: true,
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
+        description: 'The voiceover admin page provides functionalities ' +
+        'for the voiceover admin, allowing them to manage language accent' +
+        ' support for Oppia\'s voiceovers. The Voiceover Admin can use ' +
+        'this page to add new language accent support, remove existing ' +
+        'language accent support, and generate automatic voiceovers ' +
+        'for exploration.'
       },
       template:
         commonPrefix + '/pages/voiceover-admin-page/' +

@@ -50,11 +50,8 @@ class VoiceoverAdminPageTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        language_accent_code_to_description: Dict[str, str] = {}
-        for language_accent_code_mapping in (
-                voiceover_services.get_language_accent_master_list().values()):
-            language_accent_code_to_description.update(
-                language_accent_code_mapping)
+        language_accent_master_list: Dict[str, Dict[str, str]] = (
+            voiceover_services.get_language_accent_master_list())
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
@@ -62,10 +59,72 @@ class VoiceoverAdminPageTests(test_utils.GenericTestBase):
         json_response = self.get_json(feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL)
 
         self.assertDictEqual(
-            json_response['language_accent_code_to_description'],
-            language_accent_code_to_description)
+            json_response['language_accent_master_list'],
+            language_accent_master_list)
         self.assertDictEqual(
             json_response['language_codes_mapping'],
             language_codes_mapping)
+
+        self.logout()
+
+
+class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
+    """The class validates language accent codes mapping field should
+    update correctly.
+    """
+
+    def test_put_language_accent_codes_mapping_correctly(self) -> None:
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        initial_language_codes_mapping: Dict[str, Dict[str, bool]] = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        self.assertDictEqual(
+            initial_language_codes_mapping, {})
+        expected_language_codes_mapping = {
+            'en': {
+                'en-US': True
+            },
+            'hi': {
+                'hi-IN': False
+            }
+        }
+        payload = {
+            'language_codes_mapping': expected_language_codes_mapping
+        }
+
+        self.put_json(
+            feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+            payload, csrf_token=csrf_token)
+
+        language_codes_mapping: Dict[str, Dict[str, bool]] = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        self.assertDictEqual(
+            language_codes_mapping, expected_language_codes_mapping)
+
+        self.logout()
+
+    def test_invalid_language_accent_codes_mapping_raise_error(self) -> None:
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        invalid_language_codes_mapping = {
+            'en': 'en-US'
+        }
+        payload = {
+            'language_codes_mapping': invalid_language_codes_mapping
+        }
+
+        response_dict = self.put_json(
+            feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+            payload, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response_dict['error'],
+            'Schema validation for \'language_codes_mapping\' failed: '
+            'Expected dict, received en-US')
 
         self.logout()

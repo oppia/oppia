@@ -76,7 +76,7 @@ class VoiceoverLanguageCodesMappingHandler(
         Dict[str, str]
     ]
 ):
-    """Updated the language codes mapping field in the backend."""
+    """Updates the language codes mapping field in the backend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
