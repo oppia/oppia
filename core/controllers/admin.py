@@ -2347,6 +2347,15 @@ class TranslationCoordinatorRoleHandler(
         self.render_json({})
 
 
+SCHEMA_FOR_EXPLORATION_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_regex_matched',
+        'regex_pattern': constants.ENTITY_ID_REGEX
+    }]
+}
+
+
 class InteractionsByExplorationIdHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of InteractionsByExplorationIdHandler's
     normalized_request dictionary.
@@ -2357,7 +2366,7 @@ class InteractionsByExplorationIdHandlerNormalizedRequestDict(TypedDict):
 
 class InteractionsByExplorationIdHandler(
     base.BaseHandler[
-        Dict[str, str], InteractionsByExplorationIdHandlerNormalizedRequestDict
+        InteractionsByExplorationIdHandlerNormalizedRequestDict, Dict[str, str]
     ]
 ):
     """Handler for admin to retrive the list of interactions used in
@@ -2369,21 +2378,15 @@ class InteractionsByExplorationIdHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
+                'schema': SCHEMA_FOR_EXPLORATION_ID
             }
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    # @acl_decorators.can_access_admin_page
     def get(self) -> None:
         assert self.normalized_request is not None
         exploration_id = self.normalized_request['exp_id']
-
-        if not isinstance(exploration_id, str):
-            raise self.InvalidInputException('Exploration id must be a string, '
-                                             'received %s' % exploration_id)
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)

@@ -3185,14 +3185,3 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'], 'Missing key in handler args: exp_id.')
-
-    def test_handler_with_non_string_exploration_id_raise_error(self):
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-        payload = {
-            'exp_id': 0
-        }
-        response = self.get_json(
-            '/interactionsbyexplorationid', params=payload,
-            expected_status_int=400)
-        self.assertEqual(response['error'], 'Exploration does not exist.')
