@@ -35,6 +35,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -582,19 +583,50 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_id = 'topic123'
         language_code = 'en'
         opportunity_id = 'opp123'
+        mock_topic = topic_domain.Topic(
+            topic_id='topic123',
+            name='Topic 1',
+            abbreviated_name='abb name',
+            url_fragment='url',
+            description='description',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            version=1,
+            story_reference_schema_version=1,
+            meta_tag_content='tag',
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='dummy',
+            skill_ids_for_diagnostic_test=[],
+            thumbnail_filename='svg',
+            thumbnail_bg_color='green',
+            thumbnail_size_in_bytes=3
+        )
 
-        request_dict = {
-            'topic_id': topic_id,
-            'language_code': language_code,
-            'opportunity_id': opportunity_id
-        }
-        csrf_token = self.get_new_csrf_token()
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
+        with unittest.mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_name',
+            return_value=mock_topic
+        ):
 
-        _ = self.put_json(
-            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-            request_dict,
-            csrf_token=csrf_token,
-            expected_status_int=200)
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id
+            }
+            csrf_token = self.get_new_csrf_token()
+
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=200)
 
     def test_unpin_translation_opportunity(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -602,18 +634,50 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         language_code = 'en'
         opportunity_id = None
 
-        request_dict = {
-            'topic_id': topic_id,
-            'language_code': language_code,
-            'opportunity_id': opportunity_id
-        }
-        csrf_token = self.get_new_csrf_token()
+        mock_topic = topic_domain.Topic(
+            topic_id='topic123',
+            name='Topic 1',
+            abbreviated_name='abb name',
+            url_fragment='url',
+            description='description',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            version=1,
+            story_reference_schema_version=1,
+            meta_tag_content='tag',
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='dummy',
+            skill_ids_for_diagnostic_test=[],
+            thumbnail_filename='svg',
+            thumbnail_bg_color='green',
+            thumbnail_size_in_bytes=3
+        )
 
-        _ = self.put_json(
-            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-            request_dict,
-            csrf_token=csrf_token,
-            expected_status_int=200)
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
+        with unittest.mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_name',
+            return_value=mock_topic
+        ):
+
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id
+            }
+            csrf_token = self.get_new_csrf_token()
+
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=200)
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
