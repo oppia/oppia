@@ -154,10 +154,11 @@ export class CkEditorInitializerService {
                   },
                   function(widgetShouldBeRemoved) {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
-                      const highlighted = customizationArgSpecs
-                        .some(function(spec) {
-                          return spec.default_value_obtainable_from_highlight;
-                        });
+                      const defaultValueObtainableFromHighlight = (
+                        customizationArgSpecs
+                          .some(function(spec) {
+                            return spec.default_value_obtainable_from_highlight;
+                          }));
 
                       that.data.isCopied = false;
                       var newWidgetSelector = (
@@ -172,7 +173,15 @@ export class CkEditorInitializerService {
                         return;
                       }
 
-                      if ((!highlighted && componentIsNewlyCreated) ||
+                      /**
+                       * If the component's default value was not obtained from
+                       * a highlighted text and it is newly created, then simply
+                       * remove the component. Otherwise, load the initial
+                       * snapshot to revert back to the original text. If the
+                       * component is not newly created, simply remove it.
+                      */
+                      if ((!defaultValueObtainableFromHighlight &&
+                           componentIsNewlyCreated) ||
                            !componentIsNewlyCreated) {
                         widgetElement.remove();
                         editor.fire('change');
