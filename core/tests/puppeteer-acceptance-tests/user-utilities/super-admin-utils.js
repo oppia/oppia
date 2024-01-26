@@ -356,15 +356,21 @@ module.exports = class e2eSuperAdmin extends baseUser {
         `.e2e-test-add-explanation-button-${difficulty}`,
         { visible: true });
       const noteCount = await this.page.$eval(
-        'oppia-rubrics-editor > div > div:nth-child(3)',
+        '.e2e-test-rubric-explanation-list',
         rubricNotes => rubricNotes.childElementCount);
 
       for (let i = 0; i < rubricNotes.length; i++) {
-        await this.clickOn(
-          'oppia-rubrics-editor > div > div:nth-child(3) > ' + i < noteCount ?
-            `div:nth-child(${i + 1}) ` +
-              `.e2e-test-edit-rubric-explanation-${difficulty}` :
-            `.e2e-test-add-explanation-button-${difficulty}`);
+        if (i < noteCount) {
+          const editRubricExplanation = (
+            '.e2e-test-rubric-explanation-list > :nth-child(' +
+            `{i + 1}) .e2e-test-edit-rubric-explanation-${difficulty}`);
+          this.page.waitForSelector(editRubricExplanation, { visible: true });
+          this.page.hover(editRubricExplanation);
+          this.page.click(editRubricExplanation);
+        } else {
+          this.clickOn(`.e2e-test-add-explanation-button-${difficulty}`);
+        }
+
         await this.page.waitForSelector(
           '.e2e-test-rubric-explanation-text .e2e-test-rte',
           { visible: true });
@@ -376,10 +382,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }
 
     // Save skill changes.
-    await this.page.waitForSelector(
-      '.e2e-test-save-or-publish-skill:enabled');
-    await this.page.click(
-      '.e2e-test-save-or-publish-skill');
+    await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
     await this.page.waitForSelector(
       '.e2e-test-commit-message-input', { visible: true });
     await this.page.type('.e2e-test-commit-message-input', 'test');
