@@ -634,7 +634,7 @@ export class ExplorationEditorPageComponent
   }
 
   ngAfterViewInit(): void {
-    /** 
+    /**
      * Initialize the router service when the view is initialized
      * to ensure that any subscriptions to the router service are
      * recieved in the editor.
