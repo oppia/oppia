@@ -518,6 +518,12 @@ var ExplorationEditorMainTab = function() {
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
       stateContentDisplay, 'State content display not showing up');
+    // Wait for any text to be present to reduce flakes.
+    await waitFor.condition(
+      stateContentDisplay, async function() {
+        return await action.getText('Elem', stateContentDisplay);
+      }
+    );
     await forms.expectRichText(stateContentDisplay).toMatch(
       richTextInstructions);
   };
