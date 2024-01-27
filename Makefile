@@ -30,7 +30,6 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 run-devserver: ## Runs the dev-server
-# Add container label that it hasn't completed first run
 	docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
@@ -40,10 +39,11 @@ run-devserver: ## Runs the dev-server
 	$(MAKE) start-devserver
 
 run-offline: ## Runs the dev-server in offline mode
+	## Users can pass this check by simply running `make start-devserver`
 	$(MAKE) check.dev-container-healthy
 	$(MAKE) start-devserver
 
-start-devserver: ## Starts the development server for the tests
+start-devserver: ## Starts the development server
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
@@ -86,22 +86,6 @@ update.package: ## Installs the npm requirements for the project
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
 
-check.container-exists: ## Check if dev-server and angular-build containers exists
-	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
-	containers=$$(docker ps -a --format '{{.Names}}'); \
-	required=(oppia-dev-server oppia-angular-build); \
-	missing=; \
-	for c in $${required[@]}; do \
-		if ! echo "$$containers" | grep -qi $$c; then \
-			missing="$$missing $$c"; \
-		fi; \
-	done; \
-	if [ -n "$$missing" ]; then \
-		echo "Missing containers: $$missing"; \
-		echo $$run_devserver_prompt; \
-		exit 1; \
-	fi
-
 check.dev-container-healthy:
 	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
 	if [ -f ".dev/containers-health.json" ]; then \
@@ -113,14 +97,6 @@ check.dev-container-healthy:
 	else \
 		echo "Can't check container health!"; \
 		echo $$run_devserver_prompt; \
-		exit 1; \
-	fi
-
-check.dev-server-started-once: ## Check only for dev-server, as if it's started once, applies angular-build is set properly. No need to check explicitely.
-	@COMPLETED_FIRST_RUN=$$(docker ps --all --format="{{json .}}" | grep COMPLETED_FIRST_RUN | jq -r .Labels | sed -n 's/.*COMPLETED_FIRST_RUN=\([^,]*\).*/\1/p'); \
-	if [ "$$COMPLETED_FIRST_RUN" = "0" ]; then \
-		echo "Can't verify if requirements exists in dev-server container."; \
-		echo "Please run \`make dev-server\` (requires internet) once, before running \`make run-offline\`"; \
 		exit 1; \
 	fi
 
