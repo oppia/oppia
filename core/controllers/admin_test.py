@@ -3156,7 +3156,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     def test_interaction_by_exploration_id_handler(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        # Test that it returns all interaction ids.
         payload = {
             'exp_id': self.EXP_ID
         }
