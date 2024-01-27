@@ -32,7 +32,7 @@ var ReleaseCoordinatorPage = function() {
   var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
-  var featureFlagRolloutPercentageInput = $(
+  var featureFlagRolloutPercentageInput = (
     '.e2e-test-rollout-percentage');
 
   this.get = async function() {
@@ -187,7 +187,7 @@ var ReleaseCoordinatorPage = function() {
       'rolloutPercentage',
       featureFlagElement.$(featureFlagRolloutPercentageInput)
     );
-    expect(value).toMatch(rolloutPercentage);
+    expect(value).toEqual(rolloutPercentage);
   };
 
   this.saveChangeOfFeature = async function(featureElement) {
