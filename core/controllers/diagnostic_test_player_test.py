@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.domain import feature_flag_services
 from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_services
