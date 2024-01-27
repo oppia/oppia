@@ -2347,15 +2347,6 @@ class TranslationCoordinatorRoleHandler(
         self.render_json({})
 
 
-SCHEMA_FOR_EXPLORATION_ID = {
-    'type': 'basestring',
-    'validators': [{
-        'id': 'is_regex_matched',
-        'regex_pattern': constants.ENTITY_ID_REGEX
-    }]
-}
-
-
 class InteractionsByExplorationIdHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of InteractionsByExplorationIdHandler's
     normalized_request dictionary.
@@ -2378,7 +2369,9 @@ class InteractionsByExplorationIdHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'schema': SCHEMA_FOR_EXPLORATION_ID
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
