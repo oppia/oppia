@@ -36,7 +36,6 @@ fi
 curl -f http://localhost:8181/
 STATUS=$?
 
-echo "Run Started!!" >> logs.txt
 if [ $STATUS -eq 0 ]; then
   # Healthy 
   jq '.["devserver"] = true' "$FILE" > /tmp/status.json && mv /tmp/status.json "$FILE"
