@@ -69,11 +69,9 @@ describe('Voiceover Admin Page component ', () => {
     let languageCodesMapping = {
       en: {
         'en-US': true
-      },
-      hi: {
-        'hi-IN': false
       }
     };
+    component.availableLanguageAccentCodesToDescriptions = {};
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping
@@ -86,6 +84,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
     ).not.toHaveBeenCalled();
+    expect(component.pageIsInitialized).toBeFalse();
 
     component.ngOnInit();
     tick();
@@ -93,5 +92,158 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
     ).not.toHaveBeenCalledWith(voiceoverAdminDataResponse);
+    expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
+      {'hi-IN': 'Hindi (India)'});
+    expect(component.pageIsInitialized).toBeTrue();
   }));
+
+  it('should be able to add language accent pair', fakeAsync(() => {
+    component.availableLanguageAccentCodesToDescriptions = {
+      'en-US': 'English (United States)',
+      'hi-IN': 'Hindi (India)'
+    };
+    component.languageAccentCodesToDescriptionsMasterList = {
+      'en-US': 'English (United States)',
+      'hi-IN': 'Hindi (India)'
+    };
+    component.languageAccentCodeToLanguageCode = {
+      'en-US': 'en',
+      'hi-IN': 'hi'
+    };
+    component.languageCodesMapping = {};
+    component.supportedLanguageAccentCodesToDescriptions = {};
+    component.initialLanguageAccentCodes = [];
+    component.languageAccentListIsModified = false;
+
+    component.addLanguageAccentCodeSupport('en-US');
+
+    expect(component.supportedLanguageAccentCodesToDescriptions).toEqual(
+      {'en-US': 'English (United States)'});
+    expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
+      {'hi-IN': 'Hindi (India)'});
+    expect(component.languageAccentListIsModified).toBeTrue();
+  }));
+
+  it(
+    'should disable update button if a language accent code is re-added',
+    fakeAsync(() => {
+      component.availableLanguageAccentCodesToDescriptions = {
+        'hi-IN': 'Hindi (India)'
+      };
+      component.languageAccentCodesToDescriptionsMasterList = {
+        'en-US': 'English (United States)',
+        'hi-IN': 'Hindi (India)'
+      };
+      component.languageAccentCodeToLanguageCode = {
+        'en-US': 'en',
+        'hi-IN': 'hi'
+      };
+      component.languageCodesMapping = {
+        en: {
+          'en-US': 'English (United States)'
+        }
+      };
+      component.supportedLanguageAccentCodesToDescriptions = {
+        'en-US': 'English (United States)'
+      };
+      component.initialLanguageAccentCodes = ['en-US'];
+      component.languageAccentListIsModified = false;
+
+      component.removeLanguageAccentCodeSupport('en-US');
+      component.addLanguageAccentCodeSupport('en-US');
+
+      expect(component.languageAccentListIsModified).toBeFalse();
+    }));
+
+  it('should be able to remove language accent pair', fakeAsync(() => {
+    component.availableLanguageAccentCodesToDescriptions = {
+      'hi-IN': 'Hindi (India)'
+    };
+    component.languageAccentCodesToDescriptionsMasterList = {
+      'en-US': 'English (United States)',
+      'hi-IN': 'Hindi (India)'
+    };
+    component.languageAccentCodeToLanguageCode = {
+      'en-US': 'en',
+      'hi-IN': 'hi'
+    };
+    component.languageCodesMapping = {
+      en: {
+        'en-US': false
+      }
+    };
+    component.supportedLanguageAccentCodesToDescriptions = {
+      'en-US': 'English (United States)'
+    };
+    component.initialLanguageAccentCodes = ['en-US'];
+    component.languageAccentListIsModified = false;
+
+    component.removeLanguageAccentCodeSupport('en-US');
+
+    expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({});
+    expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
+      {'hi-IN': 'Hindi (India)', 'en-US': 'English (United States)'});
+    expect(component.languageAccentListIsModified).toBeTrue();
+  }));
+
+  it(
+    'should disable update button if a language accent code is re-removed',
+    fakeAsync(() => {
+      component.availableLanguageAccentCodesToDescriptions = {
+        'en-US': 'English (United States)',
+        'hi-IN': 'Hindi (India)'
+      };
+      component.languageAccentCodesToDescriptionsMasterList = {
+        'en-US': 'English (United States)',
+        'hi-IN': 'Hindi (India)'
+      };
+      component.languageAccentCodeToLanguageCode = {
+        'en-US': 'en',
+        'hi-IN': 'hi'
+      };
+      component.languageCodesMapping = {};
+      component.supportedLanguageAccentCodesToDescriptions = {};
+      component.initialLanguageAccentCodes = [];
+      component.languageAccentListIsModified = false;
+
+      component.addLanguageAccentCodeSupport('en-US');
+      component.removeLanguageAccentCodeSupport('en-US');
+
+      expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({});
+      expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
+        {'hi-IN': 'Hindi (India)', 'en-US': 'English (United States)'});
+      expect(component.languageAccentListIsModified).toBeFalse();
+    }));
+
+  it(
+    'should be able to save language accent pair after update',
+    fakeAsync(() => {
+      spyOn(
+        voiceoverBackendApiService,
+        'updateVoiceoverLanguageCodesMappingAsync'
+      ).and.returnValue(Promise.resolve());
+
+      component.initialLanguageAccentCodes = [];
+      component.supportedLanguageAccentCodesToDescriptions = {
+        'en-US': 'English (United States)'
+      };
+      component.saveUpdatedLanguageAccentSupport();
+      tick();
+
+      expect(component.initialLanguageAccentCodes).toEqual(['en-US']);
+    }));
+
+  it('should be able to show language accent dropdown', () => {
+    component.languageAccentDropdownIsShown = false;
+    component.showLanguageAccentDropdown();
+
+    expect(component.languageAccentDropdownIsShown).toBeTrue();
+  });
+
+  it('should be able to remove language accent dropdown', () => {
+    component.languageAccentDropdownIsShown = true;
+    component.removeLanguageAccentDropdown();
+
+    expect(component.languageAccentDropdownIsShown).toBeFalse();
+  });
 });

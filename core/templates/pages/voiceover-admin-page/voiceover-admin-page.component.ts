@@ -45,7 +45,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   pageIsInitialized: boolean = false;
   languageAccentListIsModified: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
-  initialLanguageCodes: string[] = [];
+  initialLanguageAccentCodes: string[] = [];
   languageAccentPanelOpenState: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
 
@@ -103,7 +103,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       }
     }
 
-    this.initialLanguageCodes = Object.keys(
+    this.initialLanguageAccentCodes = Object.keys(
       this.supportedLanguageAccentCodesToDescriptions);
 
     this.languageAccentCodeIsPresent = (
@@ -127,11 +127,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
     }
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
 
-    let languageCodesAfterAddition = Object.keys(
+    let languageAccentCodesAfterAddition = Object.keys(
       this.supportedLanguageAccentCodesToDescriptions);
     if (
-      JSON.stringify(this.initialLanguageCodes.sort()) !==
-      JSON.stringify(languageCodesAfterAddition.sort())
+      JSON.stringify(this.initialLanguageAccentCodes.sort()) !==
+      JSON.stringify(languageAccentCodesAfterAddition.sort())
     ) {
       this.languageAccentListIsModified = true;
     } else {
@@ -160,11 +160,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
       delete this.languageCodesMapping[languageCode];
     }
 
-    let languageCodesAfterRemoval = Object.keys(
+    let languageAccentCodesAfterRemoval = Object.keys(
       this.supportedLanguageAccentCodesToDescriptions);
     if (
-      JSON.stringify(this.initialLanguageCodes.sort()) !==
-      JSON.stringify(languageCodesAfterRemoval.sort())
+      JSON.stringify(this.initialLanguageAccentCodes.sort()) !==
+      JSON.stringify(languageAccentCodesAfterRemoval.sort())
     ) {
       this.languageAccentListIsModified = true;
     } else {
@@ -180,7 +180,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync(
       this.languageCodesMapping).then(() => {
       this.languageAccentListIsModified = false;
-      this.initialLanguageCodes = Object.keys(
+      this.initialLanguageAccentCodes = Object.keys(
         this.supportedLanguageAccentCodesToDescriptions);
       this.removeLanguageAccentDropdown();
     });
