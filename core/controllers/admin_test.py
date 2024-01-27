@@ -21,7 +21,6 @@ import enum
 import logging
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -34,6 +33,7 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
@@ -902,8 +902,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 platform_parameter_domain.DataTypes.BOOL)
         )
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
@@ -937,8 +937,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
             [ParamNames.TEST_PARAMETER_1]
         ):
             self.post_json(
@@ -985,8 +985,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
@@ -1029,8 +1029,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
             [ParamNames.TEST_PARAMETER_1]
         ):
             response = self.post_json(

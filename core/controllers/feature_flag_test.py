@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import enum
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
@@ -139,7 +139,7 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         feature_services.update_feature_flag(
-            platform_feature_list.FeatureNames.
+            feature_flag_list.FeatureNames.
             DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             False,
             0,
@@ -152,7 +152,7 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
         self, feature_is_enabled: bool) -> None:
         """Sets the dummy_feature feature flag value."""
         feature_services.update_feature_flag(
-            platform_feature_list.FeatureNames.
+            feature_flag_list.FeatureNames.
             DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value,
             feature_is_enabled,
             0,

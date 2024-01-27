@@ -22,10 +22,10 @@ import collections
 import enum
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_list
 from core.tests import test_utils
 
 from typing import Dict, Final, List, Optional, Union
@@ -34,8 +34,8 @@ ServerMode = parameter_domain.ServerMode
 
 
 class DummyParamNames(enum.Enum):
-    """Test class to mock platform_feature_services.
-    ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+    """Test class to mock platform_parameter_list.
+    ALL_PLATFORM_PARAMS_LIST
     """
 
     PARAMETER_A = 'parameter_a'
@@ -2127,8 +2127,8 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'feature_stage': 'dev',
         })
         swap_platform_params_list = self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
             [DummyParamNames.PARAMETER_A]
         )
         with swap_platform_params_list, self.assertRaisesRegex(

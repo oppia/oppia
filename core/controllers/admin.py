@@ -39,7 +39,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_services as parameter_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
@@ -332,8 +332,8 @@ class AdminHandler(
             summary.to_dict() for summary in topic_summaries]
 
         platform_params_dicts = (
-            feature_services.
-            get_all_platform_parameters_except_feature_flag_dicts()
+            parameter_services.
+            get_all_platform_parameters_dicts()
         )
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
@@ -554,7 +554,7 @@ class AdminHandler(
                     )
                 except (
                     utils.ValidationError,
-                    feature_services.PlatformParameterNotFoundException
+                    parameter_services.PlatformParameterNotFoundException
                 ) as e:
                     raise self.InvalidInputException(e)
 

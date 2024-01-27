@@ -23,10 +23,10 @@ import json
 import re
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+from core.domain import platform_parameter_list
 
 from typing import (
     Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
@@ -793,8 +793,8 @@ class PlatformParameter:
 
         all_platform_params_names = [
             param.value
-            for param in platform_feature_list.
-            ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+            for param in platform_parameter_list.
+            ALL_PLATFORM_PARAMS_LIST
         ]
         if (
             self._feature_stage is not None and
