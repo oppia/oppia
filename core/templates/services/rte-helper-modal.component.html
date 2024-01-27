@@ -24,29 +24,42 @@
   </div>
 
   <div class="modal-footer">
-    <input type="submit"
-           class="btn btn-danger e2e-test-delete-button"
-           value="Delete"
-           *ngIf="!defaultRTEComponent"
-           (click)="delete()">
-    <input class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
-           value="Cancel"
-           (click)="cancel()">
-    <input *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-           value="Done"
-           (click)="save()"
-           [disabled]="!customizationArgsForm.valid">
-    <input *ngIf="currentRteIsLinkEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-           value="Done"
-           (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
-    <input *ngIf="currentRteIsMathExpressionEditor"
-           class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-           value="Done"
-           (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
+    <button type="button"
+            class="btn btn-danger e2e-test-delete-button"
+            *ngIf="!defaultRTEComponent"
+            (click)="delete()">
+            Delete
+    </button>
+
+    <button type="button"
+            class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
+            (click)="cancel()">
+            Cancel
+    </button>
+
+    <button *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
+            type="button"
+            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
+            (click)="save()"
+            [disabled]="!customizationArgsForm.valid">
+            Done
+    </button>
+
+    <button *ngIf="currentRteIsLinkEditor"
+            type="button"
+            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
+            (click)="save()"
+            [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
+            Done
+    </button>
+
+    <button *ngIf="currentRteIsMathExpressionEditor"
+            type="button"
+            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
+            (click)="save()"
+            [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
+            Done
+    </button>
   </div>
 </div>
 <style>
