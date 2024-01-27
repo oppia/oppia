@@ -175,14 +175,12 @@ export class CkEditorInitializerService {
 
                       /**
                        * If the component's default value was not obtained from
-                       * a highlighted text and it is newly created, then simply
-                       * remove the component. Otherwise, load the initial
-                       * snapshot to revert back to the original text. If the
-                       * component is not newly created, simply remove it.
+                       * a highlighted text or was not newly created, then
+                       * simply remove the component. Otherwise, load the
+                       * initial snapshot to revert back to the original text.
                       */
-                      if ((!defaultValueObtainableFromHighlight &&
-                           componentIsNewlyCreated) ||
-                           !componentIsNewlyCreated) {
+                      if (!defaultValueObtainableFromHighlight ||
+                          !componentIsNewlyCreated) {
                         widgetElement.remove();
                         editor.fire('change');
                       } else {
