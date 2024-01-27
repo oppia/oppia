@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import feature_flag_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
@@ -64,16 +65,11 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
-        feature_services.update_feature_flag(
+        feature_flag_services.update_feature_flag(
             platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
-            self.owner_id,
-            'test update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [],
-                    'value_when_matched': True
-                })
-            ]
+            True,
+            0,
+            []
         )
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,

@@ -34,6 +34,7 @@ from core.domain import classroom_config_services
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
@@ -3325,26 +3326,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self
     ) -> None:
-        feature_services.update_feature_flag(
+        feature_flag_services.update_feature_flag(
             platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            self.owner_id, 'flag update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain
-                                    .ALLOWED_PLATFORM_TYPES[0]
-                                ]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ]
+            True,
+            0,
+            []
         )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
