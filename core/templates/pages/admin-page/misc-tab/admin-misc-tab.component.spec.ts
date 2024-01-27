@@ -648,16 +648,19 @@ describe('Admin misc tab component ', () => {
     , () => {
       it('should return interaction IDs if the exploration exists'
         , fakeAsync(() => {
-          let intSpy = spyOn(
+          let interactionSpy = spyOn(
             adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
-            .and.returnValue(Promise.resolve());
+            .and.returnValue(Promise.resolve(
+              { interactions: ['EndExploration'] }));
 
           component.retrieveExplorationInteractionIds();
           tick();
 
-          expect(intSpy).toHaveBeenCalled();
+          expect(interactionSpy).toHaveBeenCalled();
           expect(statusMessageSpy).toHaveBeenCalledWith(
             'Successfully fetched interactions in exploration.');
+          expect(component.explorationInteractionIds)
+            .toEqual(['EndExploration']);
         }));
 
       it('should handle the case where the exploration does not exist' +
@@ -673,6 +676,7 @@ describe('Admin misc tab component ', () => {
         expect(intSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'Server error: Exploration does not exist');
+        expect(component.explorationInteractionIds).toEqual([]);
       }));
     });
 });

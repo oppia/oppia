@@ -294,7 +294,7 @@ export class AdminMiscTabComponent {
       .then(response => {
         this.setStatusMessage.emit(
           'Successfully fetched interactions in exploration.');
-        this.explorationInteractionIds = response?.interactions;
+        this.explorationInteractionIds = response.interactions;
       }, errorResponse => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse);
