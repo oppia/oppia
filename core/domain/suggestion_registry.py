@@ -31,7 +31,7 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
@@ -1400,7 +1400,7 @@ class CommunityContributionStats:
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
         max_number_of_suggestions_per_reviewer = (
-            platform_feature_services.get_platform_parameter_value(
+            platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamNames.
                 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
             )
@@ -1448,7 +1448,7 @@ class CommunityContributionStats:
             return True
 
         max_number_of_suggestions_per_reviewer = (
-            platform_feature_services.get_platform_parameter_value(
+            platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamNames.
                 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
             )

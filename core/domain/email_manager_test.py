@@ -25,7 +25,7 @@ from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import html_cleaner
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
@@ -631,7 +631,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -891,7 +891,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     ) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -945,7 +945,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_only_sent_if_signup_was_successful(self) -> None:
         swap_get_platform_parameter_value_return_email_footer = (
             self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 self.new_footer
             )
@@ -1191,7 +1191,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             logging, 'error', log_new_error_counter)
 
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             'Email Sender'
         )
@@ -2720,7 +2720,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -4302,7 +4302,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )
@@ -5082,7 +5082,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )

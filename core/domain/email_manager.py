@@ -27,7 +27,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
@@ -590,7 +590,7 @@ def _send_email(
 
     if sender_name is None:
         email_sender_name = (
-            platform_feature_services.get_platform_parameter_value(
+            platform_parameter_services.get_platform_parameter_value(
                 EMAIL_SENDER_NAME.name)
         )
         assert isinstance(email_sender_name, str)
@@ -779,7 +779,7 @@ def send_post_signup_email(
     """
 
     email_subject_content = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             SIGNUP_EMAIL_SUBJECT_CONTENT.name)
     )
     # Here we use assert because the get_platform_parameter_value returns
@@ -788,7 +788,7 @@ def send_post_signup_email(
     # avoid the mypy error.
     assert isinstance(email_subject_content, str)
     email_body_content = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             SIGNUP_EMAIL_BODY_CONTENT.name)
     )
     if not test_for_duplicate_email:
@@ -812,7 +812,7 @@ def send_post_signup_email(
             return
 
     recipient_username = user_services.get_username(user_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username, email_body_content, email_footer)
@@ -839,7 +839,7 @@ def get_moderator_unpublish_exploration_email() -> str:
         return ''
 
     unpublish_exp_email_html_body = (
-        platform_feature_services.get_platform_parameter_value(
+        platform_parameter_services.get_platform_parameter_value(
             UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
     )
     # Ruling out the possibility of Any for mypy type checking.
@@ -909,7 +909,7 @@ def send_moderator_action_email(
     # called.
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     full_email_content = (
         '%s<br><br>%s<br><br>%s<br><br>%s' % (
@@ -996,7 +996,7 @@ def send_role_notification_email(
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_description]
 
     email_subject = email_subject_template % exploration_title
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, inviter_username, role_description, exploration_id,
@@ -1057,7 +1057,7 @@ def send_emails_to_subscribers(
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
             email_footer = (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 username, creator_name, exploration_id,
@@ -1129,7 +1129,7 @@ def send_feedback_message_email(
     email_subject = email_subject_template % (
         (count_messages, 's') if count_messages > 1 else ('a', ''))
 
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
 
     email_body = email_body_template % (
@@ -1230,7 +1230,7 @@ def send_suggestion_email(
         # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
             email_footer = (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 recipient_username, author_username, exploration_id,
@@ -1287,7 +1287,7 @@ def send_instant_feedback_message_email(
     recipient_preferences = user_services.get_email_preferences(recipient_id)
 
     if recipient_preferences.can_receive_feedback_message_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, thread_title, exploration_id,
@@ -1332,7 +1332,7 @@ def send_flag_exploration_email(
 
     reporter_username = user_services.get_username(reporter_id)
 
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
 
     email_body = email_body_template % (
@@ -1371,7 +1371,7 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, query_id, query_id, email_footer)
@@ -1407,7 +1407,7 @@ def send_query_failure_email(
         '<br>%s')
 
     recipient_username = user_services.get_username(recipient_id)
-    email_footer = platform_feature_services.get_platform_parameter_value(
+    email_footer = platform_parameter_services.get_platform_parameter_value(
         EMAIL_FOOTER.name)
     email_body = email_body_template % (
         recipient_username, query_id, email_footer)
@@ -1517,7 +1517,7 @@ def send_mail_to_onboard_new_reviewers(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, category, category, email_footer)
@@ -1563,7 +1563,7 @@ def send_mail_to_notify_users_to_review(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
         email_body = email_body_template % (
             recipient_username, category, email_footer)
@@ -1665,7 +1665,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
+    if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamNames.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
     ):
@@ -1802,7 +1802,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
+    if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamNames.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
     ):
@@ -1950,7 +1950,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         logging.error('This app cannot send emails to users.')
         return
 
-    if not platform_feature_services.get_platform_parameter_value(
+    if not platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamNames.
         CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
     ):
@@ -1992,7 +1992,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewer_suggestion_email_info))
 
-        email_footer = platform_feature_services.get_platform_parameter_value(
+        email_footer = platform_parameter_services.get_platform_parameter_value(
             EMAIL_FOOTER.name)
 
         email_body = email_body_template % (

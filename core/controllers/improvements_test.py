@@ -28,7 +28,7 @@ from core.domain import exp_services
 from core.domain import feature_flag_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -709,7 +709,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             0.35
         )
@@ -725,7 +725,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             0.05
         )
@@ -744,7 +744,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self
     ) -> None:
         swap_get_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             20
         )

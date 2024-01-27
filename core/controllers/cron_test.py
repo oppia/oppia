@@ -24,7 +24,7 @@ from core.domain import beam_job_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
@@ -379,7 +379,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             True
         )
@@ -402,7 +402,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             True
         )
@@ -426,7 +426,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             True
         )
@@ -616,7 +616,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     def test_email_not_sent_if_sending_emails_is_disabled(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             True
         )
@@ -682,7 +682,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             True
         )

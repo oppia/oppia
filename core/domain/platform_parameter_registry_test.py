@@ -110,14 +110,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             Exception, 'Parameter with name %s already exists' % param_name):
             self._create_example_parameter_with_name(param_name)
 
-    def test_create_feature_flag(self) -> None:
-        feature = registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'test feature', FeatureStages.DEV)
-        self.assertEqual(feature.data_type, DataTypes.BOOL.value)
-        self.assertTrue(feature.is_feature)
-        self.assertEqual(feature.feature_stage, FeatureStages.DEV.value)
-        feature.validate()
-
     def test_default_value_of_bool_platform_parameter(self) -> None:
         parameter = registry.Registry.create_platform_parameter(
             ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
@@ -247,87 +239,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 ],
                 'default'
             )
-
-    def test_update_dev_feature_in_prod_environment_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in dev stage cannot be updated in prod '
-                    'environment.'
-                ):
-                    registry.Registry.update_platform_parameter(
-                        parameter_name,
-                        feconf.SYSTEM_COMMITTER_ID,
-                        'commit message',
-                        [
-                            parameter_domain.PlatformParameterRule.from_dict({
-                                'filters': [],
-                                'value_when_matched': True
-                            })
-                        ],
-                        False
-                    )
-
-    def test_update_dev_feature_in_test_environment_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.DEV)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in dev stage cannot be updated in test '
-                    'environment.'
-                ):
-                    registry.Registry.update_platform_parameter(
-                        parameter_name,
-                        feconf.SYSTEM_COMMITTER_ID,
-                        'commit message',
-                        [
-                            parameter_domain.PlatformParameterRule.from_dict({
-                                'filters': [],
-                                'value_when_matched': True
-                            })
-                        ],
-                        False
-                    )
-
-    def test_update_test_feature_with_rule_enabled_for_prod_raises_exception(
-        self
-    ) -> None:
-        parameter_name = 'parameter_a'
-        registry.Registry.create_feature_flag(
-            ParamNames.PARAMETER_A, 'dev feature', FeatureStages.TEST)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in test stage cannot be updated in prod '
-                    'environment.'
-                ):
-                    registry.Registry.update_platform_parameter(
-                        parameter_name,
-                        feconf.SYSTEM_COMMITTER_ID,
-                        'commit message',
-                        [
-                            parameter_domain.PlatformParameterRule.from_dict({
-                                'filters': [],
-                                'value_when_matched': True
-                            })
-                        ],
-                        False
-                    )
 
     def test_updated_parameter_is_saved_in_storage(self) -> None:
         parameter_name = 'parameter_a'

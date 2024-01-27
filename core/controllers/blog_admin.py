@@ -23,7 +23,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
@@ -88,11 +88,11 @@ class BlogAdminHandler(
         platform_params_for_blog_admin = {
             'max_number_of_tags_assigned_to_blog_post': {
                 'schema': (
-                    platform_feature_services.get_platform_parameter_schema(
+                    platform_parameter_services.get_platform_parameter_schema(
                         max_no_of_tags_parameter.name)
                 ),
                 'description': max_no_of_tags_parameter.description,
-                'value': platform_feature_services.get_platform_parameter_value(
+                'value': platform_parameter_services.get_platform_parameter_value(
                     max_no_of_tags_parameter.name)
             }
         }

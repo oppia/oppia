@@ -35,7 +35,7 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import rating_services
@@ -449,7 +449,7 @@ class ExplorationHandler(
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     platform_parameter_list.ParamNames.
                     RECORD_PLAYTHROUGH_PROBABILITY.value
                 )
