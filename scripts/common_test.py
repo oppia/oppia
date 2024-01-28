@@ -34,32 +34,15 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 from scripts import servers
 
-import github
 from typing import Generator, List, Literal, NoReturn
 
 from . import common
-
-
-_MOCK_REQUESTER = github.Requester.Requester(
-    login_or_token=None,
-    password=None,
-    jwt=None,
-    app_auth=None,
-    base_url='https://github.com',
-    timeout=0,
-    user_agent='user',
-    per_page=0,
-    verify=False,
-    retry=None,
-    pool_size=None,
-)
 
 
 class MockCompiler:
@@ -825,111 +808,6 @@ class CommonTests(test_utils.GenericTestBase):
             'access token at https://github.com/settings/tokens and re-run '
             'the script'):
             common.get_personal_access_token()
-
-    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[github.Label.Label]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        with get_issues_swap, get_label_swap:
-            common.check_prs_for_current_release_are_released(mock_repo)
-
-    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-
-        def mock_open_tab(unused_url: str) -> None:
-            pass
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[str]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegex(
-                Exception, (
-                    'There are PRs for current release which do not '
-                    'have a \'%s\' label. Please ensure that '
-                    'they are released before release summary '
-                    'generation.') % (
-                        constants.release_constants.LABEL_FOR_RELEASED_PRS)):
-                common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_inplace_replace_file(self) -> None:
         origin_filepath = os.path.join(
