@@ -26,7 +26,7 @@ import { Subscription } from 'rxjs';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+  'domain/platform-parameter/platform-feature-admin-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from
   'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';

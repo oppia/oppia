@@ -30,14 +30,14 @@ import { AdminTaskManagerService } from
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+  'domain/platform-parameter/platform-feature-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
   // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
+import { FeatureStage, PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 class MockWindowRef {

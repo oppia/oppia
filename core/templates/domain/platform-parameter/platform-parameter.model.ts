@@ -20,7 +20,7 @@ import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
   PlatformParameterValue
-} from 'domain/platform_feature/platform-parameter-rule.model';
+} from 'domain/platform-parameter/platform-parameter-rule.model';
 
 export enum FeatureStage {
   DEV = 'dev',

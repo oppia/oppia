@@ -21,9 +21,9 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
 import { PlatformParameter } from
-  'domain/platform_feature/platform-parameter.model';
+  'domain/platform-parameter/platform-parameter.model';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData, AdminPageDataBackendDict } from

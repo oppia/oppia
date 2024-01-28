@@ -94,7 +94,7 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             )
 
         # Here we use MyPy ignore because the expected type of ALL_FEATURE_FLAGS
-        # is a list of 'platform_feature_list.FeatureNames' Enum, but here for
+        # is a list of 'feature_flag_list.FeatureNames' Enum, but here for
         # testing purposes we are providing a list of custom 'FeatureNames'
         # enums for mocking the actual behavior, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we

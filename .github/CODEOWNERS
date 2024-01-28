@@ -687,7 +687,7 @@
 /core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
 /core/domain/feature_flag*.py @oppia/web-android-compatibility-reviewers
 /core/feature_flag*.py @oppia/web-android-compatibility-reviewers
-/core/templates/domain/platform_feature/ @oppia/web-android-compatibility-reviewers
+/core/templates/domain/platform-parameter/ @oppia/web-android-compatibility-reviewers
 /core/templates/domain/feature-flag/ @oppia/web-android-compatibility-reviewers
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/web-android-compatibility-reviewers
 /core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers

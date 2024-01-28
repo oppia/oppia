@@ -25,15 +25,15 @@ import { FormsModule } from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { FeatureFlagsResponse } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+  'domain/platform-parameter/platform-feature-admin-backend-api.service';
 import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
 import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+  'domain/platform-parameter/platform-feature-admin-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from
   'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { FeatureStage } from 'domain/platform_feature/platform-parameter.model';
+import { FeatureStage } from 'domain/platform-parameter/platform-parameter.model';
 import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HttpErrorResponse } from '@angular/common/http';

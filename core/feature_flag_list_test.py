@@ -43,8 +43,8 @@ ENUM_MEMBER_REGEXP: Final = re.compile(
 )
 
 
-class PlatformFeatureListTest(test_utils.GenericTestBase):
-    """Tests for feature flags listed in platform_feature_list.py."""
+class FeatureFlagListTest(test_utils.GenericTestBase):
+    """Tests for feature flags listed in feature_flag_list.py."""
 
     def setUp(self) -> None:
         super().setUp()

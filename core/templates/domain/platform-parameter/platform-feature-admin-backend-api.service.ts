@@ -25,9 +25,9 @@ import { AdminPageConstants } from
 import { FeatureFlagDomainConstants } from
   'domain/feature-flag/feature-flag-domain.constants';
 import { PlatformParameterDomainConstants } from
-  'domain/platform_feature/platform-parameter-domain.constants';
+  'domain/platform-parameter/platform-parameter-domain.constants';
 import { PlatformParameterRule, PlatformParameterValue } from
-  'domain/platform_feature/platform-parameter-rule.model';
+  'domain/platform-parameter/platform-parameter-rule.model';
 import {
   FeatureFlag,
   FeatureFlagBackendDict
