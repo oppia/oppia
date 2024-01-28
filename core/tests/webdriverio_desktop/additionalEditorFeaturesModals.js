@@ -89,7 +89,7 @@ describe('Full exploration editor', function() {
       await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
-          await richTextChecker.readPlainText('You mus feeling great?');
+          await richTextChecker.readPlainText('You must be feeling great?');
         }
       );
       await users.logout();
