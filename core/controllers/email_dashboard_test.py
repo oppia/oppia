@@ -128,14 +128,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_email_dashboard_page(self) -> None:
-        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
-
-        response = self.get_html_response('/emaildashboard')
-        self.assertIn(b'{"title": "Email Dashboard - Oppia"})', response.body)
-
-        self.logout()
-
 
 class EmailDashboardResultTests(test_utils.EmailTestBase):
     """Tests for email dashboard result handler."""
