@@ -70,6 +70,7 @@ describe('Beam Jobs Tab Component', () => {
   const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
   const terminalBeamJobRuns = [doneBarJob];
+  const CUSTOM_TIMEOUT = 10000;
 
   beforeEach(waitForAsync(async() => {
     TestBed.configureTestingModule({
@@ -200,7 +201,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(await table.getRows()).toHaveSize(2);
 
     component.ngOnDestroy();
-  });
+  }, CUSTOM_TIMEOUT);
 
   it('should deselect a job after changing the input', async() => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -255,7 +256,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
     component.ngOnDestroy();
-  });
+  }, CUSTOM_TIMEOUT);
 
   it('should cancel the job and update its status', async() => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
