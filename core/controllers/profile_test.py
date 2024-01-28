@@ -1095,6 +1095,14 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
 
+            # Name parameter should be optional.
+            json_response = self.put_json(
+                '/mailinglistsubscriptionhandler', {
+                    'email': 'email2@example.com',
+                    'tag': 'Web',
+                }, csrf_token=csrf_token)
+            self.assertEqual(json_response, {'status': True})
+
         self.logout()
 
     def test_email_provider_error(self) -> None:
