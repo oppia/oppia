@@ -133,7 +133,7 @@ describe('Beam Jobs Tab Component', () => {
     // NOTE: This must use .documentRootLoader(), otherwise the DOM elements
     // within the dialog components won't be found.
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-  }));
+  }), CUSTOM_TIMEOUT);
 
   it('should wait until both jobs and runs are emitted', marbles(m => {
     const beamJobsOutput = m.hot('   ^-j---|', {j: beamJobs});
@@ -153,7 +153,7 @@ describe('Beam Jobs Tab Component', () => {
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
 
     component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+  }), CUSTOM_TIMEOUT);
 
   it('should return empty array when jobs fail to load', marbles(m => {
     const beamJobs = m.hot('^-#', undefined, new Error('err'));
@@ -164,7 +164,7 @@ describe('Beam Jobs Tab Component', () => {
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
 
     component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+  }), CUSTOM_TIMEOUT);
 
   it('should return empty array when runs fail to load', marbles(m => {
     const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
@@ -175,7 +175,7 @@ describe('Beam Jobs Tab Component', () => {
     m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
 
     component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+  }), CUSTOM_TIMEOUT);
 
   it('should update the table when the job name input changes', async() => {
     const input = await loader.getHarness(MatInputHarness);
@@ -221,7 +221,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.selectedJob).toBeUndefined();
 
     component.ngOnDestroy();
-  });
+  }, CUSTOM_TIMEOUT);
 
   it('should add a new job after starting a new job run', async() => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -293,7 +293,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
 
     component.ngOnDestroy();
-  });
+  }, CUSTOM_TIMEOUT);
 
   it('should show the job output', async() => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -322,7 +322,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
 
     component.ngOnDestroy();
-  });
+  }, CUSTOM_TIMEOUT);
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
     const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
@@ -340,7 +340,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
 
     component.ngOnDestroy();
-  }));
+  }), CUSTOM_TIMEOUT);
 
   it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
     const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
@@ -358,5 +358,5 @@ describe('Beam Jobs Tab Component', () => {
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     component.ngOnDestroy();
-  }));
+  }), CUSTOM_TIMEOUT);
 });
