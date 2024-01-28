@@ -31,8 +31,8 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import opportunity_services
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -45,9 +45,8 @@ from core.domain import user_services
 from core.platform import models
 from extensions import domain
 
-from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
-    cast)
+from typing import (Any, Callable, Dict, List, Mapping, Optional, Set, Type,
+                    TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover

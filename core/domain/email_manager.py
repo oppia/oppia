@@ -27,10 +27,10 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import subscription_services
@@ -38,9 +38,8 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-from typing import (
-    Callable, Dict, Final, List, Mapping, Optional, Sequence,
-    Set, Tuple, TypedDict, Union)
+from typing import (Callable, Dict, Final, List, Mapping, Optional, Sequence,
+                    Set, Tuple, TypedDict, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover

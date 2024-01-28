@@ -21,7 +21,6 @@ from __future__ import annotations
 import enum
 
 from core.domain import feature_flag_domain
-from core.domain import platform_parameter_list as params
 
 from typing import List
 

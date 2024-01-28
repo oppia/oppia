@@ -35,8 +35,8 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services

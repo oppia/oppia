@@ -23,10 +23,10 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_services
-from core.domain import platform_parameter_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import role_services
 from core.domain import user_services
 
@@ -92,8 +92,10 @@ class BlogAdminHandler(
                         max_no_of_tags_parameter.name)
                 ),
                 'description': max_no_of_tags_parameter.description,
-                'value': platform_parameter_services.get_platform_parameter_value(
-                    max_no_of_tags_parameter.name)
+                'value': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        max_no_of_tags_parameter.name)
+                )
             }
         }
         role_to_action = role_services.get_role_actions()

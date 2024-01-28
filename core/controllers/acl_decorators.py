@@ -23,8 +23,8 @@ import logging
 import re
 
 from core import android_validation_constants
-from core import feconf
 from core import feature_flag_list
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import base

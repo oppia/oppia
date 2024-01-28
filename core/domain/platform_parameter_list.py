@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from typing import List
-
 import enum
+
+from typing import List
 
 
 class ParamNames(enum.Enum):

@@ -29,7 +29,7 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
-from typing import Dict, Final, List, Set
+from typing import Dict, Final, List
 
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',

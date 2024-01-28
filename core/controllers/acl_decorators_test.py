@@ -37,8 +37,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feature_flag_services
 from core.domain import feedback_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
