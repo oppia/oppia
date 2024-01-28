@@ -292,9 +292,14 @@ export class AdminMiscTabComponent {
     this.adminBackendApiService.retrieveExplorationInteractionIdsAsync(
       this.expIdToGetInteractions)
       .then(response => {
-        this.setStatusMessage.emit(
-          'Successfully fetched interactions in exploration.');
-        this.explorationInteractionIds = response.interactions;
+        if (response.interactions.length > 0) {
+          this.setStatusMessage.emit(
+            'Successfully fetched interactions in exploration.');
+          this.explorationInteractionIds = response.interactions;
+        } else {
+          this.setStatusMessage.emit(
+            'No interactions found in exploration.');
+        }
       }, errorResponse => {
         this.setStatusMessage.emit(
           'Server error: ' + errorResponse);

@@ -3142,7 +3142,8 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
 class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     """Tests for interaction by exploration handler."""
 
-    EXP_ID = 'exp'
+    EXP_ID_1 = 'exp1'
+    EXP_ID_2 = 'exp2'
 
     def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
@@ -3150,14 +3151,16 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.editor_id, end_state_name='End')
+        self.exploration1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.editor_id, end_state_name='End')
+        self.exploration2 = self.save_new_default_exploration(
+            self.EXP_ID_2, self.EDITOR_EMAIL)
 
-    def test_interaction_by_exploration_id_handler(self) -> None:
+    def test_interactions_by_exploration_id_handler(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         payload = {
-            'exp_id': self.EXP_ID
+            'exp_id': self.EXP_ID_1
         }
 
         response = self.get_json(
@@ -3165,6 +3168,19 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         interactions_list = response['interactions']
         self.assertEqual(
             sorted(interactions_list), ['EndExploration', 'TextInput'])
+
+    def test_empty_interactions_by_exploration_id_handler(self) -> None:
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        payload = {
+            'exp_id': self.EXP_ID_2
+        }
+
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload)
+        interactions_list = response['interactions']
+        self.assertEqual(
+            sorted(interactions_list), [])
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)

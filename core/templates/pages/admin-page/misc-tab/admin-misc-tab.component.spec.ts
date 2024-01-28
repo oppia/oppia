@@ -663,20 +663,52 @@ describe('Admin misc tab component ', () => {
             .toEqual(['EndExploration']);
         }));
 
-      it('should handle the case where the exploration does not exist' +
-      'or empty expIdToGetInteractions field'
+      it('should return empty interaction IDs' +
+      ' if no interactions are found in the exploration'
       , fakeAsync(() => {
-        let intSpy = spyOn(
+        let interactionSpy = spyOn(
           adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
-          .and.rejectWith('Exploration does not exist');
+          .and.returnValue(Promise.resolve(
+            { interactions: [] }));
 
         component.retrieveExplorationInteractionIds();
         tick();
 
-        expect(intSpy).toHaveBeenCalled();
+        expect(interactionSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledWith(
-          'Server error: Exploration does not exist');
-        expect(component.explorationInteractionIds).toEqual([]);
+          'No interactions found in exploration.');
+        expect(component.explorationInteractionIds)
+          .toEqual([]);
       }));
+
+      it('should handle the case when the exploration does not exist'
+        , fakeAsync(() => {
+          let intSpy = spyOn(
+            adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
+            .and.rejectWith('Exploration does not exist');
+
+          component.retrieveExplorationInteractionIds();
+          tick();
+
+          expect(intSpy).toHaveBeenCalled();
+          expect(statusMessageSpy).toHaveBeenCalledWith(
+            'Server error: Exploration does not exist');
+          expect(component.explorationInteractionIds).toEqual([]);
+        }));
+
+      it('should handle the case when expIdToGetInteractions is empty'
+        , fakeAsync(() => {
+          let intSpy = spyOn(
+            adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
+            .and.rejectWith('Exploration does not exist');
+
+          component.retrieveExplorationInteractionIds();
+          tick();
+
+          expect(intSpy).toHaveBeenCalled();
+          expect(statusMessageSpy).toHaveBeenCalledWith(
+            'Server error: Exploration does not exist');
+          expect(component.explorationInteractionIds).toEqual([]);
+        }));
     });
 });
