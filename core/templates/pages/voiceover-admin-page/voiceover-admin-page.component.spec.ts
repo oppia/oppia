@@ -140,7 +140,7 @@ describe('Voiceover Admin Page component ', () => {
       };
       component.languageCodesMapping = {
         en: {
-          'en-US': 'English (United States)'
+          'en-US': false
         }
       };
       component.supportedLanguageAccentCodesToDescriptions = {
