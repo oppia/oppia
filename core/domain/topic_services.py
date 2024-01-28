@@ -22,6 +22,7 @@ import collections
 import logging
 
 from core import feconf
+from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
@@ -29,6 +30,7 @@ from core.domain import change_domain
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import state_domain
@@ -1112,7 +1114,12 @@ def compute_summary_of_topic(
         assert story is not None
         topic_model_published_story_exploration_mapping[
             published_story_references[i].story_id
-        ] = story.story_contents.get_linked_exp_ids_of_published_nodes()
+        ] = (
+            story.story_contents.get_linked_exp_ids_of_published_nodes()
+            if platform_feature_services.is_feature_enabled(
+                platform_feature_list.ParamNames
+                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
+            else story.story_contents.get_all_linked_exp_ids())
 
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
