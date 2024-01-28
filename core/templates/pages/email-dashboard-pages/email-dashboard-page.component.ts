@@ -131,8 +131,3 @@ export class EmailDashboardPageComponent {
     return (submitter === this.username) && (status === 'completed');
   }
 }
-
-angular.module('oppia').directive('oppiaEmailDashboardPage',
-  downgradeComponent({
-    component: EmailDashboardPageComponent
-  }) as angular.IDirectiveFactory);
