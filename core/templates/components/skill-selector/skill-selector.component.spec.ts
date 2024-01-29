@@ -20,9 +20,7 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill } from 'core/templates/domain/skill/SkillObjectFactory';
-
-
+import { SkillObjectFactory } from '../../../domain/skill/SkillObjectFactory';
 
 /**
  * @fileoverview Unit tests for SkillSelectorComponent.
@@ -55,6 +53,7 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory); 
   });
 
   beforeEach(() => {
@@ -480,7 +479,7 @@ describe('SkillSelectorComponent', () => {
     ];
 
     // Current skill for the test context.
-    let currentSkillForTest = Skill.createFromBackendDict({
+    let currentSkillForTest = skillObjectFactory.createFromBackendDict({
       id: 'skill1',
       description: 'Skill 1',
       language_code: 'en',
