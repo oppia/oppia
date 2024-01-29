@@ -29,11 +29,11 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StatsReportingService } from '../../services/stats-reporting.service';
-import { LearnerViewInfoComponent } from './player-header.component';
+import { PlayerHeaderComponent } from './player-header.component';
 
 describe('Lesson player header component', () => {
-  let fixture: ComponentFixture<LearnerViewInfoComponent>;
-  let componentInstance: LearnerViewInfoComponent;
+  let fixture: ComponentFixture<PlayerHeaderComponent>;
+  let componentInstance: PlayerHeaderComponent;
   let contextService: ContextService;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
@@ -51,7 +51,7 @@ describe('Lesson player header component', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        LearnerViewInfoComponent,
+        PlayerHeaderComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -69,7 +69,7 @@ describe('Lesson player header component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LearnerViewInfoComponent);
+    fixture = TestBed.createComponent(PlayerHeaderComponent);
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
