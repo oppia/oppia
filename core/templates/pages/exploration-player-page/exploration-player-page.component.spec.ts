@@ -25,6 +25,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for exploration player page component.
@@ -54,7 +55,8 @@ describe('Exploration Player Page', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        ExplorationPlayerPageComponent
+        ExplorationPlayerPageComponent,
+        MockTranslatePipe
       ],
       providers: [
         {
