@@ -499,6 +499,6 @@ describe('SkillSelectorComponent', () => {
 
     // Ensuring the current skill is excluded from the results.
     expect(result.length).toBe(1);
-    expect(result[0].getId()).not.toEqual(currentSkillForTest.getId()); 
+    expect(result[0].getId()).not.toEqual(currentSkillForTest.getId());
   });
 });
