@@ -52,7 +52,7 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
-    private translateService: TranslateService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
