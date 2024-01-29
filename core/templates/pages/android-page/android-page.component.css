@@ -293,6 +293,7 @@
   z-index: 100;
   transition: background-color 0.3s ease;
 }
+
 .oppia-android-carousel-chevron:hover {
   background-color: #3d9991;
 }
