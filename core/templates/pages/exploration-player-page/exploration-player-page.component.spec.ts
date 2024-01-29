@@ -20,12 +20,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
-import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
-import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 
 /**
  * @fileoverview Unit tests for exploration player page component.
