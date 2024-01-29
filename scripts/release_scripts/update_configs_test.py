@@ -18,18 +18,14 @@
 
 from __future__ import annotations
 
-import getpass
 import os
 import tempfile
 
 from core import utils
 from core.tests import test_utils
-from scripts import common
 from scripts.release_scripts import update_configs
 
 from typing import Final
-
-import github  # isort:skip pylint: disable=wrong-import-position
 
 INVALID_FECONF_CONFIG_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
@@ -44,60 +40,9 @@ MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
     'feconf.txt')
 
-MOCK_REQUESTER = github.Requester.Requester(
-    login_or_token=None,
-    password=None,
-    jwt=None,
-    app_auth=None,
-    base_url='https://github.com',
-    timeout=0,
-    user_agent='user',
-    per_page=0,
-    verify=False,
-    retry=None,
-    pool_size=None,
-)
-
 
 class UpdateConfigsTests(test_utils.GenericTestBase):
     """Test the methods for updating configs."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.mock_repo = github.Repository.Repository(
-            requester=MOCK_REQUESTER,
-            headers={},
-            attributes={},
-            completed=False
-        )
-        def mock_get_organization(
-            unused_self: str, unused_name: str
-        ) -> github.Organization.Organization:
-            return github.Organization.Organization(
-                requester=MOCK_REQUESTER,
-                headers={},
-                attributes={},
-                completed=False
-            )
-        def mock_get_repo(
-            unused_self: str, unused_org: github.Organization.Organization
-        ) -> github.Repository.Repository:
-            return self.mock_repo
-        def mock_open_tab(unused_url: str) -> None:
-            pass
-        def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
-            return 'test-token'
-        def mock_url_open(unused_url: str) -> None:
-            pass
-
-        self.get_org_swap = self.swap(
-            github.Github, 'get_organization', mock_get_organization)
-        self.get_repo_swap = self.swap(
-            github.Organization.Organization, 'get_repo', mock_get_repo)
-        self.open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
 
     def test_feconf_verification_with_correct_config(self) -> None:
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
