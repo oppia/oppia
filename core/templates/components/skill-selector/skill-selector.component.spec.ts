@@ -478,7 +478,7 @@ describe('SkillSelectorComponent', () => {
     ];
 
     // Current skill for the test context.
-    let currentSkillForTest = SkillSummary.createFromBackendDict({
+    let currentSkillForTest = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'Skill 1',
       language_code: 'en',
