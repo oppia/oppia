@@ -457,70 +457,73 @@ describe('SkillSelectorComponent', () => {
   it('should update skill list when user filters skills by only topics', () => {
   // Prepare test data for untriagedSkillSummaries.
 
-it('should update skill list when user filters skills by only topics', () => {
-  // Prepare minimal test data for untriagedSkillSummaries.
-  component.untriagedSkillSummaries = [
-    skillObjectFactory.createFromBackendDict({
-      id: 'skill1',
-      description: 'Skill 1',
-      language_code: 'en',
-      version: 1,
-      misconceptions: [],
-      rubrics: [],
-      skill_contents: {
-        explanation: {
-          content_id: 'example',
-          html: '<p>Example Content</p>'
-        },
-        worked_examples: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        }
-      },
-      next_misconception_id: 0,
-      superseding_skill_id: null,
-      all_questions_merged: false,
-      prerequisite_skill_ids: []
-    })
-  ];
+    it('should update skill list when user filters skills by only topics',
+      // Prepare minimal test data for untriagedSkillSummaries.
+      () => {
+        component.untriagedSkillSummaries = [
+          skillObjectFactory.createFromBackendDict({
+            id: 'skill1',
+            description: 'Skill 1',
+            language_code: 'en',
+            version: 1,
+            misconceptions: [],
+            rubrics: [],
+            skill_contents: {
+              explanation: {
+                content_id: 'example',
+                html: '<p>Example Content</p>'
+              },
+              worked_examples: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              },
+              written_translations: {
+                translations_mapping: {}
+              }
+            },
+            next_misconception_id: 0,
+            superseding_skill_id: null,
+            all_questions_merged: false,
+            prerequisite_skill_ids: []
+          })
+        ];
 
-  // Current skill for the test context.
-  let currentSkillForTest = skillObjectFactory.createFromBackendDict({
-    id: 'skill1',
-    description: 'Skill 1',
-    language_code: 'en',
-    version: 1,
-    misconceptions: [],
-    rubrics: [],
-    skill_contents: {
-      explanation: {
-        content_id: 'example',
-        html: '<p>Example Content</p>'
-      },
-      worked_examples: [],
-      recorded_voiceovers: {
-        voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {}
-      }
-    },
-    next_misconception_id: 0,
-    superseding_skill_id: null,
-    all_questions_merged: false,
-    prerequisite_skill_ids: []
+        // Current skill for the test context.
+        let currentSkillForTest = skillObjectFactory.createFromBackendDict({
+          id: 'skill1',
+          description: 'Skill 1',
+          language_code: 'en',
+          version: 1,
+          misconceptions: [],
+          rubrics: [],
+          skill_contents: {
+            explanation: {
+              content_id: 'example',
+              html: '<p>Example Content</p>'
+            },
+            worked_examples: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {}
+            },
+            written_translations: {
+              translations_mapping: {}
+            }
+          },
+          next_misconception_id: 0,
+          superseding_skill_id: null,
+          all_questions_merged: false,
+          prerequisite_skill_ids: []
+        });
+
+        spyOn(skillEditorStateService, 'getSkill')
+          .and.returnValue(currentSkillForTest);
+
+        let searchText = 'Skill';
+        let result = component.searchInUntriagedSkillSummaries(searchText);
+
+        // Ensuring the current skill is excluded from the results.
+        expect(result.length).toBe(1);
+        expect(result[0].getId()).not.toEqual(currentSkillForTest.getId());
+      });
   });
-
-  spyOn(skillEditorStateService, 'getSkill').and.returnValue(currentSkillForTest);
-
-  let searchText = 'Skill';
-  let result = component.searchInUntriagedSkillSummaries(searchText);
-
-  // Ensuring the current skill is excluded from the results.
-  expect(result.length).toBe(1);
-  expect(result[0].getId()).not.toEqual(currentSkillForTest.getId());
-});
 });
