@@ -32,7 +32,7 @@ describe('SkillSelectorComponent', () => {
   let userService: UserService;
   let skillEditorStateService: SkillEditorStateService;
   let skillObjectFactory: SkillObjectFactory;
-  
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -54,7 +54,7 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    SkillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
@@ -480,7 +480,7 @@ describe('SkillSelectorComponent', () => {
     ];
 
     // Current skill for the test context.
-    let currentSkillForTest = SkillObjectFactory.createFromBackendDict({
+    let currentSkillForTest = skillObjectFactory.createFromBackendDict({
       id: 'skill1',
       description: 'Skill 1',
       language_code: 'en',
