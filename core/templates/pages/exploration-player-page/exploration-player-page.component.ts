@@ -18,6 +18,7 @@
 
 import { Component, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
@@ -39,16 +40,19 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
   pageIsIframed: boolean = false;
   explorationTitle!: string;
   isLoadingExploration: boolean = true;
+  explorationIsUnpublished: boolean = false;
 
   constructor(
     private contextService: ContextService,
+    private explorationPermissionsBackendApiService:
+    ExplorationPermissionsBackendApiService,
     private keyboardShortcutService: KeyboardShortcutService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +96,11 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
 
     this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
+
+    this.explorationPermissionsBackendApiService.getPermissionsAsync()
+      .then((response) => {
+        this.explorationIsUnpublished = response.canPublish;
+      });
   }
 
   subscribeToOnLangChange(): void {
