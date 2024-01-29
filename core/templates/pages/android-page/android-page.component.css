@@ -290,17 +290,19 @@
   color: #fff;
   padding: 15px 20px;
   position: relative;
-  z-index: 100;
   transition: background-color 0.3s ease;
+  z-index: 100;
 }
 
 .oppia-android-carousel-chevron:hover {
   background-color: #3d9991;
 }
+
 .oppia-android-carousel-button{
-  border: none;
   background: none;
+  border: none;
 }
+
 .oppia-android-carousel-button:active,
 .oppia-android-carousel-button:focus {
   outline: none; 
