@@ -55,6 +55,14 @@ var getText = async function(elementName, element) {
   return await element.getText();
 };
 
+var waitForNonEmptyText = async function(elementName, element) {
+  await waitFor.condition(
+    element, async function() {
+      return await getText(elementName, element);
+    }
+  );
+};
+
 var getAttribute = async function(elementName, element, attribute) {
   await waitFor.presenceOf(
     element, `${elementName} is not present for getAttribute(${attribute})`);
@@ -113,6 +121,7 @@ var addValue = async function(
 exports.clear = clear;
 exports.click = click;
 exports.getText = getText;
+exports.waitForNonEmptyText = waitForNonEmptyText;
 exports.getAttribute = getAttribute;
 exports.getValue = getValue;
 exports.select = select;
