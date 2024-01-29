@@ -489,7 +489,8 @@ describe('SkillSelectorComponent', () => {
       skill_model_last_updated: 200
     });
 
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue(currentSkillForTest); 
+    spyOn(skillEditorStateService, 'getSkill').and
+    .returnValue(currentSkillForTest);
 
     let searchText = 'Skill';
     let result = component.searchInUntriagedSkillSummaries(searchText);
