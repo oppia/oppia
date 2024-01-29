@@ -26,12 +26,23 @@ import { VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-back
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
 
 describe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
+  let ngbModal: NgbModal;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,12 +60,17 @@ describe('Voiceover Admin Page component ', () => {
       ],
       providers: [
         VoiceoverBackendApiService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     fixture = TestBed.createComponent(VoiceoverAdminPageComponent);
     component = fixture.componentInstance;
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -112,8 +128,10 @@ describe('Voiceover Admin Page component ', () => {
     };
     component.languageCodesMapping = {};
     component.supportedLanguageAccentCodesToDescriptions = {};
-    component.initialLanguageAccentCodes = [];
-    component.languageAccentListIsModified = false;
+    spyOn(
+      voiceoverBackendApiService,
+      'updateVoiceoverLanguageCodesMappingAsync'
+    ).and.returnValue(Promise.resolve());
 
     component.addLanguageAccentCodeSupport('en-US');
 
@@ -121,39 +139,7 @@ describe('Voiceover Admin Page component ', () => {
       {'en-US': 'English (United States)'});
     expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
       {'hi-IN': 'Hindi (India)'});
-    expect(component.languageAccentListIsModified).toBeTrue();
   }));
-
-  it(
-    'should disable update button if a language accent code is re-added',
-    fakeAsync(() => {
-      component.availableLanguageAccentCodesToDescriptions = {
-        'hi-IN': 'Hindi (India)'
-      };
-      component.languageAccentCodesToDescriptionsMasterList = {
-        'en-US': 'English (United States)',
-        'hi-IN': 'Hindi (India)'
-      };
-      component.languageAccentCodeToLanguageCode = {
-        'en-US': 'en',
-        'hi-IN': 'hi'
-      };
-      component.languageCodesMapping = {
-        en: {
-          'en-US': false
-        }
-      };
-      component.supportedLanguageAccentCodesToDescriptions = {
-        'en-US': 'English (United States)'
-      };
-      component.initialLanguageAccentCodes = ['en-US'];
-      component.languageAccentListIsModified = false;
-
-      component.removeLanguageAccentCodeSupport('en-US');
-      component.addLanguageAccentCodeSupport('en-US');
-
-      expect(component.languageAccentListIsModified).toBeFalse();
-    }));
 
   it('should be able to remove language accent pair', fakeAsync(() => {
     component.availableLanguageAccentCodesToDescriptions = {
@@ -175,22 +161,30 @@ describe('Voiceover Admin Page component ', () => {
     component.supportedLanguageAccentCodesToDescriptions = {
       'en-US': 'English (United States)'
     };
-    component.initialLanguageAccentCodes = ['en-US'];
-    component.languageAccentListIsModified = false;
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {},
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
+    spyOn(
+      voiceoverBackendApiService,
+      'updateVoiceoverLanguageCodesMappingAsync'
+    ).and.returnValue(Promise.resolve());
 
     component.removeLanguageAccentCodeSupport('en-US');
+    tick();
 
+    expect(ngbModal.open).toHaveBeenCalled();
     expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({});
     expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
       {'hi-IN': 'Hindi (India)', 'en-US': 'English (United States)'});
-    expect(component.languageAccentListIsModified).toBeTrue();
   }));
 
   it(
-    'should disable update button if a language accent code is re-removed',
+    'should not remove language accent pair when confirm modal is cancelled',
     fakeAsync(() => {
       component.availableLanguageAccentCodesToDescriptions = {
-        'en-US': 'English (United States)',
         'hi-IN': 'Hindi (India)'
       };
       component.languageAccentCodesToDescriptionsMasterList = {
@@ -201,36 +195,30 @@ describe('Voiceover Admin Page component ', () => {
         'en-US': 'en',
         'hi-IN': 'hi'
       };
-      component.languageCodesMapping = {};
-      component.supportedLanguageAccentCodesToDescriptions = {};
-      component.initialLanguageAccentCodes = [];
-      component.languageAccentListIsModified = false;
-
-      component.addLanguageAccentCodeSupport('en-US');
-      component.removeLanguageAccentCodeSupport('en-US');
-
-      expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({});
-      expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
-        {'hi-IN': 'Hindi (India)', 'en-US': 'English (United States)'});
-      expect(component.languageAccentListIsModified).toBeFalse();
-    }));
-
-  it(
-    'should be able to save language accent pair after update',
-    fakeAsync(() => {
-      spyOn(
-        voiceoverBackendApiService,
-        'updateVoiceoverLanguageCodesMappingAsync'
-      ).and.returnValue(Promise.resolve());
-
-      component.initialLanguageAccentCodes = [];
+      component.languageCodesMapping = {
+        en: {
+          'en-US': false
+        }
+      };
       component.supportedLanguageAccentCodesToDescriptions = {
         'en-US': 'English (United States)'
       };
-      component.saveUpdatedLanguageAccentSupport();
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+
+      component.removeLanguageAccentCodeSupport('en-US');
       tick();
 
-      expect(component.initialLanguageAccentCodes).toEqual(['en-US']);
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({
+        'en-US': 'English (United States)'
+      });
+      expect(component.availableLanguageAccentCodesToDescriptions).toEqual(
+        {'hi-IN': 'Hindi (India)'});
     }));
 
   it('should be able to show language accent dropdown', () => {
