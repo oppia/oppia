@@ -523,3 +523,4 @@ it('should update skill list when user filters skills by only topics', () => {
   expect(result.length).toBe(1);
   expect(result[0].getId()).not.toEqual(currentSkillForTest.getId());
 });
+});
