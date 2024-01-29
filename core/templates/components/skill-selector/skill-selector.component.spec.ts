@@ -457,7 +457,7 @@ describe('SkillSelectorComponent', () => {
   it('should update skill list when user filters skills by only topics', () => {
   // Prepare test data for untriagedSkillSummaries.
     component.untriagedSkillSummaries = [
-      SkillSummary.createFromBackendDict({
+      SkillObjectFactory.createFromBackendDict({
         id: 'skill1',
         description: 'Skill 1',
         language_code: 'en',
@@ -467,7 +467,7 @@ describe('SkillSelectorComponent', () => {
         skill_model_created_on: 100,
         skill_model_last_updated: 200
       }),
-      SkillSummary.createFromBackendDict({
+      SkillObjectFactory.createFromBackendDict({
         id: 'skill2',
         description: 'Skill 2',
         language_code: 'en',
@@ -499,6 +499,6 @@ describe('SkillSelectorComponent', () => {
 
     // Ensuring the current skill is excluded from the results.
     expect(result.length).toBe(1);
-    expect(result[0].id).not.toEqual(currentSkillForTest.id);
+    expect(result[0].getId()).not.toEqual(currentSkillForTest.getId()); 
   });
 });
