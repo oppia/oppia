@@ -1727,7 +1727,6 @@ def get_new_suggestions_for_reviewer_notifications() -> List[
                 suggestion
         ))
         email_content_info.append(suggestion_info)
-
     return email_content_info
 
 

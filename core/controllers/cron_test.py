@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -42,9 +43,10 @@ from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.platform import models
 from core.tests import test_utils
+
 import main
 
-from typing import DefaultDict, Dict, Final, List, Set, Union
+from typing import Dict, Final, List, Set, Union
 import webtest
 
 MYPY = False
@@ -458,22 +460,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
     REVIEWER_USERNAME: Final = 'reviewer'
     REVIEWER_EMAIL: Final = 'reviewer@community.org'
 
-    def _mock_send_contributor_dashboard_reviewers_emails(
-            self,
-            reviewer_by_language: DefaultDict[str, List[str]],
-            reviewable_suggestions_by_language: DefaultDict[
-                str, List[
-                    suggestion_registry.ReviewableSuggestionEmailInfo]]
-        ) -> None:
-        """Mocks
-        email_manager.send_mail_to_notify_contributor_dashboard_reviewers
-        as it's not possible to send mail with self.testapp_swap,
-        i.e with the URLs defined in main.
-        """
-        self.reviewer_ids_by_language = reviewer_by_language
-        self.reviewable_suggestions_by_language = (
-            reviewable_suggestions_by_language)
-
     def _create_translation_suggestion_for_en_language(
         self
     ) -> suggestion_registry.BaseSuggestion:
@@ -516,28 +502,29 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.author_id, add_translation_change_dict,
             'test description')
 
-    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            False
-        )
+    def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self) -> None: # pylint: disable=line-too-long
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            swap_platform_parameter_value = self.swap_to_always_return(
+                platform_feature_services,
+                'get_platform_parameter_value',
+                False
+            )
 
-        with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
-                (self.get_json(
+            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
+                self.get_json(
                     '/cron/mail/reviewers/new_cont' +
-                    'ributor_dashboard_suggestions'))
+                    'ributor_dashboard_suggestions')
 
-        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
-
-        self.logout()
+            mock_send.assert_not_called()
+            self.logout()
 
     def setUp(self) -> None:
         super().setUp()
@@ -559,6 +546,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         # to be notified about.
         translation_suggestion = (
             self._create_translation_suggestion_for_en_language())
+
         self.expected_reviewable_suggestion_email_info = (
             suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
@@ -569,117 +557,117 @@ class CronMailReviewerNewSuggestionsHandlerTests(
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
-        self.reviewer_ids_by_language = DefaultDict(list)
-        self.reviewable_suggestions_by_language = DefaultDict(list)
-
     def test_email_not_sent_if_sending_emails_is_not_enabled(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            True
-        )
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            swap_platform_parameter_value = self.swap_to_always_return(
+                platform_feature_services,
+                'get_platform_parameter_value',
+                True
+            )
 
-        with self.cannot_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
+            with self.cannot_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
 
-        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
+            mock_send.assert_not_called()
+            self.logout()
 
-        self.logout()
+    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self) -> None: # pylint: disable=line-too-long
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            swap_platform_parameter_value = self.swap_to_always_return(
+                platform_feature_services,
+                'get_platform_parameter_value',
+                True
+            )
 
-    def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(
-            self
-        ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            True
-        )
-
-        with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
+            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
 
-        for (
-            language_code, reviewer_ids
-            ) in self.reviewer_ids_by_language.items():
-            suggestions = self.reviewable_suggestions_by_language[language_code]
-            self.assertEqual(len(suggestions), 1)
-            self.assertEqual(len(reviewer_ids), 1)
-            self.assertEqual(reviewer_ids[0], self.reviewer_id)
+            for call_args in mock_send.call_args_list:
+                arg1, arg2 = call_args.args
+                self.assertEqual(len(arg1['en']), 1)
+                self.assertEqual(arg1['en'][0], self.reviewer_id)
+                self.assertEqual(len(arg2['en']), 1)
+
+            self.logout()
 
     def test_email_not_sent_if_reviewer_ids_is_empty(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            True
-        )
-        user_services.remove_translation_review_rights_in_language(
-            self.reviewer_id, self.language_code)
-        user_services.remove_translation_review_rights_in_language(
-            self.reviewer_id, 'hi'
-        )
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock
+        ) as mock_send:
+            self.login(
+                self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            swap_platform_parameter_value = self.swap_to_always_return(
+                platform_feature_services,
+                'get_platform_parameter_value',
+                True
+            )
 
-        with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
+            user_services.remove_translation_review_rights_in_language(
+                self.reviewer_id, self.language_code)
+            user_services.remove_translation_review_rights_in_language(
+                self.reviewer_id, 'hi'
+            )
+            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_' +
-                    'contributor_dashboard_suggestions')
-        self.assertEqual(len(self.reviewer_ids_by_language['en']), 0)
+                    '/cron/mail/reviewers/new_contr' +
+                    'ibutor_dashboard_suggestions')
+            for call_args in mock_send.call_args_list:
+                arg1, _ = call_args.args
+                self.assertEqual(len(arg1['en']), 0)
 
-        self.logout()
+            mock_send.assert_called_once()
+            self.logout()
 
     def test_email_sent_to_reviewers_successfully(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
-            'get_platform_parameter_value',
-            True
-        )
+        # Here we use object because we need to spy on
+        # send_reviewer_notifications method and assert
+        # if it's being called.
+        with mock.patch.object(
+            email_manager, 'send_reviewer_notifications',
+            new_callable=mock.Mock) as mock_send:
+            self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            swap_platform_parameter_value = self.swap_to_always_return(
+                platform_feature_services,
+                'get_platform_parameter_value',
+                True
+            )
 
-        _ = self._create_translation_suggestion_for_hi_language()
-
-        with self.can_send_emails, self.testapp_swap:
-            with swap_platform_parameter_value, self.swap(
-                email_manager,
-                'send_reviewer_notifications',
-                self._mock_send_contributor_dashboard_reviewers_emails):
+            with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
 
-        # For 'hi' language.
-        hi_reviewer_ids = self.reviewer_ids_by_language['hi']
-        hi_reviewable_suggestions = (
-            self.reviewable_suggestions_by_language['hi'])
-        self.assertEqual(len(hi_reviewable_suggestions), 1)
-        self.assertEqual(len(hi_reviewer_ids), 0)
+            for call_args in mock_send.call_args_list:
+                arg1, _ = call_args.args
+                self.assertEqual(len(arg1['en']), 1)
+                self.assertEqual(arg1['en'][0], self.reviewer_id)
 
-        # For 'en' language.
-        en_reviewer_ids = self.reviewer_ids_by_language['en']
-        en_reviewable_suggestions = (
-            self.reviewable_suggestions_by_language['en'])
-        self.assertEqual(len(en_reviewable_suggestions), 1)
-        self.assertEqual(len(en_reviewer_ids), 1)
-        self.assertEqual(en_reviewer_ids[0], self.reviewer_id)
-
-        self.logout()
+            mock_send.assert_called_once()
+            self.logout()
 
 
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
