@@ -25,7 +25,9 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './email-dashboard-page-root.component.html',
 })
 export class EmailDashboardPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.TITLE;
+
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.META as
     unknown as Readonly<MetaTagData>[];

@@ -46,7 +46,8 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
-    loadChildren: () => import('pages/email-dashboard-pages/email-dashboard-page.module')
+    loadChildren: () => import(
+      'pages/email-dashboard-pages/email-dashboard-page.module')
       .then(m => m.EmailDashboardPageModule),
     canActivate: [IsLoggedInGuard]
   },
