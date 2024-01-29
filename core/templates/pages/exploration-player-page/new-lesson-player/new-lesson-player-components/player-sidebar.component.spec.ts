@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for new lesson player sidebar component.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PlayerSidebarComponent } from './player-sidebar.component';
 
 describe('SidebarComponent', () => {
@@ -39,21 +39,23 @@ describe('SidebarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should toggle width between 75px and 250px when clicked', () => {
+  it('should toggle width between 75px and 250px when clicked', fakeAsync(() => {
     const sidebarElement: HTMLElement = fixture.nativeElement;
     const sidebarDiv =
       sidebarElement.querySelector(
         '.oppia-lesson-player-sidebar'
       ) as HTMLElement;
-
+    tick();
     expect(sidebarDiv.style.width).toBe('75px');
 
     component.toggleSidebar();
+    tick();
     fixture.detectChanges();
     expect(sidebarDiv.style.width).toBe('250px');
 
     component.toggleSidebar();
+    tick();
     fixture.detectChanges();
     expect(sidebarDiv.style.width).toBe('75px');
-  });
+  }));
 });
