@@ -18,12 +18,19 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { VoiceoverRemovalConfirmModalComponent } from
+  './modals/language-accent-removal-confirm-modal.component';
+import {
+  VoiceoverBackendApiService, LanguageAccentToDescription,
+  LanguageCodesMapping, LanguageAccentMasterList
+} from 'domain/voiceover/voiceover-backend-api.service';
 
-import { VoiceoverBackendApiService, LanguageAccentToDescription, LanguageCodesMapping, LanguageAccentMasterList } from 'domain/voiceover/voiceover-backend-api.service';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
 }
+
 
 @Component({
   selector: 'oppia-voiceover-admin-page',
@@ -34,6 +41,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
+    private ngbModal: NgbModal,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
   ) {}
 
@@ -46,7 +54,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   languageAccentListIsModified: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
   initialLanguageAccentCodes: string[] = [];
-  languageAccentPanelOpenState: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
 
   ngOnInit(): void {
@@ -66,40 +73,38 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   initializeLanguageAccentCodesFields(
       languageAccentMasterList: LanguageAccentMasterList): void {
+    for (let languageCode in this.languageCodesMapping) {
+      const languageAccentToSupportsAutogeneration = (
+        this.languageCodesMapping[languageCode]);
+
+      for (let languageAccentCode in languageAccentToSupportsAutogeneration) {
+        const languageAccentDescription = (
+          this.languageAccentCodesToDescriptionsMasterList[languageAccentCode]);
+
+        this.supportedLanguageAccentCodesToDescriptions[
+          languageAccentCode] = languageAccentDescription;
+      }
+    }
+
     for (let languageCode in languageAccentMasterList) {
       const languageAccentCodesToDescriptions = (
         languageAccentMasterList[languageCode]);
+
       for (let languageAccentCode in languageAccentCodesToDescriptions) {
+        const languageAccentDescription = (
+          languageAccentCodesToDescriptions[languageAccentCode]);
+
         this.languageAccentCodeToLanguageCode[
           languageAccentCode] = languageCode;
-      }
-      this.languageAccentCodesToDescriptionsMasterList = {
-        ...this.languageAccentCodesToDescriptionsMasterList,
-        ...languageAccentCodesToDescriptions
-      };
-    }
 
-    for (const languageCode in this.languageCodesMapping) {
-      const languageAccentCodesToSupportsAutogeneration = (
-        this.languageCodesMapping[languageCode]);
-      for (const languageAccentCode of Object.keys(
-        languageAccentCodesToSupportsAutogeneration)) {
-        const languageDescription = (
-          this.languageAccentCodesToDescriptionsMasterList[languageAccentCode]);
-        this.supportedLanguageAccentCodesToDescriptions[
-          languageAccentCode] = languageDescription;
-      }
-    }
-
-    for (let languageAccentCode in
-      this.languageAccentCodesToDescriptionsMasterList) {
-      let languageAccentDescription = (
-        this.languageAccentCodesToDescriptionsMasterList[languageAccentCode]);
-
-      if (!(languageAccentCode in
-        this.supportedLanguageAccentCodesToDescriptions)) {
-        this.availableLanguageAccentCodesToDescriptions[
+        this.languageAccentCodesToDescriptionsMasterList[
           languageAccentCode] = languageAccentDescription;
+
+        if (!(languageAccentCode in
+          this.supportedLanguageAccentCodesToDescriptions)) {
+          this.availableLanguageAccentCodesToDescriptions[
+            languageAccentCode] = languageAccentDescription;
+        }
       }
     }
 
@@ -107,21 +112,21 @@ export class VoiceoverAdminPageComponent implements OnInit {
       this.supportedLanguageAccentCodesToDescriptions);
 
     this.languageAccentCodeIsPresent = (
-      Object.keys(
-        this.supportedLanguageAccentCodesToDescriptions).length !== 0);
+      this.initialLanguageAccentCodes.length !== 0);
   }
 
   addLanguageAccentCodeSupport(languageAccentCodeToAdd: string): void {
-    const languageDescription = (
+    const languageCode = (
+      this.languageAccentCodeToLanguageCode[languageAccentCodeToAdd]);
+    const languageAccentDescription = (
       this.languageAccentCodesToDescriptionsMasterList[
         languageAccentCodeToAdd]);
+
     this.supportedLanguageAccentCodesToDescriptions[
-      languageAccentCodeToAdd] = languageDescription;
+      languageAccentCodeToAdd] = languageAccentDescription;
     delete this.availableLanguageAccentCodesToDescriptions[
       languageAccentCodeToAdd];
 
-    const languageCode = (
-      this.languageAccentCodeToLanguageCode[languageAccentCodeToAdd]);
     if (!(languageCode in this.languageCodesMapping)) {
       this.languageCodesMapping[languageCode] = {};
     }
@@ -142,38 +147,57 @@ export class VoiceoverAdminPageComponent implements OnInit {
       Object.keys(
         this.supportedLanguageAccentCodesToDescriptions).length !== 0);
     this.removeLanguageAccentDropdown();
+    this.saveUpdatedLanguageAccentSupport();
   }
 
   removeLanguageAccentCodeSupport(languageAccentCodeToRemove: string): void {
-    delete this.supportedLanguageAccentCodesToDescriptions[
-      languageAccentCodeToRemove];
-    this.availableLanguageAccentCodesToDescriptions[
-      languageAccentCodeToRemove] = (
+    const languageCode = (
+      this.languageAccentCodeToLanguageCode[languageAccentCodeToRemove]);
+    const languageAccentDescription = (
       this.languageAccentCodesToDescriptionsMasterList[
         languageAccentCodeToRemove]);
 
-    const languageCode = (
-      this.languageAccentCodeToLanguageCode[languageAccentCodeToRemove]);
-    delete this.languageCodesMapping[languageCode][languageAccentCodeToRemove];
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(VoiceoverRemovalConfirmModalComponent, {
+        backdrop: 'static'
+      });
 
-    if (Object.keys(this.languageCodesMapping[languageCode]).length === 0) {
-      delete this.languageCodesMapping[languageCode];
-    }
+    modalRef.componentInstance.languageAccentDescription = (
+      languageAccentDescription);
 
-    let languageAccentCodesAfterRemoval = Object.keys(
-      this.supportedLanguageAccentCodesToDescriptions);
-    if (
-      JSON.stringify(this.initialLanguageAccentCodes.sort()) !==
-      JSON.stringify(languageAccentCodesAfterRemoval.sort())
-    ) {
-      this.languageAccentListIsModified = true;
-    } else {
-      this.languageAccentListIsModified = false;
-    }
+    modalRef.result.then(() => {
+      delete this.supportedLanguageAccentCodesToDescriptions[
+        languageAccentCodeToRemove];
+      this.availableLanguageAccentCodesToDescriptions[
+        languageAccentCodeToRemove] = languageAccentDescription;
 
-    this.languageAccentCodeIsPresent = (
-      Object.keys(
-        this.supportedLanguageAccentCodesToDescriptions).length !== 0);
+      delete this.languageCodesMapping[
+        languageCode][languageAccentCodeToRemove];
+
+      if (Object.keys(this.languageCodesMapping[languageCode]).length === 0) {
+        delete this.languageCodesMapping[languageCode];
+      }
+
+      let languageAccentCodesAfterRemoval = Object.keys(
+        this.supportedLanguageAccentCodesToDescriptions);
+      if (
+        JSON.stringify(this.initialLanguageAccentCodes.sort()) !==
+        JSON.stringify(languageAccentCodesAfterRemoval.sort())
+      ) {
+        this.languageAccentListIsModified = true;
+      } else {
+        this.languageAccentListIsModified = false;
+      }
+
+      this.languageAccentCodeIsPresent = (
+        Object.keys(
+          this.supportedLanguageAccentCodesToDescriptions).length !== 0);
+      this.saveUpdatedLanguageAccentSupport();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
   }
 
   saveUpdatedLanguageAccentSupport(): void {

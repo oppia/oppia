@@ -40,7 +40,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
 import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
-
+import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
 
 
 declare var angular: ng.IAngularStatic;
@@ -63,11 +63,13 @@ declare var angular: ng.IAngularStatic;
   ],
   declarations: [
     VoiceoverAdminPageComponent,
-    VoiceoverAdminNavbarComponent
+    VoiceoverAdminNavbarComponent,
+    VoiceoverRemovalConfirmModalComponent
   ],
   entryComponents: [
     VoiceoverAdminPageComponent,
-    VoiceoverAdminNavbarComponent
+    VoiceoverAdminNavbarComponent,
+    VoiceoverRemovalConfirmModalComponent
   ],
   providers: [
     {
