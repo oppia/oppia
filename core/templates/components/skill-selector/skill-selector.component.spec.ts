@@ -490,7 +490,7 @@ describe('SkillSelectorComponent', () => {
     });
 
     spyOn(skillEditorStateService, 'getSkill').and
-    .returnValue(currentSkillForTest);
+      .returnValue(currentSkillForTest);
 
     let searchText = 'Skill';
     let result = component.searchInUntriagedSkillSummaries(searchText);
@@ -499,5 +499,4 @@ describe('SkillSelectorComponent', () => {
     expect(result.length).toBe(1);
     expect(result[0].id).not.toEqual(currentSkillForTest.id);
   });
-
 });
