@@ -27,9 +27,6 @@ from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import platform_feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
