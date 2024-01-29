@@ -53,7 +53,7 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory); 
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
