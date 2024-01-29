@@ -60,8 +60,6 @@ module.exports = {
     }
   },
   entry: {
-    blog_admin:
-      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     classroom_admin:
