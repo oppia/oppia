@@ -295,11 +295,10 @@ export class SkillEditorStateService {
   setSkillRights(skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
   }
-  
-  getPrerequisiteSkillIds(): string[] {
-  return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
-  }
 
+  getPrerequisiteSkillIds(): string[] {
+    return this._skill ? this._skill.getPrerequisiteSkillIds() : [];
+  }
 }
 
 angular.module('oppia').factory('SkillEditorStateService',
