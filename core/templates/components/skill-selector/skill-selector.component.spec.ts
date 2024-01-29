@@ -452,7 +452,7 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
-  it('should exclude the current skill from untriaged skill summaries when filte
+  it('should update skill list when user filters skills by only topics', () => {
   // Prepare test data for untriagedSkillSummaries.
     component.untriagedSkillSummaries = [
       SkillSummary.createFromBackendDict({
