@@ -33,6 +33,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
@@ -647,49 +648,52 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
-        topic_services.publish_story(topic_id, story_id, self.admin_id)
-        story_services.update_story(
-            owner_id, story_id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
 
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', False):
+            topic_services.publish_story(topic_id, story_id, self.admin_id)
+            story_services.update_story(
+                owner_id, story_id, [story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': '0'
+                })], 'Changes.')
 
-        self.assertEqual(len(all_opportunity_models), 1)
+            all_opportunity_models = list(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        old_creation_time = all_opportunity_models[0].created_on
+            self.assertEqual(len(all_opportunity_models), 1)
 
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
+            old_creation_time = all_opportunity_models[0].created_on
 
-        result = self.post_json(
-            '/adminhandler', {
-                'action': 'regenerate_topic_related_opportunities',
-                'topic_id': 'topic'
-            }, csrf_token=csrf_token)
+            self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+            csrf_token = self.get_new_csrf_token()
 
-        self.assertEqual(
-            result, {
-                'opportunities_count': 1
-            })
+            result = self.post_json(
+                '/adminhandler', {
+                    'action': 'regenerate_topic_related_opportunities',
+                    'topic_id': 'topic'
+                }, csrf_token=csrf_token)
 
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            self.assertEqual(
+                result, {
+                    'opportunities_count': 1
+                })
 
-        self.assertEqual(len(all_opportunity_models), 1)
+            all_opportunity_models = list(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all())
 
-        new_creation_time = all_opportunity_models[0].created_on
+            self.assertEqual(len(all_opportunity_models), 1)
 
-        self.assertLess(old_creation_time, new_creation_time)
+            new_creation_time = all_opportunity_models[0].created_on
+
+            self.assertLess(old_creation_time, new_creation_time)
 
     def test_rollback_exploration_to_safe_state_action(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

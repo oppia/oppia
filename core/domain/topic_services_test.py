@@ -124,14 +124,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
 
-        platform_parameter_registry.Registry.parameter_registry = {}
-        self.mock_serial_chapter_launch_feature_flag = (
-            platform_parameter_registry.Registry.create_feature_flag(
-                platform_parameter_list.ParamNames
-                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-                'a mock of the serial_chapter_launch feature flag',
-                platform_parameter_domain.FeatureStages.DEV))
-
     def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
         self
     ) -> None:
@@ -191,38 +183,21 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
-    def test_compute_summary_ignores_exp_ids_in_unpublished_stories_when_serial_chapter_feature_is_disabled( # pylint: disable=line-too-long
-        self
-    ) -> None:
-        story_exp_ids = ['exp-1', 'exp-2']
-        self._enable_serial_chapter_feature_on_dev_mode()
-
-        with self.swap(constants, 'DEV_MODE', False):
-            self._create_linked_explorations(
-                self.TOPIC_ID, self.story_id_1, story_exp_ids)
-            updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-
-            topic_summary = topic_services.compute_summary_of_topic(
-                updated_topic)
-
-            self.assertDictEqual(
-                topic_summary.published_story_exploration_mapping, {})
-
-    def test_compute_summary_maps_exp_ids_in_published_stories_when_serial_chapter_feature_is_disabled( # pylint: disable=line-too-long
+    def test_compute_summary_maps_published_stories_to_its_exp_ids_when_serial_chapter_launch_disabled( # pylint: disable=line-too-long
         self
     ) -> None:
         story_exp_ids = ['exp-1', 'exp-2']
         no_exp_ids: List[str] = []
-        self._enable_serial_chapter_feature_on_dev_mode()
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, story_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_2, self.user_id_admin)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        with self.swap(constants, 'DEV_MODE', False):
-            self._create_linked_explorations(
-                self.TOPIC_ID, self.story_id_1, story_exp_ids)
-            topic_services.publish_story(
-                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
-            topic_services.publish_story(
-                self.TOPIC_ID, self.story_id_2, self.user_id_admin)
-            updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', False):
 
             topic_summary = topic_services.compute_summary_of_topic(
                 updated_topic)
@@ -233,46 +208,21 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     self.story_id_2: no_exp_ids
                 })
 
-    def test_compute_summary_ignores_exp_ids_in_unpublished_chapters_when_serial_chapter_feature_is_enabled( # pylint: disable=line-too-long
-        self
-    ) -> None:
-        story_1_exp_ids = ['exp-1', 'exp-2']
-        story_2_exp_ids = ['exp-3', 'exp-4']
-        no_published_chapter_exp_ids: List[str] = []
-        self._enable_serial_chapter_feature_on_dev_mode()
-
-        with self.swap(constants, 'DEV_MODE', True):
-            self._create_linked_explorations(
-                self.TOPIC_ID, self.story_id_1, story_1_exp_ids)
-            self._create_linked_explorations(
-                self.TOPIC_ID, self.story_id_2, story_2_exp_ids)
-            topic_services.publish_story(
-                self.TOPIC_ID, self.story_id_2, self.user_id_admin)
-            updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-
-            topic_summary = topic_services.compute_summary_of_topic(
-                updated_topic)
-
-            self.assertDictEqual(
-                topic_summary.published_story_exploration_mapping, {
-                    self.story_id_2: no_published_chapter_exp_ids
-                })
-
-    def test_compute_summary_maps_exp_ids_in_published_chapters_when_serial_chapter_feature_is_enabled( # pylint: disable=line-too-long
+    def test_compute_summary_maps_published_stories_to_its_exp_ids_of_published_chapters_when_serial_chapter_launch_enabled( # pylint: disable=line-too-long
         self
     ) -> None:
         story_1_exp_ids = ['exp-1', 'exp-2']
         story_2_exp_ids = ['exp-3', 'exp-4']
         story_2_published_chapter_exp_ids = story_2_exp_ids[:1]
-        self._enable_serial_chapter_feature_on_dev_mode()
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, story_1_exp_ids)
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_2, story_2_exp_ids,
+            story_2_published_chapter_exp_ids)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        with self.swap(constants, 'DEV_MODE', True):
-            self._publish_story_chapters_with_explorations(
-                self.TOPIC_ID, self.story_id_1, story_1_exp_ids)
-            self._publish_story_chapters_with_explorations(
-                self.TOPIC_ID, self.story_id_2, story_2_exp_ids,
-                story_2_published_chapter_exp_ids)
-            updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', True):
 
             topic_summary = topic_services.compute_summary_of_topic(
                 updated_topic)
@@ -283,26 +233,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     self.story_id_2: story_2_published_chapter_exp_ids
                 })
 
-    def _enable_serial_chapter_feature_on_dev_mode(self) -> None:
-        """Sets a rule to enable the serial chapter curriculum admin view
-        feature when running on dev mode.
-        """
-        platform_feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames
-            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-            self.owner_id,
-            'Backend test update',
-            [platform_parameter_domain.PlatformParameterRule.from_dict({
-                'filters': [{
-                    'type': 'platform_type',
-                    'conditions': [[
-                        '=',
-                        platform_parameter_domain
-                        .ALLOWED_PLATFORM_TYPES[0]
-                    ]]
-                }],
-                'value_when_matched': True
-            })])
+    def test_compute_summary_does_not_map_unpublished_stories(
+        self
+    ) -> None:
+        story_exp_ids = ['exp-1', 'exp-2']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, story_exp_ids)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
+
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {})
 
     def _publish_story_chapters_with_explorations(
         self, topic_id: str, story_id: str, exp_ids: List[str],
@@ -2840,13 +2783,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
-        self._enable_serial_chapter_feature_on_dev_mode()
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
 
-        with self.swap(constants, 'DEV_MODE', False):
-            self._create_linked_explorations(
-                self.TOPIC_ID, self.story_id_1, topic_exp_ids)
-            topic_services.publish_story(
-                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', False):
+            topic_services.generate_topic_summary(self.TOPIC_ID)
 
             story_exp_ids = topic_services.get_published_story_exploration_ids(
                 self.TOPIC_ID)
@@ -2858,12 +2802,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
         topic_published_chapters_exp_ids = topic_exp_ids[:2]
-        self._enable_serial_chapter_feature_on_dev_mode()
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids,
+            chapter_exp_ids=topic_published_chapters_exp_ids)
 
-        with self.swap(constants, 'DEV_MODE', True):
-            self._publish_story_chapters_with_explorations(
-                self.TOPIC_ID, self.story_id_1, topic_exp_ids,
-                chapter_exp_ids=topic_published_chapters_exp_ids)
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', True):
+            topic_services.generate_topic_summary(self.TOPIC_ID)
 
             story_exp_ids = topic_services.get_published_story_exploration_ids(
                 self.TOPIC_ID)
@@ -2885,15 +2830,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_story(story_id_4, self.user_id, topic_id_2)
 
         exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
-        self._enable_serial_chapter_feature_on_dev_mode()
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, exp_ids[:1])
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_3, exp_ids[1:3])
+        self._publish_story_chapters_with_explorations(
+            topic_id_2, story_id_4, exp_ids[3:])
 
-        with self.swap(constants, 'DEV_MODE', True):
-            self._publish_story_chapters_with_explorations(
-                self.TOPIC_ID, self.story_id_1, exp_ids[:1])
-            self._publish_story_chapters_with_explorations(
-                self.TOPIC_ID, self.story_id_3, exp_ids[1:3])
-            self._publish_story_chapters_with_explorations(
-                topic_id_2, story_id_4, exp_ids[3:])
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', False):
+            topic_services.generate_topic_summary(self.TOPIC_ID)
+
+            story_exp_ids = topic_services.get_published_story_exploration_ids()
+
+            self.assertItemsEqual(story_exp_ids, exp_ids)
+
+        with self.swap_to_always_return(
+                platform_feature_services, 'is_feature_enabled', True):
+            topic_services.generate_topic_summary(self.TOPIC_ID)
 
             story_exp_ids = topic_services.get_published_story_exploration_ids()
 

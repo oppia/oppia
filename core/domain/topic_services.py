@@ -1102,18 +1102,17 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    published_story_references = [
-        story_ref for story_ref in topic.canonical_story_references +
+    published_story_ids = [
+        story_ref.story_id for story_ref in topic.canonical_story_references +
             topic.additional_story_references
         if story_ref.story_is_published]
-    stories = story_fetchers.get_stories_by_ids([
-        story_ref.story_id for story_ref in published_story_references],
-        strict=False)
+    stories = story_fetchers.get_stories_by_ids(
+        published_story_ids, strict=False)
     topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {}
     for i, story in enumerate(stories):
         assert story is not None
         topic_model_published_story_exploration_mapping[
-            published_story_references[i].story_id
+            published_story_ids[i]
         ] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
             if platform_feature_services.is_feature_enabled(
