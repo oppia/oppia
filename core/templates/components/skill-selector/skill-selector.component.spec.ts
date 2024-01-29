@@ -19,6 +19,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
+import { SkillEditorStateService } from '../../../pages/skill-editor-page/services/skill-editor-state.service';
 
 
 /**
@@ -29,6 +30,7 @@ describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
+  let skillEditorStateService: SkillEditorStateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -39,7 +41,8 @@ describe('SkillSelectorComponent', () => {
         SkillSelectorComponent
       ],
       providers: [
-        UserService
+        UserService,
+        SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -49,6 +52,7 @@ describe('SkillSelectorComponent', () => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
   });
 
   beforeEach(() => {
@@ -409,42 +413,90 @@ describe('SkillSelectorComponent', () => {
   });
 
   it('should search in untriaged skill summaries and return' +
-    ' filtered skills', () => {
-    component.untriagedSkillSummaries = [
-      SkillSummary.createFromBackendDict({
-        id: '1',
-        description: 'This is untriaged skill summary 1',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        worked_examples_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444
-      }),
-      SkillSummary.createFromBackendDict({
-        id: '2',
-        description: 'This is untriaged skill summary 2',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        worked_examples_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444
-      })
-    ];
+  ' filtered skills', () => {
+  component.untriagedSkillSummaries = [
+    SkillSummary.createFromBackendDict({
+      id: '1',
+      description: 'This is untriaged skill summary 1',
+      language_code: '',
+      version: 1,
+      misconception_count: 2,
+      worked_examples_count: 2,
+      skill_model_created_on: 121212,
+      skill_model_last_updated: 124444
+    }),
+    SkillSummary.createFromBackendDict({
+      id: '2',
+      description: 'This is untriaged skill summary 2',
+      language_code: '',
+      version: 1,
+      misconception_count: 2,
+      worked_examples_count: 2,
+      skill_model_created_on: 121212,
+      skill_model_last_updated: 124444
+    })
+  ];
 
-    expect(component.searchInUntriagedSkillSummaries(
-      'skill summary 2')).toEqual([
-      SkillSummary.createFromBackendDict({
-        id: '2',
-        description: 'This is untriaged skill summary 2',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        worked_examples_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444
-      })
-    ]);
+  expect(component.searchInUntriagedSkillSummaries(
+    'skill summary 2')).toEqual([
+    SkillSummary.createFromBackendDict({
+      id: '2',
+      description: 'This is untriaged skill summary 2',
+      language_code: '',
+      version: 1,
+      misconception_count: 2,
+      worked_examples_count: 2,
+      skill_model_created_on: 121212,
+      skill_model_last_updated: 124444
+    })
+  ]);
+});
+
+it('should exclude the current skill from untriaged skill summaries when filtering', () => {
+  // Prepare test data for untriagedSkillSummaries
+  component.untriagedSkillSummaries = [
+    SkillSummary.createFromBackendDict({
+      id: 'skill1',
+      description: 'Skill 1',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 3,
+      worked_examples_count: 2,
+      skill_model_created_on: 100,
+      skill_model_last_updated: 200
+    }),
+    SkillSummary.createFromBackendDict({
+      id: 'skill2',
+      description: 'Skill 2',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 4,
+      worked_examples_count: 3,
+      skill_model_created_on: 101,
+      skill_model_last_updated: 201
+    })
+  ];
+
+  // Current skill for the test context
+  let currentSkillForTest = SkillSummary.createFromBackendDict({
+    id: 'skill1',
+    description: 'Skill 1',
+    language_code: 'en',
+    version: 1,
+    misconception_count: 3,
+    worked_examples_count: 2,
+    skill_model_created_on: 100,
+    skill_model_last_updated: 200
   });
+
+  spyOn(skillEditorStateService, 'getSkill').and.returnValue(currentSkillForTest);
+
+  let searchText = 'Skill';
+  let result = component.searchInUntriagedSkillSummaries(searchText);
+
+  // Ensuring the current skill is excluded from the results
+  expect(result.length).toBe(1);
+  expect(result[0].id).not.toEqual(currentSkillForTest.id);
+});
+
 });
