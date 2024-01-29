@@ -16,3 +16,90 @@
     </page-footer>
   </oppia-base-content>
 </oppia-angular-root>
+<style>
+  button:focus {
+        border: unset;
+        outline: unset;
+      }
+
+      @media(max-width: 768px) {
+        .collapse:not(.show) {
+          display: flex;
+        }
+
+        .navbar-brand {
+          display: none;
+        }
+
+        .oppia-navbar-brand-name.d-none {
+          /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+          is being used there). */
+          display: flex !important;
+          margin-left: -10px;
+        }
+
+        .ng-cloak {
+          display: flex !important;
+          flex-direction: row;
+        }
+
+        .float-left {
+          margin-left: 5%;
+        }
+      }
+      @media (max-width: 500px) {
+        .float-left {
+          margin-left: 2%;
+        }
+      }
+
+  @media(max-width: 870px) {
+    .blog-dashboard-card {
+      margin: 20px;
+      width: unset;
+    }
+
+    .new-post-button {
+      margin-bottom: unset;
+    }
+
+    :host /deep/ .mat-tab-label {
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.1rem;
+    }
+  }
+
+  @media(max-width: 620px) {
+    .blog-dashboard-card-title {
+      color: #333;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      text-align: left;
+    }
+
+    .new-post-button {
+      font-size: 14px;
+      margin-bottom: unset;
+      padding-left: 0;
+      padding-right: 0;
+      width: 96px;
+    }
+
+    .blog-author-bio-container {
+      font-size: 14px;
+      line-height: 16px;
+    }
+
+    :host /deep/ .mat-card-header-text {
+      margin-right: 0;
+    }
+  }
+
+  @media(max-width: 880px) {
+    .mat-card.oppia-page-card {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+</style>
