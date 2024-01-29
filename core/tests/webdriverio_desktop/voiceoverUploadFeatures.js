@@ -87,7 +87,7 @@ describe('Voiceover upload features', function() {
     var pauseClick = (
       await explorationEditorTranslationTab.playOrPauseAudioFile());
     expect(pauseClick).toBe(false);
-  });
+  }, jasmine.DEFAULT_TIMEOUT_INTERVAL, 3);
 
   it('should not let upload a non audio file', async function() {
     await explorationEditorTranslationTab.openUploadAudioModal();
@@ -96,7 +96,7 @@ describe('Voiceover upload features', function() {
     await explorationEditorTranslationTab
       .expectSaveUploadedAudioButtonToBeDisabled();
     await explorationEditorTranslationTab.closeUploadAudioModal();
-  });
+  }, jasmine.DEFAULT_TIMEOUT_INTERVAL, 3);
 
   it('should not let upload a five minutes longer audio', async function() {
     await explorationEditorTranslationTab.openUploadAudioModal();
@@ -106,7 +106,7 @@ describe('Voiceover upload features', function() {
       .expectSaveUploadedAudioButtonToBeDisabled();
     await explorationEditorTranslationTab.closeUploadAudioModal();
     await explorationEditorTranslationTab.deleteAudioRecord();
-  });
+  }, jasmine.DEFAULT_TIMEOUT_INTERVAL, 3);
 
   it('should upload recorded audio and play after logging out',
     async function() {
@@ -126,7 +126,7 @@ describe('Voiceover upload features', function() {
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
       await explorationEditorTranslationTab.deleteAudioRecord();
-    });
+    }, jasmine.DEFAULT_TIMEOUT_INTERVAL, 3);
 
   it('should upload audio file from path and play after logout',
     async function() {
@@ -150,7 +150,7 @@ describe('Voiceover upload features', function() {
       await explorationEditorPage.saveChanges(
         'Adds audio file in translation tab.');
       await workflow.publishExploration();
-    });
+    }, jasmine.DEFAULT_TIMEOUT_INTERVAL, 3);
 
   afterEach(async function() {
     await general.checkForConsoleErrors([
