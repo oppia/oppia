@@ -31,7 +31,8 @@ describe('SkillSelectorComponent', () => {
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
   let skillEditorStateService: SkillEditorStateService;
-
+  let skillObjectFactory: SkillObjectFactory;
+  
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
