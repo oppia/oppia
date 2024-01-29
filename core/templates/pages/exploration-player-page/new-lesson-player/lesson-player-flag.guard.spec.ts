@@ -23,12 +23,13 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/ro
 import { AppConstants } from 'app.constants';
 import { IsNewLessonPlayerGuard } from './lesson-player-flag.guard';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      NewFeature: {
+      NewLessonPlayer: {
         isEnabled: true
       }
     };
@@ -62,7 +63,7 @@ describe('IsNewLessonPlayerGuard', () => {
         NewLessonPlayer: {
           isEnabled: false
         }
-      }
+      } as FeatureStatusChecker
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
@@ -82,7 +83,7 @@ describe('IsNewLessonPlayerGuard', () => {
         NewLessonPlayer: {
           isEnabled: true
         }
-      }
+      } as FeatureStatusChecker
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
