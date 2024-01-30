@@ -56,7 +56,7 @@ describe('SkillSelectorComponent', () => {
       _description: 'some_description',
       _misconceptions: [],
       _rubrics: [],
-    } as Partial<Skill> as Skill;
+    } as Skill;
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
