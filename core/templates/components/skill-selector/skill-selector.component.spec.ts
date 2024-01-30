@@ -20,7 +20,7 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { SkillObjectFactory } from '../../domain/skill/SkillObjectFactory';
+
 
 /**
  * @fileoverview Unit tests for SkillSelectorComponent.
@@ -30,8 +30,6 @@ describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
-  let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -42,8 +40,7 @@ describe('SkillSelectorComponent', () => {
         SkillSelectorComponent
       ],
       providers: [
-        UserService,
-        SkillEditorStateService
+        UserService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -53,8 +50,6 @@ describe('SkillSelectorComponent', () => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
-    skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
@@ -415,7 +410,7 @@ describe('SkillSelectorComponent', () => {
   });
 
   it('should search in untriaged skill summaries and return' +
-  ' filtered skills', () => {
+    ' filtered skills', () => {
     component.untriagedSkillSummaries = [
       SkillSummary.createFromBackendDict({
         id: '1',
@@ -453,77 +448,6 @@ describe('SkillSelectorComponent', () => {
       })
     ]);
   });
-
-  it('should update skill list when user filters skills by only topics', () => {
-  // Prepare test data for untriagedSkillSummaries.
-
-    it('should update skill list when user filters skills by only topics',
-      // Prepare minimal test data for untriagedSkillSummaries.
-      () => {
-        component.untriagedSkillSummaries = [
-          skillObjectFactory.createFromBackendDict({
-            id: 'skill1',
-            description: 'Skill 1',
-            language_code: 'en',
-            version: 1,
-            misconceptions: [],
-            rubrics: [],
-            skill_contents: {
-              explanation: {
-                content_id: 'example',
-                html: '<p>Example Content</p>'
-              },
-              worked_examples: [],
-              recorded_voiceovers: {
-                voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              }
-            },
-            next_misconception_id: 0,
-            superseding_skill_id: null,
-            all_questions_merged: false,
-            prerequisite_skill_ids: []
-          })
-        ];
-
-        // Current skill for the test context.
-        let currentSkillForTest = skillObjectFactory.createFromBackendDict({
-          id: 'skill1',
-          description: 'Skill 1',
-          language_code: 'en',
-          version: 1,
-          misconceptions: [],
-          rubrics: [],
-          skill_contents: {
-            explanation: {
-              content_id: 'example',
-              html: '<p>Example Content</p>'
-            },
-            worked_examples: [],
-            recorded_voiceovers: {
-              voiceovers_mapping: {}
-            },
-            written_translations: {
-              translations_mapping: {}
-            }
-          },
-          next_misconception_id: 0,
-          superseding_skill_id: null,
-          all_questions_merged: false,
-          prerequisite_skill_ids: []
-        });
-
-        spyOn(skillEditorStateService, 'getSkill')
-          .and.returnValue(currentSkillForTest);
-
-        let searchText = 'Skill';
-        let result = component.searchInUntriagedSkillSummaries(searchText);
-
-        // Ensuring the current skill is excluded from the results.
-        expect(result.length).toBe(1);
-        expect(result[0].getId()).not.toEqual(currentSkillForTest.getId());
-      });
-  });
+     
+  
 });
