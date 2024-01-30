@@ -50,10 +50,9 @@ describe('SkillSelectorComponent', () => {
   }));
 
   beforeEach(() => {
-    const mockSkill = {
+    const mockSkill: Skill = {
       getId: () => 'mockActiveSkillId',
-    } as unknown as Skill;
-
+    } as Partial<Skill> as Skill;
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
