@@ -3,7 +3,7 @@
     <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
   </div>
   <background-banner *ngIf="!isLoadingExploration"></background-banner>
-  <div *ngIf="explorationIsUnpublished" class="unpublished-exploration-banner">
+  <div *ngIf="explorationIsUnpublished" class="oppia-unpublished-exploration-banner">
     <p>
       {{ 'I18N_PLAYER_UNPUBLISHED_EXPLORATION_BANNER' | translate }}
     </p>
@@ -17,7 +17,7 @@
 </div>
 
 <style>
-  .unpublished-exploration-banner {
+  .oppia-unpublished-exploration-banner {
     align-items: center;
     background-color: #015f9c ;
     color: white;
