@@ -48,8 +48,8 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         self) -> None:
         feature_flag_services.update_feature_flag(
             feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
-            self.owner_id,
-            'test update',
+            False,
+            0,
             []
         )
         self.get_html_response(
@@ -65,7 +65,7 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         )
 
         feature_flag_services.update_feature_flag(
-            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
             True,
             0,
             []
