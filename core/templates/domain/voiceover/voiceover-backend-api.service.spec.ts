@@ -81,7 +81,7 @@ describe('Voiceover backend API service', function() {
   }));
 
   it(
-    'should handle errorcallback while getting voiceover admin page data',
+    'should handle error callback while getting voiceover admin page data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
