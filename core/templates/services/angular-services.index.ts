@@ -296,7 +296,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { DebouncerService } from 'services/debouncer.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
@@ -534,7 +533,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CuratedExplorationValidationService', CuratedExplorationValidationService],
   ['CurrentInteractionService', CurrentInteractionService],
   ['DateTimeFormatService', DateTimeFormatService],
-  ['DebouncerService', DebouncerService],
   ['DeviceInfoService', DeviceInfoService],
   ['DiagnosticTestPlayerEngineService', DiagnosticTestPlayerEngineService],
   ['DiagnosticTestPlayerStatusService', DiagnosticTestPlayerStatusService],

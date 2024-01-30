@@ -30,7 +30,6 @@ import { UserService } from 'services/user.service';
 import { AlertsService } from 'services/alerts.service';
 import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
-import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -95,7 +94,6 @@ describe('TopNavigationBarComponent', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
-  let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService;
@@ -193,7 +191,6 @@ describe('TopNavigationBarComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     feedbackUpdatesBackendApiService =
@@ -240,7 +237,6 @@ describe('TopNavigationBarComponent', () => {
     ' window is larger', fakeAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(debouncerService, 'debounce').and.stub();
 
     component.ngOnInit();
     tick(10);

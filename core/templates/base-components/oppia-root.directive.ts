@@ -51,7 +51,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'CollectionCreationBackendService', 'ComputeGraphService',
               'CreatorDashboardBackendApiService',
               'CurrentInteractionService', 'DateTimeFormatService',
-              'DebouncerService',
               'DeviceInfoService', 'DocumentAttributeCustomizationService',
               'EditabilityService', 'EditorFirstTimeEventsService',
               'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
