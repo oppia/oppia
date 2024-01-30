@@ -57,6 +57,8 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   stateEditorIsInitialized!: boolean;
   nextContentIdIndexMemento!: number;
   nextContentIdIndexDisplayedValue!: number;
+  interactionId!: string;
+  customizationArgs!: InteractionCustomizationArgs;
 
   componentSubscriptions = new Subscription();
 
@@ -73,9 +75,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   ) { }
 
   saveInteractionId(displayedValue: string): void {
-    this._updateQuestion(() => {
-      this.stateEditorService.setInteractionId(cloneDeep(displayedValue));
-    });
+    this.interactionId = cloneDeep(displayedValue);
   }
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
@@ -94,9 +94,16 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveInteractionCustomizationArgs(
       displayedValue: InteractionCustomizationArgs): void {
+    this.customizationArgs = cloneDeep(displayedValue);
+    this.saveInteractionData();
+  }
+
+  saveInteractionData(): void {
     this._updateQuestion(() => {
+      this.stateEditorService.setInteractionId(
+        cloneDeep(this.interactionId));
       this.stateEditorService.setInteractionCustomizationArgs(
-        cloneDeep(displayedValue));
+        cloneDeep(this.customizationArgs));
     });
   }
 
