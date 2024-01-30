@@ -20,7 +20,6 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill } from 'core/templates/domain/skill/SkillObjectFactory';
 
 
 /**
@@ -50,14 +49,6 @@ describe('SkillSelectorComponent', () => {
   }));
 
   beforeEach(() => {
-    const mockSkill: Skill = {
-      getId: () => 'mockActiveSkillId',
-      _id: 'some_id',
-      _description: 'some_description',
-      _misconceptions: [],
-      _rubrics: [],
-    } as Skill;
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
@@ -461,43 +452,45 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
+  it('should filter untriaged skills and exclude the current skill', () => {
+    // Arrange.
+    const mockActiveSkillId = 'active_skill_id';
+    const mockSkillSummaries: SkillSummary[] = [
+      new SkillSummary(
+        'skill1',
+        'Skill 1 description',
+        'en',
+        1,
+        2,
+        3,
+        1706434226000,
+        1706434226000
+      ),
+      new SkillSummary(
+        mockActiveSkillId,
+        'Active Skill description',
+        'en',
+        1,
+        2,
+        3,
+        1706434226000,
+        1706434226000
+      ),
+    ];
 
-  it('should filter untriaged skills based and exclude current skill',
-    () => {
-      const mockActiveSkillId = 'active_skill_id';
-      const mockSkillSummaries = [
-        new SkillSummary(
-          'skill1',
-          'Skill 1 description',
-          'en',
-          1,
-          2,
-          3,
-          1706434226000,
-          1706434226000
-        ),
-        new SkillSummary(
-          mockActiveSkillId,
-          'Active Skill description',
-          'en',
-          1,
-          2,
-          3,
-          1706434226000,
-          1706434226000
-        )
-      ];
-      component.untriagedSkillSummaries = mockSkillSummaries;
-      spyOn(skillEditorStateService, 'getSkill').and.returnValue(
-        {getId: () => mockActiveSkillId}
-      );
+    // Spy on the getSkill method and return the mockActiveSkillId.
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
+      getId: () => mockActiveSkillId,
+    });
 
-      // Execute the function.
-      const result = component.searchInUntriagedSkillSummaries('Skill 1');
+    component.untriagedSkillSummaries = mockSkillSummaries;
 
-      // Assertion.
-      expect(result.length).toBe(1);
-      expect(result[0].id).not.toBe(mockActiveSkillId);
-    }
-  );
+    // Act.
+    const filteredSkills = component.filterUntriagedSkills();
+
+    // Assert.
+    expect(filteredSkills).toEqual([
+      'skill1', // Excludes the current skill with mockActiveSkillId.
+    ]);
+  });
 });
