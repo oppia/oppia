@@ -45,8 +45,9 @@ from core.domain import user_services
 from core.platform import models
 from extensions import domain
 
-from typing import (Any, Callable, Dict, List, Mapping, Optional, Set, Type,
-                    TypedDict, Union, cast)
+from typing import (
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type,
+    TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
