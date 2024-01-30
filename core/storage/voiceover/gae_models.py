@@ -19,9 +19,10 @@
 from __future__ import annotations
 
 from core import feconf
+from core import utils
 from core.platform import models
 
-from typing import Dict, Final, TypedDict
+from typing import Dict, Final, Sequence, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -206,3 +207,145 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+
+class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
+    """The model stores manual voice artists' information with their
+    provided voiceover metadata.
+    Instances of this class are keyed by the user ID.
+    """
+
+    # The ID of the voiceover artist's user.
+    voice_artist_id = datastore_services.StringProperty(
+        indexed=True, required=True)
+    # A dictionary mapping language codes to nested dictionaries. Each
+    # nested dictionary contains the following key-value pairs:
+    # - 'language_accent_codes': A mapping of accent codes associated with
+    # the language.
+    # - 'exploration_id_to_content_ids': A mapping of exploration IDs to lists
+    # of content IDs, representing the content IDs for which voice artists
+    # have provided voiceovers.
+    language_code_to_accent_and_contents_mapping = (
+        datastore_services.JsonProperty(required=True))
+
+    @classmethod
+    def has_reference_to_user_id(cls, voice_artist_id: str) -> bool:
+        """Check whether VoiceoArtistToVoiceoverMetadataModel references user.
+
+        Args:
+            voice_artist_id: str. The ID of the user whose data
+                should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.voice_artist_id == voice_artist_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there can
+        be multiple blog post models relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user to export."""
+        return dict(
+            super(
+                VoiceoArtistToVoiceoverMetadataModel, cls
+            ).get_export_policy(), **{
+                # We do not export the author_id because we should not
+                # export internal user ids.
+                'voice_artist_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code_to_accent_and_contents_mapping': (
+                    base_models.EXPORT_POLICY.EXPORTED)
+            }
+        )
+
+    @classmethod
+    def generate_new_voice_artist_metadata_model_id(cls) -> str:
+        """Generates a new voice artist metadata ID which is unique and is in
+        the form of random hash of 12 chars.
+
+        Returns:
+            str. A voice artist metadata ID that is different from the IDs of
+            all the existing voice artist metadata models.
+
+        Raises:
+            Exception. There were too many collisions with existing voice
+                artist metadata IDs when attempting to generate a new ID.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            voice_artist_metadata_id = utils.convert_to_hash(
+                str(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
+            if not cls.get_by_id(voice_artist_metadata_id):
+                return voice_artist_metadata_id
+        raise Exception(
+            'New voice artist metadata id generator is producing too many'
+            ' collisions.')
+
+    @classmethod
+    def create(
+        cls, voice_artist_metadata_id: str, voice_artist_id: str
+    ) -> VoiceoArtistToVoiceoverMetadataModel:
+        """Creates a new BlogPostModel entry.
+
+        Args:
+            voice_artist_metadata_id: str. Voice artist to voiceover metadata
+                model ID of the newly-created model.
+            voice_artist_id: str. User ID of the voice artist.
+
+        Returns:
+            VoiceoArtistToVoiceoverMetadataModel. The newly created
+            VoiceoArtistToVoiceoverMetadataModel instance.
+
+        Raises:
+            Exception. A voice artist to voiceover metadata model with given
+            ID exists already.
+        """
+        if cls.get_by_id(voice_artist_metadata_id):
+            raise Exception(
+                'A voice artist to voiceover metadata model with the given '
+                'ID exists already.')
+
+        entity = cls(
+            id=voice_artist_metadata_id,
+            voice_artist_id=voice_artist_id,
+            language_code_to_accent_and_contents_mapping={}
+        )
+        entity.update_timestamps()
+        entity.put()
+
+        return entity
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, VoiceoArtistToVoiceoverMetadataModel]:
+        """Exports the data from VoiceoArtistToVoiceoverMetadataModel into
+        dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+            VoiceoArtistToVoiceoverMetadataModel.
+        """
+        user_data: Dict[str, VoiceoArtistToVoiceoverMetadataModel] = {}
+        voice_artist_metadata_models: Sequence[
+            VoiceoArtistToVoiceoverMetadataModel] = cls.get_all().filter(
+            cls.voice_artist_id == user_id).fetch()
+        for voice_artist_metadata_model in voice_artist_metadata_models:
+            user_data[voice_artist_metadata_model.id] = {
+                'language_code_to_accent_and_contents_mapping': (
+                    voice_artist_metadata_model.
+                    language_code_to_accent_and_contents_mapping)
+            }
+
+        return user_data
