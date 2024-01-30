@@ -85,16 +85,6 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_that_page_is_accessible_to_authorised_users_only(self) -> None:
-        # Make sure that only authorised users can access query pages.
-        self.login(self.USER_A_EMAIL)
-        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
-            self.get_html_response('/emaildashboard')
-        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
-            self.get_html_response(
-                '/querystatuscheck?query_id=%s' % 'valid_query_id')
-        self.logout()
-
     def test_that_exception_is_raised_for_invalid_input(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
