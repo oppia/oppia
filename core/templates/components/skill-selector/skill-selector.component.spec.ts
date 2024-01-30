@@ -476,7 +476,7 @@ describe('SkillSelectorComponent', () => {
         )
       ];
       component.untriagedSkillSummaries = mockSkillSummaries;
-      spyOn(skillEditorStateService, 'getSkill').and.returnValue(
+      spyOn(SkillEditorStateService, 'getSkill').and.returnValue(
         {getId: () => mockActiveSkillId}
       );
 
