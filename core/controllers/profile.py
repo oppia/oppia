@@ -233,7 +233,8 @@ class MailingListSubscriptionHandler(
                     'validators': [{
                         'id': 'is_nonempty'
                     }]
-                }
+                },
+                'default_value': None
             },
             'tag': {
                 'schema': {

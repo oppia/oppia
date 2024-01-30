@@ -142,6 +142,25 @@
       </p>
     </div>
   </mat-card>
+
+  <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+    <div class="container ml-0">
+      <h3>Generate dummy blog post.</h3>
+      <div class="row" *ngFor="let title of DUMMY_BLOG_POST_TITLES">
+        <span class="col-lg-4 col-md-4 col-sm-4">
+          {{title}}
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+          <button type="button"
+                  class="btn btn-secondary float-right"
+                  (click)="generateNewBlogPost(title)">
+            Generate
+          </button>
+        </span>
+      </div>
+    </div>
+  </mat-card>
+
 </div>
 
 <style>
