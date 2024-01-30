@@ -30,6 +30,7 @@ describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
+  let skillEditorStateService: SkillEditorStateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +52,7 @@ describe('SkillSelectorComponent', () => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
   });
 
   beforeEach(() => {
