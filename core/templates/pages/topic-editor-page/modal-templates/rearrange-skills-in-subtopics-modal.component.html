@@ -54,7 +54,7 @@
             <strong [ngbTooltip]="subtopic.getTitle()"
                     placement="bottom"
                     *ngIf="subtopic?.getTitle()?.length < 25">
-              {{ subtopic.getTitle() }}
+              {{ subtopic.getTitle() }} <mat-icon class="edit-icon-style">edit</mat-icon>
             </strong>
             <strong [ngbTooltip]="subtopic?.getTitle()"
                     placement="bottom"
@@ -169,6 +169,10 @@
   }
   .item-flex-container {
     min-height: 200px;
+  }
+  .edit-icon-style {
+    font-size: 17px;
+    margin-top: 2px;
   }
   .skill-id {
     background: #fff;
