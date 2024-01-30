@@ -332,7 +332,7 @@ class ReviewableOpportunitiesHandler(
         if self.user_id:
             for opp in (
                 self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language
+                self.user_id, topic_name or '', language
             )):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -341,7 +341,7 @@ class ReviewableOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: Optional[str], language: Optional[str]
+        self, user_id: str, topic_name: str, language: Optional[str]
     ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
@@ -350,8 +350,8 @@ class ReviewableOpportunitiesHandler(
         Args:
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
-            topic_name: str or None. A topic name for which to filter the
-                exploration opportunity summaries. If 'All' is supplied, all
+            topic_name: str. A topic name for which to filter the
+                exploration opportunity summaries. If '' is supplied, all
                 available exploration opportunity summaries will be returned.
             language: str. ISO 639-1 language code for which to filter the
                 exploration opportunity summaries. If it is None, all
@@ -361,25 +361,28 @@ class ReviewableOpportunitiesHandler(
             list(ExplorationOpportunitySummary). A list of the matching
             exploration opportunity summaries.
         """
-        # 1. Fetch all the exploration IDs of published chapters in published
-        #    stories under the topic(s).
-        # 2. Fetch each reviewable translation suggestion to be available to the
-        #    translation reviewer.
-        # 3. Filter exploration ids. Keep those that are the target of any
-        #    fetched reviewable translation suggestions.
-        # 4. Fetch all exploration opportunity summaries for the kept
-        #    explorations.
-        # 5. If there's a pinned lesson, move the pinned lesson's summary to
-        #    the top.
-        if topic_name is None or topic_name == 'undefined':
-            topic_exp_ids = topic_services.get_published_story_exploration_ids()
+        # 1. Fetch the IDs of all published explorations in the topics'
+        #    published stories.
+        # 2. Fetch all suggestions that the user can review, and collect their
+        #    exploration IDs. Filter these IDs to only include published
+        #    explorations in published stories (see step 1).
+        # 3. Fetch all exploration opportunity summaries for the resulting set
+        #    of explorations.
+        # 4. Moved any pinned summaries to the top.
+
+        # topic_name of empty string will fetch all topics, since no topic can
+        # have an empty string as a name.
+        if topic_name == '':
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids())
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
                     'The supplied input topic: %s is not valid' % topic_name)
-            topic_exp_ids = topic_services.get_published_story_exploration_ids(
-                topic_id=topic.id)
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    topic_id=topic.id))
 
         in_review_suggestions, _ = (
             suggestion_services

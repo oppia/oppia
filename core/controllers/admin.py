@@ -2276,6 +2276,7 @@ class RegenerateTopicSummariesHandler(
     def put(self) -> None:
         """Regenerates all topic summary models."""
 
+        # Fetched topics are sorted only to make the backend tests pass.
         topics = sorted(
             topic_fetchers.get_all_topics(),
             key=operator.attrgetter('created_on'))

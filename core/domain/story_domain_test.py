@@ -1237,7 +1237,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegex(
-             ValueError, 'A node with exploration id exp_2 already exists.'
+            ValueError, 'A node with exploration id exp_2 already exists.'
         ):
             self.story.update_node_exploration_id('node_1', 'exp_2')
 
@@ -2233,12 +2233,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected exploration ID to be a string')
 
-    def test_validate_empty_exploration_id(self) -> None:
+    def test_validate_empty_str_exploration_id(self) -> None:
         self.story.story_contents.nodes[0].exploration_id = ''
         self._assert_validation_error(
             'Expected exploration ID to not be an empty string')
 
-    def test_validate_no_exploration_id(self) -> None:
+    def test_validate_exploration_id_whose_value_is_none(self) -> None:
         self.story.story_contents.nodes[0].exploration_id = None
         self._assert_validation_error(
             'Expected exploration ID to not be None')

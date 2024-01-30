@@ -383,12 +383,12 @@ class TopicSummaryModel(base_models.BaseModel):
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
-    # A mapping whose key is a story id of a published story that belongs to
-    # the topic. Each key maps to a list of exploration ids linked to the
-    # corresponding story's published chapters. This mapping must be kept
-    # up-to-date with changes related to publishing status of stories, creation
-    # and removal of story chapters, publishing status of chapters and the
-    # linking of exploration ids to the chapters.
+    # A dict that maps published story ids to lists of exploration ids.
+    # Each list represents the story's published chapters' linked
+    # exploration ids and each list of exploration ids is in the same
+    # order as the story's published chapters. This dict is regenerated
+    # whenever a story in this topic is updated, which occurs
+    # in `topic_services.compute_summary_of_topic()`.
     published_story_exploration_mapping = datastore_services.JsonProperty(
         required=True)
 

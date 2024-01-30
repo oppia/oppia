@@ -314,7 +314,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 exp_id, self.user_id_admin, end_state_name='end',
                 correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_admin, exp_id)
-        self.link_explorations_to_story(topic_id, story_id, exp_ids)
+        self.add_explorations_to_story(topic_id, story_id, exp_ids)
 
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
@@ -2771,7 +2771,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self._create_linked_explorations(
             self.TOPIC_ID, self.story_id_1, topic_exp_ids)
 
-        story_exp_ids = topic_services.get_published_story_exploration_ids(
+        story_exp_ids = topic_services.get_all_published_story_exploration_ids(
             self.TOPIC_ID)
 
         self.assertItemsEqual(story_exp_ids, [])
@@ -2789,8 +2789,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 platform_feature_services, 'is_feature_enabled', False):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = topic_services.get_published_story_exploration_ids(
-                self.TOPIC_ID)
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    self.TOPIC_ID))
 
             self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
@@ -2807,8 +2808,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 platform_feature_services, 'is_feature_enabled', True):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = topic_services.get_published_story_exploration_ids(
-                self.TOPIC_ID)
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    self.TOPIC_ID))
 
             self.assertItemsEqual(
                 story_exp_ids, topic_published_chapters_exp_ids)
@@ -2838,7 +2840,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 platform_feature_services, 'is_feature_enabled', False):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = topic_services.get_published_story_exploration_ids()
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids())
 
             self.assertItemsEqual(story_exp_ids, exp_ids)
 
@@ -2846,7 +2849,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 platform_feature_services, 'is_feature_enabled', True):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = topic_services.get_published_story_exploration_ids()
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids())
 
             self.assertItemsEqual(story_exp_ids, exp_ids)
 

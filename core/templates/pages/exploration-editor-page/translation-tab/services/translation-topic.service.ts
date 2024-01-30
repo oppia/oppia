@@ -21,6 +21,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 
+import { AppConstants } from 'app.constants';
 import { ContributionOpportunitiesService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities.service';
@@ -48,7 +49,7 @@ export class TranslationTopicService {
   setActiveTopicName(newActiveTopicName: string): void {
     this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((data) => {
-        if (newActiveTopicName !== 'All' &&
+        if (newActiveTopicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL &&
             data.indexOf(newActiveTopicName) < 0) {
           this.loggerService.error(
             'Invalid active topic name: ' + newActiveTopicName);

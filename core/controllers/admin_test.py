@@ -1788,9 +1788,9 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
 
     def test_regenerate_topic_summaries(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.admin_id, name='Topic 1',
+            topic_id_1, self.admin_id, name='Topic 1',
             abbreviated_name='T1', url_fragment='url-frag-one',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
@@ -1807,10 +1807,12 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        # Order of function calls in expected_args should not
+        # matter for this test.
         with self.swap_with_checks(
                 topic_services, 'generate_topic_summary',
                 topic_services.generate_topic_summary,
-                expected_args=[(topic_id,), (topic_id_2,)]):
+                expected_args=[(topic_id_1,), (topic_id_2,)]):
             self.put_json(
                 feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
                 csrf_token=csrf_token, expected_status_int=200)

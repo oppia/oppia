@@ -130,12 +130,17 @@ export class ContributionOpportunitiesService {
   }
 
   async getReviewableTranslationOpportunitiesAsync(
-      topicName: string,
+      topicName?: string,
       languageCode?: string):
   Promise<ExplorationOpportunitiesDict> {
+    // Represent all topics with an empty string, since no topic
+    // name can be empty.
+    const allTopics: string = '';
     return this.contributionOpportunitiesBackendApiService
-      .fetchReviewableTranslationOpportunitiesAsync(topicName, languageCode)
-      .then(({ opportunities }) => {
+      .fetchReviewableTranslationOpportunitiesAsync(
+        topicName ?? allTopics,
+        languageCode
+      ).then(({ opportunities }) => {
         return {
           opportunities: opportunities,
           more: false

@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import collections
+import itertools
 import logging
 
 from core import feconf
@@ -804,7 +805,8 @@ def publish_story(
             story_nodes: list(dict(str, *)). The list of story nodes dicts.
 
         Raises:
-            Exception. The exploration id is invalid or isn't published yet.
+            Exception. The exploration id is invalid or corresponds to an
+                exploration which isn't published yet.
         """
         exploration_id_list = []
         for node in story_nodes:
@@ -1784,35 +1786,29 @@ def get_chapter_counts_in_topic_summaries(
     return topic_chapter_counts_dict
 
 
-def get_published_story_exploration_ids(
+def get_all_published_story_exploration_ids(
     topic_id: Optional[str] = None
 ) -> List[str]:
-    """Returns a list of each exploration id linked to each published chapter.
-    The stories who own the published chapter must also be published. The topic
-    that matches the corresponding topic_id who owns the published stories will
-    have their exploration ids searched.
-
-    If no topic_id is provided, all topics will have their exploration ids
-    searched based on their ownership of published stories and published
-    chapters.
+    """Returns a list of each exploration id linked to each published story
+    chapter that belongs to topic(s).
 
     Args:
-        topic_id: str|None. The id of the topic to search through. When not
-            provided, all topics are searched through.
+        topic_id: str|None. The id of a topic. If topic_id is provided, the
+            result includes exploration ids only from the corresponding
+            topic. If no topic_id is provided, the result includes
+            exploration ids in all topics.
 
     Returns:
-        list(str). A list of all exploration ids linked to all the topic(s)'
-        published stories and published chapters.
+        list(str). A list of all exploration ids linked to the topic(s)'
+        published stories' chapters.
     """
-    mappings = ([
-        summary.published_story_exploration_mapping
-        for summary in (
-            [topic_fetchers.get_topic_summary_by_id(topic_id)]
-            if topic_id else topic_fetchers.get_all_topic_summaries())
-    ])
+    topic_summaries = (
+        [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
+        else topic_fetchers.get_all_topic_summaries())
 
-    story_exp_ids = set()
-    for mapping in mappings:
-        for exp_ids in mapping.values():
-            story_exp_ids.update(exp_ids)
-    return list(story_exp_ids)
+    exp_ids = itertools.chain.from_iterable(
+        itertools.chain.from_iterable(
+            summary.published_story_exploration_mapping.values())
+        for summary in topic_summaries)
+
+    return list(set(exp_ids))

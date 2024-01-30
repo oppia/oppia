@@ -3525,7 +3525,7 @@ version: 1
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
-    def link_explorations_to_story(
+    def add_explorations_to_story(
         self, topic_id: str, story_id: str, exp_ids: List[str]
     ) -> None:
         """Appends a story node for each exploration id given in exp_ids to the
