@@ -40,7 +40,8 @@ describe('SkillSelectorComponent', () => {
         SkillSelectorComponent
       ],
       providers: [
-        UserService
+        UserService,
+        SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -476,7 +477,7 @@ describe('SkillSelectorComponent', () => {
         )
       ];
       component.untriagedSkillSummaries = mockSkillSummaries;
-      spyOn(SkillEditorStateService, 'getSkill').and.returnValue(
+      spyOn(skillEditorStateService, 'getSkill').and.returnValue(
         {getId: () => mockActiveSkillId}
       );
 
