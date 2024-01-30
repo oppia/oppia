@@ -451,9 +451,9 @@ describe('SkillSelectorComponent', () => {
   it('should correctly filter untriaged skill summaries', () => {
   // Prepare test data.
     component.untriagedSkillSummaries = [
-      new SkillSummary('skill1', 'Skill One'),
-      new SkillSummary('skill2', 'Skill Two'),
-      new SkillSummary('skill3', 'Skill Three')
+      new SkillSummary('skill1', 'Skill One', 'en', 1, [], [], '123', '456'),
+      new SkillSummary('skill2', 'Skill Two', 'en', 1, [], [], '123', '456'),
+      new SkillSummary('skill3', 'Skill Three', 'en', 1, [], [], '123', '456')
     ];
     let activeSkillId = 'skill2';
     let searchText = 'Skill';
