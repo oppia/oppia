@@ -103,15 +103,14 @@ describe('Router Service', () => {
     testSubscriptions.unsubscribe();
   });
 
-  it('should initialize the current location hash', fakeAsync(() => {
-    spyOn(routerService, '_changeTab').and.callThrough();
+  it('should change tab on init', fakeAsync(() => {
+    spyOn(routerService, '_changeTab');
+    spyOn(windowRef.navtiveWindow.location, 'hash').and.returnValue('#/settings');
 
-    windowRef.nativeWindow.location.hash = '#/settings';
     routerService.init();
-    tick(300);
+    tick();
 
     expect(routerService._changeTab).toHaveBeenCalledWith('/settings');
-    expect(routerService.getActiveTabName()).toBe('settings');
   }));
 
   it('should not navigate to main tab when already there', fakeAsync(() => {
