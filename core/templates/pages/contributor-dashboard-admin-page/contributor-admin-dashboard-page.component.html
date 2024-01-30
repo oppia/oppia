@@ -107,7 +107,7 @@
           </div>
           <div class="topic-selector-container">
             <oppia-topic-filter
-              *ngIf="topicsFetched==='true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+              *ngIf="topicsAreFetched === 'true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
               [(defaultTopicNames)]="allTopicNames"
               [(selectedTopicNames)]="selectedTopicNames"
               (selectionsChange)="applyTopicFilter()">
@@ -190,7 +190,7 @@
           </oppia-topic-filter>
         </div>
       </div>
-      <contributor-admin-stats-table  [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
   </div>
 </div>
