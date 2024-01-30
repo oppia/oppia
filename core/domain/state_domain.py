@@ -833,12 +833,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
                 interaction_dict['id'],
-                interaction_dict['customization_args'])
-            if (
-                interaction_dict['customization_args'] is not None and
-                interaction_dict['id'] is not None
+                interaction_dict['customization_args']
             )
-            else None)
+        )
 
         return cls(
             interaction_dict['id'],
@@ -2253,8 +2250,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return (
             InteractionCustomizationArg
             .convert_cust_args_dict_to_cust_args_based_on_specs(
-                customization_args_dict, ca_specs_dict)
-            if customization_args_dict else None)
+                customization_args_dict, ca_specs_dict))
 
 
 class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
