@@ -19,7 +19,6 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 
 /**
@@ -448,6 +447,44 @@ describe('SkillSelectorComponent', () => {
       })
     ]);
   });
-     
-  
+
+
+  it('should filter untriaged skills based and exclude current skill',
+    () => {
+      const mockActiveSkillId = 'active_skill_id';
+      const mockSkillSummaries = [
+        new SkillSummary(
+          'skill1',
+          'Skill 1 description',
+          'en',
+          1,
+          2,
+          3,
+          1706434226000,
+          1706434226000
+        ),
+        new SkillSummary(
+          mockActiveSkillId,
+          'Active Skill description',
+          'en',
+          1,
+          2,
+          3,
+          1706434226000,
+          1706434226000
+        )
+      ];
+      component.untriagedSkillSummaries = mockSkillSummaries;
+      spyOn(skillEditorStateService, 'getSkill').and.returnValue(
+        {getId: () => mockActiveSkillId}
+      );
+
+      // Execute the function.
+      const result = component.searchInUntriagedSkillSummaries('Skill 1');
+
+      // Assertion.
+      expect(result.length).toBe(1);
+      expect(result[0].id).not.toBe(mockActiveSkillId);
+    }
+  );
 });
