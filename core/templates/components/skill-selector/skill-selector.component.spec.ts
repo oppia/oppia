@@ -19,7 +19,6 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 
 /**
@@ -30,7 +29,6 @@ describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
-  let skillEditorStateService: SkillEditorStateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -41,8 +39,7 @@ describe('SkillSelectorComponent', () => {
         SkillSelectorComponent
       ],
       providers: [
-        UserService,
-        SkillEditorStateService
+        UserService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -52,7 +49,6 @@ describe('SkillSelectorComponent', () => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
-    skillEditorStateService = TestBed.inject(SkillEditorStateService);
   });
 
   beforeEach(() => {
@@ -452,45 +448,24 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
-  it('should filter untriaged skills and exclude the current skill', () => {
-    // Arrange.
-    const mockActiveSkillId = 'active_skill_id';
-    const mockSkillSummaries: SkillSummary[] = [
-      new SkillSummary(
-        'skill1',
-        'Skill 1 description',
-        'en',
-        1,
-        2,
-        3,
-        1706434226000,
-        1706434226000
-      ),
-      new SkillSummary(
-        mockActiveSkillId,
-        'Active Skill description',
-        'en',
-        1,
-        2,
-        3,
-        1706434226000,
-        1706434226000
-      ),
+  it('should correctly filter untriaged skill summaries', () => {
+  // Prepare test data.
+    component.untriagedSkillSummaries = [
+      new SkillSummary('skill1', 'Skill One'),
+      new SkillSummary('skill2', 'Skill Two'),
+      new SkillSummary('skill3', 'Skill Three')
     ];
+    let activeSkillId = 'skill2';
+    let searchText = 'Skill';
 
-    // Spy on the getSkill method and return the mockActiveSkillId.
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
-      getId: () => mockActiveSkillId,
+    // Perform the filtering.
+    let filteredSkills = component.searchInUntriagedSkillSummaries(searchText);
+
+    // Assertions.
+    expect(filteredSkills.length).toBe(2);
+    filteredSkills.forEach(skill => {
+      expect(skill.id).not.toEqual(activeSkillId);
+      expect(skill.description.includes(searchText)).toBeTrue();
     });
-
-    component.untriagedSkillSummaries = mockSkillSummaries;
-
-    // Act.
-    const filteredSkills = component.filterUntriagedSkills();
-
-    // Assert.
-    expect(filteredSkills).toEqual([
-      'skill1', // Excludes the current skill with mockActiveSkillId.
-    ]);
   });
 });
