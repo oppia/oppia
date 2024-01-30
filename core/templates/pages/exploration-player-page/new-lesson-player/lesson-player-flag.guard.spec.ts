@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 import { IsNewLessonPlayerGuard } from './lesson-player-flag.guard';
@@ -36,6 +36,12 @@ class MockPlatformFeatureService {
   }
 }
 
+class MockRouter {
+  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+}
+
 describe('IsNewLessonPlayerGuard', () => {
   let router: Router;
   let guard: IsNewLessonPlayerGuard;
@@ -48,6 +54,10 @@ describe('IsNewLessonPlayerGuard', () => {
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService
+        },
+        {
+          provide: Router,
+          useClass: MockRouter
         }
       ]
     }).compileComponents();

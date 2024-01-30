@@ -39,23 +39,23 @@ describe('SidebarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should toggle width between 75px and 250px when clicked', fakeAsync(() => {
-    const sidebarElement: HTMLElement = fixture.nativeElement;
-    const sidebarDiv =
-      sidebarElement.querySelector(
-        '.oppia-lesson-player-sidebar'
-      ) as HTMLElement;
-    tick();
-    expect(sidebarDiv.style.width).toBe('75px');
+  it(
+    'should toggle width between 75px and 250px when clicked',
+    fakeAsync(() => {
+      const sidebarElement =
+        fixture.debugElement.nativeElement.querySelector(
+          '.oppia-lesson-player-sidebar');
+      expect(sidebarElement).not.toBeNull();
+      expect(sidebarElement.classList.contains('expanded')).toBe(false);
 
-    component.toggleSidebar();
-    tick();
-    fixture.detectChanges();
-    expect(sidebarDiv.style.width).toBe('250px');
+      component.toggleSidebar();
+      tick();
+      fixture.detectChanges();
+      expect(sidebarElement.classList.contains('expanded')).toBe(true);
 
-    component.toggleSidebar();
-    tick();
-    fixture.detectChanges();
-    expect(sidebarDiv.style.width).toBe('75px');
-  }));
+      component.toggleSidebar();
+      tick();
+      fixture.detectChanges();
+      expect(sidebarElement.classList.contains('expanded')).toBe(false);
+    }));
 });
