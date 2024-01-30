@@ -474,7 +474,6 @@ describe('Contribution Admin dashboard stats service', () => {
 
   it('should return classroom data for a classroom id', fakeAsync(
     () => {
-      spyOn(cdasbas, 'fetchTopics').and.callThrough();
       let response = {
         classroomDict: {
           classroomId: 'mathClassroomId',
@@ -485,13 +484,15 @@ describe('Contribution Admin dashboard stats service', () => {
           topicIdToPrerequisiteTopicIds: {}
         }
       };
+      let classroomId = '0';
+
       spyOn(crbas, 'getClassroomDataAsync')
         .and.returnValue(Promise.resolve(response));
 
       spyOn(crbas, 'fetchClassroomDataAsync')
         .and.returnValue(Promise.resolve(sampleClassroomDataObject));
 
-      cdasbas.fetchTopics('0').then(
+      cdasbas.fetchTopics(classroomId).then(
         successHandler, failHandler
       );
       flushMicrotasks();
@@ -506,9 +507,8 @@ describe('Contribution Admin dashboard stats service', () => {
 
   it('should return data for all classrooms', fakeAsync(
     () => {
-      spyOn(cdasbas, 'fetchTopicChoices').and.callThrough();
       spyOn(crbas, 'getAllClassroomIdToClassroomNameDictAsync')
-        .and.returnValue(Promise.resolve({mathclassroomId: 'math'}));
+        .and.returnValue(Promise.resolve({mathClassroomId: 'math'}));
       spyOn(cdasbas, 'fetchTopics')
         .and.returnValue(Promise.resolve([
           { id: '1', topic: 'Science' },
@@ -523,7 +523,7 @@ describe('Contribution Admin dashboard stats service', () => {
       expect(crbas.getAllClassroomIdToClassroomNameDictAsync).
         toHaveBeenCalled();
       expect(cdasbas.fetchTopics).
-        toHaveBeenCalledWith('mathclassroomId');
+        toHaveBeenCalledWith('mathClassroomId');
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();

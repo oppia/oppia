@@ -30,7 +30,7 @@ import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-
 import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { UserInfo } from 'domain/user/user-info.model';
-import {ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
+import { ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
 import { By } from '@angular/platform-browser';
@@ -152,7 +152,7 @@ describe('Contributor dashboard Admin page', () => {
     fixture.destroy();
   });
 
-  describe('null username', () => {
+  describe('when user is not logged in', () => {
     beforeEach(() => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(nullUserInfo));
@@ -170,14 +170,14 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
-  describe('null language', () => {
+  describe('when no languages are available', () => {
     beforeEach(() => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
     });
 
-    it('should find language en if no language is populated ' +
-      'if username is not null', fakeAsync(() => {
+    it('should default to English language if no language is populated ' +
+      'if user is logged in', fakeAsync(() => {
       component.ngOnInit();
       tick();
       fixture.detectChanges();
@@ -190,7 +190,7 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
-  describe('Not null username', () => {
+  describe('when user is logged in', () => {
     beforeEach(() => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo));
@@ -461,7 +461,7 @@ describe('Contributor dashboard Admin page', () => {
       }));
 
     it('should open question role editor modal when on question' +
-      ' submitter/reviewer tabs', fakeAsync(() => {
+      ' submitter tab', fakeAsync(() => {
       const removeRightsSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync');
