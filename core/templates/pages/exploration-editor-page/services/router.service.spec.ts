@@ -106,7 +106,7 @@ describe('Router Service', () => {
   it('should initialize the current location hash', fakeAsync(() => {
     spyOn(routerService, '_changeTab').and.callThrough();
 
-    window.location.hash = '/settings';
+    windowRef.nativeWindow.location.hash = '#/settings';
     routerService.init();
     tick(300);
 
