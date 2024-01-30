@@ -542,8 +542,9 @@ describe('Contributor dashboard Admin page', () => {
   }));
 
   it('should rearrange language name', () => {
-    expect(component.rearrangeLanguageName('Hinglish')).toBe('Hinglish');
-    expect(component.rearrangeLanguageName('Azeri (Azerbaijani)'))
+    expect(component.putEnglishLanguageNameAtFront('Hinglish'))
+      .toBe('Hinglish');
+    expect(component.putEnglishLanguageNameAtFront('Azeri (Azerbaijani)'))
       .toBe('Azerbaijani (Azeri)');
   });
 });

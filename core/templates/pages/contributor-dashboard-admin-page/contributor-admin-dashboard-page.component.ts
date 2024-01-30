@@ -192,7 +192,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   putEnglishLanguageNameAtFront(language: string): string {
     // Check if the language contains the expected format 'abc (something)'.
-    const pattern = new RegExp(/([\p{L}]+)\s*\(([\p{L}]+)\)/, 'u');
+    const pattern = /([^\s]*)\s*\(([a-zA-Z]+)\)/;
     const result = language.replace(pattern, '$2 ($1)');
     return result;
   }
