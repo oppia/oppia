@@ -103,6 +103,17 @@ describe('Router Service', () => {
     testSubscriptions.unsubscribe();
   });
 
+  it('should initialize the current location hash', fakeAsync(() => {
+    spyOn(routerService, '_changeTab').and.callThrough();
+
+    window.location.hash = '/settings';
+    routerService.init();
+    tick(300);
+
+    expect(routerService._changeTab).toHaveBeenCalledWith('/settings');
+    expect(routerService.getActiveTabName()).toBe('settings');
+  }));
+
   it('should not navigate to main tab when already there', fakeAsync(() => {
     let jQuerySpy = spyOn(window, '$');
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
