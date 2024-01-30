@@ -100,8 +100,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveInteractionData(): void {
     this._updateQuestion(() => {
-      this.stateEditorService.setInteractionId(
-        cloneDeep(this.interactionId));
+      if(this.interactionId !== undefined) {
+        this.stateEditorService.setInteractionId(
+          cloneDeep(this.interactionId));
+      }
       this.stateEditorService.setInteractionCustomizationArgs(
         cloneDeep(this.customizationArgs));
     });
