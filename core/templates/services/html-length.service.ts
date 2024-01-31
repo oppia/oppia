@@ -18,9 +18,12 @@
 
 const CALCULATION_TYPE_WORD = 'word';
 const CALCULATION_TYPE_CHARACTER = 'character';
-const CUSTOM_TAG_REGEX = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
 
-type CalculationType = 'word' | 'character';
+// eslint-disable-next-line max-len
+const CUSTOM_TAG_REGEX = /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs)[^>]*>/g;
+
+type CalculationType =
+ typeof CALCULATION_TYPE_WORD | typeof CALCULATION_TYPE_CHARACTER;
 
 import { Injectable, SecurityContext } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
@@ -39,7 +42,13 @@ export class HtmlLengthService {
     * ['oppia-noninteractive-image', 'oppia-noninteractive-math']
     * The above tags constitutes for non text nodes.
     */
-  nonTextTags = ['oppia-noninteractive-math', 'oppia-noninteractive-image'];
+  nonTextTags = ['oppia-noninteractive-math',
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-skillreview'];
 
   /**
     * ['li','blockquote','em','strong', 'p', 'a']
@@ -94,7 +103,14 @@ export class HtmlLengthService {
   private calculateBaselineLength(
       sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
-    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+    let dom: Document;
+    try {
+      dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+    } catch (error) {
+      throw new Error(
+        'Failed to parse HTML string.' +
+        'Ensure valid HTML tags string is provided.');
+    }
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
       const ltag = tag.tagName.toLowerCase();
@@ -108,15 +124,20 @@ export class HtmlLengthService {
 
   private getWeightForTextNodes(
       textNode: HTMLElement, calculationType: CalculationType): number {
-    const textContent = textNode.textContent || '';
+    const textContent = (textNode.textContent || '').trim();
+    return (textContent === '') ? 0 :
+        this.textWeightCalculation(textContent, calculationType);
+  }
 
-    let textContentTrimmed = textContent.trim();
-    let textContentCount: number = 0;
+  private textWeightCalculation(
+      textContent: string, calculationType: CalculationType): number {
+    let trimmedTextContent = textContent.trim();
+    let textContentCount = 0;
     if (calculationType === CALCULATION_TYPE_WORD) {
-      const words = textContentTrimmed.split(' ');
+      const words = trimmedTextContent.split('\n').join('').split(' ');
       textContentCount = words.length;
     } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
-      const characters = textContentTrimmed.split('\n').join('').split('');
+      const characters = trimmedTextContent.split('\n').join('').split('');
       textContentCount = characters.length;
     }
     return textContentCount;
@@ -126,19 +147,23 @@ export class HtmlLengthService {
       nonTextNode: string, calculationType: CalculationType): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;
-    }
-    const altTextMatch = nonTextNode
-      .match(/alt-with-value="&amp;quot;([^&]*)&amp;quot;"/);
-
-    let text = [];
-    if (altTextMatch && altTextMatch[1]) {
-      const altText = altTextMatch[1];
-      if (calculationType === CALCULATION_TYPE_WORD) {
-        text = altText.trim().split(' ');
-      } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
-        text = altText.trim().split(' ').join('').split('');
+    } else if (nonTextNode.includes(
+      'oppia-noninteractive-collapsible') || nonTextNode.includes(
+      'oppia-noninteractive-tabs')) {
+      return 1000;
+    } else if (nonTextNode.includes('oppia-noninteractive-video')) {
+      return 0;
+    } else {
+      const textMatch = nonTextNode.match(
+        /(text-with-value|alt-with-value)="&amp;quot;([^&]*)&amp;quot;"/);
+      if (textMatch && textMatch[2]) {
+        const text = textMatch[2];
+        const weight = this.textWeightCalculation(text, calculationType);
+        return nonTextNode.includes(
+          'oppia-noninteractive-image') ? weight + 10 : weight;
+      } else {
+        throw new Error('Unable to determine weight for non-text node.');
       }
     }
-    return text.length + 10; // +10 as a bonus for images with text.
   }
 }

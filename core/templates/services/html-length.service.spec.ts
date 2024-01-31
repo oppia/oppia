@@ -127,7 +127,7 @@ describe('Html Length Service', () => {
   '(image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
-      'file for demol&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
+      'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
       'h&amp;quot;" filepath-with-value="&amp;quot;img_20230602_111340' +
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
@@ -136,6 +136,114 @@ describe('Html Length Service', () => {
 
     expect(result).toBe(17);
   });
+
+  it('should compute word count of content with text and non-text ' +
+  '(math tag and image tag)', () => {
+    const htmlString = '<p>Hi this seems too good to be true but what' +
+      ' to do man<oppia-noninteractive-math math_content-with-value="' +
+      '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
+      ';quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_2023' +
+      '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
+      'svg&amp;quot;}\"></oppia-noninteractive-math></p>' +
+      '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
+      'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
+      'h&amp;quot;" filepath-with-value="&amp;quot;img_20230602_111340' +
+      '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
+      '.14"></oppia-noninteractive-image>';
+
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
+    expect(result).toBe(28);
+  });
+
+
+  it('should compute word count of content with text and all non-text', () => {
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' + 
+    'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
+    ':&amp;quot;Hint introduction&amp;quot;,&amp;quot;content' +
+    '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This set of tabs shows' +
+    'some hints. Click on the other tabs to display the relevant' +
+    'hints.&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;' +
+    ':&amp;quot;Hint 1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot' +
+    ';&amp;lt;p&amp;gt;This is a first hint.&amp;lt;/p&amp;gt;&amp;quot' +
+    ';}]"></oppia-noninteractive-tabs>' +
+    '<p>Demo hint just to check</p>' +
+    '<oppia-noninteractive-collapsible _nghost-xvp-c48=""' +
+    'content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have' +
+    'opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
+    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' + 
+    'ng-version="11.2.14"></oppia-noninteractive-collapsible>' +
+    '<oppia-noninteractive-image alt-with-value="&amp;quot;Code' +
+    ' image for testing &amp;quot;" caption-with-value="&amp;quo' +
+    't;Coding&amp;quot;" filepath-with-value="&amp;quot;img_2024' +
+    '0201_031507_0h88rxt92n_height_43_width_490.png&amp;quot;' +
+    '" ng-version="11.2.14"></oppia-noninteractive-image>' +
+    '<p><oppia-noninteractive-link ng-version="11.2.14" te' +
+    'xt-with-value="&amp;quot;oppia link&amp;quot;" url-with-' +
+    'value="&amp;quot;https://www.oppia.org/&amp;quot;">' +
+    '</oppia-noninteractive-link></p>' +
+    '<p><oppia-noninteractive-math math_content-with-value="' +
+    '{&amp;quot;raw_latex&amp;quot;:&amp;quot;x/y&amp;quot;' +
+    ',&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20240' +
+    '201_031627_1vr2hlu8ly_height_2d731_width_3d679_vertical_' +
+    '0d833.svg&amp;quot;}" ng-version="11.2.14"></oppia-' +
+    'noninteractive-math></p>' +
+    '<p><oppia-noninteractive-skillreview ng-version="11.2.14"' +
+    ' skill_id-with-value="&amp;quot;&amp;quot;" text-with-v' +
+    'alue="&amp;quot;concept card&amp;quot;"></oppia-nonint' +
+    'eractive-skillreview></p>' +
+    '<oppia-noninteractive-video _nghost-xvp-c49="" autoplay' +
+    '-with-value="false" end-with-value="0" ng-version="11.2' +
+    '.14" start-with-value="0" video_id-with-value="&amp;q' +
+    'uot;Ntcw0H0hwPU&amp;quot;"></oppia-noninteractive-video>' +
+    '<p>&nbsp;</p>' +
+    '<p>done!</p>';
+
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
+    expect(result).toBe(2025);
+  });
+
+  it('should compute word count of content with text and non-text ' +
+  '(Collapsible tag and tab tag)', () => {
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
+     'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
+     ':&amp;quot;Hint introduction&amp;quot;' +
+     ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
+     'p&amp;gt;This set of tabs shows' +
+      'some hints. Click on the other tabs to display' +
+       'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
+      '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;' +
+      ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
+       'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
+       '"></oppia-noninteractive-tabs>' +
+     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible' +
+      '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
+      ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
+       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
+        'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
+
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
+    expect(result).toBe(2005);
+  });
+
+  it('should compute word count of content with text and non-text ' +
+  '(link tag and concept card tag)', () => {
+    const htmlString = '<p><oppia-noninteractive-skillreview' +
+    'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
+     'text-with-value="&amp;quot;concept card&amp;quot;">' +
+     '</oppia-noninteractive-skillreview></p>' +
+    '<p>Demo hint just to check</p>' +
+    '<p><oppia-noninteractive-link ng-version="11.2.14"' +
+    'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
+    'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
+
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
+    expect(result).toBe(9);
+  });
+
 
   it('should compute word count of content of ordered lists', () => {
     const htmlString = '<ol><li>This is the first item</li><li> This is' +
@@ -236,7 +344,116 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
 
-    expect(result).toBe(42);
+    expect(result).toBe(45);
+  });
+
+  it('should compute character count of content with text and non-text ' +
+  '(math tag and image tag)', () => {
+    const htmlString = '<p>Hi this seems too good to be true but what' +
+      ' to do man<oppia-noninteractive-math math_content-with-value="' +
+      '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
+      ';quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_2023' +
+      '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
+      'svg&amp;quot;}\"></oppia-noninteractive-math></p>' +
+      '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
+      'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
+      'h&amp;quot;" filepath-with-value="&amp;quot;img_20230602_111340' +
+      '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
+      '.14"></oppia-noninteractive-image>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(80);
+  });
+
+
+  it('should compute character count of content with text and non-text ' +
+  '(Collapsible tag and tab tag)', () => {
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
+     'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
+     ':&amp;quot;Hint introduction&amp;quot;' +
+     ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
+     'p&amp;gt;This set of tabs shows' +
+      'some hints. Click on the other tabs to display' +
+       'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
+      '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;' +
+      ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
+       'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
+       '"></oppia-noninteractive-tabs>' +
+     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible' +
+      '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
+      ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
+       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
+        'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(2023);
+  });
+
+
+  it('should compute character count of content with text and non-text ' +
+  '(link tag and concept card tag)', () => {
+    const htmlString = '<p><oppia-noninteractive-skillreview' +
+    'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
+     'text-with-value="&amp;quot;concept card&amp;quot;">' +
+     '</oppia-noninteractive-skillreview></p>' +
+    '<p>Demo hint just to check</p>' +
+    '<p><oppia-noninteractive-link ng-version="11.2.14"' +
+    'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
+    'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(45);
+  });
+
+  it('should compute character count of content with text' +
+   ' and all non-text', () => {
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' + 
+    'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
+    ':&amp;quot;Hint introduction&amp;quot;,&amp;quot;content' +
+    '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This set of tabs shows' +
+    'some hints. Click on the other tabs to display the relevant' +
+    'hints.&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;' +
+    ':&amp;quot;Hint 1&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot' +
+    ';&amp;lt;p&amp;gt;This is a first hint.&amp;lt;/p&amp;gt;&amp;quot' +
+    ';}]"></oppia-noninteractive-tabs>' +
+    '<p>Demo hint just to check</p>' +
+    '<oppia-noninteractive-collapsible _nghost-xvp-c48=""' +
+    'content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have' +
+    'opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
+    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' + 
+    'ng-version="11.2.14"></oppia-noninteractive-collapsible>' +
+    '<oppia-noninteractive-image alt-with-value="&amp;quot;Code' +
+    ' image for testing &amp;quot;" caption-with-value="&amp;quo' +
+    't;Coding&amp;quot;" filepath-with-value="&amp;quot;img_2024' +
+    '0201_031507_0h88rxt92n_height_43_width_490.png&amp;quot;' +
+    '" ng-version="11.2.14"></oppia-noninteractive-image>' +
+    '<p><oppia-noninteractive-link ng-version="11.2.14" te' +
+    'xt-with-value="&amp;quot;oppia link&amp;quot;" url-with-' +
+    'value="&amp;quot;https://www.oppia.org/&amp;quot;">' +
+    '</oppia-noninteractive-link></p>' +
+    '<p><oppia-noninteractive-math math_content-with-value="' +
+    '{&amp;quot;raw_latex&amp;quot;:&amp;quot;x/y&amp;quot;' +
+    ',&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20240' +
+    '201_031627_1vr2hlu8ly_height_2d731_width_3d679_vertical_' +
+    '0d833.svg&amp;quot;}" ng-version="11.2.14"></oppia-' +
+    'noninteractive-math></p>' +
+    '<p><oppia-noninteractive-skillreview ng-version="11.2.14"' +
+    ' skill_id-with-value="&amp;quot;&amp;quot;" text-with-v' +
+    'alue="&amp;quot;concept card&amp;quot;"></oppia-nonint' +
+    'eractive-skillreview></p>' +
+    '<oppia-noninteractive-video _nghost-xvp-c49="" autoplay' +
+    '-with-value="false" end-with-value="0" ng-version="11.2' +
+    '.14" start-with-value="0" video_id-with-value="&amp;q' +
+    'uot;Ntcw0H0hwPU&amp;quot;"></oppia-noninteractive-video>' +
+    '<p>&nbsp;</p>' +
+    '<p>done!</p>';
+
+    const result = htmlLengthService.computeHtmlLengthInCharacters(htmlString);
+
+    expect(result).toBe(2083);
   });
 
   it('should compute character count of content of ordered lists', () => {
