@@ -192,9 +192,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   putEnglishLanguageNameAtFront(language: string): string {
     // Check if the language contains the expected format 'abc (something)'.
-    const pattern = /([^\s]*)\s*\(([a-zA-Z]+)\)/;
-    const result = language.replace(pattern, '$2 ($1)');
-    return result;
+    const pattern = /(.*)\s*\(([a-zA-Z ]+)\)/;
+    const match = language.match(pattern);
+    if (!match) {
+      return language;
+    }
+    const originalLanguageName = match[1].trim();
+    const englishLanguageName = match[2].trim();
+    return `${englishLanguageName} (${originalLanguageName})`;
   }
 
   toggleLanguageDropdown(): void {
