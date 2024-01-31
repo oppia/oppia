@@ -46,8 +46,8 @@ import { CertificateDownloadModalComponent } from './modal-templates/certificate
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
 import { BadgeComponent } from './badge/badge.component';
 import { ContributorDashboardPageRootComponent } from './contributor-dashboard-page-root.component';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { RteHelperService } from 'services/rte-helper.service';
 
 @NgModule({
   imports: [
@@ -104,6 +104,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent
-  ]
+  ],
+  providers: [RteHelperService]
 })
 export class ContributorDashboardPageModule {}
