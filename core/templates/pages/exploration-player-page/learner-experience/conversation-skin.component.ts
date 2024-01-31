@@ -1332,7 +1332,7 @@ export class ConversationSkinComponent {
           });
 
           if (remainOnCurrentCard) {
-            this.remainOnCurrentCard(
+            this.giveFeedbackAndStayOnCurrentCard(
               feedbackHtml,
               missingPrerequisiteSkillId,
               refreshInteraction,
@@ -1346,7 +1346,7 @@ export class ConversationSkinComponent {
     );
   }
 
-  private remainOnCurrentCard(
+  private giveFeedbackAndStayOnCurrentCard(
       feedbackHtml: string | null,
       missingPrerequisiteSkillId: string | null,
       refreshInteraction: boolean,
