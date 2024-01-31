@@ -251,6 +251,38 @@ var RichTextEditor = async function(elem) {
       }
       await _clickToolbarButton('.cke_button__bulletedlist');
     },
+    // This finds and highlights a certain text in the RTE.
+    highlightText: async function(text) {
+      var paragraphNodes = await rteElements[0].$$('p');
+      var textNode = null;
+      var startIndex = -1;
+      var endIndex = -1;
+
+      for (var node of paragraphNodes) {
+        var nodeText = await node.getText();
+        var index = nodeText.indexOf(text);
+
+        if (index !== -1) {
+          textNode = node;
+          startIndex = index;
+          endIndex = index + text.length;
+          break;
+        }
+      }
+
+      if (!textNode || startIndex === -1 || endIndex === -1) {
+        throw new Error('Specified text to highlight not found in RTE');
+      }
+
+      await browser.execute((element, start, end) => {
+        var range = document.createRange();
+        range.setStart(element.firstChild, start);
+        range.setEnd(element.firstChild, end);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }, textNode, startIndex, endIndex);
+    },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
