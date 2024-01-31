@@ -463,7 +463,7 @@ describe('SkillSelectorComponent', () => {
 
     // Assertions.
     expect(filteredSkills.length).toBe(2);
-    
+
     filteredSkills.forEach(skill => {
       expect(skill.id).not.toEqual(activeSkillId);
       expect(skill.description.includes(searchText)).toBeTrue();
