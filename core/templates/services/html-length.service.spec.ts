@@ -158,7 +158,7 @@ describe('Html Length Service', () => {
 
 
   it('should compute word count of content with text and all non-text', () => {
-    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' + 
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
     'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
     ':&amp;quot;Hint introduction&amp;quot;,&amp;quot;content' +
     '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This set of tabs shows' +
@@ -171,7 +171,7 @@ describe('Html Length Service', () => {
     '<oppia-noninteractive-collapsible _nghost-xvp-c48=""' +
     'content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have' +
     'opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
-    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' + 
+    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
     'ng-version="11.2.14"></oppia-noninteractive-collapsible>' +
     '<oppia-noninteractive-image alt-with-value="&amp;quot;Code' +
     ' image for testing &amp;quot;" caption-with-value="&amp;quo' +
@@ -410,7 +410,7 @@ describe('Html Length Service', () => {
 
   it('should compute character count of content with text' +
    ' and all non-text', () => {
-    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' + 
+    const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
     'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
     ':&amp;quot;Hint introduction&amp;quot;,&amp;quot;content' +
     '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This set of tabs shows' +
@@ -423,7 +423,7 @@ describe('Html Length Service', () => {
     '<oppia-noninteractive-collapsible _nghost-xvp-c48=""' +
     'content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have' +
     'opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
-    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' + 
+    'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
     'ng-version="11.2.14"></oppia-noninteractive-collapsible>' +
     '<oppia-noninteractive-image alt-with-value="&amp;quot;Code' +
     ' image for testing &amp;quot;" caption-with-value="&amp;quo' +
