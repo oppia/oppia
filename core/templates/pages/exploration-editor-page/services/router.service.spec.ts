@@ -104,9 +104,13 @@ describe('Router Service', () => {
   });
 
   it('should change tab on init', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow')
+      .and.returnValue({
+        location: {
+          hash: '#/settings'
+        }
+      });
     spyOn(routerService, '_changeTab');
-    spyOn(windowRef.navtiveWindow.location, 'hash')
-      .and.returnValue('#/settings');
 
     routerService.init();
     tick();
