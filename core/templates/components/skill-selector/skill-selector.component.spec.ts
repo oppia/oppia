@@ -452,7 +452,6 @@ describe('SkillSelectorComponent', () => {
   // Prepare test data.
     component.untriagedSkillSummaries = [
       new SkillSummary('skill1', 'Skill One', 'en', 1, 2, 3, 123, 456),
-      new SkillSummary('skill5', 'Skill Two', 'en', 1, 4, 5, 890, 790),
       new SkillSummary('skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468)
     ];
     let activeSkillId = 'skill2';
