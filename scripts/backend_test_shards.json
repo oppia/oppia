@@ -395,6 +395,7 @@
         "core.jobs.batch_jobs.story_node_jobs_test",
         "core.storage.voiceover.gae_models_test",
         "core.domain.voiceover_domain_test",
-        "core.domain.voiceover_services_test"
+        "core.domain.voiceover_services_test",
+        "core.controllers.voiceover_test"
     ]
 }
