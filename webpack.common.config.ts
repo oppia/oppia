@@ -129,6 +129,9 @@ module.exports = {
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
+    voiceover_admin:
+      commonPrefix + '/pages/voiceover-admin-page/' +
+      'voiceover-admin-page.import.ts',
   },
 
   /**
@@ -475,6 +478,25 @@ module.exports = {
       template:
         commonPrefix + '/pages/learner-group-pages/edit-group/' +
         'edit-learner-group-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['voiceover_admin'],
+      filename: 'voiceover-admin-page.mainpage.html',
+      hybrid: true,
+      meta: {
+        name: defaultMeta.name,
+        description: 'The voiceover admin page provides functionalities ' +
+        'for the voiceover admin, allowing them to manage language accent' +
+        ' support for Oppia\'s voiceovers. The Voiceover Admin can use ' +
+        'this page to add new language accent support, remove existing ' +
+        'language accent support, and generate automatic voiceovers ' +
+        'for exploration.'
+      },
+      template:
+        commonPrefix + '/pages/voiceover-admin-page/' +
+        'voiceover-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
