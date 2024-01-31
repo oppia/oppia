@@ -1100,6 +1100,10 @@ NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+VOICEOVER_ADMIN_PAGE_URL = '/voiceover-admin'
+VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
+VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
+    '/voiceover_language_codes_mapping')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

@@ -7888,11 +7888,69 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_classroom_admin_can_manage_blog_editors(self) -> None:
+    def test_classroom_admin_can_access_classroom_admin_page(self) -> None:
         self.login(self.CLASSROOM_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/classroom-admin')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_voiceover_admin_page decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_voiceover_admin_page
+        def get(self) -> None:
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/voiceover-admin', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_voiceover_admin_page(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access voiceover admin page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_voiceover_admin_page(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_voiceover_admin_can_access_voiceover_admin_page(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/voiceover-admin')
 
         self.assertEqual(response['success'], 1)
         self.logout()

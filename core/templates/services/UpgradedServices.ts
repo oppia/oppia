@@ -461,6 +461,7 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
+import { VoiceoverBackendApiService } from 'domain/voiceover/voiceover-backend-api.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -1100,6 +1101,10 @@ export class UpgradedServices {
       upgradedServices['WindowRef'],
       upgradedServices['UserBackendApiService']
     );
+    upgradedServices['VoiceoverBackendApiService'] =
+      new VoiceoverBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =

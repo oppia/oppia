@@ -96,10 +96,9 @@ angular.module('oppia').directive('oppiaRoot', [
               'ThreadStatusDisplayService',
               'TopicViewerBackendApiService',
               'TranslationLanguageService', 'UrlInterpolationService',
-              'UrlService',
-              'UserExplorationPermissionsService',
-              'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-              'WindowRef',
+              'UrlService', 'UserExplorationPermissionsService',
+              'UtilsService', 'ValidatorsService', 'VoiceoverBackendApiService',
+              'WindowDimensionsService', 'WindowRef',
             ];
             for (let serviceName of servicesToProvide) {
               OppiaAngularRootComponent.ajsValueProvider(
