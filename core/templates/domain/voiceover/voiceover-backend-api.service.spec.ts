@@ -136,7 +136,7 @@ describe('Voiceover backend API service', function() {
   }));
 
   it(
-    'should be able to handle errorcallback while updaing language codes',
+    'should be able to handle error callback while updaing language codes',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
