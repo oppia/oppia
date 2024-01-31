@@ -296,7 +296,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { DebouncerService } from 'services/debouncer.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
@@ -444,6 +443,8 @@ import { InsertScriptService } from './insert-script.service';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
 import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
+import { VoiceoverBackendApiService } from
+  'domain/voiceover/voiceover-backend-api.service';
 import { BlogDashboardAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 
@@ -536,7 +537,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CuratedExplorationValidationService', CuratedExplorationValidationService],
   ['CurrentInteractionService', CurrentInteractionService],
   ['DateTimeFormatService', DateTimeFormatService],
-  ['DebouncerService', DebouncerService],
   ['DeviceInfoService', DeviceInfoService],
   ['DiagnosticTestPlayerEngineService', DiagnosticTestPlayerEngineService],
   ['DiagnosticTestPlayerStatusService', DiagnosticTestPlayerStatusService],
@@ -895,6 +895,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
+  ['VoiceoverBackendApiService', VoiceoverBackendApiService],
   ['CheckRevertService', CheckRevertService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
