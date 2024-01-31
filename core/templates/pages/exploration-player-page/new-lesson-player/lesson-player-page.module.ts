@@ -19,21 +19,14 @@
 import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
-import { NewLessonPlayerViewerCommonModule } from './lesson-player-viewer-common.module';
+import { ExplorationPlayerViewerCommonModule } from '../exploration-player-viewer-common.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
-import { LearnerLocalNavComponent } from '../layout-directives/learner-local-nav.component';
-import { FlagExplorationModalComponent } from '../modals/flag-exploration-modal.component';
-import { ExplorationSuccessfullyFlaggedModalComponent } from '../modals/exploration-successfully-flagged-modal.component';
-import { LearnerViewInfoComponent } from '../layout-directives/learner-view-info.component';
 import { MaterialModule } from 'modules/material.module';
-import { RefresherExplorationConfirmationModal } from '../modals/refresher-exploration-confirmation-modal.component';
 import { NewLessonPlayerPageComponent } from './lesson-player-page.component';
-import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 import { NewLessonPlayerPageRoutingModule } from './lesson-player-page-routing.module';
 import { NewLessonPlayerPageRootComponent } from './lesson-player-page-root.component';
-import { ProgressReminderModalComponent } from '../templates/progress-reminder-modal.component';
 import { HintAndSolutionModalService } from '../services/hint-and-solution-modal.service';
 import { FatigueDetectionService } from '../services/fatigue-detection.service';
 
@@ -56,7 +49,7 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    NewLessonPlayerViewerCommonModule,
+    ExplorationPlayerViewerCommonModule,
     SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
@@ -64,13 +57,6 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    ExplorationSuccessfullyFlaggedModalComponent,
-    LessonInformationCardModalComponent,
-    ProgressReminderModalComponent,
-    FlagExplorationModalComponent,
-    LearnerLocalNavComponent,
-    LearnerViewInfoComponent,
-    RefresherExplorationConfirmationModal,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
     PlayerFooterComponent,
@@ -79,13 +65,6 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
   entryComponents: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    ExplorationSuccessfullyFlaggedModalComponent,
-    LessonInformationCardModalComponent,
-    ProgressReminderModalComponent,
-    FlagExplorationModalComponent,
-    LearnerLocalNavComponent,
-    LearnerViewInfoComponent,
-    RefresherExplorationConfirmationModal,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
     PlayerFooterComponent,
