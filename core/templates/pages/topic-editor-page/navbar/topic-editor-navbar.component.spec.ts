@@ -259,6 +259,22 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.getActiveTabName()).toBe('topic_editor');
   });
 
+  it('should return the navbar text on mobile', () => {
+    componentInstance.selectQuestionsTab();
+    let routingSpy = spyOn(
+      topicEditorRoutingService, 'getActiveTabName');
+    routingSpy.and.returnValue('questions');
+    expect(componentInstance.getMobileNavigatorText()).toBe('Questions');
+    routingSpy.and.returnValue('subtopic_editor');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+    routingSpy.and.returnValue('subtopic_preview');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Preview');
+    routingSpy.and.returnValue('topic_preview');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Preview');
+    routingSpy.and.returnValue('main');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+  });
+
   it('should navigate to main tab when user clicks the \'Editor\' ' +
   'option', () => {
     spyOn(topicEditorRoutingService, 'navigateToMainTab');
@@ -272,7 +288,7 @@ describe('Topic Editor Navbar', () => {
     expect(topicEditorRoutingService.navigateToMainTab).toHaveBeenCalled();
   });
 
-  it('should navigate to main tab when user clicks the \'Questions\' ' +
+  it('should navigate to Questions tab when user clicks the \'Questions\' ' +
   'option', () => {
     spyOn(topicEditorRoutingService, 'navigateToQuestionsTab');
     componentInstance.activeTab = 'Editor';
@@ -280,7 +296,7 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance.selectQuestionsTab();
 
-    expect(componentInstance.activeTab).toBe('Question');
+    expect(componentInstance.activeTab).toBe('Questions');
     expect(componentInstance.showNavigationOptions).toBe(false);
     expect(topicEditorRoutingService.navigateToQuestionsTab).toHaveBeenCalled();
   });
@@ -313,6 +329,22 @@ describe('Topic Editor Navbar', () => {
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'Please save all pending changes to preview the topic ' +
       'with the changes', 2000);
+  });
+
+  it('should open subtopic editor when user clicks the \'editor\' ' +
+  'button in the subtopic preview page', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and
+      .returnValue('subtopic_preview');
+    spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and
+      .returnValue(1);
+    spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+    componentInstance.topic = topic;
+
+    componentInstance.selectMainTab();
+
+    expect(componentInstance.activeTab).toBe('Editor');
+    expect(topicEditorRoutingService.navigateToSubtopicEditorWithId)
+      .toHaveBeenCalledWith(1);
   });
 
   it('should open subtopic preview when user clicks the \'preview\' ' +

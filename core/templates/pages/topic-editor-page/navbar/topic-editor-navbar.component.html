@@ -79,8 +79,9 @@
         <div class="oppia-topic-nav-dropdown-option" (click)="selectMainTab()">
           <i class="fas fa-pen"></i><span>Editor</span>
         </div>
-        <div class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
-          <i class="fas fa-pen"></i><span>Questions</span>
+        <div *ngIf="getActiveTabName() !== 'subtopic_preview' && getActiveTabName() !== 'subtopic_editor'"
+             class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
+          <i class="fas fa-book-open"></i><span>Questions</span>
         </div>
         <div class="oppia-topic-nav-dropdown-option" (click)="openTopicViewer()">
           <i class="fas fa-play"></i><span>Preview</span>
@@ -101,7 +102,15 @@
       </div>
       <div class="oppia-topic-nav-dropdown-content">
         <div class="oppia-topic-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="fas fa-pen">&#xE254;</i>
+          <i *ngIf="!getTotalWarningsCount() && (getActiveTabName() === 'main' || getActiveTabName() === 'subtopic_editor')"
+             class="fas fa-pen">&#xE254;
+          </i>
+          <i *ngIf="!getTotalWarningsCount() && getActiveTabName() === 'questions'"
+             class="fas fa-book-open">&#xE254;
+          </i>
+          <i *ngIf="!getTotalWarningsCount() && (getActiveTabName() === 'topic_preview' || getActiveTabName() === 'subtopic_preview')"
+             class="fas fa-play">&#xE254;
+          </i>
           <span>{{ activeTab }}</span>
           <span [hidden]="!totalWarningsCount">
             ({{ totalWarningsCount }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
