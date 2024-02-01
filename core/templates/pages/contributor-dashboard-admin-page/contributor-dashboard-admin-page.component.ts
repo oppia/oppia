@@ -21,7 +21,6 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UserService } from 'services/user.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { ContributorDashboardAdminBackendApiService } from './services/contributor-dashboard-admin-backend-api.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
 interface ViewContributionReviewers {
@@ -378,7 +377,3 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.contributionReviewersResult = {};
   }
 }
-
-angular.module('oppia').directive(
-  'contributorDashboardAdminPage', downgradeComponent(
-    { component: ContributorDashboardAdminPageComponent }));
