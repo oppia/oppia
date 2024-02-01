@@ -3162,7 +3162,8 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '/interactions', params=payload)
-        interaction_ids = sorted(interaction['id'] for interaction in response['interactions'])
+        interaction_ids = sorted(
+            interaction['id'] for interaction in response['interactions'])
         self.assertEqual(
             sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
