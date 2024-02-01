@@ -280,6 +280,21 @@ var clientSideRedirection = async function(
   await waitForCallerSpecifiedConditions();
 };
 
+var nonEmptyText = async function(elementName, element) {
+  await visibilityOf(
+    element, `${elementName} is not visible for getText()`);
+  await browser.waitUntil(
+    async function() {
+      return await element.getText();
+    }, {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: `Text in ${elementName} is empty!\n` +
+                  new Error().stack + '\n'
+    }
+  );
+};
+
+
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
 exports.urlToBe = urlToBe;
@@ -302,3 +317,4 @@ exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.numberOfElementsToBe = numberOfElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;
+exports.nonEmptyText = nonEmptyText;
