@@ -33,6 +33,7 @@ import { UrlInterpolationService } from
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  formLink: string = '';
   partnershipsImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
@@ -67,10 +68,22 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  setFormLink(): void {
+    let userLang = this.translateService.currentLang;
+
+    if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
+      this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+    } else {
+      let interpolatedLanguage = (userLang === 'pt-br') ? 'pt' : userLang;
+      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
+    }
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
+        this.setFormLink();
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -90,17 +103,17 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/partnering_image.png');
     this.org1Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org1.png');
+      '/partner_logos/movimentoAmplia.png');
     this.org2Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org2.png');
+      '/partner_logos/digitalCitizen.png');
     this.org3Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org3.png');
+      '/partner_logos/injazPalestine.png');
     this.org4Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org4.png');
+      '/partner_logos/nairobits.png');
     this.org5Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org5.png');
+      '/partner_logos/edri.png');
     this.org6Url = this.urlInterpolationService.getStaticImageUrl(
-      '/general/org6.png');
+      '/partner_logos/globalCommunities.png');
     this.partner1 = this.urlInterpolationService.getStaticImageUrl(
       '/general/partner1.png');
     this.partner2 = this.urlInterpolationService.getStaticImageUrl(

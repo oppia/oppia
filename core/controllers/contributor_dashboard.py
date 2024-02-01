@@ -492,11 +492,12 @@ class LessonsPinningHandler(
         """Handles pinning/unpinning lessons."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
-        topic_id = self.normalized_payload.get('topic_id')
+        topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
-
-        if language_code and topic_id:
+        if language_code and topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id, language_code, topic_id, opportunity_id
             )
@@ -666,8 +667,8 @@ class TranslatableTextHandler(
         content_id: str,
         suggestions: List[suggestion_registry.BaseSuggestion]
     ) -> bool:
-        """Returns whether a suggestion exists in suggestions with a change dict
-        matching the supplied state_name and content_id.
+        """Returns whether a suggestion exists in suggestions with a
+        change_cmd dict matching the supplied state_name and content_id.
 
         Args:
             state_name: str. Exploration state name.
@@ -675,12 +676,12 @@ class TranslatableTextHandler(
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            bool. True if suggestion exists in suggestions with a change dict
-            matching state_name and content_id, False otherwise.
+            bool. True if suggestion exists in suggestions with a change_cmd
+            dict matching state_name and content_id, False otherwise.
         """
         return any(
-            s.change.state_name == state_name and
-            s.change.content_id == content_id for s in suggestions)
+            s.change_cmd.state_name == state_name and
+            s.change_cmd.content_id == content_id for s in suggestions)
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
@@ -948,8 +949,9 @@ class TranslationPreferenceHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         language_code = self.normalized_payload['language_code']
-        user_services.update_preferred_translation_language_code(
-            self.user_id, language_code)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.preferred_translation_language_code = language_code
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 

@@ -1,0 +1,135 @@
+<mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
+  <h3>Update language/accent pairs available for learners and voice artists</h3>
+  <div class="card-content">
+    <div *ngIf="!pageIsInitialized">
+      <p>Loading ...</p>
+    </div>
+
+    <div *ngIf="pageIsInitialized">
+      <p class="oppia-supported-language-pair-heading"
+         *ngIf="!languageAccentCodeIsPresent">
+        No language/accent pairs added!
+      </p>
+      <p class="oppia-supported-language-pair-heading"
+         *ngIf="languageAccentCodeIsPresent">
+        Supported language/accent pairs
+      </p>
+    </div>
+
+    <div *ngIf="pageIsInitialized">
+      <div>
+        <mat-list class="oppia-supported-language-list">
+          <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
+            <div class="oppia-language-accent-list">
+              <span>
+                {{languageAccentCodeToDescription.value}}
+              </span>
+              <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
+                      mat-icon-button
+                      mat-button>
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
+        <mat-form-field class="oppia-language-accent-dropdown-selector">
+          <mat-label>Language Accent pair</mat-label>
+          <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+            <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+                        [value]="languageAccentCodeToDescription.key">
+              <span>
+                {{languageAccentCodeToDescription.value}}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button (click)="removeLanguageAccentDropdown()"
+                mat-icon-button
+                mat-button
+                class="btn btn-secondary oppia-cancel-language-accent-dropdown">
+          Cancel
+        </button>
+      </div>
+
+      <div class="oppia-first-card-bottom-buttons">
+        <button (click)="showLanguageAccentDropdown()"
+                *ngIf="!languageAccentDropdownIsShown"
+                class="btn btn-secondary">
+          <mat-icon>add</mat-icon>
+          <span> Add new language accent support</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<style>
+  .oppia-cancel-language-accent-dropdown {
+    width: fit-content;
+  }
+  .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  .oppia-update-button {
+    margin-left: 10px;
+  }
+  .card-content {
+    padding: 20px
+  }
+  .oppia-language-accent-list {
+    align-items: center;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-dropdown {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 25px;
+    padding-top: 20px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-list:hover {
+    background-color: #d0cdcd;
+  }
+  .oppia-first-card-bottom-buttons {
+    display: flex;
+    margin-left: 25px;
+    padding-top: 20px;
+  }
+  .oppia-language-accent-dropdown-selector {
+    width: 400px;
+  }
+  .oppia-add-language-accent-button {
+    color: #00645c;
+  }
+  .oppia-supported-language-pair-heading {
+    font-weight: bold;
+    margin-left: 25px;
+  }
+  .oppia-supported-language-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .oppia-expansion-panel-header {
+    height: 90px;
+  }
+  .mat-card.oppia-page-card {
+    background: rgb(255,255,255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-top: 5%;
+    overflow: auto;
+    padding: 30px 55px 30px 45px;
+    position: relative;
+  }
+  /* :ng-deep is used to style the dropdown select panel.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .mat-select-panel {
+    margin-left: 15px;
+  }
+</style>

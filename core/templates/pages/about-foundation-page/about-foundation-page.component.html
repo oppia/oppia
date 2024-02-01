@@ -77,6 +77,7 @@
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
       </div>
       <div class="row">
+<<<<<<< HEAD
         <button class="btn">
           <a id="about-foundation-page-learn-more-about-oppia-button"
              href="/about"
@@ -85,6 +86,13 @@
              {{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}
           </a>
         </button>
+=======
+        <oppia-primary-button class="about-foundation-page-button-area"
+            buttonHref="/about"
+            [customClasses]="['btn']"
+            buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}">
+        </oppia-primary-button>
+>>>>>>> develop
       </div>
     </div>
     <div class="col-lg-4 oppia-about-foundation-image-with-caption">
@@ -120,6 +128,7 @@
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
       </div>
       <div class="row">
+<<<<<<< HEAD
         <button class="btn">
           <a id="about-foundation-page-become-a-volunteer-button"
              href="/volunteer"
@@ -128,6 +137,13 @@
              {{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}
           </a>
         </button>
+=======
+        <oppia-primary-button class="about-foundation-page-button-area"
+            buttonHref="/volunteer"
+            [customClasses]="['btn']"
+            buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}">
+        </oppia-primary-button>
+>>>>>>> develop
       </div>
     </div>
   </div>
@@ -225,15 +241,6 @@
     text-decoration: none;
   }
 
-  .about-foundation-page button a {
-    color: rgba(255, 255, 255, 1);
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 1em;
-    font-weight: 500;
-    letter-spacing: 0.7px;
-    text-decoration: none;
-  }
-
   .oppia-about-foundation-info-card-gray a:hover,
   .oppia-about-foundation-info-card-white a:hover {
     text-decoration: underline;
@@ -257,11 +264,14 @@
     padding: 5em 10em;
   }
 
-  .about-foundation-page button {
-    background-color: #00645c;
-    border-radius: 4px;
-    height: 40px;
+  .about-foundation-page .about-foundation-page-button-area {
     margin: 30px auto;
+  }
+
+  :host {
+    .about-foundation-page-button-area button {
+      height: 40px;
+    }
   }
 
   .about-foundation-page button:hover,
