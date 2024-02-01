@@ -12,6 +12,7 @@ runs:
         sudo apt-get update
         sudo apt-get install libappindicator3-1
         curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/${CHROME_VERSION}/google-chrome-stable_${CHROME_VERSION}_amd64.deb
+        wait
         sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
         sudo dpkg -i google-chrome.deb
         # get version and assert if it's the same as the one we want to install
