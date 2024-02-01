@@ -1560,7 +1560,7 @@ describe('Admin backend api service', () => {
           .then(successHandler, failHandler);
 
         let req = httpTestingController.expectOne(
-          '/interactionsbyexplorationid?exp_id=123');
+          '/interactions?exp_id=123');
         expect(req.request.method).toEqual('GET');
 
         req.flush(
@@ -1572,29 +1572,6 @@ describe('Admin backend api service', () => {
         expect(failHandler).not.toHaveBeenCalled();
       }));
 
-    it('should return empty interaction IDs' +
-      ' if no interactions are found in the exploration', fakeAsync(() => {
-      let expId = '123';
-      let result = {
-        interactions: []
-      };
-
-      abas.retrieveExplorationInteractionIdsAsync(expId)
-        .then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/interactionsbyexplorationid?exp_id=123');
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(
-        { interactions: []},
-        { status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(result);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-
     it('should fail to get interaction IDs if exploration does not exist'
       , fakeAsync(() => {
         let expId = 'invalidExpId';
@@ -1603,7 +1580,7 @@ describe('Admin backend api service', () => {
           .then(successHandler, failHandler);
 
         let req = httpTestingController.expectOne(
-          '/interactionsbyexplorationid?exp_id=invalidExpId');
+          '/interactions?exp_id=invalidExpId');
         expect(req.request.method).toEqual('GET');
 
         req.flush({
@@ -1616,49 +1593,5 @@ describe('Admin backend api service', () => {
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
       }));
-
-    it('should fail to get interaction IDs if exp_id is empty'
-      , fakeAsync(() => {
-        let expId = '';
-
-        abas.retrieveExplorationInteractionIdsAsync(expId)
-          .then(successHandler, failHandler);
-
-        let req = httpTestingController.expectOne(
-          '/interactionsbyexplorationid?exp_id=');
-        expect(req.request.method).toEqual('GET');
-
-        req.flush({
-          error: 'Exploration does not exist'
-        }, {
-          status: 400, statusText: 'Bad Request'
-        });
-        flushMicrotasks();
-
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
-      }));
-
-    it('should use the rejection handler if the backend request failed.',
-      fakeAsync(() => {
-        let expId = '123';
-        abas.retrieveExplorationInteractionIdsAsync(expId)
-          .then(successHandler, failHandler);
-
-        var req = httpTestingController.expectOne(
-          '/interactionsbyexplorationid?exp_id=123');
-        expect(req.request.method).toEqual('GET');
-
-        req.flush({
-          error: 'Exploration does not exist'
-        }, {
-          status: 500, statusText: 'Internal Server Error'
-        });
-        flushMicrotasks();
-
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
-      })
-    );
   });
 });

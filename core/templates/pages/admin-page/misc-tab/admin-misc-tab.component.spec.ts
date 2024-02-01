@@ -651,7 +651,7 @@ describe('Admin misc tab component ', () => {
           let interactionSpy = spyOn(
             adminBackendApiService, 'retrieveExplorationInteractionIdsAsync')
             .and.returnValue(Promise.resolve(
-              { interactions: ['EndExploration'] }));
+              { interactions: [{id: 'EndExploration'}] }));
 
           component.retrieveExplorationInteractionIds();
           tick();
@@ -659,8 +659,8 @@ describe('Admin misc tab component ', () => {
           expect(interactionSpy).toHaveBeenCalled();
           expect(statusMessageSpy).toHaveBeenCalledWith(
             'Successfully fetched interactions in exploration.');
-          expect(component.explorationInteractionIds)
-            .toEqual(['EndExploration']);
+          expect(component.explorationInteractions)
+            .toEqual([{id: 'EndExploration'}]);
         }));
 
       it('should return empty interaction IDs' +
@@ -677,7 +677,7 @@ describe('Admin misc tab component ', () => {
         expect(interactionSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'No interactions found in exploration.');
-        expect(component.explorationInteractionIds)
+        expect(component.explorationInteractions)
           .toEqual([]);
       }));
 
@@ -693,7 +693,7 @@ describe('Admin misc tab component ', () => {
           expect(intSpy).toHaveBeenCalled();
           expect(statusMessageSpy).toHaveBeenCalledWith(
             'Server error: Exploration does not exist');
-          expect(component.explorationInteractionIds).toEqual([]);
+          expect(component.explorationInteractions).toEqual([]);
         }));
 
       it('should handle the case when expIdToGetInteractions is empty'
@@ -708,7 +708,7 @@ describe('Admin misc tab component ', () => {
           expect(intSpy).toHaveBeenCalled();
           expect(statusMessageSpy).toHaveBeenCalledWith(
             'Server error: Exploration does not exist');
-          expect(component.explorationInteractionIds).toEqual([]);
+          expect(component.explorationInteractions).toEqual([]);
         }));
     });
 });

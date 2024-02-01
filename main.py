@@ -969,7 +969,7 @@ URLS = [
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
     get_redirect_route(
-        r'/interactionsbyexplorationid',
+        r'/interactions',
         admin.InteractionsByExplorationIdHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
 

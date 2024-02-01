@@ -3143,7 +3143,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     """Tests for interaction by exploration handler."""
 
     EXP_ID_1 = 'exp1'
-    EXP_ID_2 = 'exp2'
 
     def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
@@ -3153,8 +3152,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration1 = self.save_new_valid_exploration(
             self.EXP_ID_1, self.editor_id, end_state_name='End')
-        self.exploration2 = self.save_new_default_exploration(
-            self.EXP_ID_2, self.EDITOR_EMAIL)
 
     def test_interactions_by_exploration_id_handler(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -3164,23 +3161,10 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/interactionsbyexplorationid', params=payload)
-        interactions_list = response['interactions']
+            '/interactions', params=payload)
+        interaction_ids = sorted(interaction['id'] for interaction in response['interactions'])
         self.assertEqual(
-            sorted(interactions_list), ['EndExploration', 'TextInput'])
-
-    def test_empty_interactions_by_exploration_id_handler(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
-
-        payload = {
-            'exp_id': self.EXP_ID_2
-        }
-
-        response = self.get_json(
-            '/interactionsbyexplorationid', params=payload)
-        interactions_list = response['interactions']
-        self.assertEqual(
-            sorted(interactions_list), [])
+            sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -3190,14 +3174,14 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/interactionsbyexplorationid', params=payload,
+            '/interactions', params=payload,
             expected_status_int=400)
         self.assertEqual(response['error'], 'Exploration does not exist.')
 
     def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
         response = self.get_json(
-            '/interactionsbyexplorationid', params={},
+            '/interactions', params={},
             expected_status_int=400)
         self.assertEqual(
             response['error'], 'Missing key in handler args: exp_id.')
