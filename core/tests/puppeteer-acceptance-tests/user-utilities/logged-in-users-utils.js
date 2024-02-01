@@ -60,21 +60,21 @@ const navbarGetInvolvedTabContactUsButton =
   'a#navbar-get-involved-menu-contact-us-button';
 const navbarDonateButton = 'a#navbar-donate-button';
 
-const browseOurLessonsButton = 'button#about-page-browse-our-lessons-button';
-const accessAndroidAppButton = 'button#about-page-access-android-app-button';
-const visitClassroomButton = 'button#about-page-visit-classroom-button';
-const browseLibraryButton = 'button#about-page-browse-library-button';
-const createLessonsButton = 'button#about-page-create-lessons-button';
-const exploreLessonsButton = 'button#about-page-explore-lessons-button';
+const browseOurLessonsButton = '#about-page-browse-our-lessons-button';
+const accessAndroidAppButton = '#about-page-access-android-app-button';
+const visitClassroomButton = '#about-page-visit-classroom-button';
+const browseLibraryButton = '#about-page-browse-library-button';
+const createLessonsButton = '#about-page-create-lessons-button';
+const exploreLessonsButton = '#about-page-explore-lessons-button';
 
 const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
 const millionsOfContentId = '#about-foundation-page-millions-of-content';
 const weCannotContentId = '#about-foundation-page-we-cannot-content';
 const sourceUnescoButtion = 'a#about-foundation-page-source-unesco-button';
 const learnMoreAboutOppiaButton =
-  'a#about-foundation-page-learn-more-about-oppia-button';
+  '#about-foundation-page-learn-more-about-oppia-button';
 const becomeAVolunteerButton =
-  'a#about-foundation-page-become-a-volunteer-button';
+  '#about-foundation-page-become-a-volunteer-button';
 const sectionSixPart1 = '#about-foundation-page-section-six-part-1';
 const sectionSixPart2 = '#about-foundation-page-section-six-part-2';
 const sectionSixPart3 = '#about-foundation-page-section-six-part-3';
@@ -380,8 +380,6 @@ module.exports = class LoggedInUsers extends baseUser {
     } else {
       showMessage(
         'The Learn More About Oppia button opens the About page.');
-      const newPage = await newTab.page();
-      await newPage.close();
     }
   }
 
