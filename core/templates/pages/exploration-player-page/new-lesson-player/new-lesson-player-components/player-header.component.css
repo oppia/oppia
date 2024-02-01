@@ -9,6 +9,23 @@
   background-color: #094142;
   color: #fff;
   display: flex;
-  height: 40px;
+  justify-content: space-between;
+  height: 48px;
   padding-left: 15px;
+}
+
+.player-header-right {
+  display: none;
+  padding: 12px;
+}
+
+.header-menu-button {
+  background: none;
+  border: none;
+}
+
+@media screen and (max-width: 574px) {
+  .player-header-right {
+    display: block;
+  }
 }

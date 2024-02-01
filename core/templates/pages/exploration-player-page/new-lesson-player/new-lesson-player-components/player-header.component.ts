@@ -53,6 +53,7 @@ export class PlayerHeaderComponent {
   isLinkedToTopic!: boolean;
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
+  isMobileMenuVisible = false;
 
   constructor(
     private contextService: ContextService,
@@ -163,6 +164,10 @@ export class PlayerHeaderComponent {
         this.explorationTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  toggleMenu(): void {
+    this.isMobileMenuVisible = !this.isMobileMenuVisible;
   }
 
   ngOnDestory(): void {

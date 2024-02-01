@@ -40,3 +40,9 @@
 .oppia-lesson-player-sidebar.expanded .player-sidebar-button {
   width: 200px;
 }
+
+@media screen and (max-width: 574px) {
+  .oppia-lesson-player-sidebar {
+    display: none;
+  }
+}
