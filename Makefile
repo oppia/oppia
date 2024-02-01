@@ -85,8 +85,8 @@ stop.%: ## Stops the given docker service. Example: make stop.datastore
 	docker compose stop $*
 
 update.requirements: ## Installs the python requirements for the project
-	${SHELL_PREFIX} dev-server pip install -r requirements.txt
-	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt
+	${SHELL_PREFIX} dev-server pip install -r requirements.txt -t /app/oppia/third_party/python_libs
+	${SHELL_PREFIX} dev-server pip install -r requirements_dev.txt -t /app/oppia/third_party/python_libs
 
 update.package: ## Installs the npm requirements for the project
 # TODO(#18260): Permanently change the yarn configurations in `.yarnrc` when permanently moving to Docker Setup.
@@ -105,6 +105,9 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
+
+run_tests.third_party_size_check: ## Runs the third party size check
+	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server || $(MAKE) stop
 
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
@@ -228,13 +231,12 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
 	@echo '-----------------------------------------------------------------------'
-	if [ "$(RECORD_SCREEN)" = "true" ]; then \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; ../lhci-puppeteer-video/video.mp4
-		../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-performance-${shard}.js --max-old-space-size=4096 --upload.target=temporary-public-storage; \
+	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
 	else \
-		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js 
-		../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
 	fi
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'

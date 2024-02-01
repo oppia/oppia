@@ -24,12 +24,6 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.in
-            requirements.txt
-            requirements_dev.in
-            requirements_dev.txt
       - uses: ./.github/actions/merge
       - name: Initialze Containers
         run: |
@@ -38,7 +32,7 @@ jobs:
           make stop
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.third_party_size_check
+        run: make run_tests.third_party_size_check
       - name: Run Lint Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: make run_tests.lint PYTHON_ARGS="--verbose --shard ${{ matrix.shard }}"
