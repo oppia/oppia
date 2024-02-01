@@ -100,7 +100,6 @@ jobs:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   lighthouse:
-    needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
