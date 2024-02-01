@@ -34,6 +34,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { ContributorDashboardAdminPageRootComponent } from './contributor-dashboard-admin-page-root.component';
 import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admin-auth.guard';
+import { ContributorDashboardAdminPageComponent } from './contributor-dashboard-admin-page.component';
 
 @NgModule({
   imports: [
@@ -49,7 +50,6 @@ import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admi
         canActivate: [ContributorDashboardAdminAuthGuard],
       },
     ]),
-    RouterModule.forRoot([]),
     ReactiveFormsModule,
     SharedComponentsModule,
   ],
@@ -61,6 +61,7 @@ import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admi
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal,
+    ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent
   ],
   entryComponents: [
@@ -68,6 +69,7 @@ import { ContributorDashboardAdminAuthGuard } from './contributor-dashboard-admi
     CdAdminQuestionRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
+    ContributorDashboardAdminPageComponent,
     ContributorAdminStatsTable,
     TopicFilterComponent,
     UsernameInputModal
