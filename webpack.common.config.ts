@@ -258,17 +258,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard_admin'],
-      filename: 'contributor-dashboard-admin-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-        'contributor-dashboard-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['contributor_dashboard'],
       filename: 'contributor-dashboard-page.mainpage.html',
       hybrid: true,

@@ -267,7 +267,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server error' + errorResponse;
+        this.statusMessage = 'Server Error: ' + errorResponse;
       });
     this.taskRunningInBackground = false;
   }
@@ -294,7 +294,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           this.refreshFormData();
           this.formData.viewContributionReviewers.filterCriterion = temp;
         }, errorResponse => {
-          this.statusMessage = 'Server error' + errorResponse;
+          this.statusMessage = 'Server Error: ' + errorResponse;
         });
     } else {
       this.contributorDashboardAdminBackendApiService
@@ -321,7 +321,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           this.refreshFormData();
           this.formData.viewContributionReviewers.filterCriterion = temp;
         }, errorResponse => {
-          this.statusMessage = 'Server error' + errorResponse;
+          this.statusMessage = 'Server Error: ' + errorResponse;
         });
     }
     this.taskRunningInBackground = false;
@@ -342,7 +342,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server error' + errorResponse;
+        this.statusMessage = 'Server Error: ' + errorResponse;
       });
 
     this.taskRunningInBackground = false;
@@ -366,7 +366,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server error' + errorResponse;
+        this.statusMessage = 'Server Error: ' + errorResponse;
       });
 
     this.taskRunningInBackground = false;
