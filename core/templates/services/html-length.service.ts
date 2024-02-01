@@ -100,7 +100,7 @@ export class HtmlLengthService {
     return totalCharacters;
   }
 
-  private calculateBaselineLength(
+  calculateBaselineLength(
       sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
     let dom: Document;
@@ -147,7 +147,7 @@ export class HtmlLengthService {
     return textContentCount;
   }
 
-  private getWeightForNonTextNodes(
+  getWeightForNonTextNodes(
       nonTextNode: string, calculationType: CalculationType): number {
     if (nonTextNode.includes('oppia-noninteractive-math')) {
       return 1;

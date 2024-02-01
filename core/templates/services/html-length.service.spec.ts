@@ -479,7 +479,7 @@ describe('Html Length Service', () => {
     it('should throw an error when a normal string' +
     ' is passed instead of an HTML tag string', () => {
       const sanitizedHtml = 'This is a normal string.';
-      const calculationType = 'someCalculationType';
+      const calculationType = 'character';
       expect(() => {
         htmlLengthService.calculateBaselineLength(
           sanitizedHtml, calculationType);
@@ -503,7 +503,7 @@ describe('Html Length Service', () => {
     'weight for non-text node', () => {
       const nonTextNode = '<oppia-noninteractive-xyz>This is not a ' +
       'text node</oppia-noninteractive-xyz>';
-      const calculationType = 'someCalculationType';
+      const calculationType = 'character';
       expect(() => {
         htmlLengthService.getWeightForNonTextNodes(
           nonTextNode, calculationType);
@@ -511,6 +511,3 @@ describe('Html Length Service', () => {
     });
   });
 });
-
-
-
