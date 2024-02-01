@@ -20,6 +20,7 @@ import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { ExplorationPlayerViewerCommonModule } from '../exploration-player-viewer-common.module';
+import { ExplorationPlayerPageModule } from '../exploration-player-page.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
@@ -50,6 +51,7 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
     MaterialModule,
     NgbPopoverModule,
     ExplorationPlayerViewerCommonModule,
+    ExplorationPlayerPageModule,
     SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
