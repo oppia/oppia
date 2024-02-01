@@ -106,10 +106,14 @@ export class HtmlLengthService {
     let dom: Document;
     try {
       dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+      if (dom.body.children.length === 0) {
+        throw new Error(
+          'No HTML tags found. Ensure valid HTML tags string is provided.');
+      }
     } catch (error) {
       throw new Error(
         'Failed to parse HTML string.' +
-        'Ensure valid HTML tags string is provided.');
+        ' Ensure valid HTML tags string is provided.');
     }
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {

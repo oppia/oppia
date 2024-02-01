@@ -170,7 +170,8 @@ describe('Html Length Service', () => {
     '<p>Demo hint just to check</p>' +
     '<oppia-noninteractive-collapsible _nghost-xvp-c48=""' +
     'content-with-value="&amp;quot;&amp;lt;p&amp;gt;You have' +
-    'opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
+    'opened the collapsible block.&amp;lt;/p&ht' +
+    'mlLengthServiceamp;gt;&amp;quot;"' +
     'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
     'ng-version="11.2.14"></oppia-noninteractive-collapsible>' +
     '<oppia-noninteractive-image alt-with-value="&amp;quot;Code' +
@@ -473,4 +474,43 @@ describe('Html Length Service', () => {
 
     expect(result).toBe(65);
   });
+
+  describe('calculateBaselineLength', () => {
+    it('should throw an error when a normal string' +
+    ' is passed instead of an HTML tag string', () => {
+      const sanitizedHtml = 'This is a normal string.';
+      const calculationType = 'someCalculationType';
+      expect(() => {
+        htmlLengthService.calculateBaselineLength(
+          sanitizedHtml, calculationType);
+      }).toThrowError(
+        'Failed to parse HTML string.' +
+      ' Ensure valid HTML tags string is provided.');
+    });
+
+    it('should calculate the baseline length based' +
+    ' on the provided HTML content and calculation type', () => {
+      const sanitizedHtml = '<p>This is a test HTML string.</p>';
+      const calculationType = 'character';
+      const result = htmlLengthService.calculateBaselineLength(
+        sanitizedHtml, calculationType);
+      expect(result).toBe(27);
+    });
+  });
+
+  describe('getWeightForNonTextNodes', () => {
+    it('should throw an error when unable to determine ' +
+    'weight for non-text node', () => {
+      const nonTextNode = '<oppia-noninteractive-xyz>This is not a ' +
+      'text node</oppia-noninteractive-xyz>';
+      const calculationType = 'someCalculationType';
+      expect(() => {
+        htmlLengthService.getWeightForNonTextNodes(
+          nonTextNode, calculationType);
+      }).toThrowError('Unable to determine weight for non-text node.');
+    });
+  });
 });
+
+
+
