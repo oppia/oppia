@@ -67,6 +67,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     CdAdminTranslationRoleEditorModal,
     CdAdminQuestionRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
+    ContributorDashboardAdminPageComponent,
     ContributorAdminDashboardPageComponent,
     ContributorAdminStatsTable,
     TopicFilterComponent,
@@ -76,6 +77,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     CdAdminTranslationRoleEditorModal,
     CdAdminQuestionRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
+    ContributorDashboardAdminPageComponent,
     ContributorAdminDashboardPageComponent,
     ContributorAdminStatsTable,
     TopicFilterComponent,
@@ -111,6 +113,7 @@ class ContributorDashboardAdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ContributorDashboardAdminPageComponent } from './contributor-dashboard-admin-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
