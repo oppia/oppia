@@ -220,10 +220,25 @@ export class TopicEditorNavbarComponent implements OnInit,
     return validationIssuesCount + prepublishValidationIssuesCount;
   }
 
+  getMobileNavigatorText(): string {
+    const activeTab = this.getActiveTabName();
+    if (activeTab === 'main') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_editor') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_preview') {
+      return 'Preview';
+    } else if (activeTab === 'questions') {
+      return 'Questions';
+    } else if (activeTab === 'topic_preview') {
+      return 'Preview';
+    }
+  }
+
   openTopicViewer(): void {
     this.showNavigationOptions = false;
     let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (activeTab !== 'subtopic_editor') {
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
       if (this.getChangeListLength() > 0) {
         this.alertsService.addInfoMessage(
           'Please save all pending changes to preview the topic ' +
@@ -241,23 +256,31 @@ export class TopicEditorNavbarComponent implements OnInit,
           }
         ), 'blank');
     } else {
-      this.activeTab = 'Preview';
       let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
       this.topicEditorRoutingService.navigateToSubtopicPreviewTab(
         subtopicId);
+      this.activeTab = 'Preview';
     }
   }
 
   selectMainTab(): void {
-    this.activeTab = 'Editor';
     this.showNavigationOptions = false;
-    this.topicEditorRoutingService.navigateToMainTab();
+    let activeTab = this.topicEditorRoutingService.getActiveTabName();
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
+      this.topicEditorRoutingService.navigateToMainTab();
+      this.activeTab = 'Editor';
+    } else {
+      let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
+        subtopicId);
+      this.activeTab = 'Editor';
+    }
   }
 
   selectQuestionsTab(): void {
-    this.activeTab = 'Question';
     this.showNavigationOptions = false;
     this.topicEditorRoutingService.navigateToQuestionsTab();
+    this.activeTab = 'Questions';
   }
 
   getActiveTabName(): string {
@@ -281,7 +304,7 @@ export class TopicEditorNavbarComponent implements OnInit,
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
-    this.activeTab = 'Editor';
+    this.activeTab = this.getMobileNavigatorText();
     this.showNavigationOptions = false;
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
