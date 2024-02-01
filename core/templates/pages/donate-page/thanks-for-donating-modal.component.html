@@ -13,10 +13,10 @@
     </div>
     <div class="col-md-6 col-w-full">
       <div class="row float-right mt-5 mr-2">
-        <i class="fas fa-times-circle" (click)="dismiss()"></i>
+        <i id="thanks-for-donating-page-dismiss-button" class="fas fa-times-circle" (click)="dismiss()"></i>
       </div>
       <div>
-        <h2 class="thanks-donate-header">
+        <h2 id="thanks-for-donating-page-header" class="thanks-donate-header">
           {{ 'I18N_DONATE_PAGE_THANKS_MODAL_HEADING' | translate }}
         </h2>
         <div class="thanks-paragraph">
@@ -27,12 +27,12 @@
         </div>
         <div class="row container btn-container mx-0 my-3">
           <div class="col-sm-6 watch-video-btn">
-            <a class="btn thanks-watch-video-btn" href="https://www.facebook.com/oppiaorg/videos/189487953721583/">
+            <a id="thanks-for-donating-page-watch-a-video-button" class="btn thanks-watch-video-btn" href="https://www.facebook.com/oppiaorg/videos/189487953721583/">
               {{ 'I18N_DONATE_PAGE_WATCH_VIDEO_BUTTON_TEXT' | translate }}
             </a>
           </div>
           <div class="col-sm-6 read-blog-btn">
-            <a class="btn thanks-read-blog-btn" href="https://www.oppia.org/blog">
+            <a id="thanks-for-donating-page-read-our-blog-button" class="btn thanks-read-blog-btn" href="https://www.oppia.org/blog">
               {{ 'I18N_DONATE_PAGE_READ_BLOG_BUTTON_TEXT' | translate }}
             </a>
           </div>

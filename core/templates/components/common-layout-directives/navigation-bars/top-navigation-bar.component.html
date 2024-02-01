@@ -195,6 +195,7 @@
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_ABOUT"
             class="nav-item dropdown oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a ngbDropdownAnchor
+             id="navbar-about-menu"
              (click)="aboutDropdown.toggle()"
              (keydown.enter)="aboutDropdown.toggle()"
              class="nav-link oppia-navbar-tab dropdown-toggle"
@@ -212,7 +213,8 @@
               (mouseover)="openSubmenu($event, 'aboutMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <li class="nav-item">
-              <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+              <a id="navbar-about-menu-about-button"
+                 (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
                  href="/about"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
@@ -222,7 +224,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
+              <a id="navbar-about-menu-about-foundation-button"
+                 class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
@@ -233,7 +236,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
+              <a id="navbar-about-menu-blog-button"
+                 class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
                  [href]="getOppiaBlogUrl()"
                  [target]="'_self'"
                  (blur)="aboutDropdown.close()"
@@ -252,6 +256,7 @@
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a ngbDropdownAnchor
+             id="navbar-get-involved-menu"
              class="nav-link oppia-navbar-tab dropdown-toggle get-involved"
              aria-expanded="true"
              (click)="getInvolvedDropdown.toggle()"
@@ -271,7 +276,8 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a id="navbar-get-involved-menu-school-and-organizations-button"
+                   class="item item-border d-flex flex-column innvolved-item"
                    href="/partnerships"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
@@ -286,7 +292,8 @@
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a id="navbar-get-involved-menu-volunteer-button"
+                   class="item d-flex flex-column innvolved-item"
                    href="/volunteer"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -303,7 +310,8 @@
                 </a>
               </div>
               <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a id="navbar-get-involved-menu-contact-us-button"
+                   class="item item-border d-flex flex-column innvolved-item"
                    href="/contact"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -318,7 +326,8 @@
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a id="navbar-get-involved-menu-donate-button"
+                   class="item d-flex flex-column innvolved-item"
                    href="/donate"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (blur)="getInvolvedDropdown.close()"
@@ -341,7 +350,8 @@
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item e2e-test-about-oppia-list-item">
-          <a class="nav-link oppia-navbar-tab donate-tab"
+          <a id="navbar-donate-button"
+             class="nav-link oppia-navbar-tab donate-tab"
              tabindex="0"
              href="/donate"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"

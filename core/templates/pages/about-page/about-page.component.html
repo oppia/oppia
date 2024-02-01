@@ -11,13 +11,15 @@
       <h2 class="oppia-about-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_TITLE_SECTION_ONE' | translate"></h2>
       <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
-        <button type="submit" (click)="onClickVisitClassroomButton()"
+        <button id="about-page-browse-our-lessons-button"
+                type="submit" (click)="onClickVisitClassroomButton()"
                 class="btn oppia-about-button oppia-about-button-browse">
           {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
         </button>
       </div>
       <div class="oppia-about-button-container">
-        <button type="submit" (click)="onClickAccessAndroidButton()"
+        <button id="about-page-access-android-app-button"
+                type="submit" (click)="onClickAccessAndroidButton()"
                 class="btn oppia-about-button oppia-about-button-browse">
           {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
         </button>
@@ -68,7 +70,8 @@
         <h2 class="oppia-about-learn-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM' | translate"></h2>
         <p class="oppia-about-learn-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
-          <button type="submit" (click)="onClickVisitClassroomButton()"
+          <button id="about-page-visit-classroom-button"
+                  type="submit" (click)="onClickVisitClassroomButton()"
                   class="btn oppia-about-button oppia-about-button-browse"
                   [innerHTML]="'I18N_ACTION_VISIT_CLASSROOM' | translate">
           </button>
@@ -90,7 +93,8 @@
         <h2 class="oppia-about-explore-lesson-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS' | translate"></h2>
         <p class="oppia-about-explore-lesson-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
-          <button type="submit" (click)="onClickBrowseLibraryButton()"
+          <button id="about-page-browse-library-button"
+                  type="submit" (click)="onClickBrowseLibraryButton()"
                   class="btn oppia-about-button oppia-about-button-browse"
                   [innerHTML]="'I18N_ACTION_BROWSE_LIBRARY' | translate">
           </button>
@@ -112,7 +116,8 @@
         <h2 class="oppia-about-outcome-title oppia-about-section-title oppia-about-title-mobile-display-none" [innerHTML]="'I18N_ABOUT_PAGE_EASILY_CREATE_LESSON' | translate"></h2>
         <p class="oppia-about-outcome-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_CREATE_LESSON_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
-          <button type="submit" (click)="onClickCreateLessonButton()"
+          <button id="about-page-create-lessons-button"
+                  type="submit" (click)="onClickCreateLessonButton()"
                   class="btn oppia-about-button oppia-about-button-browse"
                   [innerHTML]="'I18N_ACTION_CREATE_LESSON_BUTTON' | translate">
           </button>
@@ -123,7 +128,8 @@
   <div class="oppia-about-page-section-seven oppia-about-section">
     <h2 class="oppia-get-started-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
     <div class="oppia-about-classroom-button-container-one">
-      <button type="submit" (click)="onClickVisitClassroomButton()"
+      <button id="about-page-explore-lessons-button"
+              type="submit" (click)="onClickVisitClassroomButton()"
               class="btn oppia-about-button oppia-about-button-browse"
               [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
       </button>
