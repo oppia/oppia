@@ -1,4 +1,19 @@
 <div class="oppia-lesson-player-sidebar"
      [class.expanded]="isExpanded"
      (click)="toggleSidebar()">
+  <button>Menu toggle</button>
+  <div class="player-sidebar-button-container">
+    <button class="player-sidebar-button">
+      <img *ngIf="!isExpanded" src="/assets/images/lesson_player/share-button.svg" alt="Share button">
+    </button>
+    <button class="player-sidebar-button">
+      <img *ngIf="!isExpanded" src="/assets/images/lesson_player/feedback-button.svg" alt="Feedback button">
+    </button>
+    <button class="player-sidebar-button">
+      <img *ngIf="!isExpanded" src="/assets/images/lesson_player/report-button.svg" alt="Report button">
+    </button>
+    <button class="player-sidebar-button">
+      <img *ngIf="!isExpanded" src="/assets/images/lesson_player/help-button.svg" alt="Help button">
+    </button>
+  </div>
 </div>

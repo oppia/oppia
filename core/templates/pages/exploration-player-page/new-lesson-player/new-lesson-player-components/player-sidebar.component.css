@@ -5,15 +5,38 @@
 */
 
 .oppia-lesson-player-sidebar {
-  background-color: #fff;
+  background-color: #f2f4f7;
   box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  justify-content: space-between;
   position: relative;
-  transition: width 0.3s ease-in-out;
-  width: 75px;
+  width: 80px;
   z-index: 1;
 }
 
 .oppia-lesson-player-sidebar.expanded {
   width: 250px;
+}
+
+.player-sidebar-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.player-sidebar-button {
+  background-color: #fff;
+  border: none;
+  border-radius: 4px;
+  height: 45px;
+  padding: 10px;
+  box-shadow: 0px 0px 10px 0px #00000026;
+  width: 45px;
+}
+
+.oppia-lesson-player-sidebar.expanded .player-sidebar-button {
+  width: 200px;
 }
