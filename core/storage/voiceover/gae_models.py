@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
 from core.platform import models
 
 from typing import Dict, Final, Sequence, TypedDict
@@ -211,7 +210,7 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
 
 class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
     """The model stores manual voice artists' information with their
-    provided voiceover metadata.
+    provided voiceovers metadata.
     Instances of this class are keyed by the user ID.
     """
 
@@ -225,7 +224,7 @@ class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
     # - 'exploration_id_to_content_ids': A mapping of exploration IDs to lists
     # of content IDs, representing the content IDs for which voice artists
     # have provided voiceovers.
-    language_code_to_accent_and_contents_mapping = (
+    voiceovers_and_contents_mapping = (
         datastore_services.JsonProperty(required=True))
 
     @classmethod
@@ -261,43 +260,38 @@ class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
                 # We do not export the author_id because we should not
                 # export internal user ids.
                 'voice_artist_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'language_code_to_accent_and_contents_mapping': (
+                'voiceovers_and_contents_mapping': (
                     base_models.EXPORT_POLICY.EXPORTED)
             }
         )
 
     @classmethod
-    def generate_new_voice_artist_metadata_model_id(cls) -> str:
-        """Generates a new voice artist metadata ID which is unique and is in
-        the form of random hash of 12 chars.
+    def get_model(
+        cls, voice_artist_id: str
+    ) -> VoiceoArtistToVoiceoverMetadataModel:
+        """Gets VoiceoArtistToVoiceoverMetadataModel by voice_artist_id.
+        Returns None if the voice artist metadata model with the given voice
+        artist ID doesn't exist.
+
+        Args:
+            voice_artist_id: str. The user ID of voice artist.
 
         Returns:
-            str. A voice artist metadata ID that is different from the IDs of
-            all the existing voice artist metadata models.
-
-        Raises:
-            Exception. There were too many collisions with existing voice
-                artist metadata IDs when attempting to generate a new ID.
+            VoiceoArtistToVoiceoverMetadataModel | None. The voice artist
+            metadata model instance if exist or None if not found.
         """
-        for _ in range(base_models.MAX_RETRIES):
-            voice_artist_metadata_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
-            if not cls.get_by_id(voice_artist_metadata_id):
-                return voice_artist_metadata_id
-        raise Exception(
-            'New voice artist metadata id generator is producing too many'
-            ' collisions.')
+        return cls.query(
+            datastore_services.all_of(
+                cls.voice_artist_id == voice_artist_id, cls.deleted == False) # pylint: disable=singleton-comparison
+        ).get()
 
     @classmethod
     def create(
-        cls, voice_artist_metadata_id: str, voice_artist_id: str
+        cls, voice_artist_id: str
     ) -> VoiceoArtistToVoiceoverMetadataModel:
-        """Creates a new BlogPostModel entry.
+        """Creates a new VoiceoArtistToVoiceoverMetadataModel.
 
         Args:
-            voice_artist_metadata_id: str. Voice artist to voiceover metadata
-                model ID of the newly-created model.
             voice_artist_id: str. User ID of the voice artist.
 
         Returns:
@@ -306,17 +300,16 @@ class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
 
         Raises:
             Exception. A voice artist to voiceover metadata model with given
-            ID exists already.
+                voice artist ID exists already.
         """
-        if cls.get_by_id(voice_artist_metadata_id):
+        if cls.get_model(voice_artist_id):
             raise Exception(
                 'A voice artist to voiceover metadata model with the given '
-                'ID exists already.')
+                'user ID exists already.')
 
         entity = cls(
-            id=voice_artist_metadata_id,
             voice_artist_id=voice_artist_id,
-            language_code_to_accent_and_contents_mapping={}
+            voiceovers_and_contents_mapping={}
         )
         entity.update_timestamps()
         entity.put()
@@ -342,10 +335,9 @@ class VoiceoArtistToVoiceoverMetadataModel(base_models.BaseModel):
             VoiceoArtistToVoiceoverMetadataModel] = cls.get_all().filter(
             cls.voice_artist_id == user_id).fetch()
         for voice_artist_metadata_model in voice_artist_metadata_models:
-            user_data[voice_artist_metadata_model.id] = {
-                'language_code_to_accent_and_contents_mapping': (
+            user_data[user_id] = {
+                'voiceovers_and_contents_mapping': (
                     voice_artist_metadata_model.
-                    language_code_to_accent_and_contents_mapping)
+                    voiceovers_and_contents_mapping)
             }
-
         return user_data
