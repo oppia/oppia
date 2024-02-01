@@ -30,10 +30,9 @@ var customizeComponent = async function(modal, text, skillDescription) {
 
   var textEditor = objects.UnicodeStringEditor(
     modal.$('<schema-based-unicode-editor>'));
-  // Change the text only if it is not already present or if
-  // the text argument is specified.
-  if ((textEditor.getValue() && text !== '') ||
-      (text === null || text === undefined)) {
+  // Change the text only if is specified as an argument, as this component
+  // sometimes relies on highlights.
+  if (text === null || text === undefined) {
     return;
   }
   await textEditor.setValue(text);
