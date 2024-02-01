@@ -29,7 +29,6 @@ jobs:
         run: |
           sudo make build
           sudo make run-devserver
-      - uses: ./.github/actions/install-oppia-dependencies
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: make run_tests.custom_eslint

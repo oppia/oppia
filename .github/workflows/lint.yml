@@ -36,7 +36,6 @@ jobs:
           sudo make build
           sudo make run-devserver
           make stop
-      - uses: ./.github/actions/install-oppia-dependencies
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.third_party_size_check
