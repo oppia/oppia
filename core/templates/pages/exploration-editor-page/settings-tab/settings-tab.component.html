@@ -36,16 +36,16 @@
                   <p>
                     <mat-form-field class="e2e-test-exploration-category" appearance="fill">
                       <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type new)</mat-label>
-                      <mat-select [(value)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
+                      <mat-select [(value)]="explorationCategoryService.displayed"
+                                  (valueChange)="updateCategoryListWithUserData()"
+                                  class="e2e-test-exploration-category-dropdown">
                         <mat-option class="e2e-test-exploration-new-category-add">
                           <ngx-mat-select-search ngModel
                                                  (ngModelChange)="filterChoices($event)"
-                                                 (keydown.enter)="updateCategoryListWithUserData()"
                                                  placeholderLabel="Type new category here...">
                           </ngx-mat-select-search>
                         </mat-option>
-                        <mat-option (click)="updateCategoryListWithUserData()"
-                                    *ngFor="let option of filteredChoices"
+                        <mat-option *ngFor="let option of filteredChoices"
                                     class="e2e-test-exploration-category-selector-choice"
                                     [value]="option.id">
                           {{ option.text }}

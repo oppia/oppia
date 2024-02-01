@@ -88,6 +88,7 @@ TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
+VOICEOVERS_DATA_DIR = os.path.join('data', 'voiceovers')
 
 EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
@@ -1097,6 +1098,10 @@ NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+VOICEOVER_ADMIN_PAGE_URL = '/voiceover-admin'
+VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
+VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
+    '/voiceover_language_codes_mapping')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

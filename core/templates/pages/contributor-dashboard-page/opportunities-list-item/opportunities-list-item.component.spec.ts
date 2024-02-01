@@ -25,6 +25,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 
 import { ExplorationOpportunity, OpportunitiesListItemComponent } from './opportunities-list-item.component';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { MatIconModule } from '@angular/material/icon';
 
 class MockWindowDimensionsService {
   getResizeEvent() {
@@ -45,7 +46,8 @@ describe('Opportunities List Item Component', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        NgbTooltipModule
+        NgbTooltipModule,
+        MatIconModule
       ],
       declarations: [
         OpportunitiesListItemComponent,
@@ -74,7 +76,8 @@ describe('Opportunities List Item Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 50,
-        translationsCount: 0
+        translationsCount: 0,
+        topicName: 'Topic 1'
       };
       component.clickActionButton.emit =
         () => jasmine.createSpy('click', () => {});
@@ -137,7 +140,8 @@ describe('Opportunities List Item Component', () => {
         progressPercentage: 50,
         inReviewCount: 20,
         totalCount: 50,
-        translationsCount: 25
+        translationsCount: 25,
+        topicName: 'Topic 1'
       };
       component.opportunityType = 'translation';
       component.clickActionButton.emit =
@@ -214,7 +218,8 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
-        translationWordCount: 13
+        translationWordCount: 13,
+        topicName: 'Topic 1'
       };
       component.opportunityType = 'translation';
       component.clickActionButton.emit =
@@ -246,6 +251,52 @@ describe('Opportunities List Item Component', () => {
         '.oppia-translation-length-label');
 
       expect(translationLengthLabel).toBeNull();
+    });
+
+    it('should emit a pin event with the correct properties', () => {
+      const spy = spyOn(component.clickPinButton, 'emit');
+      const expectedPayload = {
+        topic_name: 'Topic 1',
+        exploration_id: '1'
+      };
+
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25,
+        translationWordCount: 13,
+        topicName: 'Topic 1'
+      };
+      component.pinOpportunity();
+
+      expect(spy).toHaveBeenCalledWith(expectedPayload);
+    });
+
+    it('should emit an unpin event with the correct properties', () => {
+      const spy = spyOn(component.clickUnpinButton, 'emit');
+      const expectedTopicName = 'Topic 1';
+
+      component.opportunity = {
+        id: '1',
+        labelText: 'Label text',
+        labelColor: '#fff',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 50,
+        translationsCount: 25,
+        translationWordCount: 13,
+        topicName: 'Topic 1'
+      };
+      component.unpinOpportunity();
+
+      expect(spy).toHaveBeenCalledWith({
+        topic_name: expectedTopicName,
+        exploration_id: '1'
+      });
     });
   });
 });
