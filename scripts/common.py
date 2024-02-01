@@ -33,7 +33,6 @@ import time
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from scripts import servers
 
@@ -121,12 +120,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
-
-# By specifying this condition, we are importing the below module only while
-# type checking, not in runtime.
-MYPY = False
-if MYPY:  # pragma: no cover
-    import github
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -581,36 +574,6 @@ def get_personal_access_token() -> str:
             'access token at https://github.com/settings/tokens and re-run '
             'the script')
     return personal_access_token
-
-
-def check_prs_for_current_release_are_released(
-    repo: github.Repository.Repository
-) -> None:
-    """Checks that all pull requests for current release have a
-    'PR: released' label.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Some pull requests for current release do not have a
-            "PR: released" label.
-    """
-    current_release_label = repo.get_label(
-        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-    current_release_prs = repo.get_issues(
-        state='all', labels=[current_release_label])
-    for pr in current_release_prs:
-        label_names = [label.name for label in pr.labels]
-        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
-                label_names):
-            open_new_tab_in_browser_if_possible(
-                'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
-                '+label%3A%22PR%3A+for+current+release%22+')
-            raise Exception(
-                'There are PRs for current release which do not have '
-                'a \'PR: released\' label. Please ensure that they are '
-                'released before release summary generation.')
 
 
 def convert_to_posixpath(file_path: str) -> str:
