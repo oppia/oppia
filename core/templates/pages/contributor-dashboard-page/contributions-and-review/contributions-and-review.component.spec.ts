@@ -38,6 +38,13 @@ import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+import {of, Subject } from 'rxjs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { delay } from 'rxjs/operators';
+
 
 
 class MockNgbModalRef {
@@ -65,6 +72,7 @@ class MockPlatformFeatureService {
   };
 }
 
+
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
@@ -87,10 +95,26 @@ describe('Contributions and review component', () => {
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
+  let snackBar: MatSnackBar;
+  let snackBarRefMock;
 
+  class MockMatSnackBarRef {
+    instance = { message: '' };
+    afterDismissed = () => of({ action: '', dismissedByAction: false });
+    onAction = () => new Subject<void>();
+    dismissWithAction = (a, b, c) => {
+      contributionOpportunitiesService.pinReviewableTranslationOpportunityAsync(
+        a, b, c
+      );
+    };
+  }
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        MatIconModule,
+        HttpClientTestingModule,
+        MatSnackBarModule,
+        BrowserAnimationsModule],
       declarations: [
         ContributionsAndReview
       ],
@@ -98,6 +122,10 @@ describe('Contributions and review component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal
+        },
+        {
+          provide: MatSnackBarRef,
+          useClass: MockMatSnackBarRef
         },
         ContextService,
         ContributionAndReviewService,
@@ -115,7 +143,9 @@ describe('Contributions and review component', () => {
           useValue: mockPlatformFeatureService
         },
         UserService,
-        OpportunitiesListComponent
+        OpportunitiesListComponent,
+        MatSnackBar,
+        { provide: MAT_SNACK_BAR_DATA, useValue: {} }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -139,6 +169,9 @@ describe('Contributions and review component', () => {
       FormatRtePreviewPipe);
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
     translationTopicService = TestBed.inject(TranslationTopicService);
+    snackBar = TestBed.inject(MatSnackBar);
+    snackBarRefMock = TestBed.inject(MatSnackBarRef);
+    spyOn(snackBarRefMock, 'onAction').and.returnValue(of({}).pipe(delay(1)));
 
     spyOn(
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
@@ -177,7 +210,8 @@ describe('Contributions and review component', () => {
             },
             translation_in_review_counts: {
               en: 2
-            }
+            },
+            is_pinned: false,
           }),
           ExplorationOpportunitySummary.createFromBackendDict({
             id: '2',
@@ -190,7 +224,8 @@ describe('Contributions and review component', () => {
             },
             translation_in_review_counts: {
               en: 4
-            }
+            },
+            is_pinned: false
           })
         ],
         more: false
@@ -208,7 +243,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -238,7 +273,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -333,7 +368,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'add_question',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -468,7 +503,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: null,
                 new_value: null,
                 old_value: null,
@@ -528,7 +563,7 @@ describe('Contributions and review component', () => {
       } as NgbModalRef);
 
       let suggestion = {
-        change: {
+        change_cmd: {
           skill_id: 'skill1',
           question_dict: null,
           skill_difficulty: null,
@@ -749,7 +784,7 @@ describe('Contributions and review component', () => {
               suggestion_type: 'SUGGESTION',
               suggestion_id: '',
               target_id: 'target_id',
-              change: {
+              change_cmd: {
                 content_html: '',
                 translation_html: '',
               },
@@ -927,7 +962,7 @@ describe('Contributions and review component', () => {
       };
 
       let suggestion = {
-        change: {
+        change_cmd: {
           skill_id: 'string',
           question_dict: questionDict,
           skill_difficulty: null,
@@ -953,7 +988,7 @@ describe('Contributions and review component', () => {
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
-            change: {
+            change_cmd: {
               cmd: null,
               content_html: null,
               content_id: null,
@@ -1108,7 +1143,7 @@ describe('Contributions and review component', () => {
                   suggestion_id: 'suggestion_1',
                   target_id: '1',
                   suggestion_type: 'translate_content',
-                  change: {
+                  change_cmd: {
                     state_name: null,
                     new_value: null,
                     old_value: null,
@@ -1158,7 +1193,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'suggestion_1',
               target_id: '1',
               suggestion_type: 'translate_content',
-              change: {
+              change_cmd: {
                 state_name: 'state',
                 new_value: 'new',
                 old_value: 'old',
@@ -1224,7 +1259,7 @@ describe('Contributions and review component', () => {
           suggestion_id: 'suggestion_2',
           target_id: '1',
           suggestion_type: 'add_question',
-          change: {
+          change_cmd: {
             state_name: 'state',
             new_value: 'new',
             old_value: 'old',
@@ -1377,18 +1412,152 @@ describe('Contributions and review component', () => {
               id: '1',
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
-              actionButtonTitle: 'Translations'
-            } as Opportunity,
+              actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 1'
+            } as unknown as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
-              actionButtonTitle: 'Translations'
-            } as Opportunity
+              actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 2'
+            } as unknown as Opportunity
           ]);
           expect(more).toEqual(false);
         });
     });
+
+    it('should open a snackbar if a pinned opportunity already exists', () => {
+      const openSnackbarSpy = spyOn(component, 'openSnackbarWithAction');
+
+      const dict = {
+        topic_name: 'Topic 1',
+        exploration_id: '1',
+      };
+      component.opportunities = [{
+        id: '1',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: true,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '2',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '3',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      }];
+      component.languageCode = 'en';
+
+      component.pinReviewableTranslationOpportunity(dict);
+
+      expect(openSnackbarSpy).toHaveBeenCalledWith(
+        'Topic 1', '1',
+        'A pinned opportunity already exists for this topic and language.',
+        'Pin Anyway');
+    });
+
+    it('should call pinReviewableTranslationOpportunityAsync if no pinned' +
+    ' opportunity exists', fakeAsync(() => {
+      const pinReviewableTranslationOpportunityAsyncSpy = spyOn(
+        contributionOpportunitiesService,
+        'pinReviewableTranslationOpportunityAsync')
+        .and.returnValue(Promise.resolve({}));
+
+      const dict = {
+        topic_name: 'Topic 3',
+        exploration_id: '8',
+      };
+      component.opportunities = [{
+        id: '1',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: true,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '2',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      },
+      {
+        id: '3',
+        heading: 'heading',
+        subheading: 'subheading',
+        actionButtonTitle: 'Translations',
+        isPinned: false,
+        topicName: 'Topic 1'
+      }];
+      component.languageCode = 'en';
+
+      component.pinReviewableTranslationOpportunity(dict);
+      tick();
+
+      expect(pinReviewableTranslationOpportunityAsyncSpy)
+        .toHaveBeenCalledWith('Topic 3', component.languageCode, '8');
+    }));
+
+    it('should call unpinReviewableTranslationOpportunityAsync',
+      fakeAsync(() => {
+        const unpinReviewableTranslationOpportunityAsyncSpy = spyOn(
+          contributionOpportunitiesService,
+          'unpinReviewableTranslationOpportunityAsync')
+          .and.returnValue(Promise.resolve({}));
+
+        component.languageCode = 'en';
+
+        component.unpinReviewableTranslationOpportunity({
+          topic_name: 'Dummy Topic 1',
+          exploration_id: '1'
+        });
+        tick();
+
+        expect(
+          unpinReviewableTranslationOpportunityAsyncSpy).toHaveBeenCalledWith(
+          'Dummy Topic 1', component.languageCode, '1');
+      }));
+
+    it('should open snackbar and handle action', fakeAsync(() => {
+      spyOn(snackBar, 'open').and.callFake((message, actionText, config) => {
+        const data = TestBed.inject(MAT_SNACK_BAR_DATA);
+        data.onAction = of(null);
+        return {
+          onAction: () => data.onAction,
+          dismiss: () => {}
+        };
+      });
+      spyOn(
+        contributionOpportunitiesService,
+        'pinReviewableTranslationOpportunityAsync').and.returnValue(
+        Promise.resolve());
+
+      component.openSnackbarWithAction(
+        'testTopic',
+        'testExploration',
+        'Test message',
+        'Action text');
+
+      tick();
+      fixture.detectChanges();
+      tick();
+    }));
 
     // TODO(#9749): Rename and actually assert on something. This test currently
     // only exists to satisfy code coverage.
@@ -1536,7 +1705,7 @@ describe('Contributions and review component', () => {
       let suggestion = {
         key: {
           suggestion: {
-            change: {
+            change_cmd: {
               skill_id: 'string',
               content_html: 'string',
               translation_html: 'html',
@@ -1594,7 +1763,7 @@ describe('Contributions and review component', () => {
               suggestion_id: 'id',
               suggestion_type: 'translate_content',
               status: 'review',
-              change: {
+              change_cmd: {
                 content_html: '<p>This is test para</p>',
                 translation_html: '<p>Traducáú &amp;</p>'
               }
@@ -1634,7 +1803,7 @@ describe('Contributions and review component', () => {
               target_id: null,
               suggestion_id: 'id',
               status: 'review',
-              change: {
+              change_cmd: {
                 question_dict: {
                   question_state_data: {
                     content: {
@@ -1686,7 +1855,7 @@ describe('Contributions and review component', () => {
             suggestion_id: 'suggestion_1',
             target_id: '1',
             suggestion_type: 'translate_content',
-            change: {
+            change_cmd: {
               content_html: 'Translation',
               translation_html: 'Tradução'
             },
@@ -1747,7 +1916,6 @@ describe('Contributions and review component', () => {
           component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       });
   });
-
 
   describe('when user is allowed to review questions and ' +
   'skill details are empty', () => {
