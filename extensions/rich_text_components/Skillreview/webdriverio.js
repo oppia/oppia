@@ -28,11 +28,12 @@ var customizeComponent = async function(modal, text, skillDescription) {
     modal.$('<skill-selector-editor>')
   ).setValue(skillDescription);
 
-  // Do not change the text if there is already text present as this
-  // RTE component sometimes relies on highlighting text.
   var textEditor = objects.UnicodeStringEditor(
     modal.$('<schema-based-unicode-editor>'));
-  if (textEditor.getValue()) {
+  // Change the text only if it is not already present or if
+  // the text argument is specified.
+  if ((textEditor.getValue() && text !== '') ||
+      (text === null || text === undefined)) {
     return;
   }
   await textEditor.setValue(text);

@@ -251,7 +251,7 @@ var RichTextEditor = async function(elem) {
       }
       await _clickToolbarButton('.cke_button__bulletedlist');
     },
-    // This finds and highlights a certain text in the RTE.
+    // This finds and selects a certain text in the RTE.
     highlightText: async function(text) {
       var paragraphNodes = await rteElements[0].$$('p');
       var textNode = null;
@@ -271,7 +271,8 @@ var RichTextEditor = async function(elem) {
       }
 
       if (!textNode || startIndex === -1 || endIndex === -1) {
-        throw new Error('Specified text to highlight not found in RTE');
+        throw new Error(
+          `Specified text ${text} to highlight not found in RTE`);
       }
 
       await browser.execute((element, start, end) => {
