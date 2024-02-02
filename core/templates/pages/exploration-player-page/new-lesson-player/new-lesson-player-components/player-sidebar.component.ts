@@ -16,20 +16,33 @@
  * @fileoverview Component for the new lesson player sidebar
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'oppia-player-sidebar',
   templateUrl: './player-sidebar.component.html',
   styleUrls: ['./player-sidebar.component.css'],
 })
-export class PlayerSidebarComponent {
+export class PlayerSidebarComponent implements OnInit {
+  constructor(
+    private mobileMenuService: MobileMenuService
+  ) {}
+
+  mobileMenuVisible: boolean;
   isExpanded = false;
 
   toggleSidebar(): void {
     this.isExpanded = !this.isExpanded;
+  }
+
+  ngOnInit() {
+    this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
+      this.mobileMenuVisible = visibility;
+    });
   }
 }
 

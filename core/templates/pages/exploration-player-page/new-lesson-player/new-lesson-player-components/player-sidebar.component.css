@@ -5,6 +5,10 @@
 */
 
 .oppia-lesson-player-sidebar {
+  height: 100%;
+}
+
+.player-desktop-sidebar-menu {
   background-color: #f2f4f7;
   box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
   display: flex;
@@ -16,7 +20,7 @@
   z-index: 1;
 }
 
-.oppia-lesson-player-sidebar.expanded {
+.player-desktop-sidebar-menu.expanded {
   width: 250px;
 }
 
@@ -37,12 +41,36 @@
   width: 45px;
 }
 
-.oppia-lesson-player-sidebar.expanded .player-sidebar-button {
+.player-desktop-sidebar-menu.expanded .player-sidebar-button {
   width: 200px;
 }
 
+.player-mobile-menu-overlay {
+  position: fixed;
+  background-color: #00000099;
+  height: 100%;
+  top: 0;
+  width: 100vh;
+  z-index: 30;
+}
+
+.player-mobile-menu {
+  background-color: #fff;
+  bottom: 0;
+  border-radius: 28px 28px 0 0;
+  display: none;
+  height: 240px;
+  position: fixed;
+  width: 100%;
+  z-index: 40;
+}
+
 @media screen and (max-width: 574px) {
-  .oppia-lesson-player-sidebar {
+  .player-desktop-sidebar-menu {
     display: none;
+  }
+
+  .player-mobile-menu {
+    display: block;
   }
 }
