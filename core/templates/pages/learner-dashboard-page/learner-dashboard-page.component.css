@@ -229,6 +229,7 @@ oppia-learner-dashboard-page .learner-groups-icon {
     width: 100%;
   }
 
+  /*Redesign - remove*/
   .oppia-learner-dashboard-main-content-container {
     margin-bottom: 10vh;
   }
@@ -308,3 +309,131 @@ oppia-learner-dashboard-page .learner-groups-icon {
 .oppia-diagram-spinning-button {
   margin: 0 auto;
 }
+
+
+
+/*REDESIGN CLASSES*/
+/*
+ - remove oppia-row, replace with bootstrap classes
+ - remove .oppia-learner-dashboard-menu
+ - replace .oppia-learner-dashborad-menu-hover with pseudoclasses
+*/
+.learner-dashboard-content {
+  height: 92vh;
+}
+
+.sidebar {
+  background-color: #00645C;
+  border-radius: 4px;
+  height: 95%;
+  list-style-type: none;
+  margin-bottom: 0 !important;
+  padding: 16px;
+}
+
+/*Width is fixed @ 216*/
+.sidebar-btn {
+  background-color: transparent;
+  border: 1px solid #FFFFFF;
+  color: #FFFFFF;
+  margin-bottom: 16px;
+  padding: 12px 8px;
+}
+
+.sidebar-btn:not(.sidebar-btn-active):hover {
+  background-color: #004D45;
+}
+
+.sidebar-btn path {
+  fill: currentColor !important;
+}
+
+.sidebar-btn svg {
+  margin-right: .25em;
+}
+
+/*TODO - replace this with pseudo if innate is active, .sidebar-btn:active*/
+.sidebar-btn-active {
+  background-color: #FFFFFF;
+  box-shadow: 0px 4px 4px 0px #00000040;
+  color: #00645C;
+}
+
+@media screen and (max-width: 767px) {
+  .learner-container {
+    max-width: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .learner-dashboard-content {
+    align-content: flex-start;
+  }
+
+  .progress-icon {
+    height: 24px;
+    width: 24px;
+  }
+
+  .sidebar {
+    background-color: #A5D3EC;
+    border-radius: 0;
+    display: flex;
+    justify-content: space-around;
+    height: max-content;
+    padding: 0 !important;
+  }
+
+  .sidebar-btn {
+    background-color: transparent;
+    border: 0;
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    border-radius: 0 !important;
+    color: #00645C;
+    flex-direction: column;
+    font-size: 14px;
+    height: max-content;
+    margin-bottom: 0;
+    width: 120px !important;
+  }
+
+  .sidebar-btn:not(.sidebar-btn-active):hover {
+    background-color: transparent;
+    border-bottom-color: #00645C;
+    color: #00645C;
+  }
+
+  .sidebar-btn:not(.sidebar-btn-active) path {
+    fill: #FFFFFF !important;
+  }
+
+  .sidebar-btn-active {
+    background-color: transparent;
+    box-shadow: none;
+    border-bottom-color: #00645C;
+    color: #00645C;
+  }
+
+  .sidebar-btn-active path {
+    fill: #00645C;
+  }
+
+  .sidebar-btn svg {
+    margin-right: 0;
+  }
+
+  .sidebar-position {
+    height: max-content;
+    padding: 0 !important;
+    position: relative;
+    top: 0;
+  }
+
+  .sidebar > ol li {
+    width: max-content;
+  }
+}
+
+
+/*******/

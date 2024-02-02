@@ -45,6 +45,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './learner-dashboard-page.component.css';
 
@@ -156,7 +157,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -451,6 +453,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   decodePngURIData(base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
+  }
+
+  isShowRedesignedLearnerDashboardActive() {
+    return this.platformFeatureService.status.ShowRedesignedLearnerDashboard.isEnabled
   }
 }
 

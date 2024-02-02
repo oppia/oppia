@@ -8,6 +8,8 @@
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
 }
+
+/*Remove width*/
 .home-tab .continue-where-you-left-off {
   background-color: #fff;
   border-radius: 4px;
