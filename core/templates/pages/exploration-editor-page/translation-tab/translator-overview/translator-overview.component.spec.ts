@@ -167,7 +167,7 @@ describe('Translator Overview component', () => {
 
         spyOn(
           translationLanguageService, 'getActiveLanguageCode')
-          .and.returnValue(undefined as string);
+          .and.returnValue(undefined as unknown as string);
 
         component.ngOnInit();
         tick();
@@ -215,7 +215,7 @@ describe('Translator Overview component', () => {
     'active language code selected', fakeAsync(() => {
       spyOn(
         translationLanguageService, 'getActiveLanguageCode')
-        .and.returnValue(undefined as string);
+        .and.returnValue(undefined as unknown as string);
 
       component.ngOnInit();
       tick();
