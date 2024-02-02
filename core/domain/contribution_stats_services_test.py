@@ -371,7 +371,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_translation_submitter_admin_stats(self) -> None:
-        stats, next_offset, more = (
+        stats, next_offset, more, total_records = (
             contribution_stats_services.get_translation_submitter_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
@@ -384,12 +384,13 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(2, len(stats))
         self.assertTrue(more)
+        self.assertEqual(total_records, 4)
         self.assertEqual(3, next_offset)
         self.assertEqual('user3', stats[0].contributor_id)
         self.assertEqual('user2', stats[1].contributor_id)
 
     def test_get_translation_reviewer_admin_stats(self) -> None:
-        stats, next_offset, more = (
+        stats, next_offset, more, total_records = (
             contribution_stats_services.get_translation_reviewer_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
@@ -401,12 +402,13 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(2, len(stats))
         self.assertTrue(more)
+        self.assertEqual(total_records, 4)
         self.assertEqual(3, next_offset)
         self.assertEqual('user3', stats[0].contributor_id)
         self.assertEqual('user2', stats[1].contributor_id)
 
     def test_get_question_submitter_admin_stats(self) -> None:
-        stats, next_offset, more = (
+        stats, next_offset, more, total_records = (
             contribution_stats_services.get_question_submitter_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
@@ -418,12 +420,13 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(2, len(stats))
         self.assertTrue(more)
+        self.assertEqual(total_records, 4)
         self.assertEqual(3, next_offset)
         self.assertEqual('user3', stats[0].contributor_id)
         self.assertEqual('user2', stats[1].contributor_id)
 
     def test_get_question_reviewer_admin_stats(self) -> None:
-        stats, next_offset, more = (
+        stats, next_offset, more, total_records = (
             contribution_stats_services.get_question_reviewer_total_stats( # pylint: disable=line-too-long
             page_size=2,
             offset=1,
@@ -434,6 +437,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(2, len(stats))
         self.assertFalse(more)
+        self.assertEqual(total_records, 2)
         self.assertEqual(3, next_offset)
         self.assertEqual('user2', stats[0].contributor_id)
         self.assertEqual('user1', stats[1].contributor_id)

@@ -80,6 +80,7 @@ export class ContributorAdminStatsTable implements OnInit {
 
   nextOffset: number = 0;
   more: boolean = true;
+  totalRecords = 0;
 
   expandedElement: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
@@ -94,7 +95,7 @@ export class ContributorAdminStatsTable implements OnInit {
   TAB_NAME_QUESTION_COORDINATOR: string = 'Question Coordinator';
   loadingMessage!: string;
   noDataMessage!: string;
-  itemsPerPageChoice: number[] = [20, 50, 100];
+  itemsPerPageChoice: number[] = [1, 20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
@@ -250,6 +251,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.totalRecords = response.totalRecords;
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
@@ -284,6 +286,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.totalRecords = response.totalRecords;
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
@@ -322,6 +325,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.totalRecords = response.totalRecords;
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
@@ -356,6 +360,7 @@ export class ContributorAdminStatsTable implements OnInit {
             this.dataSource = response.stats;
             this.nextOffset = response.nextOffset;
             this.more = response.more;
+            this.totalRecords = response.totalRecords;
             this.loadingMessage = '';
             this.noDataMessage = '';
             if (this.dataSource.length === 0) {
@@ -370,6 +375,7 @@ export class ContributorAdminStatsTable implements OnInit {
     this.nextOffset = 0;
     this.dataSource = [];
     this.more = true;
+    this.totalRecords = 0;
     this.firstTimeFetchingData = true;
     this.goToPageNumber(0);
   }

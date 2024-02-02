@@ -240,7 +240,8 @@ def get_translation_submitter_total_stats(
 ) -> Tuple[
         List[suggestion_registry.TranslationSubmitterTotalContributionStats],
         int,
-        bool]:
+        bool,
+        int]:
     """Returns the list of domain objects according to values specified.
 
     Args:
@@ -267,7 +268,7 @@ def get_translation_submitter_total_stats(
                     this batch. If False, there are no further results
                     after this batch.
     """
-    translation_submitter_models, next_offset, more = (
+    translation_submitter_models, next_offset, more, total_records = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
         .fetch_page(
             page_size=page_size,
@@ -286,7 +287,8 @@ def get_translation_submitter_total_stats(
     return (
         translation_submitter_stats,
         next_offset,
-        more
+        more,
+        total_records,
     )
 
 
@@ -299,7 +301,8 @@ def get_translation_reviewer_total_stats(
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
-        bool
+        bool,
+        int,
     ]:
     """Returns the list of domain objects according to values specified.
 
@@ -325,7 +328,7 @@ def get_translation_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-    translation_reviewer_models, next_offset, more = (
+    translation_reviewer_models, next_offset, more, total_records = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel
         .fetch_page(
             page_size=page_size,
@@ -344,7 +347,8 @@ def get_translation_reviewer_total_stats(
     return (
         translation_reviewer_stats,
         next_offset,
-        more
+        more,
+        total_records,
     )
 
 
@@ -357,7 +361,8 @@ def get_question_submitter_total_stats(
 ) -> Tuple[
         List[suggestion_registry.QuestionSubmitterTotalContributionStats],
         int,
-        bool
+        bool,
+        int,
     ]:
     """Returns the list of domain objects according to values specified.
 
@@ -384,7 +389,7 @@ def get_question_submitter_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-    question_submitter_models, next_offset, more = (
+    question_submitter_models, next_offset, more, total_records = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
         .fetch_page(
             page_size=page_size,
@@ -403,7 +408,8 @@ def get_question_submitter_total_stats(
     return (
         question_submitter_stats,
         next_offset,
-        more
+        more,
+        total_records
     )
 
 
@@ -415,7 +421,8 @@ def get_question_reviewer_total_stats(
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
-        bool
+        bool,
+        int,
     ]:
     """Returns the list of domain objects according to values specified.
 
@@ -440,7 +447,7 @@ def get_question_reviewer_total_stats(
                 this batch. If False, there are no further results
                 after this batch.
     """
-    question_reviewer_models, next_offset, more = (
+    question_reviewer_models, next_offset, more, total_records = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel
         .fetch_page(
             page_size=page_size,
@@ -458,7 +465,8 @@ def get_question_reviewer_total_stats(
     return (
         question_reviewer_stats,
         next_offset,
-        more
+        more,
+        total_records,
     )
 
 

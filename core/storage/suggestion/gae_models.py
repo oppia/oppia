@@ -2292,7 +2292,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
                 int,
-                bool]:
+                bool,
+                int]:
         """Returns the models according to values specified.
 
         Args:
@@ -2360,6 +2361,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     cls.language_code == language_code
                 )).order(sort)
 
+        total_count = sort_query.count()
+
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
@@ -2394,7 +2397,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         return (
             sorted_results,
             next_offset,
-            more
+            more,
+            total_count
         )
 
     @classmethod
@@ -2713,7 +2717,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
-                bool]:
+                bool,
+                int]:
         """Returns the models according to values specified.
 
         Args:
@@ -2764,6 +2769,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 cls.language_code == language_code
             )).order(sort)
 
+        total_records = sort_query.count()
+
         sorted_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
@@ -2798,7 +2805,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         return (
             sorted_results,
             next_offset,
-            more
+            more,
+            total_records,
         )
 
     @classmethod
@@ -3038,7 +3046,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
                 int,
-                bool]:
+                bool,
+                int]:
         """Returns the models according to values specified.
 
         Args:
@@ -3101,6 +3110,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         else:
             sort_query = cls.get_all().order(sort)
 
+        total_records = sort_query.count()
+
         sorted_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
@@ -3135,7 +3146,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         return (
             sorted_results,
             next_offset,
-            more
+            more,
+            total_records,
         )
 
     @classmethod
@@ -3336,7 +3348,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
-                bool]:
+                bool,
+                int]:
         """Returns the models according to values specified.
 
         Args:
@@ -3382,7 +3395,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         # separately below. Learn more about this here:
         # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         sort_query = cls.get_all().order(sort)
-
+        total_records = sort_query.count()
         sorted_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
@@ -3417,7 +3430,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         return (
             sorted_results,
             next_offset,
-            more
+            more,
+            total_records,
         )
 
     @classmethod

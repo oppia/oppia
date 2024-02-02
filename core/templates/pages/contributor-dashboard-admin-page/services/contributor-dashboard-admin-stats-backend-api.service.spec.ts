@@ -437,7 +437,8 @@ describe('Contribution Admin dasboard stats service', () => {
         expect(result).toEqual({
           stats: [],
           nextOffset: 0,
-          more: false
+          more: false,
+          totalRecords: 0,
         });
       });
     }));

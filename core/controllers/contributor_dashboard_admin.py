@@ -644,7 +644,10 @@ class ContributorDashboardAdminStatsHandler(
                 assert page_size is not None
                 assert offset is not None
                 assert language_code is not None
-                translation_submitter_stats, next_offset, more = (
+                (
+                    translation_submitter_stats, next_offset, more,
+                    total_records
+                ) = (
                     contribution_stats_services
                     .get_translation_submitter_total_stats(
                         page_size,
@@ -659,7 +662,8 @@ class ContributorDashboardAdminStatsHandler(
                 response = {
                     'stats': translation_submitter_frontend_dicts,
                     'next_offset': next_offset,
-                    'more': more
+                    'more': more,
+                    'total_records': total_records,
                 }
 
             elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
@@ -668,7 +672,7 @@ class ContributorDashboardAdminStatsHandler(
                 assert page_size is not None
                 assert offset is not None
                 assert language_code is not None
-                translation_reviewer_stats, next_offset, more = (
+                translation_reviewer_stats, next_offset, more, total_records = (
                     contribution_stats_services
                     .get_translation_reviewer_total_stats(
                         page_size,
@@ -682,7 +686,8 @@ class ContributorDashboardAdminStatsHandler(
                 response = {
                     'stats': translation_reviewer_frontend_dicts,
                     'next_offset': next_offset,
-                    'more': more
+                    'more': more,
+                    'total_records': total_records,
                 }
 
             else:
@@ -703,7 +708,7 @@ class ContributorDashboardAdminStatsHandler(
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
                 assert offset is not None
-                question_submitter_stats, next_offset, more = (
+                question_submitter_stats, next_offset, more, total_records = (
                     contribution_stats_services
                     .get_question_submitter_total_stats(
                         page_size,
@@ -717,7 +722,8 @@ class ContributorDashboardAdminStatsHandler(
                 response = {
                     'stats': question_submitter_frontend_dicts,
                     'next_offset': next_offset,
-                    'more': more
+                    'more': more,
+                    'total_records': total_records,
                 }
 
             elif contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
@@ -725,7 +731,7 @@ class ContributorDashboardAdminStatsHandler(
                 # schema mypy is assuming is can be None.
                 assert page_size is not None
                 assert offset is not None
-                question_reviewer_stats, next_offset, more = (
+                question_reviewer_stats, next_offset, more, total_records = (
                     contribution_stats_services
                     .get_question_reviewer_total_stats(
                         page_size,
@@ -738,7 +744,8 @@ class ContributorDashboardAdminStatsHandler(
                 response = {
                     'stats': question_reviewer_frontend_dicts,
                     'next_offset': next_offset,
-                    'more': more
+                    'more': more,
+                    'total_records': total_records,
                 }
 
             else:

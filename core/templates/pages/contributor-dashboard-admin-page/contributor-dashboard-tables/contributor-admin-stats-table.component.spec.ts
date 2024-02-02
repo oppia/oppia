@@ -108,6 +108,7 @@ describe('Contributor stats component', () => {
           stats: [],
           nextOffset: 1,
           more: false,
+          totalRecords: 0,
         } as TranslationSubmitterStatsData));
 
       const changes: SimpleChanges = {
@@ -140,7 +141,8 @@ describe('Contributor stats component', () => {
         .and.returnValue(Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
+          more: false,
+          totalRecords: 0,
         } as TranslationReviewerStatsData));
 
       const changes: SimpleChanges = {
@@ -171,7 +173,8 @@ describe('Contributor stats component', () => {
         .and.returnValue(Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
+          more: false,
+          totalRecords: 0,
         } as QuestionSubmitterStatsData));
 
       const changes: SimpleChanges = {
@@ -204,7 +207,8 @@ describe('Contributor stats component', () => {
         .and.returnValue(Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
+          more: false,
+          totalRecords: 0,
         } as QuestionReviewerStatsData));
 
       const changes: SimpleChanges = {
@@ -358,7 +362,8 @@ describe('Contributor stats component', () => {
         .and.returnValue(Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
+          more: false,
+          totalRecords: 0,
         } as QuestionReviewerStatsData));
     }));
   });

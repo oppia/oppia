@@ -103,48 +103,56 @@ export interface TranslationSubmitterStatsData {
   stats: TranslationSubmitterStats[];
   nextOffset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface TranslationSubmitterStatsBackendDict {
   stats: TranslationSubmitterBackendDict[];
   next_offset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface TranslationReviewerStatsData {
   stats: TranslationReviewerStats[];
   nextOffset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface TranslationReviewerStatsBackendDict {
   stats: TranslationReviewerBackendDict[];
   next_offset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface QuestionSubmitterStatsData {
   stats: QuestionSubmitterStats[];
   nextOffset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface QuestionSubmitterStatsBackendDict {
   stats: QuestionSubmitterBackendDict[];
   next_offset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface QuestionReviewerStatsData {
   stats: QuestionReviewerStats[];
   nextOffset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 export interface QuestionReviewerStatsBackendDict {
   stats: QuestionReviewerBackendDict[];
   next_offset: number;
   more: boolean;
+  totalRecords: number;
 }
 
 @Injectable({
@@ -236,7 +244,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
                 backendDict => TranslationSubmitterStats
                   .createFromBackendDict(backendDict)),
               nextOffset: response.next_offset,
-              more: response.more
+              more: response.more,
+              totalRecords: response.totalRecords,
             });
           }, errorResponse => {
             reject(errorResponse.error.error);
@@ -257,7 +266,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
                 backendDict => TranslationReviewerStats
                   .createFromBackendDict(backendDict)),
               nextOffset: response.next_offset,
-              more: response.more
+              more: response.more,
+              totalRecords: response.totalRecords,
             });
           }, errorResponse => {
             reject(errorResponse.error.error);
@@ -280,7 +290,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
                 backendDict => QuestionSubmitterStats
                   .createFromBackendDict(backendDict)),
               nextOffset: response.next_offset,
-              more: response.more
+              more: response.more,
+              totalRecords: response.totalRecords,
             });
           }, errorResponse => {
             reject(errorResponse.error.error);
@@ -301,7 +312,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
                 backendDict => QuestionReviewerStats
                   .createFromBackendDict(backendDict)),
               nextOffset: response.next_offset,
-              more: response.more
+              more: response.more,
+              totalRecords: response.totalRecords
             });
           }, errorResponse => {
             reject(errorResponse.error.error);
@@ -312,7 +324,8 @@ export class ContributorDashboardAdminStatsBackendApiService {
     return Promise.resolve({
       stats: [],
       nextOffset: 0,
-      more: false
+      more: false,
+      totalRecords: 0,
     });
   }
 
