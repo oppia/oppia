@@ -30,7 +30,6 @@ export class MobileMenuService {
   }
 
   toggleMenuVisibility() {
-    console.log("toggle");
     this.menuVisibleSubject.next(!this.menuVisibleSubject.value);
   }
 }

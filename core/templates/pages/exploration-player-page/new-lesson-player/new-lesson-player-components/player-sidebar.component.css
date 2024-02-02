@@ -65,12 +65,36 @@
   z-index: 40;
 }
 
+.player-mobile-menu-close {
+  display: flex;
+  height: 48px;
+  justify-content: flex-end;
+  padding: 12px;
+}
+
+.player-mobile-menu-options button {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-mobile-menu-options button {
+  background: none;
+  border: none;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  height: 40px;
+  line-height: 23px;
+  padding: 8px;
+}
+
 @media screen and (max-width: 574px) {
   .player-desktop-sidebar-menu {
     display: none;
   }
 
   .player-mobile-menu {
-    display: block;
+    display: flex;
+    flex-direction: column;
   }
 }

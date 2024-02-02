@@ -19,7 +19,20 @@
     </div>
   </div>
   <div *ngIf="mobileMenuVisible">
-    <div class="player-mobile-menu-overlay"></div>
-    <div class="player-mobile-menu"></div>
+    <div class="player-mobile-menu-overlay"
+         (click)="mobileMenuService.toggleMenuVisibility()">
+    </div>
+    <div class="player-mobile-menu">
+      <div class="player-mobile-menu-close" 
+           (click)="mobileMenuService.toggleMenuVisibility()">
+           X
+      </div>
+      <div class="player-mobile-menu-options">
+        <button>Share this lesson</button>
+        <button>Give feedback</button>
+        <button>Report lesson</button>
+        <button>Help</button>
+      </div>
+    </div>
   </div>
 </div>
