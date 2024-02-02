@@ -317,13 +317,14 @@ oppia-learner-dashboard-page .learner-groups-icon {
  - remove oppia-row, replace with bootstrap classes
  - remove .oppia-learner-dashboard-menu
  - replace .oppia-learner-dashborad-menu-hover with pseudoclasses
+ - remove footer component completely
 */
 .learner-dashboard-content {
   height: 92vh;
 }
 
 .sidebar {
-  background-color: #00645C;
+  background-color: #00645c;
   border-radius: 4px;
   height: 95%;
   list-style-type: none;
@@ -333,14 +334,14 @@ oppia-learner-dashboard-page .learner-groups-icon {
 
 .sidebar-btn {
   background-color: transparent;
-  border: 1px solid #FFFFFF;
-  color: #FFFFFF;
+  border: 1px solid #fff;
+  color: #fff;
   margin-bottom: 16px;
   padding: 12px 8px;
 }
 
 .sidebar-btn:not(.sidebar-btn-active):hover {
-  background-color: #004D45;
+  background-color: #004d45;
 }
 
 .sidebar-btn path {
@@ -351,11 +352,10 @@ oppia-learner-dashboard-page .learner-groups-icon {
   margin-right: .25em;
 }
 
-/*TODO - replace this with pseudo if innate is active, .sidebar-btn:active*/
 .sidebar-btn-active {
-  background-color: #FFFFFF;
-  box-shadow: 0px 4px 4px 0px #00000040;
-  color: #00645C;
+  background-color: #fff;
+  box-shadow: 0 4px 4px 0 #00000040;
+  color: #00645c;
 }
 
 @media screen and (max-width: 767px) {
@@ -375,21 +375,21 @@ oppia-learner-dashboard-page .learner-groups-icon {
   }
 
   .sidebar {
-    background-color: #A5D3EC;
+    background-color: #a5d3ec;
     border-radius: 0;
     display: flex;
-    justify-content: space-around;
     height: max-content;
+    justify-content: space-around;
     padding: 0 !important;
   }
 
   .sidebar-btn {
     background-color: transparent;
     border: 0;
-    border-top: 2px solid transparent;
     border-bottom: 2px solid transparent;
     border-radius: 0 !important;
-    color: #00645C;
+    border-top: 2px solid transparent;
+    color: #00645c;
     flex-direction: column;
     font-size: 14px;
     height: max-content;
@@ -397,25 +397,25 @@ oppia-learner-dashboard-page .learner-groups-icon {
     width: 120px !important;
   }
 
-  .sidebar-btn:not(.sidebar-btn-active):hover {
-    background-color: transparent;
-    border-bottom-color: #00645C;
-    color: #00645C;
-  }
-
-  .sidebar-btn:not(.sidebar-btn-active) path {
-    fill: #FFFFFF !important;
-  }
-
   .sidebar-btn-active {
     background-color: transparent;
+    border-bottom-color: #00645c;
     box-shadow: none;
-    border-bottom-color: #00645C;
-    color: #00645C;
+    color: #00645c;
   }
 
   .sidebar-btn-active path {
-    fill: #00645C;
+    fill: #00645c;
+  }
+
+  .sidebar-btn:not(.sidebar-btn-active):hover {
+    background-color: transparent;
+    border-bottom-color: #00645c;
+    color: #00645c;
+  }
+
+  .sidebar-btn:not(.sidebar-btn-active) path {
+    fill: #fff !important;
   }
 
   .sidebar-btn svg {
@@ -433,6 +433,3 @@ oppia-learner-dashboard-page .learner-groups-icon {
     width: max-content;
   }
 }
-
-
-/*******/

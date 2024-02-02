@@ -158,7 +158,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlService: UrlService,
-    private platformFeatureService: PlatformFeatureService
+    private platFeatService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -455,8 +455,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return decodeURIComponent(base64ImageData);
   }
 
-  isShowRedesignedLearnerDashboardActive() {
-    return this.platformFeatureService.status.ShowRedesignedLearnerDashboard.isEnabled
+  isShowRedesignedLearnerDashboardActive(): boolean {
+    return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
   }
 }
 
