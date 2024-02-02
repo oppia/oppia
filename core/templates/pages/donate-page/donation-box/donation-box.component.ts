@@ -24,13 +24,13 @@ import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.servi
   selector: 'donation-box',
   template: `
     <iframe
-      src="https://donorbox.org/embed/test-campaign-628"
+      src="https://donorbox.org/embed/oppia-annual-fundraising-campaign-2024"
       class='e2e-test-donate-page-iframe'
       name="donorbox"
       allow="payment"
       seamless="seamless"
       frameborder="0"
-      scrolling="yes"
+      scrolling="no"
       width="100%"
       title="donorbox">
     </iframe>

@@ -498,8 +498,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
+        user_settings.created_on = time_of_creation
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+        user_settings.user_bio = 'New bio.'
+        user_services.save_user_settings(user_settings)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)

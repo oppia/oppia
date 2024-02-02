@@ -8,7 +8,7 @@
       <li *ngFor="let rule of rules;  let index = index;let last = last;" [ngClass]="{'active': activeRuleIndex === index, 'oppia-answer-rule-block': last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block e2e-test-rule-block">
         <a (click)="openRuleEditor(index)" tabindex="0" (keydown.enter)="openRuleEditor(index)" [hidden]="activeRuleIndex === index" class="oppia-rule-tab e2e-test-answer-tab" [ngClass]="{'oppia-rule-tab-disabled': !isEditable}">
           <div class="oppia-rule-header">
-            <span *ngIf="index > 0">or</span>
+            <span *ngIf="index > 0">or </span>
             <span *ngIf="getCurrentInteractionId() !== 'MultipleChoiceInput' && index !== activeRuleIndex">
               {{rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices}}...
             </span>

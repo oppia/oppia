@@ -79,6 +79,7 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
+from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -457,6 +458,18 @@ URLS = [
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
         classroom.ClassroomIdHandler
     ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
+        voiceover.VoiceoverAdminPage
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
+        voiceover.VoiceoverAdminDataHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+        voiceover.VoiceoverLanguageCodesMappingHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -615,7 +628,6 @@ URLS = [
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
     get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
-    get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -990,8 +1002,6 @@ URLS = [
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsConfigHandler),
 
-    get_redirect_route(
-        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
     get_redirect_route(
         r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
         blog_admin.BlogAdminRolesHandler),

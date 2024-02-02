@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,23 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the donation page thanks for subscribing modal.
+ * @fileoverview Close language accent removal confirmation modal.
  */
 
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 
 @Component({
-  selector: 'thanks-for-subscribing-modal',
-  templateUrl: './thanks-for-subscribing-modal.component.html',
+  selector: 'oppia-language-accent-removal-confirm-modal',
+  templateUrl: './language-accent-removal-confirm-modal.component.html'
 })
-export class ThanksForSubscribingModalComponent {
+export class VoiceoverRemovalConfirmModalComponent
+  extends ConfirmOrCancelModal {
+  languageAccentDescription: string = '';
   constructor(
-    private activeModal: NgbActiveModal
-  ) {}
+    private ngbActiveModal: NgbActiveModal
+  ) {
+    super(ngbActiveModal);
+  }
 
-  dismiss(): void {
-    this.activeModal.dismiss();
+  close(): void {
+    this.ngbActiveModal.close();
   }
 }

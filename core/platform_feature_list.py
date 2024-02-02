@@ -45,7 +45,8 @@ ParamNames = params.ParamNames
 DEV_FEATURES_LIST = [
     params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    params.ParamNames.SHOW_TRANSLATION_SIZE
+    params.ParamNames.SHOW_TRANSLATION_SIZE,
+    params.ParamNames.NEW_LESSON_PLAYER
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
