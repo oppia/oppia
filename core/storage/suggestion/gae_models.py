@@ -2309,7 +2309,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 who are active in max_days_since_last_activity.
 
         Returns:
-            3-tuple(sorted_results, next_offset, more). where:
+            3-tuple(sorted_results, next_offset, more, total_records). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
@@ -2319,6 +2319,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
                     after this batch.
+                total_records: int. The total number of results present.
         """
 
         sort_options_dict = {
@@ -2361,7 +2362,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     cls.language_code == language_code
                 )).order(sort)
 
-        total_count = sort_query.count()
+        total_records = sort_query.count()
 
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
@@ -2398,7 +2399,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             sorted_results,
             next_offset,
             more,
-            total_count
+            total_records
         )
 
     @classmethod
@@ -2732,7 +2733,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 who are active in max_days_since_last_activity.
 
         Returns:
-            3-tuple(sorted_results, next_offset, more). where:
+            3-tuple(sorted_results, next_offset, more, total_records). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
@@ -2742,6 +2743,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
                     after this batch.
+                total_records: int. The total number of results present.
         """
 
         sort_options_dict = {
@@ -3062,7 +3064,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 who are active in max_days_since_last_activity.
 
         Returns:
-            3-tuple(sorted_results, next_offset, more). where:
+            3-tuple(sorted_results, next_offset, more, total_records). where:
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
@@ -3072,6 +3074,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
                     after this batch.
+                total_records: int. The total number of results present.
         """
 
         sort_options_dict = {
@@ -3362,7 +3365,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 who are active in max_days_since_last_activity.
 
         Returns:
-            3-tuple(sorted_results, next_offset, more). where:
+            3-tuple(sorted_results, next_offset, more, total_records). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
@@ -3372,6 +3375,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
                     after this batch.
+                total_records: int. The total number of results present.
         """
 
         sort_options_dict = {

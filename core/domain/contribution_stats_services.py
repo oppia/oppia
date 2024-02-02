@@ -257,7 +257,7 @@ def get_translation_submitter_total_stats(
             who are active in max_days_since_last_activity.
 
     Returns:
-        3-tuple(sorted_results, next_offset, more). where:
+        3-tuple(sorted_results, next_offset, more, total_records). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStats).
                     The list of domain objects which match the supplied
@@ -267,6 +267,7 @@ def get_translation_submitter_total_stats(
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
                     after this batch.
+                total_records: int. Total number of results present.
     """
     translation_submitter_models, next_offset, more, total_records = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
@@ -317,7 +318,7 @@ def get_translation_reviewer_total_stats(
             who are active in max_days_since_last_activity.
 
     Returns:
-        3-tuple(sorted_results, next_offset, more). where:
+        3-tuple(sorted_results, next_offset, more, total_records). where:
             sorted_results:
                 list(TranslationReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
@@ -327,6 +328,7 @@ def get_translation_reviewer_total_stats(
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
                 after this batch.
+            total_records: int. Total number of results present.
     """
     translation_reviewer_models, next_offset, more, total_records = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel
@@ -378,7 +380,7 @@ def get_question_submitter_total_stats(
             who are active in max_days_since_last_activity.
 
     Returns:
-        3-tuple(sorted_results, next_offset, more). where:
+        3-tuple(sorted_results, next_offset, more, total_records). where:
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
                 The list of domain objects which match the supplied topic_ids
@@ -388,6 +390,7 @@ def get_question_submitter_total_stats(
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
                 after this batch.
+            total_records: int. Total number of results present.
     """
     question_submitter_models, next_offset, more, total_records = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
@@ -436,7 +439,7 @@ def get_question_reviewer_total_stats(
             who are active in max_days_since_last_activity.
 
     Returns:
-        3-tuple(sorted_results, next_offset, more). where:
+        3-tuple(sorted_results, next_offset, more, total_records). where:
             sorted_results:
                 list(QuestionReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
@@ -446,6 +449,7 @@ def get_question_reviewer_total_stats(
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
                 after this batch.
+            total_records: int. Total number of results present.
     """
     question_reviewer_models, next_offset, more, total_records = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel
