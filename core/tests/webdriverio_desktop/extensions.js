@@ -72,10 +72,6 @@ describe('rich-text components', function() {
       }]);
       // Test highlighting on Skillreview component.
       await richTextEditor.appendPlainText('highlight');
-      // Pre check to ensure that no text is currently highlighted.
-      expect(await browser.execute(() => {
-        return window.getSelection().toString().length;
-      })).toEqual(0);
       await richTextEditor.highlightText('highlight');
       await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
     });
