@@ -125,11 +125,11 @@ topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .
 
 topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
 topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
+  background-color: #028c7e;
+  border-radius: 4px;
   outline: 0;
   text-decoration: none;
-  background-color: #028c7e;
   transform: scale(1.02);
-  border-radius: 4px;
 }
 
 topic-viewer-page .topic-viewer-page-content .oppia-page-card {
