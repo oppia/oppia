@@ -32,7 +32,7 @@ var ReleaseCoordinatorPage = function() {
   var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
-  var featureFlagRolloutPercentageInput = (
+  var featureFlagRolloutPercentage = (
     '.e2e-test-rollout-percentage');
 
   this.get = async function() {
@@ -167,12 +167,13 @@ var ReleaseCoordinatorPage = function() {
   this.setRolloutPercentageForFeatureFlag = async function(
       featureFlagElement, rolloutPercentage) {
     await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      featureFlagElement.$(featureFlagRolloutPercentage),
       'Setting rollout-percentage property takes too long to appear'
     );
     await action.setValue(
       'rolloutPercentage',
-      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      featureFlagElement.$(featureFlagRolloutPercentage).$(
+        '.e2e-test-editor-int'),
       rolloutPercentage);
     await this.saveChangeOfFeature(featureFlagElement);
   };
@@ -180,14 +181,15 @@ var ReleaseCoordinatorPage = function() {
   this.expectRolloutPercentageToMatch = async function(
       featureFlagElement, rolloutPercentage) {
     await waitFor.visibilityOf(
-      featureFlagElement.$(featureFlagRolloutPercentageInput),
+      featureFlagElement.$(featureFlagRolloutPercentage),
       'Rollout-percentage property takes too long to appear'
     );
     var value = await action.getValue(
       'rolloutPercentage',
-      featureFlagElement.$(featureFlagRolloutPercentageInput)
+      featureFlagElement.$(featureFlagRolloutPercentage).$(
+        '.e2e-test-editor-int')
     );
-    expect(value).toEqual(rolloutPercentage);
+    expect(value).toBe(rolloutPercentage);
   };
 
   this.saveChangeOfFeature = async function(featureElement) {

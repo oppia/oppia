@@ -21,8 +21,8 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
-from core import platform_feature_list
 from core import feconf
+from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
