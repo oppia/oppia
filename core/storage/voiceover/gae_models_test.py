@@ -22,6 +22,8 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -167,8 +169,8 @@ class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
 
-class VoiceoArtistToVoiceoverMetadataModelTests(test_utils.GenericTestBase):
-    """Unit tests for VoiceoArtistToVoiceoverMetadataModel class."""
+class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceoArtistMetadataModel class."""
 
     def test_get_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -180,54 +182,54 @@ class VoiceoArtistToVoiceoverMetadataModelTests(test_utils.GenericTestBase):
                 base_models.EXPORT_POLICY.EXPORTED)
         }
         self.assertDictEqual(
-            voiceover_models.
-            VoiceoArtistToVoiceoverMetadataModel.get_export_policy(),
+            voiceover_models.VoiceoArtistMetadataModel.get_export_policy(),
             expected_export_policy_dict
         )
 
     def test_has_reference_to_user_id(self) -> None:
         user_id = 'user_id'
         self.assertFalse(
-            voiceover_models.VoiceoArtistToVoiceoverMetadataModel.
+            voiceover_models.VoiceoArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
-        voiceover_models.VoiceoArtistToVoiceoverMetadataModel.create(
+        voiceover_models.VoiceoArtistMetadataModel.create(
             voice_artist_id=user_id)
 
         self.assertTrue(
-            voiceover_models.VoiceoArtistToVoiceoverMetadataModel.
+            voiceover_models.VoiceoArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
     def test_should_raise_error_if_user_id_already_exists(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceoArtistToVoiceoverMetadataModel.create(
+        voiceover_models.VoiceoArtistMetadataModel.create(
             voice_artist_id=user_id)
 
         with self.assertRaisesRegex(
             Exception,
-            'A voice artist to voiceover metadata model with the given '
-            'user ID exists already.'
+            'A voice artist metadata model with a given voice'
+            'artist ID already exists'
         ):
-            voiceover_models.VoiceoArtistToVoiceoverMetadataModel.create(
+            voiceover_models.VoiceoArtistMetadataModel.create(
             voice_artist_id=user_id)
 
     def test_export_data_trivial(self) -> None:
         non_existent_user_id = 'non_existent_user_id'
         user_data = (
-            voiceover_models.VoiceoArtistToVoiceoverMetadataModel.export_data(
+            voiceover_models.VoiceoArtistMetadataModel.export_data(
                 non_existent_user_id)
         )
-        test_data = {}
+        test_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceoArtistToVoiceoverMetadataModel.create(
+        voiceover_models.VoiceoArtistMetadataModel.create(
             voice_artist_id=user_id)
         user_data = (
-            voiceover_models.VoiceoArtistToVoiceoverMetadataModel.export_data(
+            voiceover_models.VoiceoArtistMetadataModel.export_data(
                 user_id))
-        test_data = {
-            user_id: {'voiceovers_and_contents_mapping': {}}
-        }
+        test_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {
+                user_id: {'voiceovers_and_contents_mapping': {}}}
         self.assertEqual(user_data, test_data)
