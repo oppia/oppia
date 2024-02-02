@@ -7,7 +7,7 @@
 .oppia-new-player-content {
   background-color: #aed2e9;
   display: flex;
-  height: calc(100vh - 96px);
+  height: calc(100vh - 104px);
 }
 
 .oppia-new-player-main-content {
