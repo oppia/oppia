@@ -28,6 +28,7 @@ import { StatsReportingService } from 'pages/exploration-player-page/services/st
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UrlService } from 'services/contextual/url.service';
 
 import './hint-and-solution-buttons.component.css';
 
@@ -48,6 +49,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   activeHintIndex!: number | null;
   displayedCard!: StateCard;
   hintIndexes: number[] = [];
+  iframed!: boolean;
   solutionModalIsActive: boolean = false;
   currentlyOnLatestCard: boolean = true;
   isVisible: boolean = true;
@@ -56,6 +58,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
+    private urlService: UrlService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
@@ -67,6 +70,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.iframed = this.urlService.isIframed();
     this.resetLocalHintsArray();
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
