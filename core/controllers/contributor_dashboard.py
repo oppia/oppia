@@ -332,7 +332,9 @@ class ReviewableOpportunitiesHandler(
         if self.user_id:
             for opp in (
                 self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name or '', language
+                self.user_id,
+                topic_name=topic_name if topic_name != 'null' else None,
+                language=language
             )):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -341,7 +343,7 @@ class ReviewableOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: str, language: Optional[str]
+        self, user_id: str, topic_name: Optional[str], language: Optional[str]
     ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
@@ -350,10 +352,10 @@ class ReviewableOpportunitiesHandler(
         Args:
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
-            topic_name: str. A topic name for which to filter the
+            topic_name: str|None. A topic name for which to filter the
                 exploration opportunity summaries. If '' is supplied, all
                 available exploration opportunity summaries will be returned.
-            language: str. ISO 639-1 language code for which to filter the
+            language: str|None. ISO 639-1 language code for which to filter the
                 exploration opportunity summaries. If it is None, all
                 available exploration opportunity summaries will be returned.
 
@@ -370,9 +372,7 @@ class ReviewableOpportunitiesHandler(
         #    of explorations.
         # 4. Moved any pinned summaries to the top.
 
-        # topic_name of empty string will fetch all topics, since no topic can
-        # have an empty string as a name.
-        if topic_name == '':
+        if topic_name is None:
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids())
         else:

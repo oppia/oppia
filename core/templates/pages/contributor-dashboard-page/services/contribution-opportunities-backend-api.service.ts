@@ -168,8 +168,6 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
-    topicName = (
-      topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
 
     const params = {
       language_code: languageCode,
@@ -203,13 +201,8 @@ export class ContributionOpportunitiesBackendApiService {
     const params: {
       topic_name?: string;
       language_code?: string;
-    } = {};
-    if (
-      topicName !== '' &&
-      topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL
-    ) {
-      params.topic_name = topicName;
-    }
+    } = { topic_name: topicName ?? null };
+    console.log(params.topic_name);
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
