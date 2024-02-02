@@ -233,3 +233,8 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
             str, voiceover_models.VoiceoversAndContentsMappingType] = {
                 user_id: {'voiceovers_and_contents_mapping': {}}}
         self.assertEqual(user_data, test_data)
+
+    def test_get_deletion_policy_is_to_keep(self) -> None:
+        self.assertEqual(
+            voiceover_models.VoiceoArtistMetadataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)

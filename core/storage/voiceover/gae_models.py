@@ -266,6 +266,14 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
             }
         )
 
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """The model contains data corresponding to a user: user_id and their
+        provided voiceover data, but it isn't deleted because the voiceover
+        data is needed to classify voiceovers.
+        """
+        return base_models.DELETION_POLICY.KEEP
+
     @classmethod
     def get_model(
         cls, voice_artist_id: str
