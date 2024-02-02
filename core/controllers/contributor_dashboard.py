@@ -384,6 +384,7 @@ class ReviewableOpportunitiesHandler(
                 topic_services.get_all_published_story_exploration_ids(
                     topic_id=topic.id))
 
+        # TODO (#19664): Implement fetching target IDs using GAE projection queries
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(
