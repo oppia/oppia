@@ -127,8 +127,8 @@ topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-v
 topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
   outline: 0;
   text-decoration: none;
+  background-color: #028c7e;
   transform: scale(1.02);
-  background-color: #028C7E;
   border-radius: 4px;
 }
 
