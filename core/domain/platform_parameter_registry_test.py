@@ -78,9 +78,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '111'
         })
 
     def test_create_platform_parameter(self) -> None:
@@ -376,9 +374,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': True,
-            'feature_stage': FeatureStages.DEV.value,
+            'default_value': '333'
         })
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_b',
@@ -387,9 +383,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': False
         })
 
         self.assertDictEqual(
