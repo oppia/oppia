@@ -1,18 +1,31 @@
 <div class="oppia-lesson-player-sidebar">
   <div class="player-desktop-sidebar-menu"
        [class.expanded]="isExpanded">
-    <button class="player-sidebar-toggle"
-            (click)="toggleSidebar()"
-            [class.expanded]="isExpanded">
-      <div *ngIf="!isExpanded">
-        Open options
-        <img src="/assets/images/lesson_player/sidebar-chevron-right.svg" alt="Share button">
-      </div>
+    <div class="lesson-player-sidebar-top">
+      <button class="player-sidebar-toggle"
+              (click)="toggleSidebar()"
+              [class.expanded]="isExpanded">
+        <div *ngIf="!isExpanded">
+          Open options
+          <img src="/assets/images/lesson_player/sidebar-chevron-right.svg" alt="Share button">
+        </div>
+        <div *ngIf="isExpanded">
+          Close options
+          <img src="/assets/images/lesson_player/sidebar-chevron-left.svg" alt="Share button">
+        </div>
+      </button>
       <div *ngIf="isExpanded">
-        Close options
-        <img src="/assets/images/lesson_player/sidebar-chevron-left.svg" alt="Share button">
+        <div class="oppia-exploration-description"
+            *ngIf="!isHackyExpDescTranslationDisplayed()">
+          {{ expDesc | truncateAndCapitalize: 90 }}
+        </div>
+        <div class="oppia-exploration-description"
+            tabindex="0"
+            *ngIf="isHackyExpDescTranslationDisplayed()">
+          {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+        </div>
       </div>
-    </button>
+    </div>
     <div class="player-sidebar-button-container">
       <button class="player-sidebar-button">
         <img *ngIf="!isExpanded" src="/assets/images/lesson_player/share-button.svg" alt="Share button">

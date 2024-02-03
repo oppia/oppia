@@ -20,7 +20,13 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
-import { Observable } from 'rxjs';
+import { LearnerExplorationSummaryBackendDict } from
+  'domain/summary/learner-exploration-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from
+  'services/i18n-language-code.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -28,21 +34,53 @@ import { Observable } from 'rxjs';
   styleUrls: ['./player-sidebar.component.css'],
 })
 export class PlayerSidebarComponent implements OnInit {
-  constructor(
-    private mobileMenuService: MobileMenuService
-  ) {}
-
   mobileMenuVisible: boolean;
   isExpanded = false;
+  explorationId!: string;
+  expInfo!: LearnerExplorationSummaryBackendDict;
+  expDesc!: string;
+  expDescTranslationKey!: string;
 
-  toggleSidebar(): void {
-    this.isExpanded = !this.isExpanded;
-  }
+  constructor(
+    private mobileMenuService: MobileMenuService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private contextService: ContextService,
+    private readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService,
+    private urlService: UrlService,
+  ) {}
 
   ngOnInit() {
     this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
       this.mobileMenuVisible = visibility;
     });
+
+    this.explorationId = this.contextService.getExplorationId();
+    this.expDesc = 'Loading...';
+    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
+      this.explorationId,
+      this.urlService.getExplorationVersionFromUrl(),
+      this.urlService.getPidFromUrl())
+      .then((response) => {
+        this.expDesc = response.exploration.objective;
+      });
+    this.expDescTranslationKey = (
+      this.i18nLanguageCodeService.
+        getExplorationTranslationKey(
+          this.explorationId, TranslationKeyType.DESCRIPTION)
+    );
+  }
+
+  toggleSidebar(): void {
+    this.isExpanded = !this.isExpanded;
+  }
+
+  isHackyExpDescTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expDescTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

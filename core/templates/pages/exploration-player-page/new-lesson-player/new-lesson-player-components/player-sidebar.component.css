@@ -8,6 +8,11 @@
   height: 100%;
 }
 
+.lesson-player-sidebar-top {
+  display: flex;
+  flex-direction: column;
+}
+
 .player-sidebar-toggle {
   background: none;
   border: none;
@@ -28,6 +33,15 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.oppia-exploration-description {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+  padding: 20px;
 }
 
 .player-desktop-sidebar-menu {
