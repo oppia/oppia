@@ -8,6 +8,28 @@
   height: 100%;
 }
 
+.player-sidebar-toggle {
+  background: none;
+  border: none;
+  color: #00645C;
+  height: 48px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
+  letter-spacing: 0em;
+}
+
+.player-sidebar-toggle div {
+  display: flex;
+  align-items: center;
+}
+
+.player-sidebar-toggle.expanded {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .player-desktop-sidebar-menu {
   background-color: #f2f4f7;
   box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
@@ -35,10 +57,20 @@
   background-color: #fff;
   border: none;
   border-radius: 4px;
-  height: 45px;
-  padding: 10px;
   box-shadow: 0px 0px 10px 0px #00000026;
+  font-size: 16px;
+  font-weight: 400;
+  height: 45px;
+  line-height: 20px;
+  letter-spacing: 0em;
+  padding: 10px;
   width: 45px;
+}
+
+.player-sidebar-button div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .player-desktop-sidebar-menu.expanded .player-sidebar-button {
