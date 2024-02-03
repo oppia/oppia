@@ -58,7 +58,6 @@ require('services/contextual/device-info.service.ts');
 require('services/contextual/url.service.ts');
 require('services/csrf-token.service.ts');
 require('services/date-time-format.service.ts');
-require('services/debouncer.service.ts');
 require('services/html-escaper.service.ts');
 require('services/id-generation.service.ts');
 require('services/interaction-rules-registry.service.ts');
