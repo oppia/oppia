@@ -169,8 +169,8 @@ class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
 
-class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
-    """Unit tests for VoiceoArtistMetadataModel class."""
+class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceArtistMetadataModel class."""
 
     def test_get_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -182,26 +182,26 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
                 base_models.EXPORT_POLICY.EXPORTED)
         }
         self.assertDictEqual(
-            voiceover_models.VoiceoArtistMetadataModel.get_export_policy(),
+            voiceover_models.VoiceArtistMetadataModel.get_export_policy(),
             expected_export_policy_dict
         )
 
     def test_has_reference_to_user_id(self) -> None:
         user_id = 'user_id'
         self.assertFalse(
-            voiceover_models.VoiceoArtistMetadataModel.
+            voiceover_models.VoiceArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
-        voiceover_models.VoiceoArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create(
             voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
         self.assertTrue(
-            voiceover_models.VoiceoArtistMetadataModel.
+            voiceover_models.VoiceArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
     def test_should_raise_error_if_user_id_already_exists(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceoArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create(
             voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
         with self.assertRaisesRegex(
@@ -209,13 +209,13 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
             'A voice artist metadata model with a given voice'
             'artist ID already exists'
         ):
-            voiceover_models.VoiceoArtistMetadataModel.create(
+            voiceover_models.VoiceArtistMetadataModel.create(
             voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
     def test_export_data_trivial(self) -> None:
         non_existent_user_id = 'non_existent_user_id'
         user_data = (
-            voiceover_models.VoiceoArtistMetadataModel.export_data(
+            voiceover_models.VoiceArtistMetadataModel.export_data(
                 non_existent_user_id)
         )
         test_data: Dict[
@@ -224,10 +224,10 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceoArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create(
             voice_artist_id=user_id, voiceovers_and_contents_mapping={})
         user_data = (
-            voiceover_models.VoiceoArtistMetadataModel.export_data(
+            voiceover_models.VoiceArtistMetadataModel.export_data(
                 user_id))
         test_data: Dict[
             str, voiceover_models.VoiceoversAndContentsMappingType] = {
@@ -236,12 +236,12 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_to_keep(self) -> None:
         self.assertEqual(
-            voiceover_models.VoiceoArtistMetadataModel.get_deletion_policy(),
+            voiceover_models.VoiceArtistMetadataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            voiceover_models.VoiceoArtistMetadataModel.
+            voiceover_models.VoiceArtistMetadataModel.
                 get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
 
@@ -277,13 +277,13 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
         }
 
         voice_artist_metadata_model = (
-            voiceover_models.VoiceoArtistMetadataModel.create(
+            voiceover_models.VoiceArtistMetadataModel.create(
                 voice_artist_id=user_id,
                 voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
             )
         )
         retreived_voice_artist_metadata_model = (
-            voiceover_models.VoiceoArtistMetadataModel.get_model(user_id))
+            voiceover_models.VoiceArtistMetadataModel.get_model(user_id))
         assert retreived_voice_artist_metadata_model
 
         self.assertEqual(

@@ -219,18 +219,18 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
         })
 
 
-class VoiceoArtistMetadataModel(base_models.BaseModel):
+class VoiceArtistMetadataModel(base_models.BaseModel):
     """The model stores manual voice artists' information with their
     provided voiceovers metadata.
     Instances of this class are keyed by the user ID.
     """
 
-    # The ID of the voiceover artist's user.
+    # The user ID of the voiceover artist.
     voice_artist_id = datastore_services.StringProperty(
         indexed=True, required=True)
     # Dictionary mapping language codes to nested dictionaries. Each
     # nested dictionary contains the following key-value pairs:
-    #   -'language_accent_code' key holds the accent code.
+    #   -'language_accent_code' key holds the language accent code value.
     #   -'exploration_id_to_content_ids' key maps exploration IDs to lists of
     #       content IDs.
     #   -'voiceovers' key contains a list of sample voiceovers associated
@@ -240,7 +240,7 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, voice_artist_id: str) -> bool:
-        """Check whether VoiceoArtistMetadataModel references user.
+        """Check whether VoiceArtistMetadataModel references user.
 
         Args:
             voice_artist_id: str. The ID of the user whose data
@@ -258,7 +258,7 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
         """Model contains data corresponding to a user to export."""
         return dict(
             super(
-                VoiceoArtistMetadataModel, cls
+                VoiceArtistMetadataModel, cls
             ).get_export_policy(), **{
                 # We do not export the voice_artist_id because we should not
                 # export internal user ids.
@@ -287,8 +287,8 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
     @classmethod
     def get_model(
         cls, voice_artist_id: str
-    ) -> Optional[VoiceoArtistMetadataModel]:
-        """Gets VoiceoArtistMetadataModel by voice_artist_id.
+    ) -> Optional[VoiceArtistMetadataModel]:
+        """Gets VoiceArtistMetadataModel by voice_artist_id.
         Returns None if the voice artist metadata model with the given voice
         artist ID doesn't exist.
 
@@ -296,8 +296,8 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
             voice_artist_id: str. The user ID of the voice artist.
 
         Returns:
-            VoiceoArtistMetadataModel | None. The voice artist metadata model
-            instance exists, or None if it is not found.
+            VoiceArtistMetadataModel | None. The voice artist metadata model
+            instance if it exists, or None if it is not found.
         """
         return cls.query(
             datastore_services.all_of(
@@ -309,8 +309,8 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
         cls,
         voice_artist_id: str,
         voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType
-    ) -> VoiceoArtistMetadataModel:
-        """Creates a new VoiceoArtistMetadataModel instance.
+    ) -> VoiceArtistMetadataModel:
+        """Creates a new VoiceArtistMetadataModel instance.
 
         Args:
             voice_artist_id: str. User ID of the voice artist.
@@ -324,8 +324,8 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
                 associated with the language code.
 
         Returns:
-            VoiceoArtistMetadataModel. The newly created
-            VoiceoArtistMetadataModel instance.
+            VoiceArtistMetadataModel. The newly created
+            VoiceArtistMetadataModel instance.
 
         Raises:
             Exception. A voice artist metadata model with a given voice
@@ -349,18 +349,18 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
     def export_data(
         cls, user_id: str
     ) -> Dict[str, VoiceoversAndContentsMappingType]:
-        """Exports the data from VoiceoArtistMetadataModel into
+        """Exports the data from VoiceArtistMetadataModel into
         dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from VoiceoArtistMetadataModel.
+            dict. Dictionary of the data from VoiceArtistMetadataModel.
         """
         user_data: Dict[str, VoiceoversAndContentsMappingType] = {}
         voice_artist_metadata_models: Sequence[
-            VoiceoArtistMetadataModel] = cls.get_all().filter(
+            VoiceArtistMetadataModel] = cls.get_all().filter(
             cls.voice_artist_id == user_id).fetch()
         for voice_artist_metadata_model in voice_artist_metadata_models:
             user_data[user_id] = {
