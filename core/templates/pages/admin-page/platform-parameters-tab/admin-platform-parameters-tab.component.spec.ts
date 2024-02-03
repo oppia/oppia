@@ -37,7 +37,7 @@ import { AdminPlatformParametersTabComponent } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType } from
   'domain/platform-parameter/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
+import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 class MockWindowRef {
