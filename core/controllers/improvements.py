@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
 from core.domain import exp_fetchers
+from core.domain import feature_flag_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.domain import platform_feature_services
@@ -238,8 +239,9 @@ class ExplorationImprovementsConfigHandler(
             'exploration_version': (
                 exp_fetchers.get_exploration_by_id(exploration_id).version),
             'is_improvements_tab_enabled': (
-                platform_feature_services.is_feature_enabled(
-                    platform_feature_list.ParamNames.
+                feature_flag_services.is_feature_flag_enabled(
+                    self.user_id,
+                    platform_feature_list.FeatureNames.
                     IS_IMPROVEMENTS_TAB_ENABLED.value)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
                 platform_feature_services.get_platform_parameter_value(

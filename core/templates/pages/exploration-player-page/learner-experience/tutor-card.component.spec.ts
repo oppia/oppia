@@ -49,7 +49,7 @@ import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { UserInfo } from 'domain/user/user-info.model';
-import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
+import { FeatureStatusChecker } from 'domain/feature-flag/feature-status-summary.model';
 
 class MockWindowRef {
   nativeWindow = {

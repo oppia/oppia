@@ -23,7 +23,7 @@ from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import platform_feature_services
+from core.domain import feature_flag_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers
@@ -42,8 +42,9 @@ class DiagnosticTestPlayerPage(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        if platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value
+        if feature_flag_services.is_feature_flag_enabled(
+            self.user_id,
+            platform_feature_list.FeatureNames.DIAGNOSTIC_TEST.value
         ):
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:

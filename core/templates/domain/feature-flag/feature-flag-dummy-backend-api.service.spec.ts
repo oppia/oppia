@@ -13,28 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformFeatureDummyBackendApiService.
+ * @fileoverview Unit tests for FeatureFlagDummyBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagDomainConstants } from
+  'domain/feature-flag/feature-flag-domain.constants';
+import { FeatureFlagDummyBackendApiService } from
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 
-describe('PlatformFeatureDummyBackendApiService', () => {
+describe('FeatureFlagDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let apiService: PlatformFeatureDummyBackendApiService;
+  let apiService: FeatureFlagDummyBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    apiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+    apiService = TestBed.get(FeatureFlagDummyBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -51,8 +51,8 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
-        .flush({ msg: 'ok' });
+        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
+        .flush({ msg: 'ok', is_enabled: true });
 
       flushMicrotasks();
 
@@ -68,36 +68,13 @@ describe('PlatformFeatureDummyBackendApiService', () => {
         .then(successHandler, failHandler);
 
       httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
-        .flush('Mock 404 Error', {
-          status: 404,
-          statusText: 'Not Found'
-        });
+        .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
+        .flush({ msg: 'ok', is_enabled: false });
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(false);
       expect(failHandler).not.toHaveBeenCalled();
-    }));
-
-    it('should throw if the exception is not caused by a 404', fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      apiService.isHandlerEnabled()
-        .then(successHandler, failHandler);
-
-      httpTestingController
-        .expectOne(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
-        .flush('Mock 500 Error', {
-          status: 500,
-          statusText: 'Some internal server error.'
-        });
-
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     }));
   });
 });

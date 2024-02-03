@@ -41,7 +41,7 @@ import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.mode
 import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
+import { FeatureStatusChecker } from 'domain/feature-flag/feature-status-summary.model';
 
 class MockPlatformFeatureService {
   get status(): object {

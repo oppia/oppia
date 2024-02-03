@@ -17,7 +17,7 @@
  */
 
 import { FeatureStatusSummary, FeatureNames } from
-  'domain/platform_feature/feature-status-summary.model';
+  'domain/feature-flag/feature-status-summary.model';
 
 describe('Feature Status Summary Model', () => {
   it('should create an instance from a backend dict.', () => {

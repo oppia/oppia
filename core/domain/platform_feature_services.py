@@ -45,7 +45,7 @@ from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List, Set
 
-ALL_FEATURE_FLAGS: List[platform_feature_list.ParamNames] = (
+ALL_FEATURE_FLAGS: List[platform_feature_list.FeatureNames] = (
     platform_feature_list.DEV_FEATURES_LIST +
     platform_feature_list.TEST_FEATURES_LIST +
     platform_feature_list.PROD_FEATURES_LIST
@@ -157,7 +157,7 @@ def is_feature_enabled(feature_name: str) -> bool:
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    return _evaluate_feature_flag_value_for_server(feature_name)
+    return _evaluate_feature_flag_config_for_server(feature_name)
 
 
 def update_feature_flag(
@@ -280,7 +280,7 @@ def _evaluate_feature_flag_values_for_context(
     return result_dict
 
 
-def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
+def _evaluate_feature_flag_config_for_server(feature_name: str) -> bool:
     """Evaluates and returns the values of the feature flag, using context
     from the server only.
 

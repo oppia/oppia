@@ -90,10 +90,8 @@ CACHE_NAMESPACE_STORY: Final = 'story'
 # Topic. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the topic.
 CACHE_NAMESPACE_TOPIC: Final = 'topic'
-# This namespace supports sub-namespaces which are identified by the stringified
-# version number of the topics within the sub-namespace. The value for
-# each key in this namespace should be a serialized representation of a
-# Platform Parameter. This namespace does not support sub-namespaces.
+# The value for each key in this namespace should be a serialized representation
+# of a Platform Parameter. This namespace does not support sub-namespaces.
 CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel

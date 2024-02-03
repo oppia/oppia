@@ -56,7 +56,6 @@ describe('Feature Gating Flow', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
-    await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
     await releaseCoordinatorPage.saveChangeOfFeature(dummy);
     await users.logout();
   });
@@ -117,6 +116,24 @@ describe('Feature Gating Flow', function() {
 
     expect(await agDummyFeatureIndicator.isExisting()).toBe(true);
     expect(await agDummyHandlerIndicator.isExisting()).toBe(true);
+    await releaseCoordinatorPage.disableFeatureFlag(dummy);
     await users.logout();
+  });
+
+  it('should set rollout-percentage for feature flag', async() => {
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
+
+    // Here we are sending the expected rollout-percentage as a string
+    // because the webdriverio is not context aware when fetching the value,
+    // It fetches the value as a string.
+    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, '0');
+
+    await releaseCoordinatorPage.setRolloutPercentageForFeatureFlag(dummy, 50);
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, '50');
   });
 });

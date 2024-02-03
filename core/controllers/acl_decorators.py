@@ -33,8 +33,8 @@ from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_config_services
 from core.domain import email_manager
+from core.domain import feature_flag_services
 from core.domain import feedback_services
-from core.domain import platform_feature_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1243,8 +1243,9 @@ def can_access_contributor_dashboard_admin_page(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        new_dashboard_enabled = platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+        new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
+            self.user_id,
+            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
 
         if new_dashboard_enabled and (
             role_services

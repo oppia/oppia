@@ -16,12 +16,17 @@
  * @fileoverview Service to check the status of dummy handler in backend.
  */
 
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { FeatureFlagDomainConstants } from
+  'domain/feature-flag/feature-flag-domain.constants';
+
+interface Response {
+  is_enabled: boolean;
+  msg: string;
+}
 
 /**
  * Api service for the backend dummy handler that is gated by the
@@ -31,7 +36,7 @@ import { PlatformFeatureDomainConstants } from
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformFeatureDummyBackendApiService {
+export class FeatureFlagDummyBackendApiService {
   constructor(
     private http: HttpClient,
   ) {}
@@ -41,27 +46,15 @@ export class PlatformFeatureDummyBackendApiService {
    * is enabled.
    *
    * @returns {Promise<boolean>} - A promise that resolves to true if request
-   * to the dummy handler succeeded without 404 error.
+   * to the dummy handler succeeded without error.
    */
   async isHandlerEnabled(): Promise<boolean> {
-    try {
-      await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
-        .toPromise();
-      return true;
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
-    } catch (err: unknown) {
-      if (err instanceof HttpErrorResponse && err.status === 404) {
-        return false;
-      } else {
-        throw err;
-      }
-    }
+    const response = await this.http.get(
+      FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise() as Response;
+    return response.is_enabled === true;
   }
 }
 
 angular.module('oppia').factory(
-  'PlatformFeatureDummyBackendApiService',
-  downgradeInjectable(PlatformFeatureDummyBackendApiService));
+  'FeatureFlagDummyBackendApiService',
+  downgradeInjectable(FeatureFlagDummyBackendApiService));

@@ -20,11 +20,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
-import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from
+import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
+import { FeatureFlagDomainConstants } from
+  'domain/feature-flag/feature-flag-domain.constants';
+import { FeatureStage } from
   'domain/platform_feature/platform-parameter.model';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -36,20 +35,13 @@ describe('PlatformFeatureAdminBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureFlagsResponse = {
     feature_flags: [{
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.DEV,
       name: 'dummy_feature_flag_for_e2e_tests',
-      description: 'this is a dummy feature',
-      data_type: 'bool',
-      rules: [{
-        filters: [{
-          type: PlatformParameterFilterType.PlatformType,
-          conditions: [['=', 'Web'] as [string, string]]
-        }],
-        value_when_matched: true
-      }],
-      rule_schema_version: 1,
-      default_value: false,
-      is_feature: true,
-      feature_stage: FeatureStage.DEV
+      force_enable_for_all_users: false,
+      rollout_percentage: 0,
+      user_group_ids: [],
+      last_updated: null
     }],
     server_stage: 'dev'
   };
@@ -73,13 +65,13 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict)),
+        dict => FeatureFlag.createFromBackendDict(dict)),
       serverStage: featureFlagsResponse.server_stage
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
     expect(req.request.method).toEqual('GET');
     req.flush(featureFlagsResponse);
 
@@ -97,7 +89,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
       expect(req.request.method).toEqual('GET');
 
       req.flush({
@@ -116,21 +108,14 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const newRules = [
-        PlatformParameterRule.createFromBackendDict({
-          filters: [],
-          value_when_matched: false
-        })
-      ];
-
       featureAdminService.updateFeatureFlag(
-        'feature_name', 'update message', newRules
+        'feature_name', true, 0, []
       ).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
       req.flush({});
-      expect(req.request.method).toEqual('POST');
+      expect(req.request.method).toEqual('PUT');
 
       flushMicrotasks();
 
@@ -143,19 +128,12 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    const newRules = [
-      PlatformParameterRule.createFromBackendDict({
-        filters: [],
-        value_when_matched: false
-      })
-    ];
-
     featureAdminService.updateFeatureFlag(
-      'feature_name', 'update message', newRules
+      'feature_name', true, 0, []
     ).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
     req.error(new ErrorEvent('Error'));
 
     flushMicrotasks();
