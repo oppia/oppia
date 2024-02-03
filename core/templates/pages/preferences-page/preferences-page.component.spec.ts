@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { PreferencesBackendDict, UpdatePreferenceDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { BackendPreferenceUpdateType, PreferencesBackendDict, UpdatePreferenceDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -105,7 +105,7 @@ describe('Preferences Page Component', () => {
       }
 
       async updateMultiplePreferencesDataAsync(
-          updates: UpdatePreferenceDict[]
+          updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
           bulk_email_signup_message_should_be_shown: false
@@ -188,31 +188,33 @@ describe('Preferences Page Component', () => {
       tick();
       tick();
       tick();
+      expect(componentInstance.userPreferences).toBeDefined();
       expect(componentInstance.hasPageLoaded).toBeTrue();
       expect(componentInstance.username).toEqual(username);
       expect(componentInstance.email).toEqual(userEmail);
-      expect(componentInstance.userBio).toEqual(preferencesData.user_bio);
-      expect(componentInstance.subjectInterests).toEqual(
+      expect(componentInstance.userPreferences.userBio).toEqual(
+        preferencesData.user_bio);
+      expect(componentInstance.userPreferences.subjectInterests).toEqual(
         preferencesData.subject_interests);
-      expect(componentInstance.preferredLanguageCodes).toEqual(
+      expect(componentInstance.userPreferences.preferredLanguageCodes).toEqual(
         preferencesData.preferred_language_codes);
-      expect(componentInstance.profilePicturePngDataUrl).toEqual(
-        'profile-image-url-png');
-      expect(componentInstance.profilePictureWebpDataUrl).toEqual(
-        'profile-image-url-webp');
-      expect(componentInstance.defaultDashboard).toEqual(
+      expect(componentInstance.userPreferences.profilePicturePngDataUrl)
+        .toEqual('profile-image-url-png');
+      expect(componentInstance.userPreferences.profilePictureWebpDataUrl)
+        .toEqual('profile-image-url-webp');
+      expect(componentInstance.userPreferences.defaultDashboard).toEqual(
         preferencesData.default_dashboard);
-      expect(componentInstance.canReceiveEmailUpdates).toEqual(
+      expect(componentInstance.userPreferences.canReceiveEmailUpdates).toEqual(
         preferencesData.can_receive_email_updates);
-      expect(componentInstance.canReceiveEditorRoleEmail).toEqual(
-        preferencesData.can_receive_editor_role_email);
-      expect(componentInstance.canReceiveSubscriptionEmail).toEqual(
-        preferencesData.can_receive_subscription_email);
-      expect(componentInstance.canReceiveFeedbackMessageEmail).toEqual(
-        preferencesData.can_receive_feedback_message_email);
-      expect(componentInstance.preferredSiteLanguageCode).toEqual(
-        preferencesData.preferred_site_language_code);
-      expect(componentInstance.subscriptionList).toEqual(
+      expect(componentInstance.userPreferences.canReceiveEditorRoleEmail)
+        .toEqual(preferencesData.can_receive_editor_role_email);
+      expect(componentInstance.userPreferences.canReceiveSubscriptionEmail)
+        .toEqual(preferencesData.can_receive_subscription_email);
+      expect(componentInstance.userPreferences.canReceiveFeedbackMessageEmail)
+        .toEqual(preferencesData.can_receive_feedback_message_email);
+      expect(componentInstance.userPreferences.preferredSiteLanguageCode)
+        .toEqual(preferencesData.preferred_site_language_code);
+      expect(componentInstance.userPreferences.subscriptionList).toEqual(
         preferencesData.subscription_list);
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
@@ -243,10 +245,10 @@ describe('Preferences Page Component', () => {
         componentInstance.ngOnInit();
         tick();
 
-        expect(componentInstance.profilePicturePngDataUrl).toEqual(
-          '/assets/images/avatar/user_blue_150px.png');
-        expect(componentInstance.profilePictureWebpDataUrl).toEqual(
-          '/assets/images/avatar/user_blue_150px.webp');
+        expect(componentInstance.userPreferences.profilePicturePngDataUrl)
+          .toEqual('/assets/images/avatar/user_blue_150px.png');
+        expect(componentInstance.userPreferences.profilePictureWebpDataUrl)
+          .toEqual('/assets/images/avatar/user_blue_150px.webp');
       }));
 
     it('should get static image url', () => {
@@ -257,15 +259,22 @@ describe('Preferences Page Component', () => {
     });
 
     describe('preferences data', () => {
-      beforeEach(() => {
+      beforeEach(fakeAsync(() => {
         spyOn(preventPageUnloadEventService, 'addListener');
         spyOn(preventPageUnloadEventService, 'removeListener');
         spyOn(alertsService, 'addInfoMessage');
         spyOn(alertsService, 'clearWarnings');
-      });
+        spyOn(userService, 'getUserInfoAsync').and
+          .returnValue(Promise.resolve(new UserInfo(
+            ['USER_ROLE'], false, false, false, false, false, 'en', 'test',
+            'test_email@example.com', true)));
+        componentInstance.ngOnInit();
+        tick();
+        expect(componentInstance.userPreferences).toBeDefined();
+      }));
 
       it('should save user bio', fakeAsync(() => {
-        componentInstance.handleBioChange();
+        componentInstance.markUserBioAsChanged();
         componentInstance.savePreferences();
         tick();
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
@@ -274,7 +283,7 @@ describe('Preferences Page Component', () => {
       }));
 
       it('should save default dashboard', fakeAsync(() => {
-        componentInstance.handleDefaultDashboardChange();
+        componentInstance.markDefaultDashboardAsChanged();
         componentInstance.savePreferences();
         tick();
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
@@ -287,30 +296,33 @@ describe('Preferences Page Component', () => {
         componentInstance.savePreferences();
         tick();
         expect(alertsService.clearWarnings).toHaveBeenCalled();
-        expect(componentInstance.subjectInterests).toEqual('math');
+        expect(componentInstance.userPreferences.subjectInterests)
+          .toEqual('math');
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(alertsService.addInfoMessage).toHaveBeenCalled();
       }));
 
       it('should save preferred language codes', fakeAsync(() => {
-        componentInstance.handleLanguageCodesChange(['en', 'hi']);
+        componentInstance.updateAndMarkLanguageCodesAsChanged(['en', 'hi']);
         componentInstance.savePreferences();
         tick();
-        expect(componentInstance.preferredLanguageCodes).toEqual(['en', 'hi']);
+        expect(componentInstance.userPreferences.preferredLanguageCodes)
+          .toEqual(['en', 'hi']);
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(alertsService.addInfoMessage).toHaveBeenCalled();
       }));
 
-      it('should save preferred site languauge code', fakeAsync(() => {
+      it('should save preferred site language code', fakeAsync(() => {
         let code = 'en';
         spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
-        componentInstance.handleSiteLanguageCodeChange(code);
+        componentInstance.updateAndMarkSiteLanguageCodeAsChanged(code);
         componentInstance.savePreferences();
         tick();
         tick();
-        expect(componentInstance.preferredSiteLanguageCode).toEqual(code);
+        expect(componentInstance.userPreferences.preferredSiteLanguageCode)
+          .toEqual(code);
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(
@@ -320,10 +332,11 @@ describe('Preferences Page Component', () => {
       }));
 
       it('should save preferred audio languauge code', fakeAsync(() => {
-        componentInstance.handleAudioLanguageCodeChange('en');
+        componentInstance.updateAndMarkAudioLanguageCodeAsChanged('en');
         componentInstance.savePreferences();
         tick();
-        expect(componentInstance.preferredAudioLanguageCode).toEqual('en');
+        expect(componentInstance.userPreferences.preferredAudioLanguageCode)
+          .toEqual('en');
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(alertsService.addInfoMessage).toHaveBeenCalled();
@@ -335,12 +348,13 @@ describe('Preferences Page Component', () => {
             Promise.resolve({
               bulk_email_signup_message_should_be_shown: true
             }));
-        componentInstance.handleEmailPreferencesChange();
+        componentInstance.markEmailPreferencesAsChanged();
         componentInstance.savePreferences();
         tick();
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-        expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
+        expect(componentInstance.userPreferences.canReceiveEmailUpdates)
+          .toBeFalse();
       }));
     });
 
@@ -365,6 +379,12 @@ describe('Preferences Page Component', () => {
         result: Promise.resolve(profilePictureDataUrl)
       } as NgbModalRef);
       spyOn(mockWindowRef.nativeWindow.location, 'reload');
+      spyOn(userService, 'getUserInfoAsync').and
+        .returnValue(Promise.resolve(new UserInfo(
+          ['USER_ROLE'], false, false, false, false, false, 'en', 'test',
+          'test_email@example.com', true)));
+      componentInstance.ngOnInit();
+      tick();
       componentInstance.showEditProfilePictureModal();
       tick();
       componentInstance.savePreferences();
@@ -384,6 +404,12 @@ describe('Preferences Page Component', () => {
         spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
           .and.returnValue(null);
         spyOn(alertsService, 'addWarning');
+        spyOn(userService, 'getUserInfoAsync').and
+          .returnValue(Promise.resolve(new UserInfo(
+            ['USER_ROLE'], false, false, false, false, false, 'en', 'test',
+            'test_email@example.com', true)));
+        componentInstance.ngOnInit();
+        tick();
         componentInstance.showEditProfilePictureModal();
         tick();
         componentInstance.savePreferences();
@@ -393,20 +419,32 @@ describe('Preferences Page Component', () => {
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
+        result: Promise.resolve()
       } as NgbModalRef);
       spyOn(userService, 'setProfileImageDataUrlAsync');
+      spyOn(userService, 'getUserInfoAsync').and
+        .returnValue(Promise.resolve(new UserInfo(
+          ['USER_ROLE'], false, false, false, false, false, 'en', 'test',
+          'test_email@example.com', true)));
+      componentInstance.ngOnInit();
+      tick();
       let previousProfilePictureDataUrl = (
-        componentInstance.newProfilePictureDataUrl);
+        componentInstance.userPreferences.newProfilePictureDataUrl);
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
-      expect(componentInstance.newProfilePictureDataUrl)
+      expect(componentInstance.userPreferences.newProfilePictureDataUrl)
         .toEqual(previousProfilePictureDataUrl);
     }));
 
     it('should handle when there are no unsaved changes', fakeAsync(() => {
       spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync');
+      spyOn(userService, 'getUserInfoAsync').and
+        .returnValue(Promise.resolve(new UserInfo(
+          ['USER_ROLE'], false, false, false, false, false, 'en', 'test',
+          'test_email@example.com', true)));
+      componentInstance.ngOnInit();
+      tick();
       componentInstance.savePreferences();
       tick();
       expect(mockUserBackendApiService.updateMultiplePreferencesDataAsync)
@@ -420,7 +458,25 @@ describe('Preferences Page Component', () => {
     let ngbModal: NgbModal;
     let mockUserBackendApiService: MockUserBackendApiService;
     let mockWindowRef: MockWindowRef;
+    let userService: UserService;
     let fixture: ComponentFixture<PreferencesPageComponent>;
+
+    let preferencesData: PreferencesBackendDict = {
+      preferred_language_codes: ['en'],
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      default_dashboard: 'creator',
+      user_bio: 'test user bio',
+      subject_interests: '',
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: true,
+      can_receive_feedback_message_email: false,
+      can_receive_subscription_email: true,
+      subscription_list: [{
+        creator_username: 'creator',
+        creator_impact: 0
+      }]
+    };
 
     class MockWindowRef {
       nativeWindow = {
@@ -431,8 +487,12 @@ describe('Preferences Page Component', () => {
     }
 
     class MockUserBackendApiService {
+      async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+        return Promise.resolve(preferencesData);
+      }
+
       async updateMultiplePreferencesDataAsync(
-          updates: UpdatePreferenceDict[]
+          updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
           bulk_email_signup_message_should_be_shown: false
@@ -472,6 +532,7 @@ describe('Preferences Page Component', () => {
       httpTestingController = TestBed.inject(HttpTestingController);
       mockWindowRef = TestBed.inject(WindowRef);
       ngbModal = TestBed.inject(NgbModal);
+      userService = TestBed.inject(UserService);
     });
 
     it('should show edit profile picture modal', fakeAsync(() => {
@@ -486,13 +547,20 @@ describe('Preferences Page Component', () => {
             bulk_email_signup_message_should_be_shown: false
           }));
       spyOn(mockWindowRef.nativeWindow.location, 'reload');
-
+      let username = 'test';
+      let userEmail = 'test_email@example.com';
+      spyOn(userService, 'getUserInfoAsync').and
+        .returnValue(Promise.resolve(new UserInfo(
+          ['USER_ROLE'], false, false, false, false, false, 'en', username,
+          userEmail, true)));
+      componentInstance.ngOnInit();
+      tick();
       componentInstance.showEditProfilePictureModal();
       tick();
       componentInstance.savePreferences();
       tick();
-      expect(componentInstance.newProfilePictureDataUrl).toEqual(
-        profilePictureDataUrl);
+      expect(componentInstance.userPreferences.newProfilePictureDataUrl)
+        .toEqual(profilePictureDataUrl);
       expect(mockUserBackendApiService.updateMultiplePreferencesDataAsync)
         .toHaveBeenCalled();
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();

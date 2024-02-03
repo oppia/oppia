@@ -116,7 +116,6 @@ a.export-btn:active {
   background-color: #fdfbf1;
   bottom: 0;
   position: sticky;
-  
 }
 @media screen and (max-width: 600px) {
   .oppia-save-btn-container {
@@ -138,8 +137,7 @@ a.export-btn:active {
     flex-direction: column;
     gap: 8px;
     justify-content: center;
-    padding: 10px 350px 10px 10px;
-    width: 100vw;
+    padding: 10px 10px 10px 10px;
   }
   .oppia-save-button {
     width: auto;

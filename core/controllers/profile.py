@@ -334,13 +334,13 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def put(self) -> None:
         """Handles PUT requests."""
         assert self.user_id is not None
-        updates = self.payload.get('updates')
+        updates = self.payload['updates']
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 
         for update in updates:
-            update_type = update.get('update_type')
-            data = update.get('data')
+            update_type = update['update_type']
+            data = update['data']
 
             if update_type == 'subject_interests':
                 self.__validate_data_type(update_type, list, data)
@@ -354,15 +354,21 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     'can_receive_editor_role_email',
                     'can_receive_feedback_message_email',
                     'can_receive_subscription_email']
-                # Check if all required keys are in the data dictionary.
-                if not all(key in data for key in required_keys):
+                missing_keys = [
+                    key for key in required_keys if key not in data]
+                if missing_keys:
                     raise self.InvalidInputException(
-                        'Expected data to contain the fields,%s, received %s'
-                        % (required_keys, data))
-                if not all(isinstance(value, bool) for value in data.values()):
+                        'Expected data dict to have all the required keys.'
+                        'Missing keys: %s .' % ', '.join(missing_keys))
+
+                non_boolean_keys = [
+                    key for key, value in data.items()
+                    if not isinstance(value, bool)]
+                if non_boolean_keys:
                     raise self.InvalidInputException(
-                        'Expected all values of data to be boolean,received %s'
-                        % data)
+                        'Expected all values of data to be booleans. '
+                        'Non-boolean values found for keys: %s .'
+                        % ', '.join(non_boolean_keys))
 
                 bulk_email_signup_message_should_be_shown = (
                     user_services.update_email_preferences(

@@ -65,13 +65,11 @@ export class SubjectInterestsComponent {
   }
 
   validInput(value: string): boolean {
-    // The following regex matches all the special characters and numbers.
-    let invalidRegex = new RegExp(
-      '[~`!@#$%^&*()_+={[}\\]|\\:;"\'<,>.?/\\-0-9]');
+    // The following regex matches only lowercase
+    // alphabetic characters and spaces.
+    let validRegex = new RegExp('^[a-z\\s]+$');
 
-    return value === value.toLowerCase() &&
-      this.subjectInterests.indexOf(value) < 0 &&
-      invalidRegex.test(value) === false ? true : false;
+    return validRegex.test(value) && this.subjectInterests.indexOf(value) < 0;
   }
 
   add(event: { value: string }): void {

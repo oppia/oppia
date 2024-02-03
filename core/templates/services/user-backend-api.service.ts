@@ -64,10 +64,36 @@ interface LoginUrlResponseDict {
   'login_url': string;
 }
 
-export interface UpdatePreferenceDict {
-  update_type: string;
-  data: boolean | string | string[] | EmailPreferencesBackendDict;
+export type BackendPreferenceUpdateType = (
+  'profile_picture_data_url' |'user_bio' | 'subject_interests' |
+  'default_dashboard' | 'preferred_language_codes' |
+  'preferred_site_language_code' | 'preferred_audio_language_code' |
+  'email_preferences'
+);
+
+export interface EmailUpdatePreferenceDict {
+  update_type: 'email_preferences';
+  data: EmailPreferencesBackendDict;
 }
+
+interface PreferredLanguageCodesUpdatePreferenceDict {
+  update_type: 'preferred_language_codes';
+  data: string[];
+}
+
+interface OtherUpdatePreferenceDict{
+  // UpdateTypes other than 'email_preferences' and 'preferred_language_codes'.
+  update_type: Exclude<BackendPreferenceUpdateType, 'email_preferences' |
+    'preferred_language_codes'>;
+  data: string;
+}
+
+export type UpdatePreferenceDict<
+  UpdateType extends BackendPreferenceUpdateType> =
+  UpdateType extends 'email_preferences' ? EmailUpdatePreferenceDict :
+  UpdateType extends 'preferred_language_codes' ?
+  PreferredLanguageCodesUpdatePreferenceDict :
+  OtherUpdatePreferenceDict;
 
 export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': string[];
@@ -138,7 +164,7 @@ export class UserBackendApiService {
   }
 
   async updateMultiplePreferencesDataAsync(
-      updates: UpdatePreferenceDict[]
+      updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
   ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(
       this.PREFERENCES_DATA_URL,

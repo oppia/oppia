@@ -50,6 +50,8 @@ var PreferencesPage = function() {
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
+    await clickSaveChangesButton();
+    await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
       `Info toast for saving ${fieldName} takes too long to appear.`);
     await waitFor.invisibilityOfInfoToast(
@@ -92,28 +94,22 @@ var PreferencesPage = function() {
 
   this.editUserBio = async function(bio) {
     await action.addValue('User bio field', userBioElement, bio);
-    // Click on a neutral element to make User bio element out of focus.
-    await action.click('Preferences page header', pageHeader);
-    await clickSaveChangesButton();
     await saveNewChanges('User Bio');
   };
 
   this.toggleEmailUpdatesCheckbox = async function() {
     await action.click('Email Updates checkbox', emailUpdatesCheckbox);
-    await clickSaveChangesButton();
     await saveNewChanges('Email Updates');
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {
     await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
-    await clickSaveChangesButton();
     await saveNewChanges('Editor Role Emails');
   };
 
   this.toggleFeedbackEmailsCheckbox = async function() {
     await action.click(
       'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
-    await clickSaveChangesButton();
     await saveNewChanges('Feedback Emails');
   };
 
@@ -121,7 +117,6 @@ var PreferencesPage = function() {
     await action.click('system language selector', languageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
-    await clickSaveChangesButton();
     await saveNewChanges('System Language');
   };
 
@@ -129,7 +124,6 @@ var PreferencesPage = function() {
     await action.click('clickable', audioLanguageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
-    await clickSaveChangesButton();
     await saveNewChanges('Preferred Audio Language');
   };
 
@@ -137,9 +131,6 @@ var PreferencesPage = function() {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
     await action.setValue(inputFieldName, userBioElement, bio);
-    // Click on a neutral element to make User bio element out of focus.
-    await action.click('Preferences page header', pageHeader);
-    await clickSaveChangesButton();
     await saveNewChanges('User Bio');
   };
 
@@ -149,7 +140,6 @@ var PreferencesPage = function() {
     for (var i = 0; i < interests.length; i++) {
       await action.setValue(
         'User Interest Input', userInterestsInput, interests[i] + '\n');
-      await clickSaveChangesButton();
       await saveNewChanges('User Interests');
     }
   };
@@ -230,21 +220,18 @@ var PreferencesPage = function() {
   this.selectCreatorDashboard = async function() {
     await action.click(
       'Creator Dashboard radio', creatorDashboardRadio);
-    await clickSaveChangesButton();
     await saveNewChanges('Creator Dashboard Option');
   };
 
   this.selectContributorDashboard = async function() {
     await action.click(
       'Contributor Dashboard radio', contributorDashboardRadio);
-    await clickSaveChangesButton();
     await saveNewChanges('Contributor Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {
     await action.click(
       'Learner Dashboard radio', learnerDashboardRadio);
-    await clickSaveChangesButton();
     await saveNewChanges('Learner Dashboard Option');
   };
 
