@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
@@ -101,7 +101,8 @@ interface ExplorationData extends ExplorationBackendDict {
   selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html'
 })
-export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
+export class ExplorationEditorPageComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   directiveSubscriptions = new Subscription();
 
   explorationIsLinkedToStory: boolean;
@@ -630,6 +631,15 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       });
 
     this.initExplorationPage();
+  }
+
+  ngAfterViewInit(): void {
+    /**
+     * Initialize the router service when the view is initialized
+     * to ensure that any subscriptions to the router service are
+     * recieved in the editor.
+    */
+    this.routerService.init();
   }
 
   isImprovementsTabEnabled(): boolean {
