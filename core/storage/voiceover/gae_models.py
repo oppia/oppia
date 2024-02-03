@@ -46,10 +46,12 @@ class VoiceoverDict(TypedDict):
 
 
 VoiceoversAndContentsMappingType = Dict[
-    str, Union[
-        str,
-        Dict[str, List[str]],
-        VoiceoverDict
+    str, Dict[
+        str, Union[
+            str,
+            Dict[str, List[str]],
+            List[VoiceoverDict]
+        ]
     ]
 ]
 
@@ -229,7 +231,7 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
     # Dictionary mapping language codes to nested dictionaries. Each
     # nested dictionary contains the following key-value pairs:
     #   -'language_accent_code' key holds the accent code.
-    #   -'exploration_id_to_contents' key maps exploration IDs to lists of
+    #   -'exploration_id_to_content_ids' key maps exploration IDs to lists of
     #       content IDs.
     #   -'voiceovers' key contains a list of sample voiceovers associated
     #       with the language code.
@@ -296,12 +298,22 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
 
     @classmethod
     def create(
-        cls, voice_artist_id: str
+        cls,
+        voice_artist_id: str,
+        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType
     ) -> VoiceoArtistMetadataModel:
         """Creates a new VoiceoArtistMetadataModel instance.
 
         Args:
             voice_artist_id: str. User ID of the voice artist.
+            voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType.
+                A Dictionary mapping language codes to nested dictionaries.
+                Each nested dictionary contains the following key-value pairs:
+                (a). 'language_accent_code' key holds the accent code.
+                (b). 'exploration_id_to_content_ids' key maps exploration IDs
+                to lists of content IDs.
+                (c). 'voiceovers' key contains a list of sample voiceovers
+                associated with the language code.
 
         Returns:
             VoiceoArtistMetadataModel. The newly created
@@ -318,7 +330,7 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
 
         entity = cls(
             voice_artist_id=voice_artist_id,
-            voiceovers_and_contents_mapping={}
+            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
         )
         entity.update_timestamps()
         entity.put()

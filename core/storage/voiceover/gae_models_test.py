@@ -193,7 +193,7 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
             has_reference_to_user_id(user_id))
 
         voiceover_models.VoiceoArtistMetadataModel.create(
-            voice_artist_id=user_id)
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
         self.assertTrue(
             voiceover_models.VoiceoArtistMetadataModel.
@@ -202,7 +202,7 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
     def test_should_raise_error_if_user_id_already_exists(self) -> None:
         user_id = 'user_id'
         voiceover_models.VoiceoArtistMetadataModel.create(
-            voice_artist_id=user_id)
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
         with self.assertRaisesRegex(
             Exception,
@@ -210,7 +210,7 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
             'artist ID already exists'
         ):
             voiceover_models.VoiceoArtistMetadataModel.create(
-            voice_artist_id=user_id)
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
 
     def test_export_data_trivial(self) -> None:
         non_existent_user_id = 'non_existent_user_id'
@@ -225,7 +225,7 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         user_id = 'user_id'
         voiceover_models.VoiceoArtistMetadataModel.create(
-            voice_artist_id=user_id)
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
         user_data = (
             voiceover_models.VoiceoArtistMetadataModel.export_data(
                 user_id))
@@ -238,3 +238,54 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_models.VoiceoArtistMetadataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_should_create_model_successfully(self) -> None:
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        user_id = 'user_id'
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
+        }
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceoArtistMetadataModel.create(
+                voice_artist_id=user_id,
+                voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
+            )
+        )
+        retreived_voice_artist_metadata_model = (
+            voiceover_models.VoiceoArtistMetadataModel.get_model(user_id))
+        assert retreived_voice_artist_metadata_model
+
+        self.assertEqual(
+            voice_artist_metadata_model.voice_artist_id,
+            retreived_voice_artist_metadata_model.voice_artist_id
+        )
+        self.assertDictEqual(
+            voice_artist_metadata_model.voiceovers_and_contents_mapping,
+            retreived_voice_artist_metadata_model.
+            voiceovers_and_contents_mapping
+        )
