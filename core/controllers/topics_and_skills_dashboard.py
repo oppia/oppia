@@ -105,7 +105,8 @@ class TopicsAndSkillsDashboardPageDataHandler(
 
         topic_classroom_dict = {}
         for classroom in all_classrooms_dict:
-            for topic_id in classroom['topic_ids']:
+            topic_ids = classroom['topic_id_to_prerequisite_topic_ids'].keys()
+            for topic_id in topic_ids:
                 topic_classroom_dict[topic_id] = classroom['name']
 
         for topic_summary_dict in topic_summary_dicts:

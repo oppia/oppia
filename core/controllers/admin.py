@@ -87,23 +87,23 @@ EDUCATION_BLOG_POST_TITLE = 'Education'
 
 EDUCATION_BLOG_POST_CONTENT = """
     <p>
-        Education is a constantly evolving landscape, and innovation lies at its core. 
-        This summer, Oppia had the privilege of hosting a group of exceptional minds 
-        through the prestigious Google Summer of Code (GSoC) program. These talented 
+        Education is a constantly evolving landscape, and innovation lies at its core.
+        This summer, Oppia had the privilege of hosting a group of exceptional minds
+        through the prestigious Google Summer of Code (GSoC) program. These talented
         individuals embarked on a journey to transform learning, one code at a time.
     </p>\n
     <p>
-        You should check out main 
-        <oppia-noninteractive-link 
-            text-with-value=\"&amp;quot;website.&amp;quot;\" 
+        You should check out main
+        <oppia-noninteractive-link
+            text-with-value=\"&amp;quot;website.&amp;quot;\"
             url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
         </oppia-noninteractive-link><br>\n&nbsp;
     </p>\n\n
     <p>Introduction to Oppia - Youtube Video</p>
-    <oppia-noninteractive-video 
-        autoplay-with-value=\"false\" 
-        end-with-value=\"0\" 
-        start-with-value=\"0\" 
+    <oppia-noninteractive-video
+        autoplay-with-value=\"false\"
+        end-with-value=\"0\"
+        start-with-value=\"0\"
         video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
     </oppia-noninteractive-video>
 """
@@ -1299,22 +1299,6 @@ class AdminHandler(
 
             classroom_config_services.update_or_create_classroom_model(
                 classroom_1)
-
-            classroom_pages_data = [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_ids': [
-                    topic_id_1,
-                    topic_id_2,
-                    topic_id_3,
-                    topic_id_4,
-                    topic_id_5
-                ],
-            }]
-            config_services.set_property(
-                self.user_id, 'classroom_pages_data', classroom_pages_data)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 

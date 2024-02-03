@@ -294,7 +294,9 @@ def get_matching_learner_group_syllabus_to_add(
     if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
-                matching_topic_ids.extend(classroom['topic_ids'])
+                topic_ids = (
+                    classroom['topic_id_to_prerequisite_topic_ids'].keys())
+                matching_topic_ids.extend(topic_ids)
         matching_topics: List[topic_domain.Topic] = (
             topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )
