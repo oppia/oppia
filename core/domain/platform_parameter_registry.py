@@ -64,9 +64,7 @@ class Registry:
         name: enum.Enum,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
-        default: Optional[Union[bool, int, str, float]] = None,
-        is_feature: bool = False,
-        feature_stage: Optional[platform_parameter_domain.FeatureStages] = None
+        default: Optional[Union[bool, int, str, float]] = None
     ) -> platform_parameter_domain.PlatformParameter:
         """Creates, registers and returns a platform parameter.
 
@@ -108,9 +106,7 @@ class Registry:
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': default,
-            'is_feature': is_feature,
-            'feature_stage': feature_stage.value if feature_stage else None,
+            'default_value': default
         }
         return cls.init_platform_parameter_from_dict(param_dict)
 
@@ -304,9 +300,7 @@ class Registry:
                 'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'default_value': default_value,
-                'is_feature': param_with_init_settings.is_feature,
-                'feature_stage': param_with_init_settings.feature_stage,
+                'default_value': default_value
             })
         else:
             return None

@@ -1476,9 +1476,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
 
         self.assertIsInstance(param, parameter_domain.PlatformParameter)
@@ -1486,8 +1484,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         self.assertEqual(param.description, 'for test')
         self.assertEqual(param.data_type, 'string')
         self.assertEqual(len(param.rules), 1)
-        self.assertEqual(param.is_feature, False)
-        self.assertIsNone(param.feature_stage)
         self.assertEqual(param.default_value, '333')
         self.assertEqual(
             param.rule_schema_version,
@@ -1511,9 +1507,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1537,9 +1531,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1565,9 +1557,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1592,9 +1582,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
         with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported data type \'InvalidType\''):
@@ -1620,31 +1608,11 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': False
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected bool, received \'222\' in value_when_matched'):
-            param.validate()
-
-    def test_validate_feature_flag_with_default_value_as_true_raises_exception(
-        self) -> None:
-        param = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'bool',
-            'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': True,
-            'is_feature': True,
-            'feature_stage': ServerMode.DEV.value,
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Feature flag is not allowed to have default value as True.'):
             param.validate()
 
     def test_validate_with_inconsistent_default_value_type_raises_exception(
@@ -1657,9 +1625,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '111'
         })
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1689,9 +1655,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         }
                     ],
                     'rule_schema_version': 1,
-                    'default_value': '333',
-                    'is_feature': False,
-                    'feature_stage': None,
+                    'default_value': '333'
                 })
 
     def test_to_dict_returns_correct_dict(self) -> None:
@@ -1712,9 +1676,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None
+            'default_value': '333'
         }
         parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
         self.assertDictEqual(parameter.to_dict(), param_dict)
@@ -1746,9 +1708,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None
+            'default_value': '333'
         })
         new_rule_dict: parameter_domain.PlatformParameterRuleDict = {
             'filters': [
@@ -1781,9 +1741,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None
+            'default_value': '333'
         })
         param.set_default_value('default')
 
@@ -1807,9 +1765,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '333',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '333'
         })
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
@@ -1841,9 +1797,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '111'
         })
 
         prod_context = parameter_domain.EvaluationContext.from_dict(
@@ -1877,9 +1831,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '111'
         })
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
@@ -1913,9 +1865,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
+            'default_value': '111'
         })
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
@@ -1947,129 +1897,9 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
+            'default_value': False
         })
         parameter.validate()
-
-    def test_validate_feature_with_invalid_type_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'string',
-            'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Data type of feature flags must be bool, got \'string\' instead'):
-            parameter.validate()
-
-    def test_validate_feature_with_invalid_stage_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'bool',
-            'rules': [],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'Invalid',
-        })
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
-            parameter.validate()
-
-    def test_validate_dev_feature_for_test_env_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Web']]
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in dev stage cannot be updated in test '
-                    'environment.'
-                ):
-                    parameter.validate()
-
-    def test_validate_dev_feature_for_prod_env_raises_exception(self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'dev',
-        })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in dev stage cannot be updated in prod '
-                    'environment.'
-                ):
-                    parameter.validate()
-
-    def test_validate_test_feature_for_prod_env_raises_exception(
-        self
-    ) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'test',
-        })
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
-                with self.assertRaisesRegex(
-                    utils.ValidationError,
-                    'Feature in test stage cannot be updated in prod '
-                    'environment.'
-                ):
-                    parameter.validate()
 
     def test_serialize_and_deserialize_returns_unchanged_platform_parameter(
         self
@@ -2094,46 +1924,9 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'test',
+            'default_value': False
         })
         self.assertEqual(
             parameter.to_dict(),
             parameter_domain.PlatformParameter.deserialize(
                 parameter.serialize()).to_dict())
-
-    def test_validate_platform_param_with_feature_stage_raises_error(
-        self) -> None:
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': '',
-            'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Web']]
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': False,
-            'feature_stage': 'dev',
-        })
-        swap_platform_params_list = self.swap(
-            platform_parameter_list,
-            'ALL_PLATFORM_PARAMS_LIST',
-            [DummyParamNames.PARAMETER_A]
-        )
-        with swap_platform_params_list, self.assertRaisesRegex(
-            utils.ValidationError, (
-                'The feature stage of the platform parameter parameter_a should'
-                ' be None.')
-        ):
-            parameter.validate()
