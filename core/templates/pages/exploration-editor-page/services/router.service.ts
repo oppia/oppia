@@ -26,6 +26,7 @@ import { StateEditorRefreshService } from 'pages/exploration-editor-page/service
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
 import { ExternalSaveService } from 'services/external-save.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +61,7 @@ export class RouterService {
     private stateEditorRefreshService: StateEditorRefreshService,
     private explorationStatesService: ExplorationStatesService,
     private explorationImprovementsService: ExplorationImprovementsService,
+    private translationLanguagesService: TranslationLanguageService,
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private location: PlatformLocation,
@@ -89,13 +91,17 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
-      const [stateName, contentId] = newPath.substring(
+      const [stateName, contentId, languageCode] = newPath.substring(
         this.TABS.TRANSLATION.path.length + 1).split('/');
       if (stateName) {
         this.stateEditorService.setActiveStateName(stateName);
       }
       if (contentId) {
         this.stateEditorService.setInitActiveContentId(contentId);
+      }
+      if (languageCode) {
+        this.translationLanguagesService.setActiveLanguageCode(
+          languageCode);
       }
       this.windowRef.nativeWindow.location.hash = (
         this.TABS.TRANSLATION.path + '/' + stateName);
