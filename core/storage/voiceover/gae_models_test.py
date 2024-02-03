@@ -239,6 +239,12 @@ class VoiceoArtistMetadataModelTests(test_utils.GenericTestBase):
             voiceover_models.VoiceoArtistMetadataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            voiceover_models.VoiceoArtistMetadataModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
     def test_should_create_model_successfully(self) -> None:
         voiceover1: voiceover_models.VoiceoverDict = {
             'filename': 'filename1.mp3',

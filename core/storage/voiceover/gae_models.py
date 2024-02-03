@@ -276,6 +276,14 @@ class VoiceoArtistMetadataModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model contain user ID of voice artist and their provided
+        voiceovers metadata.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
     @classmethod
     def get_model(
         cls, voice_artist_id: str
