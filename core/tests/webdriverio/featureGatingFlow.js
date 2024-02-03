@@ -126,11 +126,11 @@ describe('Feature Gating Flow', function() {
 
     var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
-    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, 0);
+    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, '0');
 
     await releaseCoordinatorPage.setRolloutPercentageForFeatureFlag(dummy, 50);
     await releaseCoordinatorPage.getFeaturesTab();
 
-    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, 50);
+    await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, '50');
   });
 });
