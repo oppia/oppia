@@ -122,6 +122,14 @@ export interface AdminPageData {
   platformParameters: PlatformParameter[];
 }
 
+export interface Interaction {
+  id: string;
+}
+
+export interface ExplorationInteractionIdsBackendResponse {
+  interactions: Interaction[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -543,6 +551,23 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_blog_post',
       blog_post_title: blogPostTitle,
+    });
+  }
+
+  async retrieveExplorationInteractionIdsAsync(
+      expId: string): Promise<ExplorationInteractionIdsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ExplorationInteractionIdsBackendResponse>(
+        AdminPageConstants.EXPLORATION_INTERACTIONS_HANDLER, {
+          params: {
+            exp_id: expId
+          }
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 }
