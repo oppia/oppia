@@ -92,8 +92,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform parameter.',
-          feature_stage: null,
-          is_feature: false,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [{
@@ -698,8 +696,6 @@ describe('Admin page platform parameters tab', () => {
         data_type: 'bool',
         default_value: false,
         description: 'This is a dummy feature flag.',
-        feature_stage: FeatureStage.DEV,
-        is_feature: true,
         name: 'invalid',
         rule_schema_version: 1,
         rules: [
@@ -732,8 +728,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -772,8 +766,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -812,8 +804,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -844,8 +834,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -872,8 +860,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -900,8 +886,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -923,8 +907,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
