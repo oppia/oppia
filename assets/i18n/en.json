@@ -1147,6 +1147,7 @@
     "I18N_PLAYER_SUBMIT_BUTTON": "Submit",
     "I18N_PLAYER_TAGS_TOOLTIP": "Tags",
     "I18N_PLAYER_THANK_FEEDBACK": "Thank you for the feedback!",
+    "I18N_PLAYER_UNPUBLISHED_EXPLORATION_BANNER": "You are currently viewing an unpublished exploration that you have edit rights to. Other users cannot view this exploration until you publish it",
     "I18N_PLAYER_UNRATED": "Unrated",
     "I18N_PLAYER_VIEWS_TOOLTIP": "Views",
     "I18N_PRACTICE_SESSION_PAGE_BREADCRUMB": "Practice Session",
