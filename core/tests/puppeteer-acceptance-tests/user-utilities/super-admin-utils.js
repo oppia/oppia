@@ -376,11 +376,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
             '.e2e-test-rubric-explanation-list > :nth-child(' +
             `${i + 1}) .oppia-click-to-start-editing`);
           this.page.waitForSelector(editRubricExplanation, { visible: true });
-          this.page.waitForTimeout(1000);
-          /* this.page.hover(editRubricExplanation);
-          this.page.click(editRubricExplanation); */
-          this.page.focus(editRubricExplanation);
-          this.page.keyboard.type('\n');
+          this.page.waitForTimeout(500);
+          this.page.click(
+            editRubricExplanation, { offset: { x: 30, y: 8 }, clickCount: 2 });
         } else {
           this.clickOn(`.e2e-test-add-explanation-button-${difficulty}`);
         }
@@ -388,6 +386,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
         await this.page.waitForSelector(
           '.e2e-test-rubric-explanation-text .e2e-test-rte',
           { visible: true });
+        await this.page.click(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          { clickCount: 3 });
         await this.page.type(
           '.e2e-test-rubric-explanation-text .e2e-test-rte',
           rubricNotes[i]);
@@ -440,6 +441,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
       await this.page.waitForSelector(
         '.e2e-test-add-list-entry', { visible: true });
+      await this.page.waitForTimeout(500);
       await this.page.click('.e2e-test-add-list-entry');
       await this.type(
         '.e2e-test-schema-based-list-editor-table-data input', 't');
@@ -495,11 +497,13 @@ module.exports = class e2eSuperAdmin extends baseUser {
         { visible: true });
       await this.page.type(
         '.modal-dialog .e2e-test-description-box', 't');
+      await this.page.waitForTimeout(500);
       await this.clickOn('.e2e-test-submit-answer-button');
       await this.page.waitForSelector(
         '.e2e-test-explanation-textarea .e2e-test-rte', { visible: true });
       await this.page.type(
         '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation');
+      await this.page.waitForTimeout(500);
       await this.clickOn('.e2e-test-submit-solution-button');
 
       await this.page.waitForSelector('.e2e-test-save-question-button:enabled');
