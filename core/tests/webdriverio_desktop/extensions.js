@@ -72,6 +72,7 @@ describe('rich-text components', function() {
       }]);
       // Test highlighting on Skillreview component.
       await richTextEditor.appendPlainText('highlight');
+      await general.expectNoTextToBeSelected();
       await richTextEditor.highlightText('highlight');
       await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
     });

@@ -254,11 +254,6 @@ var RichTextEditor = async function(elem) {
     // This finds and selects a certain text in the RTE.
     // NOTE: This only selects the first occurrence of the text.
     highlightText: async function(text) {
-      // Pre check to ensure that no text is currently highlighted.
-      expect(await browser.execute(() => {
-        return window.getSelection().toString().length;
-      })).toEqual(0);
-
       var paragraphNodes = await rteElements[0].$$('p');
       var textNode = null;
       var startIndex = -1;
