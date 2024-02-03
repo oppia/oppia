@@ -126,6 +126,9 @@ describe('Feature Gating Flow', function() {
 
     var dummy = await releaseCoordinatorPage.getDummyFeatureFlagForE2ETests();
 
+    // Here we are sending the expected rollout-percentage as a string
+    // because the webdriverio is not context aware when fetching the value,
+    // It fetches the value as a string.
     await releaseCoordinatorPage.expectRolloutPercentageToMatch(dummy, '0');
 
     await releaseCoordinatorPage.setRolloutPercentageForFeatureFlag(dummy, 50);
