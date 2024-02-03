@@ -100,9 +100,7 @@ describe('Admin Data Service', () => {
         value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: '',
-      is_feature: false,
-      feature_stage: null
+      default_value: ''
     }],
   };
   let adminDataResponse: AdminPageData;

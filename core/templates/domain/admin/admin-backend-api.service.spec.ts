@@ -103,9 +103,7 @@ describe('Admin backend api service', () => {
         value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: '',
-      is_feature: false,
-      feature_stage: null
+      default_value: ''
     }]
   };
   let adminDataObject: AdminPageData;
