@@ -3137,3 +3137,52 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         )
         self.assertEqual(blog_post_count, 0)
         self.logout()
+
+
+class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
+    """Tests for interaction by exploration handler."""
+
+    EXP_ID_1 = 'exp1'
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super().setUp()
+        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.editor_id, end_state_name='End')
+
+    def test_interactions_by_exploration_id_handler(self) -> None:
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        payload = {
+            'exp_id': self.EXP_ID_1
+        }
+
+        response = self.get_json(
+            '/interactions', params=payload)
+        interaction_ids = sorted(
+            interaction['id'] for interaction in response['interactions'])
+        self.assertEqual(
+            sorted(interaction_ids), ['EndExploration', 'TextInput'])
+
+    def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        payload = {
+            'exp_id': 'invalid' 
+        }
+
+        response = self.get_json(
+            '/interactions', params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')
+
+    def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        response = self.get_json(
+            '/interactions', params={},
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Missing key in handler args: exp_id.')
