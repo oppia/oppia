@@ -26,21 +26,22 @@ import { AppConstants } from 'app.constants';
 interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
-  category: string;
+  category: string | null;
   languageCode: string;
   isValid: () => boolean;
 }
 
 interface AddContributionReviewer {
   username: string;
-  category: string;
+  category: string | null;
   languageCode: string;
   isValid: () => boolean;
 }
 
 interface RemoveContributionReviewer {
+  method: string;
   username: string;
-  category: string;
+  category: string | null;
   languageCode: string;
   isValid: () => boolean;
 }
@@ -165,7 +166,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         languageCode: null,
         isValid: () => {
           if (this.formData.removeContributionReviewer.username === '' ||
-          this.formData.removeContributionReviewer.category === null) {
+            this.formData.removeContributionReviewer.category === null) {
             return false;
           }
           if (this.isLanguageSpecificReviewCategory(
@@ -174,7 +175,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
               this.formData.removeContributionReviewer.languageCode);
           }
           return true;
-        }
+        },
+        method: ''
       },
       viewTranslationContributionStats: {
         username: '',
@@ -267,7 +269,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server Error: ' + errorResponse;
+        this.statusMessage = 'Server error: ' + errorResponse;
       });
     this.taskRunningInBackground = false;
   }
@@ -294,7 +296,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           this.refreshFormData();
           this.formData.viewContributionReviewers.filterCriterion = temp;
         }, errorResponse => {
-          this.statusMessage = 'Server Error: ' + errorResponse;
+          this.statusMessage = 'Server error: ' + errorResponse;
         });
     } else {
       this.contributorDashboardAdminBackendApiService
@@ -321,7 +323,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           this.refreshFormData();
           this.formData.viewContributionReviewers.filterCriterion = temp;
         }, errorResponse => {
-          this.statusMessage = 'Server Error: ' + errorResponse;
+          this.statusMessage = 'Server error: ' + errorResponse;
         });
     }
     this.taskRunningInBackground = false;
@@ -342,7 +344,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server Error: ' + errorResponse;
+        this.statusMessage = 'Server error: ' + errorResponse;
       });
 
     this.taskRunningInBackground = false;
@@ -366,7 +368,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         this.statusMessage = 'Success.';
         this.refreshFormData();
       }, errorResponse => {
-        this.statusMessage = 'Server Error: ' + errorResponse;
+        this.statusMessage = 'Server error: ' + errorResponse;
       });
 
     this.taskRunningInBackground = false;

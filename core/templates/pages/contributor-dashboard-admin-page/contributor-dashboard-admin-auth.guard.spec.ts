@@ -35,12 +35,39 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   let userService: UserService;
   let router: Router;
   let guard: ContributorDashboardAdminAuthGuard;
+  let userInfo: UserInfo;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [UserService, { provide: Router, useClass: MockRouter }],
     }).compileComponents();
+
+    userInfo = {
+      _roles: ['USER_ROLE'],
+      _isModerator: true,
+      _isCurriculumAdmin: false,
+      _isTopicManager: false,
+      _isSuperAdmin: false,
+      _canCreateCollections: true,
+      _preferredSiteLanguageCode: 'en',
+      _username: 'username1',
+      _email: 'tester@example.org',
+      _isLoggedIn: true,
+      isModerator: () => true,
+      isCurriculumAdmin: () => false,
+      isSuperAdmin: () => false,
+      isTopicManager: () => false,
+      isTranslationAdmin: () => true,
+      isQuestionAdmin: () => true,
+      isQuestionCoordinator: () => true,
+      isTranslationCoordinator: () => true,
+      canCreateCollections: () => true,
+      getPreferredSiteLanguageCode: () => 'en',
+      getUsername: () => 'username1',
+      getEmail: () => 'tester@example.org',
+      isLoggedIn: () => true
+    } as UserInfo;
 
     guard = TestBed.inject(ContributorDashboardAdminAuthGuard);
     userService = TestBed.inject(UserService);
@@ -68,8 +95,7 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   it('should not redirect user to 401 page if user is cd-admin', (done) => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(new UserInfo(
-        [], true, false, false, false, false, '', '', '', true))
+      Promise.resolve(userInfo)
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
