@@ -24,6 +24,29 @@
             *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </div>
+        
+        <span class="player-sidebar-rating" [ngClass]="{'rating-disabled': !avgRating}">
+          <span *ngIf="avgRating" class="player-rating-text">
+            {{ avgRating | number:'1.1-1' }}
+          </span>
+          <span *ngIf="!avgRating"
+                [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+                class="player-rating-text"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="24" viewBox="0 0 120 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ng-container *ngFor="let i of getRange(fullStars)">
+              <svg fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path [attr.d]="calculateStarPath(i, true)" fill="#C55F45" stroke="#C55F45">
+                </path>
+              </svg>
+            </ng-container>
+            <ng-container *ngFor="let i of getRange(blankStars)">
+              <svg fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path [attr.d]="calculateStarPath(i, false)" fill="none" stroke="#C55F45">
+                </path>
+              </svg>
+            </ng-container>
+          </svg>
+        </span>
       </div>
     </div>
     <div class="player-sidebar-button-container">

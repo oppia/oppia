@@ -16,17 +16,17 @@
  * @fileoverview Component for the new lesson player sidebar
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
-import { LearnerExplorationSummaryBackendDict } from
-  'domain/summary/learner-exploration-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
+import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -34,12 +34,16 @@ import { UrlService } from 'services/contextual/url.service';
   styleUrls: ['./player-sidebar.component.css'],
 })
 export class PlayerSidebarComponent implements OnInit {
+  @Input() ratings!: ExplorationRatings;
+
   mobileMenuVisible: boolean;
   isExpanded = false;
   explorationId!: string;
-  expInfo!: LearnerExplorationSummaryBackendDict;
   expDesc!: string;
   expDescTranslationKey!: string;
+  avgRating!: number | null;
+  fullStars: number;
+  blankStars: number;
 
   constructor(
     private mobileMenuService: MobileMenuService,
@@ -48,6 +52,7 @@ export class PlayerSidebarComponent implements OnInit {
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
+    private ratingComputationService: RatingComputationService,
   ) {}
 
   ngOnInit() {
@@ -69,6 +74,9 @@ export class PlayerSidebarComponent implements OnInit {
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
+    this.avgRating = this.getAverageRating();
+    this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
+    this.blankStars = 5 - this.fullStars;
   }
 
   toggleSidebar(): void {
@@ -81,6 +89,23 @@ export class PlayerSidebarComponent implements OnInit {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  getAverageRating(): number | null {
+    if (this.ratings) {
+      return this.ratingComputationService.computeAverageRating(
+        this.ratings);
+    }
+    return null;
+  }
+
+  getRange(count: number): number[] {
+    return new Array(count).fill(0).map((_, i) => i);
+  }
+
+  calculateStarPath(index: number, isFilled: boolean): string {
+    const x = isFilled ? index * 24 : (this.fullStars + index) * 24;
+    return `M${x + 6.5784} ${20.4616}L${x + 7.93714} ${14.5877}L${x + 8.00498} ${14.2944}L${x + 7.77753} ${14.0972}L${x + 3.22002} ${10.146}L${x + 9.24324} ${9.62313}L${x + 9.5433} ${9.59708}L${x + 9.66056} ${9.31965}L${x + 12} ${3.78436}L${x + 14.3394} ${9.31965}L${x + 14.4567} ${9.59708}L${x + 14.7568} ${9.62313}L${x + 20.78} ${10.146}L${x + 16.2225} ${14.0972}L${x + 15.995} ${14.2944}L${x + 16.0629} ${14.5877}L${x + 17.4216} ${20.4616}L${x + 12.2583} ${17.3469}L${x + 12} ${17.1911}L${x + 11.7417} ${17.3469}L${x + 6.5784} ${20.4616}Z`;
   }
 }
 

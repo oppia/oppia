@@ -44,6 +44,23 @@
   padding: 20px;
 }
 
+.player-sidebar-rating {
+  align-items: center;
+  display: flex;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  gap: 8px;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+  padding: 8px 20px 8px 20px;
+}
+
+.player-rating-text {
+  align-self: flex-end;
+  height: 20px;
+}
+
 .player-desktop-sidebar-menu {
   background-color: #f2f4f7;
   box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
@@ -57,7 +74,7 @@
 }
 
 .player-desktop-sidebar-menu.expanded {
-  width: 250px;
+  width: 240px;
 }
 
 .player-sidebar-button-container {
