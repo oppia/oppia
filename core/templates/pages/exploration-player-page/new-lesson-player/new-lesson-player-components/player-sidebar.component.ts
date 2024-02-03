@@ -17,6 +17,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
@@ -34,8 +35,6 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
   styleUrls: ['./player-sidebar.component.css'],
 })
 export class PlayerSidebarComponent implements OnInit {
-  @Input() ratings!: ExplorationRatings;
-
   mobileMenuVisible: boolean;
   isExpanded = false;
   explorationId!: string;
@@ -44,6 +43,8 @@ export class PlayerSidebarComponent implements OnInit {
   avgRating!: number | null;
   fullStars: number;
   blankStars: number;
+  ratingsUrl: string;
+  ratings!: ExplorationRatings;
 
   constructor(
     private mobileMenuService: MobileMenuService,
@@ -53,6 +54,7 @@ export class PlayerSidebarComponent implements OnInit {
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private ratingComputationService: RatingComputationService,
+    private httpClient: HttpClient,
   ) {}
 
   ngOnInit() {
@@ -61,6 +63,7 @@ export class PlayerSidebarComponent implements OnInit {
     });
 
     this.explorationId = this.contextService.getExplorationId();
+    this.ratingsUrl = '/explorehandler/rating/' + this.explorationId;
     this.expDesc = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId,
@@ -74,9 +77,20 @@ export class PlayerSidebarComponent implements OnInit {
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
-    this.avgRating = this.getAverageRating();
-    this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
-    this.blankStars = 5 - this.fullStars;
+    this.httpClient.get<any>(this.ratingsUrl)
+      .toPromise()
+      .then(response => {
+        this.ratings = {
+          '1': response["overall_ratings"]['1'],
+          '2': response["overall_ratings"]['2'],
+          '3': response["overall_ratings"]['3'],
+          '4': response["overall_ratings"]['4'],
+          '5': response["overall_ratings"]['5'],
+        };
+        this.avgRating = this.getAverageRating();
+        this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
+        this.blankStars = 5 - this.fullStars;
+      })
   }
 
   toggleSidebar(): void {
