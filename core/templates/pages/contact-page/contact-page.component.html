@@ -122,7 +122,10 @@
   }
 
   :host {
-    .oppia-contact-page-content button {
+    .oppia-contact-page-content a.oppia-primary-button {
+      border-radius: 5px;
+      color: white;
+      display: inline-flex;
       font-size: 100%;
       font-weight: bold;
       height: 40px;
@@ -130,7 +133,7 @@
     }
 
     @media (max-width: 1010px) and (min-width: 843px) {
-      .oppia-contact-page-content button {
+      .oppia-contact-page-content a.oppia-primary-button {
         height: auto;
         padding: 5px 30px;
         width: auto;
@@ -138,20 +141,10 @@
     }
 
     @media (max-width: 375px) {
-      .oppia-contact-page-content button {
+      .oppia-contact-page-content a.oppia-primary-button {
         width: 225px;
       }
     }
-
-  }
-
-  .oppia-contact-page-content button {
-    background-color: #00645c;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    height: 40px;
-    width: 250px;
   }
 
   #donate {
