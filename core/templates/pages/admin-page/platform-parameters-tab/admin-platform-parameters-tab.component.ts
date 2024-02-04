@@ -30,8 +30,8 @@ import { AdminDataService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { LoaderService } from 'services/loader.service';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform-parameter/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
@@ -113,7 +113,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
-    private apiService: PlatformFeatureAdminBackendApiService,
+    private apiService: PlatformParameterAdminBackendApiService,
     private loaderService: LoaderService,
   ) { }
 

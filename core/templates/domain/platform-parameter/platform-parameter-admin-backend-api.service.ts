@@ -30,7 +30,7 @@ import { PlatformParameterRule, PlatformParameterValue } from
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformFeatureAdminBackendApiService {
+export class PlatformParameterAdminBackendApiService {
   constructor(
     private http: HttpClient,
   ) {}
@@ -61,5 +61,5 @@ export class PlatformFeatureAdminBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'PlatformFeatureAdminBackendApiService',
-  downgradeInjectable(PlatformFeatureAdminBackendApiService));
+  'PlatformParameterAdminBackendApiService',
+  downgradeInjectable(PlatformParameterAdminBackendApiService));

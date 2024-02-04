@@ -29,8 +29,8 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform-parameter/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
   // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
@@ -59,7 +59,7 @@ describe('Admin page platform parameters tab', () => {
   let component: AdminPlatformParametersTabComponent;
   let fixture: ComponentFixture<AdminPlatformParametersTabComponent>;
   let adminDataService: AdminDataService;
-  let featureApiService: PlatformFeatureAdminBackendApiService;
+  let parameterApiService: PlatformParameterAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
   let mockWindowRef: MockWindowRef;
 
@@ -83,7 +83,7 @@ describe('Admin page platform parameters tab', () => {
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
     component = fixture.componentInstance;
     adminDataService = TestBed.get(AdminDataService);
-    featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
+    parameterApiService = TestBed.get(PlatformParameterAdminBackendApiService);
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo({
@@ -110,7 +110,7 @@ describe('Admin page platform parameters tab', () => {
       ]
     } as AdminPageData);
 
-    updateApiSpy = spyOn(featureApiService, 'updatePlatformParameter')
+    updateApiSpy = spyOn(parameterApiService, 'updatePlatformParameter')
       .and.resolveTo();
 
     component.ngOnInit();

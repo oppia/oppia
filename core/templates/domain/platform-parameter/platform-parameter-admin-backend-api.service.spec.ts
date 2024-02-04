@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PlatformFeatureAdminBackendApiService.
+ * @fileoverview Unit tests for PlatformParameterAdminBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform-parameter/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { PlatformParameterRule } from
   'domain/platform-parameter/platform-parameter-rule.model';
 
-describe('PlatformFeatureAdminBackendApiService', () => {
-  let featureAdminService: PlatformFeatureAdminBackendApiService;
+describe('PlatformParameterAdminBackendApiService', () => {
+  let parameterAdminService: PlatformParameterAdminBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       imports: [HttpClientTestingModule]
     });
 
-    featureAdminService = TestBed.get(PlatformFeatureAdminBackendApiService);
+    parameterAdminService = TestBed.get(PlatformParameterAdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -54,7 +54,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         })
       ];
 
-      featureAdminService.updatePlatformParameter(
+      parameterAdminService.updatePlatformParameter(
         'param_name', 'update message', newRules, false
       ).then(successHandler, failHandler);
 
@@ -80,7 +80,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         })
       ];
 
-      featureAdminService.updatePlatformParameter(
+      parameterAdminService.updatePlatformParameter(
         'param_name', 'update message', newRules, false
       ).then(successHandler, failHandler);
 
