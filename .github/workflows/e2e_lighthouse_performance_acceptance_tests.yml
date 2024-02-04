@@ -115,6 +115,7 @@ jobs:
           - name: topicAndStoryViewer
           - name: users
           - name: wipeout
+    name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
