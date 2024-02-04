@@ -17,3 +17,9 @@
   background-color: #3d9991;
   color: rgba(255, 255, 255, 1);
 }
+
+a.oppia-primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
