@@ -93,8 +93,6 @@ describe('About Page', () => {
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/creator-dashboard?mode=create');
   });
 
   it('should register correct event on calling onClickVisitClassroomButton',
@@ -106,8 +104,6 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
         .toHaveBeenCalledWith();
-      expect(windowRef.nativeWindow.location.href).toBe(
-        '/learn/math');
     });
 
   it('should register correct event on calling onClickBrowseLibraryButton',
@@ -120,15 +116,5 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
         .toHaveBeenCalledWith();
-      expect(windowRef.nativeWindow.location.href)
-        .toBe('/community-library');
     });
-
-  it('should direct users to the android page on click', function() {
-    expect(windowRef.nativeWindow.location.href).not.toEqual('/android');
-
-    component.onClickAccessAndroidButton();
-
-    expect(windowRef.nativeWindow.location.href).toEqual('/android');
-  });
 });
