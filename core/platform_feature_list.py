@@ -18,14 +18,42 @@
 
 from __future__ import annotations
 
+import enum
+
+from core.domain import feature_flag_domain
 from core.domain import platform_parameter_list as params
 
 from typing import List
 
-ParamNames = params.ParamNames
 
-# Names of feature objects defined in domain/platform_parameter_list.py
-# should be added to one of the following lists:
+class FeatureNames(enum.Enum):
+    """Enum for Feature names."""
+
+    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
+    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
+    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
+        'contributor_dashboard_accomplishments')
+    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
+    BLOG_PAGES = 'blog_pages'
+    DIAGNOSTIC_TEST = 'diagnostic_test'
+    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
+        'serial_chapter_launch_curriculum_admin_view')
+    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
+        'serial_chapter_launch_learner_view')
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
+        'show_redesigned_learner_dashboard')
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
+    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
+        'show_feedback_updates_in_profile_pic_dropdown')
+    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
+    IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
+    LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
+    NEW_LESSON_PLAYER = 'new_lesson_player'
+
+
+# Names of feature objects defined in FeatureNames should be added
+# to one of the following lists:
 #   - DEV_FEATURES_LIST
 #   - TEST_FEATURES_LIST
 #   - PROD_FEATURES_LIST
@@ -43,41 +71,134 @@ ParamNames = params.ParamNames
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
-    params.ParamNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    params.ParamNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    params.ParamNames.SHOW_TRANSLATION_SIZE,
-    params.ParamNames.NEW_LESSON_PLAYER
+    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.SHOW_TRANSLATION_SIZE,
+    FeatureNames.NEW_LESSON_PLAYER
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
 # be in test stage otherwise it will cause a test error in the backend test.
-TEST_FEATURES_LIST: List[ParamNames] = [
-    params.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI,
-    params.ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
-    params.ParamNames.DIAGNOSTIC_TEST,
-    params.ParamNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
+TEST_FEATURES_LIST: List[FeatureNames] = [
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    FeatureNames.DIAGNOSTIC_TEST,
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
-PROD_FEATURES_LIST: List[ParamNames] = [
-    params.ParamNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-    params.ParamNames.END_CHAPTER_CELEBRATION,
-    params.ParamNames.CHECKPOINT_CELEBRATION,
-    params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
-    params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
+PROD_FEATURES_LIST: List[FeatureNames] = [
+    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+    FeatureNames.END_CHAPTER_CELEBRATION,
+    FeatureNames.CHECKPOINT_CELEBRATION,
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
 # completed and no longer gated because their functionality is permanently
 # built into the codebase.
-DEPRECATED_FEATURE_NAMES: List[ParamNames] = [
-    params.ParamNames.ANDROID_BETA_LANDING_PAGE,
-    params.ParamNames.BLOG_PAGES,
+DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
+    FeatureNames.ANDROID_BETA_LANDING_PAGE,
+    FeatureNames.BLOG_PAGES,
 ]
 
-ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[ParamNames] = [
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
+    FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
+        (
+            'This is a dummy feature flag for the e2e tests.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.END_CHAPTER_CELEBRATION.value: (
+        (
+            'This flag is for the end chapter celebration feature.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.CHECKPOINT_CELEBRATION.value: (
+        (
+            'This flag is for the checkpoint celebration feature.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS.value: (
+        (
+            'This flag enables showing per-contributor accomplishments on the '
+            'contributor dashboard.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.DIAGNOSTIC_TEST.value: (
+        (
+            'This flag is for the diagnostic test functionality.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
+        (
+            'This flag is for serial chapter launch feature and making changes '
+            'only in the curriculum admin view.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
+        (
+            'This flag is for serial chapter launch feature and making changes '
+            'only in the learner view.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
+        (
+            'This flag is to show redesigned learner dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.SHOW_TRANSLATION_SIZE.value: (
+        (
+            'This flag is to show translation size on translation cards in '
+            'contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
+        (
+            'This flag is to show feedback updates in the '
+            'profile pic drop-down menu.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
+        (
+            'This flag is to show new contributor admin dashboard.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
+        (
+            'Exposes the Improvements Tab for creators in the exploration '
+            'editor.',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
+        (
+            'Enable learner groups feature',
+            feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.NEW_LESSON_PLAYER.value: (
+        (
+            'This flag is to enable the exploration player redesign.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    )
+}
+
+ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[params.ParamNames] = [
     params.ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
     params.ParamNames.DUMMY_PARAMETER,

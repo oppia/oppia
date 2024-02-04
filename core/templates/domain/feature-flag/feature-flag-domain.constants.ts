@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for platform feature domain.
+ * @fileoverview Constants for feature flag domain.
  */
 
-export const PlatformFeatureDomainConstants = {
+export const FeatureFlagDomainConstants = {
   // Url for the dummy backend handler gated by the
   // dummy_feature_flag_for_e2e_tests.
-  DUMMY_HANDLER_URL: '/platform_feature_dummy_handler',
+  DUMMY_HANDLER_URL: '/feature_flag_dummy_handler',
 
   // Url for the backend handler for evaluation of platform features.
-  PLATFORM_FEATURES_EVALUATION_HANDLER_URL: (
-    '/platform_features_evaluation_handler'),
+  FEATURE_FLAGS_EVALUATION_HANDLER_URL: (
+    '/feature_flags_evaluation_handler'),
 
   // Url for the backend handler to perform actions for feature flags.
   FEATURE_FLAGS_URL: '/feature_flags',
@@ -31,8 +31,4 @@ export const PlatformFeatureDomainConstants = {
   // Action name for request to the admin handler that updates the rules
   // of feature flags.
   UPDATE_FEATURE_FLAG_ACTION: 'update_feature_flag',
-
-  // Action name for request to the release-coordinator handler that updates
-  // the rules of feature flags.
-  UPDATE_PLATFORM_PARAMETER_RULES_ACTION: 'update_platform_parameter_rules'
 } as const;

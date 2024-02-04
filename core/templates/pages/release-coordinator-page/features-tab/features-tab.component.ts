@@ -23,26 +23,21 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import { Subscription } from 'rxjs';
 
-import { AdminFeaturesTabConstants } from
-  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import {
-  PlatformParameterFilterType,
-  PlatformParameterFilter,
-} from 'domain/platform_feature/platform-parameter-filter.model';
-import { PlatformParameter } from
-  'domain/platform_feature/platform-parameter.model';
-import { PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule.model';
+import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type FilterType = keyof typeof PlatformParameterFilterType;
+
+interface IntSchema {
+  type: 'int';
+  validators: object[];
+}
 
 @Component({
   selector: 'features-tab',
@@ -50,55 +45,6 @@ type FilterType = keyof typeof PlatformParameterFilterType;
 })
 export class FeaturesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
-
-  readonly availableFilterTypes: PlatformParameterFilterType[] = Object
-    .keys(PlatformParameterFilterType)
-    .map(key => {
-      var filterType = key as FilterType;
-      return PlatformParameterFilterType[filterType];
-    });
-
-  readonly filterTypeToContext: {
-    [key in PlatformParameterFilterType]: {
-      displayName: string;
-      operators: readonly string[];
-      options?: readonly string[];
-      optionFilter?: (feature: PlatformParameter, option: string) => boolean;
-      placeholder?: string;
-      inputRegex?: RegExp;
-    }
-  } = {
-      [PlatformParameterFilterType.PlatformType]: {
-        displayName: 'Platform Type',
-        options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
-        operators: ['=']
-      },
-      [PlatformParameterFilterType.AppVersion]: {
-        displayName: 'App Version',
-        operators: ['=', '<', '>', '<=', '>='],
-        placeholder: 'e.g. 1.0.0',
-        inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP
-      },
-      [PlatformParameterFilterType.AppVersionFlavor]: {
-        displayName: 'App Version Flavor',
-        options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
-        operators: ['=', '<', '>', '<=', '>=']
-      }
-    };
-
-  private readonly defaultNewFilter: PlatformParameterFilter = (
-    PlatformParameterFilter.createFromBackendDict({
-      type: PlatformParameterFilterType.PlatformType,
-      conditions: []
-    })
-  );
-
-  private readonly defaultNewRule: PlatformParameterRule = (
-    PlatformParameterRule.createFromBackendDict({
-      filters: [this.defaultNewFilter.toBackendDict()],
-      value_when_matched: false
-    })
-  );
 
   DEV_SERVER_STAGE = 'dev';
   TEST_SERVER_STAGE = 'test';
@@ -108,8 +54,8 @@ export class FeaturesTabComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
-  featureFlags: PlatformParameter[] = [];
+  featureFlagNameToBackupMap!: Map<string, FeatureFlag>;
+  featureFlags: FeatureFlag[] = [];
   featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
@@ -119,7 +65,7 @@ export class FeaturesTabComponent implements OnInit {
     private windowRef: WindowRef,
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
-    private dummyApiService: PlatformFeatureDummyBackendApiService,
+    private dummyApiService: FeatureFlagDummyBackendApiService,
     private loaderService: LoaderService,
   ) {}
 
@@ -133,52 +79,54 @@ export class FeaturesTabComponent implements OnInit {
     this.loaderService.hideLoadingScreen();
   }
 
-  addNewRuleToTop(feature: PlatformParameter): void {
-    feature.rules.unshift(cloneDeep(this.defaultNewRule));
+  getSchema(): IntSchema {
+    return {
+      type: 'int',
+      validators: [{
+        id: 'is_at_least',
+        min_value: 1
+      }, {
+        id: 'is_at_most',
+        max_value: 100
+      }]
+    };
   }
 
-  addNewRuleToBottom(feature: PlatformParameter): void {
-    feature.rules.push(cloneDeep(this.defaultNewRule));
+  getLastUpdatedDate(feature: FeatureFlag): string {
+    if (feature.lastUpdated === null) {
+      return 'The feature has not been updated yet.';
+    }
+
+    const dateParts = feature.lastUpdated.split(', ')[0].split('/');
+    const timeParts = feature.lastUpdated.split(', ')[1].split(':');
+
+    const year = parseInt(dateParts[2], 10);
+    const month = parseInt(dateParts[0], 10) - 1;
+    const day = parseInt(dateParts[1], 10);
+    const hour = parseInt(timeParts[0], 10);
+    const minute = parseInt(timeParts[1], 10);
+    const second = parseInt(timeParts[2], 10);
+    const millisecond = parseInt(timeParts[3], 10);
+
+    const parsedDate = new Date(
+      year, month, day, hour, minute, second, millisecond);
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit', month: 'short', year: 'numeric'
+    };
+    return parsedDate.toLocaleDateString('en-US', options);
   }
 
-  addNewFilter(rule: PlatformParameterRule): void {
-    rule.filters.push(cloneDeep(this.defaultNewFilter));
+  getFeatureStageString(feature: FeatureFlag): string {
+    if (feature.featureStage === 'dev') {
+      return 'Dev (can only be enabled on dev server).';
+    } else if (feature.featureStage === 'test') {
+      return 'Test (can only be enabled on dev and test server).';
+    } else {
+      return 'Prod (can only be enabled on dev, test and prod server).';
+    }
   }
 
-  addNewCondition(filter: PlatformParameterFilter): void {
-    const context = this.filterTypeToContext[filter.type];
-    filter.conditions.push([
-      context.operators[0],
-      context.options ? context.options[0] : ''
-    ]);
-  }
-
-  removeRule(feature: PlatformParameter, ruleIndex: number): void {
-    feature.rules.splice(ruleIndex, 1);
-  }
-
-  removeFilter(rule: PlatformParameterRule, filterIndex: number): void {
-    rule.filters.splice(filterIndex, 1);
-  }
-
-  removeCondition(
-      filter: PlatformParameterFilter, conditionIndex: number): void {
-    filter.conditions.splice(conditionIndex, 1);
-  }
-
-  moveRuleUp(feature: PlatformParameter, ruleIndex: number): void {
-    const rule = feature.rules[ruleIndex];
-    this.removeRule(feature, ruleIndex);
-    feature.rules.splice(ruleIndex - 1, 0, rule);
-  }
-
-  moveRuleDown(feature: PlatformParameter, ruleIndex: number): void {
-    const rule = feature.rules[ruleIndex];
-    this.removeRule(feature, ruleIndex);
-    feature.rules.splice(ruleIndex + 1, 0, rule);
-  }
-
-  getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
+  getFeatureValidOnCurrentServer(feature: FeatureFlag): boolean {
     if (this.serverStage === this.DEV_SERVER_STAGE) {
       return true;
     } else if (this.serverStage === this.TEST_SERVER_STAGE) {
@@ -192,22 +140,20 @@ export class FeaturesTabComponent implements OnInit {
     return false;
   }
 
-  async saveDefaultValueToStorage(): Promise<void> {
+  async updateFeatureFlag(feature: FeatureFlag): Promise<void> {
     if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible.')) {
+      'This action is irreversible. Are you sure?')) {
       return;
     }
-    for (let feature of this.featureFlags) {
-      let commitMessage = `Update default value for '${feature.name}'.`;
-      await this.updateFeatureFlag(feature, commitMessage);
+    const issues = this.validateFeatureFlag(feature);
+    if (issues.length > 0) {
+      this.windowRef.nativeWindow.alert(issues.join('\n'));
+      return;
     }
-  }
-
-  async updateFeatureFlag(
-      feature: PlatformParameter, commitMessage: string): Promise<void> {
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, commitMessage, feature.rules);
+        feature.name, feature.forceEnableForAllUsers, feature.rolloutPercentage,
+        feature.userGroupIds);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
@@ -229,25 +175,7 @@ export class FeaturesTabComponent implements OnInit {
     }
   }
 
-  async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(feature);
-    if (issues.length > 0) {
-      this.windowRef.nativeWindow.alert(issues.join('\n'));
-      return;
-    }
-    const commitMessage = this.windowRef.nativeWindow.prompt(
-      'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
-      `Update feature '${feature.name}'.`
-    );
-    if (commitMessage === null) {
-      return;
-    }
-
-    await this.updateFeatureFlag(feature, commitMessage);
-  }
-
-  clearChanges(featureFlag: PlatformParameter): void {
+  clearChanges(featureFlag: FeatureFlag): void {
     if (!this.windowRef.nativeWindow.confirm(
       'This will revert all changes you made. Are you sure?')) {
       return;
@@ -257,75 +185,39 @@ export class FeaturesTabComponent implements OnInit {
     );
 
     if (backup) {
-      featureFlag.rules = cloneDeep(backup.rules);
+      featureFlag.forceEnableForAllUsers = backup.forceEnableForAllUsers;
+      featureFlag.rolloutPercentage = backup.rolloutPercentage;
+      featureFlag.userGroupIds = backup.userGroupIds;
     }
   }
 
-  clearFilterConditions(filter: PlatformParameterFilter): void {
-    filter.conditions.splice(0);
-  }
-
-  isFeatureFlagChanged(feature: PlatformParameter): boolean {
-    const original = this.featureFlagNameToBackupMap.get(
-      feature.name
-    );
+  isFeatureFlagChanged(feature: FeatureFlag): boolean {
+    const original = this.featureFlagNameToBackupMap.get(feature.name);
     if (original === undefined) {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
-    return !isEqual(original.rules, feature.rules);
+    return (
+      !isEqual(
+        original.forceEnableForAllUsers, feature.forceEnableForAllUsers
+      ) || !isEqual(
+        original.rolloutPercentage, feature.rolloutPercentage
+      ) || !isEqual(
+        original.userGroupIds, feature.userGroupIds)
+    );
   }
 
   /**
-   * Validates feature flag before updating, checks if there are identical
-   * rules, filters or conditions at the same level.
+   * Validates feature flag before updating.
    *
-   * @param {PlatformParameter} feature - the feature flag to be validated.
+   * @param {FeatureFlag} feature - the feature flag to be validated.
    *
    * @returns {string[]} - Array of issue messages, if any.
    */
-  validateFeatureFlag(feature: PlatformParameter): string[] {
+  validateFeatureFlag(feature: FeatureFlag): string[] {
     const issues = [];
 
-    const seenRules: PlatformParameterRule[] = [];
-    for (const [ruleIndex, rule] of feature.rules.entries()) {
-      const sameRuleIndex = seenRules.findIndex(
-        seenRule => isEqual(seenRule, rule));
-      if (sameRuleIndex !== -1) {
-        issues.push(
-          `The ${sameRuleIndex + 1}-th & ${ruleIndex + 1}-th rules are` +
-          ' identical.');
-        continue;
-      }
-      seenRules.push(rule);
-
-      const seenFilters: PlatformParameterFilter[] = [];
-      for (const [filterIndex, filter] of rule.filters.entries()) {
-        const sameFilterIndex = seenFilters.findIndex(
-          seenFilter => isEqual(seenFilter, filter));
-        if (sameFilterIndex !== -1) {
-          issues.push(
-            `In the ${ruleIndex + 1}-th rule: the ${sameFilterIndex + 1}-th` +
-            ` & ${filterIndex + 1}-th filters are identical.`);
-          continue;
-        }
-        seenFilters.push(filter);
-
-        const seenConditions: [string, string][] = [];
-        for (const [conditionIndex, condition] of filter.conditions
-          .entries()) {
-          const sameCondIndex = seenConditions.findIndex(
-            seenCond => isEqual(seenCond, condition));
-          if (sameCondIndex !== -1) {
-            issues.push(
-              `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th` +
-              ` filter: the ${sameCondIndex + 1}-th & ` +
-              `${conditionIndex + 1}-th conditions are identical.`);
-            continue;
-          }
-
-          seenConditions.push(condition);
-        }
-      }
+    if (feature.rolloutPercentage < 0 || feature.rolloutPercentage > 100) {
+      issues.push('Rollout percentage should be between 0 to 100.');
     }
     return issues;
   }
