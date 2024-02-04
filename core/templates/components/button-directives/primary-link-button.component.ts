@@ -34,17 +34,19 @@ export class PrimaryLinkButtonComponent implements OnInit {
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
   isButton: boolean = false;
-  openInNewTab: boolean = false;
+  openInNewTab: boolean;
 
   ngOnInit(): void {
-    if (this.buttonHref) {
-      this.openInNewTab = this.isExternalLink(this.buttonHref);
-    }
     this.isButton = this.buttonHref === '#'; 
   }
 
   getButtonHref(): string {
     return this.buttonHref;
+  }
+
+  getTarget(): string {
+    this.openInNewTab = this.isExternalLink(this.buttonHref);
+    return this.openInNewTab ? '_blank' : '_self';
   }
 
   private isExternalLink(link: string): boolean {

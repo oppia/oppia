@@ -91,19 +91,16 @@ describe('PrimaryLinkButtonComponent', () => {
     component.buttonHref = '/about';
     fixture.detectChanges();
     expect(component.openInNewTab).toBe(false);
+    expect(component.getTarget()).toEqual('_self');
+    expect(component.getButtonHref()).toEqual('/about');
   });
 
   it('should handle button click with external link', () => {
-    const externalLink = 'https://github.com';
-    component.buttonHref = externalLink;
+    component.buttonHref = 'https://github.com';
     fixture.detectChanges();
     expect(component.openInNewTab).toBe(true);
-  });
-
-  it('should return correct url from getButtonHref', () => {
-    component.buttonHref = 'https://github.com';
-    const result = component.getButtonHref();
-    expect(result).toBe('https://github.com');
+    expect(component.getTarget()).toEqual('_blank');
+    expect(component.getButtonHref()).toEqual('https://github.com');
   });
 
   it('should set isButton to false when buttonHref is provided', () => {
