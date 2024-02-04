@@ -34,7 +34,7 @@ export class PrimaryLinkButtonComponent implements OnInit {
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
   isButton: boolean = false;
-  openInNewTab: boolean;
+  openInNewTab: boolean = false;
 
   ngOnInit(): void {
     this.isButton = this.buttonHref === '#';
