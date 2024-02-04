@@ -1,4 +1,4 @@
-<a class="oppia-primary-button"
+<a *ngIf="!isButton" class="oppia-primary-button"
    [ngClass]="customClasses"
    [href]="getButtonHref()"
    [target]="openInNewTab ? '_blank' : '_self'"
