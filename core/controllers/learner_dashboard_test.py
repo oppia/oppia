@@ -21,7 +21,6 @@ from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_domain
 from core.domain import learner_progress_services
 from core.domain import story_domain
 from core.domain import story_services
