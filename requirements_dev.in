@@ -3,7 +3,7 @@
 #    python -m scripts.install_python_dev_dependencies
 #
 # to update `requirements_dev.txt` and your current Python environment.
-Pillow==10.1.0
+Pillow==10.2.0
 certifi==2023.7.22
 coverage==7.2.3
 esprima==4.0.1
