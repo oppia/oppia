@@ -30,16 +30,17 @@ export class PrimaryLinkButtonComponent implements OnInit {
   @Input() buttonText: string = '';
   @Input() customClasses?: string[];
   @Input() disabled?: boolean = false;
-  @Input() buttonHref: string = "#";
+  @Input() buttonHref: string = '#';
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
-  @Input() isButton?: boolean = false;
-  
-  openInNewTab: boolean;
+
+  isButton: boolean = false;
+  openInNewTab: boolean = false;
 
   ngOnInit(): void {
     if (this.buttonHref) {
       this.openInNewTab = this.isExternalLink(this.buttonHref);
     }
+    this.isButton = this.buttonHref === '#'; 
   }
 
   getButtonHref(): string {
