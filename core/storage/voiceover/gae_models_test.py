@@ -231,7 +231,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
                 user_id))
         test_data: Dict[
             str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                user_id: {'voiceovers_and_contents_mapping': {}}}
+                'voiceovers_and_contents_mapping': {}}
         self.assertEqual(user_data, test_data)
 
     def test_get_deletion_policy_is_to_keep(self) -> None:

@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, List, Optional, Sequence, TypedDict, Union
+from typing import Dict, Final, List, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -359,11 +359,9 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
             dict. Dictionary of the data from VoiceArtistMetadataModel.
         """
         user_data: Dict[str, VoiceoversAndContentsMappingType] = {}
-        voice_artist_metadata_models: Sequence[
-            VoiceArtistMetadataModel] = cls.get_all().filter(
-            cls.voice_artist_id == user_id).fetch()
-        for voice_artist_metadata_model in voice_artist_metadata_models:
-            user_data[user_id] = {
+        voice_artist_metadata_model = cls.get_model(user_id)
+        if voice_artist_metadata_model:
+            user_data = {
                 'voiceovers_and_contents_mapping': (
                     voice_artist_metadata_model.voiceovers_and_contents_mapping)
             }
