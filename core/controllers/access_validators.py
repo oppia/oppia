@@ -184,7 +184,9 @@ class ViewLearnerGroupPageAccessValidationHandler(
                 group.
         """
         assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled():
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
             raise self.PageNotFoundException
 
         is_valid_request = learner_group_services.is_user_learner(
