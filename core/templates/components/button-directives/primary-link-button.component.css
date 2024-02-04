@@ -19,7 +19,7 @@
 }
 
 a.oppia-primary-link-button {
-  display: inline-flex;
   align-items: center;
+  display: inline-flex;
   justify-content: center;
 }

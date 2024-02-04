@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the primary link buttons displayed on static pages.
+ * @fileoverview Component for primary link buttons displayed on static pages.
  */
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
@@ -37,7 +37,7 @@ export class PrimaryLinkButtonComponent implements OnInit {
   openInNewTab: boolean;
 
   ngOnInit(): void {
-    this.isButton = this.buttonHref === '#'; 
+    this.isButton = this.buttonHref === '#';
   }
 
   getButtonHref(): string {
