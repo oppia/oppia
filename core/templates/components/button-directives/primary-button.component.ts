@@ -16,10 +16,8 @@
  * @fileoverview Component for the primary buttons displayed on static pages.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { WindowRef } from
-  'services/contextual/window-ref.service';
 import './primary-button.component.css';
 
 
@@ -28,39 +26,33 @@ import './primary-button.component.css';
   templateUrl: './primary-button.component.html',
   styleUrls: ['./primary-button.component.css']
 })
-export class PrimaryButtonComponent {
+export class PrimaryButtonComponent implements OnInit {
   @Input() buttonText: string = '';
   @Input() customClasses?: string[];
   @Input() disabled?: boolean = false;
-  @Input() buttonHref: string | null = null;
+  @Input() buttonHref: string = "#";
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
+  @Input() isButton?: boolean = false;
+  
+  openInNewTab: boolean;
 
-  constructor(
-    private windowRef: WindowRef,
-  ) {}
-
-  handleButtonClick(): void {
-    if (this.onClickPrimaryButton.observers.length > 0) {
-      this.onClickPrimaryButton.emit();
-    } else if (this.buttonHref) {
-      const isExternalLink = this.isExternalLink(this.buttonHref);
-      if (isExternalLink) {
-        this.openExternalLink(this.buttonHref);
-      } else {
-        this.windowRef.nativeWindow.location.href = this.buttonHref;
-      }
+  ngOnInit(): void {
+    if (this.buttonHref) {
+      this.openInNewTab = this.isExternalLink(this.buttonHref);
     }
+  }
+
+  getButtonHref(): string {
+    return this.buttonHref;
   }
 
   private isExternalLink(link: string): boolean {
     return link.startsWith('http://') || link.startsWith('https://');
   }
 
-  private openExternalLink(link: string): void {
-    const newTab = window.open();
-    if (newTab) {
-      newTab.opener = null;
-      newTab.location.href = link;
+  handleButtonClick(): void {
+    if (this.onClickPrimaryButton.observers.length > 0) {
+      this.onClickPrimaryButton.emit();
     }
   }
 }
