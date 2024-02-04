@@ -89,24 +89,31 @@ describe('PrimaryLinkButtonComponent', () => {
 
   it('should handle button click with internal link', () => {
     component.buttonHref = '/about';
-    component.handleButtonClick();
-    expect(windowRef.nativeWindow.location.href).toBe('/about');
+    fixture.detectChanges();
+    expect(component.openInNewTab).toBe(false);
   });
 
   it('should handle button click with external link', () => {
     const externalLink = 'https://github.com';
-    const windowOpenSpy = jasmine.createSpyObj('Window', [
-      'location',
-      'opener',
-      'reload'
-    ]);
-
-    spyOn(window, 'open').and.returnValue(windowOpenSpy);
-    const newTab = window.open('', '_blank') as Window;
     component.buttonHref = externalLink;
-    component.handleButtonClick();
+    fixture.detectChanges();
+    expect(component.openInNewTab).toBe(true);
+  });
 
-    expect(window.open).toHaveBeenCalledWith('', '_blank');
-    expect(newTab.location.href).toBe(externalLink);
+  it('should return correct url from getButtonHref', () => {
+    component.buttonHref = 'https://github.com';
+    const result = component.getButtonHref();
+    expect(result).toBe('https://github.com');
+  });
+
+  it('should set isButton to false when buttonHref is provided', () => {
+    component.buttonHref = 'http://example.com';
+    fixture.detectChanges();
+    expect(component.isButton).toBe(false);
+  });
+
+  it('should set isButton to true when buttonHref is not provided', () => {
+    fixture.detectChanges();
+    expect(component.isButton).toBe(true);
   });
 });
