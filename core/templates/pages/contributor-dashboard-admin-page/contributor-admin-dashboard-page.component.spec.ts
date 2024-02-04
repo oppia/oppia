@@ -170,10 +170,14 @@ describe('Contributor dashboard Admin page', () => {
 
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
-
-    component.selectLanguage('Arabic (العربية)');
-    expect(component.selectedLanguage.language).toBe('Arabic (العربية)');
-    expect(component.selectedLanguage.id).toBe('ar');
+    const nonDefaultLanguage = {
+      id: 'ar',
+      language: 'Arabic (العربية)'
+    };
+    component.selectLanguage(nonDefaultLanguage.language);
+    expect(component.selectedLanguage.language)
+      .toBe(nonDefaultLanguage.language);
+    expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
   }));
 
   it('should select last activity from dropdown', fakeAsync(() => {
@@ -541,13 +545,15 @@ describe('Contributor dashboard Admin page', () => {
     expect(openRoleEditorSpy).toHaveBeenCalledWith('user1');
   }));
 
-  it('should rearrange language name', () => {
-    expect(component.putEnglishLanguageNameAtFront('Hinglish'))
-      .toBe('Hinglish');
-    expect(component.putEnglishLanguageNameAtFront(
-      'بهاس ملايو (Bahasa Melayu)'
-    )).toBe('Bahasa Melayu (بهاس ملايو)');
-    expect(component.putEnglishLanguageNameAtFront('Azeri (Azerbaijani)'))
-      .toBe('Azerbaijani (Azeri)');
+  it('should start any language with its English name', () => {
+    for (const language of component.languageChoices) {
+      if (language.id === 'hi-en') {
+        expect(language.language).toBe('Hinglish');
+      } else if (language.id === 'ms') {
+        expect(language.language).toBe('Bahasa Melayu (بهاس ملايو)');
+      } else if (language.id === 'az') {
+        expect(language.language).toBe('Azerbaijani (Azeri)');
+      }
+    }
   });
 });

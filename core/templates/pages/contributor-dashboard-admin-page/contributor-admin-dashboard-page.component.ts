@@ -190,7 +190,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       );
   }
 
-  putEnglishLanguageNameAtFront(language: string): string {
+  private putEnglishLanguageNameAtFront(language: string): string {
     // Check if the language matches the expected format 'abc (something)'.
     const pattern = /(.*)\s*\(([a-zA-Z ]+)\)/;
     const match = language.match(pattern);
