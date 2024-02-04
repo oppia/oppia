@@ -80,7 +80,6 @@ class UserPreferences {
   // The following property is the new profile picture data url that is
   // uploaded by the user and will be sent to the server.
   newProfilePictureDataUrl!: string;
-  emailPreferences!: EmailPreferencesBackendDict;
 
   constructor(
     public profilePicturePngDataUrl: string,
