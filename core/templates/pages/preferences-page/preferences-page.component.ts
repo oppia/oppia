@@ -29,7 +29,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { BackendPreferenceUpdateType, EmailPreferencesBackendDict, EmailUpdatePreferenceDict, SubscriptionSummary, UpdatePreferenceDict, UserBackendApiService } from 'services/user-backend-api.service';
+import { BackendPreferenceUpdateType, EmailPreferencesBackendDict, SubscriptionSummary, UpdatePreferenceDict, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -57,6 +57,11 @@ const BACKEND_UPDATE_TYPE_DICT: (
   preferredAudioLanguageCode: 'preferred_audio_language_code',
   emailPreferences: 'email_preferences'
 };
+
+type ValidPreferenceFields = {
+  [K in keyof UserPreferences]: UserPreferences[K] extends string |
+  string[] | EmailPreferencesBackendDict ? K : never;
+}[keyof UserPreferences];
 
 class UserPreferences {
   // The following property is used to track if there are any unsaved changes
@@ -112,8 +117,12 @@ class UserPreferences {
     }
   }
 
-  getUpdates(): UpdatePreferenceDict<BackendPreferenceUpdateType>[] {
-    const updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[] = [];
+  isPreferenceField(key: string): key is ValidPreferenceFields {
+    return key in UserPreferences;
+  }
+
+  getUpdates(): UpdatePreferenceDict[] {
+    const updates: UpdatePreferenceDict[] = [];
     for (const preferenceField in this.fieldsWithChangedValues) {
       if (this.fieldsWithChangedValues[preferenceField]) {
         if (preferenceField === 'emailPreferences') {
@@ -125,15 +134,14 @@ class UserPreferences {
             can_receive_subscription_email: this.canReceiveSubscriptionEmail
           };
           updates.push({
-            update_type: BACKEND_UPDATE_TYPE_DICT[preferenceField] as
-            EmailUpdatePreferenceDict['update_type'],
+            update_type: BACKEND_UPDATE_TYPE_DICT[preferenceField],
             data: emailData
           });
           continue;
         }
         updates.push({
           update_type: BACKEND_UPDATE_TYPE_DICT[preferenceField],
-          data: this[preferenceField]
+          data: this[preferenceField as ValidPreferenceFields]
         });
       }
     }
@@ -397,7 +405,7 @@ export class PreferencesPageComponent {
     this.alertsService.clearWarnings();
 
     // Get the updated fields to send to the backend on-save.
-    let updates = this.userPreferences.getUpdates();
+    let updates: UpdatePreferenceDict[] = this.userPreferences.getUpdates();
 
     if (AssetsBackendApiService.EMULATOR_MODE) {
       // Remove 'profile_picture_data_url' from updates if the emulator mode is

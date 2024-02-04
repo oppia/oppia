@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { BackendPreferenceUpdateType, PreferencesBackendDict, UpdatePreferenceDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, UpdatePreferenceDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -105,7 +105,7 @@ describe('Preferences Page Component', () => {
       }
 
       async updateMultiplePreferencesDataAsync(
-          updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
+          updates: UpdatePreferenceDict[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
           bulk_email_signup_message_should_be_shown: false
@@ -492,7 +492,7 @@ describe('Preferences Page Component', () => {
       }
 
       async updateMultiplePreferencesDataAsync(
-          updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
+          updates: UpdatePreferenceDict[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
           bulk_email_signup_message_should_be_shown: false

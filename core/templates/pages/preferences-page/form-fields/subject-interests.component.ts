@@ -67,7 +67,7 @@ export class SubjectInterestsComponent {
   validInput(value: string): boolean {
     // The following regex matches only lowercase
     // alphabetic characters and spaces.
-    let validRegex = new RegExp('^[a-z\\s]+$');
+    let validRegex = new RegExp('^[a-z\\s]*$');
 
     return validRegex.test(value) && this.subjectInterests.indexOf(value) < 0;
   }

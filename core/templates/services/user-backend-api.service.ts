@@ -71,29 +71,16 @@ export type BackendPreferenceUpdateType = (
   'email_preferences'
 );
 
-export interface EmailUpdatePreferenceDict {
-  update_type: 'email_preferences';
-  data: EmailPreferencesBackendDict;
-}
-
-interface PreferredLanguageCodesUpdatePreferenceDict {
-  update_type: 'preferred_language_codes';
-  data: string[];
-}
-
-interface OtherUpdatePreferenceDict{
-  // UpdateTypes other than 'email_preferences' and 'preferred_language_codes'.
-  update_type: Exclude<BackendPreferenceUpdateType, 'email_preferences' |
-    'preferred_language_codes'>;
-  data: string;
-}
-
-export type UpdatePreferenceDict<
+type DataType<
   UpdateType extends BackendPreferenceUpdateType> =
-  UpdateType extends 'email_preferences' ? EmailUpdatePreferenceDict :
-  UpdateType extends 'preferred_language_codes' ?
-  PreferredLanguageCodesUpdatePreferenceDict :
-  OtherUpdatePreferenceDict;
+  UpdateType extends 'email_preferences' ? EmailPreferencesBackendDict :
+  UpdateType extends 'preferred_language_codes' ? string[] :
+  string;
+
+export interface UpdatePreferenceDict{
+  update_type: BackendPreferenceUpdateType;
+  data: DataType<BackendPreferenceUpdateType>;
+}
 
 export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': string[];
@@ -164,7 +151,7 @@ export class UserBackendApiService {
   }
 
   async updateMultiplePreferencesDataAsync(
-      updates: UpdatePreferenceDict<BackendPreferenceUpdateType>[]
+      updates: UpdatePreferenceDict[]
   ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(
       this.PREFERENCES_DATA_URL,

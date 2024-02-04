@@ -112,16 +112,22 @@ a.export-btn:active {
   color: #fff;
   text-decoration: none;
 }
-.oppia-save-btn-container {
+.oppia-sticky-footer-container {
   background-color: #fdfbf1;
   bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   position: sticky;
+  width: 100vw;
+}
+.oppia-save-btn-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
 }
 @media screen and (max-width: 600px) {
   .oppia-save-btn-container {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     padding: 10px;
     width: 100vw;
@@ -132,12 +138,9 @@ a.export-btn:active {
 }
 @media screen and (min-width: 600px) {
   .oppia-save-btn-container {
-    align-items: flex-end;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    justify-content: center;
-    padding: 10px 10px 10px 10px;
+    justify-content: end;
+    padding: 10px 0;
+    width: 800px;
   }
   .oppia-save-button {
     width: auto;
