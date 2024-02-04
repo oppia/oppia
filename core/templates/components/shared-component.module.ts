@@ -182,7 +182,7 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
 import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 import { DirectivesModule } from 'directives/directives.module';
-import { PrimaryButtonComponent } from './button-directives/primary-button.component';
+import { PrimaryLinkButtonComponent } from './button-directives/primary-link-button.component';
 
 @NgModule({
   imports: [
@@ -354,7 +354,7 @@ import { PrimaryButtonComponent } from './button-directives/primary-button.compo
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent
+    PrimaryLinkButtonComponent
   ],
 
   entryComponents: [
@@ -485,7 +485,7 @@ import { PrimaryButtonComponent } from './button-directives/primary-button.compo
     CopierComponent,
     RandomSelectorComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent
+    PrimaryLinkButtonComponent
   ],
 
   exports: [
@@ -626,7 +626,7 @@ import { PrimaryButtonComponent } from './button-directives/primary-button.compo
     TranslateModule,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent
+    PrimaryLinkButtonComponent
   ],
 })
 

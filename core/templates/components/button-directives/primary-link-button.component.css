@@ -4,7 +4,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-primary-button {
+.oppia-primary-link-button {
   background-color: #00645c;
   color: rgba(255, 255, 255, 1.0);
   font-family: "Roboto", Arial, sans-serif;
@@ -12,13 +12,13 @@
   letter-spacing: 0.7px;
 }
 
-.oppia-primary-button:hover,
-.oppia-primary-button:focus {
+.oppia-primary-link-button:hover,
+.oppia-primary-link-button:focus {
   background-color: #3d9991;
   color: rgba(255, 255, 255, 1);
 }
 
-a.oppia-primary-button {
+a.oppia-primary-link-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;

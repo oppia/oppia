@@ -1,4 +1,4 @@
-<a *ngIf="!isButton" class="oppia-primary-button"
+<a *ngIf="!isButton" class="oppia-primary-link-button"
    [ngClass]="customClasses"
    [href]="getButtonHref()"
    [target]="openInNewTab ? '_blank' : '_self'"
@@ -7,7 +7,7 @@
 </a>
 
 <button *ngIf="isButton" type="submit"
-        class="oppia-primary-button"
+        class="oppia-primary-link-button"
         [ngClass]="customClasses"
         [disabled]="disabled"
         (click)="handleButtonClick()">

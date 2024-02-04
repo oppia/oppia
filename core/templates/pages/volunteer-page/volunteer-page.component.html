@@ -18,11 +18,11 @@
           <img alt="Volunteer page banner image - Mobile view" [src]="this.getStaticImageUrl(mobBannerImgPath)">
         </picture>
       </div>
-      <oppia-primary-button
+      <oppia-primary-link-button
           buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
           [customClasses]="['btn', 'volunteer-btn']"
           buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
-      </oppia-primary-button>
+      </oppia-primary-link-button>
     </div>
 
     <div class="hide-xs flex-45 bannerImg">
@@ -268,11 +268,11 @@
        [style.background-size]="'cover'">
     <p>{{ 'I18N_VOLUNTEER_PAGE_FOOTER' | translate }}</p>
 
-    <oppia-primary-button
+    <oppia-primary-link-button
         buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
         [customClasses]="['btn']"
         buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
-    </oppia-primary-button>
+    </oppia-primary-link-button>
   </div>
 </div>
 

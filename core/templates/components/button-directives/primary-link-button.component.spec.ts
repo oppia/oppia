@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PrimaryButtonComponent
+ * @fileoverview Unit tests for PrimaryLinkButtonComponent
  */
 
-import { PrimaryButtonComponent } from './primary-button.component';
+import { PrimaryLinkButtonComponent } from './primary-link-button.component';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -40,15 +40,15 @@ class MockWindowRef {
   }
 }
 
-describe('PrimaryButtonComponent', () => {
-  let component: PrimaryButtonComponent;
-  let fixture: ComponentFixture<PrimaryButtonComponent>;
+describe('PrimaryLinkButtonComponent', () => {
+  let component: PrimaryLinkButtonComponent;
+  let fixture: ComponentFixture<PrimaryLinkButtonComponent>;
   let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [PrimaryButtonComponent],
+      declarations: [PrimaryLinkButtonComponent],
       providers: [
         {
           provide: WindowRef,
@@ -57,7 +57,7 @@ describe('PrimaryButtonComponent', () => {
       ],
     });
 
-    fixture = TestBed.createComponent(PrimaryButtonComponent);
+    fixture = TestBed.createComponent(PrimaryLinkButtonComponent);
     component = fixture.componentInstance;
   });
 
