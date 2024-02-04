@@ -20,19 +20,17 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ClientContext } from
-  'domain/platform_feature/client-context.model';
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryBackendDict,
-} from 'domain/platform_feature/feature-status-summary.model';
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+} from 'domain/feature-flag/feature-status-summary.model';
+import { FeatureFlagDomainConstants } from
+  'domain/feature-flag/feature-flag-domain.constants';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformFeatureBackendApiService {
+export class FeatureFlagBackendApiService {
   constructor(
     private http: HttpClient
   ) {}
@@ -40,19 +38,13 @@ export class PlatformFeatureBackendApiService {
   /**
    * Gets the feature flags.
    *
-   * @param {ClientContext} context - The client side context for feature flag
-   * evlauation.
-   *
    * @returns {Promise<FeatureStatusSummary>} - A promise that resolves to
    * the feature status summary.
    */
-  async fetchFeatureFlags(context: ClientContext):
+  async fetchFeatureFlags():
       Promise<FeatureStatusSummary> {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
-      PlatformFeatureDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL,
-      {
-        params: {...context.toBackendDict()}
-      }
+      FeatureFlagDomainConstants.FEATURE_FLAGS_EVALUATION_HANDLER_URL
     ).toPromise();
 
     return FeatureStatusSummary.createFromBackendDict(
@@ -61,5 +53,5 @@ export class PlatformFeatureBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'PlatformFeatureBackendApiService',
-  downgradeInjectable(PlatformFeatureBackendApiService));
+  'FeatureFlagBackendApiService',
+  downgradeInjectable(FeatureFlagBackendApiService));
