@@ -63,28 +63,21 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickAccessAndroidButton(): void {
-    this.windowRef.nativeWindow.location.href = '/android';
-  }
-
-  onClickVisitClassroomButton(): void {
+  onClickVisitClassroomButton(): string {
     let classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = classroomUrl;
+    return classroomUrl;
   }
 
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/community-library';
   }
 
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
-    this.windowRef.nativeWindow.location.href = (
-      '/creator-dashboard?mode=create');
   }
 }
 angular.module('oppia').directive(
