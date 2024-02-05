@@ -156,7 +156,6 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
-    LessonInformationCardModalComponent,
     ExplorationGraphComponent,
     StateNameEditorComponent,
     EditorNavigationComponent,
@@ -224,7 +223,6 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
-    LessonInformationCardModalComponent,
     StateNameEditorComponent,
     EditorNavigationComponent,
     TeachOppiaModalComponent,
@@ -293,7 +291,6 @@ import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-pa
 import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
 import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
 import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
-import { LessonInformationCardModalComponent } from 'pages/exploration-player-page/templates/lesson-information-card-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
