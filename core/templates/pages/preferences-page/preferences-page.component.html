@@ -5,6 +5,11 @@
   </h1>
   <mat-card class="oppia-page-card">
     <div *ngIf="hasPageLoaded">
+      <!--
+          The 'hasPageLoaded' variable is used to ensure that the 'userPreferences' object is created.
+          else it will be undefined and we cannot access its properties below, so it throws an error in the console.
+          Eg: 'userPreferences.profilePicturePngDataUrl'.
+      -->
       <div class="container">
         <div class="form-group row">
           <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="'Username: ' + username">

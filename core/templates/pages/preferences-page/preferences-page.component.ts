@@ -116,10 +116,6 @@ class UserPreferences {
     }
   }
 
-  isPreferenceField(key: string): key is ValidPreferenceFields {
-    return key in UserPreferences;
-  }
-
   getUpdates(): UpdatePreferenceDict[] {
     const updates: UpdatePreferenceDict[] = [];
     for (const preferenceField in this.fieldsWithChangedValues) {
