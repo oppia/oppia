@@ -23,15 +23,15 @@ import re
 
 from core import platform_feature_list
 from core import utils
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_registry as registry
+from core.domain import feature_flag_domain
+from core.domain import feature_flag_registry
 from core.tests import test_utils
 
 from typing import Final, List
 
 FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),
-    'core/templates/domain/platform_feature',
+    'core/templates/domain/feature-flag',
     'feature-status-summary.model.ts')
 
 ENUM_BODY_REGEXP: Final = re.compile(
@@ -68,7 +68,10 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     def test_all_names_in_features_lists_exist(self) -> None:
         missing_names = []
         for feature in self.all_features_set:
-            if feature.value not in registry.Registry.parameter_registry:
+            if feature.value not in (
+                platform_feature_list.
+                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+            ):
                 missing_names.append(feature.value)
         self.assertTrue(
             len(missing_names) == 0,
@@ -112,26 +115,13 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             'not be used: %s.' % (found_deprecated_names)
         )
 
-    def test_all_entries_in_features_lists_are_features(self) -> None:
-        non_feature_names = []
-        for feature in self.all_features_set:
-            feature_flag = (
-                registry.Registry.get_platform_parameter(feature.value))
-            if not feature_flag.is_feature:
-                non_feature_names.append(feature.value)
-        self.assertTrue(
-            len(non_feature_names) == 0,
-            msg='Following entries in FEATURES_LIST are not features: %s.' % (
-                non_feature_names)
-        )
-
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self) -> None:
         invalid_feature_names = []
         for feature in platform_feature_list.DEV_FEATURES_LIST:
             feature_flag = (
-                registry.Registry.get_platform_parameter(feature.value))
-            if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FeatureStages.DEV.value):
+                feature_flag_registry.Registry.get_feature_flag(feature.value))
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.DEV):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -143,9 +133,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for feature in platform_feature_list.TEST_FEATURES_LIST:
             feature_flag = (
-                registry.Registry.get_platform_parameter(feature.value))
-            if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FeatureStages.TEST.value):
+                feature_flag_registry.Registry.get_feature_flag(feature.value))
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.TEST):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -157,9 +147,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         invalid_feature_names = []
         for feature in platform_feature_list.PROD_FEATURES_LIST:
             feature_flag = (
-                registry.Registry.get_platform_parameter(feature.value))
-            if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FeatureStages.PROD.value):
+                feature_flag_registry.Registry.get_feature_flag(feature.value))
+            if (feature_flag.feature_flag_spec.feature_stage !=
+                    feature_flag_domain.FeatureStages.PROD):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,

@@ -27,6 +27,7 @@ import { ExplorationImprovementsService } from 'services/exploration-improvement
 import { ExplorationStatesService } from './exploration-states.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockContextService {
@@ -51,6 +52,7 @@ describe('Router Service', () => {
   let explorationImprovementsService: ExplorationImprovementsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
+  let translationLanguageService: TranslationLanguageService;
   let windowRef: WindowRef;
   let hasStateSpy: jasmine.Spy;
   let isInitializedSpy: jasmine.Spy;
@@ -68,6 +70,7 @@ describe('Router Service', () => {
         ExplorationImprovementsService,
         ExplorationStatesService,
         StateEditorService,
+        TranslationLanguageService,
         {
           provide: ContextService,
           useClass: MockContextService
@@ -86,6 +89,7 @@ describe('Router Service', () => {
       ExplorationStatesService);
     windowRef = TestBed.inject(WindowRef);
     stateEditorService = TestBed.inject(StateEditorService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
   }));
 
   beforeEach(() => {
@@ -102,6 +106,21 @@ describe('Router Service', () => {
   afterEach(() => {
     testSubscriptions.unsubscribe();
   });
+
+  it('should change tab on init', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow')
+      .and.returnValue({
+        location: {
+          hash: '#/settings'
+        }
+      });
+    spyOn(routerService, '_changeTab');
+
+    routerService.init();
+    tick();
+
+    expect(routerService._changeTab).toHaveBeenCalledWith('/settings');
+  }));
 
   it('should not navigate to main tab when already there', fakeAsync(() => {
     let jQuerySpy = spyOn(window, '$');
@@ -184,6 +203,17 @@ describe('Router Service', () => {
 
     expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6');
   }));
+
+  it('should navigate to translation tab with correct voiceover language',
+    fakeAsync(()=>{
+      window.location.hash = '/translation/Start/ca_buttonText_6/ak';
+      routerService._changeTab('/translation/Start/ca_buttonText_6/ak');
+
+      tick(300);
+
+      expect(
+        translationLanguageService.getActiveLanguageCode()).toBe('ak');
+    }));
 
   it('should navigate to preview tab', fakeAsync(() => {
     expect(routerService.getActiveTabName()).toBe('main');
