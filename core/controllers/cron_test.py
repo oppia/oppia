@@ -601,12 +601,10 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self.get_json(
                     '/cron/mail/reviewers/new_cont' +
                     'ributor_dashboard_suggestions')
-
-            for call_args in mock_send.call_args_list:
-                arg1, arg2 = call_args.args
-                self.assertEqual(len(arg1['en']), 1)
-                self.assertEqual(arg1['en'][0], self.reviewer_id)
-                self.assertEqual(len(arg2['en']), 1)
+            mock_send.assert_called_once_with(
+                {'en': [self.reviewer_id]},
+                {'en': [mock.ANY]}
+            )
 
             self.logout()
 
@@ -635,11 +633,11 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
-            for call_args in mock_send.call_args_list:
-                arg1, _ = call_args.args
-                self.assertEqual(len(arg1['en']), 0)
-
             mock_send.assert_called_once()
+            mock_send.assert_called_once_with(
+                {'en': []},
+                mock.ANY
+            )
             self.logout()
 
     def test_email_sent_to_reviewers_successfully(self) -> None:
@@ -661,12 +659,10 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
 
-            for call_args in mock_send.call_args_list:
-                arg1, _ = call_args.args
-                self.assertEqual(len(arg1['en']), 1)
-                self.assertEqual(arg1['en'][0], self.reviewer_id)
-
-            mock_send.assert_called_once()
+            mock_send.assert_called_once_with(
+                {'en': [self.reviewer_id]},
+                {'en': [mock.ANY]}
+            )
             self.logout()
 
 
