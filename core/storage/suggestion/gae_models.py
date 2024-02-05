@@ -478,8 +478,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         threshold_datetime = datetime.datetime.utcfromtimestamp(
             current_time_millisecs / 1000.0
-            ) - datetime.timedelta(
-                days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
+        ) - datetime.timedelta(
+            days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
         )
         return (
             cls.get_all().filter(datastore_services.all_of(
