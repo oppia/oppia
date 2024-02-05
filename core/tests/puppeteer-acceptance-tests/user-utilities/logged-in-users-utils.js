@@ -380,8 +380,8 @@ module.exports = class LoggedInUsers extends baseUser {
     } else {
       showMessage(
         'The Learn More About Oppia button opens the About page.');
-        const newPage = await newTab.page();
-        await newPage.close();
+      const newPage = await newTab.page();
+      await newPage.close();
     }
   }
 
