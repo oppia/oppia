@@ -40,7 +40,7 @@ var scrollToTop = async function() {
 };
 
 // The minimum log level we will report as an error.
-var CONSOLE_LOG_THRESHOLD = 900;
+var CONSOLE_LOG_THRESHOLD = ['SEVERE'];
 var CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
@@ -84,7 +84,7 @@ var checkForConsoleErrors = async function(
 
   var browserLogs = await browser.getLogs('browser');
   var browserErrors = browserLogs.filter(logEntry => (
-    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+    CONSOLE_LOG_THRESHOLD.includes(logEntry.level) &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
 };
