@@ -95,7 +95,7 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    console.error("This should be caught");
+    console.error('This should be caught');
     this._updateViewOnLinkChange();
   }
 
