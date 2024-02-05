@@ -202,7 +202,6 @@ export class ContributionOpportunitiesBackendApiService {
       topic_name?: string;
       language_code?: string;
     } = { topic_name: topicName ?? null };
-    console.log(params.topic_name);
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }

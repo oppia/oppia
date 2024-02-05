@@ -1118,7 +1118,7 @@ def compute_summary_of_topic(
         ] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
             if platform_feature_services.is_feature_enabled(
-                platform_feature_list.ParamNames
+                platform_feature_list.FeatureNames
                 .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
             else story.story_contents.get_all_linked_exp_ids())
 

@@ -333,7 +333,8 @@ class ReviewableOpportunitiesHandler(
             for opp in (
                 self._get_reviewable_exploration_opportunity_summaries(
                 self.user_id,
-                topic_name=topic_name if topic_name != 'null' else None,
+                topic_name=(
+                    topic_name if topic_name != 'null' else None),
                 language=language
             )):
                 opportunity_dicts.append(opp.to_dict())
