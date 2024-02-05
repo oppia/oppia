@@ -191,14 +191,16 @@ module.exports = class e2eSuperAdmin extends baseUser {
     name, urlFragment, webTitleFragment, description, thumbnail, metaContent,
     assignedSkills, subtopics, diagnosticTestSkills, isPublished }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
-    await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     await this.page.waitForSelector(
-      '.dashboard-tabs-active', { visible: true });
+      '.dashboard-tabs .e2e-test-topics-tab', { visible: true });
+    await this.page.waitForTimeout(1000);
+    await this.page.click('.dashboard-tabs .e2e-test-topics-tab');
+
     await this.page.waitForSelector(
-      '.e2e-test-topics-tab', { visible: true });
-    await this.page.click('.e2e-test-topics-tab');
-    await this.clickOn('.e2e-test-create-topic-button');
+      '.e2e-test-create-topic-button', { visible: true });
+    await this.page.waitForTimeout(1000);
+    await this.page.click('.e2e-test-create-topic-button');
 
     await this.page.waitForSelector(
       '.e2e-test-new-topic-name-field', { visible: true });
@@ -220,6 +222,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
       '.e2e-test-topic-meta-tag-content-field', { visible: true });
     await this.page.type(
       '.e2e-test-topic-meta-tag-content-field', metaContent);
+    // Click anywhere off the Meta Tag text input field.
+    await this.clickOn('.e2e-test-save-topic-button:disabled');
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.page.waitForTimeout(1000);
@@ -234,41 +238,18 @@ module.exports = class e2eSuperAdmin extends baseUser {
     const topicEditorUrl = await this.page.url();
     // Assign skills.
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
-    await this.waitForNavigation({ waitUntil: 'networkidle0' });
 
-    await this.page.waitForSelector(
-      '.dashboard-tabs-active', { visible: true });
     await this.page.waitForSelector(
       '.e2e-test-skills-tab', { visible: true });
     await this.page.click('.e2e-test-skills-tab');
-    await this.page.waitForSelector('');
-    const skillDescriptions = await this.page.$$eval(
-      '.e2e-test-skill-description',
-      (descriptions) => Array.from(descriptions).map(
-        desc => desc.textContent);
-    for (const skill of assignedSkills) {
-      for (let i = 0; i < skillDescriptions.length; i++) {
-        if (skill.description === skillDescriptions) {
-          await this.clickOn('.e2e-test-assign-skill-to-topic-button');
-          await this.page.$$eval(
-            'e2e-test-topic-name-in-topic-select-modal',
-            async (topicNames, name) => {
-              for (let i = 0; i < topicNames.length; i++) {
-                if (topicNames[i] === name) {
-                  await this.clickOn(
-                    `.e2e-test-topics-list-item:nth-child(${i + 1})`);
-                  return;
-                }
-              }
-            }, name);
-          await this.clickOn('.e2e-test-confirm-move-button');
-          break;
-        }
-      }
-    }
+    await this.page.waitForSelector(
+      '.e2e-test-skill-description', { visible: true });
+    await this.page.waitForTimeout(1000);
 
+    await this.clickOn('.e2e-test-assign-skill-to-topic-button');
+    await this.clickOn('.e2e-test-topics-list-item');
+    await this.clickOn('.e2e-test-confirm-move-button');
     await this.goto(topicEditorUrl);
-    await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
 
     // Add subtopics.
     await this.page.waitForSelector(
@@ -281,40 +262,66 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.type(
       '.e2e-test-new-subtopic-url-fragment-field', subtopics[0].urlFragment);
     await this.clickOn('.e2e-test-show-schema-editor');
-    await this.type(
+    await this.page.waitForSelector(
+      '.e2e-test-create-subtopic-page-content .e2e-test-rte',
+      { visible: true });
+    await this.page.waitForTimeout(500);
+    await this.page.type(
       '.e2e-test-create-subtopic-page-content .e2e-test-rte',
       subtopics[0].description);
 
-    await this.clickOn('.e2e-test-photo-button');
+    await this.page.waitForSelector(
+      '.e2e-test-photo-button', { visible: true });
+    await this.page.waitForTimeout(500);
+    await this.page.click('.e2e-test-photo-button');
+    await this.page.waitForSelector(
+      '.e2e-test-photo-upload-input', { visible: true });
     await this.uploadFile(subtopics[0].thumbnail);
     await this.clickOn('.e2e-test-photo-upload-submit');
     await this.page.waitForTimeout(500);
     await this.clickOn('.e2e-test-confirm-subtopic-creation-button');
+    await this.page.waitForSelector(
+      'span.topic-name', { visible: true });
+    await this.page.click('span.topic-name');
 
-    await this.goto(topicEditorUrl);
-    await this.clickOn('.e2e-test-skill-item-edit-btn');
-    await this.clickOn('.e2e-test-assign-subtopic');
-    await this.clickOn('#mat-radio-2');
+    await this.page.waitForSelector(
+      '.e2e-test-skill-item-edit-btn', { visible: true });
+    await this.page.click('.e2e-test-skill-item-edit-btn');
+    await this.page.waitForSelector(
+      '.e2e-test-assign-subtopic', { visible: true });
+    await this.page.click('.e2e-test-assign-subtopic');
+    await this.page.waitForSelector(
+      '#mat-radio-2', { visible: true });
+    await this.page.click('#mat-radio-2');
     await this.clickOn('.e2e-test-skill-assign-subtopic-confirm');
 
-    await this.clickOn('.e2e-test-save-topic-button');
+    await this.page.waitForTimeout(1000);
+    await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.type(
       '.e2e-test-commit-message-input', 'Create subtopic');
     await this.clickOn('.e2e-test-close-save-modal-button');
+    await this.page.waitForSelector(
+      '.e2e-test-save-topic-button:disabled');
+    await this.page.waitForTimeout(1000);
 
     // Assign diagnostic test skills.
     // TODO (#19669): Once the issue is solved, remove this reload
-    // page statement.
+    // page statement and the saving topic changes statements just
+    // before the reload page statement.
     await this.reloadPage();
     await this.clickOn('.e2e-test-add-diagnostic-test-skill');
     await this.select(
       '.e2e-test-diagnostic-test-skill-selector',
       diagnosticTestSkills[0].skillDescription);
 
-    await this.clickOn('.e2e-test-save-topic-button');
+    await this.page.waitForTimeout(1000);
+    await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.type(
       '.e2e-test-commit-message-input', 'Diagnostic test skills');
     await this.clickOn('.e2e-test-close-save-modal-button');
+    await this.page.waitForSelector(
+      '.e2e-test-save-topic-button:disabled');
+    await this.page.waitForTimeout(1000);
 
     if (isPublished) {
       await this.clickOn('.e2e-test-publish-topic-button');
@@ -410,12 +417,12 @@ module.exports = class e2eSuperAdmin extends baseUser {
           const editRubricExplanation = (
             '.e2e-test-rubric-explanation-list > :nth-child(' +
             `${i + 1}) .oppia-click-to-start-editing`);
-          this.page.waitForSelector(editRubricExplanation, { visible: true });
-          this.page.waitForTimeout(500);
-          this.page.click(
-            editRubricExplanation, { offset: { x: 30, y: 8 }, clickCount: 2 });
+          await this.page.waitForSelector(
+            editRubricExplanation, { visible: true });
+          await this.page.waitForTimeout(500);
+          await this.page.click(editRubricExplanation);
         } else {
-          this.clickOn(`.e2e-test-add-explanation-button-${difficulty}`);
+          await this.clickOn(`.e2e-test-add-explanation-button-${difficulty}`);
         }
 
         await this.page.waitForSelector(
