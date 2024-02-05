@@ -1225,6 +1225,53 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should generate dummy blogs', fakeAsync(()=> {
+    let action = 'generate_dummy_blog_post';
+    let blogPostTitle = 'Education';
+    let payload = {
+      action,
+      blog_post_title: blogPostTitle,
+    };
+    abas.generateDummyBlogPostAsync(blogPostTitle)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should handle generate dummy blog request failure', fakeAsync(() => {
+    let action = 'generate_dummy_blog_post';
+    let blogPostTitle = 'Education';
+    let payload = {
+      action,
+      blog_post_title: blogPostTitle,
+    };
+    abas.generateDummyBlogPostAsync(blogPostTitle)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }
+  ));
+
   it('should reload exploration', fakeAsync(() => {
     let action = 'reload_exploration';
     let explorationId = 'exp1';
@@ -1499,5 +1546,52 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'User with given username does not exist');
     }));
+  });
+
+  describe('retrieveExplorationInteractionIdsAsync', () => {
+    it('should get interaction IDs if exploration exists'
+      , fakeAsync(() => {
+        let expId = '123';
+        let result = {
+          interactions: [{id: 'EndExploration'}]
+        };
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=123');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush(
+          { interactions: [{id: 'EndExploration'}]},
+          { status: 200, statusText: 'Success.'});
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(result);
+        expect(failHandler).not.toHaveBeenCalled();
+      }));
+
+    it('should fail to get interaction IDs if exploration does not exist'
+      , fakeAsync(() => {
+        let expId = 'invalidExpId';
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=invalidExpId');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({
+          error: 'Exploration does not exist'
+        }, {
+          status: 400, statusText: 'Bad Request'
+        });
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
+      }));
   });
 });

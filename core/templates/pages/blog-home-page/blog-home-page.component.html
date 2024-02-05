@@ -23,7 +23,7 @@
                 </i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
-                <button disabled class="pagination-button">{{ p }}</button>
+                <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button align-middle"
@@ -88,7 +88,7 @@
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
           <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
         </picture>
-        <p class="text-center">
+        <p class="text-center no-result-found">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
         </p>
       </div>
@@ -113,21 +113,19 @@
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
           <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
-            <div class="form-group d-flex"
-                 [ngClass]="{'flex-row-reverse': isSmallScreenViewActive()}">
+            <div class="form-group d-flex">
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
                      (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
-                     [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+                     [ngModelOptions]="{ updateOn: 'blur', standalone: 'true' }"
                      aria-label="Search bar"
                      (keydown.enter)="$event.target.blur()"
                      (input)="searchToBeExec($event)">
               <div class="input-group oppia-input-group">
                 <div class="input-group-addon oppia-search-bar-icon"
                      [ngClass]="{'d-block': isSmallScreenViewActive()}">
-                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18"
-                     *ngIf="!isSearchInProgress()">
+                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
                   </i>
                   <span *ngIf="isSearchInProgress()">
                     <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
@@ -161,7 +159,7 @@
           <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
-          <button disabled class="pagination-button">{{ p }}</button>
+          <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
         </ng-template>
         <ng-template ngbPaginationNext>
           <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>

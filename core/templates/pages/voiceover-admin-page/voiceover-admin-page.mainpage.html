@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="en">
+  <head>
+    <title>Oppia Voiceover Admin Panel</title>
+    <oppia-voiceover-admin-navbar></oppia-voiceover-admin-navbar>
+    <!-- Require head styles file using webpack -->
+    @load('pages/header_css_libs.html')
+    @load('pages/header_js_libs.html')
+  </head>
+
+  <body>
+    <oppia-root>
+      <oppia-voiceover-admin-page></oppia-voiceover-admin-page>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

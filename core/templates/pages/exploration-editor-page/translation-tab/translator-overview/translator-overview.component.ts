@@ -83,7 +83,7 @@ export class TranslatorOverviewComponent implements OnInit {
   ) { }
 
   canShowTabModeSwitcher(): boolean {
-    return !this.contextService.isExplorationLinkedToStory() && (
+    return this.contextService.isExplorationLinkedToStory() && (
       this.languageCode !== this.explorationLanguageCodeService.displayed);
   }
 
@@ -234,10 +234,13 @@ export class TranslatorOverviewComponent implements OnInit {
     this.VOICEOVER_MODE = 'Voiceover';
     this.TRANSLATION_MODE = 'Translate';
 
-    this.languageCode =
+    this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+    if (!this.languageCode) {
+      this.languageCode =
       allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
         prevLanguageCode : (
           ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
+    }
 
     this.entityTranslationsService.getEntityTranslationsAsync(
       this.languageCode

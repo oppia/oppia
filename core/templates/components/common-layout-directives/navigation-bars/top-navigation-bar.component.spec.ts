@@ -30,7 +30,6 @@ import { UserService } from 'services/user.service';
 import { AlertsService } from 'services/alerts.service';
 import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
-import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
@@ -46,12 +45,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 class MockPlatformFeatureService {
   status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    },
-    BlogPages: {
-      isEnabled: false
-    },
     ShowFeedbackUpdatesInProfilePicDropdownMenu: {
       isEnabled: false
     }
@@ -101,7 +94,6 @@ describe('TopNavigationBarComponent', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
-  let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService;
@@ -199,7 +191,6 @@ describe('TopNavigationBarComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     feedbackUpdatesBackendApiService =
@@ -246,7 +237,6 @@ describe('TopNavigationBarComponent', () => {
     ' window is larger', fakeAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(component, 'truncateNavbar').and.stub();
-    spyOn(debouncerService, 'debounce').and.stub();
 
     component.ngOnInit();
     tick(10);
@@ -703,32 +693,6 @@ describe('TopNavigationBarComponent', () => {
       component.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
   });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(TopNavigationBarComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
-  });
-
-  it('should return correct blog url if the blog homepage feature is enabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-
-      expect(component.getOppiaBlogUrl()).toEqual('/blog');
-    });
-
-  it('should return correct blog url if the blog homepage feature is disabled',
-    () => {
-      mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-
-      expect(component.getOppiaBlogUrl()).toEqual(
-        'https://medium.com/oppia-org');
-    });
 
   it('should return correct value for show feedback updates' +
     'in profile pic drop down menu feature flag', () => {
