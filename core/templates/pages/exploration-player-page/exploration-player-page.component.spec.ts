@@ -20,8 +20,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 
 /**
@@ -45,12 +48,15 @@ describe('Exploration Player Page', () => {
   let readOnlyExplorationBackendApiService:
   ReadOnlyExplorationBackendApiService;
   let translateService: TranslateService;
+  let explorationPermissionsBackendApiService:
+  ExplorationPermissionsBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        ExplorationPlayerPageComponent
+        ExplorationPlayerPageComponent,
+        MockTranslatePipe
       ],
       providers: [
         {
@@ -70,6 +76,9 @@ describe('Exploration Player Page', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     translateService = TestBed.inject(TranslateService);
+    explorationPermissionsBackendApiService = TestBed.inject(
+      ExplorationPermissionsBackendApiService
+    );
   }));
 
   it('should create', () => {
@@ -84,6 +93,9 @@ describe('Exploration Player Page', () => {
         objective: 'test objective',
       }
     };
+    const explorationPermissionResponse = {
+      canPublish: true
+    };
 
     spyOn(contextService, 'getExplorationId').and.returnValue(expId);
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
@@ -93,6 +105,9 @@ describe('Exploration Player Page', () => {
     spyOn(componentInstance, 'subscribeToOnLangChange');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
     spyOn(keyboardShortcutService, 'bindExplorationPlayerShortcuts');
+    spyOn(explorationPermissionsBackendApiService, 'getPermissionsAsync')
+      .and.returnValue(Promise.resolve(
+       explorationPermissionResponse as ExplorationPermissions));
 
     componentInstance.ngOnInit();
     tick();
@@ -102,6 +117,8 @@ describe('Exploration Player Page', () => {
       .toHaveBeenCalledWith(expId, null);
     expect(componentInstance.setPageTitle).toHaveBeenCalled();
     expect(componentInstance.subscribeToOnLangChange).toHaveBeenCalled();
+    expect(explorationPermissionsBackendApiService.getPermissionsAsync)
+      .toHaveBeenCalled();
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
       .toHaveBeenCalledWith([
         {
@@ -127,6 +144,7 @@ describe('Exploration Player Page', () => {
       ]);
     expect(keyboardShortcutService.bindExplorationPlayerShortcuts)
       .toHaveBeenCalled();
+    expect(componentInstance.explorationIsUnpublished).toBe(true);
   }));
 
   it('should obtain translated page title whenever the selected' +
