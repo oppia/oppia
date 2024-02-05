@@ -112,7 +112,9 @@
 
 
 # Audio Voiceover project
+/core/controllers/voiceover*.py @oppia/lace-backend-reviewers
 /core/domain/voiceover*.py @oppia/lace-backend-reviewers
+/core/templates/domain/voiceover/ @oppia/lace-frontend-reviewers
 
 
 # Blog project
@@ -572,6 +574,7 @@
 /core/templates/pages/moderator-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/voiceover-admin-page/ @oppia/lace-frontend-reviewers
 
 
 # Release team.
@@ -681,11 +684,13 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/feature_flag*.py @oppia/web-android-compatibility-reviewers
 /core/domain/platform_feature_services*.py @oppia/web-android-compatibility-reviewers
 /core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
+/core/domain/feature_flag*.py @oppia/web-android-compatibility-reviewers
 /core/platform_feature*.py @oppia/web-android-compatibility-reviewers
 /core/templates/domain/platform_feature/ @oppia/web-android-compatibility-reviewers
+/core/templates/domain/feature-flag/ @oppia/web-android-compatibility-reviewers
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/web-android-compatibility-reviewers
 /core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers
 

@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+from core import platform_feature_list
 from core.constants import constants
+from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import platform_parameter_domain as param_domain
-from core.domain import platform_parameter_registry as registry
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -134,36 +134,31 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
 
     def test_is_learner_group_feature_enabled(self) -> None:
-        registry.Registry.update_platform_parameter(
-            'learner_groups_are_enabled', self.admin_id, 'edit rules',
-            [
-                param_domain.PlatformParameterRule.from_dict({
-                    'filters': [],
-                    'value_when_matched': True
-                })
-            ],
-            False
+        feature_flag_services.update_feature_flag(
+            (
+                platform_feature_list.FeatureNames.
+                LEARNER_GROUPS_ARE_ENABLED.value
+            ),
+            True,
+            0,
+            []
         )
         self.assertTrue(
-            learner_group_services.is_learner_group_feature_enabled())
+            learner_group_services.is_learner_group_feature_enabled(
+                self.admin_id))
 
-        registry.Registry.update_platform_parameter(
-            'learner_groups_are_enabled', self.admin_id, 'edit rules',
-            [
-                param_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Backend']]
-                        }
-                    ],
-                    'value_when_matched': False
-                })
-            ],
-            False
+        feature_flag_services.update_feature_flag(
+            (
+                platform_feature_list.FeatureNames.
+                LEARNER_GROUPS_ARE_ENABLED.value
+            ),
+            False,
+            0,
+            []
         )
         self.assertFalse(
-            learner_group_services.is_learner_group_feature_enabled())
+            learner_group_services.is_learner_group_feature_enabled(
+                self.admin_id))
 
     def test_update_learner_group(self) -> None:
         updated_group = learner_group_services.update_learner_group(

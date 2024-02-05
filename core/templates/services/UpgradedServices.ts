@@ -289,13 +289,13 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from
+  'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureBackendApiService } from
-  'domain/platform_feature/platform-feature-backend-api.service';
+import { FeatureFlagBackendApiService } from
+  'domain/feature-flag/feature-flag-backend-api.service';
 import { PlayerCorrectnessFeedbackEnabledService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
@@ -461,6 +461,7 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
+import { VoiceoverBackendApiService } from 'domain/voiceover/voiceover-backend-api.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -981,15 +982,15 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient']);
-    upgradedServices['PlatformFeatureBackendApiService'] =
-      new PlatformFeatureBackendApiService(
+    upgradedServices['FeatureFlagBackendApiService'] =
+      new FeatureFlagBackendApiService(
         upgradedServices['HttpClient']
       );
     upgradedServices['PlatformFeatureAdminBackendApiService'] =
       new PlatformFeatureAdminBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['PlatformFeatureDummyBackendApiService'] =
-      new PlatformFeatureDummyBackendApiService(
+    upgradedServices['FeatureFlagDummyBackendApiService'] =
+      new FeatureFlagDummyBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
@@ -1100,6 +1101,10 @@ export class UpgradedServices {
       upgradedServices['WindowRef'],
       upgradedServices['UserBackendApiService']
     );
+    upgradedServices['VoiceoverBackendApiService'] =
+      new VoiceoverBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =
@@ -1127,11 +1132,10 @@ export class UpgradedServices {
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
-      upgradedServices['PlatformFeatureBackendApiService'],
+      upgradedServices['FeatureFlagBackendApiService'],
       upgradedServices['WindowRef'],
       upgradedServices['LoggerService'],
-      upgradedServices['UrlService'],
-      upgradedServices['BrowserCheckerService']);
+      upgradedServices['UrlService']);
     upgradedServices['PopulateRuleContentIdsService'] =
       new PopulateRuleContentIdsService(
         upgradedServices['GenerateContentIdService']);
