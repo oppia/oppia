@@ -37,10 +37,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ClientContext } from 'domain/platform_feature/client-context.model';
-import { FeatureStatusChecker, FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
-import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
+import { FeatureStatusChecker, FeatureStatusSummary } from 'domain/feature-flag/feature-status-summary.model';
+import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -59,12 +57,11 @@ export class PlatformFeatureService {
   static _isSkipped = false;
 
   constructor(
-      private platformFeatureBackendApiService:
-        PlatformFeatureBackendApiService,
+      private featureFlagBackendApiService:
+      FeatureFlagBackendApiService,
       private windowRef: WindowRef,
       private loggerService: LoggerService,
-      private urlService: UrlService,
-      private browserCheckerService: BrowserCheckerService) {
+      private urlService: UrlService) {
     this.initialize();
   }
 
@@ -157,8 +154,7 @@ export class PlatformFeatureService {
   }
 
   private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
-    const context = this.generateClientContext();
-    return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
+    return this.featureFlagBackendApiService.fetchFeatureFlags();
   }
 
   /**
@@ -167,19 +163,6 @@ export class PlatformFeatureService {
   private clearSavedResults(): void {
     this.windowRef.nativeWindow.sessionStorage.removeItem(
       PlatformFeatureService.SESSION_STORAGE_KEY);
-  }
-
-  /**
-   * Generates context containing the client side information required to
-   * request feature flag values.
-   *
-   * @returns {ClientContext} - The ClientContext instance containing required
-   * client information.
-   */
-  private generateClientContext(): ClientContext {
-    const platformType = 'Web';
-
-    return ClientContext.create(platformType);
   }
 }
 

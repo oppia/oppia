@@ -103,8 +103,8 @@ import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/faci
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -726,9 +726,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformFeatureAdminBackendApiService',
     PlatformFeatureAdminBackendApiService],
-  ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
-  ['PlatformFeatureDummyBackendApiService',
-    PlatformFeatureDummyBackendApiService],
+  ['FeatureFlagBackendApiService', FeatureFlagBackendApiService],
+  ['FeatureFlagDummyBackendApiService',
+    FeatureFlagDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerCorrectnessFeedbackEnabledService',
