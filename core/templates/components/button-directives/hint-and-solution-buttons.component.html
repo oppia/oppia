@@ -26,7 +26,7 @@
       </button>
     </li>
   </ul>
-  <div class="hint-container" *ngIf="isVisible && isTooltipVisible()">
+  <div class="hint-container" *ngIf="isVisible && isTooltipVisible() && !iframed">
     <div class="hint-box hint-box-add-ons">
       <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
       <button type="button"
@@ -37,7 +37,8 @@
       </button>
     </div>
   </div>
-  <div class="hint-container solution-container" *ngIf="isTooltipForSolutionVisible && isSolutionTooltipVisible()">
+  <div class="hint-container solution-container"
+       *ngIf="isTooltipForSolutionVisible && isSolutionTooltipVisible() && !iframed">
     <div class="hint-box hint-box-add-ons">
       <span [innerHTML]="'I18N_SOLUTION_NEED_HELP' | translate"></span>
       <button type="button"

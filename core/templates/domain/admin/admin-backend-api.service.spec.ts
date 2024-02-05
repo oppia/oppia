@@ -1547,4 +1547,51 @@ describe('Admin backend api service', () => {
         'User with given username does not exist');
     }));
   });
+
+  describe('retrieveExplorationInteractionIdsAsync', () => {
+    it('should get interaction IDs if exploration exists'
+      , fakeAsync(() => {
+        let expId = '123';
+        let result = {
+          interactions: [{id: 'EndExploration'}]
+        };
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=123');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush(
+          { interactions: [{id: 'EndExploration'}]},
+          { status: 200, statusText: 'Success.'});
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(result);
+        expect(failHandler).not.toHaveBeenCalled();
+      }));
+
+    it('should fail to get interaction IDs if exploration does not exist'
+      , fakeAsync(() => {
+        let expId = 'invalidExpId';
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=invalidExpId');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({
+          error: 'Exploration does not exist'
+        }, {
+          status: 400, statusText: 'Bad Request'
+        });
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
+      }));
+  });
 });

@@ -165,6 +165,10 @@ describe('Translator Overview component', () => {
           }
         }]);
 
+        spyOn(
+          translationLanguageService, 'getActiveLanguageCode')
+          .and.returnValue(undefined as unknown as string);
+
         component.ngOnInit();
         tick();
 
@@ -206,6 +210,18 @@ describe('Translator Overview component', () => {
 
         expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalse();
       }));
+
+    it('should set language code to previously selected one when there is no' +
+    'active language code selected', fakeAsync(() => {
+      spyOn(
+        translationLanguageService, 'getActiveLanguageCode')
+        .and.returnValue(undefined as unknown as string);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.languageCode).toBe('hi');
+    }));
   });
 
   it('should initialize component properties after controller is initialized',
