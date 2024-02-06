@@ -46,5 +46,7 @@ export const AdminPageConstants = {
     MISC: '#/misc'
   },
 
+  EXPLORATION_INTERACTIONS_HANDLER: '/interactions',
+
   PROFILE_URL_TEMPLATE: '/profile/<username>'
 } as const;
