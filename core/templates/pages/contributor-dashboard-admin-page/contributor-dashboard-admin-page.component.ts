@@ -295,8 +295,6 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           const temp = this.formData.viewContributionReviewers.filterCriterion;
           this.refreshFormData();
           this.formData.viewContributionReviewers.filterCriterion = temp;
-        }, errorResponse => {
-          this.statusMessage = 'Server error: ' + errorResponse;
         });
     } else {
       this.contributorDashboardAdminBackendApiService

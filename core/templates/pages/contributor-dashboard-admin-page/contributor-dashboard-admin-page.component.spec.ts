@@ -157,6 +157,31 @@ describe('ContributorDashboardAdminPageComponent', () => {
       expect(contributorDashboardAdminBackendApiServiceSpy)
         .not.toHaveBeenCalled();
     }));
+
+    it('should not update the rights of the user in case of a backend error',
+      fakeAsync(() => {
+        const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+          contributorDashboardAdminBackendApiService,
+          'addContributionReviewerAsync')
+          .and.returnValue(Promise.reject(
+            'User user1 already has rights' +
+            ' to review translation in language code en'));
+        const addContributionRightsAction = {
+          category: 'translation',
+          isValid: () => true,
+          languageCode: 'en',
+          username: 'user1'
+        };
+
+        component.submitAddContributionRightsForm(addContributionRightsAction);
+        tick();
+
+        expect(
+          contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe(
+          'Server error: User user1 already has rights' +
+        ' to review translation in language code en');
+      }));
   });
 
   describe('in the add contribution rights section ', () => {
@@ -310,6 +335,28 @@ describe('ContributorDashboardAdminPageComponent', () => {
         .not.toHaveBeenCalled();
       expect(component.contributionReviewersDataFetched).toBe(false);
     }));
+
+    it('should handle backend failure appropriately', fakeAsync(() => {
+      const viewContributionReviewersAction = {
+        category: 'category',
+        filterCriterion: 'username',
+        isValid: () => true,
+        languageCode: 'en',
+        username: 'random'
+      };
+
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync')
+        .and.returnValue(Promise.reject('Invalid username: random'));
+
+      component.submitViewContributorUsersForm(viewContributionReviewersAction);
+      tick();
+
+      expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+      expect(component.statusMessage).toBe(
+        'Server error: Invalid username: random');
+    }));
   });
 
   describe('on clicking remove rights button ', () => {
@@ -359,6 +406,31 @@ describe('ContributorDashboardAdminPageComponent', () => {
       expect(contributorDashboardAdminBackendApiServiceSpy)
         .not.toHaveBeenCalled();
     }));
+
+    it('should not remove the rights of the user in case of a backend error',
+      fakeAsync(() => {
+        const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+          contributorDashboardAdminBackendApiService,
+          'removeContributionReviewerAsync')
+          .and.returnValue(Promise.reject('Invalid username: random'));
+        const removeContributionRightsAction = {
+          category: 'translation',
+          isValid: () => true,
+          languageCode: 'en',
+          method: 'all',
+          username: 'random'
+        };
+
+        component.ngOnInit();
+        component.submitRemoveContributionRightsForm(
+          removeContributionRightsAction);
+        tick();
+
+        expect(
+          contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe(
+          'Server error: Invalid username: random');
+      }));
   });
 
   describe('on clicking \'View Translation Stats\' button ', () => {
