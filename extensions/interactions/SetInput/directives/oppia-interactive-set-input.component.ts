@@ -82,9 +82,8 @@ export class InteractiveSetInputComponent implements OnInit {
     // Check for duplicates in the user's input.
     const hasDuplicates = this.hasDuplicates(answer);
     // Set or clear the error message based on the presence of duplicates.
-    this.errorMessage = hasDuplicates 
-    ? 'Oops, it looks like your answer has duplicates!' 
-    : '';
+    this.errorMessage = hasDuplicates ?
+    'Oops, it looks like your answer has duplicates!':'';
     // Update the answer property with the provided value.
     this.answer = answer;
   }
