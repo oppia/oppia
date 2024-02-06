@@ -40,7 +40,8 @@ var scrollToTop = async function() {
 };
 
 // The minimum log level we will report as an error.
-var CONSOLE_LOG_THRESHOLD = ['SEVERE'];
+var CONSOLE_ERROR_THRESHOLD = ['SEVERE'];
+var CONSOLE_ERROR_SOURCES = ['console-api'];
 var CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
@@ -57,6 +58,9 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  _.escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
+    'load resource: the server responded with a status of 404 (Not Found)'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
@@ -84,7 +88,8 @@ var checkForConsoleErrors = async function(
 
   var browserLogs = await browser.getLogs('browser');
   var browserErrors = browserLogs.filter(logEntry => (
-    CONSOLE_LOG_THRESHOLD.includes(logEntry.level) &&
+    CONSOLE_ERROR_THRESHOLD.includes(logEntry.level) &&
+    CONSOLE_ERROR_SOURCES.includes(logEntry.source) &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
 };
