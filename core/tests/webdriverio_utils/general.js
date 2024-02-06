@@ -61,6 +61,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
     'load resource: the server responded with a status of 404 (Not Found)'),
+  _.escapeRegExp('Uncaught (in promise)'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
