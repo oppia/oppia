@@ -2,143 +2,144 @@
   <div class="oppia-about-foundation-hero-card">
     <div class="oppia-about-foundation-image-overlay">
       <div class="oppia-about-foundation-hero-content">
-        <picture>
-          <source type="image/webp"
-                  [srcset]="'/assets/images/about_foundation/oppia_big_logo.webp'">
-          <source type="image/png"
-                  [srcset]="'/assets/images/about_foundation/oppia_big_logo.png'">
-          <img alt="Oppia logo"
-               class="oppia-about-foundation-page-oppia-logo"
-               src="/assets/images/about_foundation/oppia_big_logo.png">
-        </picture>
+        <div class="mx-auto oppia-about-foundation-page-oppia-logo">
+          <picture>
+            <source type="image/webp"
+                    [srcset]="'/assets/images/about_foundation/oppia_big_logo.webp'">
+            <source type="image/png"
+                    [srcset]="'/assets/images/about_foundation/oppia_big_logo.png'">
+            <img alt="Oppia logo"
+                 class="h-auto w-100"
+                 height="480"
+                 src="/assets/images/about_foundation/oppia_big_logo.png"
+                 width="480">
+          </picture>
+        </div>
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING' | translate }}</h1>
         <h3>{{ 'I18N_ABOUT_FOUNDATION_PAGE_HEADING_CONTENT' | translate }}</h3>
       </div>
     </div>
   </div>
 
-  <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-lg-8">
-      <div class="row">
+  <div class="bg-white oppia-about-foundation-info-card first-card">
+    <div class="mx-auto row w-75">
+      <div class="col-lg-8 d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF' | translate }}</h1>
-      </div>
-      <div class="row">
         <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT' | translate"></p>
       </div>
-    </div>
-    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <figure>
-        <picture>
-          <source type="image/webp"
-                  [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
-          <source type="image/jpg"
-                  [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
-          <img alt="Education Equality Infographic"
-               class="oppia-about-foundation-page-equality-infographic"
-               src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg">
-        </picture>
-        <figcaption>
-          <a href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
-            Source: UNESCO
-          </a>
-        </figcaption>
-      </figure>
+      <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
+        <figure>
+          <picture>
+            <source type="image/webp"
+                    [srcset]="'/assets/images/about_foundation/equity-infographic-3-we-need-data.webp'">
+            <source type="image/jpg"
+                    [srcset]="'/assets/images/equity-infographic-3-we-need-data.jpg'">
+            <img alt="Education Equality Infographic"
+                 class="h-auto oppia-about-foundation-page-equality-infographic responsive w-100"
+                 height="640"
+                 src="/assets/images/about_foundation/equity-infographic-3-we-need-data.jpg"
+                 width="640">
+          </picture>
+          <figcaption>
+            <a class="text-center" href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
+              Source: UNESCO
+            </a>
+          </figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 
-  <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/20180826_161603.webp'">
-        <source type="image/jpg"
-                [srcset]="'/assets/images/20180826_161603.jpg'">
-        <img alt="Education Equality Infographic"
-             class="oppia-about-foundation-page-equality-infographic"
-             src="/assets/images/about_foundation/20180826_161603.jpg">
-      </picture>
-    </div>
-    <div class="col-lg-8">
-      <div class="row">
-        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
+  <div class="bg-white oppia-about-foundation-info-card second-card">
+    <div class="mx-auto row w-75">
+      <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="'/assets/images/about_foundation/20180826_161603.webp'">
+          <source type="image/jpg"
+                  [srcset]="'/assets/images/20180826_161603.jpg'">
+          <img alt="Education Equality Infographic"
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-100"
+               height="640"
+               src="/assets/images/about_foundation/20180826_161603.jpg"
+               width="640">
+        </picture>
       </div>
-      <div class="row">
+      <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
+        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
         <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
       </div>
     </div>
   </div>
 
-  <div class="row oppia-about-foundation-info-card-gray">
-    <div class="col-lg-8">
-      <div class="row">
+  <div class="card-gray oppia-about-foundation-info-card">
+    <div class="mx-auto row w-75">
+      <div class="col-lg-8 d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING' | translate }}</h1>
-      </div>
-      <div class="row">
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
+        <button class="btn">
+          <a href="/about"
+             target="_blank"
+             rel="noopener">
+            {{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}
+          </a>
+        </button>
       </div>
-      <div class="row">
-        <oppia-primary-button class="about-foundation-page-button-area"
-            buttonHref="/about"
-            [customClasses]="['btn']"
-            buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}">
-        </oppia-primary-button>
+      <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="'/assets/images/about_foundation/home_partner.webp'">
+          <source type="image/png"
+                  [srcset]="'/assets/images/home_partner.png'">
+          <img alt="Education Equality Infographic"
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-full"
+               height="640"
+               src="/assets/images/about_foundation/home_partner.png"
+               width="640">
+        </picture>
       </div>
-    </div>
-    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/home_partner.webp'">
-        <source type="image/png"
-                [srcset]="'/assets/images/home_partner.png'">
-        <img alt="Education Equality Infographic"
-             class="oppia-about-foundation-page-equality-infographic"
-             src="/assets/images/about_foundation/home_partner.png">
-      </picture>
     </div>
   </div>
 
-  <div class="row oppia-about-foundation-info-card-white">
-    <div class="col-lg-4 oppia-about-foundation-image-with-caption">
-      <picture>
-        <source type="image/webp"
-                [srcset]="'/assets/images/about_foundation/home_get_involved.webp'">
-        <source type="image/png"
-                [srcset]="'/assets/images/home_get_involved.png'">
-        <img alt="Education Equality Infographic"
-             class="oppia-about-foundation-page-equality-infographic"
-             src="/assets/images/about_foundation/home_get_involved.png">
-      </picture>
-    </div>
-    <div class="col-lg-8">
-      <div class="row">
+  <div class="bg-white oppia-about-foundation-info-card">
+    <div class="mx-auto row w-75">
+      <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="'/assets/images/about_foundation/home_get_involved.webp'">
+          <source type="image/png"
+                  [srcset]="'/assets/images/home_get_involved.png'">
+          <img alt="Education Equality Infographic"
+               class="h-auto oppia-about-foundation-page-equality-infographic responsive w-full"
+               height="640"
+               src="/assets/images/about_foundation/home_get_involved.png"
+               width="640">
+        </picture>
+      </div>
+      <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
-      </div>
-      <div class="row">
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
-      </div>
-      <div class="row">
-        <oppia-primary-button class="about-foundation-page-button-area"
-            buttonHref="/volunteer"
-            [customClasses]="['btn']"
-            buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}">
-        </oppia-primary-button>
+        <button class="btn">
+          <a href="/volunteer"
+             target="_blank"
+             rel="noopener">
+            {{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}
+          </a>
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="row oppia-about-foundation-info-card-gray oppia-about-foundation-cta">
-    <div class="col">
-      <div class="row">
-        <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX' | translate }}</h1>
-      </div>
-      <div class="row">
-        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
-        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
-        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_3' | translate"></p>
-      </div>
+  <div class="card-gray oppia-about-foundation-info-card oppia-about-foundation-cta">
+    <div class="d-flex flex-column justify-content-center mx-auto px-3 w-75">
+      <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX' | translate }}</h1>
+      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
+      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
+      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_3' | translate"></p>
     </div>
   </div>
 </div>
+
 <style>
   .about-foundation-page {
     user-select: text;
@@ -177,18 +178,7 @@
     color: #fff;
     font-size: 25px;
     margin: 1em auto;
-    width: 45%;
-  }
-
-  @media screen and (max-width: 500px) {
-    .oppia-about-foundation-hero-content h1 {
-      font-size: 25px;
-    }
-
-    .oppia-about-foundation-hero-content h3 {
-      font-size: 18px;
-      width: auto;
-    }
+    width: 50%;
   }
 
   .oppia-about-foundation-page-oppia-logo {
@@ -196,60 +186,43 @@
     width: 10em;
   }
 
-  .oppia-about-foundation-info-card-white {
-    background-color: #fff;
-    padding: 5em 10em;
+  .oppia-about-foundation-info-card {
+    padding: 5em 0;
   }
 
-  .oppia-about-foundation-info-card-gray .col-lg-8,
-  .oppia-about-foundation-info-card-white .col-lg-8 {
-    padding: 0 6em;
+  .oppia-about-foundation-hero-card.card-gray {
+    background-color: #f4f4f4;
   }
 
-  .oppia-about-foundation-info-card-gray p,
-  .oppia-about-foundation-info-card-white p {
+  .oppia-about-foundation-info-card p {
     font-size: 17px;
     line-height: 1.7;
     padding-top: 1em;
   }
 
-  .oppia-about-foundation-info-card-gray a,
-  .oppia-about-foundation-info-card-white a {
+  .oppia-about-foundation-info-card a {
     color: #009688;
     text-decoration: none;
   }
 
-  .oppia-about-foundation-info-card-gray a:hover,
-  .oppia-about-foundation-info-card-white a:hover {
+  .about-foundation-page button a {
+    color: rgba(255, 255, 255, 1);
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1em;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    text-decoration: none;
+  }
+
+  .oppia-about-foundation-info-card a:hover {
     text-decoration: underline;
   }
 
-  figcaption {
-    text-align: center;
-  }
-  .oppia-about-foundation-page-equality-infographic {
-    margin-bottom: 10px;
-    max-height: 320px;
-    max-width: 320px;
-  }
-
-  .oppia-about-foundation-image-with-caption {
-    text-align: center;
-  }
-
-  .oppia-about-foundation-info-card-gray {
-    background-color: #f4f4f4;
-    padding: 5em 10em;
-  }
-
-  .about-foundation-page .about-foundation-page-button-area {
+  .about-foundation-page button {
+    background-color: #00645c;
+    border-radius: 4px;
+    height: 40px;
     margin: 30px auto;
-  }
-
-  :host {
-    .about-foundation-page-button-area button {
-      height: 40px;
-    }
   }
 
   .about-foundation-page button:hover,
@@ -270,34 +243,64 @@
     padding-top: 0;
   }
 
-  @media screen and (max-width: 500px) {
-    .oppia-about-foundation-hero-content p {
-      font-size: 18px;
-      width: auto;
+  @media only screen and (max-width: 992px) {
+    .oppia-about-foundation-info-card {
+      padding: 5em 0;
     }
 
-    .oppia-about-foundation-info-card-white,
-    .oppia-about-foundation-info-card-gray {
-      padding: 5em 5em;
+    .oppia-about-foundation-info-card.first-card {
+      padding: 5em 0 0 0;
     }
 
-    .oppia-about-foundation-info-card-gray h1,
-    .oppia-about-foundation-info-card-white h1 {
-      font-size: 1.5em;
+    .oppia-about-foundation-info-card.second-card {
+      padding: 2.5em 0 5em 0;
+    }
+
+    .oppia-about-foundation-info-card .row {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
     }
 
     .oppia-about-foundation-image-with-caption {
-      margin-left: -2em;
       padding: 2em 0;
     }
 
-    .oppia-about-foundation-info-card-gray .col-lg-8,
-    .oppia-about-foundation-info-card-white .col-lg-8 {
-      padding: 0;
+    .oppia-about-foundation-page-equality-infographic {
+      margin-bottom: .5em;
+      max-height: 300px;
+      max-width: 300px;
+    }
+  }
+
+  @media only screen and (max-width: 868px) {
+    .oppia-about-foundation-hero-content h3 {
+      width: 75%;
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .oppia-about-foundation-info-card h1 {
+      font-size: 1.5em;
     }
 
     .oppia-about-foundation-cta p {
       font-size: 18px;
+    }
+
+    .oppia-about-foundation-hero-content h1 {
+      font-size: 25px;
+    }
+
+    .oppia-about-foundation-hero-content h3 {
+      font-size: 18px;
+    }
+  }
+
+  @media only screen and (max-width: 400px) {
+    .oppia-about-foundation-page-equality-infographic {
+      max-height: 275px;
+      max-width: 275px;
     }
   }
 </style>
