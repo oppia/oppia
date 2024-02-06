@@ -135,20 +135,31 @@
   padding: 12px;
 }
 
-.player-mobile-menu-options button {
+.player-mobile-menu-options {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  padding: 0px 12px 12px 12px;
 }
 
 .player-mobile-menu-options button {
+  align-items: center;
   background: none;
   border: none;
+  color: #333333;
+  display: flex;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
+  gap: 12px;
   height: 40px;
   line-height: 23px;
   padding: 8px;
+  width: 330px;
+}
+
+.mobile-menu-svg path {
+  fill: #333333;
 }
 
 @media screen and (max-width: 574px) {
