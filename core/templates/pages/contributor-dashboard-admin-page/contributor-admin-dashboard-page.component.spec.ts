@@ -39,6 +39,7 @@ describe('Contributor dashboard Admin page', () => {
   let contributorDashboardAdminBackendApiService: (
     ContributorDashboardAdminBackendApiService);
   let ngbModal: NgbModal;
+
   class MockNgbModalRef {
     componentInstance!: {};
   }
@@ -69,7 +70,7 @@ describe('Contributor dashboard Admin page', () => {
         ContributorAdminDashboardPageComponent
       ],
       providers: [
-        ContributorDashboardAdminStatsBackendApiService
+        ContributorDashboardAdminStatsBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
@@ -546,14 +547,17 @@ describe('Contributor dashboard Admin page', () => {
   }));
 
   it('should start any language with its English name', () => {
-    for (const language of component.languageChoices) {
-      if (language.id === 'hi-en') {
-        expect(language.language).toBe('Hinglish');
-      } else if (language.id === 'ms') {
-        expect(language.language).toBe('Bahasa Melayu (بهاس ملايو)');
-      } else if (language.id === 'az') {
-        expect(language.language).toBe('Azerbaijani (Azeri)');
-      }
-    }
+    expect(component.languageChoices).toContain({
+      id: 'ms',
+      language: 'Bahasa Melayu (بهاس ملايو)'
+    });
+    expect(component.languageChoices).toContain({
+      id: 'hi-en',
+      language: 'Hinglish'
+    });
+    expect(component.languageChoices).toContain({
+      id: 'az',
+      language: 'Azerbaijani (Azeri)'
+    });
   });
 });
