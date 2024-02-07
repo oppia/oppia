@@ -39,7 +39,8 @@ var scrollToTop = async function() {
   await browser.execute('window.scrollTo(0,0);');
 };
 
-// The minimum log level we will report as an error.
+// The minimum level for console errors and what sources to allow.
+// Source: https://www.selenium.dev/documentation/legacy/json_wire_protocol
 var CONSOLE_ERROR_THRESHOLD = ['SEVERE'];
 var CONSOLE_ERROR_SOURCES = ['console-api'];
 var CONSOLE_ERRORS_TO_IGNORE = [
