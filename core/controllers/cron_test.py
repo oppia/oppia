@@ -633,7 +633,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(
                 self.get_json(
                     '/cron/mail/reviewers/new_contr' +
                     'ibutor_dashboard_suggestions')
-            mock_send.assert_called_once()
             mock_send.assert_called_once_with(
                 {'en': []},
                 mock.ANY
