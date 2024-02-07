@@ -485,7 +485,7 @@ describe('Html Length Service', () => {
           sanitizedHtml, calculationType);
       }).toThrowError(
         'Failed to parse HTML string.' +
-      ' Ensure valid HTML tags string is provided.');
+      ' Ensure that a valid string that includes HTML tags is provided.');
     });
 
     it('should calculate the baseline length based' +

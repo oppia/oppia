@@ -108,12 +108,13 @@ export class HtmlLengthService {
       dom = domparser.parseFromString(sanitizedHtml, 'text/html');
       if (dom.body.children.length === 0) {
         throw new Error(
-          'No HTML tags found. Ensure valid HTML tags string is provided.');
+          'No HTML tags found. Ensure ' +
+          'that a valid string that includes HTML tags is provided.');
       }
     } catch (error) {
       throw new Error(
         'Failed to parse HTML string.' +
-        ' Ensure valid HTML tags string is provided.');
+        ' Ensure that a valid string that includes HTML tags is provided.');
     }
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
@@ -130,18 +131,18 @@ export class HtmlLengthService {
       textNode: HTMLElement, calculationType: CalculationType): number {
     const textContent = (textNode.textContent || '').trim();
     return (textContent === '') ? 0 :
-        this.textWeightCalculation(textContent, calculationType);
+        this.calculateTextWeight(textContent, calculationType);
   }
 
-  private textWeightCalculation(
+  private calculateTextWeight(
       textContent: string, calculationType: CalculationType): number {
     let trimmedTextContent = textContent.trim();
     let textContentCount = 0;
     if (calculationType === CALCULATION_TYPE_WORD) {
-      const words = trimmedTextContent.split('\n').join('').split(' ');
+      const words = trimmedTextContent.split(' ');
       textContentCount = words.length;
     } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
-      const characters = trimmedTextContent.split('\n').join('').split('');
+      const characters = trimmedTextContent.split('');
       textContentCount = characters.length;
     }
     return textContentCount;
@@ -162,7 +163,7 @@ export class HtmlLengthService {
         /(text-with-value|alt-with-value)="&amp;quot;([^&]*)&amp;quot;"/);
       if (textMatch && textMatch[2]) {
         const text = textMatch[2];
-        const weight = this.textWeightCalculation(text, calculationType);
+        const weight = this.calculateTextWeight(text, calculationType);
         return nonTextNode.includes(
           'oppia-noninteractive-image') ? weight + 10 : weight;
       } else {
