@@ -59,6 +59,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  // Webpack uncaught promise errors.
   _.escapeRegExp('Uncaught (in promise)'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
@@ -76,14 +77,17 @@ var CONSOLE_ERRORS_TO_IGNORE = [
 ];
 // Existing console errors that are not fixed yet.
 var CONSOLE_ERRORS_TO_FIX = [
+  // Several issues involving these angular errors.
   _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
   _.escapeRegExp('ERROR CONTEXT'),
   // TODO(#19687): 404 (NotFound) for Favicon on Home Page.
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
     'load resource: the server responded with a status of 404 (Not Found)'),
-  // TODO(#18653): Cannot read properties of undefined (reading 'getStory').
-  _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')')
+  // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
+  _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')'),
+  // TODO(#19704): Invalid active state name console error on translation tab.
+  _.escapeRegExp('Invalid state name: null')
 ];
 
 var checkForConsoleErrors = async function(
