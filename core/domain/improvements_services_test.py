@@ -49,7 +49,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         # Necessary to provide sufficient debug information when failures occur.
-        self.maxDiff = 0
+        self.maxDiff = None
 
     def _new_obsolete_task(
         self,
