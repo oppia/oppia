@@ -568,6 +568,16 @@ export class SiteAnalyticsService {
     this._sendEventToLegacyGoogleAnalytics(
       'OnboardingEngagement', 'delete', 'AccountDeletion');
   }
+
+  registerAnswerSubmitted(
+      explorationId: string, answerIsCorrect: boolean): void {
+    this._sendEventToGoogleAnalytics(
+      'answer_submitted', {
+        exploration_id: explorationId,
+        answer_is_correct: answerIsCorrect,
+      }
+    );
+  }
 }
 
 angular.module('oppia').factory(
