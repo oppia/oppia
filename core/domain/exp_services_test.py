@@ -3291,7 +3291,7 @@ solicit_answer_details: false
 
     def test_export_by_versions(self) -> None:
         """Test export_to_dict() for different versions."""
-        self.maxDiff = 0
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         content_id_generator = translation_domain.ContentIdGenerator(

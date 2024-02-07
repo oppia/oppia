@@ -1095,7 +1095,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_trivial_is_correct(self) -> None:
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
-        self.maxDiff = 0
+        self.maxDiff = None
         # Generate expected output.
         app_feedback_report: Dict[str, Dict[str, Union[str, int]]] = {}
         collection_progress_data: Dict[str, List[str]] = {}
