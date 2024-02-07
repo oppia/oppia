@@ -59,7 +59,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
-  // Webpack uncaught promise errors.
+  // Webpack uncaught promise errors during e2e test runs.
   _.escapeRegExp('Uncaught (in promise)'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
