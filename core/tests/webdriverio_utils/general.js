@@ -87,7 +87,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
   _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')'),
   // TODO(#19704): Invalid active state name console error on translation tab.
-  _.escapeRegExp('Invalid state name: null')
+  _.escapeRegExp('Invalid active state name: null')
 ];
 
 var checkForConsoleErrors = async function(
