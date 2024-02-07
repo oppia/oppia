@@ -77,12 +77,13 @@ var CONSOLE_ERRORS_TO_IGNORE = [
 // Existing console errors that are not fixed yet.
 var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
+  _.escapeRegExp('ERROR CONTEXT'),
   // TODO(#19687): 404 (NotFound) for Favicon on Home Page.
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
     'load resource: the server responded with a status of 404 (Not Found)'),
-  // TODO(#19688): Preferences page error context error on subscriptions.
-  _.escapeRegExp('ng:///C/P.ngfactory.js 962:84 "ERROR CONTEXT" cC'),
+  // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
+  _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')')
 ];
 
 var checkForConsoleErrors = async function(
