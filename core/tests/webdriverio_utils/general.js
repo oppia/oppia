@@ -82,7 +82,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
     'load resource: the server responded with a status of 404 (Not Found)'),
-  // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
+  // TODO(#18653): Cannot read properties of undefined (reading 'getStory').
   _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')')
 ];
 
