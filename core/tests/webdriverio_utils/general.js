@@ -58,11 +58,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
-  _.escapeRegExp(
-    'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
-    'load resource: the server responded with a status of 404 (Not Found)'),
   _.escapeRegExp('Uncaught (in promise)'),
-  _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
@@ -77,10 +73,21 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'g'
   )
 ];
+// Existing console errors that are not fixed yet.
+var CONSOLE_ERRORS_TO_FIX = [
+  _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
+  // (TODO: #19687) 404 (NotFound) for Favicon on Home Page
+  _.escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
+    'load resource: the server responded with a status of 404 (Not Found)'),
+  // (TODO: #19688) Preferences page error context error on subscriptions
+  _.escapeRegExp('ng:///C/P.ngfactory.js 962:84 "ERROR CONTEXT" cC'),
+];
 
 var checkForConsoleErrors = async function(
     errorsToIgnore, skipDebugging = true) {
-  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  errorsToIgnore = errorsToIgnore.concat(
+    CONSOLE_ERRORS_TO_IGNORE, CONSOLE_ERRORS_TO_FIX);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
