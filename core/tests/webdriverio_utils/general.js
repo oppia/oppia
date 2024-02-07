@@ -80,7 +80,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   // Several issues involving these angular errors.
   _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
   _.escapeRegExp('ERROR CONTEXT'),
-  // TODO(#19687): 404 (NotFound) for Favicon on Home Page.
+  // TODO(#19687): 404 (Not Found) for favicon on home page.
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
     'load resource: the server responded with a status of 404 (Not Found)'),
