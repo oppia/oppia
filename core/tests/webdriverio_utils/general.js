@@ -93,7 +93,12 @@ var CONSOLE_ERRORS_TO_FIX = [
     'Failed to execute \'convertToSpecifiedUnits\' on ' +
     '\'SVGLength\': Could not resolve relative length.'),
   // Redirects to /learn/math when going to /learn.
-  _.escapeRegExp('The requested path /learn/math is not found.')
+  _.escapeRegExp('The requested path /learn/math is not found.'),
+  // Flakes with feedbackUpdates e2e tests.
+  _.escapeRegExp(
+    'Requested card with index -1, but transcript only has length ' +
+    '0 cards.'),
+  _.escapeRegExp('Cannot read properties of undefined (reading \'getStateName\')')
 ];
 
 var checkForConsoleErrors = async function(
