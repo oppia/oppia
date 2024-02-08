@@ -1,4 +1,4 @@
-<a *ngIf="!isButton" class="oppia-primary-link-button"
+<a *ngIf="!componentIsButton" class="oppia-primary-link-button"
    [ngClass]="customClasses"
    [href]="getButtonHref()"
    [target]="getTarget()"
@@ -6,7 +6,7 @@
   {{ buttonText }}
 </a>
 
-<button *ngIf="isButton" type="submit"
+<button *ngIf="componentIsButton" type="submit"
         class="oppia-primary-link-button"
         [ngClass]="customClasses"
         [disabled]="disabled"
