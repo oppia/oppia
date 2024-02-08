@@ -98,7 +98,9 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp(
     'Requested card with index -1, but transcript only has length ' +
     '0 cards.'),
-  _.escapeRegExp('Cannot read properties of undefined (reading \'getStateName\')')
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' +
+    '(reading \'getStateName\')')
 ];
 
 var checkForConsoleErrors = async function(
