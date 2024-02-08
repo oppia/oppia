@@ -91,7 +91,9 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#17277): Failed to execute 'convertToSpecifiedUnits' on 'SVGLength'.
   _.escapeRegExp(
     'Failed to execute \'convertToSpecifiedUnits\' on ' +
-    '\'SVGLength\': Could not resolve relative length.')
+    '\'SVGLength\': Could not resolve relative length.'),
+  // Redirects to /learn/math when going to /learn.
+  _.escapeRegExp('The requested path /learn/math is not found.')
 ];
 
 var checkForConsoleErrors = async function(
