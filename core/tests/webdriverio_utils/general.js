@@ -100,7 +100,11 @@ var CONSOLE_ERRORS_TO_FIX = [
     '0 cards.'),
   _.escapeRegExp(
     'Cannot read properties of undefined ' +
-    '(reading \'getStateName\')')
+    '(reading \'getStateName\')'),
+  // TODO(#19657): Error in Practice Question (Drag And Drop).
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' +
+    '(reading \'nativeElement\')')
 ];
 
 var checkForConsoleErrors = async function(
