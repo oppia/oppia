@@ -358,7 +358,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     key for key in required_keys if key not in data]
                 if missing_keys:
                     raise self.InvalidInputException(
-                        'Expected data dict to have all the required keys.'
+                        'Expected data dict to have all the required keys. '
                         'Missing keys: %s .' % ', '.join(missing_keys))
 
                 non_boolean_keys = [

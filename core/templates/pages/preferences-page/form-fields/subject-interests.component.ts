@@ -69,7 +69,7 @@ export class SubjectInterestsComponent {
     // alphabetic characters and spaces.
     let validRegex = new RegExp('^[a-z\\s]*$');
 
-    return validRegex.test(value) && this.subjectInterests.indexOf(value) < 0;
+    return validRegex.test(value) && !this.subjectInterests.includes(value);
   }
 
   add(event: { value: string }): void {
