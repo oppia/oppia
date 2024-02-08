@@ -14,7 +14,8 @@ RUN apt-get update -y && apt-get upgrade -y \
     python2 \
     python3-matplotlib \
     unzip \
-    wget
+    wget \
+    jq
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 

@@ -46,15 +46,14 @@ run-devserver: ## Runs the dev-server
 	docker compose stop angular-build
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
-	$(MAKE) run-offline
+	$(MAKE) start-devserver
 
 run-offline: ## Runs the dev-server in offline mode
+	## Users can pass this check by simply running `make start-devserver`
+	$(MAKE) check.dev-container-healthy
 	$(MAKE) start-devserver
-	@echo 'Please visit http://localhost:8181 to access the development server.'
-	@echo 'Check dev-server logs using "make logs.dev-server"'
-	@echo 'Stop the development server using "make stop"'
 
-start-devserver: ## Starts the development server for the tests
+start-devserver: ## Starts the development server
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
@@ -65,7 +64,9 @@ start-devserver: ## Starts the development server for the tests
 		sleep 1; \
 	done
 	@printf '\n\n'
-	@echo 'Development server started at port 8181.'
+	@echo 'Please visit http://localhost:8181 to access the development server.'
+	@echo 'Check dev-server logs using "make logs.dev-server"'
+	@echo 'Stop the development server using "make stop"'
 
 init: build run-devserver ## Initializes the build and runs dev-server.
 
@@ -94,6 +95,20 @@ update.package: ## Installs the npm requirements for the project
 # Reverting the .yarnrc file to the original state, so that it works in python setup also.
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
+
+check.dev-container-healthy:
+	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
+	if [ -f ".dev/containers-health.json" ]; then \
+		if jq -e ".devserver != true" ".dev/containers-health.json" > /dev/null; then \
+			echo "Container is unhealthy"; \
+			echo $$run_devserver_prompt; \
+			exit 1; \
+		fi \
+	else \
+		echo "Can't check container health!"; \
+		echo $$run_devserver_prompt; \
+		exit 1; \
+	fi
 
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
