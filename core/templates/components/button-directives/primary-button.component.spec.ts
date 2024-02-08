@@ -103,14 +103,16 @@ describe('PrimaryButtonComponent', () => {
     expect(component.getButtonHref()).toEqual('https://github.com');
   });
 
-  it('should set componentIsButton to false when buttonHref is provided', () => {
-    component.buttonHref = 'http://example.com';
-    fixture.detectChanges();
-    expect(component.componentIsButton).toBe(false);
-  });
+  it('should set componentIsButton to false when buttonHref is provided',
+    () => {
+      component.buttonHref = 'http://example.com';
+      fixture.detectChanges();
+      expect(component.componentIsButton).toBe(false);
+    });
 
-  it('should set componentIsButton to true when buttonHref is not provided', () => {
-    fixture.detectChanges();
-    expect(component.componentIsButton).toBe(true);
-  });
+  it('should set componentIsButton to true when buttonHref is not provided',
+    () => {
+      fixture.detectChanges();
+      expect(component.componentIsButton).toBe(true);
+    });
 });
