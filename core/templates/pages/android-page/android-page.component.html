@@ -205,11 +205,12 @@
               Please confirm before subscribing.
             </div>
             <div class="oppia-android-updates-input-padding text-center">
-              <oppia-primary-link-button (onClickPrimaryButton)="subscribeToAndroidList()"
-                                         [disabled]="!userCanSubscribe || !validateEmailAddress()"
-                                         [customClasses]="'btn oppia-android-updates-button w-100'"
-                                         [buttonText]="'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate">
-              </oppia-primary-link-button>
+              <oppia-primary-button 
+                (onClickPrimaryButton)="subscribeToAndroidList()"
+                [disabled]="!userCanSubscribe || !validateEmailAddress()"
+                [customClasses]="'btn oppia-android-updates-button w-100'"
+                [buttonText]="'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate">
+              </oppia-primary-button>
             </div>
           </div>
           <div *ngIf="userHasSubscribed"

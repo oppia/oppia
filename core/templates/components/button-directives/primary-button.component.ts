@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for primary link buttons displayed on static pages.
+ * @fileoverview Component for primary buttons displayed on static pages.
  */
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import './primary-link-button.component.css';
+import './primary-button.component.css';
 
 
 @Component({
-  selector: 'oppia-primary-link-button',
-  templateUrl: './primary-link-button.component.html',
-  styleUrls: ['./primary-link-button.component.css']
+  selector: 'oppia-primary-button',
+  templateUrl: './primary-button.component.html',
+  styleUrls: ['./primary-button.component.css']
 })
-export class PrimaryLinkButtonComponent implements OnInit {
+export class PrimaryButtonComponent implements OnInit {
   @Input() buttonText: string = '';
   @Input() customClasses?: string[];
   @Input() disabled?: boolean = false;
@@ -60,7 +60,7 @@ export class PrimaryLinkButtonComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaPrimaryLinkButton',
+angular.module('oppia').directive('oppiaPrimaryButton',
   downgradeComponent({
-    component: PrimaryLinkButtonComponent
+    component: PrimaryButtonComponent
   }) as angular.IDirectiveFactory);

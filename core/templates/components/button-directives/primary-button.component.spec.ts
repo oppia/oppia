@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PrimaryLinkButtonComponent
+ * @fileoverview Unit tests for PrimaryButtonComponent
  */
 
-import { PrimaryLinkButtonComponent } from './primary-link-button.component';
+import { PrimaryButtonComponent } from './primary-button.component';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -40,15 +40,15 @@ class MockWindowRef {
   }
 }
 
-describe('PrimaryLinkButtonComponent', () => {
-  let component: PrimaryLinkButtonComponent;
-  let fixture: ComponentFixture<PrimaryLinkButtonComponent>;
+describe('PrimaryButtonComponent', () => {
+  let component: PrimaryButtonComponent;
+  let fixture: ComponentFixture<PrimaryButtonComponent>;
   let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [PrimaryLinkButtonComponent],
+      declarations: [PrimaryButtonComponent],
       providers: [
         {
           provide: WindowRef,
@@ -57,7 +57,7 @@ describe('PrimaryLinkButtonComponent', () => {
       ],
     });
 
-    fixture = TestBed.createComponent(PrimaryLinkButtonComponent);
+    fixture = TestBed.createComponent(PrimaryButtonComponent);
     component = fixture.componentInstance;
   });
 

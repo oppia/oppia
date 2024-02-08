@@ -160,6 +160,7 @@ import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
 import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
 import { CopierComponent } from 'value_generators/templates/copier.component';
+import { PrimaryButtonComponent } from './button-directives/primary-button.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -182,7 +183,6 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
 import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 import { DirectivesModule } from 'directives/directives.module';
-import { PrimaryLinkButtonComponent } from './button-directives/primary-link-button.component';
 
 @NgModule({
   imports: [
@@ -354,7 +354,7 @@ import { PrimaryLinkButtonComponent } from './button-directives/primary-link-but
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryLinkButtonComponent
+    PrimaryButtonComponent
   ],
 
   entryComponents: [
@@ -485,7 +485,7 @@ import { PrimaryLinkButtonComponent } from './button-directives/primary-link-but
     CopierComponent,
     RandomSelectorComponent,
     RteHelperModalComponent,
-    PrimaryLinkButtonComponent
+    PrimaryButtonComponent
   ],
 
   exports: [
@@ -626,7 +626,7 @@ import { PrimaryLinkButtonComponent } from './button-directives/primary-link-but
     TranslateModule,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryLinkButtonComponent
+    PrimaryButtonComponent
   ],
 })
 
