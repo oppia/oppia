@@ -34,6 +34,88 @@ module.exports = class baseUser {
     this.page;
     this.browserObject;
     this.userHasAcceptedCookies = false;
+    this.debug = {
+      startTime: -1,
+
+      /**
+       * This function prints all of the page's console logs to the
+       * terminal.
+       *
+       * Any time this.page object is replaced, this function must be called
+       * again to continue printing console logs.
+       */
+      capturePageConsoleLogs() {
+        // eslint-disable-next-line no-console
+        this.page.on('console', (message) => console.log(
+          'PAGE: ' + message.text()));
+      },
+
+      /**
+       * This function sets up a click logger that logs click events to the
+       * terminal.
+       *
+       * Any time this.page object is replaced, this function must be called
+       * again before it start logging clicks again.
+       */
+      async setupClickLogger() {
+        await this.page.exposeFunction(
+          'logClick', ({ position: { x, y }, time, element }) => {
+            // eslint-disable-next-line no-console
+            console.log(
+              `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
+              `of ${element}`);
+            // eslint-disable-next-line no-console
+            console.log(
+              `- Click occurred ${time - this.startTime} ms into the test`);
+          });
+      },
+
+      /**
+       * This function starts logging clicks anywhere on the page.
+       *
+       * this.setupClickLogger() must be called once before it can log click
+       * events.
+       */
+      async logClickEventsFromPage() {
+        await this.page.evaluate(() => {
+          window.addEventListener('click', (e) => {
+            // eslint-disable-next-line no-console
+            console.log('DEBUG-ACCEPTANCE-TEST: User clicked on the page:');
+            window.logClick({
+              position: { x: e.clientX, y: e.clientY },
+              time: Date.now(),
+              element: 'the viewport'
+            });
+          });
+        });
+      },
+
+      /**
+       * This function logs click events from all elements selected by the
+       * given selector.
+       *
+       * this.setupClickLogger() must be called once before it can log click
+       * events from the elements.
+       *
+       * @param {string} selector - the elements to select
+       */
+      async logClickEventsFrom(selector) {
+        await this.page.$$eval(selector, (elements, selector) => {
+          for (const element of elements) {
+            element.addEventListener('click', (e) => {
+              // eslint-disable-next-line no-console
+              console.log(
+                `DEBUG-ACCEPTANCE-TEST: User clicked on ${selector}:`);
+              window.logClick({
+                position: { x: e.clientX, y: e.clientY },
+                time: Date.now(),
+                element: selector
+              });
+            });
+          }
+        }, selector);
+      }
+    };
   }
 
   /**
@@ -52,6 +134,7 @@ module.exports = class baseUser {
         defaultViewport: null
       })
       .then(async(browser) => {
+        this.debug.startTime = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
@@ -63,9 +146,20 @@ module.exports = class baseUser {
             throw new Error(`Unexpected alert: ${alertText}`);
           }
         });
+        this._setupDebugTools();
       });
 
     return this.page;
+  }
+
+  /**
+   * Function to setup debug methods for the current page of any acceptance
+   * test.
+   */
+  async _setupDebugTools() {
+    this.debug.page = this.page;
+    this.debug.capturePageConsoleLogs();
+    await this.debug.setupClickLogger();
   }
 
   /**
@@ -115,6 +209,7 @@ module.exports = class baseUser {
       target => target.opener() === this.page.target()
     )).page();
     this.page = newPage;
+    this._setupDebugTools();
   }
 
   /**
