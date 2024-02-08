@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview NEW lesson player page root component.
+ * @fileoverview New lesson player page root component.
  */
 
 import { Component, ViewEncapsulation } from '@angular/core';
