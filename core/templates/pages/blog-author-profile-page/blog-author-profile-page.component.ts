@@ -125,14 +125,14 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     }
   }
 
-  calculateFirstPostOnPageNum(): void {
+  calculateFirstPostOnPageNum(page = this.page): void {
     this.firstPostOnPageNum = (
-      ((this.page - 1) * this.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE) + 1);
+      ((page - 1) * this.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE) + 1);
   }
 
-  calculateLastPostOnPageNum(): void {
+  calculateLastPostOnPageNum(page = this.page): void {
     this.lastPostOnPageNum = Math.min(
-      this.page * this.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE, this.totalBlogPosts);
+      page * this.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE, this.totalBlogPosts);
   }
 
   onPageChange(): void {
