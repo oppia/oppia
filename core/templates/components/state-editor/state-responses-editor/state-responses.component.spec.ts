@@ -657,13 +657,7 @@ describe('State Responses Component', () => {
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should reject self-loop with null or undefined outcome', () => {
-    // This throws "TS2322". We need to suppress this error because
-    // the isSelfLoopThatIsMarkedCorrect function accepts an argument
-    // of type Outcome.
-    // @ts-ignore
-    expect(component.isSelfLoopThatIsMarkedCorrect(null)).toBe(false);
-
+  it('should reject self-loop with undefined outcome', () => {
     // This throws "TS2322". We need to suppress this error because
     // the isSelfLoopThatIsMarkedCorrect function accepts an argument
     // of type Outcome.
