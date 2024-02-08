@@ -50,11 +50,20 @@ export class NumberWithUnitsRulesService {
     var answerString = answerObject.toMathjsCompatibleString();
     var inputsString = inputsObject.toMathjsCompatibleString();
 
-    var answerList = this.unitsObjectFactory.fromRawInputString(
-      answerString).toDict();
-    var inputsList = this.unitsObjectFactory.fromRawInputString(
-      inputsString).toDict();
-    return this.utilsService.isEquivalent(answerList, inputsList);
+    var answerList: Partial<NumberWithUnitsAnswer> = this.unitsObjectFactory
+      .fromRawInputString(
+        answerString).toDict();
+    var inputsList: Partial<NumberWithUnitsAnswer> = this.unitsObjectFactory
+      .fromRawInputString(
+        inputsString).toDict();
+
+    delete answerList.units;
+    delete inputsList.units;
+
+    return (
+      this.IsEquivalentTo(answer, inputs) &&
+      this.utilsService.isEquivalent(answerList, inputsList)
+    );
   }
 
   IsEquivalentTo(
