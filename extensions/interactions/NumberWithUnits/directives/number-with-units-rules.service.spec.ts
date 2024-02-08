@@ -90,6 +90,11 @@ describe('Number with Units rules service', () => {
       [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]), REAL_RULE_INPUT)
     ).toBe(true);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exponent: 1}, {unit: 'meter', exponent: -2}])
+    , REAL_RULE_INPUT)
+    ).toBe(true);
+    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
       'fraction', 0, createFractionDict(false, 0, 2, 3),
       [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
     FRACTION_RULE_INPUT)).toBe(true);
