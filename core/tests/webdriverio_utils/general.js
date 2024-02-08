@@ -75,7 +75,8 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'g'
   )
 ];
-// Existing console errors that are not fixed yet.
+// Existing console errors that are not fixed yet. Remember to remove these
+// when all issues are resolved.
 var CONSOLE_ERRORS_TO_FIX = [
   // Several issues involving these angular errors.
   _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
