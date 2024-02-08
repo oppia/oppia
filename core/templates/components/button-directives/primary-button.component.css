@@ -13,7 +13,7 @@
 }
 
 .primary-button:hover,
-.primary-button-button:focus {
+.primary-button:focus {
   background-color: #3d9991;
   color: rgba(255, 255, 255, 1);
 }

@@ -27,10 +27,33 @@ import './primary-button.component.css';
   styleUrls: ['./primary-button.component.css']
 })
 export class PrimaryButtonComponent implements OnInit {
+  /**
+   * The main text to be displayed on the button.
+   */
   @Input() buttonText: string = '';
+
+  /**
+   * An optional array of custom CSS classes to be applied to the component.
+   */
   @Input() customClasses?: string[];
-  @Input() disabled?: boolean = false;
+
+  /**
+   * The URL the button should navigate to when clicked, optional.
+   * If no buttonHref is provided then the component acts like an HTML button
+   * element instead of an anchor link element.
+   */
   @Input() buttonHref: string = '#';
+
+  /**
+   * A boolean value indicating whether the button should be disabled, optional.
+   * Valid only when the component is an HTML button element and not an anchor.
+   */
+  @Input() disabled?: boolean = false;
+
+  /**
+   * The function to execute when the component is clicked, optional.
+   * The return type of the function must be void.
+   */
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
   componentIsButton: boolean = false;
