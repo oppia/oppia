@@ -1,4 +1,4 @@
-<a *ngIf="!componentIsButton" class="primary-button"
+<a *ngIf="!componentIsButton" class="primary-button btn"
    [ngClass]="customClasses"
    [href]="getButtonHref()"
    [target]="getTarget()"
@@ -7,7 +7,7 @@
 </a>
 
 <button *ngIf="componentIsButton" type="submit"
-        class="primary-button"
+        class="primary-button btn"
         [ngClass]="customClasses"
         [disabled]="disabled"
         (click)="handleButtonClick()">
