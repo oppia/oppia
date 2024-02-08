@@ -23,3 +23,8 @@ a.primary-button {
   display: inline-flex;
   justify-content: center;
 }
+
+.primary-button:disabled {
+  background: rgba(0, 0, 0, .2);
+  opacity: 0.65;
+}
