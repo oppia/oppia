@@ -1153,7 +1153,7 @@ class MemoryCacheServicesStub:
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
-    maxDiff: int = 2500
+    maxDiff: Optional[int] = 2500
 
     # A test unicode string.
     UNICODE_TEST_STRING: Final = 'unicode ¡马!'
