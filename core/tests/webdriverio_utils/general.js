@@ -90,7 +90,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp('Invalid active state name: null'),
   // TODO(#17277): Failed to execute 'convertToSpecifiedUnits' on 'SVGLength'.
   _.escapeRegExp(
-    'Failed to execute \'convertToSpecifiedUnits\' on' +
+    'Failed to execute \'convertToSpecifiedUnits\' on ' +
     '\'SVGLength\': Could not resolve relative length.')
 ];
 
