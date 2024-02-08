@@ -94,7 +94,7 @@ var CONSOLE_ERRORS_TO_FIX = [
     '\'SVGLength\': Could not resolve relative length.'),
   // Redirects to /learn/math when going to /learn.
   _.escapeRegExp('The requested path /learn/math is not found.'),
-  // Flakes with feedbackUpdates e2e tests.
+  // TODO(#6478): Flakes with feedbackUpdates e2e tests.
   _.escapeRegExp(
     'Requested card with index -1, but transcript only has length ' +
     '0 cards.'),
