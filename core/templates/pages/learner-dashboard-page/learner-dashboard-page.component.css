@@ -319,6 +319,16 @@ oppia-learner-dashboard-page .learner-groups-icon {
  - replace .oppia-learner-dashborad-menu-hover with pseudoclasses
  - remove footer component completely
 */
+
+.dashboard-content {
+  flex-grow: 1;
+  max-width: 1216px;
+}
+
+.learner-container {
+  padding: 0 16px;
+}
+
 .learner-dashboard-content {
   height: 92vh;
 }
@@ -329,7 +339,9 @@ oppia-learner-dashboard-page .learner-groups-icon {
   height: 95%;
   list-style-type: none;
   margin-bottom: 0 !important;
+  max-height: 706px;
   padding: 16px;
+  width: 248px !important;
 }
 
 .sidebar-btn {
@@ -358,6 +370,15 @@ oppia-learner-dashboard-page .learner-groups-icon {
   color: #00645c;
 }
 
+.sidebar-pic-frame {
+  height: 72px;
+  width: 72px;
+}
+
+.sidebar-position {
+  max-height: 750px;
+}
+
 @media screen and (max-width: 767px) {
   .learner-container {
     max-width: none !important;
@@ -367,6 +388,7 @@ oppia-learner-dashboard-page .learner-groups-icon {
 
   .learner-dashboard-content {
     align-content: flex-start;
+    flex-direction: column;
   }
 
   .progress-icon {
@@ -381,6 +403,7 @@ oppia-learner-dashboard-page .learner-groups-icon {
     height: max-content;
     justify-content: space-around;
     padding: 0 !important;
+    width: 100% !important;
   }
 
   .sidebar-btn {
@@ -422,6 +445,10 @@ oppia-learner-dashboard-page .learner-groups-icon {
     margin-right: 0;
   }
 
+  .sidebar-pic {
+    display: none;
+  }
+
   .sidebar-position {
     height: max-content;
     padding: 0 !important;
@@ -431,5 +458,20 @@ oppia-learner-dashboard-page .learner-groups-icon {
 
   .sidebar > ol li {
     width: max-content;
+  }
+}
+
+@media screen and (min-width: 1513px) {
+  .learner-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .sidebar {
+    max-height: 100%;
+  }
+
+  .sidebar-position {
+    max-height: 100%;
   }
 }
