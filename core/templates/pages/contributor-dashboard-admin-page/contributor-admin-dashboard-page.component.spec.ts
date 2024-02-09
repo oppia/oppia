@@ -250,10 +250,14 @@ describe('Contributor dashboard Admin page', () => {
     expect(component.selectedTopicIds).toEqual(['1', '2']);
     expect(component.selectedLanguage.language).toBe('English');
     expect(component.selectedLanguage.id).toBe('en');
-
-    component.selectLanguage('Arabic (العربية)');
-    expect(component.selectedLanguage.language).toBe('Arabic (العربية)');
-    expect(component.selectedLanguage.id).toBe('ar');
+    const nonDefaultLanguage = {
+      id: 'ar',
+      language: 'Arabic (العربية)'
+    };
+    component.selectLanguage(nonDefaultLanguage.language);
+    expect(component.selectedLanguage.language)
+      .toBe(nonDefaultLanguage.language);
+    expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
     expect(component.selectedTopicIds).toEqual(['1', '2']);
   }));
 
