@@ -39,8 +39,10 @@ var scrollToTop = async function() {
   await browser.execute('window.scrollTo(0,0);');
 };
 
-// The minimum log level we will report as an error.
-var CONSOLE_LOG_THRESHOLD = 900;
+// The minimum level for console errors and what sources to allow.
+// Source: https://www.selenium.dev/documentation/legacy/json_wire_protocol
+var CONSOLE_ERROR_THRESHOLD = ['SEVERE'];
+var CONSOLE_ERROR_SOURCES = ['console-api'];
 var CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
@@ -57,6 +59,8 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  // Webpack uncaught promise errors during e2e test runs.
+  _.escapeRegExp('Uncaught (in promise)'),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
@@ -71,10 +75,43 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'g'
   )
 ];
+// Existing console errors that are not fixed yet. Remember to remove these
+// when all issues are resolved.
+var CONSOLE_ERRORS_TO_FIX = [
+  // Several issues involving these angular errors.
+  _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
+  _.escapeRegExp('ERROR CONTEXT'),
+  // TODO(#19687): 404 (Not Found) for favicon on home page.
+  _.escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
+    'load resource: the server responded with a status of 404 (Not Found)'),
+  // TODO(#18653): Cannot read properties of undefined (reading 'getStory')
+  _.escapeRegExp('Cannot read properties of undefined (reading \'getStory\')'),
+  // TODO(#19704): Invalid active state name console error on translation tab.
+  _.escapeRegExp('Invalid active state name: null'),
+  // TODO(#17277): Failed to execute 'convertToSpecifiedUnits' on 'SVGLength'.
+  _.escapeRegExp(
+    'Failed to execute \'convertToSpecifiedUnits\' on ' +
+    '\'SVGLength\': Could not resolve relative length.'),
+  // Redirects to /learn/math when going to /learn.
+  _.escapeRegExp('The requested path /learn/math is not found.'),
+  // TODO(#6478): Flakes with feedbackUpdates e2e tests.
+  _.escapeRegExp(
+    'Requested card with index -1, but transcript only has length ' +
+    '0 cards.'),
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' +
+    '(reading \'getStateName\')'),
+  // TODO(#19657): Error in Practice Question (Drag And Drop).
+  _.escapeRegExp(
+    'Cannot read properties of undefined ' +
+    '(reading \'nativeElement\')')
+];
 
 var checkForConsoleErrors = async function(
     errorsToIgnore, skipDebugging = true) {
-  errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  errorsToIgnore = errorsToIgnore.concat(
+    CONSOLE_ERRORS_TO_IGNORE, CONSOLE_ERRORS_TO_FIX);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
@@ -84,7 +121,8 @@ var checkForConsoleErrors = async function(
 
   var browserLogs = await browser.getLogs('browser');
   var browserErrors = browserLogs.filter(logEntry => (
-    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+    CONSOLE_ERROR_THRESHOLD.includes(logEntry.level) &&
+    CONSOLE_ERROR_SOURCES.includes(logEntry.source) &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
 };
