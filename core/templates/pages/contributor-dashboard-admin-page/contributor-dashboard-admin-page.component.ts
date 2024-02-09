@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview for the contributor dashboard admin page component.
+ * @fileoverview Contributor dashboard admin page component.
  */
 
 import { Component, OnInit } from '@angular/core';
