@@ -69,3 +69,5 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+# development logs and status entries
+.dev
