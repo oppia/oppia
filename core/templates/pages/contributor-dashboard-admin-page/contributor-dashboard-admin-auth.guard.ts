@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a cd-admin.
+ * if the user doesn't have the rights to access contributor-dashboard admin page.
  */
 
 import { Location } from '@angular/common';
