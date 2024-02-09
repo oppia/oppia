@@ -59,11 +59,11 @@ module.exports = class baseUser {
        */
       async setupClickLogger() {
         await this.page.exposeFunction(
-          'logClick', ({ position: { x, y }, time, element }) => {
+          'logClick', ({ position: { x, y }, time }) => {
             // eslint-disable-next-line no-console
             console.log(
               `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
-              `of ${element}`);
+              'of the viewport');
             // eslint-disable-next-line no-console
             console.log(
               `- Click occurred ${time - this.startTime} ms into the test`);
@@ -71,7 +71,9 @@ module.exports = class baseUser {
       },
 
       /**
-       * This function starts logging clicks anywhere on the page.
+       * This function starts logging clicks anywhere on the page. The click
+       * is recorded 5-10 ms after it occurred, since it takes time for the
+       * event object to bubble up to the window object.
        *
        * this.setupClickLogger() must be called once before it can log click
        * events.
@@ -83,16 +85,17 @@ module.exports = class baseUser {
             console.log('DEBUG-ACCEPTANCE-TEST: User clicked on the page:');
             window.logClick({
               position: { x: e.clientX, y: e.clientY },
-              time: Date.now(),
-              element: 'the viewport'
+              time: Date.now()
             });
           });
         });
       },
 
       /**
-       * This function logs click events from all elements selected by the
-       * given selector.
+       * This function logs click events from all enabled elements selected by
+       * a given selector.
+       *
+       * The selector must be present in the document when called.
        *
        * this.setupClickLogger() must be called once before it can log click
        * events from the elements.
@@ -108,8 +111,7 @@ module.exports = class baseUser {
                 `DEBUG-ACCEPTANCE-TEST: User clicked on ${selector}:`);
               window.logClick({
                 position: { x: e.clientX, y: e.clientY },
-                time: Date.now(),
-                element: selector
+                time: Date.now()
               });
             });
           }
