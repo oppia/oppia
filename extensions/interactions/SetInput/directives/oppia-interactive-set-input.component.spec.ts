@@ -86,8 +86,12 @@ describe('InteractiveSetInputComponent', () => {
     component.buttonTextWithValue = 'Add New Item';
   });
 
-  it('should set error message for duplicate answers immediately', () => {
+  it('should set error message for duplicate answers immediately', async() => {
     component.updateAnswer(['duplicate', 'duplicate']);
+    fixture.detectChanges(); // Trigger change detection to update bindings.
+
+    await fixture.whenStable();
+
     expect(component.errorMessage)
       .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
   });
