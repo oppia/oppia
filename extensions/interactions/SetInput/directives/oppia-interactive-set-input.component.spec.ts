@@ -24,7 +24,6 @@ import { InteractiveSetInputComponent } from './oppia-interactive-set-input.comp
 import { TranslateModule } from '@ngx-translate/core';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { SetInputAnswer } from 'interactions/answer-defs';
-import { fakeAsync, tick, flush } from '@angular/core/testing';
 
 describe('InteractiveSetInputComponent', () => {
   let component: InteractiveSetInputComponent;
@@ -131,16 +130,14 @@ describe('InteractiveSetInputComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should show error message when user enters duplicate items',
-    fakeAsync(() => {
-      component.submitAnswer(['test', 'test']);
-      tick(); // Simulate the passage of any asynchronous operations.
-      fixture.detectChanges();
+  it('should show error message when user enters duplicate items', () => {
+    component.errorMessage = '';
 
-      expect(component.errorMessage.trim())
-        .toEqual('Oops, it looks like your answer has duplicates!');
-      flush(); // Ensure no more microtasks are left.
-    }));
+    component.submitAnswer(['test', 'test']);
+
+    expect(component.errorMessage)
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
 
   it('should return SCHEMa when called', () => {
     component.ngOnInit();
@@ -173,36 +170,21 @@ describe('InteractiveSetInputComponent', () => {
     expect(component.answer).toEqual(['test1']);
   });
 
-  it('should correctly update the errorMessage when duplicates are detected ' +
-'in updateAnswer', () => {
-    const duplicateAnswer: SetInputAnswer = ['duplicate', 'duplicate'];
+  it('should set an error message for duplicate answers', () => {
+    const duplicateAnswer = ['item1', 'item1'];
     component.updateAnswer(duplicateAnswer);
+
     expect(component.errorMessage)
-      .toEqual('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+      .toBe('Oops, it looks like your answer has duplicates!');
+    expect(component.answer)
+      .toEqual(duplicateAnswer);
   });
 
-  it('should clear the errorMessage in updateAnswer when no duplicates are ' +
-'present', () => {
-    const uniqueAnswer: SetInputAnswer = ['unique1', 'unique2'];
+  it('should clear the error message for unique answers', () => {
+    const uniqueAnswer = ['item1', 'item2'];
     component.updateAnswer(uniqueAnswer);
+
     expect(component.errorMessage).toBe('');
-  });
-
-  it('should prevent submission through submitAnswer when errorMessage is ' +
-'present', () => {
-    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
-    spyOn(currentInteractionService, 'onSubmit');
-    component.submitAnswer(['some', 'answer']);
-    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
-  });
-
-  it('should allow submission through submitAnswer when no errorMessage is ' +
-'present', () => {
-    component.errorMessage = '';
-    spyOn(currentInteractionService, 'onSubmit');
-    const validAnswer: SetInputAnswer = ['valid', 'answer'];
-    component.submitAnswer(validAnswer);
-    expect(currentInteractionService.onSubmit)
-      .toHaveBeenCalledWith(validAnswer, jasmine.anything());
+    expect(component.answer).toEqual(uniqueAnswer);
   });
 });

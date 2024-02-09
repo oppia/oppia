@@ -79,14 +79,10 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   updateAnswer(answer: SetInputAnswer): void {
+    const hasDuplicates = this.hasDuplicates(answer);
+    this.errorMessage = hasDuplicates ?
+    'Oops, it looks like your answer has duplicates!' : '';
     this.answer = answer;
-    // Check for duplicates whenever the answer is updated.
-    if (this.hasDuplicates(answer)) {
-      this.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
-    } else {
-      // Clear the error message if there are no duplicates.
-      this.errorMessage = '';
-    }
   }
 
   getSchema(): Schema {
@@ -126,12 +122,15 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   submitAnswer(answer: SetInputAnswer): void {
-    if (!this.errorMessage) {
+    if (this.hasDuplicates(answer)) {
+      this.errorMessage = (
+        'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+    } else {
+      this.errorMessage = '';
       this.currentInteractionService.onSubmit(
         answer, this.setInputRulesService);
     }
   }
-
 
   isAnswerValid(): boolean {
     return (
