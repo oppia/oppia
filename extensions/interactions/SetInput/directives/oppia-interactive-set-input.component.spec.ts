@@ -131,13 +131,14 @@ describe('InteractiveSetInputComponent', () => {
   });
 
   it('should show error message when user enters duplicate items', () => {
-    component.errorMessage = '';
-
     component.submitAnswer(['test', 'test']);
 
-    expect(component.errorMessage)
+    fixture.detectChanges();
+
+    expect(component.errorMessage.trim())
       .toEqual('Oops, it looks like your answer has duplicates!');
   });
+
 
   it('should return SCHEMa when called', () => {
     component.ngOnInit();
