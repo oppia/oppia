@@ -86,41 +86,6 @@ describe('InteractiveSetInputComponent', () => {
     component.buttonTextWithValue = 'Add New Item';
   });
 
-  it('should set error message for duplicate answers immediately',
-    async(done) => {
-      component.updateAnswer(['duplicate', 'duplicate']);
-      fixture.detectChanges(); // Apply changes.
-
-      fixture.whenStable().then(() => {
-        expect(component.errorMessage)
-          .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
-        done();
-      });
-    });
-
-
-  it('should clear error message when duplicates are corrected without ' +
-    'submission', () => {
-    component.updateAnswer(['duplicate', 'duplicate']);
-    component.updateAnswer(['unique1', 'unique2']); // Correct them.
-    expect(component.errorMessage).toBe(''); // Check error is cleared.
-  });
-
-  it('should prevent submission when there are duplicates', () => {
-    spyOn(currentInteractionService, 'onSubmit');
-    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
-    component.submitAnswer(['duplicate', 'duplicate']);
-    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
-  });
-
-  it('should allow submission when there are no duplicates and no ' +
-    'error message', () => {
-    spyOn(currentInteractionService, 'onSubmit');
-    component.updateAnswer(['unique1', 'unique2']); // Ensure no duplicates.
-    component.submitAnswer(['unique1', 'unique2']); // Attempt to submit.
-    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
-  });
-
   it('should initialise component when user adds interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and
       .callThrough();
@@ -203,5 +168,38 @@ describe('InteractiveSetInputComponent', () => {
     component.updateAnswer(['test1']);
 
     expect(component.answer).toEqual(['test1']);
+  });
+
+  it('should correctly update the errorMessage when duplicates are detected ' +
+'in updateAnswer', () => {
+    const duplicateAnswer: SetInputAnswer = ['duplicate', 'duplicate'];
+    component.updateAnswer(duplicateAnswer);
+    expect(component.errorMessage)
+      .toEqual('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
+
+  it('should clear the errorMessage in updateAnswer when no duplicates are ' +
+'present', () => {
+    const uniqueAnswer: SetInputAnswer = ['unique1', 'unique2'];
+    component.updateAnswer(uniqueAnswer);
+    expect(component.errorMessage).toBe('');
+  });
+
+  it('should prevent submission through submitAnswer when errorMessage is ' +
+'present', () => {
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+    spyOn(currentInteractionService, 'onSubmit');
+    component.submitAnswer(['some', 'answer']);
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should allow submission through submitAnswer when no errorMessage is ' +
+'present', () => {
+    component.errorMessage = '';
+    spyOn(currentInteractionService, 'onSubmit');
+    const validAnswer: SetInputAnswer = ['valid', 'answer'];
+    component.submitAnswer(validAnswer);
+    expect(currentInteractionService.onSubmit)
+      .toHaveBeenCalledWith(validAnswer, jasmine.anything());
   });
 });
