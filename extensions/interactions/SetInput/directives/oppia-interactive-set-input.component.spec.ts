@@ -24,6 +24,7 @@ import { InteractiveSetInputComponent } from './oppia-interactive-set-input.comp
 import { TranslateModule } from '@ngx-translate/core';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { SetInputAnswer } from 'interactions/answer-defs';
+import { fakeAsync, tick, flush } from '@angular/core/testing';
 
 describe('InteractiveSetInputComponent', () => {
   let component: InteractiveSetInputComponent;
@@ -130,15 +131,15 @@ describe('InteractiveSetInputComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should show error message when user enters duplicate items', () => {
+  it('should show error message when user enters duplicate items', fakeAsync(() => {
     component.submitAnswer(['test', 'test']);
-
-    fixture.detectChanges();
-
+  
+    tick(); // Simulate the passage of any asynchronous operations.
+    fixture.detectChanges(); // Trigger change detection to update bindings if necessary.
+  
     expect(component.errorMessage.trim())
-      .toEqual('Oops, it looks like your answer has duplicates!');
-  });
-
+      .toEqual("Oops, it looks like your answer has duplicates!");
+    flush();
 
   it('should return SCHEMa when called', () => {
     component.ngOnInit();
