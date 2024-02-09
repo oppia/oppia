@@ -1,7 +1,9 @@
 FROM node:16.13.0 AS frontend
 
+ENV YARN_CACHE_FOLDER /home/node/.yarn-cache
 WORKDIR /app/oppia
 
+USER root:root
 RUN apt-get update -y && apt-get upgrade -y \
     chromium \
     curl \
@@ -14,3 +16,5 @@ COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 COPY yarn.lock .
 RUN npm install -g yarn@1.22.15 --force
 RUN yarn install --pure-lockfile
+RUN chown -R node:node /home/node/.yarn-cache
+USER node:node
