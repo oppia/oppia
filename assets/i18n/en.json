@@ -738,7 +738,7 @@
     "I18N_INTERACTIONS_RATIO_INVALID_FORMAT": "Please enter a valid ratio (e.g. 1:2 or 1:2:3).",
     "I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS": "For this question, each element in your ratio should be a whole number (not a fraction or a decimal).",
     "I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Add item",
-    "I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Oops, it looks like your set has duplicates!",
+    "I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Oops, it looks like your answer has duplicates!",
     "I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Add one item per line.)",
     "I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "No answer given.",
     "I18N_INTERACTIONS_SUBMIT": "Submit",

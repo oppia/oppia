@@ -136,7 +136,7 @@ describe('InteractiveSetInputComponent', () => {
     component.submitAnswer(['test', 'test']);
 
     expect(component.errorMessage)
-      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+      .toEqual('Oops, it looks like your answer has duplicates!');
   });
 
   it('should return SCHEMa when called', () => {
