@@ -131,15 +131,16 @@ describe('InteractiveSetInputComponent', () => {
       .toHaveBeenCalled();
   });
 
-  it('should show error message when user enters duplicate items', fakeAsync(() => {
-    component.submitAnswer(['test', 'test']);
-  
-    tick(); // Simulate the passage of any asynchronous operations.
-    fixture.detectChanges(); // Trigger change detection to update bindings if necessary.
-  
-    expect(component.errorMessage.trim())
-      .toEqual("Oops, it looks like your answer has duplicates!");
-    flush();
+  it('should show error message when user enters duplicate items',
+    fakeAsync(() => {
+      component.submitAnswer(['test', 'test']);
+      tick(); // Simulate the passage of any asynchronous operations.
+      fixture.detectChanges();
+
+      expect(component.errorMessage.trim())
+        .toEqual('Oops, it looks like your answer has duplicates!');
+      flush(); // Ensure no more microtasks are left.
+    }));
 
   it('should return SCHEMa when called', () => {
     component.ngOnInit();
