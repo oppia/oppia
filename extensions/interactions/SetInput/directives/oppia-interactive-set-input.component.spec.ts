@@ -86,6 +86,34 @@ describe('InteractiveSetInputComponent', () => {
     component.buttonTextWithValue = 'Add New Item';
   });
 
+  it('should set error message for duplicate answers immediately', () => {
+    component.updateAnswer(['duplicate', 'duplicate']);
+    expect(component.errorMessage)
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
+
+  it('should clear error message when duplicates are corrected without ' +
+    'submission', () => {
+    component.updateAnswer(['duplicate', 'duplicate']);
+    component.updateAnswer(['unique1', 'unique2']); // Correct them.
+    expect(component.errorMessage).toBe(''); // Check error is cleared.
+  });
+
+  it('should prevent submission when there are duplicates', () => {
+    spyOn(currentInteractionService, 'onSubmit');
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+    component.submitAnswer(['duplicate', 'duplicate']);
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should allow submission when there are no duplicates and no ' +
+    'error message', () => {
+    spyOn(currentInteractionService, 'onSubmit');
+    component.updateAnswer(['unique1', 'unique2']); // Ensure no duplicates.
+    component.submitAnswer(['unique1', 'unique2']); // Attempt to submit.
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
+  });
+
   it('should initialise component when user adds interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and
       .callThrough();
