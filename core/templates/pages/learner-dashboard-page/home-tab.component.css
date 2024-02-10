@@ -217,3 +217,21 @@
     margin-left: 0;
   }
 }
+
+/*Redesign classes*/
+.page-heading {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  margin: 0;
+}
+
+.section-container {
+  background-color: #fff;
+}
+
+.section-heading {
+  color: #205D86;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+}
