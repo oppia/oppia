@@ -20,6 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
+import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -46,6 +47,7 @@ export class PlayerSidebarComponent implements OnInit {
 
   constructor(
     private mobileMenuService: MobileMenuService,
+    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
@@ -59,6 +61,7 @@ export class PlayerSidebarComponent implements OnInit {
     this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
       this.mobileMenuVisible = visibility;
     });
+    this.explorationId = this.contextService.getExplorationId();
     this.setRatings();
     this.expDesc = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
@@ -79,11 +82,11 @@ export class PlayerSidebarComponent implements OnInit {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then(response => {
         this.ratings = {
-          '1': response['overall_ratings']['1'],
-          '2': response['overall_ratings']['2'],
-          '3': response['overall_ratings']['3'],
-          '4': response['overall_ratings']['4'],
-          '5': response['overall_ratings']['5'],
+          '1': response.overall_ratings['1'],
+          '2': response.overall_ratings['2'],
+          '3': response.overall_ratings['3'],
+          '4': response.overall_ratings['4'],
+          '5': response.overall_ratings['5'],
         };
         this.avgRating = this.getAverageRating();
         this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
