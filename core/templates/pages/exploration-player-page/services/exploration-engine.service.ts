@@ -502,6 +502,8 @@ export class ExplorationEngineService {
         oldStateName,
         this.learnerParamsService.getAllParams(),
         answer,
+        this._explorationId,
+        answerIsCorrect,
         classificationResult.answerGroupIndex,
         classificationResult.ruleIndex,
         classificationResult.classificationCategorization,

@@ -23,16 +23,16 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureService, platformFeatureInitFactory } from
   'services/platform-feature.service';
-import { PlatformFeatureBackendApiService } from
-  'domain/platform_feature/platform-feature-backend-api.service';
+import { FeatureFlagBackendApiService } from
+  'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureNames, FeatureStatusSummary } from
-  'domain/platform_feature/feature-status-summary.model';
+  'domain/feature-flag/feature-status-summary.model';
 import { UrlService } from 'services/contextual/url.service';
 
 
 describe('PlatformFeatureService', () => {
   let windowRef: WindowRef;
-  let apiService: PlatformFeatureBackendApiService;
+  let apiService: FeatureFlagBackendApiService;
   let platformFeatureService: PlatformFeatureService;
   let urlService: UrlService;
 
@@ -67,7 +67,7 @@ describe('PlatformFeatureService', () => {
     });
 
     windowRef = TestBed.inject(WindowRef);
-    apiService = TestBed.inject(PlatformFeatureBackendApiService);
+    apiService = TestBed.inject(FeatureFlagBackendApiService);
     urlService = TestBed.inject(UrlService);
 
     clearStaticProperties();
