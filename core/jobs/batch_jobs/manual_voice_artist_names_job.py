@@ -54,25 +54,135 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
         return result.Ok(exp_id)
 
     @staticmethod
+    def get_voiceover_from_recorded_voiceover_diff(
+        new_voiceover_mapping,
+        old_voiceover_mapping
+    ):
+        voiceover_mapping_diff = {}
+        for content_id, lang_code_to_voiceover_dict in (
+            new_voiceover_mapping.items()):
+
+            voiceover_mapping_diff[content_id] = {}
+
+            for lang_code, voiceover_dict in (
+                lang_code_to_voiceover_dict.items()):
+
+                if lang_code not in old_voiceover_mapping[content_id]:
+                    voiceover_mapping_diff[content_id][lang_code] = (
+                        voiceover_dict)
+                else:
+                    old_voiceover_dict = old_voiceover_mapping[lang_code]
+                    new_voiceover_dict = new_voiceover_mapping[lang_code]
+
+                    if old_voiceover_dict != new_voiceover_dict:
+                        voiceover_mapping_diff[content_id][lang_code] = (
+                            voiceover_dict)
+
+        return voiceover_mapping_diff
+
+
+    @staticmethod
+    def add_voiceover(voiceover_dicts, voiceover_dict):
+
+        if len(voiceover_dicts) < 5:
+            voiceover_dicts.append(voiceover_dict)
+        elif (
+            voiceover_dicts[0]['duration_secs'] <
+            voiceover_dict['duration_secs']
+        ):
+            voiceover_dicts[0] = voiceover_dict
+
+        sorted(
+            voiceover_dicts, key=lambda voiceover: voiceover['duration_secs'])
+        return voiceover_dicts
+
+    @staticmethod
     def get_voice_artist_name_from_exploration_model(exp_model):
-        exp_id = exp_model.id
-        exp_id = exp_model.id
+        exploration_id = exp_model.id
         exp_latest_version = exp_model.version
         exp_version_list = [
             exp_version for exp_version in range(1, exp_latest_version + 1)]
         exp_commit_log_entry_models = (
             exp_models.ExplorationCommitLogEntryModel.get_multi(
-                exp_id, exp_version_list))
+                exploration_id, exp_version_list))
+
+        # same state diff fields.
+        # different state same field
+        is_voiceover_changed_in_this_commit = False
 
         for exp_commit_log_model in exp_commit_log_entry_models:
             exp_change_dicts = exp_commit_log_model.commit_cmds
             user_id = exp_commit_log_model.user_id
-            print('.....')
-            print(user_id)
-            print(exp_change_dicts)
-            print('-------------------')
 
-        return result.Ok(exp_id)
+            # Fetch voiceover metadata model for this user ID, if the
+            # model does not exist then create an empty model.
+            voiceover_and_contents_mapping = {}
+
+            language_code_to_voiceovers = {} # assign this with model.
+
+            content_ids = []
+            for change_dict in exp_change_dicts:
+                if (
+                    change_dict['cmd'] == 'edit_state_property' and
+                    change_dict['property_name'] == 'recorded_voiceovers'
+                ):
+                    is_voiceover_changed_in_this_commit = True
+
+                    voiceovers_mapping = (
+                        GetVoiceArtistNamesFromExplorationsJob.
+                        get_voiceover_from_recorded_voiceover_diff(
+                            change_dict['new_value']['voiceovers_mapping'],
+                            change_dict['old_value']['voiceovers_mapping'])
+                    )
+
+                    for content_id, lang_code_to_voiceover_dict in (
+                        voiceovers_mapping.items()):
+                        content_ids.append(content_id)
+
+                        for lang_code, voiceover_dict in (
+                            lang_code_to_voiceover_dict.items()):
+
+                            if lang_code not in voiceover_and_contents_mapping:
+                                voiceover_and_contents_mapping[lang_code] = {
+                                    'language_accent_code': None,
+                                    'exploration_id_to_content_ids': {},
+                                    'language_code_to_voiceovers': {}
+                                }
+                                language_code_to_voiceovers[lang_code] = []
+
+                            language_code_to_voiceovers[lang_code] = (
+                                GetVoiceArtistNamesFromExplorationsJob.
+                                add_voiceover(
+                                    language_code_to_voiceovers[lang_code],
+                                    voiceover_dict)
+                            )
+
+                            exploration_id_to_content_ids = (
+                                voiceover_and_contents_mapping[
+                                    lang_code][exploration_id_to_content_ids])
+
+                            if exploration_id not in (
+                                exploration_id_to_content_ids):
+
+                                exploration_id_to_content_ids[
+                                    exploration_id] = []
+
+                            voiceover_and_contents_mapping[lang_code][
+                                exploration_id_to_content_ids][
+                                    exploration_id] = content_ids
+                            voiceover_and_contents_mapping[lang_code][
+                                language_code_to_voiceovers] = (
+                                    language_code_to_voiceovers)
+
+            if is_voiceover_changed_in_this_commit:
+                # voiceover_metadata_model.voiceover_and_contents_mapping = (
+                #     voiceover_and_contents_mapping)
+                # voiceover_metadata_model.update_timestamp()
+                # voiceover_metadata_model.put()
+                pass
+
+
+        return result.Ok(exploration_id)
 
 
 
@@ -87,9 +197,9 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                 lambda model: opportunity_services.
                 is_exploration_available_for_contribution(model.id))
             | 'Print userID' >> beam.Map(
-                lambda model: self.get_voice_artist_name_from_exploration_model(model)
+                lambda model: self.get_voice_artist_name_from_exploration_model(
+                    model)
             )
         )
 
         print(curated_exploration_models)
-
