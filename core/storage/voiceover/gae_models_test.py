@@ -177,7 +177,6 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voice_artist_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'voiceovers_and_contents_mapping': (
                 base_models.EXPORT_POLICY.EXPORTED)
         }
@@ -223,16 +222,47 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
+        }
         user_id = 'user_id'
         voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+            voice_artist_id=user_id,
+            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
         user_data = (
             voiceover_models.VoiceArtistMetadataModel.export_data(
                 user_id))
         test_data: Dict[
             str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                'voiceovers_and_contents_mapping': {}}
-        self.assertEqual(user_data, test_data)
+                'voiceovers_and_contents_mapping':
+                voiceovers_and_contents_mapping
+            }
+        self.assertDictEqual(user_data, test_data)
 
     def test_get_deletion_policy_is_to_keep(self) -> None:
         self.assertEqual(
@@ -282,16 +312,14 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
                 voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
             )
         )
-        retreived_voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.get_model(user_id))
-        assert retreived_voice_artist_metadata_model
+        retrieved_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                user_id, strict=False))
+        assert retrieved_model
 
         self.assertEqual(
-            voice_artist_metadata_model.voice_artist_id,
-            retreived_voice_artist_metadata_model.voice_artist_id
-        )
+            voice_artist_metadata_model.id, retrieved_model.id)
         self.assertDictEqual(
             voice_artist_metadata_model.voiceovers_and_contents_mapping,
-            retreived_voice_artist_metadata_model.
-            voiceovers_and_contents_mapping
+            retrieved_model.voiceovers_and_contents_mapping
         )

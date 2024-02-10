@@ -975,9 +975,38 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
+        }
         # Setup for VoiceArtistMetadataModel.
         voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=self.USER_ID_1, voiceovers_and_contents_mapping={}
+            voice_artist_id=self.USER_ID_1,
+            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
         )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
@@ -2115,7 +2144,34 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_voice_artist_data: Dict[
             str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                'voiceovers_and_contents_mapping': {}
+                'voiceovers_and_contents_mapping': {
+                    'en': {
+                        'language_accent_code': 'en-US',
+                        'exploration_id_to_content_ids': {
+                            'exp_1': ['content_1', 'content_2', 'content_3']
+                        },
+                        'voiceovers': [
+                            {
+                                'filename': 'filename1.mp3',
+                                'file_size_bytes': 3000,
+                                'needs_update': False,
+                                'duration_secs': 6.1,
+                            },
+                            {
+                                'filename': 'filename2.mp3',
+                                'file_size_bytes': 3500,
+                                'needs_update': False,
+                                'duration_secs': 5.9,
+                            },
+                            {
+                                'filename': 'filename3.mp3',
+                                'file_size_bytes': 3500,
+                                'needs_update': False,
+                                'duration_secs': 5.0,
+                            },
+                        ],
+                    }
+                }
             }
         expected_user_data = {
             'user_stats': expected_stats_data,

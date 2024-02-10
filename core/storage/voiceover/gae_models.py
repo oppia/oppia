@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, List, Optional, TypedDict, Union
+from typing import Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -225,16 +225,17 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     Instances of this class are keyed by the user ID.
     """
 
-    # The user ID of the voiceover artist.
-    voice_artist_id = datastore_services.StringProperty(
-        indexed=True, required=True)
     # Dictionary mapping language codes to nested dictionaries. Each
     # nested dictionary contains the following key-value pairs:
-    #   -'language_accent_code' key holds the language accent code value.
-    #   -'exploration_id_to_content_ids' key maps exploration IDs to lists of
-    #       content IDs.
-    #   -'voiceovers' key contains a list of sample voiceovers associated
-    #       with the language code.
+    # - 'language_accent_code': A string indicating the accent code of
+    # the voice artist for voiceovers in the respective language.
+    # - 'exploration_id_to_content_ids': A mapping from exploration IDs
+    # (strings) to lists of content IDs (strings), denoting the content IDs
+    # for which voiceovers are provided in a given exploration by the
+    # voice artist.
+    # - 'voiceovers': A list of sample voiceovers, where each voiceover is
+    # represented as a dictionary (VoiceoverDict). This field specifically
+    # contains the five sample voiceovers with the longest duration.
     voiceovers_and_contents_mapping = (
         datastore_services.JsonProperty(required=True))
 
@@ -249,9 +250,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.voice_artist_id == voice_artist_id
-        ).get(keys_only=True) is not None
+        return cls.get(voice_artist_id, strict=False) is not None
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
@@ -260,9 +259,6 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
             super(
                 VoiceArtistMetadataModel, cls
             ).get_export_policy(), **{
-                # We do not export the voice_artist_id because we should not
-                # export internal user ids.
-                'voice_artist_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'voiceovers_and_contents_mapping': (
                     base_models.EXPORT_POLICY.EXPORTED)
             }
@@ -285,26 +281,6 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
-    def get_model(
-        cls, voice_artist_id: str
-    ) -> Optional[VoiceArtistMetadataModel]:
-        """Gets VoiceArtistMetadataModel by voice_artist_id.
-        Returns None if the voice artist metadata model with the given voice
-        artist ID doesn't exist.
-
-        Args:
-            voice_artist_id: str. The user ID of the voice artist.
-
-        Returns:
-            VoiceArtistMetadataModel | None. The voice artist metadata model
-            instance if it exists, or None if it is not found.
-        """
-        return cls.query(
-            datastore_services.all_of(
-                cls.voice_artist_id == voice_artist_id, cls.deleted == False) # pylint: disable=singleton-comparison
-        ).get()
-
-    @classmethod
     def create(
         cls,
         voice_artist_id: str,
@@ -315,13 +291,19 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         Args:
             voice_artist_id: str. User ID of the voice artist.
             voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType.
-                A Dictionary mapping language codes to nested dictionaries.
+                A dictionary mapping language codes to nested dictionaries.
                 Each nested dictionary contains the following key-value pairs:
-                (a). 'language_accent_code' key holds the accent code.
-                (b). 'exploration_id_to_content_ids' key maps exploration IDs
-                to lists of content IDs.
-                (c). 'voiceovers' key contains a list of sample voiceovers
-                associated with the language code.
+                (a). 'language_accent_code': A string indicating the accent
+                code of the voice artist for voiceovers in the respective
+                language.
+                (b). 'exploration_id_to_content_ids': A mapping from
+                exploration IDs (strings) to lists of content IDs (strings),
+                denoting the content IDs for which voiceovers are provided in a
+                given exploration by the voice artist.
+                (c). 'voiceovers': A list of sample voiceovers, where each
+                voiceover is represented as a dictionary (VoiceoverDict).
+                This field specifically contains the five sample voiceovers
+                with the longest duration.
 
         Returns:
             VoiceArtistMetadataModel. The newly created
@@ -331,13 +313,13 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
             Exception. A voice artist metadata model with a given voice
                 artist ID already exists.
         """
-        if cls.get_model(voice_artist_id):
+        if cls.get(voice_artist_id, strict=False):
             raise Exception(
                 'A voice artist metadata model with a given voice'
                 'artist ID already exists')
 
         entity = cls(
-            voice_artist_id=voice_artist_id,
+            id=voice_artist_id,
             voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
         )
         entity.update_timestamps()
@@ -359,8 +341,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
             dict. Dictionary of the data from VoiceArtistMetadataModel.
         """
         user_data: Dict[str, VoiceoversAndContentsMappingType] = {}
-        voice_artist_metadata_model = cls.get_model(user_id)
-        if voice_artist_metadata_model:
+        voice_artist_metadata_model = cls.get(user_id, strict=False)
+        if voice_artist_metadata_model is not None:
             user_data = {
                 'voiceovers_and_contents_mapping': (
                     voice_artist_metadata_model.voiceovers_and_contents_mapping)
