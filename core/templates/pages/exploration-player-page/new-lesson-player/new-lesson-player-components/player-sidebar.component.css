@@ -20,8 +20,8 @@
   font-size: 12px;
   font-weight: 500;
   height: 48px;
-  line-height: 15px;
   letter-spacing: 0;
+  line-height: 15px;
 }
 
 .player-sidebar-toggle div {
@@ -114,8 +114,8 @@
 
 .player-mobile-menu-overlay {
   background-color: #0009;
-  position: fixed;
   height: 100%;
+  position: fixed;
   top: 0;
   width: 100vh;
   z-index: 30;
@@ -143,7 +143,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0px 12px 12px 12px;
+  padding: 0 12px 12px 12px;
 }
 
 .player-mobile-menu-options button {

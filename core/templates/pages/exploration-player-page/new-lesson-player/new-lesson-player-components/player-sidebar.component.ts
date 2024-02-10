@@ -53,7 +53,7 @@ export class PlayerSidebarComponent implements OnInit {
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private ratingComputationService: RatingComputationService,
-    private learnerViewRatingBackendApiService: 
+    private learnerViewRatingBackendApiService:
     LearnerViewRatingBackendApiService,
   ) {}
 
@@ -82,16 +82,16 @@ export class PlayerSidebarComponent implements OnInit {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then(response => {
         this.ratings = {
-          '1': response.overall_ratings['1'],
-          '2': response.overall_ratings['2'],
-          '3': response.overall_ratings['3'],
-          '4': response.overall_ratings['4'],
-          '5': response.overall_ratings['5'],
+          1: response.overall_ratings[1],
+          2: response.overall_ratings[2],
+          3: response.overall_ratings[3],
+          4: response.overall_ratings[4],
+          5: response.overall_ratings[5],
         };
         this.avgRating = this.getAverageRating();
         this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
         this.blankStars = 5 - this.fullStars;
-    });
+      });
   }
 
   toggleSidebar(): void {
@@ -120,7 +120,14 @@ export class PlayerSidebarComponent implements OnInit {
 
   calculateStarPath(index: number, isFilled: boolean): string {
     const x = isFilled ? index * 24 : (this.fullStars + index) * 24;
-    return `M${x + 6.5784} ${20.4616}L${x + 7.93714} ${14.5877}L${x + 8.00498} ${14.2944}L${x + 7.77753} ${14.0972}L${x + 3.22002} ${10.146}L${x + 9.24324} ${9.62313}L${x + 9.5433} ${9.59708}L${x + 9.66056} ${9.31965}L${x + 12} ${3.78436}L${x + 14.3394} ${9.31965}L${x + 14.4567} ${9.59708}L${x + 14.7568} ${9.62313}L${x + 20.78} ${10.146}L${x + 16.2225} ${14.0972}L${x + 15.995} ${14.2944}L${x + 16.0629} ${14.5877}L${x + 17.4216} ${20.4616}L${x + 12.2583} ${17.3469}L${x + 12} ${17.1911}L${x + 11.7417} ${17.3469}L${x + 6.5784} ${20.4616}Z`;
+    return `M${x + 6.5784} ${20.4616}L${x + 7.93714} ${14.5877}
+    L${x + 8.00498} ${14.2944}L${x + 7.77753} ${14.0972}L${x + 3.2200} ${10.146}
+    L${x + 9.24324} ${9.62313}L${x + 9.543} ${9.59708}L${x + 9.66056} ${9.31965}
+    L${x + 12} ${3.78436}L${x + 14.3394} ${9.31965}L${x + 14.4567} ${9.59708}
+    L${x + 14.7568} ${9.62313}L${x + 20.78} ${10.146}L${x + 16.2225} ${14.0972}
+    L${x + 15.995} ${14.2944}L${x + 16.063} ${14.5877}L${x + 17.4216} ${20.4616}
+    L${x + 12.2583} ${17.3469}L${x + 12} ${17.1911}L${x + 11.7417} ${17.3469}
+    L${x + 6.5784} ${20.4616}Z`;
   }
 }
 
