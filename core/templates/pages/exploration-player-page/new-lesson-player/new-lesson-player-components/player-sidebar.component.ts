@@ -16,18 +16,17 @@
  * @fileoverview Component for the new lesson player sidebar
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -43,27 +42,24 @@ export class PlayerSidebarComponent implements OnInit {
   avgRating!: number | null;
   fullStars: number;
   blankStars: number;
-  ratingsUrl: string;
   ratings!: ExplorationRatings;
 
   constructor(
     private mobileMenuService: MobileMenuService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private contextService: ContextService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private ratingComputationService: RatingComputationService,
-    private httpClient: HttpClient,
+    private learnerViewRatingBackendApiService: 
+    LearnerViewRatingBackendApiService,
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
       this.mobileMenuVisible = visibility;
     });
-
-    this.explorationId = this.contextService.getExplorationId();
-    this.ratingsUrl = '/explorehandler/rating/' + this.explorationId;
+    this.setRatings();
     this.expDesc = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId,
@@ -77,20 +73,22 @@ export class PlayerSidebarComponent implements OnInit {
         getExplorationTranslationKey(
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
-    this.httpClient.get<any>(this.ratingsUrl)
-      .toPromise()
+  }
+
+  setRatings(): void {
+    this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then(response => {
         this.ratings = {
-          '1': response["overall_ratings"]['1'],
-          '2': response["overall_ratings"]['2'],
-          '3': response["overall_ratings"]['3'],
-          '4': response["overall_ratings"]['4'],
-          '5': response["overall_ratings"]['5'],
+          '1': response['overall_ratings']['1'],
+          '2': response['overall_ratings']['2'],
+          '3': response['overall_ratings']['3'],
+          '4': response['overall_ratings']['4'],
+          '5': response['overall_ratings']['5'],
         };
         this.avgRating = this.getAverageRating();
         this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
         this.blankStars = 5 - this.fullStars;
-      })
+    });
   }
 
   toggleSidebar(): void {

@@ -20,18 +20,19 @@
           {{ expDesc | truncateAndCapitalize: 90 }}
         </div>
         <div class="oppia-exploration-description"
-            tabindex="0"
-            *ngIf="isHackyExpDescTranslationDisplayed()">
+             tabindex="0"
+             *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </div>
-        
+
         <span class="player-sidebar-rating" [ngClass]="{'rating-disabled': !avgRating}">
           <span *ngIf="avgRating" class="player-rating-text">
             {{ avgRating | number:'1.1-1' }}
           </span>
           <span *ngIf="!avgRating"
                 [innerHTML]="'I18N_LIBRARY_N/A' | translate"
-                class="player-rating-text"></span>
+                class="player-rating-text">
+          </span>
           <svg xmlns="http://www.w3.org/2000/svg" width="120" height="24" viewBox="0 0 120 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <ng-container *ngFor="let i of getRange(fullStars)">
               <svg fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -80,12 +81,12 @@
       </button>
     </div>
   </div>
-  <div *ngIf="mobileMenuVisible">
+  <div *ngIf="mobileMenuVisible" class="player-mobile-menu-container">
     <div class="player-mobile-menu-overlay"
          (click)="mobileMenuService.toggleMenuVisibility()">
     </div>
     <div class="player-mobile-menu">
-      <div class="player-mobile-menu-close" 
+      <div class="player-mobile-menu-close"
            (click)="mobileMenuService.toggleMenuVisibility()">
         <img src="/assets/images/lesson_player/cancel-mobile.svg" alt="Close button">
       </div>

@@ -29,7 +29,7 @@ export class MobileMenuService {
     return this.menuVisibleSubject.asObservable();
   }
 
-  toggleMenuVisibility() {
+  toggleMenuVisibility(): void {
     this.menuVisibleSubject.next(!this.menuVisibleSubject.value);
   }
 }

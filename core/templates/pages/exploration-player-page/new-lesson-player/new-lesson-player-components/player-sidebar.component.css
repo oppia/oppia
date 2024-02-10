@@ -16,31 +16,31 @@
 .player-sidebar-toggle {
   background: none;
   border: none;
-  color: #00645C;
-  height: 48px;
+  color: #00645c;
   font-size: 12px;
   font-weight: 500;
+  height: 48px;
   line-height: 15px;
-  letter-spacing: 0em;
+  letter-spacing: 0;
 }
 
 .player-sidebar-toggle div {
-  display: flex;
   align-items: center;
+  display: flex;
 }
 
 .player-sidebar-toggle.expanded {
+  align-items: center;
   display: flex;
   justify-content: flex-end;
-  align-items: center;
 }
 
 .oppia-exploration-description {
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 400;
-  line-height: 20px;
   letter-spacing: -0.02em;
+  line-height: 20px;
   padding: 20px;
 }
 
@@ -51,8 +51,8 @@
   font-size: 18px;
   font-weight: 400;
   gap: 8px;
-  line-height: 20px;
   letter-spacing: -0.02em;
+  line-height: 20px;
   padding: 8px 20px 8px 20px;
 }
 
@@ -88,29 +88,33 @@
   background-color: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0px 0px 10px 0px #00000026;
+  box-shadow: 0 0 10px 0 #00000026;
   font-size: 16px;
   font-weight: 400;
   height: 45px;
+  letter-spacing: 0;
   line-height: 20px;
-  letter-spacing: 0em;
   padding: 10px;
   width: 45px;
 }
 
 .player-sidebar-button div {
+  align-items: center;
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 .player-desktop-sidebar-menu.expanded .player-sidebar-button {
   width: 200px;
 }
 
+.player-mobile-menu-container {
+  display: none;
+}
+
 .player-mobile-menu-overlay {
+  background-color: #0009;
   position: fixed;
-  background-color: #00000099;
   height: 100%;
   top: 0;
   width: 100vh;
@@ -119,8 +123,8 @@
 
 .player-mobile-menu {
   background-color: #fff;
-  bottom: 0;
   border-radius: 28px 28px 0 0;
+  bottom: 0;
   display: none;
   height: 240px;
   position: fixed;
@@ -129,10 +133,10 @@
 }
 
 .player-mobile-menu-close {
-  display: flex;
+  align-self: flex-end;
   height: 48px;
-  justify-content: flex-end;
   padding: 12px;
+  width: 48px;
 }
 
 .player-mobile-menu-options {
@@ -146,7 +150,7 @@
   align-items: center;
   background: none;
   border: none;
-  color: #333333;
+  color: #333;
   display: flex;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
@@ -155,16 +159,15 @@
   height: 40px;
   line-height: 23px;
   padding: 8px;
-  width: 330px;
-}
-
-.mobile-menu-svg path {
-  fill: #333333;
 }
 
 @media screen and (max-width: 574px) {
   .player-desktop-sidebar-menu {
     display: none;
+  }
+
+  .player-mobile-menu-container {
+    display: block;
   }
 
   .player-mobile-menu {

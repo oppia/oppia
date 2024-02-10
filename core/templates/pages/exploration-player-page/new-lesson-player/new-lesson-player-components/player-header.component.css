@@ -9,8 +9,8 @@
   background-color: #094142;
   color: #fff;
   display: flex;
-  justify-content: space-between;
   height: 48px;
+  justify-content: space-between;
   padding-left: 15px;
 }
 
