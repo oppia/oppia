@@ -452,7 +452,6 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
-             [smartRouterLink]="profilePageUrl"
              class="dropdown-item nav-link e2e-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
@@ -508,7 +507,6 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
              class="dropdown-item nav-link e2e-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>
