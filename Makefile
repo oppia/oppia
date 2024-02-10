@@ -165,6 +165,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## CHROME_VERSION: Uses the specified version of the chrome driver.
 ## MOBILE: Run e2e test in mobile viewport.
 ## DEBUG: Runs the webdriverio test in debugging mode.
+## VIDEO_RECORDING_IS_ENABLED: Record the e2e test.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -175,6 +176,8 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	fi
 # Adding env variable for the mobile view
 	@export MOBILE=${MOBILE}
+# Adding env variable for the video recording
+	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
