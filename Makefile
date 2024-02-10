@@ -180,7 +180,8 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}	@echo '------------------------------------------------------'
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
+	echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
