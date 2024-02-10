@@ -43,6 +43,7 @@ from core.controllers import custom_landing_pages
 from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import feature_flag
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
@@ -57,7 +58,6 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import oppia_root
 from core.controllers import pages
-from core.controllers import platform_feature
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -79,6 +79,7 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
+from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -271,7 +272,7 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
-    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+    get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
@@ -442,6 +443,9 @@ URLS = [
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
+        r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
+        classroom.UnusedTopicsHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
@@ -453,6 +457,18 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
         classroom.ClassroomIdHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
+        voiceover.VoiceoverAdminPage
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
+        voiceover.VoiceoverAdminDataHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+        voiceover.VoiceoverLanguageCodesMappingHandler
     ),
 
     get_redirect_route(
@@ -612,7 +628,6 @@ URLS = [
     get_redirect_route(r'/userinfohandler', profile.UserInfoHandler),
     get_redirect_route(r'/userinfohandler/data', profile.UserInfoHandler),
     get_redirect_route(r'/url_handler', profile.UrlHandler),
-    get_redirect_route(r'/moderator', moderator.ModeratorPage),
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
@@ -966,6 +981,9 @@ URLS = [
         r'/verifyusermodelsdeletedhandler',
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
+    get_redirect_route(
+        r'/interactions',
+        admin.InteractionsByExplorationIdHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
@@ -987,8 +1005,6 @@ URLS = [
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsConfigHandler),
 
-    get_redirect_route(
-        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
     get_redirect_route(
         r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
         blog_admin.BlogAdminRolesHandler),
@@ -1031,11 +1047,11 @@ URLS = [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platform_features_evaluation_handler',
-        platform_feature.PlatformFeaturesEvaluationHandler),
+        r'/feature_flags_evaluation_handler',
+        feature_flag.FeatureFlagsEvaluationHandler),
     get_redirect_route(
-        r'/platform_feature_dummy_handler',
-        platform_feature.PlatformFeatureDummyHandler),
+        r'/feature_flag_dummy_handler',
+        feature_flag.FeatureFlagDummyHandler),
 
     get_redirect_route(
         r'%s' % (

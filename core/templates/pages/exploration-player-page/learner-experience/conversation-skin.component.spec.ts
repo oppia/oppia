@@ -19,6 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { Collection } from 'domain/collection/collection.model';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
@@ -1649,6 +1651,31 @@ describe('Conversation skin component', () => {
     expect(componentInstance.isLearnAgainButton()).toBeTrue();
   });
 
+  it('should jump to the revision state via changing card', () => {
+    const currentCard = new StateCard(
+      'currentCard', null, null, new Interaction(
+        [], [], null, null, [], 'Continue', null),
+      [], null, '', null);
+    componentInstance.displayedCard = currentCard;
+
+    componentInstance.nextCard = new StateCard(
+      'revisionState', null, null, new Interaction(
+        [], [], null, null, [], 'ImageClickInput', null),
+      [], null, '', null);
+    spyOn(componentInstance, 'isLearnAgainButton').and.returnValue(true);
+    spyOn(playerTranscriptService, 'findIndexOfLatestStateWithName')
+      .withArgs('revisionState').and.returnValue(2);
+    const changeCard = spyOn(componentInstance, 'changeCard');
+    const recordNewCardAdded = spyOn(
+      explorationPlayerStateService, 'recordNewCardAdded');
+
+    componentInstance.showUpcomingCard();
+
+    expect(currentCard.isCompleted()).toBeFalse();
+    expect(recordNewCardAdded).not.toHaveBeenCalled();
+    expect(changeCard).toHaveBeenCalledWith(2);
+  });
+
   it('should adjust page height on scroll', fakeAsync(() => {
     componentInstance.lastRequestedHeight = document.body.scrollHeight + 100;
     componentInstance.lastRequestedScroll = false;
@@ -2188,14 +2215,6 @@ describe('Conversation skin component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyExpTitleTranslationDisplayed(expId);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-  });
-
-  it('should get feedback when answer is misspelled', () => {
-    spyOn(Math, 'random').and.returnValue(0.45);
-    spyOn(translateService, 'instant').and.callThrough();
-    expect(
-      componentInstance.getFeedbackHtmlWhenAnswerMisspelled())
-      .toEqual('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1');
   });
 
   it('should check if current card was completed in a previous session',

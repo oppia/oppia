@@ -33,7 +33,6 @@ import time
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from scripts import servers
 
@@ -56,14 +55,11 @@ NODE_VERSION = '16.13.0'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
-# Versions of libraries used in backend.
-PILLOW_VERSION = '9.0.1'
-
 # Buf version.
 BUF_VERSION = '0.29.0'
 
 # Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.13.0'
+PROTOC_VERSION = '3.18.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -124,12 +120,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
-
-# By specifying this condition, we are importing the below module only while
-# type checking, not in runtime.
-MYPY = False
-if MYPY:  # pragma: no cover
-    import github
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -219,6 +209,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
     'duplicate-blog-post.spec.js',
+    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
 
@@ -585,36 +576,6 @@ def get_personal_access_token() -> str:
     return personal_access_token
 
 
-def check_prs_for_current_release_are_released(
-    repo: github.Repository.Repository
-) -> None:
-    """Checks that all pull requests for current release have a
-    'PR: released' label.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Some pull requests for current release do not have a
-            "PR: released" label.
-    """
-    current_release_label = repo.get_label(
-        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-    current_release_prs = repo.get_issues(
-        state='all', labels=[current_release_label])
-    for pr in current_release_prs:
-        label_names = [label.name for label in pr.labels]
-        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
-                label_names):
-            open_new_tab_in_browser_if_possible(
-                'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
-                '+label%3A%22PR%3A+for+current+release%22+')
-            raise Exception(
-                'There are PRs for current release which do not have '
-                'a \'PR: released\' label. Please ensure that they are '
-                'released before release summary generation.')
-
-
 def convert_to_posixpath(file_path: str) -> str:
     """Converts a Windows style filepath to posixpath format. If the operating
     system is not Windows, this function does nothing.
@@ -650,7 +611,8 @@ def inplace_replace_file(
     expected_number_of_replacements: Optional[int] = None
 ) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
-    to replace the file's content line by line.
+    to replace the file's content line by line. The old file is kept as-is until
+    it is replaced.
 
     Note:
         This function should only be used with files that are processed line by
@@ -667,26 +629,26 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    backup_filename = '%s.bak' % filename
-    shutil.copyfile(filename, backup_filename)
+    new_filename = '%s.new' % filename
+    shutil.copyfile(filename, new_filename)
     new_contents = []
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(backup_filename, 'r') as f:
-            for line in f:
+        with utils.open_file(filename, 'r') as old_file:
+            for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(filename, 'w') as f:
+        with utils.open_file(new_filename, 'w') as new_file:
             for line in new_contents:
-                f.write(line)
+                new_file.write(line)
 
         if (
-                expected_number_of_replacements is not None and
-                total_number_of_replacements != expected_number_of_replacements
+            expected_number_of_replacements is not None and
+            total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
                 'Wrong number of replacements. Expected %s. Performed %s.' % (
@@ -695,47 +657,12 @@ def inplace_replace_file(
                 )
             )
 
-        os.remove(backup_filename)
+        os.replace(new_filename, filename)
 
     except Exception:
-        # Restore the content if there was en error.
-        os.remove(filename)
-        shutil.move(backup_filename, filename)
+        # Drop the new file if there was an error.
+        os.remove(new_filename)
         raise
-
-
-@contextlib.contextmanager
-def inplace_replace_file_context(
-    filename: str, regex_pattern: str, replacement_string: str
-) -> Generator[None, None, None]:
-    """Context manager in which the file's content is replaced according to the
-    given regex pattern. This function should only be used with files that are
-    processed line by line.
-
-    Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-
-    Yields:
-        None. Nothing.
-    """
-    backup_filename = '%s.bak' % filename
-    regex = re.compile(regex_pattern)
-
-    shutil.copyfile(filename, backup_filename)
-
-    try:
-        with utils.open_file(backup_filename, 'r') as f:
-            new_contents = [regex.sub(replacement_string, line) for line in f]
-        with utils.open_file(filename, 'w') as f:
-            f.write(''.join(new_contents))
-        yield
-    finally:
-        if os.path.isfile(filename) and os.path.isfile(backup_filename):
-            os.remove(filename)
-        if os.path.isfile(backup_filename):
-            shutil.move(backup_filename, filename)
 
 
 def wait_for_port_to_be_in_use(port_number: int) -> None:

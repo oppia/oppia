@@ -103,8 +103,8 @@ import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/faci
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -121,7 +121,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -179,6 +178,7 @@ import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { MultipleChoiceInputOrderedChoicesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-ordered-choices-service';
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { MusicNotesInputRulesService } from 'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
@@ -296,7 +296,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { DebouncerService } from 'services/debouncer.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
@@ -441,9 +440,16 @@ import { RteHelperService } from 'services/rte-helper.service';
 import { HtmlLengthService } from 'services/html-length.service';
 import { ContributorDashboardAdminStatsBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service';
 import { InsertScriptService } from './insert-script.service';
+import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
+import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
+import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
+import { VoiceoverBackendApiService } from
+  'domain/voiceover/voiceover-backend-api.service';
+import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
+  ['AdminAuthGuard', AdminAuthGuard],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
@@ -471,6 +477,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['AutoplayedVideosService', AutoplayedVideosService],
   ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
+  ['BlogAdminAuthGuard', BlogAdminAuthGuard],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
@@ -528,7 +535,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CuratedExplorationValidationService', CuratedExplorationValidationService],
   ['CurrentInteractionService', CurrentInteractionService],
   ['DateTimeFormatService', DateTimeFormatService],
-  ['DebouncerService', DebouncerService],
   ['DeviceInfoService', DeviceInfoService],
   ['DiagnosticTestPlayerEngineService', DiagnosticTestPlayerEngineService],
   ['DiagnosticTestPlayerStatusService', DiagnosticTestPlayerStatusService],
@@ -653,6 +659,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['InteractiveMapValidationService', InteractiveMapValidationService],
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
+  ['IsLoggedInGuard', IsLoggedInGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
@@ -684,6 +691,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
+  ['ModeratorAuthGuard', ModeratorAuthGuard],
+  ['MultipleChoiceInputOrderedChoicesService',
+    MultipleChoiceInputOrderedChoicesService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
     MultipleChoiceInputValidationService],
@@ -716,9 +726,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformFeatureAdminBackendApiService',
     PlatformFeatureAdminBackendApiService],
-  ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
-  ['PlatformFeatureDummyBackendApiService',
-    PlatformFeatureDummyBackendApiService],
+  ['FeatureFlagBackendApiService', FeatureFlagBackendApiService],
+  ['FeatureFlagDummyBackendApiService',
+    FeatureFlagDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerCorrectnessFeedbackEnabledService',
@@ -727,7 +737,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlayerTranscriptService', PlayerTranscriptService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
-  ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
   ['PreventPageUnloadEventService', PreventPageUnloadEventService],
@@ -884,6 +893,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
+  ['VoiceoverBackendApiService', VoiceoverBackendApiService],
   ['CheckRevertService', CheckRevertService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],

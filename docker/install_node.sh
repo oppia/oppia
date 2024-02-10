@@ -14,10 +14,18 @@
 # limitations under the License.
 
 #!/bin/bash
+# Check if node is installed. If it is, skip installation.
+if [ -d "../oppia_tools/node-16.13.0" ]; then
+    echo "Node.js is already installed. Skipping the installation."
+    exit 0
+fi
+
+# Install node.js if it is not installed.
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-if [ "$OS_NAME" = "Windows" ]; then
+# We need to check for Msys because, from Windows 11 uname returns Msys instead of Windows.
+if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
     if [ "$(uname -m)" = "x86_64" ]; then
         architecture=x64
     else
@@ -26,8 +34,9 @@ if [ "$OS_NAME" = "Windows" ]; then
     extension=".zip"
     node_file_name="node-v16.13.0-win-$architecture"
     url_to_retrieve="https://nodejs.org/dist/v16.13.0/$node_file_name$extension"
-    curl -o node-download "$url_to_retrieve"
-    powershell.exe -c "Expand-Archive -Path node-download -DestinationPath ../oppia_tools"
+    curl -o node-download.zip "$url_to_retrieve"
+    powershell.exe -c "Expand-Archive -Path node-download.zip -DestinationPath ../oppia_tools"
+    rm node-download.zip
 else
     extension=".tar.gz"
     if [ "$(python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(uname -m)" = "x86_64" ]; then
@@ -46,14 +55,20 @@ else
     mkdir -p ../oppia_tools
     tar -xvf node-download -C ../oppia_tools
     rm node-download
+
+    # Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/v16.x/BUILDING.md#building-nodejs-1).
+    # The process of building from source code is intended for non-x64 Linux/Darwin systems.
+    if [ "$node_file_name" = "node-v16.13.0" ]; then
+        cd ../oppia_tools/node-16.13.0
+        ./configure
+        make
+    fi
 fi
 
-if [ "$node_file_name" = "node-v16.13.0" ]; then
-    cd ../oppia_tools/node-16.13.0
-    ./configure
-    make
+# Rename node directory to node-16.13.0.
+cd ../oppia_tools &&
+if [ "$node_file_name" != "node-v16.13.0" ]; then
+    mv $node_file_name node-16.13.0
 fi
-
-cd ../oppia_tools && find . -maxdepth 1 -type d -name 'node*' -exec mv {} node-16.13.0 \;
 
 echo "Node.js installation completed."

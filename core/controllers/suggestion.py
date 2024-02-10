@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import user_services
 
@@ -76,7 +77,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     status: str
     author_name: str
     final_reviewer_id: Optional[str]
-    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    change_cmd: Dict[str, change_domain.AcceptableChangeDictTypes]
     score_category: str
     language_code: str
     last_updated: float
@@ -137,7 +138,7 @@ class SuggestionHandlerNormalizedPayloadDict(TypedDict):
     target_type: str
     target_id: str
     target_version_at_submission: int
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes]
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes]
     description: str
     files: Optional[Dict[str, str]]
 
@@ -179,7 +180,7 @@ class SuggestionHandler(
                     }]
                 }
             },
-            'change': {
+            'change_cmd': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -228,7 +229,7 @@ class SuggestionHandler(
             self.normalized_payload['target_id'],
             self.normalized_payload['target_version_at_submission'],
             self.user_id,
-            self.normalized_payload['change'],
+            self.normalized_payload['change_cmd'],
             self.normalized_payload['description']
         )
 
@@ -246,7 +247,7 @@ class SuggestionHandler(
                 suggestion_services
             ).update_question_contribution_stats_at_submission(suggestion)
 
-        suggestion_change = suggestion.change
+        suggestion_change = suggestion.change_cmd
         if (
                 suggestion_change.cmd == 'add_written_translation' and (
                     translation_domain.TranslatableContentFormat
@@ -403,7 +404,7 @@ class ResubmitSuggestionHandlerNormalizedPayloadDict(TypedDict):
     """
 
     action: str
-    change: Dict[str, Union[str, state_domain.SubtitledHtmlDict]]
+    change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]]
     summary_message: str
 
 
@@ -431,7 +432,7 @@ class ResubmitSuggestionHandler(
                     'choices': ['resubmit']
                 }
             },
-            'change': {
+            'change_cmd': {
                 'schema': {
                     'type': 'dict',
                     'properties': [{
@@ -480,8 +481,8 @@ class ResubmitSuggestionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        new_change = self.normalized_payload['change']
-        change_cls = type(suggestion.change)
+        new_change = self.normalized_payload['change_cmd']
+        change_cls = type(suggestion.change_cmd)
         change_object = change_cls(new_change)
         summary_message = self.normalized_payload['summary_message']
         suggestion_services.resubmit_rejected_suggestion(
@@ -690,6 +691,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     offset: int
     sort_key: str
     exploration_id: Optional[str]
+    topic_name: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -747,9 +749,33 @@ class ReviewableSuggestionsHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
-            }
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
         }
     }
+
+    def _get_skill_ids_for_topic(
+            self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid')
+        return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -804,11 +830,13 @@ class ReviewableSuggestionsHandler(
             if limit is None:
                 raise ValueError(
                     'Limit must be provided for question suggestions.')
+            topic_name = self.normalized_request.get('topic_name')
+            skill_ids = self._get_skill_ids_for_topic(topic_name)
 
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key, skill_ids))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -1093,7 +1121,7 @@ class UpdateQuestionSuggestionHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_state_dict
+                        domain_objects_validator.validate_question_state_dict
                     )
                 }
             },
@@ -1224,7 +1252,8 @@ def _construct_exploration_suggestions(
         content_html: Optional[Union[str, List[str]]] = None
         try:
             content_html = exploration.get_content_html(
-                suggestion.change.state_name, suggestion.change.content_id)
+                suggestion.change_cmd.state_name,
+                suggestion.change_cmd.content_id)
         except ValueError:
             # Exploration content is no longer available.
             pass
@@ -1240,7 +1269,7 @@ def _construct_exploration_suggestions(
             'status': suggestion_dict['status'],
             'author_name': suggestion_dict['author_name'],
             'final_reviewer_id': suggestion_dict['final_reviewer_id'],
-            'change': suggestion_dict['change'],
+            'change_cmd': suggestion_dict['change_cmd'],
             'score_category': suggestion_dict['score_category'],
             'language_code': suggestion_dict['language_code'],
             'last_updated': suggestion_dict['last_updated'],
