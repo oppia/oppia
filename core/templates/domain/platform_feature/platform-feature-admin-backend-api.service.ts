@@ -22,22 +22,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
-import { PlatformFeatureDomainConstants } from
-  'domain/platform_feature/platform-feature-domain.constants';
+import { FeatureFlagDomainConstants } from
+  'domain/feature-flag/feature-flag-domain.constants';
+import { PlatformParameterDomainConstants } from
+  'domain/platform_feature/platform-parameter-domain.constants';
 import { PlatformParameterRule, PlatformParameterValue } from
   'domain/platform_feature/platform-parameter-rule.model';
 import {
-  PlatformParameter,
-  PlatformParameterBackendDict
-} from 'domain/platform_feature/platform-parameter.model';
+  FeatureFlag,
+  FeatureFlagBackendDict
+} from 'domain/feature-flag/feature-flag.model';
 
 export interface FeatureFlagsDicts {
-  'feature_flags': PlatformParameterBackendDict[];
+  'feature_flags': FeatureFlagBackendDict[];
   'server_stage': string;
 }
 
 export interface FeatureFlagsResponse {
-  featureFlags: PlatformParameter[];
+  featureFlags: FeatureFlag[];
   serverStage: string;
 }
 
@@ -52,11 +54,11 @@ export class PlatformFeatureAdminBackendApiService {
   async getFeatureFlags(): Promise<FeatureFlagsResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<FeatureFlagsDicts>(
-        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL
       ).toPromise().then(response => {
         resolve({
           featureFlags: response.feature_flags.map(
-            dict => PlatformParameter.createFromBackendDict(
+            dict => FeatureFlag.createFromBackendDict(
               dict)),
           serverStage: response.server_stage
         });
@@ -67,16 +69,18 @@ export class PlatformFeatureAdminBackendApiService {
   }
 
   async updateFeatureFlag(
-      name: string, message: string, newRules: PlatformParameterRule[]
+      name: string, forceEnableForAllUsers: boolean, rolloutPercentage: number,
+      userGroupIds: string[]
   ):
       Promise<void> {
-    await this.http.post(
-      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL,
+    await this.http.put(
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL,
       {
-        action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
-        feature_name: name,
-        commit_message: message,
-        new_rules: newRules.map(rule => rule.toBackendDict())
+        action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
+        feature_flag_name: name,
+        force_enable_for_all_users: forceEnableForAllUsers,
+        rollout_percentage: rolloutPercentage,
+        user_group_ids: userGroupIds
       }
     ).toPromise();
   }
@@ -90,7 +94,7 @@ export class PlatformFeatureAdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL,
       {
         action: (
-          PlatformFeatureDomainConstants.
+          PlatformParameterDomainConstants.
             UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
         platform_param_name: name,
         commit_message: message,
