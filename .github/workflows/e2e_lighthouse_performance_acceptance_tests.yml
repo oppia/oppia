@@ -84,21 +84,21 @@ jobs:
           sudo docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run E2E Test ${{ matrix.suite }}
-        run: sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }}
+        run: sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} VIDEO_RECORDING_IS_ENABLED=${{ env.VIDEO_RECORDING_IS_ENABLED }}
         env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: webdriverio-video
-          path: /home/runner/work/oppia/webdriverio-video
+          path: /home/runner/work/gp201/webdriverio-video
       - name: Uploading webdriverio screenshots as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: webdriverio-screenshots
-          path: /home/runner/work/oppia/webdriverio-screenshots
+          path: /home/runner/work/gp201/webdriverio-screenshots
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

@@ -7,7 +7,7 @@ runs:
     - id: install-chrome
       name: Install Chrome
       env:
-        CHROME_VERSION: "119.0.6045.105-1"
+        CHROME_VERSION: "102.0.5005.61-1"
       run: |
         sudo apt-get update
         sudo apt-get install libappindicator3-1
