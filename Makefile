@@ -175,9 +175,9 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
 # Adding env variable for the mobile view
-	@export MOBILE=${MOBILE}
+	@export MOBILE=${MOBILE:-false}
 # Adding env variable for the video recording
-	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED}
+	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED:-0}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
