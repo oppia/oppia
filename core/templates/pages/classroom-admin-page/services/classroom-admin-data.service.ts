@@ -17,7 +17,6 @@
  */
 
 import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { ClassroomData, ExistingClassroomData } from '../existing-classroom.model';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 
@@ -106,6 +105,3 @@ export class ClassroomAdminDataService {
     this.topicsGraphValidationError = '';
   }
 }
-
-angular.module('oppia').factory('ClassroomAdminDataService',
-  downgradeInjectable(ClassroomAdminDataService));

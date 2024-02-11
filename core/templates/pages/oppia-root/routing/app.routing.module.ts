@@ -51,6 +51,20 @@ const routes: Route[] = [
       .then(m => m.ClassroomPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
+    loadChildren: () => import(
+      'pages/classroom-admin-page/classroom-admin-page.module')
+      .then(m => m.ClassroomAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/learner-dashboard-page/learner-dashboard-page.module')
+      .then(m => m.LearnerDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)

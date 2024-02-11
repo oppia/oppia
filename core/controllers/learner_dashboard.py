@@ -52,20 +52,6 @@ class OldLearnerDashboardRedirectPage(
         self.redirect(feconf.LEARNER_DASHBOARD_URL, permanent=True)
 
 
-class LearnerDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the user's learner dashboard."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_learner_dashboard
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template('learner-dashboard-page.mainpage.html')
-
-
 class LearnerDashboardTopicsAndStoriesProgressHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

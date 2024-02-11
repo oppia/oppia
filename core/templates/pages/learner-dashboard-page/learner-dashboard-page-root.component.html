@@ -1,0 +1,25 @@
+<oppia-angular-root>
+  <oppia-base-content>
+    <navbar-breadcrumb>
+      <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <li>
+          <span class="oppia-navbar-breadcrumb-separator"></span>
+          <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
+        </li>
+      </ul>
+    </navbar-breadcrumb>
+    <content>
+      <oppia-learner-dashboard-page class="e2e-test-learner-dashboard-page"></oppia-learner-dashboard-page>
+    </content>
+    <page-footer></page-footer>
+  </oppia-base-content>
+</oppia-angular-root>
+
+<script>
+  // Use the normal default browser eventlistener without passive
+  // set to false.
+  // TODO(#10749): Remove workaround for passive event listeners when
+  // jQuery supports it.
+  EventTarget.prototype.addEventListener = (
+    EventTarget.prototype.addEventListener._original);
+</script>

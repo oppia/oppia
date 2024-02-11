@@ -18,7 +18,6 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
@@ -453,7 +452,3 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return decodeURIComponent(base64ImageData);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerDashboardPage', downgradeComponent(
-    {component: LearnerDashboardPageComponent}));
