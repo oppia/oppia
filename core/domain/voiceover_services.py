@@ -198,3 +198,34 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read()))
         return autogeneratable_language_accent_list
+
+
+def get_voice_artist_metadata(voice_artist_id):
+    voiceovers_and_contents_mapping = {}
+    voice_artist_metadata_model = (
+        voiceover_models.VoiceArtistMetadataModel.get(
+            voice_artist_id, strict=False))
+
+    if voice_artist_metadata_model is not None:
+        voiceovers_and_contents_mapping = (
+            voice_artist_metadata_model.voiceovers_and_contents_mapping)
+
+    return voiceovers_and_contents_mapping
+
+
+def update_voice_artist_metadata(
+    voice_artist_id,
+    voiceovers_and_contents_mapping
+):
+    voice_artist_metadata_model = (
+        voiceover_models.VoiceArtistMetadataModel.get(
+            voice_artist_id, strict=False))
+
+    if voice_artist_metadata_model is None:
+        voiceover_models.VoiceArtistMetadataModel.create(
+            voice_artist_id, voiceovers_and_contents_mapping)
+    else:
+        voice_artist_metadata_model.voiceovers_and_contents_mapping = (
+            voiceovers_and_contents_mapping)
+        voice_artist_metadata_model.update_timestamps()
+        voice_artist_metadata_model.put()

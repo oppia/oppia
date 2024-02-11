@@ -131,7 +131,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             }
         }
         old_voiceover_dict = {
-            'voiceover_mapping': {
+            'voiceovers_mapping': {
                 'content_0': {},
                 'ca_placeholder_2': {},
                 'default_outcome_1': {}
@@ -193,7 +193,67 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
         })]
         exp_services.update_exploration(
             self.editor_id_2, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
+            change_list, 'Translation commits2')
+
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    },
+                    'hi': {
+                        'filename': 'filename4.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 40
+                    }
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename4.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    },
+                    'hi': {
+                        'filename': 'filename4.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 40
+                    }
+                },
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Translation commits3')
 
 
         topic_1 = topic_domain.Topic.create_default_topic(

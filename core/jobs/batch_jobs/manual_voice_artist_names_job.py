@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import utils
-from core.domain import exp_domain
+from core.domain import voiceover_services
 from core.domain import opportunity_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -71,8 +71,10 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                     voiceover_mapping_diff[content_id][lang_code] = (
                         voiceover_dict)
                 else:
-                    old_voiceover_dict = old_voiceover_mapping[lang_code]
-                    new_voiceover_dict = new_voiceover_mapping[lang_code]
+                    old_voiceover_dict = old_voiceover_mapping[
+                        content_id][lang_code]
+                    new_voiceover_dict = new_voiceover_mapping[
+                        content_id][lang_code]
 
                     if old_voiceover_dict != new_voiceover_dict:
                         voiceover_mapping_diff[content_id][lang_code] = (
@@ -109,16 +111,17 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
         # same state diff fields.
         # different state same field
         is_voiceover_changed_in_this_commit = False
-
+        i = 0
         for exp_commit_log_model in exp_commit_log_entry_models:
+            print('Commit # %s' %i)
+            i+=1
             exp_change_dicts = exp_commit_log_model.commit_cmds
             user_id = exp_commit_log_model.user_id
+            print('UserID - ', user_id)
+            print(exp_change_dicts)
 
-            # Fetch voiceover metadata model for this user ID, if the
-            # model does not exist then create an empty model.
-            voiceover_and_contents_mapping = {}
-
-            language_code_to_voiceovers = {} # assign this with model.
+            voiceover_and_contents_mapping = (
+                voiceover_services.get_voice_artist_metadata(user_id))
 
             content_ids = []
             for change_dict in exp_change_dicts:
@@ -126,6 +129,7 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                     change_dict['cmd'] == 'edit_state_property' and
                     change_dict['property_name'] == 'recorded_voiceovers'
                 ):
+                    print('Commit is voiceover change')
                     is_voiceover_changed_in_this_commit = True
 
                     voiceovers_mapping = (
@@ -135,9 +139,12 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                             change_dict['old_value']['voiceovers_mapping'])
                     )
 
+                    print(voiceovers_mapping)
+
                     for content_id, lang_code_to_voiceover_dict in (
                         voiceovers_mapping.items()):
-                        content_ids.append(content_id)
+                        if bool(lang_code_to_voiceover_dict):
+                            content_ids.append(content_id)
 
                         for lang_code, voiceover_dict in (
                             lang_code_to_voiceover_dict.items()):
@@ -146,20 +153,12 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                                 voiceover_and_contents_mapping[lang_code] = {
                                     'language_accent_code': None,
                                     'exploration_id_to_content_ids': {},
-                                    'language_code_to_voiceovers': {}
+                                    'voiceovers': []
                                 }
-                                language_code_to_voiceovers[lang_code] = []
-
-                            language_code_to_voiceovers[lang_code] = (
-                                GetVoiceArtistNamesFromExplorationsJob.
-                                add_voiceover(
-                                    language_code_to_voiceovers[lang_code],
-                                    voiceover_dict)
-                            )
 
                             exploration_id_to_content_ids = (
-                                voiceover_and_contents_mapping[
-                                    lang_code][exploration_id_to_content_ids])
+                                voiceover_and_contents_mapping[lang_code][
+                                    'exploration_id_to_content_ids'])
 
                             if exploration_id not in (
                                 exploration_id_to_content_ids):
@@ -167,18 +166,32 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                                 exploration_id_to_content_ids[
                                     exploration_id] = []
 
+                            # Adding a list of content IDs for which the
+                            # voice artist had provided voiceovers in a
+                            # given exploration.
                             voiceover_and_contents_mapping[lang_code][
-                                exploration_id_to_content_ids][
-                                    exploration_id] = content_ids
-                            voiceover_and_contents_mapping[lang_code][
-                                language_code_to_voiceovers] = (
-                                    language_code_to_voiceovers)
+                                'exploration_id_to_content_ids'][
+                                    exploration_id].extend(content_ids)
+
+                            # Collecting Sample voiceovers.
+                            voiceovers = (
+                                voiceover_and_contents_mapping[
+                                    lang_code]['voiceovers'])
+                            voiceovers = (
+                                GetVoiceArtistNamesFromExplorationsJob.
+                                add_voiceover(voiceovers, voiceover_dict)
+                            )
+                            voiceover_and_contents_mapping[
+                                lang_code]['voiceovers'] = voiceovers
 
             if is_voiceover_changed_in_this_commit:
-                # voiceover_metadata_model.voiceover_and_contents_mapping = (
-                #     voiceover_and_contents_mapping)
-                # voiceover_metadata_model.update_timestamp()
-                # voiceover_metadata_model.put()
+                print('-----------')
+                print(voiceover_and_contents_mapping)
+                voiceover_services.update_voice_artist_metadata(
+                    voice_artist_id=user_id,
+                    voiceovers_and_contents_mapping=
+                    voiceover_and_contents_mapping
+                )
                 pass
 
 
