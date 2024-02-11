@@ -362,7 +362,7 @@ exports.config = {
     */
   beforeTest: function(test, context) {
     if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq	
+      // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
@@ -413,9 +413,9 @@ exports.config = {
    */
   afterTest: async function(
       test, context, { error, result, duration, passed, retries }) {
-        if (process.env.GITHUB_ACTIONS &&
-          // eslint-disable-next-line eqeqeq	
-          process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);
