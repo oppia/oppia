@@ -1,5 +1,6 @@
 FROM node:16.13.0 AS frontend
 
+# Set Yarn cache folder
 ENV YARN_CACHE_FOLDER /home/node/.yarn-cache
 WORKDIR /app/oppia
 
@@ -16,5 +17,7 @@ COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 COPY yarn.lock .
 RUN npm install -g yarn@1.22.15 --force
 RUN yarn install --pure-lockfile
+
+# Change ownership of Yarn cache directory to node user
 RUN chown -R node:node /home/node/.yarn-cache
 USER node:node
