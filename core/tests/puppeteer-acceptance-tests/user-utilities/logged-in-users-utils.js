@@ -23,7 +23,7 @@ const testConstants = require(
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const homeUrl = testConstants.URLs.home;
+const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
 const androidUrl = testConstants.URLs.Android;
@@ -36,80 +36,84 @@ const partnershipsUrl = testConstants.URLs.Partnerships;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const donateUrl = testConstants.URLs.Donate;
 const contactUrl = testConstants.URLs.Contact;
-const _61MillionChildrenUrl = testConstants.URLs._61MillionChildren;
-const sourceUnescoUrl = testConstants.URLs.SourceUnesco;
-const evenThoseWhoAreInSchoolUrl = testConstants.URLs.EvenThoseWhoAreInSchool;
-const _420MillionUrl = testConstants.URLs._61MillionChildren;
-const thanksForDonatingUrl = testConstants.URLs.ThanksForDonating;
-const watchAVideoUrl = testConstants.URLs.WatchAVideo;
-const blogWebUrl = testConstants.URLs.BlogWeb;
+const _61MillionChildrenUrl = testConstants.URLs.ExternalLink61MillionChildren;
+const sourceUnescoUrl = testConstants.URLs.ExternalLinkSourceUnesco;
+const evenThoseWhoAreInSchoolUrl =
+  testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
+const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
+const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
+const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
 
-const navbarAboutTab = 'a#navbar-about-menu';
-const navbarAboutTabAboutButton = 'a#navbar-about-menu-about-button';
+const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
+const navbarAboutTabAboutButton = 'a.e2e-test-navbar-about-menu-about-button';
 const navbarAboutTabAboutFoundationButton =
-  'a#navbar-about-menu-about-foundation-button';
-const navbarAboutTabBlogButton = 'a#navbar-about-menu-blog-button';
-const navbarGetInvolvedTab = 'a#navbar-get-involved-menu';
+  'a.e2e-test-navbar-about-menu-about-foundation-button';
+const navbarAboutTabBlogButton = 'a.e2e-test-navbar-about-menu-blog-button';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
-  'a#navbar-get-involved-menu-school-and-organizations-button';
+  'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
 const navbarGetInvolvedTabVolunteerButton =
-  'a#navbar-get-involved-menu-volunteer-button';
+  'a.e2e-test-navbar-get-involved-menu-volunteer-button';
 const navbarGetInvolvedTabDonateButton =
-  'a#navbar-get-involved-menu-donate-button';
+  'a.e2e-test-navbar-get-involved-menu-donate-button';
 const navbarGetInvolvedTabContactUsButton =
-  'a#navbar-get-involved-menu-contact-us-button';
-const navbarDonateButton = 'a#navbar-donate-button';
+  'a.e2e-test-navbar-get-involved-menu-contact-us-button';
+const navbarDonateButton = 'a.e2e-test-navbar-donate-button';
 
-const browseOurLessonsButton = '#about-page-browse-our-lessons-button';
-const accessAndroidAppButton = '#about-page-access-android-app-button';
-const visitClassroomButton = '#about-page-visit-classroom-button';
-const browseLibraryButton = '#about-page-browse-library-button';
-const createLessonsButton = '#about-page-create-lessons-button';
-const exploreLessonsButton = '#about-page-explore-lessons-button';
+const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
+const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
+const visitClassroomButton = '.e2e-test-about-page-visit-classroom-button';
+const browseLibraryButton = '.e2e-test-about-page-browse-library-button';
+const createLessonsButton = '.e2e-test-about-page-create-lessons-button';
+const exploreLessonsButton = '.e2e-test-about-page-explore-lessons-button';
 
 const aboutFoundationClass = '.oppia-about-foundation-hero-content h1';
-const millionsOfContentId = '#about-foundation-page-millions-of-content';
-const weCannotContentId = '#about-foundation-page-we-cannot-content';
-const sourceUnescoButtion = 'a#about-foundation-page-source-unesco-button';
+const millionsOfContentId =
+  '.e2e-test-about-foundation-page-millions-of-content';
+const weCannotContentId = '.e2e-test-about-foundation-page-we-cannot-content';
+const sourceUnescoButton =
+  'a.e2e-test-about-foundation-page-source-unesco-button';
 const learnMoreAboutOppiaButton =
-  '#about-foundation-page-learn-more-about-oppia-button';
+  '.e2e-test-about-foundation-page-learn-more-about-oppia-button';
 const becomeAVolunteerButton =
-  '#about-foundation-page-become-a-volunteer-button';
-const sectionSixPart1 = '#about-foundation-page-section-six-part-1';
-const sectionSixPart2 = '#about-foundation-page-section-six-part-2';
-const sectionSixPart3 = '#about-foundation-page-section-six-part-3';
+  '.e2e-test-about-foundation-page-become-a-volunteer-button';
+const sectionSixPart1 = '.e2e-test-about-foundation-page-section-six-part-1';
+const sectionSixPart2 = '.e2e-test-about-foundation-page-section-six-part-2';
+const sectionSixPart3 = '.e2e-test-about-foundation-page-section-six-part-3';
 
-const watchAVideoButton = 'a#thanks-for-donating-page-watch-a-video-button';
-const readOurBlogButton = 'a#thanks-for-donating-page-read-our-blog-button';
-const dismissButton = 'i#thanks-for-donating-page-dismiss-button';
+const watchAVideoButton =
+  'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
+const readOurBlogButton =
+  'a.e2e-test-thanks-for-donating-page-read-our-blog-button';
+const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
 const thanksForDonatingPage = '.modal-backdrop.fade.show';
 
 module.exports = class LoggedInUsers extends baseUser {
   /**
-   * Function for navigating to the home page.
+   * Function to navigate to the home page.
    */
   async navigateToHome() {
     await this.goto(homeUrl);
   }
 
   /**
-   * Function for navigating to the about page.
+   * Function to navigate to the about page.
    */
   async navigateToAboutPage() {
     await this.goto(aboutUrl);
   }
 
   /**
-   * Function for navigating to the about foundation page.
+   * Function to navigate to the about foundation page.
    */
   async navigateToAboutFoundationPage() {
     await this.goto(aboutFoundationUrl);
   }
 
   /**
-   * Function for navigating to the Thanks for Donating page.
+   * Function to navigate to the Thanks for Donating page.
    */
   async navigateToThanksForDonatingPage() {
     await this.page.goto(thanksForDonatingUrl, {
@@ -119,88 +123,87 @@ module.exports = class LoggedInUsers extends baseUser {
   }
 
   /**
+   * Function to click a button and check if it opens the expected destination.
+   * @param {string} button - the CSS selector of the button element
+   * @param {string} buttonName - the name of the button
+   * @param {string} expectedDestinationPageUrl - the expected page that
+   *   the button should navigate to
+   * @param {string} expectedDestinationPageName - the name of the expected page
+   */
+  async clickButtonToNavigateToNewPage(
+      button, buttonName, expectedDestinationPageUrl,
+      expectedDestinationPageName) {
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn(button),
+    ]);
+    if (this.page.url() !== expectedDestinationPageUrl) {
+      throw new Error (
+        'The ' + buttonName + ' does not open the ' +
+        expectedDestinationPageName + ' page!');
+    } else {
+      showMessage(
+        'The ' + buttonName + ' opens the ' +
+        expectedDestinationPageName + ' page.');
+    }
+  }
+
+  /**
    * Function to click the About button in the About Menu on navbar
    * and check if it opens the About page.
    */
-  async clickAboutInAboutMenuOnNavbar() {
+  async clickAboutButtonInAboutMenuOnNavbar() {
     await this.clickOn(navbarAboutTab);
-    await this.clickOn(navbarAboutTabAboutButton);
-    if (this.page.url() !== aboutUrl) {
-      throw new Error (
-        'The About Oppia button in About Menu on navbar ' +
-        'does not open the About page!');
-    } else {
-      showMessage(
-        'The About Oppia button in About Menu on navbar ' +
-        'opens the About page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarAboutTabAboutButton,
+      'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
   }
 
   /**
-   * Function for click the Browse Our Lessons button in the About page
+   * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickBrowseOurLessonsButtonInAbout() {
-    await this.clickOn(browseOurLessonsButton);
-    if (this.page.url() !== mathClassroomUrl) {
-      throw new Error (
-        'The Browse our lesson button does not open the Math Classroom page!');
-    } else {
-      showMessage(
-        'The Browse our lesson button opens the Math Classroom page.');
-    }
+  async clickBrowseOurLessonsButtonInAboutPage() {
+    await this.clickButtonToNavigateToNewPage(
+      browseOurLessonsButton,
+      'Browse Our Lesson button', mathClassroomUrl, 'Math Classroom');
   }
 
   /**
-   * Function for click the Access Android App button in the About page
+   * Function to click the Access Android App button in the About page
    * and check if it opens the Android page.
    */
-  async clickAccessAndroidAppButtonInAbout() {
-    await this.clickOn(accessAndroidAppButton);
-    if (this.page.url() !== androidUrl) {
-      throw new Error (
-        'The Access the Android App button does not open the Android page!');
-    } else {
-      showMessage(
-        'The Access the Android App button opens the Android page.');
-    }
+  async clickAccessAndroidAppButtonInAboutPage() {
+    await this.clickButtonToNavigateToNewPage(
+      accessAndroidAppButton,
+      'Access the Android button', androidUrl, 'Android');
   }
 
   /**
-   * Function for click the Visit Classroom button in the About page
+   * Function to click the Visit Classroom button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickVisitClassroomButtonInAbout() {
-    await this.clickOn(visitClassroomButton);
-    if (this.page.url() !== mathClassroomUrl) {
-      throw new Error (
-        'The Visit Classroom button does not open the Math Classroom page!');
-    } else {
-      showMessage(
-        'The Visit Classroom button opens the Math Classroom page.');
-    }
+  async clickVisitClassroomButtonInAboutPage() {
+    await this.clickButtonToNavigateToNewPage(
+      visitClassroomButton,
+      'Visit Classroom button', mathClassroomUrl, 'Math Classroom');
   }
 
   /**
-   * Function for click the Browse Our Lessons button in the About page
+   * Function to click the Browse Library button in the About page
    * and check if it opens the Community Library page.
    */
-  async clickBrowseLibraryButtonInAbout() {
-    await this.clickOn(browseLibraryButton);
-    if (this.page.url() !== communityLibraryUrl) {
-      throw new Error (
-        'The Browse Library button does not open the Community Library page!');
-    } else {
-      showMessage(
-        'The Browse Library button opens the Community Library page.');
-    }
+  async clickBrowseLibraryButtonInAboutPage() {
+    await this.clickButtonToNavigateToNewPage(
+      browseLibraryButton,
+      'Browse Library button', communityLibraryUrl, 'Community Library');
   }
 
   /**
-   * Function for click the Browse Our Lessons button in the About page
+   * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Creator Dashboard page in Create Mode.
    */
-  async clickCreateLessonsButtonInAbout() {
+  async clickCreateLessonsButtonInAboutPage() {
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error (
@@ -224,34 +227,29 @@ module.exports = class LoggedInUsers extends baseUser {
   }
 
   /**
-   * Function for click the Browse Our Lessons button in the About page
+   * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickExploreLessonsButtonInAbout() {
-    await this.clickOn(exploreLessonsButton);
-    if (this.page.url() !== mathClassroomUrl) {
-      throw new Error (
-        'The Explore Lessons button does not open the Math Classroom page!');
-    } else {
-      showMessage(
-        'The Explore Lessons button opens the Math Classroom page.');
-    }
+  async clickExploreLessonsButtonInAboutPage() {
+    await this.clickButtonToNavigateToNewPage(
+      exploreLessonsButton,
+      'Explore Lessons button', mathClassroomUrl, 'Math Classroom');
   }
 
   /**
    * Function to click the The Oppia Foundation button in the About Menu
    * on navbar and check if it opens The About Foundation page.
    */
-  async clickAboutFoundationInAboutMenuOnNavbar() {
+  async clickAboutFoundationButtonInAboutMenuOnNavbar() {
     await this.clickOn(navbarAboutTab);
     await this.clickOn(navbarAboutTabAboutFoundationButton);
     await this.page.waitForSelector(aboutFoundationClass);
-    const displayedh1 = await this.page.$eval(
+    const displayedH1 = await this.page.$eval(
       aboutFoundationClass,
       element => element.innerText
     );
     if ((this.page.url() !== aboutFoundationUrl) &&
-      (displayedh1 !== 'THE OPPIA FOUNDATION')) {
+      (displayedH1 !== 'THE OPPIA FOUNDATION')) {
       throw new Error (
         'The Oppia Foundation button in About Menu on navbar ' +
         'does not open the About Foundation page!');
@@ -263,10 +261,10 @@ module.exports = class LoggedInUsers extends baseUser {
   }
 
   /**
-   * Function for click the 61 million children button
+   * Function to click the 61 million children link
    * in the About Foundation page and check if it opens the right page.
    */
-  async click61MillionChildrenButtonInAboutFoundation() {
+  async click61MillionChildrenLinkInAboutFoundation() {
     await this.page.waitForSelector(millionsOfContentId);
     const buttonText = await this.page.$eval(
       millionsOfContentId,
@@ -276,26 +274,25 @@ module.exports = class LoggedInUsers extends baseUser {
     if (buttonText !== '61 million children') {
       throw new Error (
         'The 61 Million Children button does not exist!');
+    }
+    await this.page.$eval(
+      millionsOfContentId,
+      element => element.getElementsByTagName('a')[0].click()
+    );
+    if (this.page.url() !== _61MillionChildrenUrl) {
+      throw new Error (
+        'The 61 Million Children link does not open the right page!');
     } else {
-      await this.page.$eval(
-        millionsOfContentId,
-        element => element.getElementsByTagName('a')[0].click()
-      );
-      if (this.page.url() !== _61MillionChildrenUrl) {
-        throw new Error (
-          'The 61 Million Children button does not open the right page!');
-      } else {
-        showMessage(
-          'The 61 Million Children button opens the right page.');
-      }
+      showMessage(
+        'The 61 Million Children link opens the right page.');
     }
   }
 
   /**
-   * Function for click the even those who are in school button
+   * Function to click the even those who are in school link
    * in the About Foundation page and check if it opens the right page.
    */
-  async clickEvenThoseWhoAreInSchoolButtonInAboutFoundation() {
+  async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation() {
     await this.page.waitForSelector(millionsOfContentId);
     const buttonText = await this.page.$eval(
       millionsOfContentId,
@@ -304,27 +301,36 @@ module.exports = class LoggedInUsers extends baseUser {
     if (buttonText !== 'even those who are in school') {
       throw new Error (
         'The Even Those Who Are In School button does not exist!');
+    }
+    await this.page.$eval(
+      millionsOfContentId,
+      element => element.getElementsByTagName('a')[1].click()
+    );
+    if (this.page.url() !== evenThoseWhoAreInSchoolUrl) {
+      throw new Error (
+        'The Even Those Who Are In School link does not open ' +
+        'the right page!');
     } else {
-      await this.page.$eval(
-        millionsOfContentId,
-        element => element.getElementsByTagName('a')[1].click()
-      );
-      if (this.page.url() !== evenThoseWhoAreInSchoolUrl) {
-        throw new Error (
-          'The Even Those Who Are In School button does not open ' +
-          'the right page!');
-      } else {
-        showMessage(
-          'The Even Those Who Are In School button opens the right page.');
-      }
+      showMessage(
+        'The Even Those Who Are In School link opens the right page.');
     }
   }
 
   /**
-   * Function for click the 420 million button
+   * Function to click the Source: UNESCO link in the About Foundation page
+   * and check if it opens the right page.
+   */
+  async clickSourceUnescoLinkInAboutFoundation() {
+    await this.clickButtonToNavigateToNewPage(
+      sourceUnescoButton,
+      'Source: UNESCO link', sourceUnescoUrl, 'right');
+  }
+
+  /**
+   * Function to click the 420 million link
    * in the About Foundation page and check if it opens the right page.
    */
-  async click420MillionButtonInAboutFoundation() {
+  async click420MillionLinkInAboutFoundation() {
     await this.page.waitForSelector(weCannotContentId);
     const buttonText = await this.page.$eval(
       weCannotContentId,
@@ -332,36 +338,18 @@ module.exports = class LoggedInUsers extends baseUser {
     );
     if (buttonText !== '420 million') {
       throw new Error (
-        'The 420 Million button does not exist!');
-    } else {
-      await this.page.$eval(
-        weCannotContentId,
-        element => element.getElementsByTagName('a')[0].click()
-      );
-      if (this.page.url() !== _420MillionUrl) {
-        throw new Error (
-          'The 420 Million button does not open the right page!');
-      } else {
-        showMessage(
-          'The 420 Million button opens the right page.');
-      }
+        'The 420 Million link does not exist!');
     }
-  }
-
-  /**
-   * Function to click the Source: UNESCO button in the About Foundation page
-   * and check if it opens the right page.
-   */
-  async clickSourceUnescoButtonInAboutFoundation() {
-    await this.clickOn(sourceUnescoButtion);
-    if (this.page.url() !== sourceUnescoUrl) {
+    await this.page.$eval(
+      weCannotContentId,
+      element => element.getElementsByTagName('a')[0].click()
+    );
+    if (this.page.url() !== _420MillionUrl) {
       throw new Error (
-        'The Source: UNESCO button in the About Foundation page ' +
-        'does not open the right page!');
+        'The 420 Million link does not open the right page!');
     } else {
       showMessage(
-        'The Source: UNESCO button in the About Foundation page ' +
-        'opens the right page.');
+        'The 420 Million link opens the right page.');
     }
   }
 
@@ -404,10 +392,10 @@ module.exports = class LoggedInUsers extends baseUser {
   }
 
   /**
-   * Function for click the Consider Becoming A Partner Today! button
+   * Function to click the Consider Becoming A Partner Today! link
    * in the About Foundation page and check if it opens the Partnerships page.
    */
-  async clickConsiderBecomingAPartnerTodayButtonInAboutFoundation() {
+  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation() {
     await this.page.waitForSelector(sectionSixPart1);
     const buttonText = await this.page.$eval(
       sectionSixPart1,
@@ -415,29 +403,28 @@ module.exports = class LoggedInUsers extends baseUser {
     );
     if (buttonText !== 'Consider becoming a partner today!') {
       throw new Error (
-        'The Consider becoming a partner today! button does not exist!');
+        'The Consider becoming a partner today! link does not exist!');
+    }
+    await this.page.$eval(
+      sectionSixPart1,
+      element => element.getElementsByTagName('a')[0].click()
+    );
+    if (this.page.url() !== partnershipsUrl) {
+      throw new Error (
+        'The Consider becoming a partner today! link does not open ' +
+        'the Partnerships page!');
     } else {
-      await this.page.$eval(
-        sectionSixPart1,
-        element => element.getElementsByTagName('a')[0].click()
-      );
-      if (this.page.url() !== partnershipsUrl) {
-        throw new Error (
-          'The Consider becoming a partner today! button does not open ' +
-          'the Partnerships page!');
-      } else {
-        showMessage(
-          'The Consider becoming a partner today! button opens ' +
-          'the Partnerships page.');
-      }
+      showMessage(
+        'The Consider becoming a partner today! link opens ' +
+        'the Partnerships page.');
     }
   }
 
   /**
-   * Function for click the Join our large volunteer community! button
+   * Function to click the Join our large volunteer community! link
    * in the About Foundation page and check if it opens the Volunteer page.
    */
-  async clickJoinOurLargeVolunteerCommunityButtonInAboutFoundation() {
+  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation() {
     await this.page.waitForSelector(sectionSixPart2);
     const buttonText = await this.page.$eval(
       sectionSixPart2,
@@ -445,29 +432,28 @@ module.exports = class LoggedInUsers extends baseUser {
     );
     if (buttonText !== 'Join our large volunteer community!') {
       throw new Error (
-        'The Join our large volunteer community! button does not exist!');
+        'The Join our large volunteer community! link does not exist!');
+    }
+    await this.page.$eval(
+      sectionSixPart2,
+      element => element.getElementsByTagName('a')[0].click()
+    );
+    if (this.page.url() !== volunteerUrl) {
+      throw new Error (
+        'The Join our large volunteer community! link does not open ' +
+        'the Volunteer page!');
     } else {
-      await this.page.$eval(
-        sectionSixPart2,
-        element => element.getElementsByTagName('a')[0].click()
-      );
-      if (this.page.url() !== volunteerUrl) {
-        throw new Error (
-          'The Join our large volunteer community! button does not open ' +
-          'the Volunteer page!');
-      } else {
-        showMessage(
-          'The Join our large volunteer community! button opens ' +
-          'the Volunteer page.');
-      }
+      showMessage(
+        'The Join our large volunteer community! link opens ' +
+        'the Volunteer page.');
     }
   }
 
   /**
-   * Function for click the donations button
+   * Function to click the donations link
    * in the About Foundation page and check if it opens the Donate page.
    */
-  async clickDonationsButtonInAboutFoundation() {
+  async clickDonationsLinkInAboutFoundation() {
     await this.page.waitForSelector(sectionSixPart3);
     const buttonText = await this.page.$eval(
       sectionSixPart3,
@@ -475,19 +461,18 @@ module.exports = class LoggedInUsers extends baseUser {
     );
     if (buttonText !== 'donations') {
       throw new Error (
-        'The donations button does not exist!');
+        'The donations link does not exist!');
+    }
+    await this.page.$eval(
+      sectionSixPart3,
+      element => element.getElementsByTagName('a')[0].click()
+    );
+    if (this.page.url() !== donateUrl) {
+      throw new Error (
+        'The donations link does not open the Donate page!');
     } else {
-      await this.page.$eval(
-        sectionSixPart3,
-        element => element.getElementsByTagName('a')[0].click()
-      );
-      if (this.page.url() !== donateUrl) {
-        throw new Error (
-          'The donations button does not open the Donate page!');
-      } else {
-        showMessage(
-          'The donations button opens the Donate page.');
-      }
+      showMessage(
+        'The donations link opens the Donate page.');
     }
   }
 
@@ -495,120 +480,71 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Blog button in the About Menu on navbar
    * and check if it opens the Blog page.
    */
-  async clickBlogInAboutMenuOnNavbar() {
+  async clickBlogButtonInAboutMenuOnNavbar() {
     await this.clickOn(navbarAboutTab);
-    await this.clickOn(navbarAboutTabBlogButton);
-    if (this.page.url() !== blogUrl) {
-      throw new Error (
-        'The Blog button in About Menu on navbar does not open ' +
-        'the Blog page!');
-    } else {
-      showMessage(
-        'The Blog button in About Menu on navbar opens the Blog page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarAboutTabBlogButton,
+      'Blog button in the About Menu on navbar', blogUrl, 'Blog');
   }
 
   /**
    * Function to click the School and Organizations button in the
    * Get Involved Menu on navbar and check if it opens the Partnerships page.
    */
-  async clickPartnershipsInGetInvolvedMenuOnNavbar() {
+  async clickPartnershipsButtonInGetInvolvedMenuOnNavbar() {
     await this.clickOn(navbarGetInvolvedTab);
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(navbarGetInvolvedTabSchoolAndOrganizationsButton),
-    ]);
-    if (this.page.url() !== partnershipsUrl) {
-      throw new Error (
-        'The School and Organizations button in Get Involved Menu on navbar ' +
-        'does not open the Partnerships page!');
-    } else {
-      showMessage(
-        'The School and Organizations button in Get Involved Menu on navbar ' +
-        'opens the Partnerships page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarGetInvolvedTabSchoolAndOrganizationsButton,
+      'School and Organizations in the Get Involved Menu on navbar',
+      partnershipsUrl, 'Partnerships');
   }
 
   /**
    * Function to click the Volunteer button in the Get Involved Menu
    * on navbar and check if it opens the Volunteer page.
    */
-  async clickVolunteerInGetInvolvedMenuOnNavbar() {
+  async clickVolunteerButtonInGetInvolvedMenuOnNavbar() {
     await this.clickOn(navbarGetInvolvedTab);
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(navbarGetInvolvedTabVolunteerButton),
-    ]);
-    if (this.page.url() !== volunteerUrl) {
-      throw new Error (
-        'The Volunteer button in Get Involved Menu on navbar does not open ' +
-        'the Volunteer page!');
-    } else {
-      showMessage(
-        'The Volunteer button in Get Involved Menu on navbar opens ' +
-        'the Volunteer page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarGetInvolvedTabVolunteerButton,
+      'Volunteer button in the Get Involved Menu on navbar',
+      volunteerUrl, 'Volunteer');
   }
 
   /**
    * Function to click the Donate button in the Get Involved Menu
    * on navbar and check if it opens the Donate page.
    */
-  async clickDonateInGetInvolvedMenuOnNavbar() {
+  async clickDonateButtonInGetInvolvedMenuOnNavbar() {
     await this.clickOn(navbarGetInvolvedTab);
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(navbarGetInvolvedTabDonateButton),
-    ]);
-    if (this.page.url() !== donateUrl) {
-      throw new Error (
-        'The Donate button in Get Involved Menu on navbar does not open ' +
-        'the Donate page!');
-    } else {
-      showMessage(
-        'The Donate button in Get Involved Menu on navbar opens ' +
-        'the Donate page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarGetInvolvedTabDonateButton,
+      'Donate button in the Get Involved Menu on navbar', donateUrl, 'Donate');
   }
 
   /**
    * Function to click the Contact Us button in the Get Involved Menu
    * on navbar and check if it opens the Partnerships page.
    */
-  async clickContactUsInGetInvolvedMenuOnNavbar() {
+  async clickContactUsButtonInGetInvolvedMenuOnNavbar() {
     await this.clickOn(navbarGetInvolvedTab);
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(navbarGetInvolvedTabContactUsButton),
-    ]);
-    if (this.page.url() !== contactUrl) {
-      throw new Error (
-        'The Contact Us button in Get Involved Menu on navbar does not open ' +
-        'the Contact page!');
-    } else {
-      showMessage(
-        'The Contact Us button in Get Involved Menu on navbar opens ' +
-        'the Contact page.');
-    }
+    await this.clickButtonToNavigateToNewPage(
+      navbarGetInvolvedTabContactUsButton,
+      'Contact Us button in the Get Involved Menu on navbar',
+      contactUrl, 'Contact');
   }
 
   /**
    * Function to click the Donate button on navbar
    * and check if it opens the Donate page.
    */
-  async clickDonateOnNavbar() {
-    await this.clickOn(navbarDonateButton);
-    if (this.page.url() !== donateUrl) {
-      throw new Error (
-        'The Donate button on navbar does not open the Donate page!');
-    } else {
-      showMessage(
-        'The Donate button on navbar opens the Donate page.');
-    }
+  async clickDonateButtonOnNavbar() {
+    await this.clickButtonToNavigateToNewPage(
+      navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
   }
 
   /**
-   * Function for click the Watch A Video button
+   * Function to click the Watch A Video button
    * in the Thanks for Donating page and check if it opens the right page.
    */
   async clickWatchAVideoButtonInThanksForDonatingPage() {
@@ -620,23 +556,22 @@ module.exports = class LoggedInUsers extends baseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error (
         'The Watch A Video button does not exist!');
+    }
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(watchAVideoButton),
+    ]);
+    if (this.page.url() !== watchAVideoUrl) {
+      throw new Error (
+        'The Watch A Video button does not open the right page!');
     } else {
-      await Promise.all([
-        this.page.waitForNavigation(),
-        this.clickOn(watchAVideoButton),
-      ]);
-      if (this.page.url() !== watchAVideoUrl) {
-        throw new Error (
-          'The Watch A Video button does not open the right page!');
-      } else {
-        showMessage(
-          'The Watch A Video button opens the right page.');
-      }
+      showMessage(
+        'The Watch A Video button opens the right page.');
     }
   }
 
   /**
-   * Function for click the Read Our Blog button
+   * Function to click the Read Our Blog button
    * in the Thanks for Donating page and check if it opens the Blog page.
    */
   async clickReadOurBlogButtonInThanksForDonatingPage() {
@@ -648,24 +583,24 @@ module.exports = class LoggedInUsers extends baseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error (
         'The Read Our Blog button does not exist!');
+    }
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn(readOurBlogButton),
+    ]);
+    if (this.page.url() !== blogUrl) {
+      throw new Error (
+        'The Read Our Blog button does not open the Blog page!');
     } else {
-      await Promise.all([
-        this.page.waitForNavigation(),
-        this.clickOn(readOurBlogButton),
-      ]);
-      if (this.page.url() !== blogWebUrl) {
-        throw new Error (
-          'The Read Our Blog button does not open the Blog page!');
-      } else {
-        showMessage(
-          'The Read Our Blog button opens the Blog page.');
-      }
+      showMessage(
+        'The Read Our Blog button opens the Blog page.');
     }
   }
 
   /**
-   * Function to click the dismiss button in the Thanks for Donating page and
-   * check if the Thanks for Donating popup disappear and show the Donate page
+   * Function to click the dismiss button in the Thanks for Donating page,
+   * and check if the Thanks for Donating popup disappear
+   * and if the Donate page is shown
    */
   async clickDismissButtonInThanksForDonatingPage() {
     await this.clickOn(dismissButton);
@@ -673,19 +608,18 @@ module.exports = class LoggedInUsers extends baseUser {
     if (thanksForDonatingHeader !== null) {
       throw new Error (
         'The dismiss button does not close the Thanks for Donating popup!');
+    }
+    const donatePageShowed = await this.page.$(donatePage);
+    const thanksForDonatingPageShowed =
+      await this.page.$(thanksForDonatingPage);
+    if ((donatePageShowed === null) ||
+      (thanksForDonatingPageShowed !== null)) {
+      throw new Error (
+        'The dismiss button does not show the Donate page!');
     } else {
-      const donatePageShowed = await this.page.$(donatePage);
-      const thanksForDonatingPageShowed =
-        await this.page.$(thanksForDonatingPage);
-      if ((donatePageShowed === null) ||
-        (thanksForDonatingPageShowed !== null)) {
-        throw new Error (
-          'The dismiss button does not open the Donate page!');
-      } else {
-        showMessage(
-          'The dismiss button closes the Thanks for Donating popup ' +
-          'and opens the Donate page.');
-      }
+      showMessage(
+        'The dismiss button closes the Thanks for Donating popup ' +
+        'and if the Donate page is shown.');
     }
   }
 };

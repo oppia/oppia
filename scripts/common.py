@@ -210,9 +210,9 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
     'duplicate-blog-post.spec.js',
     'logged-in-user-tests/check-navbar-buttons.spec.js',
-    'logged-in-user-tests/check-buttons-in-about-page.spec.js',
-    'logged-in-user-tests/check-buttons-in-about-foundation-page.spec.js',
-    'logged-in-user-tests/check-buttons-in-thanks-for-donating-page.spec.js',
+    'logged-in-user-tests/click-all-buttons-in-about-page.spec.js',
+    'logged-in-user-tests/click-all-buttons-in-about-foundation-page.spec.js',
+    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page.spec.js',
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'

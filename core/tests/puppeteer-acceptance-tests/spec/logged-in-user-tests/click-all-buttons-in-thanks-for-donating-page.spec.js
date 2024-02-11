@@ -25,31 +25,31 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User in Thanks for Donating page', function() {
-  let testuser = null;
+  let testUser = null;
 
   beforeAll(async function() {
-    testuser = await userFactory.createNewGuestUser(
+    testUser = await userFactory.createNewGuestUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   beforeEach(async function() {
-    await testuser.navigateToThanksForDonatingPage();
+    await testUser.navigateToThanksForDonatingPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the right page with the Watch A Video button.',
     async function() {
-      await testuser.clickWatchAVideoButtonInThanksForDonatingPage();
+      await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the Blog page with the Read Our Blog button.',
     async function() {
-      await testuser.clickReadOurBlogButtonInThanksForDonatingPage();
+      await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should close the thanks for donating popup and open the Donate ' +
+  it('should close the thanks for donating popup and show the Donate Page' +
     'with the dismiss button.',
   async function() {
-    await testuser.clickDismissButtonInThanksForDonatingPage();
+    await testUser.clickDismissButtonInThanksForDonatingPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

@@ -25,46 +25,46 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User in About page', function() {
-  let testuser = null;
+  let testUser = null;
 
   beforeAll(async function() {
-    testuser = await userFactory.createNewGuestUser(
+    testUser = await userFactory.createNewGuestUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   beforeEach(async function() {
-    await testuser.navigateToAboutPage();
+    await testUser.navigateToAboutPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Math Classroom page with the Browse Our Lessons button.',
     async function() {
-      await testuser.clickBrowseOurLessonsButtonInAbout();
+      await testUser.clickBrowseOurLessonsButtonInAboutPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Android page with the Access Android App button.',
     async function() {
-      await testuser.clickAccessAndroidAppButtonInAbout();
+      await testUser.clickAccessAndroidAppButtonInAboutPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Math Classroom page with the Visit Classroom button.',
     async function() {
-      await testuser.clickVisitClassroomButtonInAbout();
+      await testUser.clickVisitClassroomButtonInAboutPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Community Library page with the Browse Library button.',
     async function() {
-      await testuser.clickBrowseLibraryButtonInAbout();
+      await testUser.clickBrowseLibraryButtonInAboutPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Creator Dashboard page and Exploration Editor ' +
     'with the Create Lessons button',
   async function() {
-    await testuser.clickCreateLessonsButtonInAbout();
+    await testUser.clickCreateLessonsButtonInAboutPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Math Classroom page with the Explore Lessons button.',
     async function() {
-      await testuser.clickExploreLessonsButtonInAbout();
+      await testUser.clickExploreLessonsButtonInAboutPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

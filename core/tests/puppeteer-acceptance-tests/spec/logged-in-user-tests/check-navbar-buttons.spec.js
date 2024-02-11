@@ -25,55 +25,55 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User', function() {
-  let testuser = null;
+  let testUser = null;
 
   beforeAll(async function() {
-    testuser = await userFactory.createNewGuestUser(
+    testUser = await userFactory.createNewGuestUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open About Url with About Oppia button in About Menu on navbar',
     async function() {
-      await testuser.clickAboutInAboutMenuOnNavbar();
+      await testUser.clickAboutButtonInAboutMenuOnNavbar();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open About Foundation Url with The Oppia Foundation button ' +
     'in About Menu on navbar',
   async function() {
-    await testuser.clickAboutFoundationInAboutMenuOnNavbar();
+    await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Blog Url with Blog button in About Menu on navbar',
     async function() {
-      await testuser.clickBlogInAboutMenuOnNavbar();
+      await testUser.clickBlogButtonInAboutMenuOnNavbar();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Partnerships Url with School and Organizations button ' +
     'in Get Involved menu on navbar',
   async function() {
-    await testuser.clickPartnershipsInGetInvolvedMenuOnNavbar();
+    await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Volunteer Url with Volunteer button in Get Involved menu ' +
     'on navbar',
   async function() {
-    await testuser.clickVolunteerInGetInvolvedMenuOnNavbar();
+    await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Donate Url with Donate button in Get Involved menu on navbar',
     async function() {
-      await testuser.clickDonateInGetInvolvedMenuOnNavbar();
+      await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Contact Url with Contact Us button in Get Involved menu ' +
     'on navbar',
   async function() {
-    await testuser.clickContactUsInGetInvolvedMenuOnNavbar();
+    await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open Donate Url with Donate button on navbar',
     async function() {
-      await testuser.clickDonateOnNavbar();
+      await testUser.clickDonateButtonOnNavbar();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

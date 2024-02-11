@@ -25,62 +25,62 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User in About Foundation page', function() {
-  let testuser = null;
+  let testUser = null;
 
   beforeAll(async function() {
-    testuser = await userFactory.createNewGuestUser(
+    testUser = await userFactory.createNewGuestUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   beforeEach(async function() {
-    await testuser.navigateToAboutFoundationPage();
+    await testUser.navigateToAboutFoundationPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open right page with the 61 million children button.',
+  it('should open the right page with the 61 million children link.',
     async function() {
-      await testuser.click61MillionChildrenButtonInAboutFoundation();
+      await testUser.click61MillionChildrenLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open right page with the Even Those Who Are In School button.',
+  it('should open the right page with the Even Those Who Are In School link.',
     async function() {
-      await testuser.clickEvenThoseWhoAreInSchoolButtonInAboutFoundation();
+      await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open right page with the Source: UNESCO button.',
+  it('should open the right page with the Source: UNESCO link.',
     async function() {
-      await testuser.clickSourceUnescoButtonInAboutFoundation();
+      await testUser.clickSourceUnescoLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open right page with the 420 Million button.',
+  it('should open the right page with the 420 Million link.',
     async function() {
-      await testuser.click420MillionButtonInAboutFoundation();
+      await testUser.click420MillionLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the About page with the Learn More About Oppia button.',
     async function() {
-      await testuser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
+      await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the Volunteer page with the Become A Volunteer button.',
     async function() {
-      await testuser.clickBecomeAVolunteerButtonInAboutFoundation();
+      await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the Partnerships page with the Consider Becoming A ' +
-    'Partner Today! button.',
+    'Partner Today! link.',
   async function() {
-    await testuser.clickConsiderBecomingAPartnerTodayButtonInAboutFoundation();
+    await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should open the Volunteer page with the Join Our Large Volunteer ' +
-    'Community button.',
+    'Community link.',
   async function() {
-    await testuser.clickJoinOurLargeVolunteerCommunityButtonInAboutFoundation();
+    await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the Partnerships page with the donations button.',
+  it('should open the Donate page with the donations link.',
     async function() {
-      await testuser.clickDonationsButtonInAboutFoundation();
+      await testUser.clickDonationsLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
