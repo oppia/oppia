@@ -165,7 +165,6 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## CHROME_VERSION: Uses the specified version of the chrome driver.
 ## MOBILE: Run e2e test in mobile viewport.
 ## DEBUG: Runs the webdriverio test in debugging mode.
-## VIDEO_RECORDING_IS_ENABLED: Record the e2e test.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -175,13 +174,13 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
 # Adding env variable for the mobile view
-	@export MOBILE=${MOBILE:-false}
+	@export MOBILE=${MOBILE}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false}
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
 	echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
