@@ -433,6 +433,7 @@ export class StatsReportingService {
   // on the stateName.
   recordAnswerSubmitted(
       stateName: string, params: Object, answer: string,
+      explorationId: string, answerIsCorrect: boolean,
       answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string, feedbackIsUseful: boolean): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
@@ -459,6 +460,9 @@ export class StatsReportingService {
       this.nextStateName).then(() => {
       // Required for the post operation to deliver data to backend.
     });
+
+    this.siteAnalyticsService.registerAnswerSubmitted(
+      explorationId, answerIsCorrect);
   }
 
   // The type of params is declared as Object since it can vary depending
