@@ -41,6 +41,7 @@ import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-ta
 import { ToastrModule } from 'ngx-toastr';
 import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
 import { TopicEditorAccessGuard } from './topic-editor-access.guard';
+import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-viewer-player-common.module';
 
 
 @NgModule({
@@ -48,6 +49,7 @@ import { TopicEditorAccessGuard } from './topic-editor-access.guard';
     InteractionExtensionsModule,
     SharedComponentsModule,
     CommonModule,
+    TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
