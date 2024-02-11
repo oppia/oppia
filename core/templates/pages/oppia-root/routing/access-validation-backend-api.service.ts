@@ -48,6 +48,9 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'); // eslint-disable-line max-len
 
+  TOPIC_EDITOR_ACCESS_VALIDATOR_URL = (
+    '/access_validation_handler/can_view_any_topic_editor');
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -115,5 +118,10 @@ export class AccessValidationBackendApiService {
       });
 
     return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToTopicEditorPage(): Promise<void> {
+    return this.http.get<void>(
+      this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL).toPromise();
   }
 }

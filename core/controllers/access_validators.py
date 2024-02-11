@@ -24,6 +24,7 @@ from core.domain import blog_services
 from core.domain import classroom_config_services
 from core.domain import learner_group_services
 from core.domain import user_services
+from core.domain import topic_fetchers
 
 from typing import Dict, TypedDict
 
@@ -305,3 +306,40 @@ class BlogAuthorProfilePageAccessValidationHandler(
             raise self.PageNotFoundException(
                 'User with given username is not a blog post author.'
             )
+
+class TopicEditorPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to topic editor page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_view_any_topic_editor
+    def get(self, topic_id: str) -> None:
+        """Displays the topic editor page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. The topic with the given id doesn't exist.
+        """
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
+        pass

@@ -416,3 +416,34 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
             ), expected_status_int=404
         )
         self.logout()
+
+class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the topic editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+    def test_topic_editor_page_access_without_logging_in(self) -> None:
+        self.get_html_response(
+            '%s/can_view_any_topic_editor' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+
+    def test_topic_editor_page_access_without_having_rights(self) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response(
+            '%s/can_view_any_topic_editor' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+        self.logout()
+
+    def test_topic_editor_page_access_as_topic_manager(self) -> None:
+        self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
+        self.add_user_role(
+            self.TOPIC_MANAGER_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.get_html_response(
+            '%s/can_view_any_topic_editor' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+        self.logout()
+    

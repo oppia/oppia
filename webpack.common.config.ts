@@ -126,8 +126,6 @@ module.exports = {
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
@@ -445,17 +443,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_editor'],
-      filename: 'topic-editor-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/topic-editor-page/' +
-        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
