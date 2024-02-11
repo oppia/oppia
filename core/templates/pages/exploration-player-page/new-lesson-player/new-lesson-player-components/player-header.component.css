@@ -12,6 +12,8 @@
   height: 48px;
   justify-content: space-between;
   padding-left: 15px;
+  position: fixed;
+  width: 100%;
 }
 
 .player-header-right {

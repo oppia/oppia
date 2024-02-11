@@ -8,6 +8,9 @@
   background-color: #aed2e9;
   display: flex;
   height: calc(100vh - 104px);
+  position: fixed;
+  top: 104px;
+  width: 100%;
 }
 
 .oppia-new-player-main-content {

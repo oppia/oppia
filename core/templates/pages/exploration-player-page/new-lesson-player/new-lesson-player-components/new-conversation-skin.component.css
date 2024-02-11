@@ -47,9 +47,11 @@ oppia-conversation-skin .supplemental-card-parent-container {
   align-items: flex-start;
   display: -webkit-flex;
   display: flex;
+  height: calc(100vh - 184px);
   justify-content: center;
   margin: 0 auto;
   max-width: 1400px;
+  overflow-y: scroll;
   padding: 56px 14px 0;
   width: 100%;
 }
@@ -112,6 +114,7 @@ oppia-conversation-skin .supplemental-card-parent-container {
 
 .oppia-conversation-skin-animate-cards-container {
   margin: 0 auto;
+  top: 40px;
 }
 
 .oppia-conversation-skin-next-lesson-text-container {
