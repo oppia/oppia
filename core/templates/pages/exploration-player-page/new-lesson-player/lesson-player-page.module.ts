@@ -40,6 +40,7 @@ import { PlayerHeaderComponent } from './new-lesson-player-components/player-hea
 import { PlayerSidebarComponent } from './new-lesson-player-components/player-sidebar.component';
 import { PlayerFooterComponent } from './new-lesson-player-components/player-footer.component';
 import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-bar.component';
+import { NewConversationSkinComponent } from './new-lesson-player-components/new-conversation-skin.component';
 
 @NgModule({
   imports: [
@@ -63,6 +64,7 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
     PlayerSidebarComponent,
     PlayerFooterComponent,
     NewAudioBarComponent,
+    NewConversationSkinComponent,
   ],
   entryComponents: [
     NewLessonPlayerPageComponent,
@@ -71,6 +73,7 @@ import { NewAudioBarComponent } from './new-lesson-player-components/new-audio-b
     PlayerSidebarComponent,
     PlayerFooterComponent,
     NewAudioBarComponent,
+    NewConversationSkinComponent,
   ],
   providers: [
     HintAndSolutionModalService,

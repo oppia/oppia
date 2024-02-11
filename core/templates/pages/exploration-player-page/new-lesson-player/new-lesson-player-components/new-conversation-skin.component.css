@@ -1,0 +1,191 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+/* These styles must be embedded within the directive script tags, since
+otherwise they will interfere with the iframed conversation skin directive. */
+
+/* All classes below should start with .conversation-skin */
+.conversation-skin-correctness-footer-container {
+  bottom: 40px;
+  left: 0;
+  padding: 0;
+  pointer-events: none;
+  position: fixed;
+  width: 100%;
+  z-index: 16;
+}
+
+oppia-conversation-skin .supplemental-card-parent-container {
+  min-width: 50%;
+}
+
+.conversation-skin-next-lesson-wrapper {
+  align-items: center;
+  background-color: white;
+  bottom: 0;
+  display: flex;
+  margin: 0 0 -68px 0;
+  padding: 10px;
+  position: absolute;
+  right: 0;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.conversation-skin-next-lesson-text {
+  color: #0d48a1;
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  height: 14px;
+}
+
+.conversation-skin-cards-container {
+  align-items: flex-start;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 56px 14px 0;
+  width: 100%;
+}
+
+.conversation-skin-help-card-content {
+  padding: 12px;
+}
+
+.conversation-skin-tutor-card-container {
+  flex-shrink: 10000;
+  margin-bottom: 84px;
+  max-width: 650px;
+  /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
+      below should be changed to match. */
+  min-width: 360px;
+  position: relative;
+  width: 42%;
+  z-index: 3;
+}
+
+/* Some mobile devices have CSS width below 360px, use a responsive min-width
+    when under 360px to prevent pushing things offscreen. */
+@media(max-width: 360px) {
+  .conversation-skin-tutor-card-container {
+    min-width: 100vw;
+  }
+}
+
+.conversation-skin-supplemental-card-container {
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
+  flex-shrink: 1;
+  margin-bottom: 200px;
+  margin-left: 12px;
+  margin-top: 30px;
+  max-width: 650px;
+  position: relative;
+  width: 42%;
+  z-index: 2;
+}
+
+.conversation-skin-supplemental-nav-submit-button,
+.conversation-skin-supplemental-nav-submit-button.mat-button {
+  margin-right: 10px;
+  position: absolute;
+  right: 8px;
+  top: -10px;
+}
+
+.conversation-skin-supplemental-nav-submit-button.oppia-learner-confirm-button {
+  left: auto;
+  right: 8px;
+}
+
+.conversation-skin-supplemental-nav {
+  background: white;
+  height: 32px;
+  position: relative;
+}
+
+.oppia-conversation-skin-animate-cards-container {
+  margin: 0 auto;
+}
+
+.oppia-conversation-skin-next-lesson-text-container {
+  cursor: default;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+oppia-conversation-skin .oppia-button-raised.md-raised {
+  align-items: center;
+  background-color: #0d48a1;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+oppia-conversation-skin .oppia-button-icon {
+  color: #fff;
+}
+
+.oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
+  cursor: default;
+}
+
+@media screen and (max-width: 959px) {
+  .conversation-skin-cards-container {
+    display: block;
+    padding: 66px 0;
+    position: relative;
+    width: 100%;
+  }
+
+  .conversation-skin-tutor-card-container {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    left: 0;
+    margin: 0 auto;
+    right: 0;
+    top: 40px;
+    width: 100%;
+    z-index: 15;
+  }
+
+  .conversation-skin-tutor-card-alone {
+    position: relative;
+    top: 0;
+  }
+
+  .supplemental-card-parent-container {
+    position: unset;
+  }
+
+  .conversation-skin-supplemental-card-container {
+    left: 50%;
+    margin: 60px auto 0 auto;
+    min-width: 360px;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 100%;
+  }
+
+  .conversation-skin-oppia-avatar.show-tutor-card {
+    border-radius: 50%;
+    box-shadow: 0 3px 3px grey, 0 5px 3px grey;
+    display: block;
+    height: 40px;
+    left: 100%;
+    position: absolute;
+    transform: translate(-100%, -100%);
+    width: 40px;
+    z-index: 16;
+  }
+
+  .conversation-skin-oppia-avatar.show-tutor-card:hover {
+    opacity: 0.8;
+  }
+}
