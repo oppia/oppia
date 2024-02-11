@@ -36,12 +36,11 @@ import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rear
 import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
 import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
-import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
-import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-viewer-player-common.module';
-import { ToastrModule } from 'ngx-toastr';
-import { TopicEditorAccessGuard } from './topic-editor-access.guard';
 import { TopicEditorPageComponent } from './topic-editor-page.component';
+import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
+import { ToastrModule } from 'ngx-toastr';
 import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
+import { TopicEditorAccessGuard } from './topic-editor-access.guard';
 
 
 @NgModule({
@@ -49,7 +48,6 @@ import { TopicEditorPageRootComponent } from './topic-editor-page-root.component
     InteractionExtensionsModule,
     SharedComponentsModule,
     CommonModule,
-    TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
