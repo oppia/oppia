@@ -127,7 +127,10 @@ var presenceOf = async function(element, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = async function(element, errorMessage) {
+var visibilityOf = async function(element, errorMessage, testing) {
+  if (!element) {
+    throw new Error(`Element is not defined, ${testing}`);
+  }
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'

@@ -32,7 +32,7 @@ var clear = async function(inputName, inputElement) {
 
 var click = async function(elementName, clickableElement, elementIsMasked) {
   await waitFor.visibilityOf(
-    clickableElement, `${elementName} is not visible.`);
+    clickableElement, `${elementName} is not visible.`, elementName);
   await waitFor.elementToBeClickable(
     clickableElement, `${elementName} is not clickable.`);
   // In some cases, we expect the element to be masked by a dummy element. In
