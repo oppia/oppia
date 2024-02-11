@@ -1,0 +1,73 @@
+name: Lighthouse CI accessibility tests
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  lighthouse:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      # Caching is disabled to avoid poisoning our cache with the
+      # changed lighthouse file.
+      #
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: /home/runner/work/oppia/yarn_cache
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - run: |
+          # Replace the 1.5 second timeout in lighthouse for retrieving
+          # sourcemaps with a 10 second timeout. This timeout is not
+          # configurable through Lighthouse's exposed API, so we have
+          # resorted to patching the code instead.
+          set -e
+          FILEPATH=$GITHUB_WORKSPACE/node_modules/lighthouse/lighthouse-core/gather/gatherers/source-maps.js
+          SEARCH_TARGET="1500"
+          REPLACEMENT="10000"
+          occurrences=$(grep -c $SEARCH_TARGET $FILEPATH)
+          echo "Found $occurrences occurrences of '$SEARCH_TARGET'"
+          # Assert that there is only one match for the target string.
+          # If there are ever zero or multiple matches, the lighthouse
+          # code has changed and this logic needs to be reviewed.
+          [[ $occurrences == "1" ]]
+          # Replace the target string with the replacement string.
+          sed -i 's/$SEARCH_TARGET/$REPLACEMENT/' $FILEPATH
+          echo "Replaced '$SEARCH_TARGET' with '$REPLACEMENT' in $FILEPATH"
+        shell: bash
+      - name: Install chrome
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_chrome_for_ci
+      - name: Run Lighthouse accessibility checks shard
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard }}
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A Lighthouse test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

@@ -1,0 +1,43 @@
+name: Python type checks
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  run_tests:
+    name: Run Mypy Type Checks
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - name: Install python 2 for GAE
+        run: |
+          sudo apt update
+          sudo apt install python2 -y
+      - uses: ./.github/actions/merge
+      - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_third_party_libs
+      - name: Run Mypy type checks
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_mypy_checks --skip-install --install-globally
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Python type checks failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

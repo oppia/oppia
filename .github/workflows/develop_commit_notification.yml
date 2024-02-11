@@ -1,0 +1,34 @@
+name: Broadcast 'push to develop' event to our release-scripts repo
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  send_notification:
+    name: Send notification
+    runs-on: ubuntu-22.04
+    if: github.repository == 'oppia/oppia'
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_ID }}
+          private_key: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_PRIVATE_KEY }}
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@87c5425cae5ba8b5bc7da27674076c78588babf3
+        env:
+          VERSION: ${{ format('auto-{0}', github.sha) }}
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: oppia/release-scripts
+          event-type: develop-commit
+          client-payload: '{
+            "version": "${{ env.VERSION }}",
+            "app_name": "oppiaserver-backup-migration",
+            "maintenance_mode": "false",
+            "sha": "${{ github.sha }}",
+            "build_was_manually_triggered": "false",
+            "repo_owner": "${{ github.repository_owner }}"
+          }'

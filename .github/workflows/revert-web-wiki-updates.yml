@@ -1,0 +1,58 @@
+name: Revert Wiki Changes Made Through the Web Interface
+on:
+  gollum:
+  workflow_dispatch:
+jobs:
+  revert:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Retrieve authentication token
+        id: get-token
+        # SHA1 hash of the release-v0.0.1 commit.
+        uses: oppia/get-github-app-token@8c3b19db0cdcd0f7fded7dd71e5e0429bf72df1a
+        with:
+          app_id: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_ID }}
+          private_key: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{github.repository_owner}}/oppia.wiki
+          token: ${{ steps.get-token.outputs.token }}
+          fetch-depth: 0
+      - name: Add remote
+        run: git remote add source https://github.com/${{github.repository_owner}}/oppia-web-developer-docs.git
+      - name: Fetch remote
+        run: git fetch source
+      - name: Check for differences
+        id: check-diff
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "diff<<$delimiter" >> "$GITHUB_OUTPUT"
+          echo $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
+          echo "$delimiter" >> "$GITHUB_OUTPUT"
+      - name: Revert commits
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        run: |
+          git config user.name oppia-wiki-synchronizer[bot]
+          # Email has the form id+name@users.noreply.github.com. The ID
+          # can be retrieved from
+          # https://api.github.com/users/oppia-wiki-synchronizer[bot].
+          git config user.email 102317631+oppia-wiki-synchronizer[bot]@users.noreply.github.com
+          git revert --no-commit source/develop..origin/master
+          msg_file=$(mktemp)
+          echo "Reverting the following changes made through the web interface:\n" > $msg_file
+          git log source/develop..origin/master | while read line; do echo "    ${line}"; done >> $msg_file
+          git commit -F $msg_file
+      - name: Merge in development commits
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        # If a PR in the source repository was merged around the same time as a
+        # change was made to the wiki through the web interface, its deployment
+        # might fail before this job can revert the change. In that case, we
+        # need to merge in those un-deployed changes to both the source and
+        # deployment repositories.
+        run: git merge source/develop
+      - name: Push to deployment repository
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        run: git push source master:develop
+      - name: Push to source repository
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        run: git push

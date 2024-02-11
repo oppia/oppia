@@ -1,0 +1,91 @@
+name: Frontend Karma tests
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  generate-job-strategy-matrix:
+    runs-on: ubuntu-22.04
+    outputs:
+      job-strategy-matrix: ${{ steps.generate.outputs.job-strategy-matrix }}
+    steps:
+      - name: Generate job strategy matrix
+        id: generate
+        env:
+          standard-test-runs: 2
+          flakes-test-runs: 40
+        run: |
+          if ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+          then
+            JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.flakes-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
+            echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
+          else
+            JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
+            echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
+          fi
+  frontend-karma-tests:
+    needs: generate-job-strategy-matrix
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      max-parallel: 25
+      matrix:
+        os: [ubuntu-22.04]
+        num_runs: ${{ fromJson(needs.generate-job-strategy-matrix.outputs.job-strategy-matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Describe filesystem
+        run: |
+          pwd
+          ls /home/runner/work
+          ls /home/runner/work/oppia
+          ls /home/runner/work/oppia/oppia
+          echo $GITHUB_WORKSPACE
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - name: Cache node modules and third_party/static
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            /home/runner/work/oppia/yarn_cache
+            /home/runner/work/oppia/oppia/third_party/static
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Run frontend tests ${{ matrix.num_runs }}
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+      - name: Uploading fronted coverage reports as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage-${{ matrix.num_runs }}
+          path: /home/runner/work/oppia/karma_coverage_reports
+  report-failure:
+    needs: frontend-karma-tests
+    runs-on: ubuntu-22.04
+    if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Report failure if failed on oppia/oppia develop branch
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A frontend test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
