@@ -11,9 +11,9 @@ on:
       - develop
       - release-*
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+#   cancel-in-progress: true
 
 jobs:
   e2e_test:
@@ -73,7 +73,7 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
+      # - uses: ./.github/actions/merge
       - uses: ./.github/actions/install-chrome
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
