@@ -92,9 +92,6 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
 
-  CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION: string;
-  CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION: string;
-  CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION: string;
   USER_FILTER_CRITERION_ROLE: string;
   USER_FILTER_CRITERION_USERNAME: string;
   CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
