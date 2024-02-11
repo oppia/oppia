@@ -48,7 +48,7 @@ describe('EmailDashboardAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not super admin', (done) => {
+  it('should redirect to 401 page if user is not super admin', (done) => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(UserInfo.createDefault())
@@ -66,7 +66,7 @@ describe('EmailDashboardAuthGuard', () => {
       });
   });
 
-  it('should not redirect user to 401 page if user is super admin', (done) => {
+  it('should access the email dashboard if the user is super admin', (done) => {
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
