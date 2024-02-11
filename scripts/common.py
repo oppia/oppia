@@ -212,7 +212,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/check-navbar-buttons.spec.js',
     'logged-in-user-tests/click-all-buttons-in-about-page.spec.js',
     'logged-in-user-tests/click-all-buttons-in-about-foundation-page.spec.js',
-    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page.spec.js',
+    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page' +
+    '.spec.js',
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
