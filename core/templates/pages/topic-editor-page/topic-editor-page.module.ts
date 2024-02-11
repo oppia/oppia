@@ -17,6 +17,7 @@
  */
 
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RouterModule } from '@angular/router';
@@ -35,22 +36,25 @@ import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rear
 import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
 import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
-import { TopicEditorPageComponent } from './topic-editor-page.component';
 import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
-import { TopicEditorAccessGuard } from './topic-editor-access.guard';
 import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-viewer-player-common.module';
 import { ToastrModule } from 'ngx-toastr';
+import { TopicEditorAccessGuard } from './topic-editor-access.guard';
+import { TopicEditorPageComponent } from './topic-editor-page.component';
+import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
+
 
 @NgModule({
   imports: [
     InteractionExtensionsModule,
     SharedComponentsModule,
+    CommonModule,
     TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {
         path: '',
-        component: TopicEditorPageComponent,
+        component: TopicEditorPageRootComponent,
         canActivate: [TopicEditorAccessGuard]
       }
     ]),
@@ -71,6 +75,7 @@ import { ToastrModule } from 'ngx-toastr';
     TopicEditorStoriesListComponent,
     TopicEditorTabComponent,
     TopicEditorPageComponent,
+    TopicEditorPageRootComponent,
     SubtopicEditorTabComponent
   ],
   entryComponents: [

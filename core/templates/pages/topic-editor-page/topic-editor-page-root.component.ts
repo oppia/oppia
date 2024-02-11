@@ -24,7 +24,7 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   selector: 'topic-editor-page-root',
   templateUrl: './topic-editor-page-root.component.html',
 })
-export class AdminPageRootComponent extends BaseRootComponent {
+export class TopicEditorPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.META as
