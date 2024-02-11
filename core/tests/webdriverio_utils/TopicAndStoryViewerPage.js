@@ -52,7 +52,9 @@ var TopicAndStoryViewerPage = function() {
 
   this.goToChapterIndex = async function(index) {
     var chapterTitleList = await chapterTitleListSelector();
+    console.log('Chapter title list: ', chapterTitleList);
     var chapter = chapterTitleList[index];
+    console.log('Chapter: ', chapter);
     await action.click('Chapter title', chapter);
     await waitFor.pageToFullyLoad();
   };
