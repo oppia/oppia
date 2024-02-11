@@ -446,6 +446,7 @@ import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
+import { TopicEditorAccessGuard } from 'pages/topic-editor-page/topic-editor-access.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -861,6 +862,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
+  ['TopiEditorAccessGuard', TopicEditorAccessGuard],
   ['TopicUpdateService', TopicUpdateService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
