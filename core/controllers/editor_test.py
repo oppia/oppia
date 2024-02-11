@@ -750,7 +750,7 @@ solicit_answer_details: false
                 })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
-        self.maxDiff = 0
+        self.maxDiff = None
         download_url = (
             '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
