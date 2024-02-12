@@ -19,7 +19,7 @@
           </span>
         </div>
 
-        <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container e2e-test-chapters-container">
+        <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a *ngFor="let node of storyPlaythroughObject.getStoryNodes();let last = isLast;let index = index"
              [href]="getExplorationUrl(node)" tabindex="0">
 

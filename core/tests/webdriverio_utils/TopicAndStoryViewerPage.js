@@ -32,7 +32,7 @@ var TopicAndStoryViewerPage = function() {
     '.e2e-test-dismiss-sign-up-section-button');
   var practicetabContainer = $('.e2e-test-practice-tab-container');
   var practiceSessionContainer = $('.e2e-test-practice-session-container');
-  var chaptersContainer = $('.e2e-test-chapters-container');
+  var chapterTitleItem = $('.e2e-test-chapter-title');
   var chapterTitleListSelector = function() {
     return $$('.e2e-test-chapter-title');
   };
@@ -53,7 +53,7 @@ var TopicAndStoryViewerPage = function() {
 
   this.goToChapterIndex = async function(index) {
     await waitFor.visibilityOf(
-      chaptersContainer, 'Chapters container takes too long to be visible.');
+      chapterTitleItem, 'Chapters take too long to be visible.');
     var chapterTitleList = await chapterTitleListSelector();
     var chapter = chapterTitleList[index];
     await action.click('Chapter title', chapter);
