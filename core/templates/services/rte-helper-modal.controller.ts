@@ -106,12 +106,12 @@ type CustomizationArgsNameAndValueArray = {
 export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated: boolean;
   modalIsLoading: boolean = true;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  defaultRTEComponent: boolean;
   public customizationArgsForm: FormGroup;
 
   constructor(
@@ -198,21 +198,6 @@ export class RteHelperModalComponent {
       this.currentRteIsLinkEditor = true;
     }
 
-    // The 'defaultRTEComponent' variable controls whether the delete button
-    // needs to be shown. If the RTE component has default values, there is no
-    // need for a delete button as the 'Cancel' button would have
-    // the same functionality.
-    this.defaultRTEComponent = true;
-    for (let i = 0; i < this.customizationArgSpecs.length; i++) {
-      let caName = this.customizationArgSpecs[i].name;
-      let attrsCaDict = this.attrsCustomizationArgsDict;
-      if (
-        attrsCaDict.hasOwnProperty(caName) &&
-        attrsCaDict[caName] !== this.customizationArgSpecs[i].default_value
-      ) {
-        this.defaultRTEComponent = false;
-      }
-    }
     const formGroupControls = {};
     this.customizationArgSpecs.forEach((_, index) => {
       formGroupControls[index] = this.fb.control(
@@ -228,23 +213,11 @@ export class RteHelperModalComponent {
   }
 
   cancel(): void {
-    for (let i = 0; i < this.customizationArgSpecs.length; i++) {
-      let caName = this.customizationArgSpecs[i].name;
-      let attrsCaDict = this.attrsCustomizationArgsDict;
-      // If the RTE component contains only default ca values, we remove it
-      // from the editor on clicking cancel. When the
-      // uibModalInstance.dismiss method is called with true, the tag from
-      // the editor is removed and when called with false, the tag remains
-      // as-is.
-      if (
-        attrsCaDict.hasOwnProperty(caName) &&
-        attrsCaDict[caName] !== this.customizationArgSpecs[i].default_value
-      ) {
-        this.ngbActiveModal.dismiss(false);
-        return;
-      }
+    if (this.componentIsNewlyCreated) {
+      this.ngbActiveModal.dismiss(true);
+    } else {
+      this.ngbActiveModal.dismiss(false);
     }
-    this.ngbActiveModal.dismiss(true);
   }
 
   delete(): void {
