@@ -45,6 +45,13 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/email-dashboard-pages/email-dashboard-page.module')
+      .then(m => m.EmailDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
