@@ -61,7 +61,7 @@
         </i>
       </div>
 
-      <strong class="oppia-outcome-heading" tabindex="0">Oppia tells the learner...</strong>
+      <strong class="oppia-outcome-heading" tabindex="0">Oppia tells the learner&nbsp;...&nbsp;</strong>
       <div class="position-relative">
         <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed">
           <span class="oppia-confusing-outcome-warning-text" tabindex="0">
@@ -132,8 +132,8 @@
 
       <div>
         <strong class="oppia-outcome-heading" *ngIf="displayFeedback" tabindex="0">And afterwards, directs the learner
-        to...</strong>
-        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to...</strong>
+        to&nbsp;...&nbsp;</strong>
+        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to&nbsp;...&nbsp;</strong>
         <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative" tabindex="0">
           {{ outcome.dest }}
         </span>
@@ -196,12 +196,12 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback" tabindex="0">(Optional) If the learner is really stuck, direct them to</strong>
-        <strong *ngIf="!displayFeedback" tabindex="0">(Optional) Oppia directs the stuck learner to...</strong>
+        <strong *ngIf="displayFeedback" tabindex="0">(Optional) If the learner is really stuck, direct them to&nbsp;...&nbsp;</strong>
+        <strong *ngIf="!displayFeedback" tabindex="0">(Optional) Oppia directs the stuck learner to&nbsp;...&nbsp;</strong>
         <span tabindex="0" *ngIf="outcome && outcome.destIfReallyStuck !== null" class="position-relative">
           {{ outcome.destIfReallyStuck }}
         </span>
-        <span tabindex="0" *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative"></span>
+        <span tabindex="0" *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative">(none)</span>
       </div>
     </div>
   </div>

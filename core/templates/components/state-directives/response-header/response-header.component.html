@@ -22,7 +22,7 @@
   </div>
 
   <br class="break-in-mobile">
-  <span *ngIf="outcome"> →</span>
+  <span *ngIf="outcome">→&nbsp;</span>
   <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
   </span>
@@ -68,6 +68,13 @@
   .oppia-response-header-block {
     margin-left: 39px;
   }
+
+  @media screen and (min-width: 769px) {
+    .oppia-response-header-block {
+        display: flex;
+        align-items: flex-end;
+    }
+}
 
   .oppia-nested-link {
     color: #0844aa;

@@ -2,7 +2,7 @@
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
   <div *ngIf="rules">
     <strong class="oppia-answer-group-heading" tabindex="0">
-      If the learner's answer...
+      If the learner's answer ...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
       <li *ngFor="let rule of rules;  let index = index;let last = last;" [ngClass]="{'active': activeRuleIndex === index, 'oppia-answer-rule-block': last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block e2e-test-rule-block">
@@ -10,11 +10,11 @@
           <div class="oppia-rule-header">
             <span *ngIf="index > 0">or </span>
             <span *ngIf="getCurrentInteractionId() !== 'MultipleChoiceInput' && index !== activeRuleIndex">
-              {{rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices}}...
+              {{rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices}} ...
             </span>
             <span *ngIf="getCurrentInteractionId() === 'MultipleChoiceInput'">
               <oppia-rte-output-display class="oppia-multiple-choice-rule" [rteString]="rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices">
-              </oppia-rte-output-display>...
+              </oppia-rte-output-display> ...
             </span>
           </div>
         </a>
