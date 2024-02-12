@@ -17,7 +17,6 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { QueryData } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
@@ -131,8 +130,3 @@ export class EmailDashboardPageComponent {
     return (submitter === this.username) && (status === 'completed');
   }
 }
-
-angular.module('oppia').directive('oppiaEmailDashboardPage',
-  downgradeComponent({
-    component: EmailDashboardPageComponent
-  }) as angular.IDirectiveFactory);
