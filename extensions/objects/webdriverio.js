@@ -294,6 +294,10 @@ var UnicodeStringEditor = function(elem) {
       await action.setValue(
         'Unicode String Editor Input', elem.$('<input>'), text);
     },
+    getValue: async function() {
+      return await action.getValue(
+        'Unicode String Editor Input', elem.$('<input>'));
+    },
     expectValueToBe: async function(expectedValue) {
       var value = await action.getAttribute(
         'Unicode Input Element', elem.$('<input>'), 'value');

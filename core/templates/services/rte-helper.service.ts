@@ -59,6 +59,7 @@ export class RteHelperService {
   // after exiting the modal, and moves the cursor back to where it was
   // before the modal was opened.
   openCustomizationModal(
+      componentIsNewlyCreated: boolean,
       customizationArgSpecs: CustomizationArgsSpecsType,
       attrsCustomizationArgsDict: CustomizationArgsForRteType,
       onSubmitCallback?: (arg0: unknown) => void,
@@ -68,6 +69,8 @@ export class RteHelperService {
     const modalRef = this.modalService.open(RteHelperModalComponent, {
       backdrop: 'static'
     });
+    modalRef.componentInstance.componentIsNewlyCreated = (
+      componentIsNewlyCreated);
     modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.attrsCustomizationArgsDict = (
       attrsCustomizationArgsDict);
