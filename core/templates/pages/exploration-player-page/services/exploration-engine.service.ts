@@ -114,7 +114,8 @@ export class ExplorationEngineService {
         pathnameArray[i] === 'explore' ||
         pathnameArray[i] === 'create' ||
         pathnameArray[i] === 'skill_editor' ||
-        pathnameArray[i] === 'embed'
+        pathnameArray[i] === 'embed' ||
+        pathnameArray[i] === 'lesson'
       ) {
         explorationContext = true;
         break;

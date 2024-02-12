@@ -21,7 +21,7 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
-
+import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -88,6 +88,14 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/exploration-player-page/exploration-player-page.module')
       .then(m => m.ExplorationPlayerPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NEW_LESSON_PLAYER.ROUTE,
+    loadChildren: () => import(
+      'pages/exploration-player-page/new-lesson-player' +
+      '/lesson-player-page.module')
+      .then(m => m.NewLessonPlayerPageModule),
+    canActivate: [IsNewLessonPlayerGuard]
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,

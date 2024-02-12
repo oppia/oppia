@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner view info section of the
- * footer.
+ * @fileoverview Component for the new lesson player header
  */
 
 import { Component } from '@angular/core';
@@ -31,17 +30,17 @@ import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StatsReportingService } from '../services/stats-reporting.service';
+import { StatsReportingService } from '../../services/stats-reporting.service';
 
-import './learner-view-info.component.css';
+import './player-header.component.css';
 
 
 @Component({
-  selector: 'oppia-learner-view-info',
-  templateUrl: './learner-view-info.component.html',
-  styleUrls: ['./learner-view-info.component.css']
+  selector: 'oppia-player-header',
+  templateUrl: './player-header.component.html',
+  styleUrls: ['./player-header.component.css']
 })
-export class LearnerViewInfoComponent {
+export class PlayerHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -171,7 +170,7 @@ export class LearnerViewInfoComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaLearnerViewInfo',
+angular.module('oppia').directive('oppiaPlayerHeader',
   downgradeComponent({
-    component: LearnerViewInfoComponent
+    component: PlayerHeaderComponent
   }) as angular.IDirectiveFactory);

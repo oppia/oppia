@@ -1,0 +1,19 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-lesson-player-sidebar {
+  background-color: #fff;
+  box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
+  height: 100%;
+  position: relative;
+  transition: width 0.3s ease-in-out;
+  width: 75px;
+  z-index: 1;
+}
+
+.oppia-lesson-player-sidebar.expanded {
+  width: 250px;
+}

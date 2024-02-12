@@ -1,0 +1,22 @@
+<div class="oppia-lesson-player-header">
+  <p>
+    <span class="e2e-test-exploration-header oppia-exploration-header"
+          itemprop="description">
+      <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
+        {{ explorationTitle }}
+      </span>
+      <span *ngIf="isHackyExpTitleTranslationDisplayed()">
+        {{ explorationTitleTranslationKey | translate }}
+      </span>
+    </span>
+  </p>
+  <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true"
+     [href]="getTopicUrl()">
+    <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+      {{ topicName }}
+    </span>
+    <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+      {{ topicNameTranslationKey | translate }}
+    </span>
+  </a>
+</div>

@@ -79,6 +79,10 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
   providers: [
     HintAndSolutionModalService,
     FatigueDetectionService,
-  ]
+  ],
+  exports: [
+    LearnerLocalNavComponent,
+    LearnerViewInfoComponent,
+  ],
 })
 export class ExplorationPlayerPageModule {}

@@ -1,0 +1,15 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-new-player-content {
+  background-color: #aed2e9;
+  display: flex;
+  height: calc(100vh - 96px);
+}
+
+.oppia-new-player-main-content {
+  width: 100%;
+}
