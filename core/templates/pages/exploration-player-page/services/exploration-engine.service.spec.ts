@@ -285,7 +285,6 @@ describe('Exploration engine service ', () => {
       },
       param_changes: [],
       title: 'My Exploration Title',
-      correctness_feedback_enabled: false,
       draft_change_list_id: 9,
       is_version_of_draft_valid: null,
       language_code: 'en',
@@ -305,7 +304,6 @@ describe('Exploration engine service ', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
         edits_allowed: true
       }
     };
@@ -331,7 +329,6 @@ describe('Exploration engine service ', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false,
         next_content_id_index: 1
       },
       exploration_metadata: {
@@ -347,7 +344,6 @@ describe('Exploration engine service ', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: false,
         edits_allowed: true
       },
       exploration_id: 'test_id',
@@ -358,7 +354,6 @@ describe('Exploration engine service ', () => {
       preferred_language_codes: [],
       auto_tts_enabled: false,
       displayable_language_codes: [],
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,
