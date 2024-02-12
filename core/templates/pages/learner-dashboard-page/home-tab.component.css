@@ -219,6 +219,12 @@
 }
 
 /*Redesign classes*/
+.greeting-heading { 
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+}
+
 .page-heading {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -226,12 +232,50 @@
   margin: 0;
 }
 
+.section-button {
+  background-color: #fff;
+  border: 2px solid #205D86;
+  border-radius: .25em;
+  color: #205D86;
+  font-weight: 700;
+  padding: 10px 0;
+  text-decoration: none;
+  width: 344px;
+}
+
+.section-button:hover {
+  background-color: #CADBDA;
+  color: #205D86;
+  text-decoration: none;
+}
+
 .section-container {
   background-color: #fff;
+  border-radius: .25em;
+  margin-bottom: 16px;
+  padding: 16px;
 }
 
 .section-heading {
   color: #205D86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
+}
+
+.subsection-heading {
+  color: #333333;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.topic-summary-tile-section-1 {
+  -webkit-appearance: none;
+}
+
+.topic-summary-tile-1 {
+  border-radius: .25em;
+  height: 220px;
+  margin-right: 16px;
+  width: 210px;
 }

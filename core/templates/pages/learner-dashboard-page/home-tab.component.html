@@ -84,13 +84,12 @@
   </ng-container>
 
   <!--REDESIGN-->
-  <ng-container *ngIf="featureFlag"> 
-    <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+  <div *ngIf="featureFlag" class="gap-y-4"> 
+    <p class="greeting-heading" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       {{ getTimeOfDay() | translate }}, {{ username }}!
-    </div>
-    <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
-      <!--Test filter pipe-->
-      <p class="page-heading">
+    </p>
+    <div class="section-container" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+      <p class="section-heading">
         {{(continueWhereYouLeftOffList.length !== 0 ? 
             'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' 
           : 
@@ -100,58 +99,53 @@
       </p>
       <div class="empty-continue-where-you-left-off-section overflow-scroll">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles"> 
-          <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="d-inline-block mb-0">
+          <p class="section-heading mb-0">
+            {{'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate}}
           </p>
           <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate }}
           </a>
           <ng-template #continueTiles>
-            <!--Switch to ng-container, classes-->
-            <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
-              <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
-                  class="story-summary-tile">
+            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
+              <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts" class="gap-4 w-100">
                 <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
                   [topicName]="topicSummaryTile.name">
                 </oppia-learner-story-summary-tile>
               </div>
-            </div>
+            </ng-container >
           </ng-template>
         </ng-container>
       </div>
     </div>
-    <div tabindex="0" class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
-      <p class="suggested-for-you-heading">
+    <div class="section-container e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+      <p class="section-heading">
         {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }}
       </p>
       <div class="suggested-for-you-section">
-        <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
-          <div *ngIf="item.value.length !== 0" class="classroom-name">
-            Basic {{item.key}}
-          </div>
-          <div class="topic-summary-tile-scroll">
-            <div class="topic-summary-tile-section d-flex"
-              [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-              <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
-                <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-                </oppia-learner-topic-summary-tile>
-              </div>
-              <!--Remove p-->
-              <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-                class="oppia-classroom-link">
-                <div class="classroom-card">
-                  <p class="classroom-text">
-                    {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
-                  </p>
-                </div>
-              </a>
+        <ng-container *ngFor="let item of untrackedTopics | keyvalue">
+          <p *ngIf="item.value.length !== 0" class="subsection-heading"> Basic {{item.key}} </p>
+          <hr width="100%" color="#00645c" class="mt-2" size="2">
+          <div class="topic-summary-tile-section-1 d-flex gap-4 mt-4 w-100"
+            [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
+            <!--Need to allow scroll-->
+            <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile-1 flex-shrink-0">
+              <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
+              </oppia-learner-topic-summary-tile>
             </div>
           </div>
-        </div>
+          <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+            class="align-items-center d-inline-flex justify-content-center mt-4 section-button text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right mr-1" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+            </svg>
+            {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
+          </a>
+        </ng-container>
       </div>
     </div>
     <div class="section-container px-3 py-4 w-100" *ngIf="isGoalLimitReached()">
-      <p class="section-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate" class="mt-4"></p>
+      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <p class="mt-4"> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
         [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
         href="/community-library"
@@ -161,13 +155,11 @@
     </div>
     <div class="section-container px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
-      <p class="section-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
-      </p>
+      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="empty-suggested-for-you-section">
-        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
-        </p>
+        <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
       </div>
     </div>
-  </ng-container>
+  </div>
   <!------------>
 </div>
