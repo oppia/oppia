@@ -42,7 +42,6 @@ var scrollToTop = async function() {
 // The minimum level for console errors and what sources to allow.
 // Source: https://www.selenium.dev/documentation/legacy/json_wire_protocol
 var CONSOLE_ERROR_THRESHOLD = ['SEVERE'];
-var CONSOLE_ERROR_SOURCES = ['console-api'];
 var CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
@@ -122,7 +121,6 @@ var checkForConsoleErrors = async function(
   var browserLogs = await browser.getLogs('browser');
   var browserErrors = browserLogs.filter(logEntry => (
     CONSOLE_ERROR_THRESHOLD.includes(logEntry.level) &&
-    CONSOLE_ERROR_SOURCES.includes(logEntry.source) &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
 };
