@@ -75,15 +75,20 @@ export class ThreadMessage {
 
   static createFromBackendDict(
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
+
+        if (!threadMessageBackendDict) {
+          throw new Error("Invalid thread message backend dictionary.");
+        }
+
     return new ThreadMessage(
-      threadMessageBackendDict.author_username,
-      threadMessageBackendDict.created_on_msecs,
-      threadMessageBackendDict.entity_type, threadMessageBackendDict.entity_id,
-      threadMessageBackendDict.message_id, threadMessageBackendDict.text,
-      threadMessageBackendDict.updated_status,
-      threadMessageBackendDict.updated_subject,
+      threadMessageBackendDict.author_username || '',
+      threadMessageBackendDict.created_on_msecs || 0,
+      threadMessageBackendDict.entity_type || '', threadMessageBackendDict.entity_id || '',
+      threadMessageBackendDict.message_id || 0, threadMessageBackendDict.text || '',
+      threadMessageBackendDict.updated_status || '',
+      threadMessageBackendDict.updated_subject || '',
       new ThreadMessageSummary(
-        threadMessageBackendDict.author_username,
-        threadMessageBackendDict.text));
+        threadMessageBackendDict.author_username || '',
+        threadMessageBackendDict.text || ''));
   }
 }
