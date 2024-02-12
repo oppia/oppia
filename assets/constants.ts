@@ -6666,6 +6666,15 @@ export default {
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
+    "NEW_LESSON_PLAYER": {
+      "ROUTE": "lesson/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "ANDROID": {
       "ROUTE": "android",
       "TITLE": "Android | Oppia",
