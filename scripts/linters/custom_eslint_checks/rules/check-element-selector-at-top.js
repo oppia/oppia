@@ -42,6 +42,7 @@ module.exports = {
   },
 
   create: function(context) {
+    const { sourceCode } = context;
     var elementSelector = 'CallExpression[callee.name=element]';
     var elmentAllSelector = (
       'CallExpression[callee.object.name=element][callee.property.name=all]');
@@ -52,7 +53,7 @@ module.exports = {
 
     var checkLocator = function(selectorNode, inNestedSelector) {
       var locatorNode = selectorNode.arguments[0];
-      var upperScopeType = context.getScope().upper.type;
+      var upperScopeType = sourceCode.getScope(locatorNode).upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
         return;
       }

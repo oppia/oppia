@@ -198,6 +198,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     with servers.managed_portserver():
         _, return_code = run_tests(parsed_args)
 

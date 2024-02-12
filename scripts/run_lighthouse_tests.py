@@ -208,6 +208,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     # Verify if Chrome is installed.
     common.setup_chrome_bin_env_variable()
 

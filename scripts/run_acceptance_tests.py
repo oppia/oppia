@@ -134,6 +134,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run acceptance tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     with servers.managed_portserver():
         _, return_code = run_tests(parsed_args)
 

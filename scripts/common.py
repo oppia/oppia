@@ -50,10 +50,10 @@ AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 CURRENT_PYTHON_BIN = sys.executable
 
 # Node version.
-NODE_VERSION = '16.13.0'
+NODE_VERSION = '18.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.15'
+YARN_VERSION = '1.22.19'
 
 # Buf version.
 BUF_VERSION = '0.29.0'

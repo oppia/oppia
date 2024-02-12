@@ -477,6 +477,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)

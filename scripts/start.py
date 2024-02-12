@@ -131,6 +131,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',

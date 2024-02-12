@@ -112,6 +112,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    os.environ['NODE_OPTIONS'] = '--openssl-legacy-provider'
+
     run_dtslint_type_tests()
     if parsed_args.dtslint_only:
         return
