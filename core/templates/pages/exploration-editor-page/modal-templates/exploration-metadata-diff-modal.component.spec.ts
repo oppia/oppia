@@ -80,7 +80,6 @@ describe('Exploration Metadata Diff Modal Component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     };
     newExplorationMetadataBackendDict = {
@@ -96,7 +95,6 @@ describe('Exploration Metadata Diff Modal Component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     };
 

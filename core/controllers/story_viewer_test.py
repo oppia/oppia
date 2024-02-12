@@ -69,17 +69,13 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.NEW_STORY_ID = 'new_story_id'
 
         self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
         self.save_new_valid_exploration(
-            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
         self.save_new_valid_exploration(
-            self.EXP_ID_9, self.admin_id, title='Title 4', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_9, self.admin_id, title='Title 4', end_state_name='End')
         self.save_new_valid_exploration(
-            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_9)
@@ -358,8 +354,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.STORY_URL_FRAGMENT = 'story-two'
 
         self.save_new_valid_exploration(
-            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
 
         story = story_domain.Story.create_default_story(
@@ -628,8 +623,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
     def test_mark_topic_as_learnt_and_story_as_completed(self) -> None:
 
         self.save_new_valid_exploration(
-            self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_3)
 
         story = story_domain.Story.create_default_story(

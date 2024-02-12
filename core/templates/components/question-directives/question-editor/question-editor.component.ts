@@ -156,7 +156,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   _init(): void {
     this.stateEditorService.setStateNames([]);
-    this.stateEditorService.setCorrectnessFeedbackEnabled(true);
     this.stateEditorService.setInQuestionMode(true);
     if (this.question) {
       this.stateEditorService.setInapplicableSkillMisconceptionIds(

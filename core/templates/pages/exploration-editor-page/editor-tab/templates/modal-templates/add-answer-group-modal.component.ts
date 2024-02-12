@@ -115,10 +115,6 @@ export class AddAnswerGroupModalComponent
      this.feedbackEditorIsOpen = true;
    }
 
-   isCorrectnessFeedbackEnabled(): boolean {
-     return this.stateEditorService.getCorrectnessFeedbackEnabled();
-   }
-
    // This returns false if the current interaction ID is null.
    isCurrentInteractionLinear(): boolean {
      return (

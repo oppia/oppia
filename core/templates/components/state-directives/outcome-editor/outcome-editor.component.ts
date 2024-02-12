@@ -91,10 +91,6 @@ export class OutcomeEditorComponent implements OnInit {
     return (this.outcome.feedback._html.length > 10000);
   }
 
-  isCorrectnessFeedbackEnabled(): boolean {
-    return this.stateEditorService.getCorrectnessFeedbackEnabled();
-  }
-
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
     return Boolean(interactionId) && INTERACTION_SPECS[

@@ -140,13 +140,6 @@ describe('Add Answer Group Modal Component', () => {
     expect(component.tmpTaggedSkillMisconceptionId).toBe('skill_1-1');
   });
 
-  it('should check if correctness feedback is enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and
-      .returnValue(true);
-
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
-  });
-
   it('should check if current interaction is linear', () => {
     component.currentInteractionId = 'Continue';
 

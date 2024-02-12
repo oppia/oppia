@@ -49,7 +49,6 @@ describe('Exploration data service', function() {
     states: {},
     title: 'Test Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: false,
     exploration_metadata: {
       title: 'Exploration',
       category: 'Algebra',
@@ -63,7 +62,6 @@ describe('Exploration data service', function() {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     }
   };
@@ -95,7 +93,6 @@ describe('Exploration data service', function() {
     version: 1,
     preferred_audio_language_code: 'en',
     auto_tts_enabled: true,
-    correctness_feedback_enabled: false,
     record_playthrough_probability: 1,
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
@@ -206,7 +203,6 @@ describe('Exploration data service', function() {
         title: 'Test Exploration',
         language_code: 'en',
         next_content_id_index: 5,
-        correctness_feedback_enabled: false,
         exploration_metadata: {
           title: 'Exploration',
           category: 'Algebra',
@@ -220,7 +216,6 @@ describe('Exploration data service', function() {
           param_specs: {},
           param_changes: [],
           auto_tts_enabled: false,
-          correctness_feedback_enabled: true,
           edits_allowed: true
         }
       };

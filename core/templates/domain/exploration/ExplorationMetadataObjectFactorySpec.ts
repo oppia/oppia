@@ -55,7 +55,6 @@ describe('Exploration metadata object factory', () => {
       }],
       param_specs: {},
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     };
   });

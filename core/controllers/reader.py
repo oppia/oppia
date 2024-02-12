@@ -446,8 +446,6 @@ class ExplorationHandler(
             'preferred_audio_language_code': preferred_audio_language_code,
             'preferred_language_codes': preferred_language_codes,
             'auto_tts_enabled': exploration.auto_tts_enabled,
-            'correctness_feedback_enabled': (
-                exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 platform_feature_services.get_platform_parameter_value(
                     platform_parameter_list.ParamNames.

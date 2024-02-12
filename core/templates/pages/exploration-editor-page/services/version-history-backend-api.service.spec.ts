@@ -123,7 +123,6 @@ describe('Version history backend api service', () => {
           param_changes: [],
           param_specs: {},
           auto_tts_enabled: false,
-          correctness_feedback_enabled: true,
           edits_allowed: true
         }
       };

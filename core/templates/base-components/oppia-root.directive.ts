@@ -76,7 +76,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'PageTitleService', 'ParamChangesObjectFactory',
               'ParamSpecsObjectFactory',
               'PencilCodeEditorRulesService',
-              'PlayerCorrectnessFeedbackEnabledService',
               'PlaythroughIssuesBackendApiService',
               'PredictionAlgorithmRegistryService',
               'PretestQuestionBackendApiService',

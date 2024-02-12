@@ -584,7 +584,6 @@ describe('Exploration history', function() {
       'param_specs: {}\n' +
       'param_changes: []\n' +
       'auto_tts_enabled: false\n' +
-      'correctness_feedback_enabled: true\n' +
       'edits_allowed: true\n' +
       ''
     );
@@ -602,7 +601,6 @@ describe('Exploration history', function() {
       'param_specs: {}\n' +
       'param_changes: []\n' +
       'auto_tts_enabled: false\n' +
-      'correctness_feedback_enabled: true\n' +
       'edits_allowed: true\n' +
       ''
     );

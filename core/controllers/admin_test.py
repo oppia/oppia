@@ -624,8 +624,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_id = 'topic'
         story_id = 'story'
         self.save_new_valid_exploration(
-            '0', owner_id, title='title', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            '0', owner_id, title='title', end_state_name='End State')
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
@@ -698,8 +697,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.save_new_valid_exploration(
-            '0', owner_id, title='title', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            '0', owner_id, title='title', end_state_name='End State')
         exp_services.update_exploration(
             owner_id, '0', [exp_domain.ExplorationChange({
             'new_value': {

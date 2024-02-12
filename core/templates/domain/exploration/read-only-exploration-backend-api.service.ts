@@ -39,7 +39,6 @@ export interface ReadOnlyExplorationBackendDict {
   'language_code': string;
   'objective': string;
   'next_content_id_index': number;
-  'correctness_feedback_enabled': boolean;
 }
 
 export interface FetchExplorationBackendResponse {
@@ -53,7 +52,6 @@ export interface FetchExplorationBackendResponse {
   'preferred_audio_language_code': string;
   'preferred_language_codes': string[];
   'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
   'draft_change_list_id': number;
   'has_viewed_lesson_info_modal_once': boolean;

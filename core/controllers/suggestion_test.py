@@ -112,8 +112,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-                ['TextInput'], category='Algebra',
-                correctness_feedback_enabled=True))
+                ['TextInput'], category='Algebra'))
         self.old_content_html = '<p>old content html</p>'
         self.exploration.states['State 1'].content.html = self.old_content_html
         self.exploration.states['State 2'].content.html = self.old_content_html
@@ -861,8 +860,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 exp_id, self.editor_id, ['State 1'],
-                ['EndExploration'], category='Algebra',
-                correctness_feedback_enabled=True))
+                ['EndExploration'], category='Algebra'))
 
         state_content_dict = {
             'content_id': 'content_0',
@@ -2510,8 +2508,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -2743,8 +2740,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
-            category='Algebra',
-            correctness_feedback_enabled=True
+            category='Algebra'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -2833,8 +2829,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_id = 'exp2'
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, exp_id)
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_2', self.TOPIC_ID, exp_id)
@@ -2939,8 +2934,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(

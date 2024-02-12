@@ -114,7 +114,6 @@ class UserExplorationDataDict(TypedDict):
     param_changes: List[param_domain.ParamChangeDict]
     version: int
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
     draft_change_list_id: int
     rights: rights_domain.ActivityRightsDict
@@ -830,16 +829,6 @@ def apply_change_list(
                     exploration.update_auto_tts_enabled(
                         edit_auto_tts_enabled_cmd.new_value
                     )
-                elif change.property_name == 'correctness_feedback_enabled':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
-                    edit_correctness_feedback_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
-                        change
-                    )
-                    exploration.update_correctness_feedback_enabled(
-                        edit_correctness_feedback_enabled_cmd.new_value)
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -916,8 +905,6 @@ def populate_exp_model_fields(
     exp_model.param_specs = exploration.param_specs_dict
     exp_model.param_changes = exploration.param_change_dicts
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exp_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
     exp_model.edits_allowed = exploration.edits_allowed
     exp_model.next_content_id_index = exploration.next_content_id_index
 
@@ -1442,7 +1429,6 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
         next_content_id_index=exploration.next_content_id_index
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
@@ -1855,15 +1841,6 @@ def validate_exploration_for_story(
         error_string = (
             'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
-        if strict:
-            raise utils.ValidationError(error_string)
-        validation_error_messages.append(error_string)
-
-    if not exp.correctness_feedback_enabled:
-        error_string = (
-            'Expected all explorations in a story to '
-            'have correctness feedback '
-            'enabled. Invalid exploration: %s' % exp.id)
         if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
@@ -3055,8 +3032,6 @@ def get_user_exploration_data(
     editor_dict: UserExplorationDataDict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
-        'correctness_feedback_enabled': (
-            exploration.correctness_feedback_enabled),
         'draft_change_list_id': draft_change_list_id,
         'exploration_id': exploration_id,
         'init_state_name': exploration.init_state_name,

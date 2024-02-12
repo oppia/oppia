@@ -114,23 +114,19 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
         self.save_new_valid_exploration(
             self.EXP_ID_4, self.owner_id, title='A title',
-            category='Art', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Art', language_code='en')
         self.publish_exploration(self.owner_id, self.EXP_ID_4)
         self.save_new_valid_exploration(
             self.EXP_ID_5, self.owner_id, title='Title',
-            category='Art', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Art', language_code='en')
         self.publish_exploration(self.owner_id, self.EXP_ID_5)
         self.save_new_valid_exploration(
             self.EXP_ID_6, self.owner_id, title='A title',
-            category='Art', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Art', language_code='en')
         self.publish_exploration(self.owner_id, self.EXP_ID_6)
         self.save_new_valid_exploration(
             self.EXP_ID_7, self.owner_id, title='A title',
-            category='Art', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Art', language_code='en')
         self.publish_exploration(self.owner_id, self.EXP_ID_7)
 
         # Save a few collections.

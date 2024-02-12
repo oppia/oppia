@@ -45,7 +45,6 @@ import { LearnerParamsService } from '../services/learner-params.service';
 import { LoaderService } from 'services/loader.service';
 import { MessengerService } from 'services/messenger.service';
 import { NumberAttemptsService } from '../services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from '../services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { QuestionPlayerEngineService } from '../services/question-player-engine.service';
@@ -212,8 +211,6 @@ export class ConversationSkinComponent {
     private messengerService: MessengerService,
     private localStorageService: LocalStorageService,
     private numberAttemptsService: NumberAttemptsService,
-    private playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
@@ -567,15 +564,9 @@ export class ConversationSkinComponent {
       alwaysAskLearnerForAnswerInfo);
   }
 
-  // This variable is used only when viewport is narrow.
-  // Indicates whether the tutor card is displayed.
-  isCorrectnessFeedbackEnabled(): boolean {
-    return this.playerCorrectnessFeedbackEnabledService.isEnabled();
-  }
-
   isCorrectnessFooterEnabled(): boolean {
     return (
-      this.answerIsCorrect && this.isCorrectnessFeedbackEnabled() &&
+      this.answerIsCorrect &&
       this.playerPositionService.hasLearnerJustSubmittedAnAnswer());
   }
 
@@ -598,8 +589,7 @@ export class ConversationSkinComponent {
       return false;
     }
     return (
-      this.pendingCardWasSeenBefore && !this.answerIsCorrect &&
-      this.isCorrectnessFeedbackEnabled());
+      this.pendingCardWasSeenBefore && !this.answerIsCorrect);
   }
 
   private _getRandomSuffix(): string {

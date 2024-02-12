@@ -156,7 +156,6 @@ describe('Compare versions service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     };
     return {

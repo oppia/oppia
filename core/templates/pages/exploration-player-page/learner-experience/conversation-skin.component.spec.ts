@@ -69,7 +69,6 @@ import { ImagePreloaderService } from '../services/image-preloader.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { LearnerParamsService } from '../services/learner-params.service';
 import { NumberAttemptsService } from '../services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from '../services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { QuestionPlayerEngineService } from '../services/question-player-engine.service';
@@ -143,8 +142,6 @@ describe('Conversation skin component', () => {
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
@@ -381,7 +378,6 @@ describe('Conversation skin component', () => {
     is_version_of_draft_valid: null,
     title: 'Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: true,
     init_state_name: 'Start',
     param_changes: [],
     next_content_id_index: 4,
@@ -400,7 +396,6 @@ describe('Conversation skin component', () => {
       param_specs: null,
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       states: explorationDict.states,
       next_content_id_index: explorationDict.next_content_id_index
@@ -418,7 +413,6 @@ describe('Conversation skin component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 2,
@@ -426,7 +420,6 @@ describe('Conversation skin component', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,
@@ -447,7 +440,6 @@ describe('Conversation skin component', () => {
       param_specs: null,
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       states: explorationDict.states,
       next_content_id_index: explorationDict.next_content_id_index
@@ -465,7 +457,6 @@ describe('Conversation skin component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 2,
@@ -473,7 +464,6 @@ describe('Conversation skin component', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     draft_change_list_id: 0,
     has_viewed_lesson_info_modal_once: false,
@@ -551,8 +541,6 @@ describe('Conversation skin component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     messengerService = TestBed.inject(MessengerService);
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
-    playerCorrectnessFeedbackEnabledService = TestBed.inject(
-      PlayerCorrectnessFeedbackEnabledService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
@@ -1421,20 +1409,9 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should tell if correctness feedback is enabled', () => {
-    spyOn(playerCorrectnessFeedbackEnabledService, 'isEnabled');
-
-    componentInstance.isCorrectnessFeedbackEnabled();
-
-    expect(playerCorrectnessFeedbackEnabledService.isEnabled)
-      .toHaveBeenCalled();
-  });
-
   it('should tell if correctness footer is enabled', () => {
     componentInstance.answerIsCorrect = true;
 
-    spyOn(componentInstance, 'isCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     spyOn(playerPositionService, 'hasLearnerJustSubmittedAnAnswer')
       .and.returnValue(true);
 
@@ -1645,8 +1622,6 @@ describe('Conversation skin component', () => {
 
     componentInstance.pendingCardWasSeenBefore = true;
     componentInstance.answerIsCorrect = false;
-    spyOn(componentInstance, 'isCorrectnessFeedbackEnabled')
-      .and.returnValue(true);
 
     expect(componentInstance.isLearnAgainButton()).toBeTrue();
   });

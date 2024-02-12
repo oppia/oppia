@@ -47,7 +47,6 @@ import { AutosaveInfoModalsService } from './services/autosave-info-modals.servi
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationAutomaticTextToSpeechService } from './services/exploration-automatic-text-to-speech.service';
 import { ExplorationCategoryService } from './services/exploration-category.service';
-import { ExplorationCorrectnessFeedbackService } from './services/exploration-correctness-feedback.service';
 import { ExplorationDataService } from './services/exploration-data.service';
 import { ExplorationInitStateNameService } from './services/exploration-init-state-name.service';
 import { ExplorationLanguageCodeService } from './services/exploration-language-code.service';
@@ -138,8 +137,6 @@ export class ExplorationEditorPageComponent
     private explorationAutomaticTextToSpeechService:
       ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
-    private explorationCorrectnessFeedbackService:
-      ExplorationCorrectnessFeedbackService,
     private explorationDataService: ExplorationDataService,
     private explorationFeaturesBackendApiService:
       ExplorationFeaturesBackendApiService,
@@ -256,8 +253,6 @@ export class ExplorationEditorPageComponent
           explorationData.param_changes));
       this.explorationAutomaticTextToSpeechService.init(
         explorationData.auto_tts_enabled);
-      this.explorationCorrectnessFeedbackService.init(
-        explorationData.correctness_feedback_enabled);
       this.explorationNextContentIdIndexService.init(
         explorationData.next_content_id_index);
       if (explorationData.edits_allowed) {

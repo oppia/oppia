@@ -1334,8 +1334,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             self.EXP_ID_2_0, self.owner_id, title='Sillat Suomi',
-            category='Architecture', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Architecture', language_code='en')
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)

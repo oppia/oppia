@@ -34,7 +34,6 @@ describe('Versioned exploration caching service', () => {
       param_specs: {},
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       next_content_id_index: 5,
       states: {
@@ -87,7 +86,6 @@ describe('Versioned exploration caching service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 1,
@@ -95,7 +93,6 @@ describe('Versioned exploration caching service', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,

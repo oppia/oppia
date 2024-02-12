@@ -46,7 +46,6 @@ export class ResponseHeaderComponent {
   @Input() outcome!: Outcome;
   @Input() numRules!: number;
   @Input() isResponse!: boolean;
-  @Input() correctnessFeedbackEnabled!: boolean;
   @Input() showWarning!: boolean;
   @Input() defaultOutcome!: boolean;
 
@@ -66,10 +65,6 @@ export class ResponseHeaderComponent {
 
   getCurrentInteractionId(): InteractionSpecsKey {
     return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
-  }
-
-  isCorrectnessFeedbackEnabled(): boolean {
-    return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
   isCurrentInteractionLinear(): boolean {

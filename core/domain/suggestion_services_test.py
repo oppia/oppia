@@ -2118,8 +2118,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id,
                 ['State 1', 'State 2', 'End State'],
-                ['TextInput'], category='Algebra',
-                correctness_feedback_enabled=True))
+                ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
             'content_0', '<p>old content</p>').to_dict()
@@ -2421,8 +2420,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
+            end_state_name='End State'
         ) for i in range(3)]
 
         for exp in explorations:
@@ -2478,8 +2476,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='Algebra',
-            end_state_name='End State',
-            correctness_feedback_enabled=True
+            end_state_name='End State'
         ) for i in range(103)]
 
         for exp in explorations:
@@ -2535,8 +2532,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
+            end_state_name='End State'
         ) for i in range(2, 4)]
 
         for exp in explorations:
@@ -5462,8 +5458,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
         exploration = self.save_new_valid_exploration(
-            self.target_id, self.author_id,
-        correctness_feedback_enabled=True)
+            self.target_id, self.author_id)
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         model = opportunity_models.ExplorationOpportunitySummaryModel(
@@ -6108,8 +6103,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         exploration = self.save_new_valid_exploration(
-            self.target_id, self.author_id,
-        correctness_feedback_enabled=True)
+            self.target_id, self.author_id)
         audio_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
         model = opportunity_models.ExplorationOpportunitySummaryModel(

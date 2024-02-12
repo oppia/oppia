@@ -235,7 +235,7 @@
   </div>
 </div>
 
-<div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+<div class="oppia-correctness-label-editor" *ngIf="!isCurrentInteractionLinear()">
   <div *ngIf="!isEditable"
        title="{{ isEditable ? 'Edit correctness setting' : '' }}"
        class="h-100">

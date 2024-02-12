@@ -291,13 +291,6 @@ describe('Outcome Editor Component', () => {
     expect(component.getCurrentInteractionId()).toBe('TextInput');
   });
 
-  it('should check if correctness feedback is enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled')
-      .and.returnValue(true);
-
-    expect(component.isCorrectnessFeedbackEnabled()).toBeTrue();
-  });
-
   it('should check if current interaction is linear or not', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
 

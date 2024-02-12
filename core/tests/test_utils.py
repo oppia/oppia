@@ -2221,7 +2221,6 @@ class GenericTestBase(AppEngineTestBase):
 auto_tts_enabled: false
 blurb: ''
 category: Category
-correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
@@ -3274,7 +3273,6 @@ version: 1
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
-        correctness_feedback_enabled: bool = False,
         content_html: str = '',
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
@@ -3288,8 +3286,6 @@ version: 1
             language_code: str. The language_code of this exploration.
             end_state_name: str. The name of the end state for the exploration.
             interaction_id: str. The id of the interaction.
-            correctness_feedback_enabled: bool. Whether correctness feedback is
-                enabled for the exploration.
             content_html: str. The html for the state content.
 
         Returns:
@@ -3306,7 +3302,6 @@ version: 1
             init_state, interaction_id, content_id_generator)
 
         exploration.objective = objective
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
@@ -3333,8 +3328,6 @@ version: 1
             # assert here.
             assert init_interaction.default_outcome is not None
             init_interaction.default_outcome.dest = end_state_name
-            if correctness_feedback_enabled:
-                init_interaction.default_outcome.labelled_as_correct = True
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
 
@@ -3351,7 +3344,6 @@ version: 1
         category: str = 'A category',
         objective: str = 'An objective',
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        correctness_feedback_enabled: bool = False,
         content_html: str = ''
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration with a sequence of states.
@@ -3370,8 +3362,6 @@ version: 1
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
-            correctness_feedback_enabled: bool. Whether the correctness feedback
-                is enabled or not for the exploration.
             content_html: str. The html for the state content.
 
         Returns:
@@ -3396,7 +3386,6 @@ version: 1
         init_state = exploration.states[state_names[0]]
         init_state.content.html = content_html
 
-        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         for state_name in state_names[1:]:
             exploration.add_state(
                 state_name,
@@ -3419,9 +3408,6 @@ version: 1
             # default_outcome, we used assert here.
             assert from_state.interaction.default_outcome is not None
             from_state.interaction.default_outcome.dest = dest_state_name
-            if correctness_feedback_enabled:
-                from_state.interaction.default_outcome.labelled_as_correct = (
-                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(
             end_state, 'EndExploration', content_id_generator)

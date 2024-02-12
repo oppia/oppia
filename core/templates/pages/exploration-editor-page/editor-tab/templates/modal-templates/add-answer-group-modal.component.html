@@ -58,7 +58,7 @@
     </oppia-outcome-if-stuck-destination-editor>
   </form>
 
-  <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+  <div class="oppia-correctness-label-editor" *ngIf="!isCurrentInteractionLinear()">
     <input id="labelledAsCorrect"
            class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"

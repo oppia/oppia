@@ -41,7 +41,6 @@ describe('Read only exploration backend API service', () => {
       title: 'Exploration',
       language_code: 'en',
       next_content_id_index: 5,
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       states: {
         Introduction: {
@@ -102,7 +101,6 @@ describe('Read only exploration backend API service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     version: 1,
@@ -110,7 +108,6 @@ describe('Read only exploration backend API service', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
@@ -304,7 +301,6 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false,
         next_content_id_index: 1
       },
       exploration_metadata: {
@@ -320,7 +316,6 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: false,
         edits_allowed: true
       },
       exploration_id: '0',
@@ -329,7 +324,6 @@ describe('Read only exploration backend API service', () => {
       version: 1,
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
       displayable_language_codes: [],
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
@@ -359,7 +353,6 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false,
         next_content_id_index: 1
       },
       exploration_metadata: {
@@ -375,7 +368,6 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: false,
         edits_allowed: true
       },
       exploration_id: '0',
@@ -384,7 +376,6 @@ describe('Read only exploration backend API service', () => {
       version: 1,
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       displayable_language_codes: [],
@@ -411,7 +402,6 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false,
         next_content_id_index: 1
       },
       exploration_metadata: {
@@ -427,7 +417,6 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: false,
         edits_allowed: true
       },
       exploration_id: '0',
@@ -436,7 +425,6 @@ describe('Read only exploration backend API service', () => {
       version: 1,
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       preferred_language_codes: [],

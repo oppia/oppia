@@ -186,8 +186,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -209,16 +208,12 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
-  }
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
 
 var createAndPublishExplorationWithAdditionalCheckpoints = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -255,9 +250,6 @@ var createAndPublishExplorationWithAdditionalCheckpoints = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
-  }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();

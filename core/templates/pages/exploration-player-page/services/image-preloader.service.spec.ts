@@ -51,7 +51,6 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
-    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -353,7 +352,6 @@ describe('Image preloader service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     }
   } as unknown as ExplorationBackendDict;
