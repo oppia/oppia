@@ -99,6 +99,7 @@ export class ContextService {
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
+            pathnameArray[i] === 'lesson' ||
             (pathnameArray[i] === 'embed' &&
                 pathnameArray[i + 1] === 'exploration')) {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
@@ -222,7 +223,9 @@ export class ContextService {
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
+      if (pathnameArray[i] === 'create' ||
+          pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'lesson' ||
           (pathnameArray[i] === 'embed' &&
               pathnameArray[i + 1] === 'exploration')) {
         return AppConstants.ENTITY_TYPE.EXPLORATION;
@@ -266,7 +269,8 @@ export class ContextService {
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
             pathnameArray[i] === 'create' ||
-            pathnameArray[i] === 'skill_editor') {
+            pathnameArray[i] === 'skill_editor' ||
+            pathnameArray[i] === 'lesson') {
           this.explorationId = pathnameArray[i + 1];
           return pathnameArray[i + 1];
         }

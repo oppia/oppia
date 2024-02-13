@@ -511,9 +511,6 @@ URLS = [
         '/learner_dashboard',
         learner_dashboard.OldLearnerDashboardRedirectPage),
     get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_URL,
-        learner_dashboard.LearnerDashboardPage),
-    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
     get_redirect_route(
@@ -951,7 +948,6 @@ URLS = [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
-    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
