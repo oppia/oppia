@@ -65,10 +65,15 @@ export class HtmlLengthService {
     }
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
-    let totalWords = this.calculateBaselineLength(
-      sanitizedHtml, CALCULATION_TYPE_WORD);
     // Identify custom tags using regex on the original HTML string.
     const customTags = htmlString.match(CUSTOM_TAG_REGEX);
+    let customTagsLength = (customTags) ? customTags.length : 0;
+
+    /* CustomTagsLength is being passed to calculateBaselineLength()
+    method to ensure try-catch block should not raise error if
+    we use non-interactive RTE */
+    let totalWords = this.calculateBaselineLength(
+      sanitizedHtml, CALCULATION_TYPE_WORD, customTagsLength);
 
     if (customTags) {
       for (const customTag of customTags) {
@@ -84,12 +89,18 @@ export class HtmlLengthService {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
     }
+
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
-    let totalCharacters =
-    this.calculateBaselineLength(sanitizedHtml, CALCULATION_TYPE_CHARACTER);
     // Identify custom tags using regex on the original HTML string.
     const customTags = htmlString.match(CUSTOM_TAG_REGEX);
+    let customTagsLength = (customTags) ? customTags.length : 0;
+
+    /* CustomTagsLength is being passed to calculateBaselineLength()
+    method to ensure try-catch block should not raise error if
+    we use non-interactive RTE */
+    let totalCharacters = this.calculateBaselineLength(
+      sanitizedHtml, CALCULATION_TYPE_CHARACTER, customTagsLength);
 
     if (customTags) {
       for (const customTag of customTags) {
@@ -101,12 +112,13 @@ export class HtmlLengthService {
   }
 
   calculateBaselineLength(
-      sanitizedHtml: string, calculationType: CalculationType): number {
+      sanitizedHtml: string,
+      calculationType: CalculationType, CustomTagsLength: number): number {
     let domparser = new DOMParser();
     let dom: Document;
     try {
       dom = domparser.parseFromString(sanitizedHtml, 'text/html');
-      if (dom.body.children.length === 0) {
+      if (dom.body.children.length === 0 && !CustomTagsLength) {
         throw new Error(
           'No HTML tags found. Ensure ' +
           'that a valid string that includes HTML tags is provided.');
@@ -129,46 +141,53 @@ export class HtmlLengthService {
 
   private getWeightForTextNodes(
       textNode: HTMLElement, calculationType: CalculationType): number {
-    const textContent = (textNode.textContent || '').trim();
-    return (textContent === '') ? 0 :
-        this.calculateTextWeight(textContent, calculationType);
+    const textContent = textNode.textContent || '';
+    return this.calculateTextWeight(textContent, calculationType);
   }
 
   private calculateTextWeight(
       textContent: string, calculationType: CalculationType): number {
     let trimmedTextContent = textContent.trim();
     let textContentCount = 0;
-    if (calculationType === CALCULATION_TYPE_WORD) {
+    if (calculationType === CALCULATION_TYPE_WORD && trimmedTextContent) {
       const words = trimmedTextContent.split(' ');
       textContentCount = words.length;
-    } else if (calculationType === CALCULATION_TYPE_CHARACTER) {
-      const characters = trimmedTextContent.split('');
-      textContentCount = characters.length;
+    } else {
+      textContentCount = trimmedTextContent.length;
     }
     return textContentCount;
   }
 
+  /* TODO(#19729): Create RTE-component-specific logic
+  for calculating the lengths of RTE-components */
   getWeightForNonTextNodes(
       nonTextNode: string, calculationType: CalculationType): number {
-    if (nonTextNode.includes('oppia-noninteractive-math')) {
+    let domparser = new DOMParser();
+    let dom: Document;
+    dom = domparser.parseFromString(nonTextNode, 'text/html');
+    let domTag = dom.body.children[0];
+    let domId = domTag.tagName.toLowerCase();
+    if (domId === 'oppia-noninteractive-math') {
       return 1;
-    } else if (nonTextNode.includes(
-      'oppia-noninteractive-collapsible') || nonTextNode.includes(
-      'oppia-noninteractive-tabs')) {
+    } else if ((domId === 'oppia-noninteractive-collapsible') ||
+     (domId === 'oppia-noninteractive-tabs')) {
       return 1000;
-    } else if (nonTextNode.includes('oppia-noninteractive-video')) {
+    } else if (domId === 'oppia-noninteractive-video') {
       return 0;
-    } else {
+    } else if ((domId === 'oppia-noninteractive-link') ||
+    (domId === 'oppia-noninteractive-skillreview') ||
+    (domId === 'oppia-noninteractive-image')) {
       const textMatch = nonTextNode.match(
         /(text-with-value|alt-with-value)="&amp;quot;([^&]*)&amp;quot;"/);
       if (textMatch && textMatch[2]) {
         const text = textMatch[2];
         const weight = this.calculateTextWeight(text, calculationType);
-        return nonTextNode.includes(
-          'oppia-noninteractive-image') ? weight + 10 : weight;
-      } else {
-        throw new Error('Unable to determine weight for non-text node.');
+        return (domId === 'oppia-noninteractive-image') ? weight + 10 : weight;
       }
+    } else {
+      throw new Error('Unable to determine weight for non-text node.');
     }
+    /* istanbul ignore next */
+    throw new Error('Unable to determine weight for non-text node.');
   }
 }

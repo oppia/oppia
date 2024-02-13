@@ -218,7 +218,7 @@ describe('Html Length Service', () => {
       ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
        'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
        '"></oppia-noninteractive-tabs>' +
-     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible' +
+     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
       '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
       ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
        'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
@@ -231,7 +231,7 @@ describe('Html Length Service', () => {
 
   it('should compute word count of content with text and non-text ' +
   '(link tag and concept card tag)', () => {
-    const htmlString = '<p><oppia-noninteractive-skillreview' +
+    const htmlString = '<p><oppia-noninteractive-skillreview ' +
     'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
      'text-with-value="&amp;quot;concept card&amp;quot;">' +
      '</oppia-noninteractive-skillreview></p>' +
@@ -381,7 +381,7 @@ describe('Html Length Service', () => {
       ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
        'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
        '"></oppia-noninteractive-tabs>' +
-     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible' +
+     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
       '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
       ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
        'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
@@ -395,7 +395,7 @@ describe('Html Length Service', () => {
 
   it('should compute character count of content with text and non-text ' +
   '(link tag and concept card tag)', () => {
-    const htmlString = '<p><oppia-noninteractive-skillreview' +
+    const htmlString = '<p><oppia-noninteractive-skillreview ' +
     'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
      'text-with-value="&amp;quot;concept card&amp;quot;">' +
      '</oppia-noninteractive-skillreview></p>' +
@@ -480,9 +480,10 @@ describe('Html Length Service', () => {
     ' is passed instead of an HTML tag string', () => {
       const sanitizedHtml = 'This is a normal string.';
       const calculationType = 'character';
+      const customTagsLength = 0;
       expect(() => {
         htmlLengthService.calculateBaselineLength(
-          sanitizedHtml, calculationType);
+          sanitizedHtml, calculationType, customTagsLength);
       }).toThrowError(
         'Failed to parse HTML string.' +
       ' Ensure that a valid string that includes HTML tags is provided.');
@@ -492,8 +493,9 @@ describe('Html Length Service', () => {
     ' on the provided HTML content and calculation type', () => {
       const sanitizedHtml = '<p>This is a test HTML string.</p>';
       const calculationType = 'character';
+      const customTagsLength = 0;
       const result = htmlLengthService.calculateBaselineLength(
-        sanitizedHtml, calculationType);
+        sanitizedHtml, calculationType, customTagsLength);
       expect(result).toBe(27);
     });
   });
