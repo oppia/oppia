@@ -120,9 +120,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#18324): Visiting a newly created exploration state results in some
   // version-history console error.
   _.escapeRegExp(
-    '(?=.*http://localhost:8181/version_history_handler/state)(?=*Failed to ' +
-    'load resource: the server responded with a status of 500 ' +
-    '(Internal Server Error))'
+    'http://localhost:8181/version_history_handler/state'
   ),
   // TODO(#19743): Input path is invalid when using math expression RTE.
   _.escapeRegExp(
