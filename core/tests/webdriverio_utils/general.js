@@ -112,6 +112,10 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/' +
     'acoustic_grand_piano-ogg.js - Failed to load resource: the server ' +
+    'responded with a status of 404 (Not Found)'),
+  // TODO(#19734): 404 Not Found inside blog dashboard.
+  _.escapeRegExp(
+    'http://localhost:8181/null - Failed to load resource: the server ' +
     'responded with a status of 404 (Not Found)')
 ];
 
