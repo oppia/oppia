@@ -123,7 +123,10 @@ var CONSOLE_ERRORS_TO_FIX = [
     '(?=.*http://localhost:8181/version_history_handler/state)(?=*Failed to ' +
     'load resource: the server responded with a status of 500 ' +
     '(Internal Server Error))'
-  )
+  ),
+  // TODO(#19743): Input path is invalid when using math expression RTE.
+  _.escapeRegExp(
+    'Input path  is invalid, it does not contain dimensions.')
 ];
 
 var checkForConsoleErrors = async function(
