@@ -1071,7 +1071,6 @@ TOPIC_VIEWER_URL_PREFIX = (
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
-TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_NAME_HANDLER = '/topic_name_handler'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'

@@ -35,7 +35,7 @@ import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.
 import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rearrange-skills-in-subtopics-modal.component';
 import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
 import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
-import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
+import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.component';
 import { TopicEditorPageComponent } from './topic-editor-page.component';
 import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
 import { ToastrModule } from 'ngx-toastr';
