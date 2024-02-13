@@ -209,6 +209,12 @@
   width: calc(100% - 280px);
 }
 
+@media (max-width: 1056px){
+  .oppia-profile-h1{
+  display:none;
+  }
+  }  
+
 @media (max-width: 1080px) {
   .mat-card-content.oppia-profile-portfolio-container {
     grid-template-columns: max-content max-content;
