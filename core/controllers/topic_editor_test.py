@@ -119,16 +119,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_handler_updates_story_summary_dicts(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
-            'exp-1', self.admin_id, title='Title 1', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-1', self.admin_id, title='Title 1', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-1')
         self.save_new_valid_exploration(
-            'exp-2', self.admin_id, title='Title 2', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-2', self.admin_id, title='Title 2', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-2')
         self.save_new_valid_exploration(
-            'exp-3', self.admin_id, title='Title 3', end_state_name='End',
-            correctness_feedback_enabled=True)
+            'exp-3', self.admin_id, title='Title 3', end_state_name='End')
         self.publish_exploration(self.admin_id, 'exp-3')
 
         topic_id = topic_fetchers.get_new_topic_id()

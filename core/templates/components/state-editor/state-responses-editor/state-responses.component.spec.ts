@@ -657,9 +657,15 @@ describe('State Responses Component', () => {
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
+  it('should reject self-loop with undefined outcome', () => {
+    // This throws "TS2322". We need to suppress this error because
+    // the isSelfLoopThatIsMarkedCorrect function accepts an argument
+    // of type Outcome.
+    // @ts-ignore
+    expect(component.isSelfLoopThatIsMarkedCorrect(undefined)).toBe(false);
+  });
+
   it('should check if outcome marked as correct has self loop', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
@@ -682,9 +688,7 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome marked as correct has self loop and return' +
-    ' false if correctness feedback is not enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      false);
+    ' true if correctness feedback is enabled', () => {
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
@@ -699,7 +703,7 @@ describe('State Responses Component', () => {
     });
     component.stateName = 'State Name';
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
   });
 
   it('should show state name input if user is creating new state', () => {
@@ -744,8 +748,6 @@ describe('State Responses Component', () => {
 
   it('should get outcome tooltip text', () => {
     // When outcome has self loop and is labelled correct.
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
