@@ -137,9 +137,6 @@ class DefaultClassroomRedirectPage(
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-
-
-
 class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
