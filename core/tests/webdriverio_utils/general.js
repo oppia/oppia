@@ -107,7 +107,12 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#19657): Error in Practice Question (Drag And Drop).
   _.escapeRegExp(
     'Cannot read properties of undefined ' +
-    '(reading \'nativeElement\')')
+    '(reading \'nativeElement\')'),
+  // TODO(#19733): 404 Not Found inside exporation/lesson player (midi-js).
+  _.escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic_' +
+    'grand_piano-ogg.js - Failed to load resource: the server responded with a ' +
+    'status of 404 (Not Found)'),
 ];
 
 var checkForConsoleErrors = async function(
