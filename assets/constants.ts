@@ -7292,7 +7292,7 @@ export default {
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",
-    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "param_changes", "auto_tts_enabled",
     "edits_allowed"
   ],
   "NON_METADATA_PROPERTIES": [
