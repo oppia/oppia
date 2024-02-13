@@ -22,7 +22,8 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -90,15 +91,18 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'url_fragment': 'math',
-                'name': 'math',
-                'topic_ids': [self.topic_id],
-                'topic_list_intro': 'Topics covered',
-                'course_details': 'Course details'
-            }]
-        )
+        math_classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': 'math_classroom_id',
+            'name': 'math',
+            'url_fragment': 'math',
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom',
+            'topic_id_to_prerequisite_topic_ids': {}
+        }
+        math_classroom = classroom_config_domain.Classroom.from_dict(
+            math_classroom_dict)
+        classroom_config_services.update_or_create_classroom_model(
+            math_classroom)
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)

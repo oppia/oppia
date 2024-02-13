@@ -209,46 +209,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_without_new_config_property_values_action_is_not_performed(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'The \'new_config_property_values\' must be provided when the '
-            'action is save_config_properties.'
-        )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'save_config_properties',
-                    'new_config_property_values': None
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
-    def test_without_config_property_id_action_is_not_performed(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'The \'config_property_id\' must be provided when the action '
-            'is revert_config_property.'
-        )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'revert_config_property',
-                    'config_property_id': None
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
     def test_without_data_action_upload_topic_similarities_is_not_performed(
         self
     ) -> None:
@@ -3072,7 +3032,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
         payload = {
-            'exp_id': 'invalid' 
+            'exp_id': 'invalid'
         }
 
         response = self.get_json(
