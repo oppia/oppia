@@ -141,6 +141,8 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                 exploration_id, exp_version_list))
 
         voice_artist_metadata_models = []
+        exploration_id_to_user_ids = {}
+        voice_artist_ids = []
 
         is_voiceover_changed_in_this_commit = False
         for exp_commit_log_model in exp_commit_log_entry_models:
@@ -164,6 +166,7 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                         voiceovers_and_contents_mapping = copy.deepcopy(
                             voice_artist_metadata_model.
                             voiceovers_and_contents_mapping)
+                        voice_artist_ids.append(user_id)
                     is_voiceover_changed_in_this_commit = True
 
                     voiceovers_mapping = (
@@ -221,23 +224,48 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                 voice_artist_metadata_model.voiceovers_and_contents_mapping = (
                     voiceovers_and_contents_mapping)
                 voice_artist_metadata_models.append(voice_artist_metadata_model)
+                exploration_id_to_user_ids[exploration_id] = voice_artist_ids
 
-        return result.Ok(voice_artist_metadata_models)
+        return result.Ok((exploration_id, voice_artist_ids))
+
+    @staticmethod
+    def count_voice_artist_id(key_value):
+        key, voice_artist_ids_iterables = key_value
+        voice_artist_ids_len = len(voice_artist_ids_iterables)
+        print(key, voice_artist_ids_len)
+        return key, voice_artist_ids_len
+
+    @staticmethod
+    def printing(a):
+        print(a)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        voice_artist_metadata_models_result = (
+        curated_exploration_models = (
             self.pipeline
             | 'Get explorations' >> (
                 ndb_io.GetModels(exp_models.ExplorationModel.get_all()))
             | 'Get curated explorations' >> beam.Filter(
                 lambda model: opportunity_services.
                 is_exploration_available_for_contribution(model.id))
+        )
+
+        exploration_id_to_voice_artist_ids_result = (
+            curated_exploration_models
             | 'Save voice artist metadata models' >> beam.Map(
-                self.save_voice_artist_model_from_exploration_model
-            ))
+                    self.save_voice_artist_model_from_exploration_model)
+        )
+
+        unused_put_result = (
+            exploration_id_to_voice_artist_ids_result
+            | 'Filter the results with OK status' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Fetch the models to be put' >> beam.Map(
+                lambda result: self.count_voice_artist_id(result.unwrap()))
+        )
+
 
         voice_artist_metadata_job_result = (
-            voice_artist_metadata_models_result
+            exploration_id_to_voice_artist_ids_result
             | job_result_transforms.ResultsToJobRunResults(
                 'USER IDS WHOSE METADATA MODELS ARE CREATED')
         )

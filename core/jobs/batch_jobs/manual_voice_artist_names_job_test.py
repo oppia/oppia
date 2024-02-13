@@ -94,7 +94,6 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             title='title1',
             category=constants.ALL_CATEGORIES[0],
             end_state_name='End State',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exploration_1.id)
 
@@ -280,7 +279,6 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             title='title2',
             category=constants.ALL_CATEGORIES[0],
             end_state_name='End State',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exploration_2.id)
 
