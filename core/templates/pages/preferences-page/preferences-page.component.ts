@@ -269,6 +269,7 @@ export class PreferencesPageComponent {
     this.userPreferences.newProfilePictureDataUrl = newProfilePictureDataUrl;
   }
 
+  // TODO(#19737): Remove the following function.
   private _saveProfileImageToLocalStorage(image: string): void {
     const newImageFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(image));
@@ -402,6 +403,7 @@ export class PreferencesPageComponent {
     // Get the updated fields to send to the backend on-save.
     let updates: UpdatePreferenceDict[] = this.userPreferences.getUpdates();
 
+    // TODO(#19737): Remove the following condition.
     if (AssetsBackendApiService.EMULATOR_MODE) {
       // Remove 'profile_picture_data_url' from updates if the emulator mode is
       // on because the backend doesn't support updating profile picture in
@@ -425,6 +427,7 @@ export class PreferencesPageComponent {
         } else {
           this.alertsService.addInfoMessage('Saved!', 1000);
         }
+        // TODO(#19737): Remove the following condition.
         if (this.userPreferences.isFieldChanged(
           'newProfilePictureDataUrl') &&
           AssetsBackendApiService.EMULATOR_MODE) {
