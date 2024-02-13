@@ -149,7 +149,6 @@ describe('Settings Tab Component', () => {
               states: {},
               title: 'Test Exploration',
               language_code: 'en',
-              correctness_feedback_enabled: false,
               exploration_metadata: {
                 title: 'Exploration',
                 category: 'Algebra',
@@ -163,7 +162,6 @@ describe('Settings Tab Component', () => {
                 param_specs: {},
                 param_changes: [],
                 auto_tts_enabled: false,
-                correctness_feedback_enabled: true,
                 edits_allowed: true
               }
             }),
@@ -981,13 +979,6 @@ describe('Settings Tab Component', () => {
     expect(component.isAutomaticTextToSpeechEnabled()).toBe(false);
   });
 
-  it('should evaluate when correctness feedback is enabled', () => {
-    component.toggleCorrectnessFeedback();
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
-    component.toggleCorrectnessFeedback();
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(false);
-  });
-
   it('should evaluate when edits are allowed', fakeAsync(() => {
     spyOn(eeabas, 'setEditsAllowed').and.callFake(
       async(unusedValue, unusedId, cb) => cb());
@@ -1222,7 +1213,7 @@ describe('Settings Tab Component', () => {
       const explorationMetadata = new ExplorationMetadata(
         'title', 'category', 'objective', 'en',
         [], '', '', 55, 'Introduction',
-        new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+        new ParamSpecs({}, paramSpecObjectFactory), [], false, true
       );
       spyOn(
         versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
@@ -1278,7 +1269,7 @@ describe('Settings Tab Component', () => {
       const explorationMetadata = new ExplorationMetadata(
         'title', 'category', 'objective', 'en',
         [], '', '', 55, 'Introduction',
-        new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+        new ParamSpecs({}, paramSpecObjectFactory), [], false, true
       );
       spyOn(
         versionHistoryService, 'getBackwardMetadataDiffData'

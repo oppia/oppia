@@ -1,0 +1,13 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-lesson-player-footer {
+  background-color: #fff;
+  bottom: 0;
+  height: 40px;
+  position: absolute;
+  width: 100%;
+}
