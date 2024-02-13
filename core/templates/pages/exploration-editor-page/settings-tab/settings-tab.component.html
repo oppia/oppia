@@ -269,32 +269,6 @@
         </div>
       </div>
       <hr class="oppia-feature-separator">
-      <div role="form" class="form-horizontal">
-        <div class="oppia-features-header">
-          <label for="enableCorrectnessFeedback">
-            Correctness Feedback
-          </label>
-          <div>
-            <div class="oppia-on-off-switch">
-              <input type="checkbox" class="sr-only" *ngIf="!isCorrectnessFeedbackEnabled()" (click)="toggleCorrectnessFeedback()" aria-label="Correctness feedback" tabindex="0" (keydown.enter)="toggleCorrectnessFeedback()">
-              <input type="checkbox" *ngIf="!isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()">
-              <input type="checkbox" class="sr-only" *ngIf="isCorrectnessFeedbackEnabled()" (click)="toggleCorrectnessFeedback()" aria-label="Correctness feedback" tabindex="0" (keydown.enter)="toggleCorrectnessFeedback()" checked>
-              <input type="checkbox" *ngIf="isCorrectnessFeedbackEnabled()" [disabled]="explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()" checked>
-              <label class="oppia-on-off-switch-label e2e-test-enable-mark-correctness-feedback" for="correctness-switch">
-                <span class="oppia-on-off-switch-inner"></span>
-                <span class="oppia-on-off-switch-main"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <span class="form-text secondary-info-text" tabindex="0">
-          Correctness feedback allows the user to categorise answer groups as correct or incorrect.
-        </span>
-        <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory && isCorrectnessFeedbackEnabled()" tabindex="0">
-          Correctness feedback cannot be disabled for an exploration linked to a story.
-        </span>
-      </div>
-      <hr class="oppia-feature-separator">
     </div>
   </mat-card>
 

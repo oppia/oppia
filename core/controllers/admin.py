@@ -858,24 +858,6 @@ class AdminHandler(
             self._reload_exploration('6')
             self._reload_exploration('25')
             self._reload_exploration('13')
-            exp_services.update_exploration(
-                self.user_id, '6', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
-                self.user_id, '25', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
-            exp_services.update_exploration(
-                self.user_id, '13', [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',

@@ -140,7 +140,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         },
-        'correctness_feedback_enabled': False,
         'next_content_id_index': 7,
         'edits_allowed': True,
         'language_code': 'en',
@@ -180,7 +179,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '{"content_id": "content_0", "html": "<p>Unicode Characters '
         '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, '
         '"solicit_answer_details": false}}, "version": 0, '
-        '"correctness_feedback_enabled": false, "edits_allowed": true, "l'
+        '"edits_allowed": true, "l'
         'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
         '", "blurb": "", "author_notes": ""}'
     )

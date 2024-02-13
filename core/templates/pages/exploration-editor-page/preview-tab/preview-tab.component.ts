@@ -30,7 +30,6 @@ import { ExplorationEngineService } from 'pages/exploration-player-page/services
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { ExplorationParams, LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
@@ -75,8 +74,6 @@ export class PreviewTabComponent
     private numberAttemptsService: NumberAttemptsService,
     private paramChangeObjectFactory: ParamChangeObjectFactory,
     private parameterMetadataService: ParameterMetadataService,
-    private playerCorrectnessFeedbackEnabledService:
-      PlayerCorrectnessFeedbackEnabledService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private paramChangesObjectFactory: ParamChangesObjectFactory
@@ -152,8 +149,6 @@ export class PreviewTabComponent
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });
-        this.playerCorrectnessFeedbackEnabledService.init(
-          returnDict.correctness_feedback_enabled);
         this.numberAttemptsService.reset();
       });
     }, 200);
