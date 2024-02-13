@@ -116,7 +116,14 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#19734): 404 Not Found inside blog dashboard.
   _.escapeRegExp(
     'http://localhost:8181/null - Failed to load resource: the server ' +
-    'responded with a status of 404 (Not Found)')
+    'responded with a status of 404 (Not Found)'),
+  // TODO(#18324): Visiting a newly created exploration state results in some
+  // version-history console error.
+  _.escapeRegExp(
+    '(?=.*http://localhost:8181/version_history_handler/state)(?=*Failed to ' +
+    'load resource: the server responded with a status of 500 ' +
+    '(Internal Server Error))'
+  )
 ];
 
 var checkForConsoleErrors = async function(
