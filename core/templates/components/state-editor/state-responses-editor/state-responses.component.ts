@@ -154,8 +154,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     if (!outcome) {
       return false;
     } else {
+      this.stateName = this.stateEditorService.getActiveStateName()
       let currentStateName = this.stateName;
-
+      console.log("current: ", currentStateName, ", destination: ", outcome.dest)
       return (
         (outcome.dest === currentStateName) &&
         outcome.labelledAsCorrect);
