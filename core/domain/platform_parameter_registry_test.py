@@ -81,9 +81,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'default_value': '111'
         })
 
+    def _create_dummy_platform_parameter(
+        self, data_types: DataTypes) -> parameter_domain.PlatformParameter:
+        """Creates dummy platform parameter."""
+        return registry.Registry.create_platform_parameter(
+            ParamNames.PARAMETER_A, 'test', data_types)
+
     def test_create_platform_parameter(self) -> None:
-        parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.BOOL)
+        parameter = self._create_dummy_platform_parameter(DataTypes.BOOL)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
@@ -108,20 +113,17 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             self._create_example_parameter_with_name(param_name)
 
     def test_default_value_of_bool_platform_parameter(self) -> None:
-        parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test feature', DataTypes.BOOL)
+        parameter = self._create_dummy_platform_parameter(DataTypes.BOOL)
         parameter.validate()
         self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self) -> None:
-        parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.STRING)
+        parameter = self._create_dummy_platform_parameter(DataTypes.STRING)
         parameter.validate()
         self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_number_platform_parameter(self) -> None:
-        parameter = registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', DataTypes.NUMBER)
+        parameter = self._create_dummy_platform_parameter(DataTypes.NUMBER)
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 

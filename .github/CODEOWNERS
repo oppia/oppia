@@ -683,18 +683,6 @@
 /core/templates/services/services.constants.ts @oppia/lace-frontend-reviewers
 
 
-# Dynamic Feature Gating project
-/core/controllers/feature_flag*.py @oppia/web-android-compatibility-reviewers
-/core/domain/platform_parameter_services*.py @oppia/web-android-compatibility-reviewers
-/core/domain/platform_parameter*.py @oppia/web-android-compatibility-reviewers
-/core/domain/feature_flag*.py @oppia/web-android-compatibility-reviewers
-/core/feature_flag*.py @oppia/web-android-compatibility-reviewers
-/core/templates/domain/platform-parameter/ @oppia/web-android-compatibility-reviewers
-/core/templates/domain/feature-flag/ @oppia/web-android-compatibility-reviewers
-/core/templates/pages/release-coordinator-page/features-tab/ @oppia/web-android-compatibility-reviewers
-/core/templates/services/platform-feature*.ts @oppia/web-android-compatibility-reviewers
-
-
 # Frontend unit tests
 /core/templates/**/*.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/**/*Spec.ts @oppia/lace-frontend-reviewers
@@ -788,3 +776,13 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+# Dynamic Feature Gating project
+/core/controllers/feature_flag*.py @oppia/core-reviewers
+/core/domain/platform_parameter_services*.py @oppia/core-reviewers
+/core/domain/platform_parameter*.py @oppia/core-reviewers
+/core/domain/feature_flag*.py @oppia/core-reviewers
+/core/feature_flag*.py @oppia/core-reviewers
+/core/templates/domain/platform-parameter/ @oppia/core-reviewers
+/core/templates/domain/feature-flag/ @oppia/core-reviewers
+/core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
+/core/templates/services/platform-feature*.ts @oppia/core-reviewers

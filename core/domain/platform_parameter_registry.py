@@ -61,7 +61,7 @@ class Registry:
     @classmethod
     def create_platform_parameter(
         cls,
-        name: enum.Enum,
+        name: ParamNames,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
         default: Optional[Union[bool, int, str, float]] = None
