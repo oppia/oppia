@@ -159,7 +159,7 @@
         <div *ngIf="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span *ngIf="!isCurrentInteractionTrivial()" [hidden]="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
             <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
-            <label for="label-target-solicit-answer-details-checkbox">&nbsp;Solicit Answer Details</label>
+            <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>
         <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length)" class="misconception-parent-card">
@@ -287,7 +287,7 @@
   }
 
   .solicit-answer-checkbox label {
-    margin-bottom: 0;
+    margin: 0 0 0 5px;
   }
 
   .nav-pills > div {

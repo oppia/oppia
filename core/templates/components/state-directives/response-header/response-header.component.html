@@ -22,7 +22,7 @@
   </div>
 
   <br class="break-in-mobile">
-  <span *ngIf="outcome">→&nbsp;</span>
+  <span class="outcome-arrow" *ngIf="outcome">→</span>
   <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
   </span>
@@ -113,6 +113,9 @@
   .oppia-response-short-summary {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .outcome-arrow {
+    margin-right: 5px;
   }
   .badge {
     vertical-align: bottom;
