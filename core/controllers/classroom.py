@@ -137,18 +137,7 @@ class DefaultClassroomRedirectPage(
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ClassroomAdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Renders the classroom admin page."""
 
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
-        """Renders the classroom admin page."""
-        self.render_template('classroom-admin-page.mainpage.html')
 
 
 class ClassroomIdToNameHandler(
