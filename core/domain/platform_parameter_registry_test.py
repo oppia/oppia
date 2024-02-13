@@ -84,8 +84,11 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def _create_dummy_platform_parameter(
         self, data_types: DataTypes) -> parameter_domain.PlatformParameter:
         """Creates dummy platform parameter."""
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamNames.
         return registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', data_types)
+            ParamNames.PARAMETER_A, 'test', data_types) # type: ignore[arg-type]
 
     def test_create_platform_parameter(self) -> None:
         parameter = self._create_dummy_platform_parameter(DataTypes.BOOL)

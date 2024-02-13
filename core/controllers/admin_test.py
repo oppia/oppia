@@ -99,11 +99,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def _create_dummy_param(
         self) -> platform_parameter_domain.PlatformParameter:
         """Creates dummy platform parameter."""
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamNames.
         return platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAMETER_1,
+            ParamNames.TEST_PARAMETER_1, # type: ignore[arg-type]
             'Param for test.',
-            platform_parameter_domain.DataTypes.BOOL
-        )
+            platform_parameter_domain.DataTypes.BOOL)
 
     def test_change_configuration_property(self) -> None:
         """Test that configuration properties can be changed."""

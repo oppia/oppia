@@ -63,16 +63,25 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             self.param_names)
 
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamNames.
         self.param_a = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_A,
+            ParamNames.PARAM_A, # type: ignore[arg-type]
             'Parameter named a',
             platform_parameter_domain.DataTypes.STRING)
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamNames.
         self.param_b = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_B,
+            ParamNames.PARAM_B, # type: ignore[arg-type]
             'Parameter named b',
             platform_parameter_domain.DataTypes.BOOL)
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamNames.
         self.param_c = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_C,
+            ParamNames.PARAM_C, # type: ignore[arg-type]
             'Parameter named c',
             platform_parameter_domain.DataTypes.NUMBER)
 
