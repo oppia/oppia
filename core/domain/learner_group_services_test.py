@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
@@ -136,7 +136,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     def test_is_learner_group_feature_enabled(self) -> None:
         feature_flag_services.update_feature_flag(
             (
-                platform_feature_list.FeatureNames.
+                feature_flag_list.FeatureNames.
                 LEARNER_GROUPS_ARE_ENABLED.value
             ),
             True,
@@ -149,7 +149,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         feature_flag_services.update_feature_flag(
             (
-                platform_feature_list.FeatureNames.
+                feature_flag_list.FeatureNames.
                 LEARNER_GROUPS_ARE_ENABLED.value
             ),
             False,

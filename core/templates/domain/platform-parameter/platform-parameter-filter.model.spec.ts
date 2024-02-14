@@ -20,7 +20,7 @@ import {
   PlatformParameterFilter,
   PlatformParameterFilterBackendDict,
   PlatformParameterFilterType
-} from 'domain/platform_feature/platform-parameter-filter.model';
+} from 'domain/platform-parameter/platform-parameter-filter.model';
 
 describe('PlatformParameterFilterModel', () => {
   it('should create an instance from a backend dict.', () => {

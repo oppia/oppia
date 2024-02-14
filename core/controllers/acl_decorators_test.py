@@ -21,8 +21,8 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -3325,7 +3325,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self
     ) -> None:
         feature_flag_services.update_feature_flag(
-            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
             True,
             0,
             []
@@ -3347,7 +3347,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self
     ) -> None:
         feature_flag_services.update_feature_flag(
-            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
             True,
             0,
             []

@@ -27,7 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
-from core.domain import platform_feature_services
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_services
@@ -3211,7 +3211,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )
@@ -3232,7 +3232,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )
@@ -3253,7 +3253,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )
@@ -3301,7 +3301,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )
@@ -3318,7 +3318,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )
@@ -3335,7 +3335,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
         swap_platform_parameter_value = self.swap_to_always_return(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             1
         )

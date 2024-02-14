@@ -25,10 +25,10 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
+from core.domain import platform_parameter_services
 from core.domain import value_generators_domain
 
 from typing import Dict, TypedDict
@@ -200,10 +200,10 @@ class PromoBarHandler(
         """Retrieves the configuration values for a promotional bar."""
         self.render_json({
             'promo_bar_enabled': (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     'promo_bar_enabled')),
             'promo_bar_message': (
-                platform_feature_services.get_platform_parameter_value(
+                platform_parameter_services.get_platform_parameter_value(
                     'promo_bar_message'))
         })
 
@@ -234,12 +234,12 @@ class PromoBarHandler(
 
         promo_bar_enabled_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value)
+                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value)
         )
 
         promo_bar_message_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value)
+                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value)
         )
 
         registry.Registry.update_platform_parameter(

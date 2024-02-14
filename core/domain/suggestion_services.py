@@ -1995,7 +1995,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
     number of suggestions in that type divided by the number of reviewers is
-    greater than ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+    greater than ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
     Returns:
         dict. A dictionary that uses the presence of its keys to indicate which

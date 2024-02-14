@@ -25,7 +25,7 @@ import { AdminPageConstants } from
 import {
   PlatformParameter,
   PlatformParameterBackendDict
-} from 'domain/platform_feature/platform-parameter.model';
+} from 'domain/platform-parameter/platform-parameter.model';
 import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict

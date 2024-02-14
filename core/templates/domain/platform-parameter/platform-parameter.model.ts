@@ -20,7 +20,7 @@ import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
   PlatformParameterValue
-} from 'domain/platform_feature/platform-parameter-rule.model';
+} from 'domain/platform-parameter/platform-parameter-rule.model';
 
 export enum FeatureStage {
   DEV = 'dev',
@@ -35,8 +35,6 @@ export interface PlatformParameterBackendDict {
   'rules': PlatformParameterRuleBackendDict[];
   'rule_schema_version': number;
   'default_value': PlatformParameterValue;
-  'is_feature': boolean;
-  'feature_stage': FeatureStage | null;
 }
 
 /**
@@ -51,24 +49,19 @@ export class PlatformParameter {
   readonly description: string;
   readonly dataType: string;
   readonly ruleSchemaVersion: number;
-  readonly isFeature: boolean;
-  readonly featureStage: FeatureStage | null;
   rules: PlatformParameterRule[];
   defaultValue: PlatformParameterValue;
 
   constructor(
       name: string, description: string, dataType: string,
       rules: PlatformParameterRule[], ruleSchemaVersion: number,
-      defaultValue: PlatformParameterValue, isFeature: boolean,
-      featureStage: FeatureStage | null) {
+      defaultValue: PlatformParameterValue) {
     this.name = name;
     this.description = description;
     this.dataType = dataType;
     this.rules = rules;
     this.ruleSchemaVersion = ruleSchemaVersion;
     this.defaultValue = defaultValue;
-    this.isFeature = isFeature;
-    this.featureStage = featureStage;
   }
 
   static createFromBackendDict(
@@ -83,9 +76,7 @@ export class PlatformParameter {
             ruleDict)
         )),
       backendDict.rule_schema_version,
-      backendDict.default_value,
-      backendDict.is_feature,
-      backendDict.feature_stage
+      backendDict.default_value
     );
   }
 

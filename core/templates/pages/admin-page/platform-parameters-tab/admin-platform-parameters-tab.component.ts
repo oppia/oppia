@@ -30,16 +30,16 @@ import { AdminDataService } from
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { LoaderService } from 'services/loader.service';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
-} from 'domain/platform_feature/platform-parameter-filter.model';
+} from 'domain/platform-parameter/platform-parameter-filter.model';
 import { PlatformParameter } from
-  'domain/platform_feature/platform-parameter.model';
+  'domain/platform-parameter/platform-parameter.model';
 import { PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule.model';
+  'domain/platform-parameter/platform-parameter-rule.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 interface PlatformSchema {
@@ -113,7 +113,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
-    private apiService: PlatformFeatureAdminBackendApiService,
+    private apiService: PlatformParameterAdminBackendApiService,
     private loaderService: LoaderService,
   ) { }
 

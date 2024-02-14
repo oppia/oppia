@@ -292,8 +292,8 @@ import { PencilCodeEditorValidationService } from
 import { FeatureFlagDummyBackendApiService } from
   'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from
   'domain/feature-flag/feature-flag-backend-api.service';
 import { PlayerPositionService } from
@@ -981,8 +981,8 @@ export class UpgradedServices {
       new FeatureFlagBackendApiService(
         upgradedServices['HttpClient']
       );
-    upgradedServices['PlatformFeatureAdminBackendApiService'] =
-      new PlatformFeatureAdminBackendApiService(
+    upgradedServices['PlatformParameterAdminBackendApiService'] =
+      new PlatformParameterAdminBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['FeatureFlagDummyBackendApiService'] =
       new FeatureFlagDummyBackendApiService(

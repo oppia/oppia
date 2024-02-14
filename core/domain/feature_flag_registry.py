@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.platform import models
 
@@ -30,9 +30,9 @@ if MYPY: # pragma: no cover
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
-FeatureNames = platform_feature_list.FeatureNames
+FeatureNames = feature_flag_list.FeatureNames
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    platform_feature_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE)
+    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE)
 
 
 class Registry:

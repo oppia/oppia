@@ -21,9 +21,9 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
 import { PlatformParameter } from
-  'domain/platform_feature/platform-parameter.model';
+  'domain/platform-parameter/platform-parameter.model';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData, AdminPageDataBackendDict } from
@@ -100,9 +100,7 @@ describe('Admin Data Service', () => {
         value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: '',
-      is_feature: false,
-      feature_stage: null
+      default_value: ''
     }],
   };
   let adminDataResponse: AdminPageData;

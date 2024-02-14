@@ -879,9 +879,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'test 😍',
+            'default_value': False
         })
 
         caching_services.set_multi(

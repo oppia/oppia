@@ -2506,7 +2506,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         platform_parameter_registry.Registry.update_platform_parameter(
             (
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
             ),
             self.admin_id,

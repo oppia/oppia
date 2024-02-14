@@ -24,11 +24,26 @@ import { FeatureFlagBackendApiService } from
   'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDomainConstants } from
   'domain/feature-flag/feature-flag-domain.constants';
+import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
+import { FeatureStage } from
+  'domain/platform-parameter/platform-parameter.model';
 import { FeatureStatusSummary } from 'domain/feature-flag/feature-status-summary.model';
 
 describe('FeatureFlagBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureFlagBackendApiService: FeatureFlagBackendApiService;
+  let featureFlagsResponse = {
+    feature_flags: [{
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.DEV,
+      name: 'dummy_feature_flag_for_e2e_tests',
+      force_enable_for_all_users: false,
+      rollout_percentage: 0,
+      user_group_ids: [],
+      last_updated: null
+    }],
+    server_stage: 'dev'
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,6 +58,90 @@ describe('FeatureFlagBackendApiService', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
+
+  it('should get feature flags data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let featureFlagsObject = {
+      featureFlags: featureFlagsResponse.feature_flags.map(
+        dict => FeatureFlag.createFromBackendDict(dict)),
+      serverStage: featureFlagsResponse.server_stage
+    };
+    featureFlagBackendApiService.getFeatureFlags().then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(featureFlagsResponse);
+
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalledWith(featureFlagsObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if backend request fails to fetch features',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      featureFlagBackendApiService.getFeatureFlags().then(
+        successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    }));
+
+  it('should make a request to update the feature flag rules',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      featureFlagBackendApiService.updateFeatureFlag(
+        'feature_name', true, 0, []
+      ).then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
+      req.flush({});
+      expect(req.request.method).toEqual('PUT');
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should reject if the request fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    featureFlagBackendApiService.updateFeatureFlag(
+      'feature_name', true, 0, []
+    ).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      FeatureFlagDomainConstants.FEATURE_FLAGS_URL);
+    req.error(new ErrorEvent('Error'));
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   describe('.fetchFeatureFlags', () => {
     it('should correctly fetch feature flags',

@@ -20,31 +20,13 @@ from __future__ import annotations
 
 import enum
 
+from typing import List
 
-class ParamNames(enum.Enum):
+
+class ParamName(enum.Enum):
     """Enum for parameter names."""
 
-    DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
     DUMMY_PARAMETER = 'dummy_parameter'
-
-    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
-    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
-    CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
-        'contributor_dashboard_accomplishments')
-    ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
-    BLOG_PAGES = 'blog_pages'
-    DIAGNOSTIC_TEST = 'diagnostic_test'
-    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
-        'serial_chapter_launch_curriculum_admin_view')
-    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
-        'serial_chapter_launch_learner_view')
-    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
-        'show_redesigned_learner_dashboard')
-    SHOW_TRANSLATION_SIZE = 'show_translation_size'
-    SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown')
-    IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
-    LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
     MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = (
@@ -71,6 +53,32 @@ class ParamNames(enum.Enum):
     SIGNUP_EMAIL_BODY_CONTENT = 'signup_email_body_content'
     UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
         'unpublish_exploration_email_html_body')
-    CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'
-    NEW_LESSON_PLAYER = 'new_lesson_player'
+
+
+ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
+    ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    ParamName.DUMMY_PARAMETER,
+    ParamName.EMAIL_FOOTER,
+    ParamName.EMAIL_SENDER_NAME,
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    (
+        ParamName.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
+    ),
+    (
+        ParamName.
+        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
+    ),
+    ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    ParamName.PROMO_BAR_ENABLED,
+    ParamName.PROMO_BAR_MESSAGE,
+    ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+    ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+    ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+    ParamName.RECORD_PLAYTHROUGH_PROBABILITY
+]

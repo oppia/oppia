@@ -17,11 +17,11 @@
  */
 
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
 import {
   PlatformParameter,
   PlatformParameterBackendDict,
-} from 'domain/platform_feature/platform-parameter.model';
+} from 'domain/platform-parameter/platform-parameter.model';
 
 describe('PlatformParameterModel', () => {
   it('should create an instance from a backend dict.', () => {
@@ -40,8 +40,6 @@ describe('PlatformParameterModel', () => {
           value_when_matched: 'matched'
         }
       ],
-      is_feature: false,
-      feature_stage: null,
       rule_schema_version: 1,
       default_value: 'default value'
     });
@@ -70,8 +68,6 @@ describe('PlatformParameterModel', () => {
           value_when_matched: 'matched'
         }
       ],
-      is_feature: false,
-      feature_stage: null,
       rule_schema_version: 1,
       default_value: 'default value'
     };
