@@ -23,7 +23,7 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras }
 import { AppConstants } from 'app.constants';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { TopicsAndSkillsDashboardAuthGuard } from './topics-and-skills-dashboard.auth.guard';
+import { TopicsAndSkillsDashboardAuthGuard } from './topics-and-skills-dashboard-auth.guard';
 
 class MockRouter {
   navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
