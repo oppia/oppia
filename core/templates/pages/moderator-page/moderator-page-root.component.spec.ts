@@ -25,7 +25,7 @@ import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 import { ModeratorPageRootComponent } from './moderator-page-root.component';
 
-describe('AdminPageRootComponent', () => {
+describe('ModeratorPageRootComponent', () => {
   let fixture: ComponentFixture<ModeratorPageRootComponent>;
   let component: ModeratorPageRootComponent;
 

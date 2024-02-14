@@ -27,6 +27,6 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 export class ModeratorPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE;
   meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.META as
     unknown as Readonly<MetaTagData>[];
 }
