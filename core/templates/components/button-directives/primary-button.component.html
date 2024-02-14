@@ -3,7 +3,7 @@
    [ngClass]="customClasses"
    [href]="getButtonHref()"
    [target]="getTarget()"
-   (click)="handleButtonClick()">
+   (click)="handleButtonClick($event)">
   {{ buttonText }}
 </a>
 
@@ -11,6 +11,6 @@
         class="primary-button btn"
         [ngClass]="customClasses"
         [disabled]="disabled"
-        (click)="handleButtonClick()">
+        (click)="handleButtonClick($event)">
   {{ buttonText }}
 </button>

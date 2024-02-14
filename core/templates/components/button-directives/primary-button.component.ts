@@ -76,9 +76,23 @@ export class PrimaryButtonComponent implements OnInit {
     return link.startsWith('http://') || link.startsWith('https://');
   }
 
-  handleButtonClick(): void {
+  handleButtonClick(event: MouseEvent): void {
+    event.preventDefault();
+
     if (this.onClickPrimaryButton.observers.length > 0) {
       this.onClickPrimaryButton.emit();
+    }
+
+    if (!this.componentIsButton) {
+      const target = event.target as HTMLAnchorElement;
+      const link = target.href; // The actual link to redirect to.
+      const linkTarget = target.target; // '_blank' or '_self'.
+
+      if (linkTarget === '_blank') {
+        window.open(link, '_blank');
+      } else {
+        window.location.href = link;
+      }
     }
   }
 }
