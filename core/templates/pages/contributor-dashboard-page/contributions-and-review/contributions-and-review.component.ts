@@ -259,8 +259,8 @@ export class ContributionsAndReview
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
-            this.htmlLengthService.computeHtmlLengthInWords(
-              suggestion.change_cmd.content_html)) : undefined
+            this.htmlLengthService.computeHtmlLength(
+              suggestion.change_cmd.content_html, 'word')) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);

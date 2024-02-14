@@ -75,8 +75,8 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
   isHintLengthExceeded(): boolean {
     return Boolean(
-      this.htmlLengthService.computeHtmlLengthInCharacters(
-        this.hint.hintContent._html) >
+      this.htmlLengthService.computeHtmlLength(
+        this.hint.hintContent._html, 'character') >
         ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 

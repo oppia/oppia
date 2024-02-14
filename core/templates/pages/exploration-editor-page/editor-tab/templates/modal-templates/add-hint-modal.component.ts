@@ -76,8 +76,9 @@ export class AddHintModalComponent
 
   isHintLengthExceeded(tmpHint: string): boolean {
     return Boolean(
-      this.htmlLengthService.computeHtmlLengthInCharacters(
-        tmpHint) > ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
+      this.htmlLengthService.computeHtmlLength(
+        tmpHint, 'character') >
+        ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 
   updateLocalHint($event: string): void {

@@ -28,6 +28,7 @@ type CalculationType =
 import { Injectable, SecurityContext } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { HtmlEscaperService } from './html-escaper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,14 +36,16 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   /**
     * ['oppia-noninteractive-image', 'oppia-noninteractive-math']
     * The above tags constitutes for non text nodes.
     */
-  nonTextTags = ['oppia-noninteractive-math',
+  nonTextTags = [
+    'oppia-noninteractive-math',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-collapsible',
@@ -58,33 +61,9 @@ export class HtmlLengthService {
     */
   textTags = ['p', 'ul', 'ol'];
 
-  computeHtmlLengthInWords(htmlString: string): number {
-    if (!htmlString) {
-      this.loggerService.error('Empty string was passed to compute length');
-      return 0;
-    }
-    const sanitizedHtml = this.sanitizer.sanitize(
-      SecurityContext.HTML, htmlString) as string;
-    // Identify custom tags using regex on the original HTML string.
-    const customTags = htmlString.match(CUSTOM_TAG_REGEX);
-    let customTagsLength = (customTags) ? customTags.length : 0;
-
-    /* CustomTagsLength is being passed to calculateBaselineLength()
-    method to ensure try-catch block should not raise error if
-    we use non-interactive RTE */
-    let totalWords = this.calculateBaselineLength(
-      sanitizedHtml, CALCULATION_TYPE_WORD, customTagsLength);
-
-    if (customTags) {
-      for (const customTag of customTags) {
-        totalWords += this.getWeightForNonTextNodes(
-          customTag, CALCULATION_TYPE_WORD);
-      }
-    }
-    return totalWords;
-  }
-
-  computeHtmlLengthInCharacters(htmlString: string): number {
+  computeHtmlLength(
+      htmlString: string,
+      calculationType: CalculationType): number {
     if (!htmlString) {
       this.loggerService.error('Empty string was passed to compute length');
       return 0;
@@ -92,23 +71,21 @@ export class HtmlLengthService {
 
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
+
     // Identify custom tags using regex on the original HTML string.
     const customTags = htmlString.match(CUSTOM_TAG_REGEX);
     let customTagsLength = (customTags) ? customTags.length : 0;
 
-    /* CustomTagsLength is being passed to calculateBaselineLength()
-    method to ensure try-catch block should not raise error if
-    we use non-interactive RTE */
-    let totalCharacters = this.calculateBaselineLength(
-      sanitizedHtml, CALCULATION_TYPE_CHARACTER, customTagsLength);
+    let totalLength = this.calculateBaselineLength(
+      sanitizedHtml, calculationType, customTagsLength);
 
     if (customTags) {
       for (const customTag of customTags) {
-        totalCharacters += this.getWeightForNonTextNodes(
-          customTag, CALCULATION_TYPE_CHARACTER);
+        totalLength += this.getWeightForNonTextNodes(
+          customTag, calculationType);
       }
     }
-    return totalCharacters;
+    return totalLength;
   }
 
   calculateBaselineLength(
@@ -130,10 +107,11 @@ export class HtmlLengthService {
     }
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
-      const ltag = tag.tagName.toLowerCase();
-      if (this.textTags.includes(ltag)) {
+      const lowercaseTagName = tag.tagName.toLowerCase();
+      if (this.textTags.includes(lowercaseTagName)) {
         totalWeight +=
-        this.getWeightForTextNodes(tag as HTMLElement, calculationType);
+        this.getWeightForTextNodes(
+          tag as HTMLElement, calculationType);
       }
     }
     return totalWeight;
@@ -148,46 +126,49 @@ export class HtmlLengthService {
   private calculateTextWeight(
       textContent: string, calculationType: CalculationType): number {
     let trimmedTextContent = textContent.trim();
-    let textContentCount = 0;
+    let totalWeight = 0;
     if (calculationType === CALCULATION_TYPE_WORD && trimmedTextContent) {
       const words = trimmedTextContent.split(' ');
-      textContentCount = words.length;
+      totalWeight = words.length;
     } else {
-      textContentCount = trimmedTextContent.length;
+      totalWeight = trimmedTextContent.length;
     }
-    return textContentCount;
+    return totalWeight;
   }
 
   /* TODO(#19729): Create RTE-component-specific logic
   for calculating the lengths of RTE-components */
   getWeightForNonTextNodes(
       nonTextNode: string, calculationType: CalculationType): number {
+    nonTextNode = this.htmlEscaperService.escapedStrToUnescapedStr(nonTextNode);
     let domparser = new DOMParser();
     let dom: Document;
     dom = domparser.parseFromString(nonTextNode, 'text/html');
     let domTag = dom.body.children[0];
     let domId = domTag.tagName.toLowerCase();
-    if (domId === 'oppia-noninteractive-math') {
-      return 1;
-    } else if ((domId === 'oppia-noninteractive-collapsible') ||
-     (domId === 'oppia-noninteractive-tabs')) {
-      return 1000;
-    } else if (domId === 'oppia-noninteractive-video') {
-      return 0;
-    } else if ((domId === 'oppia-noninteractive-link') ||
-    (domId === 'oppia-noninteractive-skillreview') ||
-    (domId === 'oppia-noninteractive-image')) {
-      const textMatch = nonTextNode.match(
-        /(text-with-value|alt-with-value)="&amp;quot;([^&]*)&amp;quot;"/);
-      if (textMatch && textMatch[2]) {
-        const text = textMatch[2];
-        const weight = this.calculateTextWeight(text, calculationType);
-        return (domId === 'oppia-noninteractive-image') ? weight + 10 : weight;
+    switch (domId) {
+      case 'oppia-noninteractive-math':
+        return 1;
+      case 'oppia-noninteractive-collapsible':
+      case 'oppia-noninteractive-tabs':
+        return 1000;
+      case 'oppia-noninteractive-video':
+        return 0;
+      case 'oppia-noninteractive-link':
+      case 'oppia-noninteractive-skillreview': {
+        const textValueAttr = domTag.getAttribute('text-with-value');
+        const textValue = textValueAttr ? textValueAttr.replace(/"/g, '') : '';
+        const weight = this.calculateTextWeight(textValue, calculationType);
+        return weight;
       }
-    } else {
-      throw new Error('Unable to determine weight for non-text node.');
+      case 'oppia-noninteractive-image': {
+        const altTextAttr = domTag.getAttribute('alt-with-value');
+        const altTextValue = altTextAttr ? altTextAttr.replace(/"/g, '') : '';
+        const Weight = this.calculateTextWeight(altTextValue, calculationType);
+        return Weight + 10;
+      }
+      default:
+        throw new Error(`Invalid non-text node: ${domId}`);
     }
-    /* istanbul ignore next */
-    throw new Error('Unable to determine weight for non-text node.');
   }
 }
