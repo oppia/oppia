@@ -270,31 +270,23 @@
 
     <oppia-primary-button
         buttonHref="https://forms.gle/rhFYoLLSFr3JEZHy8"
+        [customClasses]="['volunteer-btn']"
         buttonText="{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_BUTTON' | translate }}">
     </oppia-primary-button>
   </div>
 </div>
 
 <style>
-  .volunteer-page a {
+  .volunteer-page .volunteer-btn {
     background-color: #00645c;
     border-radius: 4px;
     height: 40px;
     margin: 2rem auto 7rem auto;
   }
 
-  .volunteer-page button:hover,
-  .volunteer-page button:focus {
+  .volunteer-page .volunteer-btn:hover,
+  .volunteer-page .volunteer-btn:focus {
     background-color: #3d9991;
-  }
-
-  .volunteer-page button a {
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 1em;
-    font-weight: 500;
-    letter-spacing: 0.7px;
-    text-decoration: none;
   }
 
   .mat-tab-label, .mat-tab-label-content {
@@ -350,7 +342,7 @@
     flex-direction: row;
   }
 
-  .oppia-volunteer-banner-content a {
+  .oppia-volunteer-banner-content .volunteer-btn {
     height: 50px;
     width: 100%;
   }
