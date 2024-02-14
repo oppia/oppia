@@ -311,9 +311,6 @@ URLS = [
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
-        contributor_dashboard.ContributorDashboardPage),
-    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
         contributor_dashboard.ContributorStatsSummariesHandler),
@@ -434,8 +431,8 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
-        classroom.ClassroomAdminDataHandler),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
+        classroom.ClassroomIdToNameHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),
@@ -1207,6 +1204,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
+        cron.CronMailReviewerNewSuggestionsHandler),
 ))
 
 # Add tasks urls.
