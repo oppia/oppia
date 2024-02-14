@@ -61,7 +61,6 @@ describe('Learner Local Nav Component ', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false,
       next_content_id_index: 0
     },
     exploration_metadata: {
@@ -77,7 +76,6 @@ describe('Learner Local Nav Component ', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: false,
       edits_allowed: true
     },
     exploration_id: 'test_id',
@@ -87,7 +85,6 @@ describe('Learner Local Nav Component ', () => {
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: false,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,

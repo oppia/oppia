@@ -490,7 +490,6 @@ describe('Contribution and review service', () => {
           language_code: 'en',
           objective: 'Dummy Objective',
           next_content_id_index: 4,
-          correctness_feedback_enabled: true
         },
         exploration_metadata: {
           title: 'Dummy Title',
@@ -505,7 +504,6 @@ describe('Contribution and review service', () => {
           param_specs: {},
           param_changes: [],
           auto_tts_enabled: true,
-          correctness_feedback_enabled: true,
           edits_allowed: true,
         },
         exploration_id: '1',
@@ -515,7 +513,6 @@ describe('Contribution and review service', () => {
         preferred_audio_language_code: 'en',
         preferred_language_codes: [],
         auto_tts_enabled: true,
-        correctness_feedback_enabled: true,
         record_playthrough_probability: 1,
         draft_change_list_id: 1,
         has_viewed_lesson_info_modal_once: false,

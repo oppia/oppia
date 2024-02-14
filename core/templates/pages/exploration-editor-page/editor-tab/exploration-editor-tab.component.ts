@@ -38,7 +38,6 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
 import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { ExplorationCorrectnessFeedbackService } from '../services/exploration-correctness-feedback.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorRefreshService } from '../services/state-editor-refresh.service';
 import { LoaderService } from 'services/loader.service';
@@ -93,8 +92,6 @@ export class ExplorationEditorTabComponent
       public stateCardIsCheckpointService: StateCardIsCheckpointService,
       private explorationInitStateNameService: ExplorationInitStateNameService,
       private explorationWarningsService: ExplorationWarningsService,
-      private explorationCorrectnessFeedbackService:
-        ExplorationCorrectnessFeedbackService,
       private focusManagerService: FocusManagerService,
       private stateEditorRefreshService: StateEditorRefreshService,
       private loaderService: LoaderService,
@@ -331,8 +328,6 @@ export class ExplorationEditorTabComponent
       this.stateName = this.stateEditorService.getActiveStateName();
       this.stateEditorService.setStateNames(
         this.explorationStatesService.getStateNames());
-      this.stateEditorService.setCorrectnessFeedbackEnabled(
-       this.explorationCorrectnessFeedbackService.isEnabled() as boolean);
       this.stateEditorService.setInQuestionMode(false);
 
       let stateData = this.explorationStatesService.getState(this.stateName);
