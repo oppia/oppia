@@ -242,6 +242,14 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
   }
 };
 
+// This function checks if any text is selected on the page.
+var expectNoTextToBeSelected = async function() {
+  expect(await browser.execute(function() {
+    var selection = window.getSelection();
+    return selection.toString() === '';
+  })).toBe(true);
+};
+
 var goToHomePage = async function() {
   var oppiaMainLogo = $('.e2e-test-oppia-main-logo');
   await action.click('Oppia Main Logo', oppiaMainLogo);
@@ -355,6 +363,7 @@ exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
 exports.openAboutDropdown = openAboutDropdown;
+exports.expectNoTextToBeSelected = expectNoTextToBeSelected;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
