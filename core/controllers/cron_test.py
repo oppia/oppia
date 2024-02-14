@@ -513,7 +513,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.login(
                 self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
             swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 False
             )
@@ -568,7 +568,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.login(
                 self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
             swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 True
             )
@@ -592,7 +592,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.login(
                 self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
             swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 True
             )
@@ -619,7 +619,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             self.login(
                 self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
             swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 True
             )
@@ -648,7 +648,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             new_callable=mock.Mock) as mock_send:
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
             swap_platform_parameter_value = self.swap_to_always_return(
-                platform_feature_services,
+                platform_parameter_services,
                 'get_platform_parameter_value',
                 True
             )

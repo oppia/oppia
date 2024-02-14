@@ -4979,7 +4979,7 @@ class NotifyReviewersNewSuggestionsTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         self.swap_get_platform_parameter_value = self.swap(
-            platform_feature_services,
+            platform_parameter_services,
             'get_platform_parameter_value',
             self._swap_get_platform_parameter_value_function
         )

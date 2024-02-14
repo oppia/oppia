@@ -221,7 +221,7 @@ class CronMailReviewerNewSuggestionsHandler(
         if not feconf.CAN_SEND_EMAILS:
             return self.render_json({})
 
-        if not platform_feature_services.get_platform_parameter_value(
+        if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamNames.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
