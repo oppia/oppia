@@ -27,6 +27,7 @@ import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.compon
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.component';
 import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
@@ -42,6 +43,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
 import { TopicEditorAccessGuard } from './topic-editor-access.guard';
 import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-viewer-player-common.module';
+import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
+import { EntityCreationService } from './services/entity-creation.service';
+import { CreateNewSkillModalService } from './services/create-new-skill-modal.service';
 
 
 @NgModule({
@@ -66,6 +70,7 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewSkillModalComponent,
     CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
@@ -85,6 +90,7 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewSkillModalComponent,
     CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
@@ -96,5 +102,10 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
     TopicEditorPageComponent,
     SubtopicEditorTabComponent
   ],
+  providers: [
+    StoryCreationBackendApiService,
+    EntityCreationService,
+    CreateNewSkillModalService,
+  ]
 })
 export class TopicEditorPageModule {}
