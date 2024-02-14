@@ -17,7 +17,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -379,8 +378,3 @@ export class QuestionSuggestionReviewModalComponent
     this.refreshContributionState();
   }
 }
-
-angular.module('oppia').directive('oppiaQuestionSuggestionReviewModal',
-  downgradeComponent({
-    component: QuestionSuggestionReviewModalComponent
-  }) as angular.IDirectiveFactory);

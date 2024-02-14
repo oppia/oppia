@@ -61,20 +61,6 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     topic_name: str
 
 
-class ContributorDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the contributor dashboard."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests and renders the contributor dashboard page."""
-        self.render_template('contributor-dashboard-page.mainpage.html')
-
-
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ContributionOpportunitiesHandler's
     normalized_request dictionary.

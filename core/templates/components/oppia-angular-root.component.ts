@@ -184,6 +184,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private rteHelperService: RteHelperService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private contextService: ContextService,
     private urlService: UrlService,
     private injector: Injector
   ) {
@@ -200,7 +201,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
         this.htmlEscaperService,
-        OppiaAngularRootComponent.contextService,
+        this.contextService,
         this.ngZone
       );
     });
