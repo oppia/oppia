@@ -4,6 +4,11 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
+/*
+  Note: The .primary-button class in this component is necessary in order to avoid
+  style conflicts with other classes such as the .btn class, do not remove it.
+*/
+
 .primary-button {
   background-color: #00645c;
   color: rgba(255, 255, 255, 1.0);
