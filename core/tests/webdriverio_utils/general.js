@@ -99,8 +99,8 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp('The requested path /learn/math is not found.'),
   _.escapeRegExp(
     'http://localhost:8181/access_validation_handler/can_access_classroom_page' +
-    '?classroom_url_fragment=math - Failed to load resource: the server responded ' +
-    'with a status of 404 (Not Found)'),
+    '?classroom_url_fragment=math - Failed to load resource: the server ' +
+    'responded with a status of 404 (Not Found)'),
   // TODO(#6478): Flakes with feedbackUpdates e2e tests.
   _.escapeRegExp(
     'Requested card with index -1, but transcript only has length ' +
@@ -127,7 +127,12 @@ var CONSOLE_ERRORS_TO_FIX = [
     'http://localhost:8181/version_history_handler/state'),
   // TODO(#19743): Input path is invalid when using math expression RTE.
   _.escapeRegExp(
-    'Input path  is invalid, it does not contain dimensions.')
+    'Input path  is invalid, it does not contain dimensions.'),
+  // TODO(#18837): The supplied input topic: undefined is not valid.
+  _.escapeRegExp(
+    'http://localhost:8181/getreviewableopportunitieshandler' +
+    '?topic_name=undefined - Failed to load resource: the server responded ' +
+    'with a status of 400 (Bad Request)')
 ];
 
 var checkForConsoleErrors = async function(
