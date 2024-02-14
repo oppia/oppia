@@ -84,7 +84,6 @@ describe('Preview Tab Component', () => {
   let changeObjectName = 'change';
   let exploration = {
     auto_tts_enabled: false,
-    correctness_feedback_enabled: true,
     draft_changes: [],
     is_version_of_draft_valid: false,
     init_state_name: stateName,
@@ -107,7 +106,6 @@ describe('Preview Tab Component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
       edits_allowed: true
     },
     next_content_id_index: 5,
