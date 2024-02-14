@@ -1704,6 +1704,33 @@ def get_info_about_suggestions_waiting_too_long_for_review() -> List[
     ]
 
 
+def get_new_suggestions_for_reviewer_notifications() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
+    """Retrieves and organizes new suggestions for reviewer email notifications.
+
+    Returns:
+        list[ReviewableSuggestionEmailInfo]. A list of email content info
+        objects for new suggestions.
+    """
+    new_suggestions = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_new_suggestions_waiting_for_review()
+        )
+    ]
+
+    email_content_info = []
+
+    for suggestion in new_suggestions:
+        suggestion_info = (
+            create_reviewable_suggestion_email_info_from_suggestion(
+                suggestion
+        ))
+        email_content_info.append(suggestion_info)
+    return email_content_info
+
+
 def get_user_proficiency_from_model(
     user_proficiency_model: user_models.UserContributionProficiencyModel
 ) -> user_domain.UserContributionProficiency:
