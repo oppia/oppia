@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Creator dashboard page root component.
+ * @fileoverview Contributor dashboard page root component.
  */
 
 import { Component } from '@angular/core';
@@ -21,15 +21,15 @@ import { AppConstants } from 'app.constants';
 import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-creator-dashboard-page-root',
-  templateUrl: './creator-dashboard-page-root.component.html',
+  selector: 'oppia-contributor-dashboard-page-root',
+  templateUrl: './contributor-dashboard-page-root.component.html',
 })
-export class CreatorDashboardPageRootComponent extends BaseRootComponent {
+export class ContributorDashboardPageRootComponent extends BaseRootComponent {
   title: string = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .CREATOR_DASHBOARD.TITLE);
+      .CONTRIBUTOR_DASHBOARD.TITLE);
 
   meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.META as
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD.META as
     unknown as Readonly<MetaTagData>[];
 }
