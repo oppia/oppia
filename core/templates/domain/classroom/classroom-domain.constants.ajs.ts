@@ -46,5 +46,5 @@ angular.module('oppia').constant(
   ClassroomDomainConstants.NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE);
 
 angular.module('oppia').constant(
-  'CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE',
-  ClassroomDomainConstants.CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE);
+  'CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE',
+  ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE);
