@@ -28,6 +28,7 @@ export class CreatorDashboardPageRootComponent extends BaseRootComponent {
   title: string = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CREATOR_DASHBOARD.TITLE);
+  
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.META as
     unknown as Readonly<MetaTagData>[];
