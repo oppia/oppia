@@ -80,11 +80,10 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp('ERROR CONTEXT'),
   // TODO(#19746): Development console error "Uncaught in Promise" on signup.
   _.escapeRegExp(
-    'Uncaught (in promise): S: {\"headers\":{\"normalizedNames\":{},' +
-    '\"lazyUpdate\":null},\"status\":200,\"statusText\":\"OK\",\"url\":\"' +
-    'http://localhost:8181/logout?redirect_url=/learner_groups_feature' +
-    '_status_handler\",\"ok\":false,\"name\":\"HttpErrorResponse\"'
-  ),
+    'Uncaught (in promise): HttpErrorResponse: {"headers":{"normalizedNames":' +
+    '{},"lazyUpdate":null},"status":200,"statusText":"OK","url":' +
+    '"http://localhost:8181/logout?redirect_url=/learner_groups_feature_status' +
+    '_handler","ok":false,"name":"HttpErrorResponse"'),
   // TODO(#19687): 404 (Not Found) for favicon on home page.
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
