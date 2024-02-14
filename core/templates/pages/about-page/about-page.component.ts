@@ -19,13 +19,9 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { WindowRef } from
-  'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './about-page.component.css';
 
@@ -53,9 +49,7 @@ export class AboutPageComponent {
   }];
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
   ) {}
 
@@ -63,13 +57,8 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickVisitClassroomButton(): string {
-    let classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
-      });
+  onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    return classroomUrl;
   }
 
   onClickBrowseLibraryButton(): void {
