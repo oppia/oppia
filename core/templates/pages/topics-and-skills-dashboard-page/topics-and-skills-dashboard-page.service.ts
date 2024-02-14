@@ -16,7 +16,6 @@
  * @fileoverview Service for topics and skills dashboard page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { CreatorTopicSummary } from
@@ -161,7 +160,3 @@ export class TopicsAndSkillsDashboardPageService {
     return filteredTopics;
   }
 }
-
-angular.module('oppia').factory(
-  'TopicsAndSkillsDashboardPageService',
-  downgradeInjectable(TopicsAndSkillsDashboardPageService));

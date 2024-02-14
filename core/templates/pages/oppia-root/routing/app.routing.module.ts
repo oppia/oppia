@@ -52,6 +52,16 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .TOPICS_AND_SKILLS_DASHBOARD.ROUTE),
+    loadChildren: () => import(
+      // eslint-disable-next-line max-len
+      'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module')
+      .then(m => m.TopicsAndSkillsDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')

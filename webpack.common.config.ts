@@ -119,11 +119,6 @@ module.exports = {
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
-    topics_and_skills_dashboard: (
-      commonPrefix +
-      '/pages/topics-and-skills-dashboard-page/' +
-      'topics-and-skills-dashboard-page.import.ts'
-    ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
     voiceover_admin:
@@ -407,19 +402,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-editor-page/' +
         'topic-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topics_and_skills_dashboard'],
-      filename: 'topics-and-skills-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/topics-and-skills-dashboard-page/' +
-        'topics-and-skills-dashboard-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),
