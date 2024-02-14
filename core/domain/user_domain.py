@@ -1204,6 +1204,14 @@ class UserContributionRights:
             self.can_review_voiceover_for_language_codes or
             self.can_review_questions)
 
+    def can_submit_at_least_one_item(self) -> bool:
+        """Checks whether user has rights to submit at least one item.
+
+        Returns:
+            boolean. Whether user has rights to submit at east one item.
+        """
+        return bool(self.can_submit_questions)
+
     def validate(self) -> None:
         """Validates different attributes of the class."""
         if not isinstance(self.can_review_translation_for_language_codes, list):

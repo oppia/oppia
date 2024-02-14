@@ -96,7 +96,6 @@ export class TopicFilterComponent implements OnInit {
     this.filteredTopics.pipe(
       debounceTime(1500), distinctUntilChanged()
     ).subscribe(() => {
-      this.autoTrigger.closePanel();
       this.selectionsChange.emit(this.selectedTopicNames);
     });
   }

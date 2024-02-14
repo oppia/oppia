@@ -24,6 +24,7 @@ import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService: ClassroomBackendApiService;
@@ -216,7 +217,7 @@ describe('Classroom backend API service', function() {
     service.getAllClassroomIdToClassroomNameDictAsync().then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/classroom_admin_data_handler');
+      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE);
     expect(req.request.method).toEqual('GET');
 
     let classroomIdToClassroomNameDict = {
@@ -244,7 +245,7 @@ describe('Classroom backend API service', function() {
       service.getAllClassroomIdToClassroomNameDictAsync().then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/classroom_admin_data_handler');
+        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE);
       expect(req.request.method).toEqual('GET');
 
       req.flush('Invalid request', {

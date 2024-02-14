@@ -118,7 +118,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => true,
         },
       };
-      component.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
+      component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -151,7 +151,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => false,
         },
       };
-      component.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+      component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -182,7 +182,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => true,
         },
       };
-      component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -215,7 +215,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => false,
         },
       };
-      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -270,7 +270,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => true,
         },
       };
-      component.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
+      component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -294,7 +294,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => false,
         },
       };
-      component.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+      component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -316,7 +316,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => true,
         },
       };
-      component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -340,7 +340,7 @@ describe('Contributor stats component', () => {
           isFirstChange: () => false,
         },
       };
-      component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
 
@@ -376,7 +376,7 @@ describe('Contributor stats component', () => {
         isFirstChange: () => true,
       },
     };
-    component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
@@ -416,7 +416,7 @@ describe('Contributor stats component', () => {
         isFirstChange: () => true,
       },
     };
-    component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
@@ -456,7 +456,7 @@ describe('Contributor stats component', () => {
         isFirstChange: () => true,
       },
     };
-    component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
@@ -496,7 +496,7 @@ describe('Contributor stats component', () => {
         isFirstChange: () => true,
       },
     };
-    component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
@@ -532,7 +532,7 @@ describe('Contributor stats component', () => {
         isFirstChange: () => true,
       },
     };
-    component.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+    component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
