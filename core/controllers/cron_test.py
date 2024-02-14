@@ -925,7 +925,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         platform_parameter_registry.Registry.update_platform_parameter(
             (
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
             ),
             self.admin_id,

@@ -68,14 +68,14 @@ from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
 PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
-    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
-    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
+    platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
+    platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
 ])
 
 # Platform parameters that we plan to show on the blog admin page.
 PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
     (
-        platform_parameter_list.ParamNames.
+        platform_parameter_list.ParamName.
         MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
     )
 ])

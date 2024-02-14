@@ -59,6 +59,6 @@ class ExplorationFeaturesHandler(
                     exploration_id),
             'always_ask_learners_for_answer_details':
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value)
         })

@@ -234,12 +234,12 @@ class PromoBarHandler(
 
         promo_bar_enabled_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value)
+                platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value)
         )
 
         promo_bar_message_parameter = (
             registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value)
+                platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value)
         )
 
         registry.Registry.update_platform_parameter(

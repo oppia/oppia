@@ -82,7 +82,7 @@ class BlogAdminHandler(
         """Handles GET requests."""
         max_no_of_tags_parameter = (
             platform_parameter_registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value)
         )
         platform_params_for_blog_admin = {

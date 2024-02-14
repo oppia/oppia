@@ -245,19 +245,19 @@ class ExplorationImprovementsConfigHandler(
                     IS_IMPROVEMENTS_TAB_ENABLED.value)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.
                     value
                 )),
             'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
                     .value
                 )),
             'high_bounce_rate_task_minimum_exploration_starts': (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value
                 )),
         })

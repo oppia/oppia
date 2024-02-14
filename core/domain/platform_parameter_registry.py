@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
 (config_models, suggestion_models) = models.Registry.import_models(
     [models.Names.CONFIG, models.Names.SUGGESTION])
 
-ParamNames = platform_parameter_list.ParamNames
+ParamName = platform_parameter_list.ParamName
 
 
 class Registry:
@@ -59,7 +59,7 @@ class Registry:
     @classmethod
     def create_platform_parameter(
         cls,
-        name: ParamNames,
+        name: ParamName,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
         default: Optional[Union[bool, int, str, float]] = None
@@ -344,31 +344,31 @@ class Registry:
 
 # Platform parameters should all be defined below.
 Registry.create_platform_parameter(
-    ParamNames.DUMMY_PARAMETER,
+    ParamName.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
     platform_parameter_domain.DataTypes.STRING
 )
 
 Registry.create_platform_parameter(
-    ParamNames.PROMO_BAR_ENABLED,
+    ParamName.PROMO_BAR_ENABLED,
     'Whether the promo bar should be enabled for all users',
     platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
-    ParamNames.PROMO_BAR_MESSAGE,
+    ParamName.PROMO_BAR_MESSAGE,
     'The message to show to all users if the promo bar is enabled',
     platform_parameter_domain.DataTypes.STRING
 )
 
 Registry.create_platform_parameter(
-    ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     'Always ask learners for answer details. For testing -- do not use',
     platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
-    ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
+    ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
     'The maximum number of tags that can be selected to categorize the blog '
     'post',
     platform_parameter_domain.DataTypes.NUMBER,
@@ -376,21 +376,21 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
+    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
     'The bounce-rate a state must exceed to create a new improvements task.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.20
 )
 
 Registry.create_platform_parameter(
-    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
+    ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
     'The bounce-rate a state must fall under to discard its improvement task.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.20
 )
 
 Registry.create_platform_parameter(
-    ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
     'The minimum number of times an exploration is started before it can '
     'generate high bounce-rate improvements tasks.',
     platform_parameter_domain.DataTypes.NUMBER,
@@ -398,14 +398,14 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
+    ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
     'Enable sending Contributor Dashboard reviewers email notifications '
     'about suggestions that need review. The default value is false.',
     platform_parameter_domain.DataTypes.BOOL
 )
 
 Registry.create_platform_parameter(
-    ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
     (
         'Enable sending admins email notifications if there are Contributor '
         'Dashboard suggestions that have been waiting for a review for more '
@@ -416,7 +416,7 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
+    ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
     (
         'Enable sending admins email notifications if Contributor Dashboard '
         'reviewers are needed in specific suggestion types. The default value '
@@ -426,7 +426,7 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
+    ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
     (
         'The maximum number of Contributor Dashboard suggestions per reviewer.'
         'If the number of suggestions per reviewer surpasses this maximum, '
@@ -438,7 +438,7 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.RECORD_PLAYTHROUGH_PROBABILITY,
+    ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
     'The probability of recording playthroughs',
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.2

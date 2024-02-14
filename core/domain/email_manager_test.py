@@ -2666,16 +2666,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_FOOTER.value
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value
         ):
             return email_manager.EMAIL_FOOTER.default_value
         return ''
@@ -4252,12 +4252,12 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''
@@ -5047,16 +5047,16 @@ class NotifyReviewersNewSuggestionsTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_FOOTER.value
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value
         ):
             return email_manager.EMAIL_FOOTER.default_value
         return ''
@@ -5319,12 +5319,12 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             PlatformDataTypes. The defined data type of the platform parameter.
         """
         if param_name == (
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             return True
         elif param_name == (
-            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+            platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
         ):
             return email_manager.EMAIL_SENDER_NAME.default_value
         return ''

@@ -110,7 +110,7 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
 
 EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.EMAIL_SENDER_NAME,
+        platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
         'The default sender name for outgoing emails.',
         platform_parameter_domain.DataTypes.STRING,
         default='Site Admin'
@@ -119,7 +119,7 @@ EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
 
 EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.EMAIL_FOOTER,
+        platform_parameter_list.ParamName.EMAIL_FOOTER,
         'The footer to append to all outgoing emails. (This should '
         'be written in HTML and include an unsubscribe link.)',
         platform_parameter_domain.DataTypes.STRING,
@@ -138,7 +138,7 @@ _PLACEHOLDER_HTML_BODY: Final = (
 
 SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
         'Content of email sent after a new user signs up. Set the email '
         'subject. These emails are only sent if the functionality is enabled '
         'in feconf.py.',
@@ -149,7 +149,7 @@ SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
 
 SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
     PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
         'Content of email sent after a new user signs up. (The email body '
         'should be written with HTML and not include a salutation or footer.) '
         'These emails are only sent if the functionality is enabled in '
@@ -198,7 +198,7 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
     platform_parameter_domain.PlatformParameter) = (
         PlatformParameterRegistry.create_platform_parameter(
             (
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
             ),
             'Default content for the email sent after an exploration is '
@@ -1666,7 +1666,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+        platform_parameter_list.ParamName.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
     ):
         logging.error(
@@ -1866,7 +1866,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+        platform_parameter_list.ParamName.
         ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
     ):
         logging.error(
@@ -2014,7 +2014,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         return
 
     if not platform_parameter_services.get_platform_parameter_value(
-        platform_parameter_list.ParamNames.
+        platform_parameter_list.ParamName.
         CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
     ):
         logging.error(

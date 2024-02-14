@@ -284,7 +284,7 @@ class BlogPostHandler(
             blog_post.author_id)
         max_no_of_tags = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
             )
         )

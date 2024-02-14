@@ -448,7 +448,7 @@ class ExplorationHandler(
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'record_playthrough_probability': (
                 platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     RECORD_PLAYTHROUGH_PROBABILITY.value
                 )
             ),

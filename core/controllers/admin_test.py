@@ -74,7 +74,7 @@ BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
 
-class ParamNames(enum.Enum):
+class ParamName(enum.Enum):
     """Enum for parameter names."""
 
     TEST_PARAMETER_1 = 'test_param_1'
@@ -101,9 +101,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamNames.
+        # platform parameter name of type platform_parameter_list.ParamName.
         return platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAMETER_1, # type: ignore[arg-type]
+            ParamName.TEST_PARAMETER_1, # type: ignore[arg-type]
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
 
@@ -908,7 +908,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
-            [ParamNames.TEST_PARAMETER_1]
+            [ParamName.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
         self.assertEqual(
@@ -938,7 +938,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
-            [ParamNames.TEST_PARAMETER_1]
+            [ParamName.TEST_PARAMETER_1]
         ):
             self.post_json(
                 '/adminhandler', {
@@ -983,7 +983,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
-            [ParamNames.TEST_PARAMETER_1]
+            [ParamName.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
             self.assertEqual(
@@ -1027,7 +1027,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
-            [ParamNames.TEST_PARAMETER_1]
+            [ParamName.TEST_PARAMETER_1]
         ):
             response = self.post_json(
                 '/adminhandler', {

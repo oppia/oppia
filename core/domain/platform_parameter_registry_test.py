@@ -33,7 +33,7 @@ DataTypes = parameter_domain.DataTypes
 FeatureStages = parameter_domain.FeatureStages
 
 
-class ParamNames(enum.Enum):
+class ParamName(enum.Enum):
     """Enum for parameter names."""
 
     PARAMETER_A = 'parameter_a'
@@ -86,9 +86,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         """Creates dummy platform parameter."""
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamNames.
+        # platform parameter name of type platform_parameter_list.ParamName.
         return registry.Registry.create_platform_parameter(
-            ParamNames.PARAMETER_A, 'test', data_types) # type: ignore[arg-type]
+            ParamName.PARAMETER_A, 'test', data_types) # type: ignore[arg-type]
 
     def test_create_platform_parameter(self) -> None:
         parameter = self._create_dummy_platform_parameter(DataTypes.BOOL)
@@ -106,7 +106,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             registry.Registry.create_platform_parameter(
-                ParamNames.PARAMETER_A, 'test', DataType.INVALID)  # type: ignore[arg-type]
+                ParamName.PARAMETER_A, 'test', DataType.INVALID)  # type: ignore[arg-type]
 
     def test_create_platform_parameter_with_the_same_name_failure(self) -> None:
         param_name = 'parameter_a'

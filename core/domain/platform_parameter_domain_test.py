@@ -31,7 +31,7 @@ from typing import Dict, Final, List, Optional, Union
 ServerMode = parameter_domain.ServerMode
 
 
-class DummyParamNames(enum.Enum):
+class DummyParamName(enum.Enum):
     """Test class to mock platform_parameter_list.
     ALL_PLATFORM_PARAMS_LIST
     """

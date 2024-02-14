@@ -30,7 +30,7 @@ from core.domain import platform_parameter_services as parameter_services
 from core.tests import test_utils
 
 
-class ParamNames(enum.Enum):
+class ParamName(enum.Enum):
     """Enum for parameter names."""
 
     PARAM_A = 'param_a'
@@ -58,30 +58,30 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Parameter names that might be used in following tests.
         self.param_names = ['param_a', 'param_b', 'param_c']
         self.param_name_enums = [
-            ParamNames.PARAM_A, ParamNames.PARAM_B, ParamNames.PARAM_C]
+            ParamName.PARAM_A, ParamName.PARAM_B, ParamName.PARAM_C]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             self.param_names)
 
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamNames.
+        # platform parameter name of type platform_parameter_list.ParamName.
         self.param_a = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_A, # type: ignore[arg-type]
+            ParamName.PARAM_A, # type: ignore[arg-type]
             'Parameter named a',
             platform_parameter_domain.DataTypes.STRING)
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamNames.
+        # platform parameter name of type platform_parameter_list.ParamName.
         self.param_b = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_B, # type: ignore[arg-type]
+            ParamName.PARAM_B, # type: ignore[arg-type]
             'Parameter named b',
             platform_parameter_domain.DataTypes.BOOL)
         # Here we use MyPy ignore because we use dummy platform parameter
         # names for our tests and create_platform_parameter only accepts
-        # platform parameter name of type platform_parameter_list.ParamNames.
+        # platform parameter name of type platform_parameter_list.ParamName.
         self.param_c = registry.Registry.create_platform_parameter(
-            ParamNames.PARAM_C, # type: ignore[arg-type]
+            ParamName.PARAM_C, # type: ignore[arg-type]
             'Parameter named c',
             platform_parameter_domain.DataTypes.NUMBER)
 
