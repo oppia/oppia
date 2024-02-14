@@ -39,7 +39,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Mapping, Optional, Sequence,
+    Callable, DefaultDict, Dict, Final, List, Mapping, Optional, Sequence,
     Set, Tuple, TypedDict, Union)
 
 MYPY = False
@@ -1769,6 +1769,69 @@ def _send_suggestions_waiting_too_long_email(
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
             recipient_email=admin_emails[index])
+
+
+def send_reviewer_notifications(
+    reviewer_ids_by_language: DefaultDict[str, List[str]],
+    suggestions_by_language: DefaultDict[str, List[
+        suggestion_registry.ReviewableSuggestionEmailInfo]],
+) -> None:
+    """Sends email notifications to reviewers about new suggestions.
+
+    Args:
+        suggestions_by_language: dict. A dictionary that organizes
+            new suggestions by language code.
+        reviewer_ids_by_language: dict. A dictionary that organizes reviewer
+            IDs by language code.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
+    for language_code, suggestions in suggestions_by_language.items():
+        reviewer_ids = reviewer_ids_by_language[language_code]
+
+        if not reviewer_ids:
+            message = 'No reviewers found for language %s to notify'
+            logging.error(message % language_code)
+            continue
+
+        email_subject = 'Contributor Dashboard New Reviewer Opportunities'
+        email_body_template = (
+            'Hi %s,<br><br>'
+            'There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:<br><br>' +
+            'The following suggestions are available for review: ' +
+            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
+            'of the above contributions (if they still need a review)' +
+            ' or any other contributions on the dashboard.' +
+            ' We appreciate your help!<br><br>Thanks again, '
+            'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
+        )
+        suggestion_descriptions = []
+        for suggestion in suggestions:
+            suggestion_descriptions.append(
+                _create_html_for_reviewable_suggestion_email_info(suggestion))
+
+        for reviewer_id in reviewer_ids:
+            reviewer_username = user_services.get_username(reviewer_id)
+            email_body = email_body_template % (
+                reviewer_username, feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
+                    suggestion_descriptions))
+
+            # Send the email to each reviewer.
+            reviewer_email = user_services.get_email_from_user_id(reviewer_id)
+
+            _send_email(
+                reviewer_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
+                email_subject,
+                email_body,
+                feconf.NOREPLY_EMAIL_ADDRESS,
+                recipient_email=reviewer_email)
 
 
 def send_mail_to_notify_admins_that_reviewers_are_needed(

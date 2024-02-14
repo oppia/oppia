@@ -21,10 +21,10 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-
 from typing import Dict, Final, List, Mapping
 
 MYPY = False
@@ -1282,6 +1282,33 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     suggestion_models.GeneralSuggestionModel
                     .get_suggestions_waiting_too_long_for_review()
                 )
+
+    def test_get_new_suggestions_waiting_for_review(self) -> None:
+        suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        max_suggestions = 1
+        creation_time = datetime.datetime(2020, 6, 14, 5)
+        creation_time_in_millisecs = int(creation_time.timestamp() * 1000)
+        mock_value = creation_time_in_millisecs
+
+        mock_get_current_time_in_millisecs = lambda: mock_value
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+                suggestion_models.GeneralSuggestionModel.create(
+                    suggestion_type, feconf.ENTITY_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    suggestion_models.STATUS_IN_REVIEW, 'author_3',
+                    'reviewer_2', self.change_cmd, self.score_category,
+                    's.thread1', None)
+
+            with self.mock_datetime_utcnow(self.mocked_datetime_utcnow):
+                results = (
+                    suggestion_models.GeneralSuggestionModel.
+                        get_new_suggestions_waiting_for_review())
+
+        self.assertEqual(len(results), max_suggestions)
 
     def test_get_suggestions_waiting_too_long_if_not_contributor_suggestion(
         self

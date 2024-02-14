@@ -41,7 +41,8 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, Dict, Final, List, Optional, Sequence, Set, Type, Union)
+    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Type,
+    Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -4918,6 +4919,284 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self._assert_email_data_stored_in_sent_email_model_is_correct(
             expected_email_html_body_admin_2, self.admin_2_id,
             self.CURRICULUM_ADMIN_2_EMAIL)
+
+
+class NotifyReviewersNewSuggestionsTests(
+    test_utils.EmailTestBase):
+    """Tests the send_mail_to_notify_contributor_dashboard_reviewers method,
+    which sends an email to reviewers with information regarding the suggestions
+    that have waited the longest for review.
+    """
+
+    target_id: str = 'exp1'
+    skill_id: str = 'skill_123456'
+    timezone = datetime.timezone.utc
+    mocked_review_submission_datetime: datetime.datetime = (
+        datetime.datetime(2023, 10, 23, 5, tzinfo=timezone)
+    )
+    mocked_review_submission_datetime = (
+        mocked_review_submission_datetime.replace(
+            tzinfo=None))
+    AUTHOR_USERNAME: Final = 'author'
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_1_USERNAME: Final = 'reviewer1'
+    REVIEWER_1_EMAIL: Final = 'reviewer1@community.org'
+    REVIEWER_2_USERNAME: Final = 'reviewer2'
+    REVIEWER_2_EMAIL: Final = 'reviewer2@community.org'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
+        self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_1_id, True, False, False, False)
+        self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
+        self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_2_id, True, False, False, False)
+
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+        self.log_new_error_counter = test_utils.CallCounter(
+            logging.error)
+        self.log_new_error_ctx = self.swap(
+            logging, 'error', self.log_new_error_counter)
+        self.logged_info: List[str] = []
+        self.log_new_info_ctx = self.swap(
+            logging, 'info', self._mock_logging_info)
+
+        self.save_new_valid_exploration(self.target_id, self.author_id)
+        self.save_new_skill(self.skill_id, self.author_id)
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(  # pylint: disable=line-too-long
+                'en', '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime))
+        self.reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        self.swap_get_platform_parameter_value = self.swap(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            self._swap_get_platform_parameter_value_function
+        )
+
+    def _create_reviewable_suggestion_email_infos_from_suggestions(
+            self,
+            suggestions: List[suggestion_registry.BaseSuggestion]
+    ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
+        """Creates a list of ReviewableSuggestionEmailInfo objects from
+        the given suggestions.
+        """
+
+        return [
+            (
+                suggestion_services
+                .create_reviewable_suggestion_email_info_from_suggestion(
+                    suggestion)
+            ) for suggestion in suggestions
+        ]
+
+    def _assert_email_data_stored_in_sent_email_model_is_correct(
+        self,
+        expected_email_html_body: str,
+        reviewer_id: Optional[str],
+        reviewer_email: str
+    ) -> None:
+        """Asserts that the created sent email model from the sent email
+        contains the right information.
+        """
+        sent_email_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().filter(
+            email_models.SentEmailModel.recipient_id == reviewer_id).fetch()
+        self.assertEqual(len(sent_email_models), 1)
+        sent_email_model = sent_email_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            email_manager
+            .CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
+                'email_subject'])
+        self.assertEqual(
+            sent_email_model.recipient_id, reviewer_id)
+        self.assertEqual(
+            sent_email_model.recipient_email, reviewer_email)
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_html_body)
+        self.assertEqual(
+            sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(
+            sent_email_model.sender_email,
+            'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+        self.assertEqual(
+            sent_email_model.intent,
+            feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS)
+
+    def _swap_get_platform_parameter_value_function(
+        self, param_name: str
+    ) -> platform_parameter_domain.PlatformDataTypes:
+        """Swap function for get_platform_parameter_value.
+
+        Args:
+            param_name: str. The name of the platform parameter.
+
+        Returns:
+            PlatformDataTypes. The defined data type of the platform parameter.
+        """
+        if param_name == (
+            platform_parameter_list.ParamNames.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
+            return True
+        elif param_name == (
+            platform_parameter_list.ParamNames.EMAIL_SENDER_NAME.value
+        ):
+            return email_manager.EMAIL_SENDER_NAME.default_value
+        elif param_name == (
+            platform_parameter_list.ParamNames.EMAIL_FOOTER.value
+        ):
+            return email_manager.EMAIL_FOOTER.default_value
+        return ''
+
+    def _mock_logging_info(self, msg: str, *args: str) -> None:
+        """Mocks logging.info() by appending the log message to the logged info
+        list.
+        """
+        self.logged_info.append(msg % args)
+
+    def _create_translation_suggestion_in_lang_with_html_and_datetime(
+        self,
+        language_code: str,
+        translation_html: str,
+        submission_datetime: datetime.datetime
+    ) -> suggestion_registry.BaseSuggestion:
+        """Creates a translation suggestion in the given language_code with the
+        given translation html and submission datetime.
+        """
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'content_id': 'content_0',
+            'language_code': language_code,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': translation_html,
+            'data_format': 'html'
+        }
+
+        translation_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_translation_change_dict,
+            'test description')
+
+        translation_suggestion.last_updated = submission_datetime
+        return translation_suggestion
+
+    def test_email_not_sent_if_can_send_emails_is_false(self) -> None:
+        with self.swap_get_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR) as logs:
+            with self.cannot_send_emails_ctx, self.log_new_error_ctx:
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                suggestions_by_language: DefaultDict[str, List[
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]] = DefaultDict(list)
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0], 'This app cannot send emails to users.')
+
+    def test_email_not_sent_if_no_reviewers_to_notify(self) -> None:
+        with self.swap_get_platform_parameter_value, self.capture_logging(
+            min_level=logging.ERROR) as logs:
+            with self.can_send_emails_ctx, self.log_new_error_ctx:
+                reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                suggestions_by_language: (DefaultDict[str, List[
+                        suggestion_registry.
+                            ReviewableSuggestionEmailInfo]]) = DefaultDict(
+                                list)
+                reviewer_ids_by_language['en'] = []
+                suggestions_by_language['en'] = []
+
+                email_manager.send_reviewer_notifications(
+                    reviewer_ids_by_language,
+                    suggestions_by_language
+                )
+
+            messages = self._get_all_sent_email_messages()
+            self.assertEqual(len(messages), 0)
+            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(
+                logs[0],
+                'No reviewers found for language en to notify')
+
+    def test_email_sent_to_reviewer_with_translation_waiting_days_for_review(
+        self
+    ) -> None:
+        translation_suggestion = (
+            self._create_translation_suggestion_in_lang_with_html_and_datetime(
+                'en',
+                '<p>What is the meaning of life?</p>',
+                self.mocked_review_submission_datetime))
+        reviewable_suggestion_email_info = (
+            suggestion_services
+            .create_reviewable_suggestion_email_info_from_suggestion(
+                translation_suggestion))
+        review_wait_time = 2
+        mocked_datetime_for_utcnow = (
+            reviewable_suggestion_email_info.submission_datetime +
+            datetime.timedelta(days=review_wait_time))
+        expected_email_html_body = (
+            'Hi reviewer1' +
+            ',<br><br>There are new <a href="%s%s">opportunities</a>' +
+            ' to review translations that we think you might be interested' +
+            ' in on the Contributor Dashboard page. Here are some examples' +
+            ' of contributions that are waiting for review:'
+            '<br><br>The following suggestions are available for review: ' +
+            '<br><br><ul><li>The following English translation suggestion ' +
+            'was submitted for review 2 days ago:<br>What is the' +
+            ' meaning of life?</li><br></ul><br>Please take some time ' +
+            'to review any of the above contributions '
+            '(if they still need a review) or any other contributions ' +
+            'on the dashboard. We appreciate your help!<br><br>Thanks again,' +
+            ' and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
+            )
+
+        with self.can_send_emails_ctx, self.log_new_error_ctx:
+            with self.mock_datetime_utcnow(mocked_datetime_for_utcnow):
+                with self.swap_get_platform_parameter_value:
+                    reviewer_ids_by_language: DefaultDict[
+                        str, List[str]] = DefaultDict(list)
+                    suggestions_by_language: DefaultDict[str, List[suggestion_registry.ReviewableSuggestionEmailInfo]] = ( # pylint: disable=line-too-long
+                        DefaultDict(list))
+                    reviewer_ids_by_language['en'] = [self.reviewer_1_id]
+                    suggestions_by_language['en'] = [
+                        reviewable_suggestion_email_info]
+
+                    email_manager.send_reviewer_notifications(
+                        reviewer_ids_by_language,
+                        suggestions_by_language
+                    )
+
+        messages = self._get_sent_email_messages(self.REVIEWER_1_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].html, (expected_email_html_body % (
+                feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL)))
 
 
 class NotifyAdminsContributorDashboardReviewersNeededTests(
