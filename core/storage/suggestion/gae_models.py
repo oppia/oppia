@@ -20,6 +20,7 @@ import datetime
 import enum
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.platform import models
 
@@ -102,6 +103,8 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS: Final = (
 # top MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
 # waited for a review longer than the threshold number of days.
 SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS: Final = 7
+
+SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION: Final = 3
 
 # The maximum number of suggestions, that have been waiting too long for review,
 # to email admins about.
@@ -458,6 +461,35 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).order(
             cls.last_updated
         ).fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
+
+    @classmethod
+    def get_new_suggestions_waiting_for_review(
+        cls,
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Returns new suggestions waiting for review that were
+        submitted within timespan of SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
+        days.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of new suggestions
+            matching the criteria.
+        """
+        current_time_millisecs = utils.get_current_time_in_millisecs()
+
+        threshold_datetime = datetime.datetime.utcfromtimestamp(
+            current_time_millisecs / 1000.0
+        ) - datetime.timedelta(
+            days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
+        )
+        return (
+            cls.get_all().filter(datastore_services.all_of(
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.created_on > threshold_datetime
+            ))
+            .order(-cls.created_on)
+            .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN)
+        )
 
     @classmethod
     def get_translation_suggestions_submitted_within_given_dates(
