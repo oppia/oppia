@@ -95,8 +95,12 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp(
     'Failed to execute \'convertToSpecifiedUnits\' on ' +
     '\'SVGLength\': Could not resolve relative length.'),
-  // Redirects to /learn/math when going to /learn.
+  // Redirects to /learn/math when going to /learn userJourney E2E test.
   _.escapeRegExp('The requested path /learn/math is not found.'),
+  _.escapeRegExp(
+    'http://localhost:8181/access_validation_handler/can_access_classroom_page' +
+    '?classroom_url_fragment=math - Failed to load resource: the server responded ' +
+    'with a status of 404 (Not Found)'),
   // TODO(#6478): Flakes with feedbackUpdates e2e tests.
   _.escapeRegExp(
     'Requested card with index -1, but transcript only has length ' +
@@ -120,8 +124,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#18324): Visiting a newly created exploration state results in some
   // version-history console error.
   _.escapeRegExp(
-    'http://localhost:8181/version_history_handler/state'
-  ),
+    'http://localhost:8181/version_history_handler/state'),
   // TODO(#19743): Input path is invalid when using math expression RTE.
   _.escapeRegExp(
     'Input path  is invalid, it does not contain dimensions.')
