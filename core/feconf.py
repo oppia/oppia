@@ -425,9 +425,7 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
 DEFAULT_AUTO_TTS_ENABLED = False
-# Whether new explorations should have correctness-feedback enabled
-# by default.
-DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+
 # Default value for next_content_id_index in exploration/question.
 DEFUALT_NEXT_CONTENT_ID_INDEX = 0
 
