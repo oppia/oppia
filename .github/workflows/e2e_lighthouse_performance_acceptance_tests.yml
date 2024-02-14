@@ -184,7 +184,7 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
