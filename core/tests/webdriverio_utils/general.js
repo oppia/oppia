@@ -79,10 +79,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   _.escapeRegExp('ExpressionChangedAfterItHasBeenCheckedError'),
   _.escapeRegExp('ERROR CONTEXT'),
   // TODO(#19746): Development console error "Uncaught in Promise" on signup.
-  new RegExp(
-    'Uncaught \(in promise\).*learner_groups_feature_status_handler',
-    'gm'
-  ),
+  new RegExp('Uncaught \\(in promise\\).*learner_groups_feature_status_handler'),
   // TODO(#19687): 404 (Not Found) for favicon on home page.
   _.escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/favicon.ico - Failed to ' +
