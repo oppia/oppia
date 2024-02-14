@@ -153,7 +153,6 @@ var checkForConsoleErrors = async function(
   var browserErrors = browserLogs.filter(logEntry => (
     CONSOLE_ERROR_THRESHOLD.includes(logEntry.level) &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
-  console.log(browserErrors)
   expect(browserErrors).toEqual([]);
 };
 
