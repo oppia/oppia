@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_services
@@ -26,6 +27,7 @@ from core.domain import email_manager
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_list
 from core.domain import story_services
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
@@ -34,7 +36,7 @@ from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs
 
-from typing import Dict
+from typing import DefaultDict, Dict, List
 
 
 class CronModelsCleanupHandler(
@@ -197,6 +199,70 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     question_admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+        return self.render_json({})
+
+
+class CronMailReviewerNewSuggestionsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for mailing reviewers about new suggestions
+    on the Contributor Dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self) -> None:
+        """Sends email notifications to reviewers about new
+        suggestions on the Contributor Dashboard.
+        """
+        if not feconf.CAN_SEND_EMAILS:
+            return self.render_json({})
+
+        if not platform_feature_services.get_platform_parameter_value(
+            platform_parameter_list.ParamNames.
+            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+        ):
+            return self.render_json({})
+
+        new_suggestions_info = (
+            suggestion_services
+                .get_new_suggestions_for_reviewer_notifications())
+
+        # Initialize dictionaries to organize data.
+        reviewer_ids_by_language: DefaultDict[
+            str, List[str]] = DefaultDict(list)
+        suggestions_by_language: DefaultDict[
+            str, List[
+                suggestion_registry.
+                    ReviewableSuggestionEmailInfo]] = DefaultDict(list)
+
+        for suggestion in new_suggestions_info:
+            language_property = suggestion.language_code
+
+            # Collect reviewer IDs.
+            reviewer_usernames = user_services.get_contributor_usernames(
+                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                language_property
+            )
+
+            reviewer_ids = [
+                user_services.get_user_id_from_username(
+                    username) for username in reviewer_usernames]
+            filtered_reviewer_ids = [
+                id for id in reviewer_ids if id is not None]
+            reviewer_ids_by_language[language_property].extend(
+                filtered_reviewer_ids)
+
+            # Collect suggestions.
+            suggestions_by_language[language_property].append(suggestion)
+
+        # Send email notifications to reviewers based on the organized data.
+        email_manager.send_reviewer_notifications(
+            reviewer_ids_by_language, suggestions_by_language)
+
         return self.render_json({})
 
 
