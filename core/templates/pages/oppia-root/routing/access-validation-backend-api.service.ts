@@ -36,6 +36,11 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
+  CAN_ACCESS_EDIT_LEARNER_GROUP_PAGE = (
+    // eslint-disable-next-line max-len
+    '/access_validation_handler/can_access_edit_learner_group_page/<learner_group_id>'
+  );
+
   DOES_LEARNER_GROUP_EXIST = (
     '/access_validation_handler/does_learner_group_exist/<learner_group_id>');
 
@@ -106,6 +111,15 @@ export class AccessValidationBackendApiService {
   Promise<void> {
     return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  canAccessEditLearnerGroupPage(learnerGroupId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.CAN_ACCESS_EDIT_LEARNER_GROUP_PAGE, {
+        learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
   }
 
   doesLearnerGroupExist(learnerGroupId: string): Promise<void> {

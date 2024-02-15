@@ -268,9 +268,15 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.EditLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.LearnerGroupPageAccessValidationHandler),
+        access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
