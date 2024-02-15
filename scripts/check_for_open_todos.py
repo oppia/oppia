@@ -92,7 +92,7 @@ def append_todos_to_file(
             file.write(
                 f'{github_perma_link_url}/' +
                 remove_prefix(todo['file_path'], repository_path) +
-                '#L' + todo['line_number'] + '\n')
+                '#L' + str(todo['line_number']) + '\n')
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -114,7 +114,7 @@ def main(args: Optional[List[str]] = None) -> None:
             for issue_number in file:
                 issues_to_check.append(issue_number.strip())
 
-    todos: todo_finder.TodoDict = (
+    todos: List[todo_finder.TodoDict] = (
         todo_finder.get_correctly_formated_todos(
             todo_finder.get_todos(repository_path)))
 

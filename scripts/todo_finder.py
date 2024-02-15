@@ -85,7 +85,7 @@ def get_search_files(repository_path: str) -> List[str]:
     Returns:
         List[str]. The files to search for todos.
     """
-    search_files: str = []
+    search_files: List[str] = []
     for root, _, files in os.walk(repository_path):
         for file in files:
             file_path = os.path.join(root, file)
@@ -102,7 +102,7 @@ def get_todo_in_line(
     file_path: str,
     line_content: str,
     line_number: int
-) -> TodoDict:
+) -> Optional[TodoDict]:
     """Gets the todo in the line if it exists.
 
     Args:
@@ -136,7 +136,7 @@ def get_todos(repository_path: str) -> List[TodoDict]:
     for file_path in search_files:
         with open(file_path, 'r', encoding='utf-8') as file:
             for line_index, line_content in enumerate(file, start=1):
-                todo: TodoDict = (
+                todo: Optional[TodoDict] = (
                     get_todo_in_line(file_path, line_content, line_index))
                 if todo:
                     todos.append(todo)
@@ -152,7 +152,10 @@ def get_issue_number_from_todo(line_content: str) -> Optional[str]:
     Returns:
         Optional[str]. The issue number if it exists.
     """
-    return CORRECT_TODO_REGEX.search(line_content).group(1)
+    issue_number = CORRECT_TODO_REGEX.search(line_content)
+    if issue_number:
+        return issue_number.group(1)
+    return None
 
 
 def get_correctly_formated_todos(todos: List[TodoDict]) -> List[TodoDict]:
