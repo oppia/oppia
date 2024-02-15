@@ -447,25 +447,33 @@ describe('SkillSelectorComponent', () => {
       })
     ]);
   });
-
-  it('should correctly filter untriaged skill summaries', () => {
-  // Prepare test data.
-    component.untriagedSkillSummaries = [
-      new SkillSummary('skill1', 'Skill One', 'en', 1, 2, 3, 123, 456),
-      new SkillSummary('skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468)
-    ];
-    let activeSkillId = 'skill2';
-    let searchText = 'Skill';
-
-    // Perform the filtering.
-    let filteredSkills = component.searchInUntriagedSkillSummaries(searchText);
-
-    // Assertions.
-    expect(filteredSkills.length).toBe(2);
-
-    filteredSkills.forEach(skill => {
-      expect(skill.id).not.toEqual(activeSkillId);
-      expect(skill.description.includes(searchText)).toBeTrue();
-    });
-  });
 });
+
+
+it('should filter skill summaries and exclude the active skill', () => {
+  // Mock skillEditorStateService.getSkill() to return active skill ID.
+  spyOn(component.skillEditorStateService, 'getSkill').and.returnValue({
+    getId: () => 'skill2', // Active skill ID.
+  });
+
+  // Test data with an active skill to be automatically excluded.
+  component.untriagedSkillSummaries = [
+    new SkillSummary('skill1', 'Skill One', 'en', 1, 2, 3, 123, 456),
+    new SkillSummary('skill2', 'Active Skill', 'en', 4, 5, 6, 789, 1011),
+    new SkillSummary('skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468),
+  ];
+  const searchText = 'Skill';
+
+  // Perform filtering.
+  let filteredSkills = component.searchInUntriagedSkillSummaries(searchText);
+
+  // Expected results, excluding the active skill.
+  const expectedFilteredSkills = [
+    new SkillSummary('skill1', 'Skill One', 'en', 1, 2, 3, 123, 456),
+    new SkillSummary('skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468),
+  ];
+
+  // Assertions.
+  expect(filteredSkills).toEqual(expectedFilteredSkills);
+});
+
