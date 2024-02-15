@@ -36,8 +36,6 @@ describe('Topic editor access guard', () => {
   let userService: UserService;
   let router: Router;
 
-  let userInfo: UserInfo;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

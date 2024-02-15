@@ -312,6 +312,7 @@ class TopicEditorStoryHandler(
             'storyId': new_story_id
         })
 
+
 class EditableSubtopicPageDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

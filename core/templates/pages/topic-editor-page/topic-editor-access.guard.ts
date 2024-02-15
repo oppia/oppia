@@ -55,4 +55,3 @@ export class TopicEditorAccessGuard implements CanActivate {
     return false;
   }
 }
-

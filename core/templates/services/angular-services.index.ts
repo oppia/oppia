@@ -480,6 +480,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['AutosaveInfoModalsService', AutosaveInfoModalsService],
   ['BackgroundMaskService', BackgroundMaskService],
   ['BlogAdminAuthGuard', BlogAdminAuthGuard],
+  ['TopicEditorAccessGuard', TopicEditorAccessGuard],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],

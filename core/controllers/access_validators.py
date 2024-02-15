@@ -23,8 +23,8 @@ from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_config_services
 from core.domain import learner_group_services
-from core.domain import user_services
 from core.domain import topic_fetchers
+from core.domain import user_services
 
 from typing import Dict, TypedDict
 
@@ -306,6 +306,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
             raise self.PageNotFoundException(
                 'User with given username is not a blog post author.'
             )
+
 
 class TopicEditorPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
