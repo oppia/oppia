@@ -328,7 +328,7 @@ class TopicEditorPageAccessValidationHandler(
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_view_any_topic_editor
+    @acl_decorators.can_edit_topic
     def get(self, topic_id: str) -> None:
         """Displays the topic editor page.
 

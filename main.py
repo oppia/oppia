@@ -273,7 +273,7 @@ URLS = [
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_view_any_topic_editor' %
+        r'%s/can_edit_topic' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicEditorPageAccessValidationHandler),
 
