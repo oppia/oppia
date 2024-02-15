@@ -49,7 +49,7 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
     return new Promise<boolean>((resolve) => {
       let learnerGroupId = this.contextService.getLearnerGroupId();
       this.accessValidationBackendApiService
-        .canAccessEditLearnerGroupPage(learnerGroupId)
+        .validateAccessToLearnerGroupEditorPage(learnerGroupId)
         .then(() => {
           resolve(true);
         })
