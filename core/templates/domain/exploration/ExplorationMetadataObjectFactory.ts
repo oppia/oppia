@@ -35,7 +35,6 @@ export interface ExplorationMetadataBackendDict {
   'param_specs': ParamSpecsBackendDict;
   'param_changes': ParamChangeBackendDict[];
   'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
   'edits_allowed': boolean;
 }
 
@@ -58,7 +57,6 @@ export class ExplorationMetadata {
   _paramSpecs: ParamSpecs;
   _paramChanges: ParamChange[];
   _autoTtsEnabled: boolean;
-  _correctnessFeedbackEnabled: boolean;
   _editsAllowed: boolean;
 
   constructor(
@@ -66,8 +64,7 @@ export class ExplorationMetadata {
       tags: string[], blurb: string, authorNotes: string,
       statesSchemaVersion: number, initStateName: string,
       paramSpecs: ParamSpecs, paramChanges: ParamChange[],
-      autoTtsEnabled: boolean, correctnessFeedbackEnabled: boolean,
-      editsAllowed: boolean
+      autoTtsEnabled: boolean, editsAllowed: boolean
   ) {
     this._title = title;
     this._category = category;
@@ -81,7 +78,6 @@ export class ExplorationMetadata {
     this._paramSpecs = paramSpecs;
     this._paramChanges = paramChanges;
     this._autoTtsEnabled = autoTtsEnabled;
-    this._correctnessFeedbackEnabled = correctnessFeedbackEnabled;
     this._editsAllowed = editsAllowed;
   }
 
@@ -100,7 +96,6 @@ export class ExplorationMetadata {
       param_changes: this._paramChanges.map(
         (paramChange) => paramChange.toBackendDict()),
       auto_tts_enabled: this._autoTtsEnabled,
-      correctness_feedback_enabled: this._correctnessFeedbackEnabled,
       edits_allowed: this._editsAllowed
     };
   }
@@ -138,7 +133,6 @@ export class ExplorationMetadataObjectFactory {
       explorationMetadataBackendDict.init_state_name,
       paramSpecs, paramChanges,
       explorationMetadataBackendDict.auto_tts_enabled,
-      explorationMetadataBackendDict.correctness_feedback_enabled,
       explorationMetadataBackendDict.edits_allowed
     );
   }

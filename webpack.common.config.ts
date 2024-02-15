@@ -62,9 +62,6 @@ module.exports = {
   entry: {
     blog_dashboard:
       commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
-    classroom_admin:
-      commonPrefix + '/pages/classroom-admin-page/' +
-      'classroom-admin-page.import.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.import.ts',
@@ -75,15 +72,9 @@ module.exports = {
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.import.ts',
-    contributor_dashboard:
-      commonPrefix + '/pages/contributor-dashboard-page/' +
-      'contributor-dashboard-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
-    email_dashboard:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
@@ -93,9 +84,6 @@ module.exports = {
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    learner_dashboard:
-      commonPrefix + '/pages/learner-dashboard-page/' +
-      'learner-dashboard-page.import.ts',
     facilitator_dashboard:
       commonPrefix + '/pages/facilitator-dashboard-page/' +
       'facilitator-dashboard-page.import.ts',
@@ -153,24 +141,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['classroom_admin'],
-      filename: 'classroom-admin-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template:
-        commonPrefix + '/pages/classroom-admin-page/' +
-        'classroom-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['diagnostic_test_player_page'],
@@ -258,28 +228,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard'],
-      filename: 'contributor-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-page/' +
-        'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['email_dashboard'],
-      filename: 'email-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-page.mainpage.html'),
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
       meta: defaultMeta,
@@ -337,17 +285,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_dashboard'],
-      filename: 'learner-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-dashboard-page/' +
-        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
