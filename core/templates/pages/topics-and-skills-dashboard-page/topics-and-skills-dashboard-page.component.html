@@ -1,7 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-topics-and-skills-dashboard position-relative">
   <div>
-    <h2 class="dashboard-title"
+    <h2 class="dashboard-title e2e-test-no-topics-and-no-skills-present-message"
         *ngIf="(totalTopicSummaries.length === 0 && untriagedSkillSummaries.length === 0)">
       {{ 'I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD' | translate }}
     </h2>
@@ -28,7 +28,7 @@
     <div class="dashboard-content">
       <div class="dashboard-content-primary">
         <div>
-          <ul class="dashboard-tabs e2e-test-topics-tab">
+          <ul class="dashboard-tabs e2e-test-topics-and-skills-tab-list">
             <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
               <a class="dashboard-tabs-text e2e-test-topics-tab"
                  (click)="setActiveTab(TAB_NAME_TOPICS)">

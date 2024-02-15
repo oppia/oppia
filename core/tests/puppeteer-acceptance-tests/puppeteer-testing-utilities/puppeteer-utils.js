@@ -214,12 +214,29 @@ module.exports = class baseUser {
     this._setupDebugTools();
   }
 
+  async withinContainerAboveCurrentContent({
+    containerSelector,
+    beforeOpened = async (_this, container) => {
+      await _this.page.waitForSelector(
+        container, { visible: true });
+    },
+    whenOpened,
+    afterClosing = async (_this, container) => {
+      await _this.page.waitForSelector(
+        container, { hidden: true });
+    }
+  }) {
+    await beforeOpened(this, containerSelector);
+    await whenOpened(this, containerSelector);
+    await afterClosing(this, containerSelector);
+  }
+
   /**
    * The function clicks the element using the text on the button.
    * @param {string} selector - The text on the button or the CSS selector of
    * the element to be clicked
    */
-  async clickOn(selector) {
+  async clickOn(selector, waitForSelectorOptions = {}) {
     try {
       /** Normalize-space is used to remove the extra spaces in the text.
        * Check the documentation for the normalize-space function here :
@@ -228,7 +245,7 @@ module.exports = class baseUser {
         `\/\/*[contains(text(), normalize-space('${selector}'))]`);
       await button.click();
     } catch (error) {
-      await this.page.waitForSelector(selector);
+      await this.page.waitForSelector(selector, waitForSelectorOptions);
       await this.page.click(selector);
     }
   }
@@ -238,8 +255,8 @@ module.exports = class baseUser {
    * @param {string} selector - The CSS selector of the input field.
    * @param {string} text - The text to be typed in the input field.
    */
-  async type(selector, text) {
-    await this.page.waitForSelector(selector);
+  async type(selector, text, waitForSelectorOptions = {}) {
+    await this.page.waitForSelector(selector, waitForSelectorOptions);
     await this.page.type(selector, text);
   }
 
@@ -248,8 +265,8 @@ module.exports = class baseUser {
    * @param {string} selector - The CSS selector of the input field.
    * @param {string} option - The option to be selected.
    */
-  async select(selector, option) {
-    await this.page.waitForSelector(selector);
+  async select(selector, option, waitForSelectorOptions) {
+    await this.page.waitForSelector(selector, waitForSelectorOptions);
     await this.page.select(selector, option);
   }
 
