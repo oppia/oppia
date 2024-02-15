@@ -135,8 +135,8 @@ var CONSOLE_ERRORS_TO_FIX = [
     '?topic_name=undefined - Failed to load resource: the server responded ' +
     'with a status of 400 (Bad Request)'),
   _.escapeRegExp(
-    'Uncaught (in promise): Error: The supplied input topic: undefined is not ' +
-    'valid')
+    'Uncaught (in promise): Error: The supplied input topic: undefined is ' +
+    'not valid')
 ];
 
 var checkForConsoleErrors = async function(
