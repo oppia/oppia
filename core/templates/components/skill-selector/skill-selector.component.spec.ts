@@ -476,5 +476,3 @@ it('should filter skill summaries and exclude the active skill', () => {
   // Assertions.
   expect(filteredSkills).toEqual(expectedFilteredSkills);
 });
-
-
