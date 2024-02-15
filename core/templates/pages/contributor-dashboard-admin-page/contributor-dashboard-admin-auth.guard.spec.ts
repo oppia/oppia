@@ -35,7 +35,6 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   let userService: UserService;
   let router: Router;
   let guard: ContributorDashboardAdminAuthGuard;
-  let userInfoObject: UserInfo;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -67,22 +66,12 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   });
 
   it('should not redirect user to 401 page if user is cd-admin', (done) => {
-    userInfoObject = {
-      roles: ['USER_ROLE', 'QUESTION_COORDINATOR', 'TRANSLATION_COORDINATOR'],
-      is_moderator: true,
-      is_curriculum_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: 'en',
-      username: 'username1',
-      email: 'tester@example.org',
-      user_is_logged_in: true,
-    };
-    const userInfo = UserInfo.createFromBackendDict(userInfoObject);
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(userInfo)
+      Promise.resolve(new UserInfo(
+        ['USER_ROLE', 'TRANSLATION_COORDINATOR'], true, false, false, false,
+        true, 'en', null, 'tester@example.com', true
+      ))
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
