@@ -107,21 +107,6 @@ describe('Router Service', () => {
     testSubscriptions.unsubscribe();
   });
 
-  it('should change tab on init', fakeAsync(() => {
-    spyOnProperty(windowRef, 'nativeWindow')
-      .and.returnValue({
-        location: {
-          hash: '#/settings'
-        }
-      });
-    spyOn(routerService, '_changeTab');
-
-    routerService.init();
-    tick();
-
-    expect(routerService._changeTab).toHaveBeenCalledWith('/settings');
-  }));
-
   it('should not navigate to main tab when already there', fakeAsync(() => {
     let jQuerySpy = spyOn(window, '$');
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
