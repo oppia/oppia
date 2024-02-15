@@ -56,19 +56,11 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
     def test_should_access_diagnostic_test_page_when_feature_is_enabled(
-        self) -> None:
-        self.get_html_response(
-            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-            expected_status_int=404
-        )
-
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
-            True,
-            0,
-            []
-        )
+        self
+    ) -> None:
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
             expected_status_int=200

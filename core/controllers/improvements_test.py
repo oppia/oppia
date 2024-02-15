@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import feature_flag_list
 from core import utils
 from core.constants import constants
 from core.controllers import improvements
@@ -693,16 +694,10 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED])
     def test_improvements_tab_enabled(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-
-        with swap_is_feature_flag_enabled, self.login_context(
-            self.OWNER_EMAIL
-        ):
+        with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])
