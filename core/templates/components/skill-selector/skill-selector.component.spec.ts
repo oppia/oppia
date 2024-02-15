@@ -476,5 +476,3 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 });
-
-
