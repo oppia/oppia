@@ -443,17 +443,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['learner_group_editor'],
-      filename: 'edit-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/edit-group/' +
-        'edit-learner-group-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['voiceover_admin'],
       filename: 'voiceover-admin-page.mainpage.html',
       hybrid: true,

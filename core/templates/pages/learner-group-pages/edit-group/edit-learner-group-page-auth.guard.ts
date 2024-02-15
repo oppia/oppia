@@ -33,7 +33,7 @@ import { ContextService } from 'services/context.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AdminAuthGuard implements CanActivate {
+export class EditLearnerGroupPageAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,

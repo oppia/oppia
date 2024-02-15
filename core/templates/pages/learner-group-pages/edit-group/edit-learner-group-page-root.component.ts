@@ -24,7 +24,7 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   selector: 'oppia-admin-page-root',
   templateUrl: './admin-page-root.component.html',
 })
-export class AdminPageRootComponent extends BaseRootComponent {
+export class EditLearnerGroupPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.
     PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.TITLE;
 
