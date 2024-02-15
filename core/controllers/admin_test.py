@@ -21,7 +21,6 @@ import enum
 import logging
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
@@ -34,6 +33,7 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
@@ -74,7 +74,7 @@ BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
 
-class ParamNames(enum.Enum):
+class ParamName(enum.Enum):
     """Enum for parameter names."""
 
     TEST_PARAMETER_1 = 'test_param_1'
@@ -95,6 +95,17 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
         self.get_html_response('/admin', expected_status_int=200)
+
+    def _create_dummy_param(
+        self) -> platform_parameter_domain.PlatformParameter:
+        """Creates dummy platform parameter."""
+        # Here we use MyPy ignore because we use dummy platform parameter
+        # names for our tests and create_platform_parameter only accepts
+        # platform parameter name of type platform_parameter_list.ParamName.
+        return platform_parameter_registry.Registry.create_platform_parameter(
+            ParamName.TEST_PARAMETER_1, # type: ignore[arg-type]
+            'Param for test.',
+            platform_parameter_domain.DataTypes.BOOL)
 
     def test_change_configuration_property(self) -> None:
         """Test that configuration properties can be changed."""
@@ -893,16 +904,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_get_handler_includes_all_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        param = (
-            platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_PARAMETER_1,
-                'Param for test.',
-                platform_parameter_domain.DataTypes.BOOL)
-        )
+        param = self._create_dummy_param()
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
-            [ParamNames.TEST_PARAMETER_1]
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
+            [ParamName.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
         self.assertEqual(
@@ -916,12 +922,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        param = (
-            platform_parameter_registry.Registry.create_platform_parameter(
-                ParamNames.TEST_PARAMETER_1,
-                'Param for test.',
-                platform_parameter_domain.DataTypes.BOOL)
-        )
+        param = self._create_dummy_param()
         new_rule_dicts = [
             {
                 'filters': [
@@ -935,9 +936,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
-            [ParamNames.TEST_PARAMETER_1]
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
+            [ParamName.TEST_PARAMETER_1]
         ):
             self.post_json(
                 '/adminhandler', {
@@ -966,10 +967,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         platform_parameter_registry.Registry.parameter_registry.clear()
-        param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAMETER_1,
-            'Param for test.',
-            platform_parameter_domain.DataTypes.BOOL)
+        param = self._create_dummy_param()
         new_rule_dicts = [
             {
                 'filters': [
@@ -983,9 +981,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
-            [ParamNames.TEST_PARAMETER_1]
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
+            [ParamName.TEST_PARAMETER_1]
         ):
             response_dict = self.get_json('/adminhandler')
             self.assertEqual(
@@ -1027,9 +1025,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         with self.swap(
-            platform_feature_list,
-            'ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS',
-            [ParamNames.TEST_PARAMETER_1]
+            platform_parameter_list,
+            'ALL_PLATFORM_PARAMS_LIST',
+            [ParamName.TEST_PARAMETER_1]
         ):
             response = self.post_json(
                 '/adminhandler', {
@@ -1055,10 +1053,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         platform_parameter_registry.Registry.parameter_registry.clear()
-        param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAMETER_1,
-            'Param for test.',
-            platform_parameter_domain.DataTypes.BOOL)
+        param = self._create_dummy_param()
         new_rule_dicts = [
             {
                 'filters': [
@@ -1186,10 +1181,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        param = platform_parameter_registry.Registry.create_platform_parameter(
-            ParamNames.TEST_PARAMETER_1,
-            'Param for test.',
-            platform_parameter_domain.DataTypes.BOOL)
+        param = self._create_dummy_param()
         new_rule_dicts = [
             {
                 'filters': [

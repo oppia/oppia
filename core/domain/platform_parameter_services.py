@@ -14,21 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The service for gating features.
-
-This service provides different interfaces to access the feature flag values
-for clients and the backend respectively as they have different context for
-evaluation of feature flag values.
-
-For clients, please use 'evaluate_all_feature_flag_values_for_client' from
-request handlers with client context.
-
-For the backend, please directly call 'is_feature_enabled' with the name of
-the feature.
-
-For more details of the usage of these two methods, please refer their
-docstrings in this file.
-"""
+"""The service file for platform parameters."""
 
 from __future__ import annotations
 
@@ -37,23 +23,13 @@ import json
 import os
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
-from typing import Dict, Final, List, Set
-
-ALL_FEATURE_FLAGS: List[platform_feature_list.FeatureNames] = (
-    platform_feature_list.DEV_FEATURES_LIST +
-    platform_feature_list.TEST_FEATURES_LIST +
-    platform_feature_list.PROD_FEATURES_LIST
-)
-
-ALL_FEATURES_NAMES_SET: Set[str] = set(
-    feature.value for feature in ALL_FEATURE_FLAGS
-)
+from typing import Dict, Final, List
 
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
@@ -62,12 +38,6 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
 }
 
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
-
-
-class FeatureFlagNotFoundException(Exception):
-    """Exception thrown when an unknown feature flag is requested."""
-
-    pass
 
 
 class PlatformParameterNotFoundException(Exception):
@@ -96,28 +66,12 @@ def create_evaluation_context_for_client(
     )
 
 
-def get_all_feature_flag_dicts() -> List[
+def get_all_platform_parameters_dicts() -> List[
     platform_parameter_domain.PlatformParameterDict
 ]:
-    """Returns dict representations of all feature flags. This method is used
-    for providing detailed feature flags information to the admin panel.
-
-    Returns:
-        list(dict). A list containing the dict mappings of all fields of the
-        feature flags.
-    """
-    return [
-        registry.Registry.get_platform_parameter(_feature.value).to_dict()
-        for _feature in ALL_FEATURE_FLAGS
-    ]
-
-
-def get_all_platform_parameters_except_feature_flag_dicts() -> List[
-    platform_parameter_domain.PlatformParameterDict
-]:
-    """Returns dict representations of all platform parameters that do not
-    contains feature flags. This method is used for providing detailed
-    platform parameters information to the release-coordinator page.
+    """Returns dict representations of all platform parameters. This method
+    is used for providing detailed platform parameters information to the
+    release-coordinator page.
 
     Returns:
         list(dict). A list containing the dict mappings of all fields of the
@@ -125,68 +79,8 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     """
     return [
         registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
-        for _plat_param in platform_feature_list.
-        ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
+        for _plat_param in platform_parameter_list.ALL_PLATFORM_PARAMS_LIST
     ]
-
-
-def evaluate_all_feature_flag_values_for_client(
-    context: platform_parameter_domain.EvaluationContext
-) -> Dict[str, bool]:
-    """Evaluates and returns the values for all feature flags.
-
-    Args:
-        context: EvaluationContext. The context used for evaluation.
-
-    Returns:
-        dict. The keys are the feature names and the values are boolean
-        results of corresponding flags.
-    """
-    return _evaluate_feature_flag_values_for_context(
-        ALL_FEATURES_NAMES_SET, context)
-
-
-def is_feature_enabled(feature_name: str) -> bool:
-    """A short-form method for server-side usage. This method evaluates and
-    returns the values of the feature flag, using context from the server only.
-
-    Args:
-        feature_name: str. The name of the feature flag that needs to
-            be evaluated.
-
-    Returns:
-        bool. The value of the feature flag, True if it's enabled.
-    """
-    return _evaluate_feature_flag_config_for_server(feature_name)
-
-
-def update_feature_flag(
-    feature_name: str,
-    committer_id: str,
-    commit_message: str,
-    new_rules: List[platform_parameter_domain.PlatformParameterRule]
-) -> None:
-    """Updates the feature flag's rules.
-
-    Args:
-        feature_name: str. The name of the feature to update.
-        committer_id: str. ID of the committer.
-        commit_message: str. The commit message.
-        new_rules: list(PlatformParameterRule). A list of PlatformParameterRule
-            objects to update.
-
-    Raises:
-        FeatureFlagNotFoundException. The feature_name is not registered in
-            core/platform_feature_list.py.
-    """
-    if feature_name not in ALL_FEATURES_NAMES_SET:
-        raise FeatureFlagNotFoundException(
-            'Unknown feature flag: %s.' % feature_name)
-
-    # The default value of a feature flag is always False and that
-    # is why we are explicitly passing default_value as False.
-    registry.Registry.update_platform_parameter(
-        feature_name, committer_id, commit_message, new_rules, False)
 
 
 def get_server_mode() -> platform_parameter_domain.ServerMode:
@@ -245,58 +139,6 @@ def _create_evaluation_context_for_server() -> (
     )
 
 
-def _evaluate_feature_flag_values_for_context(
-    feature_names_set: Set[str],
-    context: platform_parameter_domain.EvaluationContext
-) -> Dict[str, bool]:
-    """Evaluates and returns the values for specified feature flags.
-
-    Args:
-        feature_names_set: set(str). The set of names of feature flags that need
-            to be evaluated.
-        context: EvaluationContext. The context used for evaluation.
-
-    Returns:
-        dict. The keys are the feature names and the values are boolean
-        results of corresponding flags.
-
-    Raises:
-        FeatureFlagNotFoundException. Some names in 'feature_names_set' are not
-            registered in core/platform_feature_list.py.
-    """
-    unknown_feature_names = list(feature_names_set - ALL_FEATURES_NAMES_SET)
-    if len(unknown_feature_names) > 0:
-        raise FeatureFlagNotFoundException(
-            'Unknown feature flag(s): %s.' % unknown_feature_names)
-
-    result_dict = {}
-    for feature_name in feature_names_set:
-        param = registry.Registry.get_platform_parameter(
-            feature_name)
-        feature_is_enabled = param.evaluate(context)
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(feature_is_enabled, bool)
-        result_dict[feature_name] = feature_is_enabled
-    return result_dict
-
-
-def _evaluate_feature_flag_config_for_server(feature_name: str) -> bool:
-    """Evaluates and returns the values of the feature flag, using context
-    from the server only.
-
-    Args:
-        feature_name: str. The name of the feature flag that needs to
-            be evaluated.
-
-    Returns:
-        bool. The value of the feature flag, True if it's enabled.
-    """
-    context = _create_evaluation_context_for_server()
-    values_dict = _evaluate_feature_flag_values_for_context(
-        set([feature_name]), context)
-    return values_dict[feature_name]
-
-
 def get_platform_parameter_value(
     parameter_name: str) -> platform_parameter_domain.PlatformDataTypes:
     """Returns the value of the platform parameter.
@@ -311,8 +153,7 @@ def get_platform_parameter_value(
     Raises:
         PlatformParameterNotFoundException. Platform parameter is not valid.
     """
-    all_platform_params_dicts = (
-        get_all_platform_parameters_except_feature_flag_dicts())
+    all_platform_params_dicts = get_all_platform_parameters_dicts()
     all_platform_params_names_set = set(
         param['name'] for param in all_platform_params_dicts)
     if parameter_name not in all_platform_params_names_set:
