@@ -136,7 +136,11 @@ var CONSOLE_ERRORS_TO_FIX = [
     'with a status of 400 (Bad Request)'),
   _.escapeRegExp(
     'Uncaught (in promise): Error: The supplied input topic: undefined is ' +
-    'not valid')
+    'not valid'),
+  // TODO(#18672): Cannot read properties of undefined ('version_number').
+  _.escapeRegExp(
+    'TypeError: Cannot read properties of undefined ' +
+    '(reading \'version_number\')')
 ];
 
 var checkForConsoleErrors = async function(
