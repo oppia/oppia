@@ -21,7 +21,6 @@ import json
 from core import feature_flag_list
 from core import feconf
 from core.constants import constants
-from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services

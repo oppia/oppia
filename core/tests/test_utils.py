@@ -328,7 +328,7 @@ def generate_random_hexa_str() -> str:
 
 @contextlib.contextmanager
 def swap_is_feature_flag_enabled_function(
-   feature_flag_names: List[feature_flag_list.FeatureNames]
+    feature_flag_names: List[feature_flag_list.FeatureNames]
 ) -> Iterator[None]:
     """Mocks is_feature_flag_enabled function within the context of a
     'with' statement. is_feature_flag_enabled will return True for all
