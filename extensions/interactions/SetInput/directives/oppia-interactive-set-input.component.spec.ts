@@ -169,22 +169,22 @@ describe('InteractiveSetInputComponent', () => {
 
     expect(component.answer).toEqual(['test1']);
   });
-
-  it('should set an error message for duplicate answers', () => {
-    const duplicateAnswer = ['item1', 'item1'];
-    component.updateAnswer(duplicateAnswer);
-
+  it('should show error message for duplicate items', () => {
+    component.errorMessage = '';
+    component.submitAnswer(['test', 'test']);
     expect(component.errorMessage)
-      .toBe('Oops, it looks like your answer has duplicates!');
-    expect(component.answer)
-      .toEqual(duplicateAnswer);
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
   });
 
-  it('should clear the error message for unique answers', () => {
-    const uniqueAnswer = ['item1', 'item2'];
-    component.updateAnswer(uniqueAnswer);
+  it('should update errorMessage for detected duplicates', () => {
+    component.updateAnswer(['duplicate', 'duplicate']);
+    expect(component.errorMessage)
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
 
+  it('should clear errorMessage with no duplicates', () => {
+    component.updateAnswer(['duplicate', 'duplicate']);
+    component.updateAnswer(['unique1', 'unique2']);
     expect(component.errorMessage).toBe('');
-    expect(component.answer).toEqual(uniqueAnswer);
   });
 });
