@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import feature_flag_services
@@ -56,8 +56,7 @@ def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
     """
     return bool(feature_flag_services.is_feature_flag_enabled(
         user_id,
-        platform_feature_list.FeatureNames.
-        LEARNER_GROUPS_ARE_ENABLED.value))
+        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value))
 
 
 def create_learner_group(
