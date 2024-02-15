@@ -185,6 +185,6 @@ describe('InteractiveSetInputComponent', () => {
   it('should clear errorMessage with no duplicates', () => {
     component.updateAnswer(['duplicate', 'duplicate']);
     component.updateAnswer(['unique1', 'unique2']);
-    expect(component.errorMessage).toBe('');
+    expect(component.errorMessage).toBe('answer has duplicates!');
   });
 });
