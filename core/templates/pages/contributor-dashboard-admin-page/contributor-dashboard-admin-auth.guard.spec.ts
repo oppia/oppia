@@ -35,39 +35,13 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   let userService: UserService;
   let router: Router;
   let guard: ContributorDashboardAdminAuthGuard;
-  let userInfo: UserInfo;
+  let userInfoObject: UserInfo;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [UserService, { provide: Router, useClass: MockRouter }],
     }).compileComponents();
-
-    userInfo = {
-      _roles: ['USER_ROLE'],
-      _isModerator: true,
-      _isCurriculumAdmin: false,
-      _isTopicManager: false,
-      _isSuperAdmin: false,
-      _canCreateCollections: true,
-      _preferredSiteLanguageCode: 'en',
-      _username: 'username1',
-      _email: 'tester@example.org',
-      _isLoggedIn: true,
-      isModerator: () => true,
-      isCurriculumAdmin: () => false,
-      isSuperAdmin: () => false,
-      isTopicManager: () => false,
-      isTranslationAdmin: () => true,
-      isQuestionAdmin: () => true,
-      isQuestionCoordinator: () => true,
-      isTranslationCoordinator: () => true,
-      canCreateCollections: () => true,
-      getPreferredSiteLanguageCode: () => 'en',
-      getUsername: () => 'username1',
-      getEmail: () => 'tester@example.org',
-      isLoggedIn: () => true
-    } as UserInfo;
 
     guard = TestBed.inject(ContributorDashboardAdminAuthGuard);
     userService = TestBed.inject(UserService);
@@ -93,6 +67,19 @@ describe('ContributorDashboardAdminAuthGuard', () => {
   });
 
   it('should not redirect user to 401 page if user is cd-admin', (done) => {
+    userInfoObject = {
+      roles: ['USER_ROLE', 'QUESTION_COORDINATOR', 'TRANSLATION_COORDINATOR'],
+      is_moderator: true,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: 'en',
+      username: 'username1',
+      email: 'tester@example.org',
+      user_is_logged_in: true,
+    };
+    const userInfo = UserInfo.createFromBackendDict(userInfoObject);
     const getUserInfoAsyncSpy = spyOn(
       userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo)
