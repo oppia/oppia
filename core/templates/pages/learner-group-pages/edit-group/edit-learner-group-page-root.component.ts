@@ -21,8 +21,8 @@ import { AppConstants } from 'app.constants';
 import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
-  selector: 'oppia-admin-page-root',
-  templateUrl: './admin-page-root.component.html',
+  selector: 'oppia-edit-learner-group-page-root',
+  templateUrl: './edit-learner-group-page-root.component.html',
 })
 export class EditLearnerGroupPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.

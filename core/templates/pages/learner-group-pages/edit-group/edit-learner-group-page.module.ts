@@ -17,13 +17,11 @@
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from
-  '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { ToastrModule } from 'ngx-toastr';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
 import { EditLearnerGroupPageRootComponent } from './edit-learner-group-page-root.component';
@@ -31,7 +29,6 @@ import { EditLearnerGroupPageComponent } from
   './edit-learner-group-page.component';
 import { LearnerGroupSyllabusComponent } from
   './learner-group-syllabus.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
@@ -53,10 +50,8 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
     SharedComponentsModule,
+    CommonModule,
     SharedLearnerGroupComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
@@ -68,6 +63,7 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     ]),
   ],
   declarations: [
+    EditLearnerGroupPageRootComponent,
     EditLearnerGroupPageComponent,
     LearnerGroupSyllabusComponent,
     LearnerGroupLearnersProgressComponent,
