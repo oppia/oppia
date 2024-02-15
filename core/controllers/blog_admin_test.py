@@ -126,7 +126,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': 10,
         }, response_platform_parameters[
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value]
         )
 
@@ -134,7 +134,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             }
@@ -146,7 +146,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': new_platform_parameter_value,
         }, response_platform_parameters[
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value]
         )
 
@@ -162,7 +162,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': 10,
         }, response_platform_parameters[
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value]
         )
 
@@ -170,7 +170,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             }
@@ -216,7 +216,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': 10,
         }, response_platform_parameters[
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value]
         )
 
@@ -224,7 +224,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             }
@@ -247,7 +247,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'value': 10,
         }, response_platform_parameters[
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value]
         )
 
@@ -255,7 +255,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             'action': 'save_platform_parameters',
             'new_platform_parameter_values': {
                 (
-                    platform_parameter_list.ParamNames.
+                    platform_parameter_list.ParamName.
                     MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
                 ): new_platform_parameter_value,
             }

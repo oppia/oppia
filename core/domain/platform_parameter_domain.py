@@ -23,7 +23,6 @@ import json
 import re
 
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
@@ -652,8 +651,6 @@ class PlatformParameterDict(TypedDict):
     rules: List[PlatformParameterRuleDict]
     rule_schema_version: int
     default_value: PlatformDataTypes
-    is_feature: bool
-    feature_stage: Optional[str]
 
 
 class PlatformParameter:
@@ -676,9 +673,7 @@ class PlatformParameter:
         data_type: str,
         rules: List[PlatformParameterRule],
         rule_schema_version: int,
-        default_value: PlatformDataTypes,
-        is_feature: bool,
-        feature_stage: Optional[str]
+        default_value: PlatformDataTypes
     ) -> None:
         self._name = name
         self._description = description
@@ -686,8 +681,6 @@ class PlatformParameter:
         self._rules = rules
         self._rule_schema_version = rule_schema_version
         self._default_value = default_value
-        self._is_feature = is_feature
-        self._feature_stage = feature_stage
 
     @property
     def name(self) -> str:
@@ -761,25 +754,6 @@ class PlatformParameter:
         """
         self._default_value = default_value
 
-    @property
-    def is_feature(self) -> bool:
-        """Returns whether this parameter is also a feature flag.
-
-        Returns:
-            bool. True if the parameter is a feature flag.
-        """
-        return self._is_feature
-
-    @property
-    def feature_stage(self) -> Optional[str]:
-        """Returns the stage of the feature flag.
-
-        Returns:
-            FeatureStages|None. The stage of the feature flag, None if the
-            parameter isn't a feature flag.
-        """
-        return self._feature_stage
-
     def validate(self) -> None:
         """Validates the PlatformParameter domain object."""
         if re.match(self.PARAMETER_NAME_REGEXP, self._name) is None:
@@ -790,20 +764,6 @@ class PlatformParameter:
         if self._data_type not in self.DATA_TYPE_PREDICATES_DICT:
             raise utils.ValidationError(
                 'Unsupported data type \'%s\'.' % self._data_type)
-
-        all_platform_params_names = [
-            param.value
-            for param in platform_feature_list.
-            ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS
-        ]
-        if (
-            self._feature_stage is not None and
-            self._name in all_platform_params_names
-        ):
-            raise utils.ValidationError(
-                'The feature stage of the platform parameter %s should '
-                'be None.' % self._name
-            )
 
         predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
         if not predicate(self._default_value):
@@ -816,23 +776,6 @@ class PlatformParameter:
                     'Expected %s, received \'%s\' in value_when_matched.' % (
                         self._data_type, rule.value_when_matched))
             rule.validate()
-
-        if self._is_feature:
-            self._validate_feature_flag()
-
-    def _get_server_mode(self) -> ServerMode:
-        """Returns the current server mode.
-
-        Returns:
-            ServerMode. The current server mode.
-        """
-        return (
-            ServerMode.DEV
-            if constants.DEV_MODE
-            else ServerMode.PROD
-            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-            else ServerMode.TEST
-        )
 
     def evaluate(
         self, context: EvaluationContext
@@ -852,19 +795,6 @@ class PlatformParameter:
             *. The evaluate result of the platform parameter.
         """
         if context.is_valid:
-            if self._is_feature:
-                server_mode = self._get_server_mode()
-                if (
-                    server_mode == ServerMode.TEST and
-                    self._feature_stage == ServerMode.DEV.value
-                ):
-                    return False
-                if (
-                    server_mode == ServerMode.PROD and
-                    self._feature_stage in (
-                        ServerMode.DEV.value, ServerMode.TEST.value)
-                ):
-                    return False
             for rule in self._rules:
                 if rule.evaluate(context):
                     return rule.value_when_matched
@@ -883,50 +813,8 @@ class PlatformParameter:
             'data_type': self._data_type,
             'rules': [rule.to_dict() for rule in self._rules],
             'rule_schema_version': self._rule_schema_version,
-            'default_value': self._default_value,
-            'is_feature': self._is_feature,
-            'feature_stage': self._feature_stage
+            'default_value': self._default_value
         }
-
-    def _validate_feature_flag(self) -> None:
-        """Validates the PlatformParameter domain object that is a feature
-        flag.
-        """
-        if self._default_value is True:
-            raise utils.ValidationError(
-                'Feature flag is not allowed to have default value as True.'
-            )
-        if self._data_type != DataTypes.BOOL.value:
-            raise utils.ValidationError(
-                'Data type of feature flags must be bool, got \'%s\' '
-                'instead.' % self._data_type)
-        if not any(
-            self._feature_stage == feature_stage
-            for feature_stage in ALLOWED_FEATURE_STAGES
-        ):
-            raise utils.ValidationError(
-                'Invalid feature stage, got \'%s\', expected one of %s.' % (
-                    self._feature_stage, ALLOWED_FEATURE_STAGES))
-
-        server_mode = self._get_server_mode()
-        if (
-            server_mode == ServerMode.TEST and
-            self._feature_stage == ServerMode.DEV.value
-        ):
-            raise utils.ValidationError(
-                'Feature in %s stage cannot be updated in %s environment.' % (
-                    self._feature_stage, server_mode.value
-                )
-            )
-        if (
-            server_mode == ServerMode.PROD and
-            self._feature_stage in (ServerMode.DEV.value, ServerMode.TEST.value)
-        ):
-            raise utils.ValidationError(
-                'Feature in %s stage cannot be updated in %s environment.' % (
-                    self._feature_stage, server_mode.value
-                )
-            )
 
     @classmethod
     def from_dict(cls, param_dict: PlatformParameterDict) -> PlatformParameter:
@@ -967,8 +855,6 @@ class PlatformParameter:
                 for rule_dict in param_dict['rules']],
             param_dict['rule_schema_version'],
             param_dict['default_value'],
-            param_dict['is_feature'],
-            param_dict['feature_stage'],
         )
 
     def serialize(self) -> str:
