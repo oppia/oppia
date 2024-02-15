@@ -1,0 +1,49 @@
+name: Issue Checks
+
+on:
+  issues:
+    types: [closed, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  todos_check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      
+      - name: Check for todos
+        id: check_for_open_todos
+        run: |
+          python -m scripts.check_for_open_todos --repository_path=$(pwd) --issue_number=${{ github.event.issue.number }} --commit_sha=${{ github.sha }}
+
+      - name: Reopen issue
+        if: failure() && steps.check_for_open_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue reopen ${{ github.event.issue.number }}
+      
+      - name: Check for duplicate todo comment
+        id: check_for_duplicate_todo_comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue view ${{ github.event.issue.number }} --json comments --jq '.comments[-1].body' > $(pwd)/latest_comment.txt
+          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=todo_list.txt
+
+      - name: Add Comment
+        if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -F $(pwd)/todo_list.txt
