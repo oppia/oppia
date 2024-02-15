@@ -100,6 +100,8 @@
     "mocha": "^9.0.0",
     "nyc": "^15.1.0",
     "postcss-html": "^1.3.0",
+    "postcss-loader": "^4.0.0",
+    "postcss-rtlcss": "^3.7.2",
     "protoc-gen-ts": "^0.3.4",
     "puppeteer": "^13.0.0",
     "puppeteer-screen-recorder": "2.1.2",
