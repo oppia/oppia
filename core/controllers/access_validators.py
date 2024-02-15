@@ -195,6 +195,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
         if not is_valid_request:
             raise self.PageNotFoundException
 
+
 class EditLearnerGroupPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
