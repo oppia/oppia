@@ -149,7 +149,7 @@ class ReleaseCoordinatorAccessValidationHandler(
         pass
 
 
-class ViewLearnerGroupPageAccessValidationHandler(
+class LearnerGroupPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Validates access to view learner group page."""

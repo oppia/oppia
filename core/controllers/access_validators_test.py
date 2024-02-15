@@ -187,7 +187,7 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ViewLearnerGroupPageAccessValidationHandlerTests(
+class LearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):
 
