@@ -186,8 +186,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -209,16 +208,12 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
-  }
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
 
 var createAndPublishExplorationWithAdditionalCheckpoints = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -255,9 +250,6 @@ var createAndPublishExplorationWithAdditionalCheckpoints = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
-  }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -329,6 +321,15 @@ var getExplorationVoiceArtists = async function(isEmpty = false) {
 
 var getExplorationPlaytesters = async function(isEmpty = false) {
   return await _getExplorationRoles('viewer', isEmpty);
+};
+
+var createTopic = async function(
+    topicName, topicUrlFragment, description, shouldCloseTopicEditor) {
+  var topicsAndSkillsDashboardPage = (
+    new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.createTopic(
+    topicName, topicUrlFragment, description, shouldCloseTopicEditor);
 };
 
 var createSkillAndAssignTopic = async function(
@@ -444,5 +445,6 @@ exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
+exports.createTopic = createTopic;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;

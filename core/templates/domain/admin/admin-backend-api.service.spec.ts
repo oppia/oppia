@@ -23,8 +23,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { PlatformParameterFilterType } from 'domain/platform-parameter/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -104,9 +104,7 @@ describe('Admin backend api service', () => {
         value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: '',
-      is_feature: false,
-      feature_stage: null
+      default_value: ''
     }]
   };
   let adminDataObject: AdminPageData;
