@@ -18,18 +18,17 @@
 
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-
-import { AppConstants } from 'app.constants';
-import { ContextService } from 'services/context.service';
-import { Location } from '@angular/common';
-import { of } from 'rxjs';
 import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { Location } from '@angular/common';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { AppConstants } from 'app.constants';
+import { of } from 'rxjs';
 
 class MockAccessValidationBackendApiService {
   validateAccessToLearnerGroupEditorPage(learnerGroupId: string) {
-    return of(true).toPromise();
+    return of().toPromise();
   }
 }
 
@@ -73,10 +72,9 @@ describe('EditLearnerGroupPageAuthGuard', () => {
   });
 
   it('should allow access if validation succeeds', fakeAsync(() => {
-    const validateAccessSpy = spyOn(
-      accessValidationBackendApiService,
+    const validateAccessSpy = spyOn(accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
-      .and.returnValue(of(true).toPromise());
+      .and.returnValue(Promise.resolve());
     const getLearnerGroupIdSpy = spyOn(contextService, 'getLearnerGroupId')
       .and.returnValue('mockLearnerGroupId');
     const navigateSpy = spyOn(router, 'navigate')
@@ -98,10 +96,9 @@ describe('EditLearnerGroupPageAuthGuard', () => {
   }));
 
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
-    spyOn(
-      accessValidationBackendApiService,
+    spyOn(accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
-      .and.returnValue(Promise.reject('Validation failed'));
+      .and.returnValue(Promise.reject());
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));
 
