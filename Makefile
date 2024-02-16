@@ -135,7 +135,7 @@ run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_tests" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop

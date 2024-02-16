@@ -119,7 +119,7 @@
         "core.domain.fs_services_test",
         "core.domain.recommendations_services_test",
         "core.platform.search.elastic_search_services_test",
-        "scripts.typescript_checks_test",
+        "scripts.run_typescript_tests_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
         "core.platform.translate.cloud_translate_emulator_test",

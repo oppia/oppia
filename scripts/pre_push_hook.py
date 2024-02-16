@@ -70,9 +70,10 @@ BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 CI_PROTRACTOR_CHECK_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
-TYPESCRIPT_CHECKS_CMDS: Final = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
+TYPESCRIPT_CHECKS_CMDS: Final = [
+    PYTHON_CMD, '-m', 'scripts.run_typescript_tests']
 STRICT_TYPESCRIPT_CHECKS_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.typescript_checks', '--strict_checks']
+    PYTHON_CMD, '-m', 'scripts.run_typescript_tests', '--strict_checks']
 GIT_IS_DIRTY_CMD: Final = 'git status --porcelain --untracked-files=no'
 
 
