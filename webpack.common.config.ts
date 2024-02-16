@@ -72,18 +72,12 @@ module.exports = {
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.import.ts',
-    contributor_dashboard:
-      commonPrefix + '/pages/contributor-dashboard-page/' +
-      'contributor-dashboard-page.import.ts',
     contributor_dashboard_admin:
       commonPrefix + '/pages/contributor-dashboard-admin-page/' +
       'contributor-dashboard-admin-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
-    email_dashboard:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
@@ -244,28 +238,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/contributor-dashboard-admin-page/' +
         'contributor-dashboard-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard'],
-      filename: 'contributor-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-page/' +
-        'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['email_dashboard'],
-      filename: 'email-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-page.mainpage.html'),
       minify: htmlMinifyConfig,
       inject: false
     }),

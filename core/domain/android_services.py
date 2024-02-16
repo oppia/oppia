@@ -26,7 +26,6 @@ from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
@@ -191,12 +190,6 @@ def initialize_android_test_data() -> str:
     exp_services.load_demo(exp_id)
     rights_manager.release_ownership_of_exploration(
         user_services.get_system_user(), exp_id)
-    exp_services.update_exploration(
-        user_id, exp_id, [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'correctness_feedback_enabled',
-            'new_value': True
-        })], 'Changed correctness_feedback_enabled.')
 
     # Add and update the exploration/node to the story.
     story = story_domain.Story.create_default_story(

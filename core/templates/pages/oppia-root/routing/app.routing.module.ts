@@ -33,6 +33,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .CONTRIBUTOR_DASHBOARD.ROUTE),
+    loadChildren: () => import(
+      'pages/contributor-dashboard-page/contributor-dashboard-page.module')
+      .then(m => m.ContributorDashboardPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () => import('pages/moderator-page/moderator-page.module')
       .then(m => m.ModeratorPageModule),
@@ -42,6 +50,13 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
     loadChildren: () => import('pages/blog-admin-page/blog-admin-page.module')
       .then(m => m.BlogAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/email-dashboard-pages/email-dashboard-page.module')
+      .then(m => m.EmailDashboardPageModule),
     canActivate: [IsLoggedInGuard]
   },
   {
