@@ -15,16 +15,17 @@
 /**
  * @fileoverview Tests for EditLearnerGroupPageAuthGuard
  */
-
+import { Location } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+
+import { AppConstants } from 'app.constants';
+import { of } from 'rxjs';
 import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { Location } from '@angular/common';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { AppConstants } from 'app.constants';
-import { of } from 'rxjs';
+
 
 class MockAccessValidationBackendApiService {
   validateAccessToLearnerGroupEditorPage(learnerGroupId: string) {
