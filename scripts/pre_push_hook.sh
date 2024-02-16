@@ -63,15 +63,15 @@ install_hook() {
                     echo "Copied file to .git/hooks directory"
                 }
 
-            # Make the hook file executable
-            chmod +x "$file"
+            # # Make the hook file executable
+            # chmod +x "$file"
 
-            if [ $? -eq 0 ]; then
-                echo "pre-push hook file is now executable!"
-            else
-                echo >&2 "Failed to make pre-push executable"
-                exit 1
-            fi
+            # if [ $? -eq 0 ]; then
+            #     echo "pre-push hook file is now executable!"
+            # else
+            #     echo >&2 "Failed to make pre-push executable"
+            #     exit 1
+            # fi
         fi
     done
     exit 0
