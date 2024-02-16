@@ -24,7 +24,7 @@ from core.tests import test_utils
 from . import todo_finder
 
 
-class TodoFinderTest(test_utils.GenericTestBase):
+class TodoFinderTests(test_utils.GenericTestBase):
     """Unit tests for testing the todo_finder script."""
 
     def setUp(self) -> None:
@@ -71,7 +71,6 @@ class TodoFinderTest(test_utils.GenericTestBase):
         open('dummy_dir/zip1.zip', 'w', encoding='utf-8').close()
         open('dummy_dir/ico1.ico', 'w', encoding='utf-8').close()
         open('dummy_dir/png1.png', 'w', encoding='utf-8').close()
-        self.maxDiff = None
 
     def tearDown(self) -> None:
         super().tearDown()
