@@ -34,7 +34,8 @@ class TodoFinderTests(test_utils.GenericTestBase):
         os.mkdir('dummy_dir', mode=0o777)
         with open('dummy_dir/file1.txt', 'w', encoding='utf-8') as file:
             content = (
-                """Test Line 1
+                """
+                Test Line 1
                 // TODO(#43242): Test Description 1
                 # TODO(#1234)
                 # TODO(#23432)
@@ -55,18 +56,19 @@ class TodoFinderTests(test_utils.GenericTestBase):
                 # TODO(#34414   ): Test Description 13
                 // TODO(#21524): Test Description 14
                 // Some Random Comment TODO(#51243): Test Description
-                """)
+                """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open('dummy_dir/file2.txt', 'w', encoding='utf-8') as file:
             content = (
-                """Test Line 1
+                """
+                Test Line 1
                 # TODO(#41412): Test Description 1
                 # TODO(#1234): Test Description 2
                 # TODO(#1233): Test Description 3
                 # TODO(#1235): Test Description 4
                 # TODO(#4215   ): Test Description 5
                 // Random Comment
-                """)
+                """).lstrip('\n')
             file.write(textwrap.dedent(content))
         open('dummy_dir/zip1.zip', 'w', encoding='utf-8').close()
         open('dummy_dir/ico1.ico', 'w', encoding='utf-8').close()

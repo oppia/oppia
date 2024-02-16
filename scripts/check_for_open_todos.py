@@ -134,8 +134,8 @@ def main(args: Optional[List[str]] = None) -> None:
                 github_perma_link_url,
                 issue_number)
     if todos_found:
-        raise Exception('There are todos associated with issues.')
-    print('Open todos check passed.')
+        raise Exception('There are todos associated with the provided issues.')
+    print('There are no todos associated with the provided issues.', end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
