@@ -432,7 +432,7 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.get_json(
             '%s/can_view_any_topic_editor' %
             ACCESS_VALIDATION_HANDLER_PREFIX , expected_status_int=400)
-    
+
     def test_access_topic_editor_page_with_guest_user(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -443,7 +443,8 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_access_topic_editor_page_with_curriculum_admin(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+        topic_id = topic_fetchers.get_new_topic_id()
         self.get_html_response(
-            '%s/can_view_any_topic_editor?topic_id=' %
-            ACCESS_VALIDATION_HANDLER_PREFIX)
+            '%s/can_view_any_topic_editor?topic_id=%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, topic_id), expected_status_int=200)
         self.logout()

@@ -112,6 +112,19 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate whether user can view any topic editor', fakeAsync(() => {
+    avbas.validateAccessToTopicEditorPage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_view_any_topic_editor');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate whether given learner group exists', fakeAsync(() => {
     let learnerGroupId = 'groupId';
 
