@@ -23,6 +23,8 @@ let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 let e2eQuestionAdmin = require(
   '../user-utilities/question-admin-utils.js');
+let e2eExplorationCreator = require(
+  '../user-utilities/exploration-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -115,6 +117,23 @@ let createNewGuestUser = async function(username, email) {
 };
 
 /**
+ * Function to create a new exploration creator user and return the instance
+ * @param {string} username - The username of the exploration creator.
+ * @returns {e2eExplorationCreator} - The instance of the exploration creator.
+ */
+// first step , create the explorationcreator
+let createExplorationCreator = async function(username) {
+  // if (superAdminInstance !== null) {
+  //   superAdminInstance = await createNewSuperAdmin('superAdm');
+  // }
+  const explorationCreator = new e2eExplorationCreator()
+  await explorationCreator.openBrowser();
+  await explorationCreator.signUpNewUser(username, 'exploration_creator@example.com');
+  activeUsers.push(explorationCreator);
+  return explorationCreator;
+};
+
+/**
  * Function to create a user with the translation admin role.
  * @param {string} username - the username of the translation admin.
  * @param {string} email - the email of the user.
@@ -190,6 +209,7 @@ module.exports = {
   createNewSuperAdmin,
   createNewBlogAdmin,
   createNewBlogPostEditor,
+  createExplorationCreator,
   createNewGuestUser,
   createNewTranslationAdmin,
   createNewQuestionAdmin,
