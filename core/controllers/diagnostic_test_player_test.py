@@ -16,10 +16,9 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.domain import feature_flag_services
-from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import topic_domain
@@ -46,10 +45,10 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
 
     def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
         self) -> None:
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
-            self.owner_id,
-            'test update',
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            False,
+            0,
             []
         )
         self.get_html_response(
@@ -65,7 +64,7 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
         )
 
         feature_flag_services.update_feature_flag(
-            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
             True,
             0,
             []
