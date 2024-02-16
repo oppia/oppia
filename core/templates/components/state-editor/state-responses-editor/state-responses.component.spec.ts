@@ -318,7 +318,6 @@ describe('State Responses Component', () => {
     expect(component.responseCardIsShown).toBe(false);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(false);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    expect(component.stateName).toBeUndefined();
     expect(component.misconceptionsBySkill).toBeUndefined();
     expect(component.inapplicableSkillMisconceptionIds).toBeUndefined();
 
@@ -327,7 +326,7 @@ describe('State Responses Component', () => {
     expect(component.responseCardIsShown).toBe(true);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(true);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    expect(component.stateName).toBe('Hola');
+    expect(component.getActiveStateName()).toBe('Hola');
     expect(component.misconceptionsBySkill).toEqual({});
     expect(component.inapplicableSkillMisconceptionIds).toEqual(['id1']);
 
@@ -647,7 +646,7 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome has no feedback with self loop', () => {
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
     let outcome1 = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
     let outcome2 = outcomeObjectFactory.createNew(
@@ -678,11 +677,9 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValues('State Name', 'Hola');
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
-
-    component.stateName = 'Hola';
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
   });
@@ -701,7 +698,7 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
   });
@@ -760,7 +757,7 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
 
     expect(component.getOutcomeTooltip(outcome)).toBe(
       'Self-loops should not be labelled as correct.');
@@ -825,8 +822,7 @@ describe('State Responses Component', () => {
             value();
           }
         },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
+        currentInteractionId: 'currentInteractionId'
       },
       result: Promise.resolve({
         reopen: true,
@@ -850,8 +846,7 @@ describe('State Responses Component', () => {
             value();
           }
         },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
+        currentInteractionId: 'currentInteractionId'
       },
       result: Promise.resolve({
         reopen: false,
@@ -885,8 +880,7 @@ describe('State Responses Component', () => {
             return;
           }
         },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
+        currentInteractionId: 'currentInteractionId'
       },
       result: Promise.reject()
     } as NgbModalRef);
@@ -1211,7 +1205,7 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome is looping', () => {
-    component.stateName = 'Hola';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
     expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(
       'Hola', '', '', []))).toBe(true);
     expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(
