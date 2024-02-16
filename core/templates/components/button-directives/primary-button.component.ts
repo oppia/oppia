@@ -19,6 +19,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import './primary-button.component.css';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 
 @Component({
@@ -59,6 +60,10 @@ export class PrimaryButtonComponent implements OnInit {
   componentIsButton: boolean = false;
   openInNewTab: boolean = false;
 
+  constructor(
+    private windowRef: WindowRef,
+  ) {}
+
   ngOnInit(): void {
     this.componentIsButton = this.buttonHref === '#';
   }
@@ -89,10 +94,18 @@ export class PrimaryButtonComponent implements OnInit {
       const linkTarget = target.target; // '_blank' or '_self'.
 
       if (linkTarget === '_blank') {
-        window.open(link, '_blank');
+        this.openExternalLink(link);
       } else {
-        window.location.href = link;
+        this.windowRef.nativeWindow.location.href = link;
       }
+    }
+  }
+
+  private openExternalLink(link: string): void {
+    const newTab = window.open();
+    if (newTab) {
+      newTab.opener = null;
+      newTab.location.href = link;
     }
   }
 }

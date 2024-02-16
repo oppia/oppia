@@ -83,24 +83,64 @@ describe('PrimaryButtonComponent', () => {
   it('should handle button click with observers', () => {
     spyOn(component.onClickPrimaryButton, 'emit');
     component.onClickPrimaryButton.subscribe();
-    component.handleButtonClick();
+    fixture.detectChanges();
+    const event = {
+      target: {
+        href: '#',
+        target: '_blank'
+      },
+      preventDefault: () => {}
+    } as unknown as MouseEvent;
+    component.handleButtonClick(event);
     expect(component.onClickPrimaryButton.emit).toHaveBeenCalled();
   });
 
   it('should handle button click with internal link', () => {
     component.buttonHref = '/about';
+    const event = {
+      target: {
+        href: '/about',
+        target: '_self'
+      },
+      preventDefault: () => {}
+    } as unknown as MouseEvent;
+
+    component.buttonHref = '/about';
     fixture.detectChanges();
+    component.handleButtonClick(event);
+
     expect(component.openInNewTab).toBe(false);
     expect(component.getTarget()).toEqual('_self');
     expect(component.getButtonHref()).toEqual('/about');
+    expect(windowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should handle button click with external link', () => {
-    component.buttonHref = 'https://github.com';
+    const externalLink = 'https://github.com';
+    const event = {
+      target: {
+        href: externalLink,
+        target: '_blank'
+      },
+      preventDefault: () => {}
+    } as unknown as MouseEvent;
+
+    const windowOpenSpy = jasmine.createSpyObj('Window', [
+      'location',
+      'opener',
+      'reload'
+    ]);
+    spyOn(window, 'open').and.returnValue(windowOpenSpy);
+    const newTab = window.open('', '_blank') as Window;
+    component.buttonHref = externalLink;
     fixture.detectChanges();
+    component.handleButtonClick(event);
+
     expect(component.openInNewTab).toBe(true);
     expect(component.getTarget()).toEqual('_blank');
-    expect(component.getButtonHref()).toEqual('https://github.com');
+    expect(component.getButtonHref()).toEqual(externalLink);
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
+    expect(newTab.location.href).toBe(externalLink);
   });
 
   it('should set componentIsButton to false when buttonHref is provided',
