@@ -72,7 +72,8 @@ describe('EditLearnerGroupPageAuthGuard', () => {
   });
 
   it('should allow access if validation succeeds', fakeAsync(() => {
-    const validateAccessSpy = spyOn(accessValidationBackendApiService,
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
       .and.returnValue(Promise.resolve());
     const getLearnerGroupIdSpy = spyOn(contextService, 'getLearnerGroupId')
@@ -96,7 +97,8 @@ describe('EditLearnerGroupPageAuthGuard', () => {
   }));
 
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService,
+    spyOn(
+      accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
       .and.returnValue(Promise.reject());
     const navigateSpy = spyOn(router, 'navigate')
