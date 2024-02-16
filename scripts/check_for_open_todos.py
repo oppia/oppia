@@ -44,6 +44,7 @@ _PARSER.add_argument(
     help='The commit SHA to which we will display the todo in.')
 
 
+# TODO(#7): Test todo.
 def remove_prefix(text: str, prefix: str) -> str:
     """Removes the prefix from the text if it is present."""
     if text.startswith(prefix):
@@ -95,6 +96,7 @@ def append_todos_to_file(
                 '#L' + str(todo['line_number']) + '\n')
 
 
+# TODO(#7): Test todo.
 def main(args: Optional[List[str]] = None) -> None:
     """Checks if there are any todos associated with issues in a file."""
 
@@ -118,6 +120,7 @@ def main(args: Optional[List[str]] = None) -> None:
         todo_finder.get_correctly_formated_todos(
             todo_finder.get_todos(repository_path)))
 
+    # TODO(#8): Test todo.
     todos_found = False
     for issue_number in issues_to_check:
         todos_associated_with_issue = (
