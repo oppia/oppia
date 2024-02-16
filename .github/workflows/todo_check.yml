@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   issue_check:
+    if: github.event_name == 'issues'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
