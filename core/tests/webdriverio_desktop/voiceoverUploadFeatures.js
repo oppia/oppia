@@ -114,8 +114,8 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.addAudioRecord();
       await explorationEditorTranslationTab.stopAudioRecord();
       await explorationEditorTranslationTab.confirmAudioRecord();
-      await explorationEditorTranslationTab.playAudioRecord();
       await action.waitForAutosave();
+      await explorationEditorTranslationTab.playAudioRecord();
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
@@ -136,8 +136,8 @@ describe('Voiceover upload features', function() {
         '../../../data/explorations/audio_test/assets/audio/' +
         'test_audio_1_en.mp3');
       await explorationEditorTranslationTab.saveAudioRecord();
-      await explorationEditorTranslationTab.playAudioRecord();
       await action.waitForAutosave();
+      await explorationEditorTranslationTab.playAudioRecord();
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
