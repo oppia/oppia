@@ -86,6 +86,25 @@ describe('InteractiveSetInputComponent', () => {
     component.buttonTextWithValue = 'Add New Item';
   });
 
+  it('should update answer and set error message if duplicates', () => {
+    component.errorMessage = '';
+
+    component.updateAnswer(['duplicate', 'duplicate']);
+    expect(component.answer).toEqual(['duplicate', 'duplicate']);
+    expect(component.errorMessage)
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
+
+  it('should update answer and clear error message if no duplicates', () => {
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+
+    component.updateAnswer(['unique1', 'unique2']);
+
+    expect(component.answer).toEqual(['unique1', 'unique2']);
+    expect(component.errorMessage).toBe('');
+  });
+
+
   it('should initialise component when user adds interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and
       .callThrough();
@@ -168,23 +187,5 @@ describe('InteractiveSetInputComponent', () => {
     component.updateAnswer(['test1']);
 
     expect(component.answer).toEqual(['test1']);
-  });
-  it('should show error message for duplicate items', () => {
-    component.errorMessage = '';
-    component.submitAnswer(['test', 'test']);
-    expect(component.errorMessage)
-      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
-  });
-
-  it('should update errorMessage for detected duplicates', () => {
-    component.updateAnswer(['duplicate', 'duplicate']);
-    expect(component.errorMessage)
-      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
-  });
-
-  it('should clear errorMessage with no duplicates', () => {
-    component.updateAnswer(['duplicate', 'duplicate']);
-    component.updateAnswer(['unique1', 'unique2']);
-    expect(component.errorMessage).toBe('answer has duplicates!');
   });
 });

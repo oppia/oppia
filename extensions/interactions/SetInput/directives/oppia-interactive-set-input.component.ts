@@ -78,16 +78,13 @@ export class InteractiveSetInputComponent implements OnInit {
     });
   }
 
+
   updateAnswer(answer: SetInputAnswer): void {
     this.answer = answer;
-    // Check for duplicates whenever the answer is updated.
-    if (this.hasDuplicates(answer)) {
-      this.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
-    } else {
-      // Clear the error message if there are no duplicates.
-      this.errorMessage = '';
-    }
+    this.errorMessage = this.hasDuplicates(answer) ?
+      'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR' : '';
   }
+
 
   getSchema(): Schema {
     return this.schema as Schema;
@@ -126,11 +123,13 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   submitAnswer(answer: SetInputAnswer): void {
-    if (!this.errorMessage) {
+    if (this.hasDuplicates(answer)) {
+      this.errorMessage = (
+        'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+    } else {
+      this.errorMessage = '';
       this.currentInteractionService.onSubmit(
-        answer,
-        this.setInputRulesService
-      );
+        answer, this.setInputRulesService);
     }
   }
 
