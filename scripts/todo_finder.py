@@ -47,8 +47,7 @@ EXCLUDED_EXTENSIONS = [
 ]
 
 TODO_DETECTOR_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
-TODO_REGEX = re.compile(r'\bTODO\b\s*\(', re.IGNORECASE)
-CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\):.*')
+CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\): .+')
 
 
 class TodoDict(TypedDict):
