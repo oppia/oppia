@@ -1,4 +1,4 @@
-name: Issue Checks
+name: Todo Check
 
 on:
   issues:
@@ -8,7 +8,7 @@ permissions:
   issues: write
 
 jobs:
-  todos_check:
+  issue_check:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -20,7 +20,7 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      
+    
       - name: Check for todos
         id: check_for_open_todos
         run: |
@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue reopen ${{ github.event.issue.number }}
-      
+    
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         env:
