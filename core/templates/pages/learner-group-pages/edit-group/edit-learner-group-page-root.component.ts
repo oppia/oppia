@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Admin page root component.
+ * @fileoverview Learner Group Editor page root component.
  */
 
 import { Component } from '@angular/core';

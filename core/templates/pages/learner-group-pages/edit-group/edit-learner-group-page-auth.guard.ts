@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a super admin.
+ * if the user is not a valid faccilitator.
  */
 
 import { Location } from '@angular/common';
