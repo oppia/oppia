@@ -21,7 +21,7 @@ import shutil
 import textwrap
 
 from core.tests import test_utils
-from . import todo_finder  # isort:skip
+from . import todo_finder
 
 
 class TodoFinderTest(test_utils.GenericTestBase):
@@ -68,9 +68,9 @@ class TodoFinderTest(test_utils.GenericTestBase):
                 // Random Comment
                 """)
             file.write(textwrap.dedent(content))
-        open('dummy_dir/zip1.zip', 'w').close()
-        open('dummy_dir/ico1.ico', 'w').close()
-        open('dummy_dir/png1.png', 'w').close()
+        open('dummy_dir/zip1.zip', 'w', encoding='utf-8').close()
+        open('dummy_dir/ico1.ico', 'w', encoding='utf-8').close()
+        open('dummy_dir/png1.png', 'w', encoding='utf-8').close()
         self.maxDiff = None
 
     def tearDown(self) -> None:
@@ -145,7 +145,8 @@ class TodoFinderTest(test_utils.GenericTestBase):
             },
             {
                 'file_path': 'dummy_dir/file1.txt',
-                'line_content': '// Some Random Comment TODO(#51223): Test Description',
+                'line_content':
+                    '// Some Random Comment TODO(#51223): Test Description',
                 'line_number': 13
             },
             {
@@ -175,7 +176,8 @@ class TodoFinderTest(test_utils.GenericTestBase):
             },
             {
                 'file_path': 'dummy_dir/file1.txt',
-                'line_content': '// Some Random Comment TODO(#51243): Test Description',
+                'line_content':
+                    '// Some Random Comment TODO(#51243): Test Description',
                 'line_number': 21
             },
             {
@@ -258,7 +260,8 @@ class TodoFinderTest(test_utils.GenericTestBase):
             },
             {
                 'file_path': 'dummy_dir/file1.txt',
-                'line_content': '// Some Random Comment TODO(#51223): Test Description',
+                'line_content':
+                    '// Some Random Comment TODO(#51223): Test Description',
                 'line_number': 13
             },
             {
@@ -278,7 +281,8 @@ class TodoFinderTest(test_utils.GenericTestBase):
             },
             {
                 'file_path': 'dummy_dir/file1.txt',
-                'line_content': '// Some Random Comment TODO(#51243): Test Description',
+                'line_content':
+                    '// Some Random Comment TODO(#51243): Test Description',
                 'line_number': 21
             },
             {
@@ -302,8 +306,9 @@ class TodoFinderTest(test_utils.GenericTestBase):
                 'line_number': 5
             }
         ]
-        self.assertCountEqual(correctly_formatted_todos, expected_correctly_formated_todos)
-
+        self.assertCountEqual(
+            correctly_formatted_todos,
+            expected_correctly_formated_todos)
 
     def test_get_issue_number_from_todo(self) -> None:
         invalid_issue_number_one = todo_finder.get_issue_number_from_todo(

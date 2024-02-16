@@ -57,7 +57,6 @@ def main(args: Optional[List[str]] = None) -> None:
     ) as latest_comment_file:
         latest_comment_lines = latest_comment_file.read().strip().split('\n')
         latest_comment = [line.strip() for line in latest_comment_lines]
-        
 
     with open(
         repository_path + parsed_args.new_comment_file, 'r',
