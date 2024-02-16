@@ -116,7 +116,7 @@ def get_todo_in_line(
     if TODO_DETECTOR_REGEX.search(line_content):
         return {
             'file_path': file_path,
-            'line_content': line_content,
+            'line_content': line_content.strip(),
             'line_number': line_number
         }
     return None

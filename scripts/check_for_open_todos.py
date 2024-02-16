@@ -105,8 +105,8 @@ def main(args: Optional[List[str]] = None) -> None:
         f'https://github.com/oppia/oppia/blob/{parsed_args.commit_sha}')
 
     issues_to_check: List[str] = []
-    if parsed_args.issue:
-        issues_to_check.append(parsed_args.issue)
+    if parsed_args.issue_number:
+        issues_to_check.append(parsed_args.issue_number)
     if parsed_args.issue_file:
         with open(
             repository_path + parsed_args.issue_file, 'r', encoding='utf-8'
