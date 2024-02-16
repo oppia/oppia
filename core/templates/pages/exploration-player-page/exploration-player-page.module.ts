@@ -30,7 +30,6 @@ import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
-import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
 import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-routing.module';
 import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
 import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
@@ -61,7 +60,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    LessonInformationCardModalComponent,
     ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
@@ -72,7 +70,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    LessonInformationCardModalComponent,
     ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,

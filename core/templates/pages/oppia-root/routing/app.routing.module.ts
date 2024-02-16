@@ -33,6 +33,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .CONTRIBUTOR_DASHBOARD.ROUTE),
+    loadChildren: () => import(
+      'pages/contributor-dashboard-page/contributor-dashboard-page.module')
+      .then(m => m.ContributorDashboardPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () => import('pages/moderator-page/moderator-page.module')
       .then(m => m.ModeratorPageModule),
@@ -45,10 +53,31 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/email-dashboard-pages/email-dashboard-page.module')
+      .then(m => m.EmailDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
       .then(m => m.ClassroomPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
+    loadChildren: () => import(
+      'pages/classroom-admin-page/classroom-admin-page.module')
+      .then(m => m.ClassroomAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/learner-dashboard-page/learner-dashboard-page.module')
+      .then(m => m.LearnerDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,

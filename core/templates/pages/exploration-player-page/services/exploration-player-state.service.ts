@@ -34,7 +34,6 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { ExplorationEngineService } from './exploration-engine.service';
 import { NumberAttemptsService } from './number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from './player-correctness-feedback-enabled.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
@@ -88,8 +87,6 @@ export class ExplorationPlayerStateService {
     ExplorationFeaturesBackendApiService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private numberAttemptsService: NumberAttemptsService,
-    private playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService,
     private playerTranscriptService:
     PlayerTranscriptService,
     private playthroughService: PlaythroughService,
@@ -161,12 +158,9 @@ export class ExplorationPlayerStateService {
     this.playthroughService.initSession(
       this.explorationId, returnDict.version,
       returnDict.record_playthrough_probability);
-    this.playerCorrectnessFeedbackEnabledService.init(
-      returnDict.correctness_feedback_enabled);
     this.explorationEngineService.init(
       {
         auto_tts_enabled: returnDict.auto_tts_enabled,
-        correctness_feedback_enabled: returnDict.correctness_feedback_enabled,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: returnDict.exploration.init_state_name,
@@ -192,7 +186,6 @@ export class ExplorationPlayerStateService {
       pretestQuestionObjects: Question[],
       callback: (
         initialCard: StateCard, nextFocusLabel: string) => void): void {
-    this.playerCorrectnessFeedbackEnabledService.init(true);
     this.questionPlayerEngineService.init(
       pretestQuestionObjects, callback, () => {});
   }
@@ -201,7 +194,6 @@ export class ExplorationPlayerStateService {
       questionDicts: QuestionBackendDict[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
-    this.playerCorrectnessFeedbackEnabledService.init(true);
     let questionObjects = questionDicts.map(
       function(questionDict) {
         return this.questionObjectFactory.createFromBackendDict(
@@ -258,8 +250,6 @@ export class ExplorationPlayerStateService {
       }, featuresData);
       this.explorationEngineService.init(
         explorationData, null, null, null, null, [], callback);
-      this.playerCorrectnessFeedbackEnabledService.init(
-        explorationData.correctness_feedback_enabled);
       this.numberAttemptsService.reset();
     });
   }
