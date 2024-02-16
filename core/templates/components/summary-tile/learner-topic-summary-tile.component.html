@@ -1,27 +1,52 @@
-<mat-card class="oppia-topic-dashboard-card">
-  <a [href]="getTopicLink()"
-     target="{{ openInNewWindow ? '_blank' : '_self' }}"
-     class="oppia-topic-link">
+<ng-container> 
+  <mat-card *ngIf="!featureFlag" class="oppia-topic-dashboard-card">
+    <a [href]="getTopicLink()"
+      target="{{ openInNewWindow ? '_blank' : '_self' }}"
+      class="oppia-topic-link">
+      <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+        <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
+        <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      </div>
+      <div class="oppia-summary-section">
+        <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
+          {{topicTitle}}
+        </span>
+        <div class="oppia-topic-lessons">
+          {{totalPublishedNodeCount}}
+          <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
+            <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+          </div>
+          <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
+            <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </mat-card>
+  <!--REDESIGN-->
+  <mat-card *ngIf="!featureFlag" class="d-flex flex-column summary-tile w-100">
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
       <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
-    <div class="oppia-summary-section">
-      <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
+    <div class="summary-tile-info">
+      <p class="summary-tile-title e2e-test-learner-topic-summary-tile-title">
         {{topicTitle}}
-      </span>
-      <div class="oppia-topic-lessons">
-        {{totalPublishedNodeCount}}
-        <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
-          <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
-        </div>
-        <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
-          <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
-        </div>
+      </p>
+      <p class="summary-tile-text">
+        {{totalPublishedNodeCount}} <br />
+        {{(totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS' ) | translate }}
+      </p>
+      <div class="d-flex justify-content-evenly"> 
+        <a [href]="getTopicLink()"
+        target="{{ openInNewWindow ? '_blank' : '_self' }}"
+        class="text-decoration-none">
+        </a>
       </div>
     </div>
-  </a>
-</mat-card>
+  </mat-card>
+  <!------------>
+</ng-container>
 <style>
   .oppia-topic-dashboard-card .oppia-topic-link {
     text-decoration: none;
@@ -71,4 +96,32 @@
     height: 108px;
     width: 160px;
   }
+
+  /*REDESIGN CLASSES*/
+  .summary-tile {
+    background-color: #205d86;
+    border-radius: 0 0 .25em .25em;
+    box-shadow: 0px 2px 2px 0px #00000040;
+  }
+
+  .summary-tile-button {
+    border: 1px solid #00645C;
+    font-size: 14px;
+  }
+
+  .summary-tile-info {
+    color: #fff;
+    padding: 8px;
+  }
+
+  .summary-tile-text {
+    color: #00645C;
+    font-size: 11px;
+  }
+
+  .summary-tile-title {
+    color: #00645C;
+    font-size: 15px;
+  }
+  /******************/
 </style>

@@ -279,3 +279,7 @@
   margin-right: 16px;
   width: 210px;
 }
+
+.topic-summary-tile-1:not(:last-child) {
+  margin-right: 16px;
+}

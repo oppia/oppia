@@ -85,9 +85,7 @@
 
   <!--REDESIGN-->
   <div *ngIf="featureFlag" class="gap-y-4"> 
-    <p class="greeting-heading" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
-      {{ getTimeOfDay() | translate }}, {{ username }}!
-    </p>
+    <p class="greeting-heading mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="section-container" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="section-heading">
         {{(continueWhereYouLeftOffList.length !== 0 ? 
@@ -112,7 +110,7 @@
                   [topicName]="topicSummaryTile.name">
                 </oppia-learner-story-summary-tile>
               </div>
-            </ng-container >
+            </ng-container>
           </ng-template>
         </ng-container>
       </div>
@@ -127,7 +125,7 @@
           <hr width="100%" color="#00645c" class="mt-2" size="2">
           <div class="topic-summary-tile-section-1 d-flex gap-4 mt-4 w-100"
             [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-            <!--Need to allow scroll-->
+            <!--Need to allow overflow-x-scroll-->
             <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile-1 flex-shrink-0">
               <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
               </oppia-learner-topic-summary-tile>
