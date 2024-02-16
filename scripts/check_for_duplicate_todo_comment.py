@@ -76,7 +76,7 @@ def main(args: Optional[List[str]] = None) -> None:
         if latest_comment_line_content != new_comment_line_content:
             raise Exception('New todo comment should be posted.')
 
-    print('The latest comment is the same as the new todo comment.')
+    print('The latest comment is the same as the new todo comment.', end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

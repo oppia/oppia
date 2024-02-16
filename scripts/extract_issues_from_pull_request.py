@@ -48,6 +48,7 @@ def main() -> None:
             match = ISSUE_REGEX.search(line)
             if match:
                 issue_list_file.write(f'{match.group(1)}\n')
+    issue_list_file.close()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
