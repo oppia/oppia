@@ -30,8 +30,18 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import manual_voice_artist_names_job
 from core.jobs.types import job_run_result
 from core.tests import test_utils
+from core.platform import models
+
 
 from typing import Type
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import voiceover_models
+
+(voiceover_models, exp_models) = models.Registry.import_models([
+    models.Names.VOICEOVER, models.Names.EXPLORATION])
 
 
 class GetVoiceArtistNamesFromExplorationsJobTests(
@@ -353,6 +363,53 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
         })]
         exp_services.update_exploration(
             self.editor_id_4, self.CURATED_EXPLORATION_ID_2,
+            change_list, 'Translation commits2')
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename6.mp3',
+                        'file_size_bytes': 5000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    },
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 1000,
+                        'needs_update': False,
+                        'duration_secs': 25
+                    },
+                },
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename6.mp3',
+                        'file_size_bytes': 5000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    },
+                },
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_2,
             change_list, 'Translation commits2')
 
         topic_2 = topic_domain.Topic.create_default_topic(
