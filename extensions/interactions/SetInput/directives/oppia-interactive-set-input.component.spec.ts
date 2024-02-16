@@ -104,7 +104,6 @@ describe('InteractiveSetInputComponent', () => {
     expect(component.errorMessage).toBe('');
   });
 
-
   it('should initialise component when user adds interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and
       .callThrough();

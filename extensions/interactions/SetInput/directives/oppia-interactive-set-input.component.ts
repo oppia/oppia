@@ -78,13 +78,11 @@ export class InteractiveSetInputComponent implements OnInit {
     });
   }
 
-
   updateAnswer(answer: SetInputAnswer): void {
     this.answer = answer;
     this.errorMessage = this.hasDuplicates(answer) ?
       'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR' : '';
   }
-
 
   getSchema(): Schema {
     return this.schema as Schema;
