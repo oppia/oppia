@@ -55,13 +55,16 @@ def main(args: Optional[List[str]] = None) -> None:
         repository_path + parsed_args.latest_comment_file, 'r',
         encoding='utf-8'
     ) as latest_comment_file:
-        latest_comment = [line.strip() for line in latest_comment_file]
+        latest_comment_lines = latest_comment_file.read().strip().split('\n')
+        latest_comment = [line.strip() for line in latest_comment_lines]
+        
 
     with open(
         repository_path + parsed_args.new_comment_file, 'r',
         encoding='utf-8'
     ) as new_comment_file:
-        new_comment = [line.strip() for line in new_comment_file]
+        new_comment_lines = new_comment_file.read().strip().split('\n')
+        new_comment = [line.strip() for line in new_comment_lines]
 
     if (
         len(latest_comment) != len(new_comment) or
