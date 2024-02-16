@@ -28,6 +28,7 @@ from core.domain import learner_group_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
+from core.domain import topic_fetchers
 
 from typing import Final
 
@@ -424,26 +425,25 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-    def test_topic_editor_page_access_without_logging_in(self) -> None:
-        self.get_html_response(
-            '%s/can_edit_topic' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
-
-    def test_topic_editor_page_access_without_having_rights(self) -> None:
+    def test_access_topic_editor_page_without_logging_in(self) -> None:
+        self.get_json(
+            '%s/can_view_any_topic_editor' %
+            ACCESS_VALIDATION_HANDLER_PREFIX , expected_status_int=400)
+    
+    def test_access_topic_editor_page_with_guest_user(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.get_html_response(
-            '%s/can_edit_topic' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+        self.get_json(
+            '%s/can_view_any_topic_editor' %
+            ACCESS_VALIDATION_HANDLER_PREFIX , expected_status_int=400)
         self.logout()
 
-    def test_topic_editor_page_access_as_topic_manager(self) -> None:
-        self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
-        self.add_user_role(
-            self.TOPIC_MANAGER_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.login(self.TOPIC_MANAGER_EMAIL)
+    def test_access_topic_editor_page_with_curriculum_admin(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
-            '%s/can_edit_topic' %
-            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+            '%s/can_view_any_topic_editor?topic_id=' %
+            ACCESS_VALIDATION_HANDLER_PREFIX)
         self.logout()
