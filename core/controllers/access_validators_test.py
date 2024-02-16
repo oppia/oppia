@@ -276,7 +276,6 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
             [self.facilitator_id], [],
             ['subtopic_id_1'], ['story_id_1'])
 
-
     def test_validation_returns_false_with_learner_groups_feature_disabled(
         self
     ) -> None:

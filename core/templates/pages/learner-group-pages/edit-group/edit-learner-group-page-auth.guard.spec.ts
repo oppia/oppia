@@ -98,7 +98,8 @@ describe('EditLearnerGroupPageAuthGuard', () => {
   }));
 
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService,
+    spyOn(
+      accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
       .and.returnValue(Promise.reject('Validation failed'));
     const navigateSpy = spyOn(router, 'navigate')
