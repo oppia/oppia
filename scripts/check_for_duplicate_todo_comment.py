@@ -49,32 +49,30 @@ def main(args: Optional[List[str]] = None) -> None:
     github_perma_link_url = 'https://github.com/oppia/oppia/blob/'
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
-    latest_comment: List[str] = []
-    new_comment: List[str] = []
+    latest_comment_lines: List[str] = []
+    new_comment_lines: List[str] = []
     with open(
         repository_path + parsed_args.latest_comment_file, 'r',
         encoding='utf-8'
     ) as latest_comment_file:
-        latest_comment_lines = latest_comment_file.read().strip().split('\n')
-        latest_comment = [line.strip() for line in latest_comment_lines]
+        latest_comment_lines = latest_comment_file.read().splitlines()
 
     with open(
         repository_path + parsed_args.new_comment_file, 'r',
         encoding='utf-8'
     ) as new_comment_file:
-        new_comment_lines = new_comment_file.read().strip().split('\n')
-        new_comment = [line.strip() for line in new_comment_lines]
+        new_comment_lines = new_comment_file.read().splitlines()
 
     if (
-        len(latest_comment) != len(new_comment) or
-        latest_comment[0] != new_comment[0]
+        len(latest_comment_lines) != len(new_comment_lines) or
+        latest_comment_lines[0] != new_comment_lines[0]
     ):
         raise Exception('New todo comment should be posted.')
 
-    for index in range(1, len(latest_comment)):
+    for index in range(1, len(latest_comment_lines)):
         latest_comment_line_content = (
-            latest_comment[index][compare_start_index:])
-        new_comment_line_content = new_comment[index][compare_start_index:]
+            latest_comment_lines[index][compare_start_index:])
+        new_comment_line_content = new_comment_lines[index][compare_start_index:]
         if latest_comment_line_content != new_comment_line_content:
             raise Exception('New todo comment should be posted.')
 
