@@ -199,7 +199,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
 class EditLearnerGroupPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to view learner group page."""
+    """Validates access to edit learner group page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -220,7 +220,7 @@ class EditLearnerGroupPageAccessValidationHandler(
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
-        """Retrieves information about a learner group.
+        """Validates access to edit learner group page.
 
         Args:
             learner_group_id: str. The learner group ID.
