@@ -20,6 +20,7 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
 
 var ExplorationEditorPage =
     require('../webdriverio_utils/ExplorationEditorPage.js');
@@ -114,6 +115,7 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.stopAudioRecord();
       await explorationEditorTranslationTab.confirmAudioRecord();
       await explorationEditorTranslationTab.playAudioRecord();
+      await action.waitForAutosave();
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
@@ -135,6 +137,7 @@ describe('Voiceover upload features', function() {
         'test_audio_1_en.mp3');
       await explorationEditorTranslationTab.saveAudioRecord();
       await explorationEditorTranslationTab.playAudioRecord();
+      await action.waitForAutosave();
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
