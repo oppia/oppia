@@ -634,7 +634,6 @@ describe('ExplorationFooterComponent', () => {
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Start: {
@@ -847,7 +846,6 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
         edits_allowed: true
       },
       version: 1,
@@ -855,7 +853,6 @@ describe('ExplorationFooterComponent', () => {
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,
@@ -1078,7 +1075,6 @@ describe('ExplorationFooterComponent', () => {
         param_specs: null,
         title: 'Exploration',
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Introduction: {
@@ -1128,7 +1124,6 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
         edits_allowed: true
       },
       version: 1,
@@ -1136,7 +1131,6 @@ describe('ExplorationFooterComponent', () => {
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
@@ -1172,7 +1166,6 @@ describe('ExplorationFooterComponent', () => {
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Introduction: {
@@ -1222,7 +1215,6 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
         edits_allowed: true
       },
       version: 1,
@@ -1230,7 +1222,6 @@ describe('ExplorationFooterComponent', () => {
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
