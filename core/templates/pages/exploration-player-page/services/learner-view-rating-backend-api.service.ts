@@ -52,7 +52,8 @@ export class LearnerViewRatingBackendApiService {
   Promise<LearnerViewRatingBackendResponse> {
     return this.httpClient.put<LearnerViewRatingBackendResponse>(
       this.ratingsUrl, {
-        user_rating: ratingValue
+        user_rating: ratingValue,
+        overall_ratings: {}
       }).toPromise();
   }
 }

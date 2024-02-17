@@ -35,14 +35,14 @@ import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-pag
   styleUrls: ['./player-sidebar.component.css'],
 })
 export class PlayerSidebarComponent implements OnInit {
-  mobileMenuVisible: boolean;
-  isExpanded = false;
+  mobileMenuVisible: boolean = false;
+  isExpanded: boolean = false;
   explorationId!: string;
   expDesc!: string;
   expDescTranslationKey!: string;
   avgRating!: number | null;
-  fullStars: number;
-  blankStars: number;
+  fullStars: number = 0;
+  blankStars: number = 5;
   ratings!: ExplorationRatings;
 
   constructor(
