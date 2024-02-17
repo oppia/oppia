@@ -50,7 +50,7 @@ describe('EditLearnerGroupPageAuthGuard', () => {
         EditLearnerGroupPageAuthGuard,
         { provide: AccessValidationBackendApiService,
           useClass: MockAccessValidationBackendApiService },
-        { provide: ContextService, useClass: MockContextService },
+        { provide: ContextService },
         { provide: Router, useClass: MockRouter },
         Location,
       ],
