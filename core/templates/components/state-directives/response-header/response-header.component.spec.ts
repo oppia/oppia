@@ -83,13 +83,6 @@ describe('Response Header Component', () => {
     expect(component.getCurrentInteractionId()).toBe('TextInput');
   });
 
-  it('should check if correctness feedback is enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      false);
-
-    expect(component.isCorrectnessFeedbackEnabled()).toBe(false);
-  });
-
   it('should check if current interaction is linear or not', () => {
     expect(component.isCurrentInteractionLinear()).toBe(false);
   });

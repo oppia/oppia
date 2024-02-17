@@ -518,14 +518,6 @@ describe('Editor state service', () => {
     expect(ecs.isInQuestionMode()).toBeFalse();
   });
 
-  it('should set correctness feedback enabled', () => {
-    expect(ecs.getCorrectnessFeedbackEnabled()).toBeFalse();
-    ecs.setCorrectnessFeedbackEnabled(true);
-    expect(ecs.getCorrectnessFeedbackEnabled()).toBeTrue();
-    ecs.setCorrectnessFeedbackEnabled(false);
-    expect(ecs.getCorrectnessFeedbackEnabled()).toBeFalse();
-  });
-
   it('should set inapplicable skill misconception ids', () => {
     expect(ecs.getInapplicableSkillMisconceptionIds()).toEqual([]);
     ecs.setInapplicableSkillMisconceptionIds(['id1', 'id2']);
