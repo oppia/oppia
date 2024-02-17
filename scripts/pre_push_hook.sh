@@ -56,9 +56,9 @@ install_hook() {
 
             # Try creating a symlink
             if [ "$(basename $file)" == "pre-push" ]; then
-                ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.sh"
+                ORIGINAL_FILE="../../scripts/pre_push_hook.sh"
             else
-                ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.py"
+                ORIGINAL_FILE="../../scripts/pre_push_hook.py"
             fi
 
             ln -s "$ORIGINAL_FILE" "$file" &&
@@ -84,7 +84,7 @@ install_hook() {
 }
 
 
-# Check for --install in args and install pre-push hook if it's found
+# Check for --install in args and install pre-push hook if itC's found
 for arg in "$@"; do
     if [ "$arg" == "--install" ]; then
         install_hook
@@ -93,12 +93,14 @@ done
 
 
 # Check if containers are running, so we can shut them down at end if not
-WAS_RUNNING=$(docker inspect -f '{{.State.Running}}' "$DEV_CONTAINER")
+WAS_RUNNING=$(docker inspect -f '{{.State.Running}}' "oppia-dev-server")
 
-# Start containers and run pre-push hook
-make run-offline
+if [ "$WAS_RUNNING" != "true" ]; then
+    # Start containers and run pre-push hook
+    make run-offline
+fi
 
-CMD="$DOCKER_EXEC_COMMAND python3 $PYTHON_PREPUSH_HOOK_PATH $@"
+CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PREPUSH_HOOK_PATH $@"
 echo "Running $CMD"
 
 $CMD
@@ -108,7 +110,7 @@ exitcode=$?
 echo "Python script exited with code $exitcode"
 
 # Shut down containers if they were not running before
-if [ "$WAS_RUNNING" != "false" ]; then
+if [ "$WAS_RUNNING" != "true" ]; then
     make stop
 fi
 
