@@ -80,8 +80,7 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
-    path: AppConstants.
-      PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.ROUTE,
+    path: 'edit-learner-group/:learner_group_id',
     loadChildren: () => import(
       'pages/learner-group-pages/edit-group/edit-learner-group-page.module')
       .then(m => m.EditLearnerGroupPageModule),

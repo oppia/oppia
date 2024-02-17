@@ -28,7 +28,6 @@ import {
 
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +37,7 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
     private router: Router,
-    private location: Location,
-    private windowRef: WindowRef
+    private location: Location
   ) {}
 
   async canActivate(
@@ -47,11 +45,7 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      let pathnameArray = this.windowRef.nativeWindow.location.pathname
-        .split('/');
-
-      let learnerGroupIndex = pathnameArray.indexOf('edit-learner-group');
-      let learnerGroupId = pathnameArray[learnerGroupIndex + 1];
+      let learnerGroupId = route.paramMap.get('learner_group_id');
 
       this.accessValidationBackendApiService
         .validateAccessToLearnerGroupEditorPage(learnerGroupId)
