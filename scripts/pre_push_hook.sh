@@ -92,6 +92,8 @@ WAS_RUNNING=$(docker inspect -f '{{.State.Running}}' "$DEV_CONTAINER")
 # Start containers and run pre-push hook
 make run-offline
 
+# TODO: tmp
+PYTHON_PREPUSH_HOOK_PATH="./scripts/pre_push_hook.py"
 CMD="$DOCKER_EXEC_COMMAND python3 $PYTHON_PREPUSH_HOOK_PATH $@"
 echo "Running $CMD"
 
