@@ -826,7 +826,8 @@ describe('State Responses Component', () => {
             value();
           }
         },
-        currentInteractionId: 'currentInteractionId'
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
       },
       result: Promise.resolve({
         reopen: true,
@@ -850,7 +851,8 @@ describe('State Responses Component', () => {
             value();
           }
         },
-        currentInteractionId: 'currentInteractionId'
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
       },
       result: Promise.resolve({
         reopen: false,
@@ -884,7 +886,8 @@ describe('State Responses Component', () => {
             return;
           }
         },
-        currentInteractionId: 'currentInteractionId'
+        currentInteractionId: 'currentInteractionId',
+        stateName: 'stateName'
       },
       result: Promise.reject()
     } as NgbModalRef);

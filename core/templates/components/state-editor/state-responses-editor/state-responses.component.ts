@@ -142,7 +142,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateSolicitAnswerDetailsService.saveDisplayedValue();
   }
 
-  getActiveStateName(): string {
+  getActiveStateName(): string | null {
     return this.stateEditorService.getActiveStateName();
   }
 
