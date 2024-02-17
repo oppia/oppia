@@ -116,7 +116,7 @@ describe('Access validation backend api service', () => {
     avbas.validateAccessToTopicEditorPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_view_any_topic_editor');
+      '/access_validation_handler/can_access_topic_editor/<topic_id>');
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
