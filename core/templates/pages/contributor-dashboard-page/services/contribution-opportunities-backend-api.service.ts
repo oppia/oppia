@@ -36,8 +36,7 @@ import {
 import { UserService } from 'services/user.service';
 
 import { AppConstants } from 'app.constants';
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   'opportunities': SkillOpportunityBackendDict[];
@@ -197,16 +196,14 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchReviewableTranslationOpportunitiesAsync(
-      topicName: string,
+      topicName?: string,
       languageCode?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (
-      topicName !== ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
-    ) {
+    if (topicName) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
