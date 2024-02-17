@@ -47,15 +47,11 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      let learnerGroupId = '';
       let pathnameArray = this.windowRef.nativeWindow.location.pathname
         .split('/');
 
       let learnerGroupIndex = pathnameArray.indexOf('edit-learner-group');
-
-      if (learnerGroupIndex !== -1) {
-        learnerGroupId = pathnameArray[learnerGroupIndex + 1];
-      }
+      let learnerGroupId = pathnameArray[learnerGroupIndex + 1];
 
       this.accessValidationBackendApiService
         .validateAccessToLearnerGroupEditorPage(learnerGroupId)
