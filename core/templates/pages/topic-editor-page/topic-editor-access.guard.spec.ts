@@ -72,7 +72,8 @@ describe('Topic editor access guard', () => {
     async() => {
       const getUserInfoAsyncSpy = spyOn(
         userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(UserInfo.createDefault({ curriculum_admin: true }))
+        Promise.resolve(new UserInfo(
+          [], false, true, false, false, false, '', '', '', true))
       );
       const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 

@@ -23,21 +23,21 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
-import { AdminPageRootComponent } from './topic-editor-page-root.component';
+import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
 
-describe('AdminPageRootComponent', () => {
-  let component: AdminPageRootComponent;
-  let fixture: ComponentFixture<AdminPageRootComponent>;
+describe('TopicEditorPageRootComponent', () => {
+  let component: TopicEditorPageRootComponent;
+  let fixture: ComponentFixture<TopicEditorPageRootComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      declarations: [AdminPageRootComponent],
+      declarations: [TopicEditorPageRootComponent],
       providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminPageRootComponent);
+    fixture = TestBed.createComponent(TopicEditorPageRootComponent);
     component = fixture.componentInstance;
   });
 
