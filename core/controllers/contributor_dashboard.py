@@ -310,7 +310,9 @@ class ReviewableOpportunitiesHandler(
     def get(self) -> None:
         """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
-        topic_name = self.normalized_request.get('topic_name')
+        # Default value is None, since this is a GET request handler, which
+        # means all request parameters come in as strings.
+        topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
@@ -318,11 +320,8 @@ class ReviewableOpportunitiesHandler(
         if self.user_id:
             for opp in (
                 self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id,
-                topic_name=(
-                    topic_name if topic_name != 'null' else None),
-                language=language
-            )):
+                self.user_id, topic_name, language)
+            ):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
             'opportunities': opportunity_dicts,
@@ -340,11 +339,13 @@ class ReviewableOpportunitiesHandler(
             user_id: str. The user ID of the user for which to filter
                 translation suggestions.
             topic_name: str|None. A topic name for which to filter the
-                exploration opportunity summaries. If '' is supplied, all
-                available exploration opportunity summaries will be returned.
+                exploration opportunity summaries. If it is None, all available
+                exploration opportunity summaries will be returned, regardless
+                of the topic.
             language: str|None. ISO 639-1 language code for which to filter the
-                exploration opportunity summaries. If it is None, all
-                available exploration opportunity summaries will be returned.
+                exploration opportunity summaries. If it is None, all available
+                exploration opportunity summaries will be returned, regardless
+                of the language.
 
         Returns:
             list(ExplorationOpportunitySummary). A list of the matching

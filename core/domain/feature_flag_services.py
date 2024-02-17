@@ -199,17 +199,17 @@ def load_feature_flags_from_storage(
 
 
 def is_feature_flag_enabled(
-    user_id: Optional[str],
     feature_flag_name: str,
-    feature_flag: Optional[feature_flag_domain.FeatureFlag] = None
+    feature_flag: Optional[feature_flag_domain.FeatureFlag] = None,
+    user_id: Optional[str] = None,
 ) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
     Args:
-        user_id: str|None. The id of the user, if logged-out user then None.
         feature_flag_name: str. The name of the feature flag that needs to
             be evaluated.
-        feature_flag: FeatureFlag. The feature flag domain model.
+        feature_flag: FeatureFlag|None. The feature flag domain model.
+        user_id: str|None. The id of the user, if logged-out user then None.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.
@@ -264,7 +264,7 @@ def evaluate_all_feature_flag_configs(
     feature_flags = get_all_feature_flags()
     for feature_flag in feature_flags:
         feature_flag_status = is_feature_flag_enabled(
-            user_id, feature_flag.name, feature_flag)
+            feature_flag.name, feature_flag, user_id)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_flag_status, bool)
         result_dict[feature_flag.name] = feature_flag_status

@@ -42,9 +42,9 @@ class DiagnosticTestPlayerPage(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        if feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
+        if feature_flag_services.is_feature_flag_enabled( 
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            used_id=self.user_id
         ):
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:

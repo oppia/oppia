@@ -36,6 +36,8 @@ import {
 import { UserService } from 'services/user.service';
 
 import { AppConstants } from 'app.constants';
+import { ContributorDashboardConstants } from
+  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   'opportunities': SkillOpportunityBackendDict[];
@@ -201,7 +203,12 @@ export class ContributionOpportunitiesBackendApiService {
     const params: {
       topic_name?: string;
       language_code?: string;
-    } = { topic_name: topicName ?? null };
+    } = {};
+    if (
+      topicName !== ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
+    ) {
+      params.topic_name = topicName;
+    }
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
