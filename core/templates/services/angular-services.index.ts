@@ -102,7 +102,7 @@ import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/lear
 import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -255,7 +255,6 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
 import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -389,7 +388,6 @@ import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/servi
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
-import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
 import { ExplorationEditsAllowedBackendApiService } from 'pages/exploration-editor-page/services/exploration-edits-allowed-backend-api.service';
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
@@ -447,6 +445,7 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
+import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -552,6 +551,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditableTopicBackendApiService', EditableTopicBackendApiService],
   ['EditableStoryBackendApiService', EditableStoryBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
+  ['EmailDashboardAuthGuard', EmailDashboardAuthGuard],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EmailDashboardResultBackendApiService',
@@ -564,8 +564,6 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationCreationBackendApiService],
   ['ExplorationCreationService',
     ExplorationCreationService],
-  ['ExplorationCorrectnessFeedbackService',
-    ExplorationCorrectnessFeedbackService],
   ['ExplorationEditsAllowedBackendApiService',
     ExplorationEditsAllowedBackendApiService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
@@ -728,15 +726,13 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParamTypeObjectFactory', ParamTypeObjectFactory],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
-  ['PlatformFeatureAdminBackendApiService',
-    PlatformFeatureAdminBackendApiService],
+  ['PlatformParameterAdminBackendApiService',
+    PlatformParameterAdminBackendApiService],
   ['FeatureFlagBackendApiService', FeatureFlagBackendApiService],
   ['FeatureFlagDummyBackendApiService',
     FeatureFlagDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlaythroughIssuesService', PlaythroughIssuesService],
-  ['PlayerCorrectnessFeedbackEnabledService',
-    PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
   ['PlayerTranscriptService', PlayerTranscriptService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],

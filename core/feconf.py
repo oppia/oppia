@@ -425,9 +425,7 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
 DEFAULT_AUTO_TTS_ENABLED = False
-# Whether new explorations should have correctness-feedback enabled
-# by default.
-DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+
 # Default value for next_content_id_index in exploration/question.
 DEFUALT_NEXT_CONTENT_ID_INDEX = 0
 
@@ -1093,7 +1091,7 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
     '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
-CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
+CLASSROOM_ID_TO_NAME_HANDLER_URL = '/classroom_id_to_name_handler'
 UNUSED_TOPICS_HANDLER_URL = '/unused_topics'
 NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
