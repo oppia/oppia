@@ -23,7 +23,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AppConstants } from 'app.constants';
 import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { ContextService } from 'services/context.service';
 
 
 class MockAccessValidationBackendApiService {
@@ -50,7 +49,6 @@ describe('EditLearnerGroupPageAuthGuard', () => {
         EditLearnerGroupPageAuthGuard,
         { provide: AccessValidationBackendApiService,
           useClass: MockAccessValidationBackendApiService },
-        { provide: ContextService },
         { provide: Router, useClass: MockRouter },
         Location,
       ],
@@ -60,7 +58,6 @@ describe('EditLearnerGroupPageAuthGuard', () => {
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
     router = TestBed.inject(Router);
   });
 
