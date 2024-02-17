@@ -20,8 +20,8 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
 from core import feature_flag_list
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import improvements
