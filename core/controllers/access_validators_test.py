@@ -27,6 +27,7 @@ from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
+from core.domain import skill_services
 from core.tests import test_utils
 from core.domain import topic_fetchers
 
@@ -419,7 +420,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
-class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     """Checks the access to the topic editor page and its rendering."""
 
     def setUp(self) -> None:
@@ -428,23 +429,48 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.skill_id = skill_services.get_new_skill_id()
+
     def test_access_topic_editor_page_without_logging_in(self) -> None:
         self.get_json(
-            '%s/can_view_any_topic_editor' %
-            ACCESS_VALIDATION_HANDLER_PREFIX , expected_status_int=400)
+            '%s/can_access_topic_editor/%s' %(
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            self.topic_id), expected_status_int=401)
 
     def test_access_topic_editor_page_with_guest_user(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_json(
-            '%s/can_view_any_topic_editor' %
-            ACCESS_VALIDATION_HANDLER_PREFIX , expected_status_int=400)
+            '%s/can_access_topic_editor/%s' %(
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            self.topic_id), expected_status_int=401)
         self.logout()
 
-    def test_access_topic_editor_page_with_curriculum_admin(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
+
+    def test_access_topic_editor_page_with_curriculum_admin(
+        self
+    ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        topic_id = topic_fetchers.get_new_topic_id()
         self.get_html_response(
-            '%s/can_view_any_topic_editor?topic_id=%s' %
-            (ACCESS_VALIDATION_HANDLER_PREFIX, topic_id), expected_status_int=200)
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id))
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'invalid_id'),
+            expected_status_int=401)
         self.logout()
