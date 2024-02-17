@@ -22,68 +22,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
-import { FeatureFlagDomainConstants } from
-  'domain/feature-flag/feature-flag-domain.constants';
 import { PlatformParameterDomainConstants } from
-  'domain/platform_feature/platform-parameter-domain.constants';
+  'domain/platform-parameter/platform-parameter-domain.constants';
 import { PlatformParameterRule, PlatformParameterValue } from
-  'domain/platform_feature/platform-parameter-rule.model';
-import {
-  FeatureFlag,
-  FeatureFlagBackendDict
-} from 'domain/feature-flag/feature-flag.model';
-
-export interface FeatureFlagsDicts {
-  'feature_flags': FeatureFlagBackendDict[];
-  'server_stage': string;
-}
-
-export interface FeatureFlagsResponse {
-  featureFlags: FeatureFlag[];
-  serverStage: string;
-}
+  'domain/platform-parameter/platform-parameter-rule.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformFeatureAdminBackendApiService {
+export class PlatformParameterAdminBackendApiService {
   constructor(
     private http: HttpClient,
   ) {}
-
-  async getFeatureFlags(): Promise<FeatureFlagsResponse> {
-    return new Promise((resolve, reject) => {
-      this.http.get<FeatureFlagsDicts>(
-        FeatureFlagDomainConstants.FEATURE_FLAGS_URL
-      ).toPromise().then(response => {
-        resolve({
-          featureFlags: response.feature_flags.map(
-            dict => FeatureFlag.createFromBackendDict(
-              dict)),
-          serverStage: response.server_stage
-        });
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async updateFeatureFlag(
-      name: string, forceEnableForAllUsers: boolean, rolloutPercentage: number,
-      userGroupIds: string[]
-  ):
-      Promise<void> {
-    await this.http.put(
-      FeatureFlagDomainConstants.FEATURE_FLAGS_URL,
-      {
-        action: FeatureFlagDomainConstants.UPDATE_FEATURE_FLAG_ACTION,
-        feature_flag_name: name,
-        force_enable_for_all_users: forceEnableForAllUsers,
-        rollout_percentage: rolloutPercentage,
-        user_group_ids: userGroupIds
-      }
-    ).toPromise();
-  }
 
   async updatePlatformParameter(
       name: string, message: string, newRules: PlatformParameterRule[],
@@ -111,5 +61,5 @@ export class PlatformFeatureAdminBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'PlatformFeatureAdminBackendApiService',
-  downgradeInjectable(PlatformFeatureAdminBackendApiService));
+  'PlatformParameterAdminBackendApiService',
+  downgradeInjectable(PlatformParameterAdminBackendApiService));
