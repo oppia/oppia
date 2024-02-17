@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a valid faccilitator.
+ * if the user is not a valid facilitator.
  */
 
 import { Location } from '@angular/common';
@@ -28,7 +28,7 @@ import {
 
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,9 +37,9 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
-    private contextService: ContextService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private windowRef: WindowRef
   ) {}
 
   async canActivate(
@@ -47,7 +47,16 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      let learnerGroupId = this.contextService.getLearnerGroupId();
+      let learnerGroupId = '';
+      let pathnameArray = this.windowRef.nativeWindow.location.pathname
+        .split('/');
+
+      let learnerGroupIndex = pathnameArray.indexOf('edit-learner-group');
+
+      if (learnerGroupIndex !== -1) {
+        learnerGroupId = pathnameArray[learnerGroupIndex + 1];
+      }
+
       this.accessValidationBackendApiService
         .validateAccessToLearnerGroupEditorPage(learnerGroupId)
         .then(() => {

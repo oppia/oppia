@@ -38,7 +38,8 @@ export class AccessValidationBackendApiService {
 
   LEARNER_GROUP_EDITOR_PAGE_ACCESS_VALIDATOR = (
     // eslint-disable-next-line max-len
-    '/access_validation_handler/can_access_edit_learner_group_page/<learner_group_id>'
+    '/access_validation_handler/can_access_edit_learner_group_page/' +
+    '<learner_group_id>'
   );
 
   DOES_LEARNER_GROUP_EXIST = (

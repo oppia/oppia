@@ -21,7 +21,6 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/ro
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppConstants } from 'app.constants';
-import { of } from 'rxjs';
 import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -29,7 +28,7 @@ import { ContextService } from 'services/context.service';
 
 class MockAccessValidationBackendApiService {
   validateAccessToLearnerGroupEditorPage(learnerGroupId: string) {
-    return of().toPromise();
+    return Promise.resolve();
   }
 }
 
