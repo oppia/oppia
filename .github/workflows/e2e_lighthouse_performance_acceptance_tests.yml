@@ -95,7 +95,7 @@ jobs:
           - name: feedbackUpdates
           - name: fileUploadExtensions
           - name: fileUploadFeatures
-            flaky_lines: |
+            flaky_indicators: |
               Play record button is not clickable
               Translation tab button is not clickable
           - name: learner
@@ -189,7 +189,7 @@ jobs:
         uses: oppia/retry@develop
         with:
           max_attempts: 2
-          flaky_test_output_lines: ${{ matrix.suite.flaky_lines || '' }}
+          substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
           command: >
             xvfb-run -a --server-args="-screen 0, 1285x1000x24"
             python -m scripts.run_e2e_tests --skip-install
