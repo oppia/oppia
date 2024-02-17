@@ -32,12 +32,6 @@ class MockAccessValidationBackendApiService {
   }
 }
 
-class MockContextService {
-  getLearnerGroupId() {
-    return 'mockLearnerGroupId';
-  }
-}
-
 class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
@@ -47,7 +41,6 @@ class MockRouter {
 describe('EditLearnerGroupPageAuthGuard', () => {
   let guard: EditLearnerGroupPageAuthGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
-  let contextService: ContextService;
   let router: Router;
 
   beforeEach(() => {
@@ -76,8 +69,6 @@ describe('EditLearnerGroupPageAuthGuard', () => {
       accessValidationBackendApiService,
       'validateAccessToLearnerGroupEditorPage')
       .and.returnValue(Promise.resolve());
-    const getLearnerGroupIdSpy = spyOn(contextService, 'getLearnerGroupId')
-      .and.returnValue('mockLearnerGroupId');
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));
 
@@ -92,7 +83,6 @@ describe('EditLearnerGroupPageAuthGuard', () => {
 
     expect(canActivateResult).toBeTrue();
     expect(validateAccessSpy).toHaveBeenCalledWith('mockLearnerGroupId');
-    expect(getLearnerGroupIdSpy).toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
