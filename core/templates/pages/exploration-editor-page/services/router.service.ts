@@ -66,9 +66,7 @@ export class RouterService {
     private stateEditorService: StateEditorService,
     private location: PlatformLocation,
     private ngZone: NgZone
-  ) {}
-
-  init(): void {
+  ) {
     this._changeTab(this.windowRef.nativeWindow.location.hash.split('#')[1]);
 
     this.location.onPopState(() => {
