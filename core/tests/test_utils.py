@@ -336,25 +336,30 @@ def swap_is_feature_flag_enabled_function(
 
     Args:
         feature_flag_names: List[FeatureNames]. The name of the feature
-           flags for which the value should be returned as True.
+            flags for which the value should be returned as True.
+
+    Yields:
+        context. The context with function replaced.
     """
     def mock_is_feature_flag_enabled(
         _: str, target_feature_flag_name: str
     ) -> bool:
-       """Mocks is_feature_flag_enabled function.
+        """Mocks is_feature_flag_enabled function to return True if the
+        target_feature_flag_name is present in feature_flag_names.
 
         Args:
-           target_feature_flag_name: str. The name of the target feature flag.
+            _: str. The id of the user.
+            target_feature_flag_name: str. The name of the target feature flag.
 
         Returns:
-           enable_feature_flag: bool. Returns True if the target feature flag
-           name is in feature_flag_names list.
-       """
-       enable_feature_flag = False
-       for feature_flag_name in feature_flag_names:
-           if feature_flag_name.value == target_feature_flag_name:
-               enable_feature_flag = True
-       return enable_feature_flag
+            enable_feature_flag: bool. Returns True if the target feature flag
+            name is in feature_flag_names list.
+        """
+        enable_feature_flag = False
+        for feature_flag_name in feature_flag_names:
+            if feature_flag_name.value == target_feature_flag_name:
+                enable_feature_flag = True
+        return enable_feature_flag
 
     original_is_feature_flag_enabled = getattr(
        feature_flag_services, 'is_feature_flag_enabled')
@@ -364,13 +369,14 @@ def swap_is_feature_flag_enabled_function(
        mock_is_feature_flag_enabled
     )
     try:
-       yield
+        yield
     finally:
-       setattr(
-           feature_flag_services,
-           'is_feature_flag_enabled',
-           original_is_feature_flag_enabled
+        setattr(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            original_is_feature_flag_enabled
        )
+
 
 def enable_feature_flags(
    feature_flag_names: List[feature_flag_list.FeatureNames]
@@ -384,6 +390,10 @@ def enable_feature_flags(
     Args:
         feature_flag_names: List[feature_flag_list.FeatureNames]. The list
             of the names of the feature flags that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given
+        feature flags for the scope of the test.
     """
     def decorator(
         func: Callable[..., _GenericHandlerFunctionReturnType]
