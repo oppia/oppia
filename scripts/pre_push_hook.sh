@@ -55,7 +55,7 @@ install_hook() {
             fi
 
             # Try creating a symlink
-            if [ "$file" == "pre-push" ]; then
+            if [ "$(basename $file)" == "pre-push" ]; then
                 ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.sh"
             else
                 ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.py"
