@@ -129,6 +129,52 @@ describe('SkillSelectorComponent', () => {
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 
+  it('should not include non-matching skills in results', () => {
+    // Prepare test data with non-matching skills.
+    component.untriagedSkillSummaries = [
+      new SkillSummary(
+        'skill1', 'Basic Skill One', 'en', 1, 2, 3, 123, 456
+      ),
+      new SkillSummary(
+        'skill3', 'Basic Skill Three', 'en', 1, 6, 7, 565, 468
+      )
+    ];
+    const searchText = 'Advanced';
+    const filteredSkills = component.searchInUntriagedSkillSummaries(
+      searchText
+    );
+
+    // Assert no skills match 'Advanced'.
+    expect(filteredSkills).toEqual([]);
+  });
+
+  it('should include skills with exact description match', () => {
+    // Prepare test data with one exact description match.
+    component.untriagedSkillSummaries = [
+      new SkillSummary(
+        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
+      ),
+      new SkillSummary(
+        'skill2', 'Partial Match', 'en', 4, 5, 6, 789, 1011
+      ),
+      new SkillSummary(
+        'skill3', 'No Match', 'en', 1, 6, 7, 565, 468
+      )
+    ];
+    const searchText = 'Exact Match';
+    const filteredSkills = component.searchInUntriagedSkillSummaries(
+      searchText
+    );
+    const expectedFilteredSkills = [
+      new SkillSummary(
+        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
+      )
+    ];
+
+    // Assert only exact matches are included.
+    expect(filteredSkills).toEqual(expectedFilteredSkills);
+  });
+
 
   it('should check if skill is empty', () => {
     let categorizedSkills = {
