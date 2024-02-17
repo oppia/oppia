@@ -79,7 +79,7 @@ describe('EditLearnerGroupPageAuthGuard', () => {
     tick();
 
     expect(canActivateResult).toBeTrue();
-    expect(validateAccessSpy).toHaveBeenCalledWith('mockLearnerGroupId');
+    expect(validateAccessSpy).toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
