@@ -646,7 +646,8 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome has no feedback with self loop', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
     let outcome1 = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
     let outcome2 = outcomeObjectFactory.createNew(
@@ -677,7 +678,8 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValues('State Name', 'Hola');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValues(
+      'State Name', 'Hola');
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
 
@@ -698,7 +700,8 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
   });
@@ -757,7 +760,8 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State Name');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
 
     expect(component.getOutcomeTooltip(outcome)).toBe(
       'Self-loops should not be labelled as correct.');
