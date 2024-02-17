@@ -53,14 +53,6 @@ export class HtmlLengthService {
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-skillreview'];
 
-  /**
-    * ['li','blockquote','em','strong', 'p', 'a']
-    * The above tags serve as the tags for text content. Blockquote,
-    * em, a, strong occur as descendants of p tag. li tags are
-    * descendants of ol/ul tags.
-    */
-  textTags = ['p', 'ul', 'ol'];
-
   computeHtmlLength(
       htmlString: string,
       calculationType: CalculationType): number {
@@ -107,20 +99,11 @@ export class HtmlLengthService {
     }
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
-      const lowercaseTagName = tag.tagName.toLowerCase();
-      if (this.textTags.includes(lowercaseTagName)) {
-        totalWeight +=
-        this.getWeightForTextNodes(
-          tag as HTMLElement, calculationType);
-      }
+      const textContent = tag.textContent || '';
+      totalWeight += this.calculateTextWeight(
+        textContent, calculationType);
     }
     return totalWeight;
-  }
-
-  private getWeightForTextNodes(
-      textNode: HTMLElement, calculationType: CalculationType): number {
-    const textContent = textNode.textContent || '';
-    return this.calculateTextWeight(textContent, calculationType);
   }
 
   private calculateTextWeight(
@@ -164,8 +147,8 @@ export class HtmlLengthService {
       case 'oppia-noninteractive-image': {
         const altTextAttr = domTag.getAttribute('alt-with-value');
         const altTextValue = altTextAttr ? altTextAttr.replace(/"/g, '') : '';
-        const Weight = this.calculateTextWeight(altTextValue, calculationType);
-        return Weight + 10;
+        const weight = this.calculateTextWeight(altTextValue, calculationType);
+        return weight + 10;
       }
       default:
         throw new Error(`Invalid non-text node: ${domId}`);

@@ -16,6 +16,8 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
+const CALCULATION_TYPE_WORD = 'word';
+
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -260,7 +262,8 @@ export class ContributionsAndReview
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
             this.htmlLengthService.computeHtmlLength(
-              suggestion.change_cmd.content_html, 'word')) : undefined
+              suggestion.change_cmd.content_html,
+              CALCULATION_TYPE_WORD)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);

@@ -122,6 +122,9 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* "Hi this seems too good to be true but what to do
+    man" is paragraph tag content which computes to 13 words
+    and math tag return 1 for every tag found therefore 13+1 = 14 words*/
     expect(result).toBe(14);
   });
 
@@ -136,6 +139,10 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* "naghiue abghy gjuh &nbsp;" is paragraph tag content
+    which computes to 3 words and "Svg file for demo" is image tag
+    alt-text which computes to 4 words and 10 is premium we
+    add for images therefore 3+4+10 = 17 words*/
     expect(result).toBe(17);
   });
 
@@ -155,6 +162,11 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* "Hi this seems too good to be true but what to do
+    man" is paragraph tag content which computes to 13 words
+    and math tag return 1 for every tag found and "Svg file for demo"
+    is image tag alt-text which computes to 4 words and 10 is premium we
+    add for images therefore 13+10+1+4 = 28 words*/
     expect(result).toBe(28);
   });
 
@@ -207,6 +219,13 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* In this collapsible and tab tag return 1000 each as a
+      premium which comutes to 1000+1000 =2000, paragraph tag content is
+      "Demo hint just to check","done!" which computes to 6+2000=2006,
+      math tag return 1 for every tag found and "code image for testing"
+      is image tag alt-text which computes to 4 words and a premium of 10
+      so, 2006+1+4+10=2021, skillreview tag has "Concept card" and
+       link tag has "oppia link" which computes to 2021+2+2=2025 */
     expect(result).toBe(2025);
   });
 
@@ -231,6 +250,9 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* In this collapsible and tab tag return 1000 each as a
+      premium which comutes to 1000+1000 =2000, paragraph tag content is
+      "Demo hint just to check" which computes to 5+2000=2005*/
     expect(result).toBe(2005);
   });
 
@@ -247,6 +269,9 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
+    /* Skillreview tag has "Concept card" and
+       link tag has "oppia link" and paragraph tag content is
+      "Demo hint just to check" which computes to 5+2+2=2025 */
     expect(result).toBe(9);
   });
 
@@ -343,6 +368,9 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
+    /* "Hi this seems too good to be true but what to do
+    man" is paragraph tag content which computes to 52 characters
+    and math tag return 1 for every tag found therefore 52+1 = 53 characters*/
     expect(result).toBe(53);
   });
 
