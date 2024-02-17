@@ -44,9 +44,9 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
       route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      let learnerGroupId = route.paramMap.get('learner_group_id');
+    let learnerGroupId = route.paramMap.get('learner_group_id') || '';
 
+    return new Promise<boolean>((resolve) => {
       this.accessValidationBackendApiService
         .validateAccessToLearnerGroupEditorPage(learnerGroupId)
         .then(() => {
