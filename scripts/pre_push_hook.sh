@@ -91,7 +91,7 @@ for arg in "$@"; do
 done
 
 # Check if dev-server is running and is healthy
-$(docker ps -a --format '{{json .}}' | grep dev-server | jq .Status | grep -q healthy)
+$(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
 is_dev_server_halthy=$?
 
 if [ "$is_dev_server_halthy" != "0" ]; then
@@ -99,12 +99,16 @@ if [ "$is_dev_server_halthy" != "0" ]; then
     make run-offline
 fi
 
+# Bypassing notification
+echo "You can Bypass Pre-Push check by using `git push --no-verify`"
+
+# Run hook in container
 CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PREPUSH_HOOK_PATH $@"
 echo "Running $CMD"
 
 $CMD
 
-# Exit with the exit code from the docker command
+# Save exit code from the docker command
 exitcode=$?
 echo "Python script exited with code $exitcode"
 
@@ -113,4 +117,5 @@ if [ "$is_dev_server_halthy" != "0" ]; then
     make stop
 fi
 
+# Exit with exit code from container
 exit $exitcode
