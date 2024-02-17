@@ -55,7 +55,7 @@ install_hook() {
             fi
 
             # Try creating a symlink
-            ln -s "$(pwd)/$(basename "$0")" "$file" &&
+            ln -s "${OPPIA_DIR}/scripts/$(basename "$0")" "$file" &&
                 echo "Created symlink in .git/hooks directory" ||
                 {
                     # Fallback to copy on windows
