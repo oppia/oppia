@@ -30,6 +30,7 @@ from core.storage.blog import gae_models as blog_models
 from core.domain import skill_services
 from core.tests import test_utils
 from core.domain import topic_fetchers
+from core.domain import user_services
 
 from typing import Final
 
@@ -429,10 +430,23 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-        self.topic_id = topic_fetchers.get_new_topic_id()
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.skill_id_2 = skill_services.get_new_skill_id()
+
         self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        
 
     def test_access_topic_editor_page_without_logging_in(self) -> None:
         self.get_json(
@@ -462,14 +476,15 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id))
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.topic_id), expected_status_int=200)
         self.logout()
 
     def test_cannot_access_topic_editor_page_with_invalid_topic_id(
         self
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
+        self.get_json(
             '%s/can_access_topic_editor/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, 'invalid_id'),
             expected_status_int=401)

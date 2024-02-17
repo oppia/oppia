@@ -526,6 +526,474 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
+class TopicEditorTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
+
+    def test_editable_topic_handler_get(self) -> None:
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+        # Check that non-admins cannot access the editable topic data.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
+
+        # Check that admins can access the editable topic data.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertTrue(
+                self.skill_id in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id], 0)
+            self.assertTrue(
+                self.skill_id_2 in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id_2], 0)
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
+
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(expected_email_html_body, messages[0].html)
+
+        self.logout()
+
+        # Check that editable topic handler is accessed only when a topic id
+        # passed has an associated topic.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
+    def test_editable_topic_handler_put_fails_with_long_commit_message(
+        self
+    ) -> None:
+        commit_msg = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        change_cmd = {
+            'version': 2,
+            'commit_message': commit_msg,
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'commit_message\' failed: '
+            'Validation failed: has_length_at_most '
+            f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
+            f'for object {commit_msg}')
+
+    def test_editable_topic_handler_put_raises_error_with_invalid_name(
+        self
+    ) -> None:
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Changed name',
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Name should be a string.')
+
+    def test_editable_topic_handler_put(self) -> None:
+        # Check that admins can edit a topic.
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Some changes and added a subtopic.',
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 'A new name'
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 1,
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
+                'cmd': 'add_subtopic',
+                'subtopic_id': 2,
+                'title': 'Title2',
+                'url_fragment': 'subtopic-fragment-two'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
+                },
+                'new_value': {
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False,
+                                'duration_secs': 0.34342
+                            }
+                        }
+                    }
+                },
+                'subtopic_id': 2
+            }]
+        }
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
+
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(expected_email_html_body, messages[0].html)
+
+        # Test if the corresponding subtopic pages were created.
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '<p>New Data</p>',
+                'content_id': 'content'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
+                }
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 2))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False,
+                            'duration_secs': 0.34342
+                        }
+                    }
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
+                }
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        self.logout()
+
+        # Test that any topic manager cannot edit the topic.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=401)
+        self.logout()
+
+        # Check that non-admins and non-topic managers cannot edit a topic.
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=401)
+
+        # Check that topic can not be edited when version is None.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            {
+                'version': None,
+                'commit_message': 'Some changes and added a subtopic.',
+                'topic_and_subtopic_page_change_dicts': [{
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': '',
+                    'new_value': 'A new name'
+                }]
+            }, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Missing key in handler args: version.')
+
+        self.logout()
+
+        # Check topic can not be edited when payload version differs from
+        # topic version.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description 1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
+            {
+                'version': 3,
+                'commit_message': 'Some changes and added a subtopic.',
+                'topic_and_subtopic_page_change_dicts': [{
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': '',
+                    'new_value': 'A new name'
+                }]
+            }, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of topic from version 3, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
+    def test_editable_topic_handler_put_for_assigned_topic_manager(
+        self
+    ) -> None:
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Some changes and added a subtopic.',
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 'A new name'
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 1,
+                'new_value': {
+                    'html': '<p>New Data</p>',
+                    'content_id': 'content'
+                }
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
+                'cmd': 'add_subtopic',
+                'subtopic_id': 2,
+                'title': 'Title2',
+                'url_fragment': 'subtopic-frag-two'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_html',
+                'old_value': {
+                    'html': '',
+                    'content_id': 'content'
+                },
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'content'
+                },
+                'subtopic_id': 2
+            }, {
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'page_contents_audio',
+                'old_value': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
+                },
+                'new_value': {
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False,
+                                'duration_secs': 0.34342
+                            }
+                        }
+                    }
+                },
+                'subtopic_id': 2
+            }]
+        }
+
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        # Check that the topic manager can edit the topic now.
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token)
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.assertEqual('A new name', json_response['topic_dict']['name'])
+        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+        self.logout()
+
+    def test_guest_can_not_delete_topic(self) -> None:
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_cannot_delete_invalid_topic(self) -> None:
+        # Check that an invalid topic can not be deleted.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_id'), expected_status_int=404)
+        self.logout()
+
+    def test_editable_topic_handler_delete(self) -> None:
+        # Check that admins can delete a topic.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=200)
+        self.logout()
+
+        # Check that non-admins cannot delete a topic.
+        self.login(self.NEW_USER_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
+
+        # Check that topic can not be deleted when the topic id passed does
+        # not have a topic associated with it.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
+
 class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
