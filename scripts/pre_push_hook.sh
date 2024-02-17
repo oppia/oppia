@@ -55,11 +55,17 @@ install_hook() {
             fi
 
             # Try creating a symlink
-            ln -s "${OPPIA_DIR}/scripts/$(basename "$0")" "$file" &&
+            if [ "$file" == "pre-push" ]; then
+                ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.sh"
+            else
+                ORIGINAL_FILE="${OPPIA_DIR}/scripts/pre_push_hook.py"
+            fi
+
+            ln -s "$ORIGINAL_FILE" "$file" &&
                 echo "Created symlink in .git/hooks directory" ||
                 {
                     # Fallback to copy on windows
-                    cp "$(pwd)/$(basename "$0")" "$file"
+                    cp "$ORIGINAL_FILE" "$file"
                     echo "Copied file to .git/hooks directory"
                 }
 
@@ -92,8 +98,6 @@ WAS_RUNNING=$(docker inspect -f '{{.State.Running}}' "$DEV_CONTAINER")
 # Start containers and run pre-push hook
 make run-offline
 
-# TODO: tmp
-PYTHON_PREPUSH_HOOK_PATH="./scripts/pre_push_hook.py"
 CMD="$DOCKER_EXEC_COMMAND python3 $PYTHON_PREPUSH_HOOK_PATH $@"
 echo "Running $CMD"
 
@@ -106,5 +110,6 @@ echo "Python script exited with code $exitcode"
 # Shut down containers if they were not running before
 if [ "$WAS_RUNNING" != "false" ]; then
     make stop
+fi
 
 exit $exitcode
