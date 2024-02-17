@@ -254,11 +254,12 @@ describe('Blog Dashboard Page Component', () => {
   it('should display alert when unable to fetch blog dashboard data',
     fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen');
+      spyOn(component, 'getUserInfoAsync').and.returnValue(Promise.resolve());
       spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
         .and.returnValue(Promise.reject(500));
       spyOn(alertsService, 'addWarning');
 
-      component.ngOnInit();
+      component.initMainTab();
       tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
