@@ -446,13 +446,13 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_7, self.admin_id, title='Title 3',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -698,10 +698,10 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
 

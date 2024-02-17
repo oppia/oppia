@@ -40,13 +40,11 @@ export class NewChapterTitleModalComponent implements OnInit {
   invalidExpId!: boolean;
   errorMsg!: string | null;
   invalidExpErrorStrings!: string[];
-  correctnessFeedbackDisabledString!: string;
   MAX_CHARS_IN_EXPLORATION_TITLE = AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;
   story!: Story;
   nodeId!: string;
   editableThumbnailBgColor!: string;
   editableThumbnailFilename!: string;
-  correctnessFeedbackDisabled!: boolean;
   categoryIsDefault!: boolean;
   statesWithRestrictedInteractions!: string | string[];
   statesWithTooFewMultipleChoiceOptions!: string | string[];
@@ -90,13 +88,9 @@ export class NewChapterTitleModalComponent implements OnInit {
     this.invalidExpId = false;
     this.errorMsg = null;
     this.invalidExpErrorStrings = ['Please enter a valid exploration id.'];
-    this.correctnessFeedbackDisabledString = 'The correctness feedback ' +
-      'of this exploration is disabled. Explorations need to have their ' +
-      'correctness feedback enabled before they can be added to a story.';
     this.story = this.storyEditorStateService.getStory();
     this.nodeId = this.story.getStoryContents().getNextNodeId();
     this.editableThumbnailBgColor = '';
-    this.correctnessFeedbackDisabled = false;
     this.categoryIsDefault = true;
     this.statesWithRestrictedInteractions = [];
     this.statesWithTooFewMultipleChoiceOptions = [];
@@ -133,7 +127,6 @@ export class NewChapterTitleModalComponent implements OnInit {
   resetErrorMsg(): void {
     this.errorMsg = null;
     this.invalidExpId = false;
-    this.correctnessFeedbackDisabled = false;
     this.categoryIsDefault = true;
     this.invalidExpErrorStrings = ['Please enter a valid exploration id.'];
   }
@@ -168,14 +161,6 @@ export class NewChapterTitleModalComponent implements OnInit {
     }
 
     this.invalidExpId = false;
-    const correctnessFeedbackIsEnabled = (
-      await this.curatedExplorationValidationService
-        .isCorrectnessFeedbackEnabled(this.explorationId));
-    if (!correctnessFeedbackIsEnabled) {
-      this.correctnessFeedbackDisabled = true;
-      return;
-    }
-    this.correctnessFeedbackDisabled = false;
 
     const categoryIsDefault = (
       await this.curatedExplorationValidationService.isDefaultCategoryAsync(

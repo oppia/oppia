@@ -39,7 +39,6 @@ import { UserService } from 'services/user.service';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationAutomaticTextToSpeechService } from '../services/exploration-automatic-text-to-speech.service';
 import { ExplorationCategoryService } from '../services/exploration-category.service';
-import { ExplorationCorrectnessFeedbackService } from '../services/exploration-correctness-feedback.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
 import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
@@ -137,8 +136,6 @@ export class SettingsTabComponent
     private explorationAutomaticTextToSpeechService:
       ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
-    private explorationCorrectnessFeedbackService:
-      ExplorationCorrectnessFeedbackService,
     private explorationDataService: ExplorationDataService,
     private explorationEditsAllowedBackendApiService:
       ExplorationEditsAllowedBackendApiService,
@@ -444,14 +441,6 @@ export class SettingsTabComponent
   toggleAutomaticTextToSpeech(): void {
     return this.explorationAutomaticTextToSpeechService
       .toggleAutomaticTextToSpeech();
-  }
-
-  isCorrectnessFeedbackEnabled(): boolean {
-    return (this.explorationCorrectnessFeedbackService.isEnabled() as boolean);
-  }
-
-  toggleCorrectnessFeedback(): void {
-    this.explorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
   }
 
   isExplorationEditable(): boolean {
