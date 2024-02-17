@@ -69,20 +69,19 @@ install_hook() {
                     echo "Copied file to .git/hooks directory"
                 }
 
-            # # Make the hook file executable
-            # chmod +x "$file"
+            # Make the hook file executable
+            chmod +x "$file"
 
-            # if [ $? -eq 0 ]; then
-            #     echo "pre-push hook file is now executable!"
-            # else
-            #     echo >&2 "Failed to make pre-push executable"
-            #     exit 1
-            # fi
+            if [ $? -eq 0 ]; then
+                echo "pre-push hook file is now executable!"
+            else
+                echo >&2 "Failed to make pre-push executable"
+                exit 1
+            fi
         fi
     done
     exit 0
 }
-
 
 # Check for --install in args and install pre-push hook if itC's found
 for arg in "$@"; do
@@ -91,11 +90,11 @@ for arg in "$@"; do
     fi
 done
 
+# Check if dev-server is running and is healthy
+$(docker ps -a --format '{{json .}}' | grep dev-server | jq .Status | grep -q healthy)
+is_dev_server_halthy=$?
 
-# Check if containers are running, so we can shut them down at end if not
-WAS_RUNNING=$(docker inspect -f '{{.State.Running}}' "oppia-dev-server")
-
-if [ "$WAS_RUNNING" != "true" ]; then
+if [ "$is_dev_server_halthy" != "0" ]; then
     # Start containers and run pre-push hook
     make run-offline
 fi
@@ -110,7 +109,7 @@ exitcode=$?
 echo "Python script exited with code $exitcode"
 
 # Shut down containers if they were not running before
-if [ "$WAS_RUNNING" != "true" ]; then
+if [ "$is_dev_server_halthy" != "0" ]; then
     make stop
 fi
 
