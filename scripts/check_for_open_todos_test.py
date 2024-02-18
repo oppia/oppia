@@ -16,18 +16,21 @@
 
 from __future__ import annotations
 
-import os
 import io
-import sys
+import os
 import shutil
+import sys
 import textwrap
 
 from core.tests import test_utils
 
 from . import check_for_open_todos
 
-OPEN_TODOS_PRESENT_INDICATOR = "There are todos associated with the provided issues."
-OPEN_TODOS_NOT_PRESENT_INDICATOR = "There are no todos associated with the provided issues."
+OPEN_TODOS_PRESENT_INDICATOR = (
+    'There are todos associated with the provided issues.')
+OPEN_TODOS_NOT_PRESENT_INDICATOR = (
+    'There are no todos associated with the provided issues.')
+
 
 class CheckForOpenTodosTests(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_open_todos script."""
@@ -98,18 +101,19 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
                 '--commit_sha=abcdefg'])
 
         github_perma_link_url = (
-            f'https://github.com/oppia/oppia/blob/abcdefg')
-        
+            'https://github.com/oppia/oppia/blob/abcdefg')
+
         expected_todo_list_lines = [
-            "The following todos are associated with this issue #4151:",
+            'The following todos are associated with this issue #4151:',
             f'{github_perma_link_url}/file1.txt#L4',
             f'{github_perma_link_url}/file1.txt#L11',
             f'{github_perma_link_url}/file1.txt#L13',
             f'{github_perma_link_url}/file2.txt#L3'
         ]
-        
+
         with open('dummy_dir/todo_list.txt', 'r', encoding='utf-8') as file:
-            self.assertItemsEqual(file.read().splitlines(), expected_todo_list_lines)
+            self.assertItemsEqual(
+                file.read().splitlines(), expected_todo_list_lines)
 
     def test_get_open_todos_by_nonexisting_issue_number(self) -> None:
         mock_stdout = io.StringIO()
@@ -121,7 +125,8 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
                 '--repository_path=dummy_dir',
                 '--issue_number=4157',
                 '--commit_sha=abcdefg'])
-        self.assertEqual(mock_stdout.getvalue(), OPEN_TODOS_NOT_PRESENT_INDICATOR)
+        self.assertEqual(
+            mock_stdout.getvalue(), OPEN_TODOS_NOT_PRESENT_INDICATOR)
 
     def test_get_open_todos_by_existing_issue_file(self) -> None:
         with self.assertRaisesRegex(Exception, OPEN_TODOS_PRESENT_INDICATOR):
@@ -131,7 +136,7 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
                 '--commit_sha=abcdefg'])
 
         github_perma_link_url = (
-            f'https://github.com/oppia/oppia/blob/abcdefg')
+            'https://github.com/oppia/oppia/blob/abcdefg')
 
         expected_todo_list_lines = [
             'The following todos are associated with this issue #4151:',
