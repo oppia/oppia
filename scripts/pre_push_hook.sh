@@ -94,17 +94,17 @@ for arg in "$@"; do
     fi
 done
 
+# Bypassing notification
+echo "You can Bypass Pre-Push check by using \`git push --no-verify\`"
+
 # Check if dev-server is running and is healthy
 $(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
-is_dev_server_halthy=$?
+is_dev_server_running=$?
 
-if [ "$is_dev_server_halthy" != "0" ]; then
+if [ "$is_dev_server_running" != "0" ]; then
     # Start containers and run pre-push hook
-    make run-offline
+    make start-devserver  # We don't need to use run-offline as internet would be available when pushing commit
 fi
-
-# Bypassing notification
-echo "You can Bypass Pre-Push check by using `git push --no-verify`"
 
 # Run hook in container
 CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PREPUSH_HOOK_PATH $@"
@@ -117,7 +117,7 @@ exitcode=$?
 echo "Python script exited with code $exitcode"
 
 # Shut down containers if they were not running before
-if [ "$is_dev_server_halthy" != "0" ]; then
+if [ "$is_dev_server_running" != "0" ]; then
     make stop
 fi
 
