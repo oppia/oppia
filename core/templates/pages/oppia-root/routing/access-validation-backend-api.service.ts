@@ -120,8 +120,12 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  validateAccessToTopicEditorPage(): Promise<void> {
-    return this.http.get<void>(
-      this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL).toPromise();
+  validateAccessToTopicEditorPage(topicId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL, {
+        topic_id: topicId
+      });
+
+    return this.http.get<void>(url).toPromise();
   }
 }

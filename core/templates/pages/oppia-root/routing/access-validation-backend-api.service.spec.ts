@@ -113,10 +113,16 @@ describe('Access validation backend api service', () => {
   }));
 
   it('should validate whether user can view any topic editor', fakeAsync(() => {
-    avbas.validateAccessToTopicEditorPage().then(successSpy, failSpy);
+    let topicId = 'topicId';
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/access_validation_handler/can_access_topic_editor/' + topicId
+    );
+
+    avbas.validateAccessToTopicEditorPage(topicId).then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_topic_editor/<topic_id>');
+      '/access_validation_handler/can_access_topic_editor/' + topicId);
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
