@@ -22,10 +22,13 @@
 #
 # To install hook (which runs inside docker container), run this script
 # command from oppia root directory with --install argument
+# 
+# Currently it only works for Unix systems, on windows it will create symlink but won't have any effect
 
 DEV_CONTAINER="dev-server"
 DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
 
+# Hook file paths, we need you use relative path as actual path won't be same in host and container
 PYTHON_PREPUSH_HOOK_PATH=".git/hooks/pre-push-python"
 PREPUSH_HOOK_PATH=".git/hooks/pre-push"
 
@@ -55,13 +58,14 @@ install_hook() {
             fi
 
             # Try creating a symlink
+            base_symlink="../../scripts"  # Symlinks needs to be relative as actual path won't be same on host and docker container
             if [ "$(basename $file)" == "pre-push" ]; then
-                ORIGINAL_FILE="../../scripts/pre_push_hook.sh"
+                ORIGINAL_FILE="$base_symlink/pre_push_hook.sh"  
             else
-                ORIGINAL_FILE="../../scripts/pre_push_hook.py"
+                ORIGINAL_FILE="$base_symlink/pre_push_hook.py"
             fi
 
-            ln -s "$ORIGINAL_FILE" "$file" &&
+                     ln -s "$ORIGINAL_FILE" "$file" &&
                 echo "Created symlink in .git/hooks directory" ||
                 {
                     # Fallback to copy on windows
