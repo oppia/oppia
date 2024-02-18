@@ -105,49 +105,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Param for test.',
             platform_parameter_domain.DataTypes.BOOL)
 
-    def test_change_configuration_property(self) -> None:
-        """Test that configuration properties can be changed."""
-
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [],
-            'course_details': 'Detailed math classroom.',
-            'topic_list_intro': ''
-        }]
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-        self.assertDictContainsSubset({
-            'value': [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }],
-        }, response_config_properties[
-            config_domain.CLASSROOM_PAGES_DATA.name])
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: new_config_value,
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-        self.assertDictContainsSubset({
-            'value': new_config_value,
-        }, response_config_properties[
-            config_domain.CLASSROOM_PAGES_DATA.name])
-
-        self.logout()
-
     def test_cannot_reload_exploration_in_production_mode(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()

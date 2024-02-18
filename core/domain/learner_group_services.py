@@ -287,7 +287,6 @@ def get_matching_learner_group_syllabus_to_add(
 
     matching_topic_ids: List[str] = []
     classrooms = classroom_config_services.get_all_classrooms()
-    all_classrooms_dict = [classroom.to_dict() for classroom in classrooms]
 
     matching_subtopics_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []
@@ -295,10 +294,10 @@ def get_matching_learner_group_syllabus_to_add(
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
 
     if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
-        for classroom in all_classrooms_dict:
-            if category and classroom['name'] == category:
+        for classroom in classrooms:
+            if category and classroom.name == category:
                 topic_ids = (
-                    classroom['topic_id_to_prerequisite_topic_ids'].keys())
+                    classroom.topic_id_to_prerequisite_topic_ids.keys())
                 matching_topic_ids.extend(topic_ids)
         matching_topics: List[topic_domain.Topic] = (
             topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)

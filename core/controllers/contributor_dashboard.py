@@ -184,10 +184,9 @@ class ContributionOpportunitiesHandler(
         # See issue #12221.
         classroom_topic_ids: List[str] = []
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classrooms_dict = [classroom.to_dict() for classroom in classrooms]
-        for classroom_dict in all_classrooms_dict:
+        for classroom in classrooms:
             topic_ids = (
-                classroom_dict['topic_id_to_prerequisite_topic_ids'].keys())
+                classroom.topic_id_to_prerequisite_topic_ids.keys())
             classroom_topic_ids.extend(topic_ids)
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.

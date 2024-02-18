@@ -155,6 +155,7 @@ class ConfigProperty:
     - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
     - classroom_promos_are_enabled.
+    - classroom_pages_data.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.

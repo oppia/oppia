@@ -99,15 +99,14 @@ class TopicsAndSkillsDashboardPageDataHandler(
                     )
 
         classrooms = classroom_config_services.get_all_classrooms()
-        all_classrooms_dict = [classroom.to_dict() for classroom in classrooms]
         all_classroom_names = [
-            classroom['name'] for classroom in all_classrooms_dict]
+            classroom.name for classroom in classrooms]
 
         topic_classroom_dict = {}
-        for classroom in all_classrooms_dict:
-            topic_ids = classroom['topic_id_to_prerequisite_topic_ids'].keys()
+        for classroom in classrooms:
+            topic_ids = classroom.topic_id_to_prerequisite_topic_ids.keys()
             for topic_id in topic_ids:
-                topic_classroom_dict[topic_id] = classroom['name']
+                topic_classroom_dict[topic_id] = classroom.name
 
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(

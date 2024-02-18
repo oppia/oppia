@@ -91,16 +91,16 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
 
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        math_classroom_dict: classroom_config_domain.ClassroomDict = {
-            'classroom_id': 'math_classroom_id',
-            'name': 'math',
-            'url_fragment': 'math',
-            'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom',
-            'topic_id_to_prerequisite_topic_ids': {}
-        }
-        math_classroom = classroom_config_domain.Classroom.from_dict(
-            math_classroom_dict)
+        math_classroom: classroom_config_domain.Classroom = (
+            classroom_config_domain.Classroom(
+                classroom_id='math_classroom_id',
+                name='math',
+                url_fragment='math',
+                course_details='Course details for classroom.',
+                topic_list_intro='Topics covered for classroom',
+                topic_id_to_prerequisite_topic_ids={}
+            )
+        )
         classroom_config_services.update_or_create_classroom_model(
             math_classroom)
         json_response = self.get_json(
