@@ -200,23 +200,21 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         return autogeneratable_language_accent_list
 
 
-def get_voice_artist_metadata(voice_artist_id):
-    voice_artist_metadata_model = (
-        voiceover_models.VoiceArtistMetadataModel.get(
-            voice_artist_id, strict=False))
-
-    if voice_artist_metadata_model is None:
-        return voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=voice_artist_id, voiceovers_and_contents_mapping={}
-        )
-
-    return voice_artist_metadata_model
-
-
 def update_voice_artist_metadata(
-    voice_artist_id,
-    voiceovers_and_contents_mapping
-):
+    voice_artist_id: str,
+    voiceovers_and_contents_mapping: (
+        voiceover_models.VoiceoversAndContentsMappingType)
+) -> None:
+    """The method updates or creates metadata for a voice artist in the
+    VoiceArtistMetadataModel.
+
+    Args:
+        voice_artist_id: str. The ID of the voice artist for which metadata
+            needs to be updated.
+        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
+            dict representing the updated metadata information for the
+            given voice artist.
+    """
     voice_artist_metadata_model = (
         voiceover_models.VoiceArtistMetadataModel.get(
             voice_artist_id, strict=False))
@@ -229,13 +227,3 @@ def update_voice_artist_metadata(
             voiceovers_and_contents_mapping)
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
-
-
-def create_voice_artist_metadata_model(
-    voice_artist_id,
-    voiceovers_and_contents_mapping
-):
-    return voiceover_models.VoiceArtistMetadataModel(
-        id=voice_artist_id,
-        voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
-    )

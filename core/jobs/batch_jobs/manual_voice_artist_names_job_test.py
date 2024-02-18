@@ -30,18 +30,12 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import manual_voice_artist_names_job
 from core.jobs.types import job_run_result
 from core.tests import test_utils
-from core.platform import models
 
-
-from typing import Type
+from typing import Dict, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import voiceover_models
-
-(voiceover_models, exp_models) = models.Registry.import_models([
-    models.Names.VOICEOVER, models.Names.EXPLORATION])
 
 
 class GetVoiceArtistNamesFromExplorationsJobTests(
@@ -97,7 +91,10 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def create_curated_explorations(self) -> None:
+    def _create_curated_explorations(self) -> None:
+        """The method generates two curated explorations and integrates them
+        into the corresponding stories of two distinct topics.
+        """
         exploration_1 = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
             self.owner_id,
@@ -121,13 +118,14 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
                 'default_outcome_1': {}
             }
         }
-        old_voiceover_dict = {
-            'voiceovers_mapping': {
-                'content_0': {},
-                'ca_placeholder_2': {},
-                'default_outcome_1': {}
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
             }
-        }
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': (
@@ -450,9 +448,12 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
                 'new_value': self.CURATED_EXPLORATION_ID_2
             })], 'Changes.')
 
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
     def test_version_is_added_after_running_job(self) -> None:
-        self.create_curated_explorations()
+        self._create_curated_explorations()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='USER IDS WHOSE METADATA MODELS ARE CREATED SUCCESS: 2')
+                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 1')
         ])
