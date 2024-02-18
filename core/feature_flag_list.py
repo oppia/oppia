@@ -21,7 +21,6 @@ from __future__ import annotations
 import enum
 
 from core.domain import feature_flag_domain
-from core.domain import platform_parameter_list as params
 
 from typing import List
 
@@ -197,30 +196,3 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         )
     )
 }
-
-ALL_PLATFORM_PARAMS_EXCEPT_FEATURE_FLAGS: List[params.ParamNames] = [
-    params.ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
-    params.ParamNames.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
-    params.ParamNames.DUMMY_PARAMETER,
-    params.ParamNames.EMAIL_FOOTER,
-    params.ParamNames.EMAIL_SENDER_NAME,
-    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
-    params.ParamNames.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW,
-    (
-        params.ParamNames.
-        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
-    ),
-    (
-        params.ParamNames.
-        HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
-    ),
-    params.ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
-    params.ParamNames.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST,
-    params.ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER,
-    params.ParamNames.PROMO_BAR_ENABLED,
-    params.ParamNames.PROMO_BAR_MESSAGE,
-    params.ParamNames.SIGNUP_EMAIL_BODY_CONTENT,
-    params.ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
-    params.ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
-    params.ParamNames.RECORD_PLAYTHROUGH_PROBABILITY
-]

@@ -19,7 +19,7 @@
 import {
   PlatformParameterFilter,
   PlatformParameterFilterBackendDict
-} from 'domain/platform_feature/platform-parameter-filter.model';
+} from 'domain/platform-parameter/platform-parameter-filter.model';
 
 
 export type PlatformParameterValue = boolean | number | string;

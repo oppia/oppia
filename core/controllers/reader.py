@@ -35,8 +35,8 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -447,8 +447,8 @@ class ExplorationHandler(
             'preferred_language_codes': preferred_language_codes,
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'record_playthrough_probability': (
-                platform_feature_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamNames.
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.
                     RECORD_PLAYTHROUGH_PROBABILITY.value
                 )
             ),

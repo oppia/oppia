@@ -17,7 +17,6 @@
  */
 
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -186,7 +185,3 @@ export class OpportunitiesListItemComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaOpportunitiesListItem', downgradeComponent(
-    { component: OpportunitiesListItemComponent }));
