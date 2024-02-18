@@ -342,5 +342,5 @@ class TopicEditorPageAccessValidationHandler(
 
         if topic is None:
             raise self.PageNotFoundException(
-                'The topic with the given id doesn\'t exist.')
-        pass
+                'The topic with the given id doesn\'t exist.'
+            )
