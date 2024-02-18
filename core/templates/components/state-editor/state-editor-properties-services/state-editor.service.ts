@@ -85,7 +85,6 @@ export class StateEditorService {
   interaction!: Interaction;
   linkedSkillId!: string;
   stateNames: string[] = [];
-  correctnessFeedbackEnabled: boolean = false;
   inQuestionMode: boolean = false;
   misconceptionsBySkill: {} = {};
   explorationIsCurated: boolean = false;
@@ -261,14 +260,6 @@ export class StateEditorService {
 
   isInQuestionMode(): boolean {
     return this.inQuestionMode;
-  }
-
-  setCorrectnessFeedbackEnabled(newCorrectnessFeedbackEnabled: boolean): void {
-    this.correctnessFeedbackEnabled = newCorrectnessFeedbackEnabled;
-  }
-
-  getCorrectnessFeedbackEnabled(): boolean {
-    return this.correctnessFeedbackEnabled;
   }
 
   setSolicitAnswerDetails(newSolicitAnswerDetails: boolean): void {
