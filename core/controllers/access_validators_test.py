@@ -25,12 +25,11 @@ from core.domain import config_services
 from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
-from core.domain import skill_services
 from core.tests import test_utils
-from core.domain import topic_fetchers
-from core.domain import user_services
 
 from typing import Final
 
@@ -446,11 +445,10 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        
 
     def test_access_topic_editor_page_without_logging_in(self) -> None:
         self.get_json(
-            '%s/can_access_topic_editor/%s' %(
+            '%s/can_access_topic_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX,
             self.topic_id), expected_status_int=401)
 
@@ -458,7 +456,7 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_json(
-            '%s/can_access_topic_editor/%s' %(
+            '%s/can_access_topic_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX,
             self.topic_id), expected_status_int=401)
         self.logout()
