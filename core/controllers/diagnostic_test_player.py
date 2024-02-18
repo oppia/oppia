@@ -31,26 +31,6 @@ from core.domain import topic_fetchers
 from typing import Dict, List, TypedDict, cast
 
 
-class DiagnosticTestPlayerPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Renders the diagnostic test player page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        if feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
-        ):
-            self.render_template('diagnostic-test-player-page.mainpage.html')
-        else:
-            raise self.PageNotFoundException
-
-
 def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
     """Normalizes a string of comma-separated question IDs into a list of
     question IDs.
