@@ -17,11 +17,11 @@
  */
 
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
 import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
-} from 'domain/platform_feature/platform-parameter-rule.model';
+} from 'domain/platform-parameter/platform-parameter-rule.model';
 
 describe('PlatformParameterRuleModel', () => {
   it('should create an instance from a backend dict.', () => {
