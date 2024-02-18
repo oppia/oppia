@@ -122,9 +122,9 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* "Hi this seems too good to be true but what to do
-    man" is paragraph tag content which computes to 13 words
-    and math tag return 1 for every tag found therefore 13+1 = 14 words*/
+    /* "Hi this seems too good to be true but what to do man" is a paragraph
+    with 13 words. The math tag counts as 1 word. So, this gives
+    a total of 13 + 1 = 14 words.*/
     expect(result).toBe(14);
   });
 
@@ -139,10 +139,10 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* "naghiue abghy gjuh &nbsp;" is paragraph tag content
-    which computes to 3 words and "Svg file for demo" is image tag
-    alt-text which computes to 4 words and 10 is premium we
-    add for images therefore 3+4+10 = 17 words*/
+    /* "naghiue abghy gjuh &nbsp;" is paragraph tag is a paragraph
+    with 3 words. "Svg file for demo" is the content for image alternative
+    text which counts to 4 words and 10 words is premium we
+    add for images. Therefore this gives a total of 3 + 4 + 10 = 17 words*/
     expect(result).toBe(17);
   });
 
@@ -162,11 +162,10 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* "Hi this seems too good to be true but what to do
-    man" is paragraph tag content which computes to 13 words
-    and math tag return 1 for every tag found and "Svg file for demo"
-    is image tag alt-text which computes to 4 words and 10 is premium we
-    add for images therefore 13+10+1+4 = 28 words*/
+    /* "Hi this seems too good to be true but what to do man" is a paragraph
+    with 13 words. The math tag counts as 1 word. "Svg file for demo" is the
+    content for image alternative text which counts to 4 words and 10 words
+    is the premium we add for images therefore 13 + 10 + 1 + 4 = 28 words*/
     expect(result).toBe(28);
   });
 
@@ -219,13 +218,17 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* In this collapsible and tab tag return 1000 each as a
-      premium which comutes to 1000+1000 =2000, paragraph tag content is
-      "Demo hint just to check","done!" which computes to 6+2000=2006,
-      math tag return 1 for every tag found and "code image for testing"
-      is image tag alt-text which computes to 4 words and a premium of 10
-      so, 2006+1+4+10=2021, skillreview tag has "Concept card" and
-       link tag has "oppia link" which computes to 2021+2+2=2025 */
+    /* Collapsible tag and Tab tag counts 1000 words each as a
+      premium which counts to 1000+1000 =2000 words.
+     "Demo hint just to check","done!" are paragraph with 5 words
+      and 1 word repsectively which counts to 6+2000=2006 words.
+      The math tag counts as 1 word and "code image for testing"
+      is the content for image alternative text with
+      4 words and 10 words is the  premium we add for images,
+      2006 + 1 + 4 + 10 = 2021 words. Skillreview tag has
+      "Concept card" as text content and link tag has "oppia link" as
+      text content with 2 words each, Therefore total word count
+      is 2021 + 2 + 2 = 2025 words*/
     expect(result).toBe(2025);
   });
 
@@ -250,9 +253,10 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* In this collapsible and tab tag return 1000 each as a
-      premium which comutes to 1000+1000 =2000, paragraph tag content is
-      "Demo hint just to check" which computes to 5+2000=2005*/
+    /* Collapsible tag and Tab tag counts 1000 words each as a
+      premium which counts to 1000+1000 =2000 words."Demo hint just to check"
+      is a paragraph with 5 words. Therefore total word count
+      is 5 + 2000 = 2005 words*/
     expect(result).toBe(2005);
   });
 
@@ -269,9 +273,11 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
-    /* Skillreview tag has "Concept card" and
-       link tag has "oppia link" and paragraph tag content is
-      "Demo hint just to check" which computes to 5+2+2=2025 */
+    /* Skillreview tag has
+      "Concept card" as text content and link tag has "oppia link" as
+      text content with 2 words each, "Demo hint just to check" is a
+      paragraph with 5 words.
+      Therefore total word count is 5 + 2 + 2 = 9 words*/
     expect(result).toBe(9);
   });
 
@@ -369,8 +375,8 @@ describe('Html Length Service', () => {
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
     /* "Hi this seems too good to be true but what to do
-    man" is paragraph tag content which computes to 52 characters
-    and math tag return 1 for every tag found therefore 52+1 = 53 characters*/
+    man" is paragraph with 52 characters. The math tag
+    counts as 1 word. So, this gives total characters 52 + 1 = 53 characters*/
     expect(result).toBe(53);
   });
 
@@ -385,6 +391,11 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
+    /* "naghiue abghy gjuh &nbsp;" is paragraph tag is a paragraph
+    with 18 characters. "Svg file for demo" is the content for image alternative
+    text which counts to 17 characters and 10 characters is premium we
+    add for images. Therefore this gives a total of
+    18 + 17 + 10 = 45 charcaters*/
     expect(result).toBe(45);
   });
 
@@ -404,6 +415,11 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
+    /* "Hi this seems too good to be true but what to do man" is a paragraph
+    with 52 characters. The math tag counts as 1 character. "Svg file for demo"
+    is the content for image alternative text which counts to 17 characters
+     and 10 characters is the premium we add for images therefore
+    52 + 10 + 1 + 17 = 80 characters*/
     expect(result).toBe(80);
   });
 
@@ -446,6 +462,11 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
+    /* Skillreview tag has "Concept card" as text content with
+    12 characters and link tag has "oppia link" as text content
+    with 10 characters, "Demo hint just to check" is paragraph
+    with 23 characters. Therefore total character count is
+    12 + 10 + 23 = 45*/
     expect(result).toBe(45);
   });
 
@@ -497,6 +518,19 @@ describe('Html Length Service', () => {
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
+    /* Collapsible tag and Tab tag counts 1000 charcters each as a
+      premium which counts to 1000+1000 =2000 characters.
+     "Demo hint just to check","done!" are paragraph with 23 characters
+      and 5 characters repsectively which counts to
+      23 + 5 + 2000 = 2028 characters.
+      The math tag counts as 1 charcater and "code image for testing"
+      is the content for image alternative text with
+      22 characters and 10 characters is the  premium we add for images,
+      2028 + 22 + 1 + 10 = 2061 characters. Skillreview tag has
+      "Concept card" as text content with 12 characters and
+      link tag has "oppia link" as text content with 10 characters,
+      Therefore total word count
+      is 2061 + 12 + 10 = 2083 characters*/
     expect(result).toBe(2083);
   });
 
@@ -522,31 +556,6 @@ describe('Html Length Service', () => {
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
     expect(result).toBe(65);
-  });
-
-  describe('calculateBaselineLength', () => {
-    it('should throw an error when a normal string' +
-    ' is passed instead of an HTML tag string', () => {
-      const sanitizedHtml = 'This is a normal string.';
-      const calculationType = 'character';
-      const customTagsLength = 0;
-      expect(() => {
-        htmlLengthService.calculateBaselineLength(
-          sanitizedHtml, calculationType, customTagsLength);
-      }).toThrowError(
-        'Failed to parse HTML string.' +
-        ' Ensure that a valid string that includes HTML tags is provided.');
-    });
-
-    it('should calculate the baseline length based' +
-    ' on the provided HTML content and calculation type', () => {
-      const sanitizedHtml = '<p>This is a test HTML string.</p>';
-      const calculationType = 'character';
-      const customTagsLength = 0;
-      const result = htmlLengthService.calculateBaselineLength(
-        sanitizedHtml, calculationType, customTagsLength);
-      expect(result).toBe(27);
-    });
   });
 
   describe('getWeightForNonTextNodes', () => {

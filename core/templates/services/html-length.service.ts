@@ -53,6 +53,15 @@ export class HtmlLengthService {
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-skillreview'];
 
+  /**
+   * Computes the length of an HTML string based on
+   * the specified calculation type.
+   * @param {string} htmlString - The HTML string.
+   * @param {CalculationType} calculationType - The calculation
+   *  type ('word' or 'character').
+   * @returns {number} The computed length of the HTML string.
+   */
+
   computeHtmlLength(
       htmlString: string,
       calculationType: CalculationType): number {
@@ -66,10 +75,9 @@ export class HtmlLengthService {
 
     // Identify custom tags using regex on the original HTML string.
     const customTags = htmlString.match(CUSTOM_TAG_REGEX);
-    let customTagsLength = (customTags) ? customTags.length : 0;
 
     let totalLength = this.calculateBaselineLength(
-      sanitizedHtml, calculationType, customTagsLength);
+      sanitizedHtml, calculationType);
 
     if (customTags) {
       for (const customTag of customTags) {
@@ -80,23 +88,21 @@ export class HtmlLengthService {
     return totalLength;
   }
 
+  /**
+   * Calculates the baseline length of sanitized HTML.
+   * @param {string} sanitizedHtml - The sanitized HTML string and
+   *  can also process normal string.
+   * @param {CalculationType} calculationType - The calculation
+   *  type ('word' or 'character').
+   * @returns {number} The baseline length of the HTML.
+   */
+
   calculateBaselineLength(
-      sanitizedHtml: string,
-      calculationType: CalculationType, CustomTagsLength: number): number {
+      sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
     let dom: Document;
-    try {
-      dom = domparser.parseFromString(sanitizedHtml, 'text/html');
-      if (dom.body.children.length === 0 && !CustomTagsLength) {
-        throw new Error(
-          'No HTML tags found. Ensure ' +
-          'that a valid string that includes HTML tags is provided.');
-      }
-    } catch (error) {
-      throw new Error(
-        'Failed to parse HTML string.' +
-        ' Ensure that a valid string that includes HTML tags is provided.');
-    }
+    dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+
     let totalWeight = 0;
     for (let tag of Array.from(dom.body.children)) {
       const textContent = tag.textContent || '';
@@ -105,6 +111,14 @@ export class HtmlLengthService {
     }
     return totalWeight;
   }
+
+  /**
+   * Calculates the weight of text content based on the calculation type.
+   * @param {string} textContent - The text content to calculate weight for.
+   * @param {CalculationType} calculationType - The calculation
+   * type ('word' or 'character').
+   * @returns {number} The weight of the text content.
+   */
 
   private calculateTextWeight(
       textContent: string, calculationType: CalculationType): number {
@@ -118,6 +132,15 @@ export class HtmlLengthService {
     }
     return totalWeight;
   }
+
+
+  /**
+   * Calculates the weight for non-text nodes.
+   * @param {string} nonTextNode - The non-text node HTML string.
+   * @param {CalculationType} calculationType - The calculation
+   *  type ('word' or 'character').
+   * @returns {number} The weight of the non-text node.
+   */
 
   /* TODO(#19729): Create RTE-component-specific logic
   for calculating the lengths of RTE-components */
@@ -140,13 +163,13 @@ export class HtmlLengthService {
       case 'oppia-noninteractive-link':
       case 'oppia-noninteractive-skillreview': {
         const textValueAttr = domTag.getAttribute('text-with-value');
-        const textValue = textValueAttr ? textValueAttr.replace(/"/g, '') : '';
+        const textValue = textValueAttr ? textValueAttr.slice(1, -1) : '';
         const weight = this.calculateTextWeight(textValue, calculationType);
         return weight;
       }
       case 'oppia-noninteractive-image': {
         const altTextAttr = domTag.getAttribute('alt-with-value');
-        const altTextValue = altTextAttr ? altTextAttr.replace(/"/g, '') : '';
+        const altTextValue = altTextAttr ? altTextAttr.slice(1, -1) : '';
         const weight = this.calculateTextWeight(altTextValue, calculationType);
         return weight + 10;
       }

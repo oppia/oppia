@@ -16,6 +16,8 @@
  * @fileoverview Component for the hint editor.
  */
 
+const CALCULATION_TYPE_CHARACTER = 'character';
+
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -76,7 +78,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   isHintLengthExceeded(): boolean {
     return Boolean(
       this.htmlLengthService.computeHtmlLength(
-        this.hint.hintContent._html, 'character') >
+        this.hint.hintContent._html, CALCULATION_TYPE_CHARACTER) >
         ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 
