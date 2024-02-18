@@ -48,8 +48,6 @@ var ExplorationEditorSettingsTab = function() {
   var confirmDeleteExplorationButton = $(
     '.e2e-test-really-delete-exploration-button');
   var deleteExplorationButton = $('.e2e-test-delete-exploration-button');
-  var disableCorrectnessFeedbackButton = $(
-    '.e2e-test-enable-mark-correctness-feedback');
   var openPreviewSummaryButton = $('.e2e-test-open-preview-summary-modal');
 
   /*
@@ -67,12 +65,6 @@ var ExplorationEditorSettingsTab = function() {
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator-dashboard.
     await waitFor.pageToFullyLoad();
-  };
-
-  this.disableCorrectnessFeedback = async function() {
-    await action.waitForAutosave();
-    await action.click(
-      'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {

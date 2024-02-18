@@ -53,7 +53,6 @@ describe('Extracting Image file names in the state service', () => {
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {
-      correctness_feedback_enabled: false,
       draft_changes: [],
       is_version_of_draft_valid: false,
       language_code: 'en',
@@ -818,7 +817,6 @@ describe('Extracting Image file names in the state service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
         edits_allowed: true
       }
     };

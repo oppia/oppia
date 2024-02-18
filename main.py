@@ -43,6 +43,7 @@ from core.controllers import custom_landing_pages
 from core.controllers import diagnostic_test_player
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import feature_flag
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import feedback_updates
@@ -57,7 +58,6 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import oppia_root
 from core.controllers import pages
-from core.controllers import platform_feature
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -79,6 +79,7 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
+from core.controllers import voiceover
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -310,9 +311,6 @@ URLS = [
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
-        contributor_dashboard.ContributorDashboardPage),
-    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
         contributor_dashboard.ContributorStatsSummariesHandler),
@@ -436,11 +434,8 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
-        classroom.ClassroomAdminPage),
-    get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
-        classroom.ClassroomAdminDataHandler),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
+        classroom.ClassroomIdToNameHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),
@@ -456,6 +451,18 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
         classroom.ClassroomIdHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
+        voiceover.VoiceoverAdminPage
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
+        voiceover.VoiceoverAdminDataHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
+        voiceover.VoiceoverLanguageCodesMappingHandler
     ),
 
     get_redirect_route(
@@ -497,9 +504,6 @@ URLS = [
     get_redirect_route(
         '/learner_dashboard',
         learner_dashboard.OldLearnerDashboardRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_URL,
-        learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
@@ -938,7 +942,6 @@ URLS = [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
-    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
@@ -968,6 +971,9 @@ URLS = [
         r'/verifyusermodelsdeletedhandler',
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
+    get_redirect_route(
+        r'/interactions',
+        admin.InteractionsByExplorationIdHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
@@ -1031,11 +1037,11 @@ URLS = [
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     get_redirect_route(
-        r'/platform_features_evaluation_handler',
-        platform_feature.PlatformFeaturesEvaluationHandler),
+        r'/feature_flags_evaluation_handler',
+        feature_flag.FeatureFlagsEvaluationHandler),
     get_redirect_route(
-        r'/platform_feature_dummy_handler',
-        platform_feature.PlatformFeatureDummyHandler),
+        r'/feature_flag_dummy_handler',
+        feature_flag.FeatureFlagDummyHandler),
 
     get_redirect_route(
         r'%s' % (
@@ -1204,6 +1210,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
+        cron.CronMailReviewerNewSuggestionsHandler),
 ))
 
 # Add tasks urls.

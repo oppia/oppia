@@ -159,7 +159,7 @@ def validate_platform_params_values_for_blog_admin(
 
         if (
             name ==
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         ):
             assert isinstance(value, int)

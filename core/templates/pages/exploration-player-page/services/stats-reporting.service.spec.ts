@@ -68,6 +68,8 @@ describe('Stats reporting service ', () => {
       .and.callThrough();
     spyOn(siteAnalyticsService, 'registerCuratedLessonCompleted')
       .and.callThrough();
+    spyOn(siteAnalyticsService, 'registerAnswerSubmitted')
+      .and.callThrough();
     spyOn(playthroughService, 'recordExplorationStartAction')
       .and.callThrough();
     spyOn(playthroughService, 'recordExplorationQuitAction')
@@ -388,9 +390,11 @@ describe('Stats reporting service ', () => {
       .and.returnValue(Promise.resolve({}));
 
     statsReportingService.recordAnswerSubmitted(
-      'firstState', {}, 'answer', 0, 0, 'category', true);
+      'firstState', {}, 'answer', explorationId, true, 0, 0, 'category', true);
 
     expect(recordAnswerSubmittedSpy).toHaveBeenCalled();
+    expect(siteAnalyticsService.registerAnswerSubmitted)
+      .toHaveBeenCalledWith(explorationId, true);
   });
 
   it('should set topic name', () => {
