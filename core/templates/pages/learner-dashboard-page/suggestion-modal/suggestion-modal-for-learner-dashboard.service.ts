@@ -16,7 +16,6 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -59,8 +58,3 @@ export class SuggestionModalForLearnerDashboardService {
     }
   }
 }
-
-angular.module('oppia').factory(
-  'SuggestionModalForLearnerDashboardService',
-  downgradeInjectable(SuggestionModalForLearnerDashboardService)
-);
