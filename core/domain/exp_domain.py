@@ -42,8 +42,8 @@ from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    TYPE_CHECKING, Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
-    Tuple, TypedDict, Union, cast, overload)
+    TYPE_CHECKING, Callable, Dict, Final, List, Literal, Mapping, Optional,
+    Sequence, Set, Tuple, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
