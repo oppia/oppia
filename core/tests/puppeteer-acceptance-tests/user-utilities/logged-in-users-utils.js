@@ -214,7 +214,7 @@ module.exports = class LoggedInUsers extends baseUser {
         'in Create Mode.');
     }
     await this.page.waitForNavigation();
-    const urlRegex = 
+    const urlRegex =
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
       throw new Error (
