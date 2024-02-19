@@ -186,7 +186,7 @@ jobs:
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
       - name: Run E2E Test ${{ matrix.suite.name }}
-        uses: oppia/retry@a9fb265
+        uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
         with:
           max_attempts: 2
           substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
