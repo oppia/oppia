@@ -42,13 +42,18 @@ from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
-    Tuple, TypedDict, Union, cast, overload)
+    TYPE_CHECKING, Callable, Dict, Final, List, Literal, Mapping, Optional,
+    Sequence, Set, Tuple, TypedDict, Union, cast, overload
+)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+
+if TYPE_CHECKING:
+    from core.domain import rights_domain
+    from core.domain import user_domain
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -58,7 +63,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
-
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -5783,6 +5787,122 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'objective': self.objective,
             'language_code': self.language_code,
             'next_content_id_index': self.next_content_id_index
+        }
+
+
+class AugmentedUserExplorationDataDict(TypedDict):
+    """Dictionary representing the AugmentedUserExplorationData object."""
+
+    exploration_id: str
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    init_state_name: str
+    states: Dict[str, state_domain.StateDict]
+    param_specs: Dict[str, param_domain.ParamSpecDict]
+    param_changes: List[param_domain.ParamChangeDict]
+    version: int
+    auto_tts_enabled: bool
+    edits_allowed: bool
+    draft_change_list_id: int
+    rights: rights_domain.ActivityRightsDict
+    show_state_editor_tutorial_on_load: bool
+    show_state_translation_tutorial_on_load: bool
+    is_version_of_draft_valid: Optional[bool]
+    draft_changes: Optional[Dict[str, str]]
+    email_preferences: Optional[user_domain.UserExplorationPrefsDict]
+    next_content_id_index: int
+    exploration_metadata: ExplorationMetadataDict
+
+
+class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
+    """Domain object for an User Exploration data."""
+
+    default_exp_email_pref: user_domain.UserExplorationPrefsDict = {
+        'mute_feedback_notifications': False,
+        'mute_suggestion_notifications': False
+    }
+
+    def __init__(
+        self,
+        exploration: Exploration,
+        states: Dict[str, state_domain.StateDict],
+        rights: rights_domain.ActivityRightsDict,
+        exp_email_pref: Optional[user_domain.UserExplorationPrefsDict] = None,
+        show_state_editor_tutorial_on_load: bool = False,
+        show_state_translation_tutorial_on_load: bool = False,
+        draft_change_list_id: int = 0,
+        is_valid_draft_version: Optional[bool] = False,
+        draft_changes: Optional[Dict[str, str]] = None,
+    ) -> None:
+        """Initializes a AugmentedUserExplorationData domain object.
+
+        Args:
+            exploration: Exploration. The exploration domain object.
+            states: Dict[str, state_domain.StateDict]. Dictionary representing
+                the State object.
+            rights: rights_domain.ActivityRightsDict. Dictionary
+                representation of activity rights.
+            exp_email_pref: Optional[user_domain.UserExplorationPrefsDict].
+                Dictionary representation of UserExplorationPrefs.
+            show_state_editor_tutorial_on_load: bool. Whether to show the
+                tutorial when the exploration editor loads.
+            show_state_translation_tutorial_on_load: bool. Whether to show the
+                tutorial when the translation tab loads.
+            draft_change_list_id: int. The id of draf change list.
+            is_valid_draft_version: Optional[bool]. Whether the given draft
+                version is valid or not.
+            draft_changes: Optional[Dict[str, str]]. A dict of draft changes.
+        """
+        self.exploration = exploration
+        self.draft_change_list_id = draft_change_list_id
+        self.show_state_editor_tutorial_on_load = show_state_editor_tutorial_on_load # pylint: disable=line-too-long
+        self.show_state_translation_tutorial_on_load = show_state_translation_tutorial_on_load # pylint: disable=line-too-long
+        self.draft_changes = draft_changes
+        self.states = states
+        self.rights = rights
+        self.is_valid_draft_version = is_valid_draft_version
+        if exp_email_pref is None:
+            self.exploration_email_preferences = self.default_exp_email_pref
+        else:
+            self.exploration_email_preferences = exp_email_pref
+
+    def to_dict(self) -> AugmentedUserExplorationDataDict:
+        """Gets the dict representation of AugmentedUserExplorationData
+            domain object.
+
+        Returns:
+            dict. The dict representation of the AugmentedUserExplorationData
+            domain object.
+        """
+
+        return {
+            'exploration_id': self.exploration.id,
+            'title': self.exploration.title,
+            'category': self.exploration.category,
+            'objective': self.exploration.objective,
+            'language_code': self.exploration.language_code,
+            'tags': self.exploration.tags,
+            'init_state_name': self.exploration.init_state_name,
+            'states': self.states,
+            'param_changes': self.exploration.param_change_dicts,
+            'param_specs': self.exploration.param_specs_dict,
+            'version': self.exploration.version,
+            'auto_tts_enabled': self.exploration.auto_tts_enabled,
+            'edits_allowed': self.exploration.edits_allowed,
+            'draft_change_list_id': self.draft_change_list_id,
+            'rights': self.rights,
+            'show_state_editor_tutorial_on_load':
+                self.show_state_editor_tutorial_on_load,
+            'show_state_translation_tutorial_on_load':
+                self.show_state_editor_tutorial_on_load,
+            'draft_changes': self.draft_changes,
+            'exploration_metadata': self.exploration.get_metadata().to_dict(),
+            'email_preferences': self.exploration_email_preferences,
+            'next_content_id_index': self.exploration.next_content_id_index,
+            'is_version_of_draft_valid': self.is_valid_draft_version
         }
 
 

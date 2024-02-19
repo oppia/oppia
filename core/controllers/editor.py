@@ -190,30 +190,14 @@ class ExplorationHandler(
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
-        assert self.user_id is not None
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request['apply_draft']
-
-        user_settings = user_services.get_user_settings(
-            self.user_id, strict=False
-        ) if self.user_id else None
-        has_seen_editor_tutorial = False
-        has_seen_translation_tutorial = False
-        if user_settings is not None:
-            if user_settings.last_started_state_editor_tutorial:
-                has_seen_editor_tutorial = True
-            if user_settings.last_started_state_translation_tutorial:
-                has_seen_translation_tutorial = True
 
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
-            exploration_data['show_state_editor_tutorial_on_load'] = bool(
-                self.user_id and not has_seen_editor_tutorial)
-            exploration_data['show_state_translation_tutorial_on_load'] = bool(
-                self.user_id and not has_seen_translation_tutorial)
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
             # dictionary.

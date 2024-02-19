@@ -99,33 +99,6 @@ AcceptableActivityModelTypes = Union[
 ]
 
 
-class UserExplorationDataDict(TypedDict):
-    """Dictionary representing the user's specific exploration data."""
-
-    exploration_id: str
-    title: str
-    category: str
-    objective: str
-    language_code: str
-    tags: List[str]
-    init_state_name: str
-    states: Dict[str, state_domain.StateDict]
-    param_specs: Dict[str, param_domain.ParamSpecDict]
-    param_changes: List[param_domain.ParamChangeDict]
-    version: int
-    auto_tts_enabled: bool
-    edits_allowed: bool
-    draft_change_list_id: int
-    rights: rights_domain.ActivityRightsDict
-    show_state_editor_tutorial_on_load: bool
-    show_state_translation_tutorial_on_load: bool
-    is_version_of_draft_valid: Optional[bool]
-    draft_changes: Dict[str, str]
-    email_preferences: user_domain.UserExplorationPrefsDict
-    next_content_id_index: int
-    exploration_metadata: exp_domain.ExplorationMetadataDict
-
-
 class SnapshotsMetadataDict(TypedDict):
     """Dictionary representing the snapshot metadata for exploration model."""
 
@@ -2990,14 +2963,14 @@ def is_version_of_draft_valid(exp_id: str, version: int) -> bool:
 
 
 def get_user_exploration_data(
-    user_id: str,
+    user_id: str | None,
     exploration_id: str,
     apply_draft: bool = False,
     version: Optional[int] = None
-) -> UserExplorationDataDict:
+) -> exp_domain.AugmentedUserExplorationDataDict:
     """Returns a description of the given exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+        user_id, exploration_id) if user_id else None
     is_valid_draft_version = (
         is_version_of_draft_valid(
             exploration_id, exp_user_data.draft_change_list_exp_version)
@@ -3005,7 +2978,8 @@ def get_user_exploration_data(
         else None)
     if apply_draft:
         updated_exploration = (
-            get_exp_with_draft_applied(exploration_id, user_id))
+            get_exp_with_draft_applied(exploration_id, user_id)
+        ) if user_id else None
         if updated_exploration is None:
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=version)
@@ -3025,35 +2999,34 @@ def get_user_exploration_data(
         and exp_user_data.draft_change_list else None)
     draft_change_list_id = (
         exp_user_data.draft_change_list_id if exp_user_data else 0)
-    exploration_email_preferences = (
-        user_services.get_email_preferences_for_exploration(
-            user_id, exploration_id))
 
-    editor_dict: UserExplorationDataDict = {
-        'auto_tts_enabled': exploration.auto_tts_enabled,
-        'category': exploration.category,
-        'draft_change_list_id': draft_change_list_id,
-        'exploration_id': exploration_id,
-        'init_state_name': exploration.init_state_name,
-        'language_code': exploration.language_code,
-        'objective': exploration.objective,
-        'param_changes': exploration.param_change_dicts,
-        'param_specs': exploration.param_specs_dict,
-        'rights': rights_manager.get_exploration_rights(
-            exploration_id).to_dict(),
-        'show_state_editor_tutorial_on_load': False,
-        'show_state_translation_tutorial_on_load': False,
-        'states': states,
-        'tags': exploration.tags,
-        'title': exploration.title,
-        'version': exploration.version,
-        'is_version_of_draft_valid': is_valid_draft_version,
-        'draft_changes': draft_changes,
-        'email_preferences': exploration_email_preferences.to_dict(),
-        'next_content_id_index': exploration.next_content_id_index,
-        'edits_allowed': exploration.edits_allowed,
-        'exploration_metadata': exploration.get_metadata().to_dict()
-    }
+    editor_dict = exp_domain.AugmentedUserExplorationData(
+        exploration=exploration,
+        states=states,
+        rights=rights_manager.get_exploration_rights(exploration_id).to_dict()
+    ).to_dict()
+
+    if user_id is not None:
+        user_settings = user_services.get_user_settings(
+            user_id, strict=False
+        )
+        has_seen_editor_tutorial = False
+        has_seen_translation_tutorial = False
+        if user_settings is not None:
+            if user_settings.last_started_state_editor_tutorial:
+                has_seen_editor_tutorial = True
+            if user_settings.last_started_state_translation_tutorial:
+                has_seen_translation_tutorial = True
+        editor_dict['show_state_editor_tutorial_on_load'] = bool(
+            user_id and not has_seen_editor_tutorial)
+        editor_dict['show_state_translation_tutorial_on_load'] = bool(
+            user_id and not has_seen_translation_tutorial)
+        editor_dict['draft_changes'] = draft_changes
+        editor_dict['draft_change_list_id'] = draft_change_list_id
+        editor_dict['is_version_of_draft_valid'] = is_valid_draft_version
+        editor_dict['email_preferences'] = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)).to_dict()
 
     return editor_dict
 
