@@ -18,33 +18,78 @@
  */
 
 const userFactory = require(
-    '../../puppeteer-testing-utilities/user-factory.js');
-  const testConstants = require(
-    '../../puppeteer-testing-utilities/test-constants.js');
-  
-  const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-  
-  describe('Exploration Creator and Exploration Manager', function() {
-    let explorationCreator = null;  
-    beforeAll(async function() {
-      explorationCreator = await userFactory.createExplorationCreator('exploration_creator@example.com');
-    }, DEFAULT_SPEC_TIMEOUT);
-  
-    it('should perform exploration creation and management actions', async function() {
-      // Exploration Creator Actions
-      await explorationCreator.createExploration();
-      await explorationCreator.goToBasicSettingsTab();
-      await explorationCreator.updateBasicSettings();
-      await explorationCreator.previewSummary();
-      await explorationCreator.updateAdvancedSettings();
-      await explorationCreator.inviteCollaborator();
+  '../../puppeteer-testing-utilities/user-factory.js');
+const testConstants = require(
+  '../../puppeteer-testing-utilities/test-constants.js');
+
+const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+
+describe('Exploration Creator and Exploration Manager', function () {
+  let explorationCreator = null;
+  let guestUser1 = null;
+  let guestUser2 = null;
+  let guestUser3 = null;
+  let superAdmin = null;
+  beforeAll(async function () {
+    // guestuser 1 -> collaboratorRole
+
+     guestUser1 = await userFactory.createNewGuestUser(
+      'guestUsr1', 'guest_user1@example.com');
+
+    //guestuser2 -> playTesterRole
+
+     guestUser2 = await userFactory.createNewGuestUser(
+      'guestUsr2', 'guest_user2@example.com');
+
+    //guestuser3 -> voiceArtist
+
+     guestUser3 = await userFactory.createNewGuestUser(
+      'guestUsr3', 'guest_user3@example.com');
+
+    // instance saved for creator
+    explorationCreator = await userFactory.createExplorationCreator('explorationAdm');
+    superAdmin = await userFactory.createNewSuperAdmin('Leader'); //This superadmin will give the required access to guest,manager
+  }, DEFAULT_SPEC_TIMEOUT);
+
+  it('should perform exploration creation and basic actions', async function () {
+    await superAdmin.assignRoleToUser('explorationAdm', 'voiceover admin');//dikkat
+
+    // Exploration Creator Actions
+    await explorationCreator.createExploration();
+    await explorationCreator.goToBasicSettingsTab();
+    await explorationCreator.expectTitleToHaveMaxLength(36);
+    await explorationCreator.updateBasicSettings();
+    await explorationCreator.expectGoalToBeSet();
+    await explorationCreator.expectCategoryToBeSelected();
+    await explorationCreator.expectLanguageToBeSelected();
+    await explorationCreator.previewSummary();
+    await explorationCreator.expectPreviewSummaryToBeVisible();
+    await explorationCreator.updateAdvancedSettings();
+    await explorationCreator.expectAutomaticTextToSpeechToBeEnabledOrDisabled();
 
 
-      
-    }, DEFAULT_SPEC_TIMEOUT);
-  
-    afterAll(async function() {
-      await userFactory.closeAllBrowsers();
-    });
+    // assign guestUser1 to collaborator Role
+    await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
+   //assign guestUser2 to PlayTesterRole
+    await explorationCreator.assignUserToPlayTesterRole('guestUsr2');
+
+    // assign voice Artist Role
+    await explorationCreator.makeExplorationPublic();//working
+    await explorationCreator.expectExplorationAccessibility();//working
+    await explorationCreator.voiceArtistAdded(); //working
+    await explorationCreator.expectVoiceArtistToBeAdded();
+    await explorationCreator.selectVoiceArtist();
+
+    await explorationCreator.chooseToRecieveNotification();
+    await explorationCreator.expectFeedbackNotificationChoice();
+    await explorationCreator.deleteExploration();
+    await explorationCreator.expectExplorationToBeDeleted();
+
+
+  }, DEFAULT_SPEC_TIMEOUT);
+
+  afterAll(async function () {
+    await userFactory.closeAllBrowsers();
   });
-  
+});
+

@@ -28,6 +28,7 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
+// const voiceOverAdminTab = '#mat-option-10'
 
 module.exports = class e2eSuperAdmin extends baseUser {
   /**
@@ -101,4 +102,24 @@ module.exports = class e2eSuperAdmin extends baseUser {
     showMessage(`User ${username} does not have the ${role} role!`);
     await this.goto(currentPageUrl);
   }
+
+  // async assignVoiceoverAdminRoleToCreator(){
+  //   await this.page.goto(rolesEditorTab);
+  //   await this.clickOn(roleEditorInputField);
+  //   await this.type(roleEditorInput, 'explorationAdmin');
+  //   await this.clickOn('."e2e-test-role-edit-button');
+  //   await this.clickOn('.e2e-test-add-new-role-button');
+  //   await this.clickOn('.mat-select-value-1');
+  //   // see if scrolling needed
+  //   await this.clickOn(voiceOverAdminTab);
+  // }
+
+  // async assignVoiceoverAdminRoleToGuest3(){
+  //   await this.type(roleEditorInputField, 'explorationAdmin');
+  //   await this.clickOn('."e2e-test-role-edit-button');
+  //   await this.clickOn('.e2e-test-add-new-role-button');
+  //   await this.clickOn('.mat-select-value-1');
+  //   // see if scrolling needed
+  //   await this.clickOn(voiceOverAdminTab);
+  // }
 };

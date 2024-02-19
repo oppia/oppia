@@ -210,6 +210,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
     'duplicate-blog-post.spec.js',
     'exploration-editor-tests/exploration-creator-manager.spec.js',
+    'exploration-editor-tests/exploration-publisher-drafter.spec.js',
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
