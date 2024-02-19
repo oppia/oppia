@@ -484,6 +484,6 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, 'invalid_id'),
-            expected_status_int=401)
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                topic_fetchers.get_new_topic_id()), expected_status_int=401)
         self.logout()
