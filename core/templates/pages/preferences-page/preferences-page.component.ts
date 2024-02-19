@@ -267,6 +267,8 @@ export class PreferencesPageComponent {
     this.pageShouldBeReloaded = true;
     this.userPreferences.markPreferenceAsChanged('newProfilePictureDataUrl');
     this.userPreferences.newProfilePictureDataUrl = newProfilePictureDataUrl;
+    this.userPreferences.profilePicturePngDataUrl = newProfilePictureDataUrl;
+    this.userPreferences.profilePictureWebpDataUrl = newProfilePictureDataUrl;
   }
 
   // TODO(#19737): Remove the following function.
