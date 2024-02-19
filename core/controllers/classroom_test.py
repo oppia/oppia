@@ -247,25 +247,17 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
             self.math_classroom)
 
     def test_get_classroom_id_to_classroom_name(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         classroom_id_to_classroom_name = {
             self.math_classroom_id: 'math',
             self.physics_classroom_id: 'physics'
         }
-        json_response = self.get_json(feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL)
+        json_response = self.get_json(feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL)
         self.assertEqual(
             json_response['classroom_id_to_classroom_name'],
             classroom_id_to_classroom_name
         )
-        self.logout()
-
-    def test_not_able_to_get_classroom_data_when_user_is_not_admin(
-        self
-    ) -> None:
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-        self.get_json(
-            feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL, expected_status_int=401)
         self.logout()
 
     def test_get_new_classroom_id(self) -> None:
