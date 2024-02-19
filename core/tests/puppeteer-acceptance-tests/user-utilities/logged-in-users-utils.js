@@ -214,7 +214,8 @@ module.exports = class LoggedInUsers extends baseUser {
         'in Create Mode.');
     }
     await this.page.waitForNavigation();
-    const urlRegex = /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
+    const urlRegex = 
+      /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
       throw new Error (
         'The Create Lessons button does not display ' +
