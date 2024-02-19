@@ -61,7 +61,22 @@ export class PlayerSidebarComponent implements OnInit {
     this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
       this.mobileMenuVisible = visibility;
     });
-    this.explorationId = this.contextService.getExplorationId();
+    let pathnameArray = this.urlService.getPathname().split('/');
+    let explorationContext = false;
+
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'create' ||
+          pathnameArray[i] === 'skill_editor' ||
+          pathnameArray[i] === 'embed' ||
+          pathnameArray[i] === 'lesson') {
+        explorationContext = true;
+        break;
+      }
+    }
+
+    this.explorationId = explorationContext ?
+      this.contextService.getExplorationId() : 'test_id';
     this.setRatings();
     this.expDesc = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
