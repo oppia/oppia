@@ -1,5 +1,11 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "À propos de la Fondation Oppia",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM": "Construit à partir d’une passion unifiée pour l’égalité éducative",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON": "DEVENIR BÉNÉVOLE",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT": "Notre plateforme et tout ce que nous avons accompli jusqu’à présent sont dus au travail acharné et à la collaboration de dizaines de bénévoles passionnés. Passez à l’étape suivante et rejoignez notre communauté dès aujourd’hui !",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING": "Créer un apprentissage amusant et efficace pour les étudiants mal desservis du monde",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON": "EN SAVOIR PLUS SUR OPPIA",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT": "La Fondation Oppia accomplit sa mission grâce à la création et à l’expansion de sa plateforme d’apprentissage en ligne, Oppia, où nous utilisons des leçons basées sur des histoires et des fonctionnalités spécialisées pour impliquer les étudiants les plus défavorisés du monde.",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "À propos de la Fondation Oppia | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Créer une exploration",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "à propos d’un sujet auquel vous tenez.",
