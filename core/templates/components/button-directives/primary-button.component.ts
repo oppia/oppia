@@ -82,6 +82,11 @@ export class PrimaryButtonComponent implements OnInit {
   }
 
   handleButtonClick(event: MouseEvent): void {
+    // Prevent the browser from loading the next page
+    // and thus unloading the current page, before the functions
+    // passed to component such as registering Google analytics
+    // have finished executing. Reference -
+    // https://developers.google.com/analytics/devguides/collection/gtagjs/sending-data#know_when_an_event_has_been_sent
     event.preventDefault();
 
     if (this.onClickPrimaryButton.observers.length > 0) {
