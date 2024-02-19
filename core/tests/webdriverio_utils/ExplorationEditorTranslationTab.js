@@ -199,7 +199,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.saveAudioRecord = async function() {
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
-    await waitFor.pageToFullyLoad();
+    await action.waitForAutosave();
   };
 
   this.addAudioRecord = async function() {
@@ -214,7 +214,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.confirmAudioRecord = async function() {
     await action.click('Confirm record button', confirmRecordButton);
-    await waitFor.pageToFullyLoad();
+    await action.waitForAutosave();
   };
 
   this.playAudioRecord = async function() {
