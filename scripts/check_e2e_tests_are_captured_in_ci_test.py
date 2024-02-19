@@ -266,8 +266,8 @@ jobs:
     strategy:
       matrix:
         suite:
-          - threeWords
-          - fourWords
+          - name: threeWords
+          - name: fourWords
     steps:
       - name: Run E2E test ${{ matrix.suite }}
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
