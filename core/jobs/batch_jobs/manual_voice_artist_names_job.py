@@ -44,98 +44,16 @@ if MYPY: # pragma: no cover
 MAX_SAMPLE_VOICEOVERS_IN_VOICE_ARTIST_MODEL = 5
 
 
+class FilterByIds(beam.DoFn):
+    def process(self, model, keys):
+        if model.exploration_id in keys:
+            yield model
+
+
 class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
     """Jobs used for fetching and saving voice artist names from curated
     exploration models.
     """
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        curated_exploration_models = (
-            self.pipeline
-            | 'Get explorations models' >> (
-                ndb_io.GetModels(exp_models.ExplorationModel.get_all()))
-            | 'Get curated explorations models' >> beam.Filter(
-                lambda model: opportunity_services.
-                is_exploration_available_for_contribution(model.id))
-        )
-
-        voice_artist_metadata_models_result = (
-            curated_exploration_models
-            | 'Save voice artist metadata models' >> beam.ParDo(
-                GetAndSaveVoiceArtistMetaDataModels(),
-                beam.pvalue.AsList(curated_exploration_models))
-        )
-
-        voice_artist_metadata_job_result = (
-            voice_artist_metadata_models_result
-            | job_result_transforms.ResultsToJobRunResults(
-                'VOICE ARTIST METADATA MODELS ARE CREATED')
-        )
-
-        return voice_artist_metadata_job_result
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to
-# assume that PTransform class is of type Any. Thus to avoid MyPy's error
-# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
-# ignore here.
-class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
-    """DoFn to save voice artist metadata models."""
-
-    def __init__(self) -> None: # pylint: disable=super-init-not-called
-        # A dictionary mapping voice artist IDs as keys and nested dicts as
-        # values. Each nested dict refers to the voiceovers_and_contents_mapping
-        # field in the VoiceArtistMetadataModel.
-        self.voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
-        self.total_explorations_operated = 0
-        self.total_number_of_explorations = 0
-
-    def process(
-        self,
-        exploration_model: exp_models.ExplorationModel,
-        exploration_models: List[exp_models.ExplorationModel]
-    ) -> Iterable[result.Result[None, Exception]]:
-        """Gets and saves VoiceArtistMetadataModels using
-        ExplorationCommitLogEntryModel from the given exploration model.
-
-        Args:
-            exploration_model: ExplorationModel. An instance of an
-                exploration model.
-            exploration_models: list(ExplorationModel). List of
-                exploration models.
-
-        Yields:
-            JobRunResult. List containing one element, which is either SUCCESS,
-            or FAILURE.
-        """
-
-        self.total_number_of_explorations = len(exploration_models)
-
-        exploration_id = exploration_model.id
-        exp_latest_version = exploration_model.version
-        exp_version_list = list(range(1, exp_latest_version + 1))
-
-        exp_commit_log_entry_models = (
-            exp_models.ExplorationCommitLogEntryModel.get_multi(
-                exploration_id, exp_version_list))
-
-        for exp_commit_log_model in exp_commit_log_entry_models:
-            assert exp_commit_log_model
-            self.voice_artist_id_to_metadata_mapping = copy.deepcopy(
-                GetAndSaveVoiceArtistMetaDataModels.
-                _get_voice_artist_metadata_info_from_exp_commit(
-                    exp_commit_log_model,
-                    self.voice_artist_id_to_metadata_mapping)
-            )
-
-        self.total_explorations_operated += 1
-        if (
-            self.total_explorations_operated ==
-            self.total_number_of_explorations
-        ):
-            yield result.Ok(self._create_voice_artist_model_from_dict())
 
     @staticmethod
     def _delete_voice_artist_model_for_old_commits(
@@ -190,9 +108,6 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                     del exploration_mapping[exploration_id]
 
                 if not exploration_mapping:
-                    del language_mapping['exploration_id_to_content_ids']
-
-                if not language_mapping:
                     del voiceovers_and_contents_mapping[language_code]
 
             if not voiceovers_and_contents_mapping:
@@ -255,7 +170,7 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                         voiceover_mapping_diff[content_id][lang_code] = (
                             voiceover_dict)
                         voice_artist_id_to_metadata_mapping = (
-                            GetAndSaveVoiceArtistMetaDataModels.
+                            GetVoiceArtistNamesFromExplorationsJob.
                             _delete_voice_artist_model_for_old_commits(
                                 lang_code,
                                 exploration_id,
@@ -263,7 +178,7 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                                 voice_artist_id_to_metadata_mapping)
                         )
 
-        return voiceover_mapping_diff
+        return voiceover_mapping_diff, voice_artist_id_to_metadata_mapping
 
     @staticmethod
     def _add_voiceover(
@@ -330,6 +245,15 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                 change_dict['cmd'] == 'edit_state_property' and
                 change_dict['property_name'] == 'recorded_voiceovers'
             ):
+                voiceovers_mapping, voice_artist_id_to_metadata_mapping = (
+                    GetVoiceArtistNamesFromExplorationsJob.
+                    _get_voiceover_from_recorded_voiceover_diff(
+                        change_dict['new_value']['voiceovers_mapping'],
+                        change_dict['old_value']['voiceovers_mapping'],
+                        voice_artist_id_to_metadata_mapping,
+                        exploration_id)
+                )
+
                 voice_artist_id = exp_commit_log_model.user_id
                 voiceovers_and_contents_mapping: (
                     voiceover_models.VoiceoversAndContentsMappingType) = {}
@@ -337,15 +261,6 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                 if voice_artist_id in voice_artist_id_to_metadata_mapping:
                     voiceovers_and_contents_mapping = copy.deepcopy(
                         voice_artist_id_to_metadata_mapping[voice_artist_id])
-
-                voiceovers_mapping = (
-                    GetAndSaveVoiceArtistMetaDataModels.
-                    _get_voiceover_from_recorded_voiceover_diff(
-                        change_dict['new_value']['voiceovers_mapping'],
-                        change_dict['old_value']['voiceovers_mapping'],
-                        voice_artist_id_to_metadata_mapping,
-                        exploration_id)
-                )
 
                 for content_id, lang_code_to_voiceover_dict in (
                     voiceovers_mapping.items()):
@@ -382,7 +297,7 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
                         )
                         assert isinstance(voiceovers, list)
                         voiceovers = (
-                            GetAndSaveVoiceArtistMetaDataModels.
+                            GetVoiceArtistNamesFromExplorationsJob.
                             _add_voiceover(voiceovers, voiceover_dict)
                         )
                         voiceovers_and_contents_mapping[
@@ -410,3 +325,58 @@ class GetAndSaveVoiceArtistMetaDataModels(beam.DoFn): # type: ignore[misc]
             total_voice_artist_model_generated += 1
 
         return total_voice_artist_model_generated
+
+
+    @staticmethod
+    def temp(commit_models):
+        return result.Ok(commit_models)
+
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        curated_exploration_model_ids = (
+            self.pipeline
+            | 'Get explorations models' >> (
+                ndb_io.GetModels(exp_models.ExplorationModel.get_all()))
+            | 'Get curated explorations models' >> beam.Filter(
+                lambda model: opportunity_services.
+                is_exploration_available_for_contribution(model.id))
+            | 'Get model ids' >> beam.Map(
+                lambda exploration: exploration.id
+            )
+        )
+
+        exp_commit_log_models = (
+            self.pipeline
+            | 'Get exploration commit log models' >> ndb_io.GetModels(
+                exp_models.ExplorationCommitLogEntryModel.get_all())
+            | 'Filter commit log models for curated explorations' >> beam.ParDo(
+                FilterByIds(),
+                keys=beam.pvalue.AsList(curated_exploration_model_ids)
+            )
+        )
+
+        self.voice_artist_metadata_mapping = {}
+
+        unused_model = (
+            exp_commit_log_models
+            | 'Update models' >> beam.Map(
+                lambda model: (
+                    GetVoiceArtistNamesFromExplorationsJob.
+                    _get_voice_artist_metadata_info_from_exp_commit(
+                        model, self.voice_artist_metadata_mapping)
+                )
+            )
+        )
+
+        unused_model_result = (
+            unused_model
+            | 'Getting result' >> beam.Map(self.temp)
+        )
+
+        voice_artist_metadata_job_result = (
+            unused_model_result
+            | job_result_transforms.ResultsToJobRunResults(
+                'VOICE ARTIST METADATA MODELS ARE CREATED')
+        )
+
+        return voice_artist_metadata_job_result

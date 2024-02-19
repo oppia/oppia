@@ -108,7 +108,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename3.mp3',
+                        'filename': 'filename1.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 42.43
@@ -142,13 +142,13 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename3.mp3',
+                        'filename': 'filename1.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 42.43
                     },
                     'hi': {
-                        'filename': 'filename4.mp3',
+                        'filename': 'filename2.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 40
@@ -162,7 +162,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename3.mp3',
+                        'filename': 'filename1.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 42.43
@@ -188,13 +188,13 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename3.mp3',
+                        'filename': 'filename1.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 42.43
                     },
                     'hi': {
-                        'filename': 'filename4.mp3',
+                        'filename': 'filename2.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 40
@@ -202,7 +202,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
                 },
                 'ca_placeholder_2': {
                     'en': {
-                        'filename': 'filename4.mp3',
+                        'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 20
@@ -215,13 +215,13 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename3.mp3',
+                        'filename': 'filename1.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 42.43
                     },
                     'hi': {
-                        'filename': 'filename4.mp3',
+                        'filename': 'filename2.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 40
@@ -294,7 +294,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename5.mp3',
+                        'filename': 'filename4.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 20
@@ -327,7 +327,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename6.mp3',
+                        'filename': 'filename5.mp3',
                         'file_size_bytes': 5000,
                         'needs_update': False,
                         'duration_secs': 42.43
@@ -341,7 +341,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename5.mp3',
+                        'filename': 'filename4.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
                         'duration_secs': 20
@@ -367,7 +367,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename6.mp3',
+                        'filename': 'filename5.mp3',
                         'file_size_bytes': 5000,
                         'needs_update': False,
                         'duration_secs': 42.43
@@ -375,7 +375,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
                 },
                 'ca_placeholder_2': {
                     'en': {
-                        'filename': 'filename7.mp3',
+                        'filename': 'filename6.mp3',
                         'file_size_bytes': 1000,
                         'needs_update': False,
                         'duration_secs': 25
@@ -388,7 +388,7 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
             'voiceovers_mapping': {
                 'content_0': {
                     'en': {
-                        'filename': 'filename6.mp3',
+                        'filename': 'filename5.mp3',
                         'file_size_bytes': 5000,
                         'needs_update': False,
                         'duration_secs': 42.43
@@ -455,5 +455,5 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
         self._create_curated_explorations()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 1')
+                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 2')
         ])
