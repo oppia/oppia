@@ -40,14 +40,11 @@ describe('MobileMenuService', () => {
   });
 
   it('should toggle menu visibility', () => {
+    let currentValue: boolean | undefined;
+    service.getMenuVisibility().subscribe(value => currentValue = value);
     service.toggleMenuVisibility();
-    service.getMenuVisibility().subscribe((visibility) => {
-      expect(visibility).toBe(true);
-    });
-
+    expect(currentValue).toBe(true);
     service.toggleMenuVisibility();
-    service.getMenuVisibility().subscribe((visibility) => {
-      expect(visibility).toBe(false);
-    });
+    expect(currentValue).toBe(false);
   });
 });
