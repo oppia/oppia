@@ -5846,7 +5846,7 @@ class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
             rights: rights_domain.ActivityRightsDict. Dictionary
                 representation of activity rights.
             exp_email_pref: Optional[user_domain.UserExplorationPrefsDict].
-                Dictionary representation of UserExplorationPrefs.
+                Dictionary representing feedback and suggestion email settings.
             show_state_editor_tutorial_on_load: bool. Whether to show the
                 tutorial when the exploration editor loads.
             show_state_translation_tutorial_on_load: bool. Whether to show the
