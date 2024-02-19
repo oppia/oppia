@@ -36,22 +36,22 @@ describe('Logged-in User in About Foundation page', function() {
     await testUser.navigateToAboutFoundationPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the right page with the 61 million children link.',
+  it('should open the page with the 61 million children link.',
     async function() {
       await testUser.click61MillionChildrenLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the right page with the Even Those Who Are In School link.',
+  it('should open the page with the Even Those Who Are In School link.',
     async function() {
       await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the right page with the Source: UNESCO link.',
+  it('should open the page with the Source: UNESCO link.',
     async function() {
       await testUser.clickSourceUnescoLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the right page with the 420 Million link.',
+  it('should open the page with the 420 Million link.',
     async function() {
       await testUser.click420MillionLinkInAboutFoundation();
     }, DEFAULT_SPEC_TIMEOUT);

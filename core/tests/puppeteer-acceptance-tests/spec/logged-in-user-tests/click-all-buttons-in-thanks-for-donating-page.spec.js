@@ -46,7 +46,7 @@ describe('Logged-in User in Thanks for Donating page', function() {
       await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should close the thanks for donating popup and show the Donate Page' +
+  it('should close the thanks for donating popup and show the Donate Page ' +
     'with the dismiss button.',
   async function() {
     await testUser.clickDismissButtonInThanksForDonatingPage();

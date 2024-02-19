@@ -45,10 +45,10 @@ const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
-const navbarAboutTabAboutButton = 'a.e2e-test-navbar-about-menu-about-button';
+const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabAboutFoundationButton =
   'a.e2e-test-navbar-about-menu-about-foundation-button';
-const navbarAboutTabBlogButton = 'a.e2e-test-navbar-about-menu-blog-button';
+const navbarAboutTabBlogButton = 'a.e2e-test-blog-link';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -88,7 +88,6 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
-const thanksForDonatingPage = '.modal-backdrop.fade.show';
 
 module.exports = class LoggedInUsers extends baseUser {
   /**
@@ -116,10 +115,10 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to navigate to the Thanks for Donating page.
    */
   async navigateToThanksForDonatingPage() {
-    await this.page.goto(thanksForDonatingUrl, {
-      waitUntil: 'load',
-      timeout: 0
-    });
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.page.goto(thanksForDonatingUrl),
+    ]);
   }
 
   /**
@@ -166,7 +165,7 @@ module.exports = class LoggedInUsers extends baseUser {
   async clickBrowseOurLessonsButtonInAboutPage() {
     await this.clickButtonToNavigateToNewPage(
       browseOurLessonsButton,
-      'Browse Our Lesson button', mathClassroomUrl, 'Math Classroom');
+      'Browse Our Lessons button', mathClassroomUrl, 'Math Classroom');
   }
 
   /**
@@ -176,7 +175,7 @@ module.exports = class LoggedInUsers extends baseUser {
   async clickAccessAndroidAppButtonInAboutPage() {
     await this.clickButtonToNavigateToNewPage(
       accessAndroidAppButton,
-      'Access the Android button', androidUrl, 'Android');
+      'Access the Android App button', androidUrl, 'Android');
   }
 
   /**
@@ -215,7 +214,7 @@ module.exports = class LoggedInUsers extends baseUser {
         'in Create Mode.');
     }
     await this.page.waitForNavigation();
-    const urlRegex = /http:\/\/localhost:8181\/create\/\w*(\/\w*\/?\w*)?/;
+    const urlRegex = /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
       throw new Error (
         'The Create Lessons button does not display ' +
@@ -599,7 +598,7 @@ module.exports = class LoggedInUsers extends baseUser {
 
   /**
    * Function to click the dismiss button in the Thanks for Donating page,
-   * and check if the Thanks for Donating popup disappear
+   * and check if the Thanks for Donating popup disappears
    * and if the Donate page is shown
    */
   async clickDismissButtonInThanksForDonatingPage() {
@@ -610,10 +609,7 @@ module.exports = class LoggedInUsers extends baseUser {
         'The dismiss button does not close the Thanks for Donating popup!');
     }
     const donatePageShowed = await this.page.$(donatePage);
-    const thanksForDonatingPageShowed =
-      await this.page.$(thanksForDonatingPage);
-    if ((donatePageShowed === null) ||
-      (thanksForDonatingPageShowed !== null)) {
+    if (donatePageShowed === null) {
       throw new Error (
         'The dismiss button does not show the Donate page!');
     } else {

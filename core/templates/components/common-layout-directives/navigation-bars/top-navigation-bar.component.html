@@ -215,7 +215,7 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link e2e-test-navbar-about-menu-about-button"
+                 class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
                  href="/about"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                 <span class="link">
@@ -235,7 +235,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link e2e-test-navbar-about-menu-blog-button"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
                  [href]="getOppiaBlogUrl()"
                  [target]="'_self'"
                  (blur)="aboutDropdown.close()"
