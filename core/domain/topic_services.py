@@ -1088,26 +1088,24 @@ def compute_summary_of_topic(
     """
     canonical_story_count = 0
     additional_story_count = 0
-    published_node_count = 0
+    published_canonical_story_ids = []
     for reference in topic.canonical_story_references:
         if reference.story_is_published:
             canonical_story_count += 1
-            story_summary = story_fetchers.get_story_summary_by_id(
-                reference.story_id)
-            published_node_count += len(story_summary.node_titles)
+            published_canonical_story_ids.append(reference.story_id)
+
+    published_additional_story_ids = []
     for reference in topic.additional_story_references:
         if reference.story_is_published:
             additional_story_count += 1
+            published_additional_story_ids.append(reference.story_id)
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
-    topic_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    published_story_ids = [
-        story_ref.story_id for story_ref in topic.canonical_story_references +
-            topic.additional_story_references
-        if story_ref.story_is_published]
+    published_story_ids = (
+        published_canonical_story_ids + published_additional_story_ids)
     stories = story_fetchers.get_stories_by_ids(
         published_story_ids, strict=False)
     topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {}
@@ -1121,6 +1119,17 @@ def compute_summary_of_topic(
                 feature_flag_list.FeatureNames
                 .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
             else story.story_contents.get_all_linked_exp_ids())
+
+    topic_model_published_node_count = sum(map(
+        lambda story: (
+            story.story_contents.get_published_node_count()
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
+            else len(story.story_contents.nodes)),
+        filter(
+            lambda story: story.id in published_canonical_story_ids,
+            stories)))
 
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
