@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,24 @@
 
 /**
  * @fileoverview Backend Api Service for the rating functionality
- * in the learner view.
+ * for the new learner view.
  */
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ExplorationEngineService } from './exploration-engine.service';
+import { ExplorationEngineService } from '../../services/exploration-engine.service';
 
-interface LearnerViewRatingBackendResponse {
+interface NewLearnerViewRatingBackendResponse {
   'user_rating': number;
+  'overall_ratings': {
+    [key: string]: number;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class LearnerViewRatingBackendApiService {
+export class NewLearnerViewRatingBackendApiService {
   explorationId: string;
   ratingsUrl: string;
 
@@ -40,16 +43,8 @@ export class LearnerViewRatingBackendApiService {
     this.ratingsUrl = '/explorehandler/rating/' + this.explorationId;
   }
 
-  async getUserRatingAsync(): Promise<LearnerViewRatingBackendResponse> {
-    return this.httpClient.get<LearnerViewRatingBackendResponse>(
+  async getUserRatingAsync(): Promise<NewLearnerViewRatingBackendResponse> {
+    return this.httpClient.get<NewLearnerViewRatingBackendResponse>(
       this.ratingsUrl).toPromise();
-  }
-
-  async submitUserRatingAsync(ratingValue: number):
-  Promise<LearnerViewRatingBackendResponse> {
-    return this.httpClient.put<LearnerViewRatingBackendResponse>(
-      this.ratingsUrl, {
-        user_rating: ratingValue
-      }).toPromise();
   }
 }

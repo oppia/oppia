@@ -27,7 +27,7 @@ import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-on
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
+import { NewLearnerViewRatingBackendApiService } from '../new-lesson-player-services/new-learner-view-rating-backend-api.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -54,7 +54,7 @@ export class PlayerSidebarComponent implements OnInit {
     private urlService: UrlService,
     private ratingComputationService: RatingComputationService,
     private learnerViewRatingBackendApiService:
-    LearnerViewRatingBackendApiService,
+    NewLearnerViewRatingBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -114,10 +114,15 @@ export class PlayerSidebarComponent implements OnInit {
     return null;
   }
 
+  // For generating stars in HTML.
   getRange(count: number): number[] {
     return new Array(count).fill(0).map((_, i) => i);
   }
 
+  /**
+   * Function to calculate path of each star's SVG so that they don't overlap
+   * and are correctly aligned.
+   */
   calculateStarPath(index: number, isFilled: boolean): string {
     const x = isFilled ? index * 24 : (this.fullStars + index) * 24;
     return `M${x + 6.5784} ${20.4616}L${x + 7.93714} ${14.5877}
