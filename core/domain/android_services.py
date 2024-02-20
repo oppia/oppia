@@ -24,6 +24,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -123,12 +124,11 @@ def initialize_android_test_data() -> str:
             topic_id_to_prerequisite_topic_ids = (
                 classroom.topic_id_to_prerequisite_topic_ids
             )
-            if topic.id in topic_id_to_prerequisite_topic_ids:
-                del topic_id_to_prerequisite_topic_ids[topic.id]
-                classroom.topic_id_to_prerequisite_topic_ids = (
-                    topic_id_to_prerequisite_topic_ids)
-                classroom_config_services.update_or_create_classroom_model(
-                    classroom)
+            del topic_id_to_prerequisite_topic_ids[topic.id]
+            classroom.topic_id_to_prerequisite_topic_ids = (
+                topic_id_to_prerequisite_topic_ids)
+            classroom_config_services.update_or_create_classroom_model(
+                classroom)
 
     # Generate new Structure id for topic, story, skill and question.
     topic_id = topic_fetchers.get_new_topic_id()
@@ -575,10 +575,11 @@ def initialize_android_test_data() -> str:
             )
 
     # Add the new topic to all available classrooms.
-    classrooms = classroom_config_services.get_all_classrooms()
-    for classroom in classrooms:
-        classroom.topic_id_to_prerequisite_topic_ids[topic_id] = []
-        classroom_config_services.update_or_create_classroom_model(classroom)
+    classroom_id = classroom_config_services.get_new_classroom_id()
+    classroom = classroom_config_domain.Classroom(
+        classroom_id, 'Math', 'math', '', '', {topic_id: []}
+    )
+    classroom_config_services.update_or_create_classroom_model(classroom)
     return topic_id
 
 

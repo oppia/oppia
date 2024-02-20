@@ -23,8 +23,6 @@ import os
 
 from core import feconf
 from core.domain import android_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import skill_fetchers
@@ -114,10 +112,6 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         old_topic = topic_fetchers.get_topic_by_name(
             'Android test', strict=True)
         old_topic_last_updated = old_topic.last_updated
-        classroom = classroom_config_domain.Classroom(
-            'math', 'Math', 'math', '', '', {old_topic.id: []}
-        )
-        classroom_config_services.update_or_create_classroom_model(classroom)
         android_services.initialize_android_test_data()
         self.assertTrue(
             topic_services.does_topic_with_name_exist('Android test'))
