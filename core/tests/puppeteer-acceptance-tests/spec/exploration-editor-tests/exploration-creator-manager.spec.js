@@ -39,41 +39,40 @@ describe('Exploration Creator and Exploration Manager', function() {
     guestUser3 = await userFactory.createNewGuestUser(
       'guestUsr3', 'guest_user3@example.com');
     explorationCreator = await userFactory.createExplorationCreator(
-    'explorationAdm');
-    superAdmin = await userFactory.createNewSuperAdmin('Leader'); 
+      'explorationAdm');
+    superAdmin = await userFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should perform exploration creation and basic actions',
-   async function() {
-    await superAdmin.assignRoleToUser(
-    'explorationAdm', 'voiceover admin');
+    async function() {
+      await superAdmin.assignRoleToUser(
+        'explorationAdm', 'voiceover admin');
 
-    await explorationCreator.createExploration();
-    await explorationCreator.goToBasicSettingsTab();
-    await explorationCreator.expectTitleToHaveMaxLength(36);
-    await explorationCreator.updateBasicSettings();
-    await explorationCreator.expectGoalToBeSet();
-    await explorationCreator.expectCategoryToBeSelected();
-    await explorationCreator.expectLanguageToBeSelected();
-    await explorationCreator.previewSummary();
-    await explorationCreator.expectPreviewSummaryToBeVisible();
-    await explorationCreator.updateAdvancedSettings();
-    await explorationCreator.expectAutomaticTextToSpeechToBeEnabledOrDisabled();
-    await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
-    await explorationCreator.assignUserToPlayTesterRole('guestUsr2');
-    await explorationCreator.makeExplorationPublic();
-    await explorationCreator.expectExplorationAccessibility();
-    await explorationCreator.voiceArtistAdded(); 
-    await explorationCreator.expectVoiceArtistToBeAdded();
-    await explorationCreator.selectVoiceArtist();
-    await explorationCreator.chooseToRecieveNotification();
-    await explorationCreator.expectFeedbackNotificationChoice();
-    await explorationCreator.deleteExploration();
-    await explorationCreator.expectExplorationToBeDeleted();
+      await explorationCreator.createExploration();
+      await explorationCreator.goToBasicSettingsTab();
+      await explorationCreator.expectTitleToHaveMaxLength(36);
+      await explorationCreator.updateBasicSettings();
+      await explorationCreator.expectGoalToBeSet();
+      await explorationCreator.expectCategoryToBeSelected();
+      await explorationCreator.expectLanguageToBeSelected();
+      await explorationCreator.previewSummary();
+      await explorationCreator.expectPreviewSummaryToBeVisible();
+      await explorationCreator.updateAdvancedSettings();
+      await explorationCreator.expectAutomaticTextToSpeechToBeEnabledOrDisabled();
+      await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
+      await explorationCreator.assignUserToPlayTesterRole('guestUsr2');
+      await explorationCreator.makeExplorationPublic();
+      await explorationCreator.expectExplorationAccessibility();
+      await explorationCreator.voiceArtistAdded();
+      await explorationCreator.expectVoiceArtistToBeAdded();
+      await explorationCreator.selectVoiceArtist();
+      await explorationCreator.chooseToRecieveNotification();
+      await explorationCreator.expectFeedbackNotificationChoice();
+      await explorationCreator.deleteExploration();
+      await explorationCreator.expectExplorationToBeDeleted();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  afterAll(async function () {
+  afterAll(async function() {
     await userFactory.closeAllBrowsers();
   });
 });
-

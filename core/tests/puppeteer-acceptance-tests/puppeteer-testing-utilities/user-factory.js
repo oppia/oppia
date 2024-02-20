@@ -125,7 +125,7 @@ let createExplorationCreator = async function(username) {
   const explorationCreator = new e2eExplorationCreator();
   await explorationCreator.openBrowser();
   await explorationCreator.signUpNewUser(
-  username, 'exploration_creator@example.com');
+    username, 'exploration_creator@example.com');
   activeUsers.push(explorationCreator);
   return explorationCreator;
 };
