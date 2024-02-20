@@ -22,30 +22,28 @@
 #
 # To install hook (which runs inside docker container), run this script
 # command from oppia root directory with --install argument
-# 
+#
 # Currently it only works for Unix systems, on windows it will create symlink but won't have any effect
 
 DEV_CONTAINER="dev-server"
 DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
 
-# Hook file paths, we need you use relative path as actual path won't be same in host and container
-PYTHON_PREPUSH_HOOK_PATH=".git/hooks/pre-push-python"
-PREPUSH_HOOK_PATH=".git/hooks/pre-push"
-
-# Get the oppia app directory
-OPPIA_DIR=$(pwd)
 
 # Location of git hooks directory
-HOOKS_DIR="$OPPIA_DIR/.git/hooks"
+HOOKS_DIR=".git/hooks"
 
 # Path for pre-push hook file
-PRE_PUSH_FILE="$HOOKS_DIR/pre-push"
-PYTHON_PRE_PUSH_FILE="$HOOKS_DIR/pre-push-python"
+PRE_PUSH_SYMLINK="$HOOKS_DIR/pre-push"
+PYTHON_PRE_PUSH_SYMLINK="$HOOKS_DIR/pre-push-python"
+
+# Path for pre-push hook file
+PRE_PUSH_FILE="docker/pre_push_hook.sh"
+PYTHON_PRE_PUSH_FILE="scripts/pre_push_hook.py"
 
 # Install pre-push hook
 install_hook() {
     # Create symlinks for pre-push hook files
-    for file in "$PRE_PUSH_FILE" "$PYTHON_PRE_PUSH_FILE"; do
+    for file in "$PRE_PUSH_SYMLINK" "$PYTHON_PRE_PUSH_SYMLINK"; do
         # Check if pre-push file is already a symlink
         if [ -h "$file" ] && [ -e "$file" ]; then
             echo "Symlink already exists (for $file)"
@@ -58,14 +56,13 @@ install_hook() {
             fi
 
             # Try creating a symlink
-            base_symlink="../../scripts"  # Symlinks needs to be relative as actual path won't be same on host and docker container
             if [ "$(basename $file)" == "pre-push" ]; then
-                ORIGINAL_FILE="$base_symlink/pre_push_hook.sh"  
+                ORIGINAL_FILE="../../$PRE_PUSH_FILE"
             else
-                ORIGINAL_FILE="$base_symlink/pre_push_hook.py"
+                ORIGINAL_FILE="../../$PYTHON_PRE_PUSH_FILE"
             fi
 
-                     ln -s "$ORIGINAL_FILE" "$file" &&
+            ln -s "$ORIGINAL_FILE" "$file" &&
                 echo "Created symlink in .git/hooks directory" ||
                 {
                     # Fallback to copy on windows
@@ -100,11 +97,11 @@ was_container_running_before_hook=$?
 
 if [ "$was_container_running_before_hook" != "0" ]; then
     # Start containers and run pre-push hook
-    make start-devserver  # We don't need to use run-offline as internet would be available when pushing commit
+    make start-devserver # We don't need to use run-offline as internet would be available when pushing commit
 fi
 
 # Run hook in container
-CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PREPUSH_HOOK_PATH $@"
+CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_PUSH_SYMLINK $@"
 echo "Running $CMD"
 
 $CMD
