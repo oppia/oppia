@@ -157,18 +157,6 @@ describe('PlayerSidebarComponent', () => {
     expect(component.blankStars).toBe(2);
   }));
 
-  it('should calculate star path', () => {
-    const path = component.calculateStarPath(0, true);
-    const expectedPath = 'M6.5784 20.4616L7.93714 14.5877 L8.00498 ' +
-      '14.2944L7.77753 14.0972L3.22 10.146 L9.24324 9.62313L9.543 ' +
-      '9.59708L9.66056 9.31965 L12 3.78436L14.3394 9.31965L14.4567 ' +
-      '9.59708L14.7568 9.62313L20.78 10.146L16.2225 14.0972 L15.995 ' +
-      '14.2944L16.063 14.5877 L17.4216 20.4616 L12.2583 17.3469L12 ' +
-      '17.1911L11.7417 17.3469 L6.5784 20.4616Z';
-
-    expect(path.replace(/\s/g, '')).toEqual(expectedPath.replace(/\s/g, ''));
-  });
-
   it('should check if hacky exp desc translation is displayed', () => {
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.

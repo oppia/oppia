@@ -33,20 +33,18 @@
                 [innerHTML]="'I18N_LIBRARY_N/A' | translate"
                 class="player-rating-text">
           </span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="24" viewBox="0 0 120 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <ng-container *ngFor="let i of getRange(fullStars)">
+          <div class="ratings-container">
+            <div *ngFor="let i of getRange(fullStars)" class="rating-star-block">
               <svg fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path [attr.d]="calculateStarPath(i, true)" fill="#C55F45" stroke="#C55F45">
-                </path>
+                <path d="M6.5784 20.4616L7.93714 14.5877L8.00498 14.2944L7.77753 14.0972L3.22002 10.146L9.24324 9.62313L9.5433 9.59708L9.66056 9.31965L12 3.78436L14.3394 9.31965L14.4567 9.59708L14.7568 9.62313L20.78 10.146L16.2225 14.0972L15.995 14.2944L16.0629 14.5877L17.4216 20.4616L12.2583 17.3469L12 17.1911L11.7417 17.3469L6.5784 20.4616Z" fill="#C55F45" stroke="#C55F45"/>
               </svg>
-            </ng-container>
-            <ng-container *ngFor="let i of getRange(blankStars)">
+            </div>
+            <div *ngFor="let i of getRange(blankStars)" class="rating-star-block">
               <svg fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path [attr.d]="calculateStarPath(i, false)" fill="none" stroke="#C55F45">
-                </path>
+                <path d="M6.5784 20.4616L7.93714 14.5877L8.00498 14.2944L7.77753 14.0972L3.22002 10.146L9.24324 9.62313L9.5433 9.59708L9.66056 9.31965L12 3.78436L14.3394 9.31965L14.4567 9.59708L14.7568 9.62313L20.78 10.146L16.2225 14.0972L15.995 14.2944L16.0629 14.5877L17.4216 20.4616L12.2583 17.3469L12 17.1911L11.7417 17.3469L6.5784 20.4616Z" fill="none" stroke="#C55F45"/>
               </svg>
-            </ng-container>
-          </svg>
+            </div>
+          </div>
         </span>
       </div>
     </div>

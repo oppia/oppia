@@ -161,6 +161,17 @@
   padding: 8px;
 }
 
+.rating-star-block {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+}
+
+.rating-star-block svg {
+  height: 24px;
+  width: 24px;
+}
+
 @media screen and (max-width: 574px) {
   .player-desktop-sidebar-menu {
     display: none;

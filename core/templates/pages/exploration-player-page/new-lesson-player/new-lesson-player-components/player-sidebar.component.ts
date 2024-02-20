@@ -133,22 +133,6 @@ export class PlayerSidebarComponent implements OnInit {
   getRange(count: number): number[] {
     return new Array(count).fill(0).map((_, i) => i);
   }
-
-  /**
-   * Function to calculate path of each star's SVG so that they don't overlap
-   * and are correctly aligned.
-   */
-  calculateStarPath(index: number, isFilled: boolean): string {
-    const x = isFilled ? index * 24 : (this.fullStars + index) * 24;
-    return `M${x + 6.5784} ${20.4616}L${x + 7.93714} ${14.5877}
-    L${x + 8.00498} ${14.2944}L${x + 7.77753} ${14.0972}L${x + 3.2200} ${10.146}
-    L${x + 9.24324} ${9.62313}L${x + 9.543} ${9.59708}L${x + 9.66056} ${9.31965}
-    L${x + 12} ${3.78436}L${x + 14.3394} ${9.31965}L${x + 14.4567} ${9.59708}
-    L${x + 14.7568} ${9.62313}L${x + 20.78} ${10.146}L${x + 16.2225} ${14.0972}
-    L${x + 15.995} ${14.2944}L${x + 16.063} ${14.5877}L${x + 17.4216} ${20.4616}
-    L${x + 12.2583} ${17.3469}L${x + 12} ${17.1911}L${x + 11.7417} ${17.3469}
-    L${x + 6.5784} ${20.4616}Z`;
-  }
 }
 
 angular.module('oppia').directive('oppiaPlayerHeader',
