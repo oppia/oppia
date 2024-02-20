@@ -426,7 +426,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
       const explorationLinks = Array.from(
         explorationContainer.querySelectorAll('a[href]'));
       return explorationLinks.some(link => link.getAttribute(
-      'href') === `/create/${explorationId}`);
+        'href') === `/create/${explorationId}`);
     }, explorationId);
     if (isExplorationPresent) {
       showMessage(
