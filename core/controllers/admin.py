@@ -174,10 +174,6 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    new_config_property_values: Optional[
-        Dict[str, AllowedAdminConfigPropertyValueTypes]
-    ]
-    config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
@@ -240,20 +236,6 @@ class AdminHandler(
             'num_dummy_exps_to_publish': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_value': None
-            },
-            'new_config_property_values': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        validation_method.validate_new_config_property_values)
-                },
-                'default_value': None
-            },
-            'config_property_id': {
-                'schema': {
-                    'type': 'basestring'
                 },
                 'default_value': None
             },
