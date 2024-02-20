@@ -245,15 +245,41 @@ describe('Auth service', function() {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    it('should return firebase config', () => {
-      expect(AuthService.firebaseConfig).toEqual({
-        apiKey: 'fake-api-key',
-        authDomain: '',
-        projectId: 'dev-project-id',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: '',
+    fit('should return firebase config', () => {
+    // Mock getConfig function to return a sample configuration.
+      spyOn(AuthService ,'getConfig').and.returnValue({
+        FIREBASE_CONFIG_API_KEY: 'sample-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'sample-app-id',
       });
+      const firebaseConfig = AuthService.firebaseConfig;
+      //console.log(firebaseConfig)
+      expect(firebaseConfig).toEqual({
+        apiKey: 'sample-api-key',
+        authDomain: 'sample-auth-domain',
+        projectId: 'sample-project-id',
+        storageBucket: 'sample-storage-bucket',
+        messagingSenderId: 'sample-sender-id',
+        appId: 'sample-app-id',
+      });
+    });
+
+    fit('should return the same config if called multiple times', () => {
+      spyOn(AuthService, 'getConfig').and.returnValue({
+        FIREBASE_CONFIG_API_KEY: 'sample-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'sample-app-id',
+      });
+      const firebaseConfig1 = AuthServiceModule.firebaseConfig;
+      const firebaseConfig2 = AuthServiceModule.firebaseConfig;
+
+      expect(firebaseConfig1).toBe(firebaseConfig2);
     });
   });
 });

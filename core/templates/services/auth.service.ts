@@ -27,23 +27,24 @@ import { md5 } from 'hash-wasm';
 import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
-var getConfig: () => FirebaseOptions = function() {
-  let config: string = '';
-  let request = new XMLHttpRequest();
-  try {
-    request.open('GET', '/firebase_config', false);
-    request.send(null);
+// export var getConfig: () => FirebaseOptions = function() {
+//   let config: string = '';
+//   let request = new XMLHttpRequest();
+//   console.log('Inside actual getConfig');
+//   try {
+//     request.open('GET', '/firebase_config', false);
+//     request.send(null);
 
-    if (request.status === 200) {
-      let jsonResponse = request.responseText.substr(
-        request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
-      config = jsonResponse;
-    }
-  } catch (e) {
-    console.error('Unable to fetch firebase config : ', e);
-  }
-  return JSON.parse(config);
-};
+//     if (request.status === 200) {
+//       let jsonResponse = request.responseText.substr(
+//         request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
+//       config = jsonResponse;
+//     }
+//   } catch (e) {
+//     console.error('Unable to fetch firebase config : ', e);
+//   }
+//   return JSON.parse(config);
+// };
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<
@@ -132,13 +133,30 @@ export class AuthService {
     }
   }
 
+  static getConfig: () => FirebaseOptions = function() {
+    let config: string = '';
+    let request = new XMLHttpRequest();
+    try {
+      request.open('GET', '/firebase_config', false);
+      request.send(null);
+      if (request.status === 200) {
+        let jsonResponse = request.responseText.substr(
+          request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
+        config = jsonResponse;
+      }
+    } catch (e) {
+      console.error('Unable to fetch firebase config : ', e);
+    }
+    return JSON.parse(config);
+  };
+
   static get firebaseEmulatorIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
   static get firebaseConfig(): FirebaseOptions {
     if (AuthService.firebaseConfigDict === undefined) {
-      var config = getConfig();
+      var config = AuthService.getConfig();
       AuthService.firebaseConfigDict = {
         apiKey: config.FIREBASE_CONFIG_API_KEY,
         authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
