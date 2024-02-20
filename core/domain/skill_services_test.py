@@ -481,6 +481,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.SKILL_ID2],
             subtopics=[], next_subtopic_id=1)
 
+        math_classroom = classroom_config_domain.Classroom(
+            classroom_config_services.get_new_classroom_id(),
+            'Math', 'math', '', '', {topic_id: []})
+        classroom_config_services.update_or_create_classroom_model(
+            math_classroom)
+
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, 'Assigned', None,
