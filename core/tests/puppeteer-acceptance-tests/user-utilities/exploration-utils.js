@@ -17,24 +17,24 @@
 
 const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
-const { text } = require('stream/consumers');
-
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
-const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
+const createNewExplorationButton = 
+'.e2e-test-create-new-exploration-button';
 const takeMeToEditorButton = '.e2e-test-dismiss-welcome-modal';
 const addCardName = '.e2e-test-state-name-text';
 const introSubmitButton = '.e2e-test-state-name-submit';
-const forButtonToBeEnabled = '.e2e-test-state-name-submit:not([disabled])';
+const forButtonToBeEnabled = 
+'.e2e-test-state-name-submit:not([disabled])';
 const introTitleSubmitButton = '.e2e-test-save-state-content';
 const interactionAddbutton = '.oppia-add-interaction-button';
-const endExplorationTab = 'img[src="/extensions/interactions/EndExploration/static/EndExploration.png"]';
+const endExplorationTab = 
+'img[src="/extensions/interactions/EndExploration/static/EndExploration.png"]';
 const saveInteractionButton = '.e2e-test-save-interaction';
-const basicSettingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
+const basicSettingsTab = 
+'.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = '.e2e-test-exploration-title-input';
 const addTitle = '.e2e-test-exploration-title-input';
 const addGoalBar = '.e2e-test-exploration-objective-input';
@@ -59,9 +59,11 @@ const deleteExplorationButton = '.oppia-delete-button';
 const saveDraftButton = '.oppia-save-draft-button'
 const publishButton = '.oppia-editor-publish-button';
 const discardDraftButton = '#mat-menu-panel-0'
-const deleteConfirmButton = '.e2e-test-really-delete-exploration-button';
+const deleteConfirmButton = 
+'.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
-const voiceArtistSaveButton = '.e2e-test-add-voice-artist-role-button';
+const voiceArtistSaveButton = 
+'.e2e-test-add-voice-artist-role-button';
 const publishConfirmButton = '.e2e-test-confirm-pre-publication';
 const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
@@ -70,24 +72,24 @@ const addVoiceArtistUserName = '#newVoicAartistUsername';
 let titleBeforeChanges = '';
 
 module.exports = class e2eExplorationCreator extends baseUser {
-
   /**
    * This function helps in making a new exploration.
    */
   async createExploration() {
-    await this.page.goto(creatorDashboardUrl); //working
-    await this.clickOn(createNewExplorationButton); //working
-    await this.clickOn(takeMeToEditorButton);//working
-    await this.clickOn(addCardName); //(sometimes)working
-    await this.type('.e2e-test-state-name-input', 'Test question'); //previous - input[name="title"]
+    await this.goto(creatorDashboardUrl);
+    await this.clickOn(createNewExplorationButton);
+    await this.clickOn(takeMeToEditorButton);
+    await this.clickOn(addCardName);
+    await this.type('.e2e-test-state-name-input', 'Test question');
+    //previous - input[name="title"]
     await this.page.waitForSelector(forButtonToBeEnabled);
-    await this.clickOn(introSubmitButton);//working
-    await this.clickOn('.e2e-test-edit-content-pencil-button');//(explicitly)working
-    await this.type('.e2e-test-rte', 'Exploration intro text'); //working
-    await this.clickOn(introTitleSubmitButton);//working
-    await this.clickOn(interactionAddbutton);//working
-    await this.clickOn(endExplorationTab);//working
-    await this.clickOn(saveInteractionButton);//working
+    await this.clickOn(introSubmitButton);
+    await this.clickOn('.e2e-test-edit-content-pencil-button');
+    await this.type('.e2e-test-rte', 'Exploration intro text');
+    await this.clickOn(introTitleSubmitButton);
+    await this.clickOn(interactionAddbutton);
+    await this.clickOn(endExplorationTab);
+    await this.clickOn(saveInteractionButton);
 
     showMessage('Successfully created a exploration!');
   }
@@ -103,34 +105,38 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in updating basic settings.
    */
   async updateBasicSettings() {
-    await this.clickOn(addTitleBar); //working
-    await this.page.type(addTitle, 'Your Title Here'); //working
-    await this.clickOn(addGoalBar);//working
-    await this.page.type(addGoal, 'Your Goal Here Please');//working
-    await this.clickOn(cateogryDropDawn);//working
-    // await this.page.waitForSelector('.e2e-test-exploration-category-selector-choice'); {i think its causing problem}
+    await this.clickOn(addTitleBar);
+    await this.type(addTitle, 'Your Title Here');
+    await this.clickOn(addGoalBar);
+    await this.type(addGoal, 'Your Goal Here Please');
+    await this.clickOn(cateogryDropDawn);
     await this.clickOn(addCateogry);
     await this.clickOn(languageUpdateBar);
     // await this.page.waitForSelector(addLanguage);
     await this.clickOn(addLanguage);
-
     await this.clickOn(addTags);
-    await this.page.type(addTags, 'Your Tag Here');
+    await this.type(addTags, 'Your Tag Here');
+
     showMessage('Successfully updated basic settings!');
   }
 
-  /**This function checks length of title bar at basic settings tab
+  /**
+   * This function checks length of title bar at basic settings tab
    * @param {Number} maxLength 
    */
   async expectTitleToHaveMaxLength(maxLength) {
-    const titleInput = await this.page.$('.e2e-test-exploration-title-input');
-    const title = await this.page.evaluate(input => input.value, titleInput);
+    const titleInput = await this.page.$(
+    '.e2e-test-exploration-title-input');
+    const title = await this.page.evaluate(input =>
+    input.value, titleInput);
     const titleLength = title.length;
 
     if (titleLength <= maxLength) {
-      showMessage(`Title length is within the allowed limit of ${maxLength} characters.`);
+      showMessage(`Title length is within the` +
+      ` allowed limit of ${maxLength} characters.`);
     } else {
-      throw new Error(`Title length exceeds the allowed limit of ${maxLength} characters.`);
+      throw new Error(`Title length exceeds the allowed` +
+      ` limit of ${maxLength} characters.`);
     }
   }
 
@@ -138,9 +144,10 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToBeSet() {
-    const goalInput = await this.page.$('.e2e-test-exploration-objective-input');
-    const goal = await this.page.evaluate(input => input.value, goalInput);
-
+    const goalInput = await this.page.$(
+    '.e2e-test-exploration-objective-input');
+    const goal = await this.page.evaluate(input => 
+    input.value, goalInput);
     if (goal.trim().length > 0) {
       showMessage('The goal has been set for the exploration.');
     } else {
@@ -156,7 +163,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await categoryDropdown.click();
 
     const selectedCategory = await this.page.evaluate(() => {
-      const selectedOption = document.querySelector('.e2e-test-exploration-category-selector-choice[aria-selected="true"]');
+      const selectedOption = document.querySelector(
+      '.e2e-test-exploration-category-selector-choice[aria-selected="true"]');
       if (selectedOption) {
         return selectedOption.innerText.trim();
       } else {
@@ -165,7 +173,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
     });
 
     if (selectedCategory !== null) {
-      showMessage(`The category "${selectedCategory}" has been selected for the exploration.`);
+      showMessage(`The category "${selectedCategory}"` + 
+      ` has been selected for the exploration.`);
     } else {
       throw new Error('No category has been selected for the exploration.');
     }
@@ -176,7 +185,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async expectLanguageToBeSelected() {
     const languageDropdown = await this.page.$("#mat-select-value-9");
-    const language = await this.page.evaluate(option => option.textContent, languageDropdown);
+    const language = await this.page.evaluate(option => 
+    option.textContent, languageDropdown);
     if (language) {
       showMessage(`Language ${language} is selected.`);
     } else {
@@ -184,7 +194,9 @@ module.exports = class e2eExplorationCreator extends baseUser {
     }
   }
 
-  // This function checks if tags are successfully added.
+  /**
+   * This function checks if tags are successfully added.
+   */
   async expectTagsToBeAdded() {
     const tags = await this.page.$$('#mat-chip-list-input-0');
     if (tags.length > 0) {
@@ -198,15 +210,19 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function allows you to preview the exploration.
    */
   async previewSummary() {
-    await this.page.waitForSelector('#clickToSeePreviewSummary:not([disabled])');
+    await this.page.waitForSelector(
+    '#clickToSeePreviewSummary:not([disabled])');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
   }
 
-  // This function verifies that the preview summary is visible.
+  /**
+   * This function verifies that the preview summary is visible.
+   */
   async expectPreviewSummaryToBeVisible() {
-    const previewSummary = await this.page.$('.e2e-test-open-preview-summary-modal');
+    const previewSummary = await this.page.$(
+    '.e2e-test-open-preview-summary-modal');
     if (previewSummary) {
       showMessage('Preview summary is visible.');
     } else {
@@ -219,13 +235,17 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async updateAdvancedSettings() {
     await this.clickOn(textToSpeechToggle);
+
     showMessage('Successfully updated advanced settings!');
   }
 
-  // This function checks whether the Automatic Text-to-Speech setting is enabled or disabled.
+  /**
+   * This function checks whether the Automatic Text-to-Speech setting is enabled or disabled.
+   */
   async expectAutomaticTextToSpeechToBeEnabledOrDisabled() {
     const autoTTSwitch = await this.page.$('#text-speech-switch');
-    const isAutoTTSwitchOn = await this.page.evaluate(switchElement => switchElement.checked, autoTTSwitch);
+    const isAutoTTSwitchOn = await this.page.evaluate(switchElement => 
+    switchElement.checked, autoTTSwitch);
     if (isAutoTTSwitchOn) {
       showMessage('Automatic Text-to-Speech is enabled.');
     } else {
@@ -234,13 +254,12 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   *  This function helps in assigning role of collaborator to any guest user.
+   * This function helps in assigning role of collaborator to any guest user.
    */
   async assignUserToCollaboratorRole() {
-    // querry what username should be added as its saying `sorry we couldn't find the specific user`
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.page.type(addUserName, 'guestUsr1');
+    await this.type(addUserName, 'guestUsr1');
     await this.clickOn(addRoleBar);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRole);
@@ -252,7 +271,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async assignUserToPlayTesterRole() {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.page.type(addUserName, 'guestUser2');
+    await this.type(addUserName, 'guestUser2');
     await this.clickOn(addRoleBar);
     await this.clickOn(playTesterRoleOption);
     await this.clickOn(saveRole);
@@ -265,13 +284,17 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.publishExploration();
   }
 
-  // Exception function to verify the setting of the exploration to Public/Private
+/**
+ * Exception function to verify the setting of the exploration to Public/Private
+ */
   async expectExplorationAccessibility() {
     const publishButton = await this.page.$('.e2e-test-publish-exploration');
     if (publishButton) {
-      showMessage(`Exploration is set to Private and is not accessible to Oppia users.`);
+      showMessage(`Exploration is set to Private and is not` + 
+      ` accessible to Oppia users.`);
     } else {
-      showMessage(`Exploration is set to Public and is accessible to Oppia users.`);
+      showMessage(`Exploration is set to Public and is accessible` + 
+      ` to Oppia users.`);
     }
   }
 
@@ -281,8 +304,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async voiceArtistAdded() {
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
-    await this.page.type(addVoiceArtistUserName, 'guestUsr3');
-
+    await this.type(addVoiceArtistUserName, 'guestUsr3');
     await this.clickOn(voiceArtistSaveButton);
   }
 
@@ -309,7 +331,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   // Exception function to verify the choice of receiving feedback and suggestion notifications via email
   async expectFeedbackNotificationChoice() {
-    const isChecked = await this.page.$eval('input[id="feedback-switch"]', input => input.checked);
+    const isChecked = await this.page.$eval('input[id="feedback-switch"]', input => 
+    input.checked);
     if (isChecked) {
       showMessage(`suggestions notifications via email are enabled.`);
     } else {
@@ -326,10 +349,10 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   * This function helps in verifying , if exploration is deleted successfully?
+   * This function helps in verifying , if exploration is 
+   * deleted successfully?
    */
   async expectExplorationToBeDeleted() {
-    // Check if the delete exploration button is present
     const deleteButton = await this.page.$('.oppia-delete-button');
     if (!deleteButton) {
       showMessage(`Exploration has been successfully deleted.`);
@@ -344,7 +367,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async saveDraftExploration() {
     await this.clickOn(saveDraftButton);
     await this.clickOn(commitMessage);
-    await this.page.type(commitMessage, 'Testing Testing');
+    await this.type(commitMessage, 'Testing Testing');
     await this.clickOn('.e2e-test-save-draft-button');
   }
 
@@ -352,7 +375,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks whether changes has been drafted or not.
    */
   async exceptExplorationToBeDrafted() {
-    const isDraftButtonDisabled = await this.page.$eval('#tutorialSaveButton', button => button.disabled);
+    const isDraftButtonDisabled = await this.page.$eval(
+    '#tutorialSaveButton', button => button.disabled);
     if (isDraftButtonDisabled) {
       showMessage('Changes have been successfully drafted.');
     } else {
@@ -389,14 +413,19 @@ module.exports = class e2eExplorationCreator extends baseUser {
     const explorationId = currentUrl.split('/create/')[1].split('#/')[0];
     await this.page.goto(creatorDashboardUrl);
     const isExplorationPresent = await page.evaluate((explorationId) => {
-      const explorationContainer = document.querySelector('.oppia-card-view-wrap');
-      const explorationLinks = Array.from(explorationContainer.querySelectorAll('a[href]'));
-      return explorationLinks.some(link => link.getAttribute('href') === `/create/${explorationId}`);
+      const explorationContainer = document.querySelector(
+      '.oppia-card-view-wrap');
+      const explorationLinks = Array.from(
+      explorationContainer.querySelectorAll('a[href]'));
+      return explorationLinks.some(link => link.getAttribute(
+      'href') === `/create/${explorationId}`);
     }, explorationId);
     if (isExplorationPresent) {
-      console.log(`Exploration with ID ${explorationId} is present on the creator dashboard.`);
+      console.log(`Exploration with ID ${explorationId}` + 
+      ` is present on the creator dashboard.`);
     } else {
-      throw new Error(`Exploration with ID ${explorationId} is not present on the creator dashboard.`);
+      throw new Error(`Exploration with ID ${explorationId}` + 
+      ` is not present on the creator dashboard.`);
     }
   }
 
@@ -404,10 +433,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in doing some changes in exploration.
    */
   async addSomeChanges() {
-    await this.clickOn(basicSettingsTab);//working
-    titleBeforeChanges = await this.page.$eval('.e2e-test-exploration-title-input', title => title.value);
-    await this.clickOn(addTitleBar); //working
-    await this.page.type(addTitle, 'Your Title Here please'); //working
+    await this.clickOn(basicSettingsTab);
+    titleBeforeChanges = await this.page.$eval(
+    '.e2e-test-exploration-title-input', title => title.value);
+    await this.clickOn(addTitleBar); 
+    await this.type(addTitle, 'Your Title Here please');
   }
 
   async discardCurrentChanges() {
@@ -419,7 +449,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
   * This function checks whether changes has discarded successfully or not
   */
   async expectChangesToBeDiscarded() {
-    const titleAfterChanges = await this.page.$eval('.e2e-test-exploration-title-input', title => title.value);
+    const titleAfterChanges = await this.page.$eval(
+  '.e2e-test-exploration-title-input', title => title.value);
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
     } else {

@@ -121,14 +121,11 @@ let createNewGuestUser = async function(username, email) {
  * @param {string} username - The username of the exploration creator.
  * @returns {e2eExplorationCreator} - The instance of the exploration creator.
  */
-// first step , create the explorationcreator
 let createExplorationCreator = async function(username) {
-  // if (superAdminInstance !== null) {
-  //   superAdminInstance = await createNewSuperAdmin('superAdm');
-  // }
-  const explorationCreator = new e2eExplorationCreator()
+  const explorationCreator = new e2eExplorationCreator();
   await explorationCreator.openBrowser();
-  await explorationCreator.signUpNewUser(username, 'exploration_creator@example.com');
+  await explorationCreator.signUpNewUser(
+  username, 'exploration_creator@example.com');
   activeUsers.push(explorationCreator);
   return explorationCreator;
 };

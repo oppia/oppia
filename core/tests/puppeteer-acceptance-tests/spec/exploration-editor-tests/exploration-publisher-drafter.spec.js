@@ -23,32 +23,29 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Publisher, Saver and Drafter',
-    function () {
-        let explorationCreator = null;
-        beforeAll(async function () {
-            explorationCreator = await userFactory.createExplorationCreator('explorationAdm');
-        }, DEFAULT_SPEC_TIMEOUT);
-        it('should perform exploration management actions',
-            async function () {
-                await explorationCreator.createExploration(); //working
-                await explorationCreator.goToBasicSettingsTab(); //working
-                await explorationCreator.updateBasicSettings(); //working
-                await explorationCreator.publishExploration(); //it contains drafting also (working, )
-                // await explorationCreator.expectInteractionOnCreatorDashboard();
+describe('Exploration Publisher, Saver and Drafter',function() {
+  let explorationCreator = null;
+  beforeAll(async function () {
+    explorationCreator = await userFactory.createExplorationCreator('explorationAdm');
+  }, DEFAULT_SPEC_TIMEOUT);
 
+  it('should perform exploration management actions',
+   async function () {
+    await explorationCreator.createExploration(); 
+    await explorationCreator.goToBasicSettingsTab(); 
+    await explorationCreator.updateBasicSettings(); 
+    await explorationCreator.publishExploration(); 
+    //It contains drafting also (working,)
+    //await explorationCreator.expectInteractionOnCreatorDashboard();
+    await explorationCreator.addSomeChanges(); //working
+    await explorationCreator.discardCurrentChanges();
+    await explorationCreator.expectChangesToBeDiscarded();
+    await explorationCreator.addSomeChanges();
+    await explorationCreator.saveDraftExploration();
+    await explorationCreator.exceptExplorationToBeDrafted();
+   }, DEFAULT_SPEC_TIMEOUT);
 
-                await explorationCreator.addSomeChanges(); //working
-                await explorationCreator.discardCurrentChanges();
-                await explorationCreator.expectChangesToBeDiscarded();
-
-                await explorationCreator.addSomeChanges();
-                await explorationCreator.saveDraftExploration();
-                await explorationCreator.exceptExplorationToBeDrafted();
-
-            }, DEFAULT_SPEC_TIMEOUT);
-
-        afterAll(async function () {
-            await userFactory.closeAllBrowsers();
-        });
-    });
+  afterAll(async function() {
+    await userFactory.closeAllBrowsers();
+  });
+});
