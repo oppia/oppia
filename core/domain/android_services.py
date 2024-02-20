@@ -575,11 +575,10 @@ def initialize_android_test_data() -> str:
             )
 
     # Add the new topic to all available classrooms.
-    classroom_id = classroom_config_services.get_new_classroom_id()
-    classroom = classroom_config_domain.Classroom(
-        classroom_id, 'Math', 'math', '', '', {topic_id: []}
-    )
-    classroom_config_services.update_or_create_classroom_model(classroom)
+    classrooms = classroom_config_services.get_all_classrooms()
+    for classroom in classrooms:
+        classroom.topic_id_to_prerequisite_topic_ids[topic_id] = []
+        classroom_config_services.update_or_create_classroom_model(classroom)
     return topic_id
 
 
