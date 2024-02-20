@@ -2,14 +2,14 @@
   <div class="oppia-response-header">
     <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
-      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
-      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
     </div>
     <div class="oppia-responses-mobile">
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()">
         Incorrect
       </div>
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isResponse && !isCurrentInteractionLinear()">
         Correct
       </div>
     </div>
