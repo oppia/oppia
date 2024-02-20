@@ -201,7 +201,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-create-topic-button', { visible: true });
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-create-new-topic-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type('.e2e-test-new-topic-name-field', name);
         await _this.type(
           '.e2e-test-new-topic-url-fragment-field', urlFragment);
@@ -213,7 +213,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
         await _this.clickOn('.e2e-test-photo-button');
         await _this.withinContainerAboveCurrentContent({
           containerSelector: 'edit-thumbnail-modal',
-          whenOpened: async (_this) => {
+          whenOpened: async(_this) => {
             await _this.uploadFile(thumbnail);
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
           }
@@ -221,7 +221,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
         await _this.clickOn('.e2e-test-confirm-topic-creation-button:enabled');
       },
-      afterClosing: async () => {}
+      afterClosing: async() => {}
     });
     await this.switchToPageOpenedByElementInteraction();
 
@@ -233,10 +233,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-save-topic-button');
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
-    // await this.page.waitForTimeout(1000);
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-topic-editor-save-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         _this.type('.e2e-test-commit-message-input', 'Init');
         _this.clickOn('.e2e-test-close-save-modal-button');
       }
@@ -254,12 +253,11 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-skills-list',
-      whenOpened: async (_this) => {    
-        // await _this.page.waitForTimeout(1000);
+      whenOpened: async(_this) => {
         await _this.clickOn('.e2e-test-assign-skill-to-topic-button');
         await _this.withinContainerAboveCurrentContent({
           containerSelector: 'oppia-assign-skill-to-topic-modal',
-          whenOpened: async (_this) => {
+          whenOpened: async(_this) => {
             await _this.clickOn('.e2e-test-topics-list-item');
             await _this.clickOn('.e2e-test-confirm-move-button');
           }
@@ -278,44 +276,38 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-add-subtopic-button', { visible: true });
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-create-new-subtopic-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-new-subtopic-title-field', subtopics[0].title);
         await _this.type(
-          '.e2e-test-new-subtopic-url-fragment-field', subtopics[0].urlFragment);
+          '.e2e-test-new-subtopic-url-fragment-field',
+          subtopics[0].urlFragment);
 
         await _this.clickOn('.e2e-test-show-schema-editor');
         await _this.withinContainerAboveCurrentContent({
           containerSelector: '.e2e-test-create-subtopic-page-content ' +
             '.e2e-test-rte',
-          whenOpened: async (_this) => {
-            // await _this.page.waitForTimeout(500);
+          whenOpened: async(_this) => {
             await _this.page.type(
               '.e2e-test-create-subtopic-page-content .e2e-test-rte',
               subtopics[0].description);
           },
-          afterClosing: async () => {}
+          afterClosing: async() => {}
         });
 
         await _this.clickOn(
           '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
-        // await _this.page.waitForTimeout(30000);
         await _this.withinContainerAboveCurrentContent({
           containerSelector: 'edit-thumbnail-modal',
-          whenOpened: async (_this) => {
+          whenOpened: async(_this) => {
             await _this.uploadFile(subtopics[0].thumbnail);
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
           }
         });
 
-        await _this.clickOn('.e2e-test-confirm-subtopic-creation-button:enabled');
-        /* await Promise.all([
-          _this.page.waitForNavigation({ waitUntil: 'load' }),
-          _this.clickOn(
-            '.e2e-test-confirm-subtopic-creation-button:enabled')
-        ]); */
-      },
-      // afterClosing: async () => {}
+        await _this.clickOn(
+          '.e2e-test-confirm-subtopic-creation-button:enabled');
+      }
     });
 
     await this.clickOn('.e2e-test-back-to-topic-editor', { visible: true });
@@ -323,23 +315,22 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-skill-item-edit-btn', { visible: true });
     await this.withinContainerAboveCurrentContent({
       containerSelector: '.e2e-test-options-for-uncategorized-skill',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.clickOn('.e2e-test-assign-skill-to-subtopic');
       }
     });
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-change-subtopic-assignment-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.clickOn('#mat-radio-2');
         await _this.clickOn('.e2e-test-skill-assign-subtopic-confirm');
       }
     });
 
-    // await this.page.waitForTimeout(1000);
     await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-topic-editor-save-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-commit-message-input', 'Create subtopic');
         await _this.clickOn('.e2e-test-close-save-modal-button');
@@ -347,7 +338,6 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
     await this.page.waitForSelector(
       '.e2e-test-save-topic-button:disabled');
-    // await this.page.waitForTimeout(1000);
 
     // Assign diagnostic test skills.
     // TODO (#19669): Once the issue is solved, remove this reload
@@ -360,11 +350,10 @@ module.exports = class e2eSuperAdmin extends baseUser {
       '.e2e-test-diagnostic-test-skill-selector',
       diagnosticTestSkills[0].description, { visible: true });
 
-    // await this.page.waitForTimeout(1000);
     await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-topic-editor-save-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-commit-message-input',
           'Select diagnostic test skills');
@@ -373,10 +362,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
     await this.page.waitForSelector(
       '.e2e-test-save-topic-button:disabled');
-    // await this.page.waitForTimeout(1000);
 
     if (isPublished) {
-      // Navigates to the Topics and Skills Dashboard
+      // Navigates to the Topics and Skills Dashboard.
       await Promise.all([
         this.page.waitForNavigation(),
         this.clickOn('.e2e-test-publish-topic-button')
@@ -421,16 +409,16 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-create-skill-button', { visible: true });
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'oppia-create-new-skill-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-new-skill-description-field', description);
         await _this.clickOn('.e2e-test-open-concept-card');
         await _this.type(
           '.e2e-test-concept-card-text .e2e-test-rte', reviewMaterial,
           { visible: true });
-        await _this.clickOn('.e2e-test-confirm-skill-creation-button:enabled'); 
+        await _this.clickOn('.e2e-test-confirm-skill-creation-button:enabled');
       },
-      afterClosing: async () => {}
+      afterClosing: async() => {}
     });
     await this.switchToPageOpenedByElementInteraction();
 
@@ -439,7 +427,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-add-misconception-modal-button', { visible: true });
       await this.withinContainerAboveCurrentContent({
         containerSelector: '.e2e-test-add-misconception-modal',
-        whenOpened: async (_this) => {
+        whenOpened: async(_this) => {
           await _this.type(
             '.e2e-test-misconception-name-field', misconception.name);
           await _this.type(
@@ -490,7 +478,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           `.e2e-test-add-explanation-button-${difficulty}`);
         await this.withinContainerAboveCurrentContent({
           containerSelector: '.e2e-test-rubric-explanation-text .e2e-test-rte',
-          whenOpened: async (_this, rteEditor) => {
+          whenOpened: async(_this, rteEditor) => {
             // Triple-click to highlight the text. Then, the first letter typed
             // will clear the previous text.
             await _this.page.click(rteEditor, { clickCount: 3 });
@@ -505,7 +493,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
     await this.withinContainerAboveCurrentContent({
       containerSelector: 'skill-editor-save-modal',
-      whenOpened: async (_this) => {
+      whenOpened: async(_this) => {
         await _this.type('.e2e-test-commit-message-input', 'test');
         await _this.clickOn('.e2e-test-close-save-modal-button');
       }
@@ -523,23 +511,23 @@ module.exports = class e2eSuperAdmin extends baseUser {
       await this.clickOn('.e2e-test-create-question-button');
       await this.withinContainerAboveCurrentContent({
         containerSelector: '.e2e-test-create-question-progress',
-        whenOpened: async (_this) => {
+        whenOpened: async(_this) => {
           await _this.clickOn('.e2e-test-skill-difficulty-medium');
 
           await _this.clickOn('.e2e-test-edit-content');
           await _this.withinContainerAboveCurrentContent({
             containerSelector: '.e2e-test-state-content-editor .e2e-test-rte',
-            whenOpened: async (_this, questionTextEditor) => {
+            whenOpened: async(_this, questionTextEditor) => {
               await _this.page.type(
                 questionTextEditor, 'Question created by Skill Owner');
-              await _this.clickOn('.e2e-test-save-state-content'); 
+              await _this.clickOn('.e2e-test-save-state-content');
             }
           });
 
           await _this.clickOn('.e2e-test-open-add-interaction-modal');
           await _this.withinContainerAboveCurrentContent({
             containerSelector: 'oppia-customize-interaction',
-            whenOpened: async (_this) => {
+            whenOpened: async(_this) => {
               await _this.clickOn(
                 '.e2e-test-interaction-tile-TextInput button');
               await _this.clickOn('.e2e-test-save-interaction');
@@ -547,7 +535,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           });
           await _this.withinContainerAboveCurrentContent({
             containerSelector: 'oppia-add-answer-group-modal-component',
-            whenOpened: async (_this) => {
+            whenOpened: async(_this) => {
               await _this.clickOn('.e2e-test-add-list-entry');
               await _this.type(
                 '.e2e-test-schema-based-list-editor-table-data input', 't',
@@ -570,7 +558,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           await _this.withinContainerAboveCurrentContent({
             containerSelector: '.e2e-test-response-body-default ' +
               '.e2e-test-rte',
-            whenOpened: async (_this, responseEditor) => {
+            whenOpened: async(_this, responseEditor) => {
               _this.page.type(responseEditor, 'Incorrect!');
               _this.clickOn('.e2e-test-save-outcome-feedback');
             }
@@ -578,8 +566,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
           await _this.clickOn('.e2e-test-misconception-0-0-options');
           await _this.withinContainerAboveCurrentContent({
-            containerSelector: '.e2e-test-mark-non-applicable-misconception-0-0',
-            whenOpened: async (_this, misconceptionOptions) => {
+            containerSelector:
+              '.e2e-test-mark-non-applicable-misconception-0-0',
+            whenOpened: async(_this, misconceptionOptions) => {
               _this.page.click(misconceptionOptions);
             }
           });
@@ -587,8 +576,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
           await _this.clickOn('.e2e-test-oppia-add-hint-button');
           await _this.withinContainerAboveCurrentContent({
             containerSelector: 'oppia-add-hint-modal',
-            whenOpened: async (_this) => {
-              await _this.type('.e2e-test-hint-text .e2e-test-rte', 'hint text');
+            whenOpened: async(_this) => {
+              await _this.type(
+                '.e2e-test-hint-text .e2e-test-rte', 'hint text');
               await _this.clickOn('.e2e-test-save-hint');
             }
           });
@@ -596,7 +586,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
           await _this.clickOn('.e2e-test-oppia-add-solution-button');
           await _this.withinContainerAboveCurrentContent({
             containerSelector: 'oppia-add-or-update-solution-modal',
-            whenOpened: async (_this) => {
+            whenOpened: async(_this) => {
               await _this.type(
                 'oppia-add-or-update-solution-modal .e2e-test-description-box',
                 't');

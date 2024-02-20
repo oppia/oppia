@@ -216,12 +216,12 @@ module.exports = class baseUser {
 
   async withinContainerAboveCurrentContent({
     containerSelector,
-    beforeOpened = async (_this, container) => {
+    beforeOpened = async(_this, container) => {
       await _this.page.waitForSelector(
         container, { visible: true });
     },
     whenOpened,
-    afterClosing = async (_this, container) => {
+    afterClosing = async(_this, container) => {
       await _this.page.waitForSelector(
         container, { hidden: true });
     }
