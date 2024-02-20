@@ -8,6 +8,6 @@
   background-color: #fff;
   bottom: 0;
   height: 40px;
-  position: fixed;
+  position: absolute;
   width: 100%;
 }

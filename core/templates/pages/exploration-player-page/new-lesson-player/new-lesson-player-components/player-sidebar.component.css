@@ -5,6 +5,7 @@
 */
 
 .oppia-lesson-player-sidebar {
+  display: flex;
   height: 100%;
 }
 
