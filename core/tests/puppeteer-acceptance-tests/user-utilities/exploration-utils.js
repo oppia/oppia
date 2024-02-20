@@ -174,7 +174,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
     if (selectedCategory !== null) {
       showMessage(
-        `The category ${selectedCategory}` + 
+        `The category ${selectedCategory}` +
         ' has been selected for the exploration.');
     } else {
       throw new Error('No category has been selected for the exploration.');
@@ -273,7 +273,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async assignUserToPlayTesterRole() {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.type(addUserName, 'guestUser2');
+    await this.type(addUserName, 'guestUsr2');
     await this.clickOn(addRoleBar);
     await this.clickOn(playTesterRoleOption);
     await this.clickOn(saveRole);
@@ -287,17 +287,18 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   * Exception function to verify the setting of the exploration to Public/Private
+   *Exception function to verify the setting
+   *of the exploration to Public/Private
    */
   async expectExplorationAccessibility() {
     const publishButton = await this.page.$('.e2e-test-publish-exploration');
     if (publishButton) {
       showMessage(
-        'Exploration is set to Private and is not' + 
+        'Exploration is set to Private and is not' +
         ' accessible to Oppia users.');
     } else {
       showMessage(
-      'Exploration is set to Public and is accessible to Oppia users.');
+        'Exploration is set to Public and is accessible to Oppia users.');
     }
   }
 
@@ -412,7 +413,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-  * This function checks whether the exploration is published successfully or not.
+  *This function checks whether the exploration
+  *is published successfully or not.
   */
   async expectInteractionOnCreatorDashboard() {
     const currentUrl = await this.page.url();
@@ -420,19 +422,20 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.page.goto(creatorDashboardUrl);
     const isExplorationPresent = await page.evaluate((explorationId) => {
       const explorationContainer = document.querySelector(
-      '.oppia-card-view-wrap');
+        '.oppia-card-view-wrap');
       const explorationLinks = Array.from(
-      explorationContainer.querySelectorAll('a[href]'));
+        explorationContainer.querySelectorAll('a[href]'));
       return explorationLinks.some(link => link.getAttribute(
       'href') === `/create/${explorationId}`);
     }, explorationId);
     if (isExplorationPresent) {
-      console.log(
-        `Exploration with ID ${explorationId}` + 
+      showMessage(
+        `Exploration with ID ${explorationId}` +
         ' is present on the creator dashboard.');
     } else {
-      throw new Error(`Exploration with ID ${explorationId}` + 
-      ' is not present on the creator dashboard.');
+      throw new Error(
+        `Exploration with ID ${explorationId}` +
+        ' is not present on the creator dashboard.');
     }
   }
 

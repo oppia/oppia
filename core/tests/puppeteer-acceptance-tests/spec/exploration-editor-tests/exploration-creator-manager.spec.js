@@ -26,17 +26,17 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Creator and Exploration Manager', function() {
   let explorationCreator = null;
-  let guestUser1 = null;
-  let guestUser2 = null;
-  let guestUser3 = null;
+  let _guestUser1 = null;
+  let _guestUser2 = null;
+  let _guestUser3 = null;
   let superAdmin = null;
 
   beforeAll(async function() {
-    guestUser1 = await userFactory.createNewGuestUser(
+    _guestUser1 = await userFactory.createNewGuestUser(
       'guestUsr1', 'guest_user1@example.com');
-    guestUser2 = await userFactory.createNewGuestUser(
+    _guestUser2 = await userFactory.createNewGuestUser(
       'guestUsr2', 'guest_user2@example.com');
-    guestUser3 = await userFactory.createNewGuestUser(
+    _guestUser3 = await userFactory.createNewGuestUser(
       'guestUsr3', 'guest_user3@example.com');
     explorationCreator = await userFactory.createExplorationCreator(
       'explorationAdm');
@@ -58,7 +58,8 @@ describe('Exploration Creator and Exploration Manager', function() {
       await explorationCreator.previewSummary();
       await explorationCreator.expectPreviewSummaryToBeVisible();
       await explorationCreator.updateAdvancedSettings();
-      await explorationCreator.expectAutomaticTextToSpeechToBeEnabledOrDisabled();
+      await explorationCreator.
+      expectAutomaticTextToSpeechToBeEnabledOrDisabled();
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
       await explorationCreator.assignUserToPlayTesterRole('guestUsr2');
       await explorationCreator.makeExplorationPublic();

@@ -25,18 +25,17 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationCreator = null;
-  beforeAll(async function () {
+  beforeAll(async function() {
     explorationCreator = await userFactory.createExplorationCreator(
       'explorationAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should perform exploration management actions',
-    async function () {
+    async function() {
       await explorationCreator.createExploration();
       await explorationCreator.goToBasicSettingsTab();
       await explorationCreator.updateBasicSettings();
       await explorationCreator.publishExploration();
-      //It contains drafting also (working,)
       await explorationCreator.expectInteractionOnCreatorDashboard();
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
@@ -44,7 +43,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
       await explorationCreator.exceptExplorationToBeDrafted();
-  }, DEFAULT_SPEC_TIMEOUT);
+    }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
     await userFactory.closeAllBrowsers();
