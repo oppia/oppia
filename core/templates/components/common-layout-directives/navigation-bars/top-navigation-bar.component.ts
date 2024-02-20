@@ -23,10 +23,10 @@ import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { DebouncerService } from 'services/debouncer.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import debounce from 'lodash/debounce';
 import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SearchService } from 'services/search.service';
@@ -128,7 +128,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
-    'create', 'explore', 'collection', 'collection_editor',
+    'create', 'explore', 'lesson', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
 
@@ -159,7 +159,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     FeedbackUpdatesBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
-    private debouncerService: DebouncerService,
     private navigationService: NavigationService,
     private siteAnalyticsService: SiteAnalyticsService,
     private userService: UserService,
@@ -297,7 +296,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
         this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
-        this.debouncerService.debounce(this.truncateNavbar, 500);
+        debounce(this.truncateNavbar, 500);
       })
     );
 

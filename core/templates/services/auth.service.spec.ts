@@ -245,9 +245,9 @@ describe('Auth service', function() {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    fit('should return firebase config', () => {
+    it('should return firebase config', () => {
     // Mock getConfig function to return a sample configuration.
-      spyOn(AuthService ,'getConfig').and.returnValue({
+      spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
         FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
@@ -256,7 +256,6 @@ describe('Auth service', function() {
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
       });
       const firebaseConfig = AuthService.firebaseConfig;
-      //console.log(firebaseConfig)
       expect(firebaseConfig).toEqual({
         apiKey: 'sample-api-key',
         authDomain: 'sample-auth-domain',
@@ -267,7 +266,7 @@ describe('Auth service', function() {
       });
     });
 
-    fit('should return the same config if called multiple times', () => {
+    it('should return the same config if called multiple times', () => {
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
@@ -276,8 +275,8 @@ describe('Auth service', function() {
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
       });
-      const firebaseConfig1 = AuthServiceModule.firebaseConfig;
-      const firebaseConfig2 = AuthServiceModule.firebaseConfig;
+      const firebaseConfig1 = AuthService.firebaseConfig;
+      const firebaseConfig2 = AuthService.firebaseConfig;
 
       expect(firebaseConfig1).toBe(firebaseConfig2);
     });

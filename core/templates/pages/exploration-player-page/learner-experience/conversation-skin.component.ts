@@ -45,7 +45,6 @@ import { LearnerParamsService } from '../services/learner-params.service';
 import { LoaderService } from 'services/loader.service';
 import { MessengerService } from 'services/messenger.service';
 import { NumberAttemptsService } from '../services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from '../services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { QuestionPlayerEngineService } from '../services/question-player-engine.service';
@@ -212,8 +211,6 @@ export class ConversationSkinComponent {
     private messengerService: MessengerService,
     private localStorageService: LocalStorageService,
     private numberAttemptsService: NumberAttemptsService,
-    private playerCorrectnessFeedbackEnabledService:
-    PlayerCorrectnessFeedbackEnabledService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
@@ -567,15 +564,9 @@ export class ConversationSkinComponent {
       alwaysAskLearnerForAnswerInfo);
   }
 
-  // This variable is used only when viewport is narrow.
-  // Indicates whether the tutor card is displayed.
-  isCorrectnessFeedbackEnabled(): boolean {
-    return this.playerCorrectnessFeedbackEnabledService.isEnabled();
-  }
-
   isCorrectnessFooterEnabled(): boolean {
     return (
-      this.answerIsCorrect && this.isCorrectnessFeedbackEnabled() &&
+      this.answerIsCorrect &&
       this.playerPositionService.hasLearnerJustSubmittedAnAnswer());
   }
 
@@ -598,8 +589,7 @@ export class ConversationSkinComponent {
       return false;
     }
     return (
-      this.pendingCardWasSeenBefore && !this.answerIsCorrect &&
-      this.isCorrectnessFeedbackEnabled());
+      this.pendingCardWasSeenBefore && !this.answerIsCorrect);
   }
 
   private _getRandomSuffix(): string {
@@ -1332,139 +1322,158 @@ export class ConversationSkinComponent {
           });
 
           if (remainOnCurrentCard) {
-            // Stay on the same card.
-            this.numberOfIncorrectSubmissions++;
-            this.hintsAndSolutionManagerService.recordWrongAnswer();
-            this.conceptCardManagerService.recordWrongAnswer();
-            this.playerTranscriptService.addNewResponse(feedbackHtml);
-            let helpCardAvailable = false;
-            if (feedbackHtml &&
-                !this.displayedCard.isInteractionInline()) {
-              helpCardAvailable = true;
-            }
-
-            if (helpCardAvailable) {
-              this.playerPositionService.onHelpCardAvailable.emit({
-                helpCardHtml: feedbackHtml,
-                hasContinueButton: false
-              });
-            }
-            if (missingPrerequisiteSkillId) {
-              this.displayedCard.markAsCompleted();
-              this.conceptCardBackendApiService.loadConceptCardsAsync(
-                [missingPrerequisiteSkillId]
-              ).then((conceptCardObject) => {
-                this.conceptCard = conceptCardObject[0];
-                if (helpCardAvailable) {
-                  this.playerPositionService.onHelpCardAvailable.emit({
-                    helpCardHtml: feedbackHtml,
-                    hasContinueButton: true
-                  });
-                }
-              });
-            }
-            if (refreshInteraction) {
-              // Replace the previous interaction with another of the
-              // same type.
-              this._nextFocusLabel = (
-                this.focusManagerService.generateFocusLabel());
-              this.playerTranscriptService.updateLatestInteractionHtml(
-                this.displayedCard.getInteractionHtml() +
-                this._getRandomSuffix());
-            }
-
-            this.redirectToRefresherExplorationConfirmed = false;
-
-            if (refresherExplorationId) {
-              // TODO(bhenning): Add tests to verify the event is
-              // properly recorded.
-              let confirmRedirection = () => {
-                this.redirectToRefresherExplorationConfirmed = true;
-                this._recordLeaveForRefresherExp(refresherExplorationId);
-              };
-              this.explorationSummaryBackendApiService
-                .loadPublicExplorationSummariesAsync([refresherExplorationId])
-                .then((response) => {
-                  if (response.summaries.length > 0) {
-                    this.refresherExplorationConfirmationModalService.
-                      displayRedirectConfirmationModal(
-                        refresherExplorationId, confirmRedirection);
-                  }
-                });
-            }
-            this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-            this.scrollToBottom();
+            this.giveFeedbackAndStayOnCurrentCard(
+              feedbackHtml,
+              missingPrerequisiteSkillId,
+              refreshInteraction,
+              refresherExplorationId);
           } else {
-            // There is a new card. If there is no feedback, move on
-            // immediately. Otherwise, give the learner a chance to read
-            // the feedback, and display a 'Continue' button.
-            this.pendingCardWasSeenBefore = false;
-            this.displayedCard.markAsCompleted();
-            if (isFinalQuestion) {
-              if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-                // We will redirect to the results page here.
-                this.questionSessionCompleted = true;
-              }
-              this.moveToExploration = true;
-              if (feedbackHtml) {
-                this.playerTranscriptService.addNewResponse(feedbackHtml);
-                if (
-                  !this.displayedCard.isInteractionInline()) {
-                  this.playerPositionService.onHelpCardAvailable.emit({
-                    helpCardHtml: feedbackHtml,
-                    hasContinueButton: true
-                  });
-                }
-              } else {
-                this.showUpcomingCard();
-              }
-              this.answerIsBeingProcessed = false;
-              return;
-            }
-            this.fatigueDetectionService.reset();
-            this.numberAttemptsService.reset();
-
-            let _isNextInteractionInline =
-              this.nextCard.isInteractionInline();
-            this.upcomingInlineInteractionHtml = (
-              _isNextInteractionInline ?
-                this.nextCard.getInteractionHtml() : '');
-            this.upcomingInteractionInstructions = (
-              this.nextCard.getInteractionInstructions());
-
-            if (feedbackHtml) {
-              if (
-                this.playerTranscriptService.hasEncounteredStateBefore(
-                  nextCard.getStateName())) {
-                this.pendingCardWasSeenBefore = true;
-              }
-              this.playerTranscriptService.addNewResponse(feedbackHtml);
-              if (!this.displayedCard.isInteractionInline()) {
-                this.playerPositionService.onHelpCardAvailable.emit({
-                  helpCardHtml: feedbackHtml,
-                  hasContinueButton: true
-                });
-              }
-              this.playerPositionService.onNewCardAvailable.emit();
-              this._nextFocusLabel = (
-                ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
-              this.focusManagerService.setFocusIfOnDesktop(
-                this._nextFocusLabel);
-              this.scrollToBottom();
-            } else {
-              this.playerTranscriptService.addNewResponse(feedbackHtml);
-              // If there is no feedback, it immediately moves on
-              // to next card. Therefore this.answerIsCorrect needs
-              // to be set to false before it proceeds to next card.
-              this.answerIsCorrect = false;
-              this.showPendingCard();
-            }
-            this.currentInteractionService.clearPresubmitHooks();
+            this.moveToNewCard(feedbackHtml, isFinalQuestion, nextCard);
           }
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
       }
     );
+  }
+
+  private giveFeedbackAndStayOnCurrentCard(
+      feedbackHtml: string | null,
+      missingPrerequisiteSkillId: string | null,
+      refreshInteraction: boolean,
+      refresherExplorationId: string | null
+  ) {
+    this.numberOfIncorrectSubmissions++;
+    this.hintsAndSolutionManagerService.recordWrongAnswer();
+    this.conceptCardManagerService.recordWrongAnswer();
+    this.playerTranscriptService.addNewResponse(feedbackHtml);
+    let helpCardAvailable = false;
+    if (feedbackHtml &&
+        !this.displayedCard.isInteractionInline()) {
+      helpCardAvailable = true;
+    }
+
+    if (helpCardAvailable) {
+      this.playerPositionService.onHelpCardAvailable.emit({
+        helpCardHtml: feedbackHtml,
+        hasContinueButton: false
+      });
+    }
+    if (missingPrerequisiteSkillId) {
+      this.displayedCard.markAsCompleted();
+      this.conceptCardBackendApiService.loadConceptCardsAsync(
+        [missingPrerequisiteSkillId]
+      ).then((conceptCardObject) => {
+        this.conceptCard = conceptCardObject[0];
+        if (helpCardAvailable) {
+          this.playerPositionService.onHelpCardAvailable.emit({
+            helpCardHtml: feedbackHtml,
+            hasContinueButton: true
+          });
+        }
+      });
+    }
+    if (refreshInteraction) {
+      // Replace the previous interaction with another of the
+      // same type.
+      this._nextFocusLabel = (
+        this.focusManagerService.generateFocusLabel());
+      this.playerTranscriptService.updateLatestInteractionHtml(
+        this.displayedCard.getInteractionHtml() +
+        this._getRandomSuffix());
+    }
+
+    this.redirectToRefresherExplorationConfirmed = false;
+
+    if (refresherExplorationId) {
+      // TODO(bhenning): Add tests to verify the event is
+      // properly recorded.
+      let confirmRedirection = () => {
+        this.redirectToRefresherExplorationConfirmed = true;
+        this._recordLeaveForRefresherExp(refresherExplorationId);
+      };
+      this.explorationSummaryBackendApiService
+        .loadPublicExplorationSummariesAsync([refresherExplorationId])
+        .then((response) => {
+          if (response.summaries.length > 0) {
+            this.refresherExplorationConfirmationModalService.
+              displayRedirectConfirmationModal(
+                refresherExplorationId, confirmRedirection);
+          }
+        });
+    }
+    this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+    this.scrollToBottom();
+  }
+
+  private moveToNewCard(
+      feedbackHtml: string | null,
+      isFinalQuestion: boolean,
+      nextCard: StateCard) {
+    // There is a new card. If there is no feedback, move on
+    // immediately. Otherwise, give the learner a chance to read
+    // the feedback, and display a 'Continue' button.
+    this.pendingCardWasSeenBefore = false;
+    this.displayedCard.markAsCompleted();
+    if (isFinalQuestion) {
+      if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+        // We will redirect to the results page here.
+        this.questionSessionCompleted = true;
+      }
+      this.moveToExploration = true;
+      if (feedbackHtml) {
+        this.playerTranscriptService.addNewResponse(feedbackHtml);
+        if (
+          !this.displayedCard.isInteractionInline()) {
+          this.playerPositionService.onHelpCardAvailable.emit({
+            helpCardHtml: feedbackHtml,
+            hasContinueButton: true
+          });
+        }
+      } else {
+        this.showUpcomingCard();
+      }
+      this.answerIsBeingProcessed = false;
+      return;
+    }
+    this.fatigueDetectionService.reset();
+    this.numberAttemptsService.reset();
+
+    let _isNextInteractionInline =
+      this.nextCard.isInteractionInline();
+    this.upcomingInlineInteractionHtml = (
+      _isNextInteractionInline ?
+        this.nextCard.getInteractionHtml() : '');
+    this.upcomingInteractionInstructions = (
+      this.nextCard.getInteractionInstructions());
+
+    if (feedbackHtml) {
+      if (
+        this.playerTranscriptService.hasEncounteredStateBefore(
+          nextCard.getStateName())) {
+        this.pendingCardWasSeenBefore = true;
+      }
+      this.playerTranscriptService.addNewResponse(feedbackHtml);
+      if (!this.displayedCard.isInteractionInline()) {
+        this.playerPositionService.onHelpCardAvailable.emit({
+          helpCardHtml: feedbackHtml,
+          hasContinueButton: true
+        });
+      }
+      this.playerPositionService.onNewCardAvailable.emit();
+      this._nextFocusLabel = (
+        ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+      this.focusManagerService.setFocusIfOnDesktop(
+        this._nextFocusLabel);
+      this.scrollToBottom();
+    } else {
+      this.playerTranscriptService.addNewResponse(feedbackHtml);
+      // If there is no feedback, it immediately moves on
+      // to next card. Therefore this.answerIsCorrect needs
+      // to be set to false before it proceeds to next card.
+      this.answerIsCorrect = false;
+      this.showPendingCard();
+    }
+    this.currentInteractionService.clearPresubmitHooks();
   }
 
   showPendingCard(): void {

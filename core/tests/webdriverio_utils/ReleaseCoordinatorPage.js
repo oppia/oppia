@@ -23,21 +23,17 @@ var waitFor = require('./waitFor.js');
 
 var ReleaseCoordinatorPage = function() {
   var RELEASE_COORDINATOR_URL_SUFFIX = '/release-coordinator';
-  var addConditionButtonLocator = '.e2e-test-add-condition-button';
-  var addFeatureRuleButtonLocator = '.e2e-test-feature-add-rule-button';
   var featureFlagElementsSelector = function() {
     return $$('.e2e-test-feature-flag');
   };
   var featureFlagElement = $('.e2e-test-feature-flag');
   var featureNameLocator = '.e2e-test-feature-name';
   var featuresTab = $('.e2e-test-features-tab');
-  var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
-  var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var saveButtonLocator = '.e2e-test-save-button';
-  var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
-  var removeFilterConditionLocator = '.e2e-test-remove-condition';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
+  var featureFlagRolloutPercentage = (
+    '.e2e-test-rollout-percentage');
 
   this.get = async function() {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);
@@ -79,16 +75,6 @@ var ReleaseCoordinatorPage = function() {
     }
 
     return null;
-  };
-
-  this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.$(noRuleIndicatorLocator).isExisting()) {
-      await action.click(
-        'Remove feature rule button',
-        featureElement
-          .$(removeRuleButtonLocator)
-      );
-    }
   };
 
   // Remove this method after the end_chapter_celebration feature flag
@@ -156,71 +142,54 @@ var ReleaseCoordinatorPage = function() {
   };
 
   // This function is meant to be used to enable a feature gated behind
-  // a feature flag in test mode, which is the server environment the E2E
-  // tests are run in.
-  this.enableFeatureForTest = async function(featureElement) {
-    await action.click(
-      'Add feature rule button',
-      featureElement.$(addFeatureRuleButtonLocator)
-    );
-
+  // a feature flag.
+  this.enableFeature = async function(featureElement) {
     await waitFor.visibilityOf(
       featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
-      'Enabled');
-
-    await action.click(
-      'Add condition button',
-      featureElement
-        .$(addConditionButtonLocator)
+      'Enabling force-enable property takes too long to appear'
     );
 
-    await waitFor.visibilityOf(
-      featureElement.$(serverModeSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(serverModeSelectorLocator)).selectByVisibleText(
-      'test');
-
+    await (featureElement.$(valueSelectorLocator)).selectByVisibleText('Yes');
     await this.saveChangeOfFeature(featureElement);
   };
 
-  // This function is meant to be used to enable a feature gated behind
-  // a feature flag in prod mode, which is the server environment the E2E
-  // tests are run in.
-  this.enableFeature = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
-
-    await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
-    );
+  this.disableFeatureFlag = async function(featureFlagElement) {
     await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
+      featureFlagElement.$(valueSelectorLocator),
+      'Disabling force-enable property takes too long to appear'
     );
 
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
-      'Enabled');
-    await action.click(
-      'Add condition button',
-      featureElement
-        .$(addConditionButtonLocator)
-    );
+    await (
+      featureFlagElement.$(valueSelectorLocator)).selectByVisibleText('No');
+    await this.saveChangeOfFeature(featureFlagElement);
+  };
+
+  this.setRolloutPercentageForFeatureFlag = async function(
+      featureFlagElement, rolloutPercentage) {
     await waitFor.visibilityOf(
-      featureElement.$(serverModeSelectorLocator),
-      'Value Selector takes too long to appear'
+      featureFlagElement.$(featureFlagRolloutPercentage),
+      'Setting rollout-percentage property takes too long to appear'
     );
+    await action.setValue(
+      'rolloutPercentage',
+      featureFlagElement.$(featureFlagRolloutPercentage).$(
+        '.e2e-test-editor-int'),
+      rolloutPercentage);
+    await this.saveChangeOfFeature(featureFlagElement);
+  };
 
-    await action.click(
-      'Remove filter condition',
-      featureElement.$(removeFilterConditionLocator)
+  this.expectRolloutPercentageToMatch = async function(
+      featureFlagElement, rolloutPercentage) {
+    await waitFor.visibilityOf(
+      featureFlagElement.$(featureFlagRolloutPercentage),
+      'Rollout-percentage property takes too long to appear'
     );
-
-    await this.saveChangeOfFeature(featureElement);
+    var value = await action.getValue(
+      'rolloutPercentage',
+      featureFlagElement.$(featureFlagRolloutPercentage).$(
+        '.e2e-test-editor-int')
+    );
+    expect(value).toBe(rolloutPercentage);
   };
 
   this.saveChangeOfFeature = async function(featureElement) {

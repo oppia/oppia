@@ -23,8 +23,8 @@ import logging
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.controllers import base
@@ -33,8 +33,8 @@ from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_config_services
 from core.domain import email_manager
+from core.domain import feature_flag_services
 from core.domain import feedback_services
-from core.domain import platform_feature_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1243,8 +1243,9 @@ def can_access_contributor_dashboard_admin_page(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        new_dashboard_enabled = platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+        new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
+            self.user_id,
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
 
         if new_dashboard_enabled and (
             role_services
@@ -3778,6 +3779,53 @@ def can_access_classroom_admin_page(
             'You do not have credentials to access classroom admin page.')
 
     return test_can_access_classroom_admin_page
+
+
+def can_access_voiceover_admin_page(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access vocieover admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the voiceover admin page.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_voiceover_admin_page(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user is logged in and can access voiceover admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the voiceover admin page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+            role_services.ACTION_ACCESS_VOICEOVER_ADMIN_PAGE in
+            self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access voiceover admin page.')
+
+    return test_can_access_voiceover_admin_page
 
 
 def can_change_topic_publication_status(
