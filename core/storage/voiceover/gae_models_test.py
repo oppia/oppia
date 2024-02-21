@@ -167,8 +167,6 @@ class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             model_cls.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
-<<<<<<< HEAD
-=======
 
 
 class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
@@ -325,4 +323,3 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             voice_artist_metadata_model.voiceovers_and_contents_mapping,
             retrieved_model.voiceovers_and_contents_mapping
         )
->>>>>>> upstream/develop

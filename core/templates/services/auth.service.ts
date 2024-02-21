@@ -27,25 +27,6 @@ import { md5 } from 'hash-wasm';
 import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
-// export var getConfig: () => FirebaseOptions = function() {
-//   let config: string = '';
-//   let request = new XMLHttpRequest();
-//   console.log('Inside actual getConfig');
-//   try {
-//     request.open('GET', '/firebase_config', false);
-//     request.send(null);
-
-//     if (request.status === 200) {
-//       let jsonResponse = request.responseText.substr(
-//         request.responseText.indexOf(')]}\'') + 4); // Extract the JSON part.
-//       config = jsonResponse;
-//     }
-//   } catch (e) {
-//     console.error('Unable to fetch firebase config : ', e);
-//   }
-//   return JSON.parse(config);
-// };
-
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<
     firebase.auth.UserCredential | null

@@ -41,10 +41,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
 import { ContributionsAndReview } from './contributions-and-review/contributions-and-review.component';
 import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
 import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
-<<<<<<< HEAD
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-=======
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
 import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
@@ -52,7 +48,6 @@ import { BadgeComponent } from './badge/badge.component';
 import { ContributorDashboardPageRootComponent } from './contributor-dashboard-page-root.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RteHelperService } from 'services/rte-helper.service';
->>>>>>> upstream/develop
 
 @NgModule({
   imports: [
@@ -62,9 +57,6 @@ import { RteHelperService } from 'services/rte-helper.service';
     SharedFormsModule,
     OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig),
-<<<<<<< HEAD
-    MatSnackBarModule,
-=======
     RouterModule.forChild([
       {
         path: '',
@@ -72,7 +64,6 @@ import { RteHelperService } from 'services/rte-helper.service';
       }
     ]),
     MatSnackBarModule
->>>>>>> upstream/develop
   ],
   declarations: [
     CertificateDownloadModalComponent,
