@@ -77,13 +77,13 @@
       <div class="col-lg-8 d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
-        <button class="btn">
-          <a href="/about"
-             target="_blank"
-             rel="noopener">
-            {{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}
-          </a>
-        </button>
+        <span class="about-foundation-page-button-area">
+          <oppia-primary-button
+              buttonHref="/about"
+              customClasses="about-foundation-page-button"
+              buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}">
+          </oppia-primary-button>
+        </span>
       </div>
       <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
         <picture>
@@ -119,13 +119,13 @@
       <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
-        <button class="btn">
-          <a href="/volunteer"
-             target="_blank"
-             rel="noopener">
-            {{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}
-          </a>
-        </button>
+        <span class="about-foundation-page-button-area">
+          <oppia-primary-button
+              buttonHref="/volunteer"
+              customClasses="about-foundation-page-button"
+              buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}">
+          </oppia-primary-button>
+        </span>
       </div>
     </div>
   </div>
@@ -218,16 +218,14 @@
     text-decoration: underline;
   }
 
-  .about-foundation-page button {
-    background-color: #00645c;
-    border-radius: 4px;
-    height: 40px;
+  .about-foundation-page-button-area {
     margin: 30px auto;
   }
 
-  .about-foundation-page button:hover,
-  .about-foundation-page button:focus {
-    background-color: #3d9991;
+  :host {
+    .about-foundation-page-button {
+      height: 40px;
+    }
   }
 
   .oppia-about-foundation-cta h1 {

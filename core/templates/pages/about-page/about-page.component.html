@@ -12,15 +12,16 @@
       <p class="oppia-about-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
         <oppia-primary-button
+          buttonHref="/learn/math"
           (onClickPrimaryButton)="onClickVisitClassroomButton()"
-          [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+          [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
           buttonText="{{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}">
         </oppia-primary-button>
       </div>
       <div class="oppia-about-button-container">
         <oppia-primary-button
-          (onClickPrimaryButton)="onClickAccessAndroidButton()"
-          [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+          buttonHref="/android"
+          [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
           buttonText="{{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}">
         </oppia-primary-button>
       </div>
@@ -71,8 +72,9 @@
         <p class="oppia-about-learn-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
           <oppia-primary-button
+                  buttonHref="/learn/math"
                   (onClickPrimaryButton)="onClickVisitClassroomButton()"
-                  [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
                   buttonText="{{ 'I18N_ACTION_VISIT_CLASSROOM' | translate }}">
           </oppia-primary-button>
         </div>
@@ -94,8 +96,9 @@
         <p class="oppia-about-explore-lesson-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
           <oppia-primary-button
+                  buttonHref="/community-library"
                   (onClickPrimaryButton)="onClickBrowseLibraryButton()"
-                  [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
                   buttonText="{{ 'I18N_ACTION_BROWSE_LIBRARY' | translate }}">
           </oppia-primary-button>
         </div>
@@ -117,8 +120,9 @@
         <p class="oppia-about-outcome-content oppia-about-section-content" [innerHTML]="'I18N_ABOUT_PAGE_CREATE_LESSON_CONTENT' | translate"></p>
         <div class="oppia-about-classroom-button-container">
           <oppia-primary-button
+                  buttonHref="/creator-dashboard?mode=create"
                   (onClickPrimaryButton)="onClickCreateLessonButton()"
-                  [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+                  [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
                   buttonText="{{ 'I18N_ACTION_CREATE_LESSON_BUTTON' | translate }}">
           </oppia-primary-button>
         </div>
@@ -129,8 +133,9 @@
     <h2 class="oppia-get-started-title oppia-about-section-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
     <div class="oppia-about-classroom-button-container-one">
       <oppia-primary-button
+              buttonHref="/learn/math"
               (onClickPrimaryButton)="onClickVisitClassroomButton()"
-              [customClasses]="['btn', 'oppia-about-button', 'oppia-about-button-browse']"
+              [customClasses]="['oppia-about-button', 'oppia-about-button-browse']"
               buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate}} ">
       </oppia-primary-button>
     </div>

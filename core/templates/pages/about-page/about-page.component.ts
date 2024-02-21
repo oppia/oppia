@@ -19,13 +19,9 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { WindowRef } from
-  'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './about-page.component.css';
 
@@ -53,9 +49,7 @@ export class AboutPageComponent {
   }];
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
   ) {}
 
@@ -63,28 +57,16 @@ export class AboutPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickAccessAndroidButton(): void {
-    this.windowRef.nativeWindow.location.href = '/android';
-  }
-
   onClickVisitClassroomButton(): void {
-    let classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
-      });
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = classroomUrl;
   }
 
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/community-library';
   }
 
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
-    this.windowRef.nativeWindow.location.href = (
-      '/creator-dashboard?mode=create');
   }
 }
 angular.module('oppia').directive(
