@@ -50,6 +50,29 @@ class FilterByIds(beam.DoFn):
             yield model
 
 
+class Testing(beam.DoFn):
+    total_models = 0
+    processed_models = 0
+
+    @staticmethod
+    def convert_to_models(model_dict):
+        vocie_artist_models = []
+        for voice_artist_id, metadata_mapping in model_dict.items():
+            vocie_artist_model = (
+                voiceover_services.create_voice_artist_metadata_model_instance(
+                    voice_artist_id, metadata_mapping))
+            vocie_artist_models.append(vocie_artist_model)
+        return vocie_artist_models
+
+    def process(self, model_dict, commmit_models):
+        self.processed_models += 1
+        self.total_models = len(commmit_models)
+        if self.processed_models == self.total_models:
+            models = self.convert_to_models(model_dict)
+            for model in models:
+                yield model
+
+
 class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
     """Jobs used for fetching and saving voice artist names from curated
     exploration models.
@@ -357,7 +380,7 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
 
         self.voice_artist_metadata_mapping = {}
 
-        unused_model = (
+        voice_artist_metadata_models = (
             exp_commit_log_models
             | 'Update models' >> beam.Map(
                 lambda model: (
@@ -366,15 +389,25 @@ class GetVoiceArtistNamesFromExplorationsJob(base_jobs.JobBase):
                         model, self.voice_artist_metadata_mapping)
                 )
             )
+            | 'Getting models' >> beam.ParDo(
+                Testing(),
+                commmit_models=beam.pvalue.AsList(exp_commit_log_models)
+            )
         )
 
-        unused_model_result = (
-            unused_model
+        unused_voice_artist_metadata_put_results = (
+            voice_artist_metadata_models
+            | 'Put TranslationSubmitterTotalContributionStatsModel models'
+                >> ndb_io.PutModels()
+        )
+
+        voice_artist_metadata_models_result = (
+            voice_artist_metadata_models
             | 'Getting result' >> beam.Map(self.temp)
         )
 
         voice_artist_metadata_job_result = (
-            unused_model_result
+            voice_artist_metadata_models_result
             | job_result_transforms.ResultsToJobRunResults(
                 'VOICE ARTIST METADATA MODELS ARE CREATED')
         )

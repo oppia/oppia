@@ -227,3 +227,14 @@ def update_voice_artist_metadata(
             voiceovers_and_contents_mapping)
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
+
+def create_voice_artist_metadata_model_instance(
+    voice_artist_id: str,
+    voiceovers_and_contents_mapping: (
+        voiceover_models.VoiceoversAndContentsMappingType)
+) -> voiceover_models.VoiceArtistMetadataModel:
+    model = voiceover_models.VoiceArtistMetadataModel(
+        id=voice_artist_id,
+        voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+    model.update_timestamps()
+    return model

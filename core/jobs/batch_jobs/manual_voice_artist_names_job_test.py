@@ -455,5 +455,5 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
         self._create_curated_explorations()
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 2')
+                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 3')
         ])
