@@ -90,6 +90,10 @@ describe('PlayerSidebarComponent', () => {
     newLearnerViewRatingBackendApiService = TestBed.inject(
       NewLearnerViewRatingBackendApiService);
     contextService = TestBed.inject(ContextService);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
+    urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(PlayerSidebarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -100,6 +104,7 @@ describe('PlayerSidebarComponent', () => {
     let explorationTitle = 'Exploration Title';
     let explorationObjective = 'Exploration Objective';
 
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve({
@@ -115,6 +120,7 @@ describe('PlayerSidebarComponent', () => {
     tick();
     tick();
 
+    expect(urlService.getPathname).toHaveBeenCalled();
     expect(urlService.getExplorationVersionFromUrl).toHaveBeenCalled();
     expect(urlService.getPidFromUrl).toHaveBeenCalled();
     expect(contextService.getExplorationId).toHaveBeenCalled();
@@ -152,7 +158,7 @@ describe('PlayerSidebarComponent', () => {
     tick();
     expect(userRatingSpy).toHaveBeenCalled();
     expect(component.ratings).toEqual({ 1: 1, 2: 2, 3: 3, 4: 4, 5: 0 });
-    expect(component.avgRating).toBe(2);
+    expect(component.avgRating).toBe(3);
     expect(component.fullStars).toBe(3);
     expect(component.blankStars).toBe(2);
   }));
