@@ -203,7 +203,10 @@ export class ContributionOpportunitiesBackendApiService {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (topicName) {
+    if (
+      topicName &&
+      topicName !== ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
+    ) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
