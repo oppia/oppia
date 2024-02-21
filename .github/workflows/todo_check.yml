@@ -69,6 +69,8 @@ jobs:
         
       - name: Extract issues from pull request
         id: extract_issues_from_pull_request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr view ${{ github.event.pull_request.number }} --json body --jq '.body' > $(pwd)/pr_body.txt
           python -m scripts.extract_issues_from_pull_request --repository_path=$(pwd) --pull_request_file=pr_body.txt
