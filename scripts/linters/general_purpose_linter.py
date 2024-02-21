@@ -145,11 +145,11 @@ BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^A-Z]+[^\w]*$'),
         'message': 'Please link TODO comments to an issue '
                    'in the format TODO(#issuenum): XXX. ',
-        'excluded_files': (),
-        'excluded_dirs': (
+        'excluded_files': (
             'todo_finder.py', 'todo_finder_test.py',
             'check_for_open_todos_test.py',
-            'check_for_duplicate_todo_comment_test.py')
+            'check_for_duplicate_todo_comment_test.py'),
+        'excluded_dirs': ()
     }
 ]
 
