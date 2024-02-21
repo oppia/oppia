@@ -191,7 +191,7 @@ jobs:
           max_attempts: 2
           substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
           command: >
-            VIDEO_RECORDING_IS_ENABLED=0;
+            VIDEO_RECORDING_IS_ENABLED=1;
             xvfb-run -a --server-args="-screen 0, 1285x1000x24"
             python -m scripts.run_e2e_tests --skip-install
             --skip-build --suite=${{ matrix.suite.name }} --prod_env
