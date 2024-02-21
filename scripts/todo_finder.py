@@ -164,7 +164,7 @@ def get_correctly_formated_todos(todos: List[TodoDict]) -> List[TodoDict]:
         todos: List[TodoDict]. The todos to check.
 
     Returns:
-        List[TodoDict]. The correctly formated todos. 
+        List[TodoDict]. The correctly formated todos.
     """
     return [todo for todo in todos if
                 CORRECT_TODO_REGEX.search(todo['line_content'])]

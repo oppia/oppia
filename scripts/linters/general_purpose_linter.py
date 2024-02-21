@@ -146,9 +146,12 @@ BAD_PATTERNS_REGEXP: List[BadPatternRegexpDict] = [
         'message': 'Please link TODO comments to an issue '
                    'in the format TODO(#issuenum): XXX. ',
         'excluded_files': (
-            'todo_finder.py', 'todo_finder_test.py',
-            'check_for_open_todos_test.py',
-            'check_for_duplicate_todo_comment_test.py'),
+            'todo_finder.py',
+            'todo_finder_test.py',
+            'check_for_duplicate_todo_comment.py',
+            'check_for_duplicate_todo_comment_test.py',
+            'check_for_open_todos.py',
+            'check_for_open_todos_test.py'),
         'excluded_dirs': ()
     }
 ]

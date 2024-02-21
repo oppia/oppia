@@ -22,6 +22,11 @@ from scripts import todo_finder
 
 from typing import List, Optional
 
+OPEN_TODOS_PRESENT_INDICATOR = (
+    'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.')
+OPEN_TODOS_NOT_PRESENT_INDICATOR = (
+    'THERE ARE NO TODOS ASSOCIATED WITH THE PROVIDED ISSUES.')
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Checks if there are any todos associated with the provided issues.
@@ -131,8 +136,8 @@ def main(args: Optional[List[str]] = None) -> None:
                 github_perma_link_url,
                 issue_number)
     if todos_found:
-        raise Exception('There are todos associated with the provided issues.')
-    print('There are no todos associated with the provided issues.', end='')
+        raise Exception(OPEN_TODOS_PRESENT_INDICATOR)
+    print(OPEN_TODOS_NOT_PRESENT_INDICATOR, end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

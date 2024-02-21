@@ -26,11 +26,6 @@ from core.tests import test_utils
 
 from . import check_for_open_todos
 
-OPEN_TODOS_PRESENT_INDICATOR = (
-    'There are todos associated with the provided issues.')
-OPEN_TODOS_NOT_PRESENT_INDICATOR = (
-    'There are no todos associated with the provided issues.')
-
 
 class CheckForOpenTodosTests(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_open_todos script."""
@@ -94,7 +89,10 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         shutil.rmtree('dummy_dir')
 
     def test_get_open_todos_by_existing_issue_number(self) -> None:
-        with self.assertRaisesRegex(Exception, OPEN_TODOS_PRESENT_INDICATOR):
+        with self.assertRaisesRegex(
+            Exception,
+            check_for_open_todos.OPEN_TODOS_PRESENT_INDICATOR
+        ):
             check_for_open_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue_number=4151',
@@ -126,10 +124,14 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
                 '--issue_number=4157',
                 '--commit_sha=abcdefg'])
         self.assertEqual(
-            mock_stdout.getvalue(), OPEN_TODOS_NOT_PRESENT_INDICATOR)
+            mock_stdout.getvalue(),
+            check_for_open_todos.NO_OPEN_TODOS_INDICATOR)
 
     def test_get_open_todos_by_existing_issue_file(self) -> None:
-        with self.assertRaisesRegex(Exception, OPEN_TODOS_PRESENT_INDICATOR):
+        with self.assertRaisesRegex(
+            Exception,
+            check_for_open_todos.OPEN_TODOS_PRESENT_INDICATOR
+        ):
             check_for_open_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue_file=issue_list.txt',

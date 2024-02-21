@@ -30,11 +30,6 @@ DUMMY_SHA_ONE = '51ab6a0341cfb86d95a387438fc993b5eb977b83'
 DUMMY_SHA_TWO = '74cd6a0341cfb86d95a387438fc993b5eb977b83'
 GITHUB_PERMA_LINK_URL = 'https://github.com/oppia/oppia/blob'
 
-NO_DUPLICATE_TODO_COMMENT_INDICATOR = (
-    'New todo comment should be posted.')
-DUPLICATE_TODO_COMMENT_INDICATOR = (
-    'The latest comment is the same as the new todo comment.')
-
 
 class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_duplicate_todo_comment script."""
@@ -116,7 +111,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     def test_check_for_duplicate_todo_comment_with_no_duplicate(self) -> None:
         with self.assertRaisesRegex(
             Exception,
-            NO_DUPLICATE_TODO_COMMENT_INDICATOR
+            check_for_duplicate_todo_comment.NO_DUPLICATE_TODO_COMMENT_INDICATOR
         ):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
@@ -129,7 +124,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            NO_DUPLICATE_TODO_COMMENT_INDICATOR
+            check_for_duplicate_todo_comment.NO_DUPLICATE_TODO_COMMENT_INDICATOR
         ):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
@@ -149,4 +144,5 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
                 '--new_comment_file=todo_list_three.txt'
             ])
         self.assertEqual(
-            mock_stdout.getvalue(), DUPLICATE_TODO_COMMENT_INDICATOR)
+            mock_stdout.getvalue(),
+            check_for_duplicate_todo_comment.DUPLICATE_TODO_COMMENT_INDICATOR)

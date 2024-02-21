@@ -22,6 +22,11 @@ from typing import List, Optional
 
 COMMIT_SHA_HASH_LENGTH = 40
 
+DUPLICATE_TODO_COMMENT_INDICATOR = (
+    'NEW TODO COMMENT SHOULD BE POSTED')
+NO_DUPLICATE_TODO_COMMENT_INDICATOR = (
+    'THE LATEST COMMENT IS THE SAME AS THE NEW TODO COMMENT')
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Checks if the new todo comment is a duplicate of the latest comment.
@@ -67,16 +72,17 @@ def main(args: Optional[List[str]] = None) -> None:
         len(latest_comment_lines) != len(new_comment_lines) or
         latest_comment_lines[0] != new_comment_lines[0]
     ):
-        raise Exception('New todo comment should be posted.')
+        raise Exception(DUPLICATE_TODO_COMMENT_INDICATOR)
 
     for index in range(1, len(latest_comment_lines)):
         latest_comment_line_content = (
             latest_comment_lines[index][compare_start_index:])
-        new_comment_line_content = new_comment_lines[index][compare_start_index:]
+        new_comment_line_content = (
+            new_comment_lines[index][compare_start_index:])
         if latest_comment_line_content != new_comment_line_content:
-            raise Exception('New todo comment should be posted.')
+            raise Exception(DUPLICATE_TODO_COMMENT_INDICATOR)
 
-    print('The latest comment is the same as the new todo comment.', end='')
+    print(NO_DUPLICATE_TODO_COMMENT_INDICATOR, end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
