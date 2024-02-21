@@ -22,16 +22,16 @@ import collections
 import itertools
 import logging
 
-from core import feconf
 from core import feature_flag_list
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
+from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import feature_flag_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import state_domain
@@ -1811,9 +1811,31 @@ def get_all_published_story_exploration_ids(
         list(str). A list of all exploration ids linked to the topic(s)'
         published stories' chapters.
     """
-    topic_summaries = (
+    fetched_topic_summaries = (
         [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
         else topic_fetchers.get_all_topic_summaries())
+
+    # Keep all topic summaries with a mapping. For those without a mapping,
+    # record their ids, fetch their corresponding topics with them, and then
+    # use the topic to compute their summary. Add each new topic summary to
+    # the list of summaries that initially had a mapping.
+    topic_summaries_with_persisted_mapping = []
+    ids_of_summaries_without_persisted_mapping = []
+    for summary in fetched_topic_summaries:
+        if summary.published_story_exploration_mapping is None:
+            ids_of_summaries_without_persisted_mapping.append(summary.id)
+        else:
+            topic_summaries_with_persisted_mapping.append(summary)
+    topic_summaries_with_recently_computed_mapping = []
+    if len(ids_of_summaries_without_persisted_mapping) > 0:
+        topics = topic_fetchers.get_topics_by_ids(
+            ids_of_summaries_without_persisted_mapping)
+        for topic in topics:
+            topic_summaries_with_recently_computed_mapping.append(
+                compute_summary_of_topic(topic))
+    topic_summaries = (
+        topic_summaries_with_persisted_mapping +
+        topic_summaries_with_recently_computed_mapping)
 
     exp_ids = itertools.chain.from_iterable(
         itertools.chain.from_iterable(

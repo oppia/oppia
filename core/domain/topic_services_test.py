@@ -25,8 +25,8 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import exp_services
-from core.domain import fs_services
 from core.domain import feature_flag_services
+from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -2869,16 +2869,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, topic_exp_ids)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
-
         with self.swap_to_always_return(
                 feature_flag_services, 'is_feature_flag_enabled', False):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    self.TOPIC_ID))
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids(
+                self.TOPIC_ID))
 
-            self.assertItemsEqual(story_exp_ids, topic_exp_ids)
+        self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
     def test_get_published_story_exploration_ids_from_published_chapters_when_serial_chapter_feature_enabled( # pylint: disable=line-too-long
         self
@@ -2888,17 +2887,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self._publish_story_chapters_with_explorations(
             self.TOPIC_ID, self.story_id_1, topic_exp_ids,
             chapter_exp_ids=topic_published_chapters_exp_ids)
-
         with self.swap_to_always_return(
                 feature_flag_services, 'is_feature_flag_enabled', True):
             topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    self.TOPIC_ID))
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids(
+                self.TOPIC_ID))
 
-            self.assertItemsEqual(
-                story_exp_ids, topic_published_chapters_exp_ids)
+        self.assertItemsEqual(
+            story_exp_ids, topic_published_chapters_exp_ids)
 
     def test_get_published_story_exploration_ids_in_all_topics_when_topic_id_not_given( # pylint: disable=line-too-long
         self
@@ -2938,6 +2936,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_services.get_all_published_story_exploration_ids())
 
             self.assertItemsEqual(story_exp_ids, exp_ids)
+
+    def test_get_published_story_exploration_ids_when_exp_ids_not_found( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_summary_without_exp_ids = (
+            topic_services.compute_summary_of_topic(self.topic))
+        topic_summary_without_exp_ids.published_story_exploration_mapping = (
+            None)
+
+        with self.swap_to_always_return(
+                topic_fetchers, 'get_topic_summary_by_id',
+                topic_summary_without_exp_ids):
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    self.TOPIC_ID))
+
+            self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
