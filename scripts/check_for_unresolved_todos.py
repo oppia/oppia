@@ -22,9 +22,9 @@ from scripts import todo_finder
 
 from typing import List, Optional
 
-OPEN_TODOS_PRESENT_INDICATOR = (
+UNRESOLVED_TODOS_PRESENT_INDICATOR = (
     'THERE ARE TODOS ASSOCIATED WITH THE PROVIDED ISSUES.')
-OPEN_TODOS_NOT_PRESENT_INDICATOR = (
+UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR = (
     'THERE ARE NO TODOS ASSOCIATED WITH THE PROVIDED ISSUES.')
 
 _PARSER = argparse.ArgumentParser(
@@ -47,13 +47,6 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--commit_sha', type=str,
     help='The commit SHA to which we will display the todo in.')
-
-
-def remove_prefix(text: str, prefix: str) -> str:
-    """Removes the prefix from the text if it is present."""
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
 
 
 def check_if_todo_is_associated_with_issue(
@@ -96,12 +89,12 @@ def append_todos_to_file(
         for todo in todos:
             file.write(
                 f'{github_perma_link_url}/' +
-                remove_prefix(todo['file_path'], repository_path) +
+                todo['file_path'].removeprefix(repository_path) +
                 '#L' + str(todo['line_number']) + '\n')
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Checks if there are any todos associated with issues in a file."""
+    """Checks if there are any todos associated with issues provided."""
 
     parsed_args = _PARSER.parse_args(args)
 
@@ -136,8 +129,8 @@ def main(args: Optional[List[str]] = None) -> None:
                 github_perma_link_url,
                 issue_number)
     if todos_found:
-        raise Exception(OPEN_TODOS_PRESENT_INDICATOR)
-    print(OPEN_TODOS_NOT_PRESENT_INDICATOR, end='')
+        raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
+    print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR, end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

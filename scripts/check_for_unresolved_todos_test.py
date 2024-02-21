@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/check_for_open_todos.py."""
+"""Unit tests for scripts/check_for_unresolved_todos.py."""
 
 from __future__ import annotations
 
@@ -24,11 +24,11 @@ import textwrap
 
 from core.tests import test_utils
 
-from . import check_for_open_todos
+from . import check_for_unresolved_todos
 
 
 class CheckForOpenTodosTests(test_utils.GenericTestBase):
-    """Unit tests for testing the check_for_open_todos script."""
+    """Unit tests for testing the check_for_unresolved_todos script."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -91,9 +91,9 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
     def test_get_open_todos_by_existing_issue_number(self) -> None:
         with self.assertRaisesRegex(
             Exception,
-            check_for_open_todos.OPEN_TODOS_PRESENT_INDICATOR
+            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
         ):
-            check_for_open_todos.main([
+            check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue_number=4151',
                 '--commit_sha=abcdefg'])
@@ -119,20 +119,20 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
 
         with stdout_write_swap:
-            check_for_open_todos.main([
+            check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue_number=4157',
                 '--commit_sha=abcdefg'])
         self.assertEqual(
             mock_stdout.getvalue(),
-            check_for_open_todos.NO_OPEN_TODOS_INDICATOR)
+            check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
 
     def test_get_open_todos_by_existing_issue_file(self) -> None:
         with self.assertRaisesRegex(
             Exception,
-            check_for_open_todos.OPEN_TODOS_PRESENT_INDICATOR
+            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
         ):
-            check_for_open_todos.main([
+            check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue_file=issue_list.txt',
                 '--commit_sha=abcdefg'])

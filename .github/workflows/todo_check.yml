@@ -27,13 +27,13 @@ jobs:
           architecture: 'x64'
       - uses: ./.github/actions/merge
     
-      - name: Check for open todos
-        id: check_for_open_todos
+      - name: Check for unresolved todos
+        id: check_for_unresolved_todos
         run: |
-          python -m scripts.check_for_open_todos --repository_path=$(pwd) --issue_number=${{ github.event.issue.number }} --commit_sha=${{ github.sha }}
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue_number=${{ github.event.issue.number }} --commit_sha=${{ github.sha }}
 
       - name: Reopen issue
-        if: failure() && steps.check_for_open_todos.outcome == 'failure'
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -41,7 +41,7 @@ jobs:
     
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
-        if: failure() && steps.check_for_open_todos.outcome == 'failure'
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -76,14 +76,14 @@ jobs:
           gh pr view ${{ github.event.pull_request.number }} --json body --jq '.body' > $(pwd)/pr_body.txt
           python -m scripts.extract_issues_from_pull_request --repository_path=$(pwd) --pull_request_file=pr_body.txt
       
-      - name: Check for open todos
-        id: check_for_open_todos
+      - name: Check for unresolved todos
+        id: check_for_unresolved_todos
         run: |
-          python -m scripts.check_for_open_todos --repository_path=$(pwd) --issue_file=issue_list.txt --commit_sha=${{ github.sha }}
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue_file=issue_list.txt --commit_sha=${{ github.sha }}
 
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
-        if: failure() && steps.check_for_open_todos.outcome == 'failure'
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
