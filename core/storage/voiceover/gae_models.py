@@ -21,11 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-<<<<<<< HEAD
-from typing import Dict, Final, TypedDict
-=======
 from typing import Dict, Final, List, TypedDict, Union
->>>>>>> upstream/develop
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -221,8 +217,6 @@ class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-<<<<<<< HEAD
-=======
 
 
 class VoiceArtistMetadataModel(base_models.BaseModel):
@@ -354,4 +348,3 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
                     voice_artist_metadata_model.voiceovers_and_contents_mapping)
             }
         return user_data
->>>>>>> upstream/develop
