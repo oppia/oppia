@@ -124,7 +124,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             languageItem => {
               return {
                 id: languageItem.id,
-                language: languageItem.description
+                language:
+                  this.putEnglishLanguageNameAtFront(languageItem.description),
               };
             }
           );
@@ -205,6 +206,18 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     });
 
     return filteredTopic;
+  }
+
+  private putEnglishLanguageNameAtFront(language: string): string {
+    // Check if the language matches the expected format 'abc (something)'.
+    const pattern = /(.*)\s*\(([a-zA-Z ]+)\)/;
+    const match = language.match(pattern);
+    if (!match) {
+      return language;
+    }
+    const originalLanguageName = match[1].trim();
+    const englishLanguageName = match[2].trim();
+    return `${englishLanguageName} (${originalLanguageName})`;
   }
 
   toggleLanguageDropdown(): void {
