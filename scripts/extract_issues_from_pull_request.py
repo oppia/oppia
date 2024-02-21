@@ -19,6 +19,8 @@ from __future__ import annotations
 import argparse
 import re
 
+from typing import List, Optional
+
 ISSUE_REGEX = re.compile(r'Fixes\s+#(\d+)', re.IGNORECASE)
 
 _PARSER = argparse.ArgumentParser(
@@ -35,10 +37,10 @@ _PARSER.add_argument(
     help='The file where the pull request content is stored.')
 
 
-def main() -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Extracts github issues from a pull request."""
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args)
     repository_path = f'{parsed_args.repository_path}/'
     issue_list_file = open(
         repository_path + 'issue_list.txt', 'w+', encoding='utf-8')
