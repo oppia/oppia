@@ -19,7 +19,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
-
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 /**
  * @fileoverview Unit tests for SkillSelectorComponent.
@@ -36,10 +36,10 @@ describe('SkillSelectorComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        SkillSelectorComponent
+        SkillSelectorComponent,
       ],
       providers: [
-        UserService
+        UserService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -101,80 +101,6 @@ describe('SkillSelectorComponent', () => {
       ]
     });
   });
-
-  it('should correctly filter untriaged skill summaries', () => {
-    // Prepare test data.
-    component.untriagedSkillSummaries = [
-      new SkillSummary(
-        'skill1', 'Skill One', 'en', 1, 2, 3, 123, 456
-      ),
-      new SkillSummary(
-        'skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468
-      )
-    ];
-    const searchText = 'Skill';
-    const filteredSkills = component.searchInUntriagedSkillSummaries(
-      searchText
-    );
-    const expectedFilteredSkills = [
-      new SkillSummary(
-        'skill1', 'Skill One', 'en', 1, 2, 3, 123, 456
-      ),
-      new SkillSummary(
-        'skill3', 'Skill Three', 'en', 1, 6, 7, 565, 468
-      )
-    ];
-
-    // Assertions.
-    expect(filteredSkills).toEqual(expectedFilteredSkills);
-  });
-
-  it('should not include non-matching skills in results', () => {
-    // Prepare test data with non-matching skills.
-    component.untriagedSkillSummaries = [
-      new SkillSummary(
-        'skill1', 'Basic Skill One', 'en', 1, 2, 3, 123, 456
-      ),
-      new SkillSummary(
-        'skill3', 'Basic Skill Three', 'en', 1, 6, 7, 565, 468
-      )
-    ];
-    const searchText = 'Advanced';
-    const filteredSkills = component.searchInUntriagedSkillSummaries(
-      searchText
-    );
-
-    // Assert no skills match 'Advanced'.
-    expect(filteredSkills).toEqual([]);
-  });
-
-  it('should include skills with exact description match', () => {
-    // Prepare test data with one exact description match.
-    component.untriagedSkillSummaries = [
-      new SkillSummary(
-        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
-      ),
-      new SkillSummary(
-        'skill2', 'Partial Match', 'en', 4, 5, 6, 789, 1011
-      ),
-      new SkillSummary(
-        'skill3', 'No Match', 'en', 1, 6, 7, 565, 468
-      )
-    ];
-    const searchText = 'Exact Match';
-    const filteredSkills = component.searchInUntriagedSkillSummaries(
-      searchText
-    );
-    const expectedFilteredSkills = [
-      new SkillSummary(
-        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
-      )
-    ];
-
-    // Assert only exact matches are included.
-    expect(filteredSkills).toEqual(expectedFilteredSkills);
-  });
-
 
   it('should check if skill is empty', () => {
     let categorizedSkills = {
@@ -521,4 +447,97 @@ describe('SkillSelectorComponent', () => {
       })
     ]);
   });
+
+  it('should exclude the active skill from the search results', () => {
+    // Set up the SkillEditorStateService to return the active skill.
+    const skillEditorStateService: SkillEditorStateService = TestBed
+      .inject(SkillEditorStateService);
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
+      getId: () => 'skill1',
+    });
+
+    component.untriagedSkillSummaries = [
+      new SkillSummary(
+        'skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456
+      ),
+      new SkillSummary('skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101),
+      new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314)
+    ];
+
+    // Perform the search.
+    const searchText = 'Skill';
+    const filteredSkills = component
+      .searchInUntriagedSkillSummaries(searchText);
+
+    // Define the expected results (excluding the active skill 'skill1').
+    const expectedFilteredSkills = [
+      component.untriagedSkillSummaries[1],
+      component.untriagedSkillSummaries[2]
+    ];
+
+    // Verify the active skill is excluded from the results.
+    expect(filteredSkills).toEqual(expectedFilteredSkills);
+  });
+
+  it('should filter based on search text and exclude active skill', () => {
+    // Obtain an instance of the SkillEditorStateService with the correct type.
+    const skillEditorStateService: SkillEditorStateService = TestBed
+      .inject(SkillEditorStateService);
+
+    // Create a spy for the 'getSkill' method of the service.
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
+      getId: () => 'skill1',
+    });
+    component.untriagedSkillSummaries = [
+      new SkillSummary(
+        'skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456
+      ),
+      new SkillSummary(
+        'skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101
+      ),
+      new SkillSummary(
+        'skill3', 'New Skill Three', 'en', 7, 8, 9, 1112, 1314
+      )
+    ];
+    const searchText = 'Two';
+    const expectedFilteredSkills = [component.untriagedSkillSummaries[1]];
+    const filteredSkills = component
+      .searchInUntriagedSkillSummaries(searchText);
+    expect(filteredSkills.length)
+      .toBe(1, 'Should only contain one matching skill.');
+    expect(filteredSkills)
+      .toEqual(
+        expectedFilteredSkills,
+        'Should match "Skill Two" only.'
+      );
+  });
+
+  it('should include skills with exact description match', () => {
+    // Prepare test data with one exact description match.
+    component.untriagedSkillSummaries = [
+      new SkillSummary(
+        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
+      ),
+      new SkillSummary(
+        'skill2', 'Partial Match', 'en', 4, 5, 6, 789, 1011
+      ),
+      new SkillSummary(
+        'skill3', 'No Match', 'en', 1, 6, 7, 565, 468
+      )
+    ];
+    const searchText = 'Exact Match';
+    const filteredSkills = component.searchInUntriagedSkillSummaries(
+      searchText
+    );
+    const expectedFilteredSkills = [
+      new SkillSummary(
+        'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
+      )
+    ];
+
+    // Assert only exact matches are included.
+    expect(filteredSkills).toEqual(expectedFilteredSkills);
+  });
 });
+
+
