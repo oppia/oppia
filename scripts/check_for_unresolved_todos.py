@@ -84,8 +84,8 @@ def append_todos_to_file(
     """
     with open(repository_path + 'todo_list.txt', 'a', encoding='utf-8') as file:
         file.write(
-            f'The following todos are associated '
-            f'with this issue #{issue_number}:\n')
+            f'The following TODOs are unresolved for '
+            f'this issue #{issue_number}:\n')
         for todo in todos:
             file.write(
                 f'{github_perma_link_url}/' +

@@ -153,4 +153,4 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         ]
 
         with open('dummy_dir/todo_list.txt', 'r', encoding='utf-8') as file:
-            self.assertEqual(file.read().splitlines(), expected_todo_list_lines)
+            self.assertListEqual(file.read().splitlines(), expected_todo_list_lines)
