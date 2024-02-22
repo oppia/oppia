@@ -174,6 +174,9 @@ describe('PlayerSidebarComponent', () => {
   });
 
   it('should get average rating', fakeAsync(() => {
+    let averageRating = component.getAverageRating();
+    expect(averageRating).toBe(null);
+
     component.ratings = {
       1: 1,
       2: 0,
@@ -185,7 +188,7 @@ describe('PlayerSidebarComponent', () => {
       ratingComputationService, 'computeAverageRating')
       .and.returnValue(3);
 
-    let averageRating = component.getAverageRating();
+    averageRating = component.getAverageRating();
     tick();
     fixture.detectChanges();
 
