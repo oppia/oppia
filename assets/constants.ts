@@ -6638,7 +6638,7 @@ export default {
         }
       ]
     },
-    "DIAGNOSTIC-TEST-PLAYER": {
+    "DIAGNOSTIC_TEST_PLAYER": {
       "ROUTE": "diagnostic-test-player",
       "TITLE": "Diagnostic Test Player - Oppia",
       "META": [
