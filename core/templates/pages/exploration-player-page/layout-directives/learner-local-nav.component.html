@@ -51,9 +51,9 @@
   </li>
 </ul>
 <div ngbDropdown class="dropdown d-lg-none d-flex justify-content-end" [ngClass]="{'dropdown-border-active': isDropdownOpen}" (openChange)="toggleDropdown()">
-  <button type="button" class="mobile-option-btn btn btn-sm border-white text-white" id="dropdownBasic1" ngbDropdownToggle>
+  <div class="mobile-option-btn btn btn-sm border-white text-white" id="dropdownBasic1" ngbDropdownToggle>
     <i class="fas fa-ellipsis-v exploration-player-navbar-icons"></i>
-  </button>
+  </div>
   <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="dropdown-menu-right">
     <span ngbDropdownItem tabindex="0" placement="bottom" (click)="toggleAttributionModal()" (keydown.enter)="toggleAttributionModal()" class="custom-dropdown-item">
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
