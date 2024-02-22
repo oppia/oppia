@@ -46,6 +46,7 @@ describe('Contributor dashboard Admin page', () => {
     ContributorDashboardAdminBackendApiService);
   let ngbModal: NgbModal;
   let $window: WindowRef;
+
   class MockNgbModalRef {
     componentInstance!: {};
   }
@@ -84,7 +85,7 @@ describe('Contributor dashboard Admin page', () => {
       ],
       providers: [
         ContributorDashboardAdminStatsBackendApiService,
-        ContributorDashboardAdminBackendApiService
+        ContributorDashboardAdminBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
@@ -122,7 +123,10 @@ describe('Contributor dashboard Admin page', () => {
       .and.returnValue(Promise.resolve({
         translation_reviewers_count: {
           en: 1,
-          ar: 1
+          ar: 1,
+          ms: 1,
+          az: 1,
+          'hi-en': 1
         },
         question_reviewers_count: 1
       } as CommunityContributionStatsBackendDict));
@@ -130,7 +134,7 @@ describe('Contributor dashboard Admin page', () => {
     fetchAssignedLanguageIdsSpy = spyOn(
       contributorDashboardAdminStatsBackendApiService,
       'fetchAssignedLanguageIds')
-      .and.returnValue(Promise.resolve(['en', 'ar']));
+      .and.returnValue(Promise.resolve(['en', 'ar', 'az', 'ms', 'hi-en']));
 
     spyOn(
       contributorDashboardAdminStatsBackendApiService,
@@ -266,10 +270,14 @@ describe('Contributor dashboard Admin page', () => {
       component.ngOnInit();
       tick();
       fixture.detectChanges();
-
-      component.selectLanguage('العربية (Arabic)');
-      expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
-      expect(component.selectedLanguage.id).toBe('ar');
+      const nonDefaultLanguage = {
+        id: 'ar',
+        language: 'Arabic (العربية)'
+      };
+      component.selectLanguage(nonDefaultLanguage.language);
+      expect(component.selectedLanguage.language)
+        .toBe(nonDefaultLanguage.language);
+      expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
     }));
 
     it('should select last activity from dropdown', fakeAsync(() => {
@@ -346,10 +354,14 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.selectedTopicIds).toEqual(['1', '2']);
       expect(component.selectedLanguage.language).toBe('English');
       expect(component.selectedLanguage.id).toBe('en');
-
-      component.selectLanguage('العربية (Arabic)');
-      expect(component.selectedLanguage.language).toBe('العربية (Arabic)');
-      expect(component.selectedLanguage.id).toBe('ar');
+      const nonDefaultLanguage = {
+        id: 'ar',
+        language: 'Arabic (العربية)'
+      };
+      component.selectLanguage(nonDefaultLanguage.language);
+      expect(component.selectedLanguage.language)
+        .toBe(nonDefaultLanguage.language);
+      expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
       expect(component.selectedTopicIds).toEqual(['1', '2']);
     }));
 
@@ -653,6 +665,23 @@ describe('Contributor dashboard Admin page', () => {
 
       expect(modalSpy).toHaveBeenCalledWith(UsernameInputModal);
       expect(openRoleEditorSpy).toHaveBeenCalledWith('user1');
+    }));
+
+    it('should start any language with its English name', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      expect(component.languageChoices).toContain({
+        id: 'ms',
+        language: 'Bahasa Melayu (بهاس ملايو)'
+      });
+      expect(component.languageChoices).toContain({
+        id: 'hi-en',
+        language: 'Hinglish'
+      });
+      expect(component.languageChoices).toContain({
+        id: 'az',
+        language: 'Azerbaijani (Azeri)'
+      });
     }));
   });
 });
