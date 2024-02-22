@@ -196,6 +196,53 @@ class ViewLearnerGroupPageAccessValidationHandler(
             raise self.PageNotFoundException
 
 
+class EditLearnerGroupPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to edit learner group page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id: str) -> None:
+        """Validates access to edit learner group page.
+
+        Args:
+            learner_group_id: str. The learner group ID.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+            PageNotFoundException. The user is not a member of the learner
+                group.
+        """
+        assert self.user_id is not None
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_facilitator(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+
 class BlogHomePageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

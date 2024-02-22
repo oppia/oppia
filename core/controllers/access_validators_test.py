@@ -255,6 +255,73 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
                     ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
+class EditLearnerGroupPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+        learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [],
+            ['subtopic_id_1'], ['story_id_1'])
+
+    def test_validation_returns_false_with_learner_groups_feature_disabled(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        swap_is_feature_flag_enabled = self.swap_to_always_return(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            False
+        )
+        with swap_is_feature_flag_enabled:
+            self.get_json(
+                '%s/can_access_edit_learner_group_page/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                    expected_status_int=404)
+
+    def test_validation_returns_false_with_user_not_being_a_facilitator(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        swap_is_feature_flag_enabled = self.swap_to_always_return(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            True
+        )
+        with swap_is_feature_flag_enabled:
+            self.get_json(
+                '%s/can_access_edit_learner_group_page/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                    expected_status_int=404)
+
+    def test_validation_returns_true_for_valid_facilitator(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        swap_is_feature_flag_enabled = self.swap_to_always_return(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            True
+        )
+        with swap_is_feature_flag_enabled:
+            self.get_html_response(
+                '%s/can_access_edit_learner_group_page/%s' % (
+                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+
+
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 
