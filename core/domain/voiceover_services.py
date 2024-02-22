@@ -228,13 +228,28 @@ def update_voice_artist_metadata(
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
 
+
 def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
     voiceovers_and_contents_mapping: (
         voiceover_models.VoiceoversAndContentsMappingType)
 ) -> voiceover_models.VoiceArtistMetadataModel:
-    model = voiceover_models.VoiceArtistMetadataModel(
+    """The method creates a VoiceArtistMetadataModel instance.
+
+    Args:
+        voice_artist_id: str. The ID of the voice artist for which metadata
+            needs to be updated.
+        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
+            dict representing the updated metadata information for the
+            given voice artist.
+
+    Returns:
+        VoiceArtistMetadataModel. A newly created VoiceArtistMetadataModel
+        instance.
+    """
+    voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
         voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
-    model.update_timestamps()
-    return model
+    voice_artist_metadata_model.update_timestamps()
+
+    return voice_artist_metadata_model

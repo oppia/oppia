@@ -29,6 +29,7 @@ from core.domain import topic_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import manual_voice_artist_names_job
 from core.jobs.types import job_run_result
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, Type
@@ -37,16 +38,12 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
+(voiceover_models, exp_models) = models.Registry.import_models([
+    models.Names.VOICEOVER, models.Names.EXPLORATION])
 
-class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
+
+class VoiceArtistMetadataModelsTestsBaseClass(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
-
-    JOB_CLASS: Type[
-        manual_voice_artist_names_job.
-        CreateVoiceArtistMetadataModelsFromExplorationsJob
-    ] = (
-        manual_voice_artist_names_job.
-        CreateVoiceArtistMetadataModelsFromExplorationsJob)
 
     EDITOR_EMAIL_1 = 'editor1@example.com'
     EDITOR_EMAIL_2 = 'editor2@example.com'
@@ -451,6 +448,15 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
                 'new_value': self.CURATED_EXPLORATION_ID_2
             })], 'Changes.')
 
+
+class AuditVoiceArtistNamesFromExplorationJobTests(
+    VoiceArtistMetadataModelsTestsBaseClass):
+
+    JOB_CLASS: Type[
+        manual_voice_artist_names_job.AuditVoiceArtistNamesFromExplorationJob
+    ] = (
+        manual_voice_artist_names_job.AuditVoiceArtistNamesFromExplorationJob)
+
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
@@ -468,3 +474,42 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
                 stdout='Voice artist with ID %s contributed 1 voiceovers.' %
                 self.editor_id_2, stderr='')
         ])
+
+        total_voice_artist_metadata_models = len(
+            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+        # No models are being saved in the datastore since this is an audit job.
+        self.assertEqual(total_voice_artist_metadata_models, 0)
+
+
+class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
+    VoiceArtistMetadataModelsTestsBaseClass):
+
+    JOB_CLASS: Type[
+        manual_voice_artist_names_job.
+        CreateVoiceArtistMetadataModelsFromExplorationsJob
+    ] = (
+        manual_voice_artist_names_job.
+        CreateVoiceArtistMetadataModelsFromExplorationsJob)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_version_is_added_after_running_job(self) -> None:
+        self._create_curated_explorations()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                self.editor_id_4, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Voice artist with ID %s contributed 3 voiceovers.' %
+                self.editor_id_1, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                self.editor_id_2, stderr='')
+        ])
+
+        total_voice_artist_metadata_models = len(
+            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+
+        self.assertEqual(total_voice_artist_metadata_models, 3)
