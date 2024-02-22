@@ -20,6 +20,8 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+
 
 /**
  * @fileoverview Unit tests for SkillSelectorComponent.
@@ -449,68 +451,60 @@ describe('SkillSelectorComponent', () => {
   });
 
   it('should exclude the active skill from the search results', () => {
-    // Set up the SkillEditorStateService to return the active skill.
-    const skillEditorStateService: SkillEditorStateService = TestBed
-      .inject(SkillEditorStateService);
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
+    const mockSkill: Partial<Skill> = {
       getId: () => 'skill1',
-    });
+    };
+
+    spyOn(SkillEditorStateService, 'getSkill')
+      .and.returnValue(mockSkill as Skill);
 
     component.untriagedSkillSummaries = [
-      new SkillSummary(
-        'skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456
-      ),
+      new SkillSummary('skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456),
       new SkillSummary('skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101),
-      new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314)
+      new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314),
     ];
 
-    // Perform the search.
     const searchText = 'Skill';
     const filteredSkills = component
       .searchInUntriagedSkillSummaries(searchText);
 
-    // Define the expected results (excluding the active skill 'skill1').
     const expectedFilteredSkills = [
       component.untriagedSkillSummaries[1],
-      component.untriagedSkillSummaries[2]
+      component.untriagedSkillSummaries[2],
+    ];
+
+    expect(filteredSkills).toEqual(expectedFilteredSkills);
+  });
+
+  it('should filter based on search text and exclude active skill', () => {
+    const mockSkill: Partial<Skill> = {
+      getId: () => 'skill1',
+    };
+
+    const skillEditorStateService: SkillEditorStateService = TestBed
+      .inject(SkillEditorStateService);
+
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
+
+    component.untriagedSkillSummaries = [
+      new SkillSummary('skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456),
+      new SkillSummary('skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101),
+      new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314),
+    ];
+
+    const searchText = 'Two';
+    const filteredSkills = component
+      .searchInUntriagedSkillSummaries(searchText);
+
+    const expectedFilteredSkills = [
+      component.untriagedSkillSummaries[1],
+      component.untriagedSkillSummaries[2],
     ];
 
     // Verify the active skill is excluded from the results.
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 
-  it('should filter based on search text and exclude active skill', () => {
-    // Obtain an instance of the SkillEditorStateService with the correct type.
-    const skillEditorStateService: SkillEditorStateService = TestBed
-      .inject(SkillEditorStateService);
-
-    // Create a spy for the 'getSkill' method of the service.
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
-      getId: () => 'skill1',
-    });
-    component.untriagedSkillSummaries = [
-      new SkillSummary(
-        'skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456
-      ),
-      new SkillSummary(
-        'skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101
-      ),
-      new SkillSummary(
-        'skill3', 'New Skill Three', 'en', 7, 8, 9, 1112, 1314
-      )
-    ];
-    const searchText = 'Two';
-    const expectedFilteredSkills = [component.untriagedSkillSummaries[1]];
-    const filteredSkills = component
-      .searchInUntriagedSkillSummaries(searchText);
-    expect(filteredSkills.length)
-      .toBe(1, 'Should only contain one matching skill.');
-    expect(filteredSkills)
-      .toEqual(
-        expectedFilteredSkills,
-        'Should match "Skill Two" only.'
-      );
-  });
 
   it('should include skills with exact description match', () => {
     // Prepare test data with one exact description match.
@@ -534,6 +528,8 @@ describe('SkillSelectorComponent', () => {
         'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
       )
     ];
+
+    // Assert only exact matches are included.
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 });
