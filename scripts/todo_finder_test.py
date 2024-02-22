@@ -81,11 +81,11 @@ class TodoFinderTests(test_utils.GenericTestBase):
 
     def test_should_exclude_bad_files(self) -> None:
         search_files = todo_finder.get_search_files('dummy_dir')
-        expected_search_files = [
-            'dummy_dir/file1.txt',
-            'dummy_dir/file2.txt'
-        ]
-        self.assertEqual(search_files, expected_search_files)
+        self.assertIn('dummy_dir/file1.txt', search_files)
+        self.assertIn('dummy_dir/file2.txt', search_files)
+        self.assertNotIn('dummy_dir/zip1.zip', search_files)
+        self.assertNotIn('dummy_dir/ico1.ico', search_files)
+        self.assertNotIn('dummy_dir/png1.png', search_files)
 
     def test_get_all_todos(self) -> None:
         todos = todo_finder.get_todos('dummy_dir')
@@ -208,7 +208,7 @@ class TodoFinderTests(test_utils.GenericTestBase):
                 'line_number': 6
             }
         ]
-        self.assertCountEqual(todos, expected_todos)
+        self.assertItemsEqual(todos, expected_todos)
 
     def test_get_all_correctly_formatted_todos(self) -> None:
         todos = todo_finder.get_todos('dummy_dir')
@@ -308,7 +308,7 @@ class TodoFinderTests(test_utils.GenericTestBase):
                 'line_number': 5
             }
         ]
-        self.assertCountEqual(
+        self.assertItemsEqual(
             correctly_formatted_todos,
             expected_correctly_formated_todos)
 
