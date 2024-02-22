@@ -1747,7 +1747,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             handlers_with_non_conforming_default_schemas, [], error_msg)
 
-    def test_handlers_with_schemas_are_not_in_handler_schema_unresolved_todo_list(
+    def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(
         self
     ) -> None:
         """This test ensures that the
