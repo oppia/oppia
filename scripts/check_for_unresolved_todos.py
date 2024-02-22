@@ -89,7 +89,7 @@ def append_todos_to_file(
         for todo in todos:
             file.write(
                 f'{github_perma_link_url}/' +
-                todo['file_path'].removeprefix(repository_path) +
+                todo['file_path'].replace(repository_path, '', 1) +
                 '#L' + str(todo['line_number']) + '\n')
 
 
