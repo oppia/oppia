@@ -143,7 +143,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
                 '--new_comment_file=unresolved_todo_list_one.txt'
             ])
 
-    def test_check_for_duplicate_todo_comment_with_no_duplicate_two_shas(
+    def test_check_for_duplicate_todo_comment_two_shas_with_no_duplicate(
             self
     ) -> None:
         with self.assertRaisesRegex(
@@ -156,7 +156,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
                 '--new_comment_file=unresolved_todo_list_two.txt'
             ])
 
-    def test_check_for_duplicate_todo_comment_with_no_duplicate_different_lines(
+    def test_check_for_duplicate_todo_comment_different_lines_with_no_duplicate(
             self
     ) -> None:
         with self.assertRaisesRegex(
