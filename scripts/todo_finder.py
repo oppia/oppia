@@ -46,7 +46,9 @@ EXCLUDED_EXTENSIONS = [
     '.flac'
 ]
 
-TODO_DETECTOR_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
+# Regex to detect general todos, doesn't have to be correctly formatted.
+TODO_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
+# Regex to detect correctly formatted todos, e.g. "TODO(#1234): Description".
 CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\): .+')
 
 
@@ -112,7 +114,7 @@ def get_todo_in_line(
     Returns:
         Optional[TodoDict]. The todo if it exists.
     """
-    if TODO_DETECTOR_REGEX.search(line_content):
+    if TODO_REGEX.search(line_content):
         return {
             'file_path': file_path,
             'line_content': line_content.strip(),

@@ -21,6 +21,7 @@ import re
 
 from typing import List, Optional
 
+# Regex to detect github issues on pull requests, e.g. "Fixes #1234".
 ISSUE_REGEX = re.compile(r'Fixes\s+#(\d+)', re.IGNORECASE)
 
 _PARSER = argparse.ArgumentParser(
