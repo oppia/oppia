@@ -94,7 +94,7 @@ def get_search_files(repository_path: str) -> List[str]:
                 os.path.isfile(file_path)
             ):
                 search_files.append(file_path)
-    return search_files
+    return sorted(search_files)
 
 
 def get_todo_in_line(
