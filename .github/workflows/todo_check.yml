@@ -46,14 +46,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue view ${{ github.event.issue.number }} --json comments --jq '.comments[-1].body' > $(pwd)/latest_comment.txt
-          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=todo_list.txt
+          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=unresolved_todo_list.txt
 
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment ${{ github.event.issue.number }} -F $(pwd)/todo_list.txt
+          gh issue comment ${{ github.event.issue.number }} -F $(pwd)/unresolved_todo_list.txt
   pull_request_check:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     runs-on: ${{ matrix.os }}
@@ -88,11 +88,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr view ${{ github.event.pull_request.number }} --json comments --jq '.comments[-1].body' > $(pwd)/latest_comment.txt
-          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=todo_list.txt
+          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=unresolved_todo_list.txt
 
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} -F $(pwd)/todo_list.txt
+          gh pr comment ${{ github.event.pull_request.number }} -F $(pwd)/unresolved_todo_list.txt

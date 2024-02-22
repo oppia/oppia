@@ -101,17 +101,20 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')
 
-        expected_todo_list_lines = [
-            'The following todos are associated with this issue #4151:',
+        expected_unresolved_todo_list_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
             f'{github_perma_link_url}/file1.txt#L4',
             f'{github_perma_link_url}/file1.txt#L11',
             f'{github_perma_link_url}/file1.txt#L13',
             f'{github_perma_link_url}/file2.txt#L3'
         ]
 
-        with open('dummy_dir/todo_list.txt', 'r', encoding='utf-8') as file:
+        with open(
+            'dummy_dir/unresolved_todo_list.txt', 'r',
+            encoding='utf-8'
+        ) as file:
             self.assertItemsEqual(
-                file.read().splitlines(), expected_todo_list_lines)
+                file.read().splitlines(), expected_unresolved_todo_list_lines)
 
     def test_get_open_todos_by_nonexisting_issue_number(self) -> None:
         mock_stdout = io.StringIO()
@@ -140,17 +143,21 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')
 
-        expected_todo_list_lines = [
-            'The following todos are associated with this issue #4151:',
+        expected_unresolved_todo_list_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
             f'{github_perma_link_url}/file1.txt#L4',
             f'{github_perma_link_url}/file1.txt#L11',
             f'{github_perma_link_url}/file1.txt#L13',
             f'{github_perma_link_url}/file2.txt#L3',
-            'The following todos are associated with this issue #4156:',
+            'The following TODOs are unresolved for this issue #4156:',
             f'{github_perma_link_url}/file1.txt#L6',
-            'The following todos are associated with this issue #4153:',
+            'The following TODOs are unresolved for this issue #4153:',
             f'{github_perma_link_url}/file1.txt#L7'
         ]
 
-        with open('dummy_dir/todo_list.txt', 'r', encoding='utf-8') as file:
-            self.assertListEqual(file.read().splitlines(), expected_todo_list_lines)
+        with open(
+            'dummy_dir/unresolved_todo_list.txt', 'r',
+            encoding='utf-8'
+        ) as file:
+            self.assertListEqual(
+                file.read().splitlines(), expected_unresolved_todo_list_lines)

@@ -82,7 +82,10 @@ def append_todos_to_file(
         github_perma_link_url: str. The github perma link url.
         issue_number: str. The issue number that the todos are associated with.
     """
-    with open(repository_path + 'todo_list.txt', 'a', encoding='utf-8') as file:
+    with open(
+        repository_path + 'unresolved_todo_list.txt', 'a',
+        encoding='utf-8'
+    ) as file:
         file.write(
             f'The following TODOs are unresolved for '
             f'this issue #{issue_number}:\n')

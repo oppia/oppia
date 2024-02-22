@@ -45,12 +45,12 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             file.write('')
         with open(
-            'dummy_dir/todo_list_one.txt', 'w',
+            'dummy_dir/unresolved_todo_list_one.txt', 'w',
             encoding='utf-8'
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4175:
+                The following TODOs are unresolved for this issue #4175:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
@@ -62,19 +62,19 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4176:
+                The following TODOs are unresolved for this issue #4176:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open(
-            'dummy_dir/todo_list_two.txt', 'w', 
+            'dummy_dir/unresolved_todo_list_two.txt', 'w', 
             encoding='utf-8'
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4176:
+                The following TODOs are unresolved for this issue #4176:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 """).lstrip('\n')
@@ -85,19 +85,19 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4177:
+                The following TODOs are unresolved for this issue #4177:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open(
-            'dummy_dir/todo_list_three.txt', 'w',
+            'dummy_dir/unresolved_todo_list_three.txt', 'w',
             encoding='utf-8'
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4177:
+                The following TODOs are unresolved for this issue #4177:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L41
@@ -109,19 +109,19 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4177:
+                The following TODOs are unresolved for this issue #4177:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open(
-            'dummy_dir/todo_list_four.txt', 'w',
+            'dummy_dir/unresolved_todo_list_four.txt', 'w',
             encoding='utf-8'
         ) as file:
             content = (
                 f"""
-                The following todos are associated with this issue #4177:
+                The following TODOs are unresolved for this issue #4177:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
@@ -140,7 +140,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
                 '--latest_comment_file=latest_comment_one.txt',
-                '--new_comment_file=todo_list_one.txt'
+                '--new_comment_file=unresolved_todo_list_one.txt'
             ])
 
     def test_check_for_duplicate_todo_comment_with_no_duplicate_two_shas(
@@ -153,7 +153,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
                 '--latest_comment_file=latest_comment_two.txt',
-                '--new_comment_file=todo_list_two.txt'
+                '--new_comment_file=unresolved_todo_list_two.txt'
             ])
 
     def test_check_for_duplicate_todo_comment_with_no_duplicate_different_lines(
@@ -166,7 +166,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
                 '--latest_comment_file=latest_comment_three.txt',
-                '--new_comment_file=todo_list_three.txt'
+                '--new_comment_file=unresolved_todo_list_three.txt'
             ])
 
     def test_check_for_duplicate_todo_comment_with_duplicate(self) -> None:
@@ -178,7 +178,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
                 '--latest_comment_file=latest_comment_four.txt',
-                '--new_comment_file=todo_list_four.txt'
+                '--new_comment_file=unresolved_todo_list_four.txt'
             ])
         self.assertEqual(
             mock_stdout.getvalue(),
