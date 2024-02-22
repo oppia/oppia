@@ -1,0 +1,98 @@
+name: Todo Check
+
+on:
+  issues:
+    types: [closed, reopened]
+  pull_request:
+    types: [opened]
+  merge_group:
+    types: [checks_requested]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  issue_check:
+    if: github.event_name == 'issues'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+    
+      - name: Check for unresolved todos
+        id: check_for_unresolved_todos
+        run: |
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue_number=${{ github.event.issue.number }} --commit_sha=${{ github.sha }}
+
+      - name: Reopen issue
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue reopen ${{ github.event.issue.number }}
+    
+      - name: Check for duplicate todo comment
+        id: check_for_duplicate_todo_comment
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue view ${{ github.event.issue.number }} --json comments --jq '.comments[-1].body' > $(pwd)/latest_comment.txt
+          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=todo_list.txt
+
+      - name: Add Comment
+        if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} -F $(pwd)/todo_list.txt
+  pull_request_check:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+        
+      - name: Extract issues from pull request
+        id: extract_issues_from_pull_request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr view ${{ github.event.pull_request.number }} --json body --jq '.body' > $(pwd)/pr_body.txt
+          python -m scripts.extract_issues_from_pull_request --repository_path=$(pwd) --pull_request_file=pr_body.txt
+      
+      - name: Check for unresolved todos
+        id: check_for_unresolved_todos
+        run: |
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue_file=issue_list.txt --commit_sha=${{ github.sha }}
+
+      - name: Check for duplicate todo comment
+        id: check_for_duplicate_todo_comment
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr view ${{ github.event.pull_request.number }} --json comments --jq '.comments[-1].body' > $(pwd)/latest_comment.txt
+          python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --latest_comment_file=latest_comment.txt --new_comment_file=todo_list.txt
+
+      - name: Add Comment
+        if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} -F $(pwd)/todo_list.txt
