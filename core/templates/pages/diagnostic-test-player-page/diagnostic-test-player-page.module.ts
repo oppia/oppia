@@ -28,6 +28,8 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module';
+import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -40,7 +42,13 @@ import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module'
     InteractionExtensionsModule,
     SharedComponentsModule,
     SummaryTilesModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DiagnosticTestPlayerPageRootComponent,
+      },
+    ]),
   ],
   declarations: [
     DiagnosticTestPlayerComponent,
