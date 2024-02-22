@@ -89,6 +89,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
+
     if (this.username !== null) {
       [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
         this.userService.getProfileImageDataUrl(this.username));
@@ -102,9 +103,10 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  initMainTab(): void {
+
+  async initMainTab(): Promise<void> {
     this.loaderService.showLoadingScreen('Loading');
-    this.getUserInfoAsync();
+    await this.getUserInfoAsync();
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;
@@ -115,9 +117,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
           this.showAuthorDetailsEditor();
         }
       }, (errorResponse) => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(
-            errorResponse) !== -1) {
+        if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse) !== -1) {
           this.alertsService.addWarning('Failed to get blog dashboard data');
         }
       });
