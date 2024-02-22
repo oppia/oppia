@@ -72,7 +72,7 @@ def main(args: Optional[List[str]] = None) -> None:
         len(latest_comment_lines) != len(new_comment_lines) or
         latest_comment_lines[0] != new_comment_lines[0]
     ):
-        raise Exception(DUPLICATE_TODO_COMMENT_INDICATOR)
+        raise Exception(NO_DUPLICATE_TODO_COMMENT_INDICATOR)
 
     for index in range(1, len(latest_comment_lines)):
         latest_comment_line_content = (
@@ -80,9 +80,9 @@ def main(args: Optional[List[str]] = None) -> None:
         new_comment_line_content = (
             new_comment_lines[index][compare_start_index:])
         if latest_comment_line_content != new_comment_line_content:
-            raise Exception(DUPLICATE_TODO_COMMENT_INDICATOR)
+            raise Exception(NO_DUPLICATE_TODO_COMMENT_INDICATOR)
 
-    print(NO_DUPLICATE_TODO_COMMENT_INDICATOR, end='')
+    print(DUPLICATE_TODO_COMMENT_INDICATOR, end='')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
