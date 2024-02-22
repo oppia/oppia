@@ -259,7 +259,7 @@ describe('Blog Dashboard Page Component', () => {
         .and.returnValue(Promise.reject(500));
       spyOn(alertsService, 'addWarning');
 
-      component.initMainTab();
+      component.ngOnInit();
       tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
