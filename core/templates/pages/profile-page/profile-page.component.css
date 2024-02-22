@@ -221,6 +221,12 @@
   }
 }
 
+@media (max-width: 1065px) {
+  .oppia-profile-h1 {
+    display: none;
+  }
+}
+
 @media (max-width: 610px) {
   .oppia-profile-container {
     width: 90%;

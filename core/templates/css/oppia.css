@@ -939,7 +939,6 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: calc(100vw - 930px);
 }
 
 .oppia-navbar-breadcrumb-separator {
