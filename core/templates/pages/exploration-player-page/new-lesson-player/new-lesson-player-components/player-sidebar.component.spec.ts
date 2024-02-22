@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { PlayerSidebarComponent } from './player-sidebar.component';
-import { Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
 import { I18nLanguageCodeService } from
@@ -82,6 +82,7 @@ describe('PlayerSidebarComponent', () => {
           useClass: MockTranslateService
         }
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -115,6 +116,7 @@ describe('PlayerSidebarComponent', () => {
       } as FetchExplorationBackendResponse));
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(urlService, 'getPidFromUrl').and.returnValue('');
+    spyOn(component, 'setRatings');
 
     component.ngOnInit();
     tick();
