@@ -52,7 +52,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     repository_path = f'{parsed_args.repository_path}/'
     github_perma_link_url = 'https://github.com/oppia/oppia/blob/'
-    # Only start comparing after the commit SHA hash as the commit SHA hash 
+    # Only start comparing after the commit SHA hash as the commit SHA hash
     # might change depending on the workflow.
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
