@@ -19,12 +19,12 @@ from __future__ import annotations
 import os
 import shutil
 import textwrap
+import unittest
 
-from core.tests import test_utils
 from . import extract_issues_from_pull_request
 
 
-class ExtractIssuesFromPullRequestTests(test_utils.GenericTestBase):
+class ExtractIssuesFromPullRequestTests(unittest.TestBase):
     """Test the extract_issues_from_pull_request script."""
 
     def setUp(self) -> None:

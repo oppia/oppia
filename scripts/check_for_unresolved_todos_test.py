@@ -21,13 +21,12 @@ import os
 import shutil
 import sys
 import textwrap
-
-from core.tests import test_utils
+import unittest
 
 from . import check_for_unresolved_todos
 
 
-class CheckForOpenTodosTests(test_utils.GenericTestBase):
+class CheckForOpenTodosTests(unittest.TestBase):
     """Unit tests for testing the check_for_unresolved_todos script."""
 
     def setUp(self) -> None:

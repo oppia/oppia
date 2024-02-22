@@ -19,12 +19,12 @@ from __future__ import annotations
 import os
 import shutil
 import textwrap
+import unittest
 
-from core.tests import test_utils
 from . import todo_finder
 
 
-class TodoFinderTests(test_utils.GenericTestBase):
+class TodoFinderTests(unittest.TestCase):
     """Unit tests for testing the todo_finder script."""
 
     def setUp(self) -> None:
