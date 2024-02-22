@@ -268,6 +268,11 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_diagnostic_test_player_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.DiagnosticTestPlayerAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
