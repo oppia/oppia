@@ -99,6 +99,28 @@ def append_todos_to_file(
                 '#L' + str(todo['line_number']) + '\n')
 
 
+def log_unresolved_todos_failure(
+    repository_path: str,
+    todos: List[todo_finder.TodoDict],
+    issue_number: str
+) -> None:
+    """Logs the unresolved todos to the console.
+
+    Args:
+        repository_path: str. The path to the repository.
+        todos: List[TodoDict]. The todos to log.
+        issue_number: str. The issue number that the todos are associated with.
+    """
+    print(f'The following TODOs are unresolved for this issue #{issue_number}:')
+    for todo in sorted(
+        todos,
+        key=lambda todo: (todo['file_path'], todo['line_number'])
+    ):
+        print(
+            '- ' + todo['file_path'].replace(repository_path, '', 1) +
+            ':L' + str(todo['line_number']))
+
+
 def main(args: Optional[List[str]] = None) -> None:
     """Checks if there are any todos associated with issues provided."""
 
@@ -129,6 +151,10 @@ def main(args: Optional[List[str]] = None) -> None:
                 check_if_todo_is_associated_with_issue(todo, issue_number)])
         if todos_associated_with_issue:
             todos_found = True
+            log_unresolved_todos_failure(
+                repository_path,
+                todos_associated_with_issue,
+                issue_number)
             append_todos_to_file(
                 repository_path,
                 todos_associated_with_issue,

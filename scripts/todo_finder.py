@@ -31,20 +31,6 @@ EXCLUDED_DIRECTORIES = [
     '.git',
     'dist'
 ]
-EXCLUDED_EXTENSIONS = [
-    # Extensions that should be excluded from the search.
-    '.rdb',
-    '.pyc',
-    '.ico',
-    '.png',
-    '.jpg',
-    '.webp',
-    '.gif',
-    '.mp3',
-    '.gz',
-    '.zip',
-    '.flac'
-]
 
 # Regex to detect general todos, doesn't have to be correctly formatted.
 TODO_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
@@ -71,9 +57,7 @@ def is_file_excluded(file_path: str) -> bool:
     """
     exclude_criteria = (
         [file_path.startswith(exclude_directory) for
-            exclude_directory in EXCLUDED_DIRECTORIES] +
-        [file_path.endswith(exclude_extension) for
-            exclude_extension in EXCLUDED_EXTENSIONS])
+            exclude_directory in EXCLUDED_DIRECTORIES])
     return any(exclude_criteria)
 
 
@@ -135,7 +119,7 @@ def get_todos(repository_path: str) -> List[TodoDict]:
     search_files = get_search_files(repository_path)
     todos: List[TodoDict] = []
     for file_path in search_files:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
             for line_index, line_content in enumerate(file, start=1):
                 todo: Optional[TodoDict] = (
                     get_todo_in_line(file_path, line_content, line_index))

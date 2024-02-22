@@ -27,7 +27,7 @@ from core.tests import test_utils
 from . import check_for_unresolved_todos
 
 
-class CheckForOpenTodosTests(test_utils.GenericTestBase):
+class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_unresolved_todos script."""
 
     def setUp(self) -> None:
@@ -88,15 +88,30 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
         super().tearDown()
         shutil.rmtree('dummy_dir')
 
-    def test_get_open_todos_by_existing_issue_number(self) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
-        ):
-            check_for_unresolved_todos.main([
-                '--repository_path=dummy_dir',
-                '--issue_number=4151',
-                '--commit_sha=abcdefg'])
+    def test_get_unresolved_todos_should_fail(self) -> None:
+        mock_stdout = io.StringIO()
+
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+
+        with stdout_write_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
+            ):
+                check_for_unresolved_todos.main([
+                    '--repository_path=dummy_dir',
+                    '--issue_number=4151',
+                    '--commit_sha=abcdefg'])
+
+        expected_failure_log = textwrap.dedent(
+            """
+            The following TODOs are unresolved for this issue #4151:
+            - file1.txt:L4
+            - file1.txt:L11
+            - file1.txt:L13
+            - file2.txt:L3
+            """).lstrip('\n')
+        self.assertEqual(mock_stdout.getvalue(), expected_failure_log)
 
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')
@@ -116,7 +131,7 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines)
 
-    def test_get_open_todos_by_nonexisting_issue_number(self) -> None:
+    def test_get_unresolved_todos_should_succeed(self) -> None:
         mock_stdout = io.StringIO()
 
         stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
@@ -130,15 +145,34 @@ class CheckForOpenTodosTests(test_utils.GenericTestBase):
             mock_stdout.getvalue(),
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
 
-    def test_get_open_todos_by_existing_issue_file(self) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
-        ):
-            check_for_unresolved_todos.main([
-                '--repository_path=dummy_dir',
-                '--issue_file=issue_list.txt',
-                '--commit_sha=abcdefg'])
+    def test_get_unresolved_todos_by_issue_file_should_fail(self) -> None:
+        mock_stdout = io.StringIO()
+
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+
+        with stdout_write_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
+            ):
+                check_for_unresolved_todos.main([
+                    '--repository_path=dummy_dir',
+                    '--issue_file=issue_list.txt',
+                    '--commit_sha=abcdefg'])
+
+        expected_failure_log = textwrap.dedent(
+            """
+            The following TODOs are unresolved for this issue #4151:
+            - file1.txt:L4
+            - file1.txt:L11
+            - file1.txt:L13
+            - file2.txt:L3
+            The following TODOs are unresolved for this issue #4156:
+            - file1.txt:L6
+            The following TODOs are unresolved for this issue #4153:
+            - file1.txt:L7
+            """).lstrip('\n')
+        self.assertEqual(mock_stdout.getvalue(), expected_failure_log)
 
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')

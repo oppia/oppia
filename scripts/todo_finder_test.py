@@ -71,9 +71,9 @@ class TodoFinderTests(test_utils.GenericTestBase):
                 // Random Comment
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
-        open('dummy_dir/zip1.zip', 'w', encoding='utf-8').close()
-        open('dummy_dir/ico1.ico', 'w', encoding='utf-8').close()
-        open('dummy_dir/png1.png', 'w', encoding='utf-8').close()
+        os.mkdir('dummy_dir/dist', mode=0o777)
+        open('dummy_dir/dist/file4.txt', 'w', encoding='utf-8').close()
+        open('dummy_dir/dist/file5.txt', 'w', encoding='utf-8').close()
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -83,9 +83,8 @@ class TodoFinderTests(test_utils.GenericTestBase):
         search_files = todo_finder.get_search_files('dummy_dir')
         self.assertIn('dummy_dir/file1.txt', search_files)
         self.assertIn('dummy_dir/file2.txt', search_files)
-        self.assertNotIn('dummy_dir/zip1.zip', search_files)
-        self.assertNotIn('dummy_dir/ico1.ico', search_files)
-        self.assertNotIn('dummy_dir/png1.png', search_files)
+        self.assertNotIn('dummy_dir/dist/file3.txt', search_files)
+        self.assertNotIn('dummy_dir/dist/file4.txt', search_files)
 
     def test_get_all_todos(self) -> None:
         todos = todo_finder.get_todos('dummy_dir')
