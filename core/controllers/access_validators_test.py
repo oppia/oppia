@@ -122,6 +122,11 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class DiagnosticTestPlayerAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for diagnostic test player access validation."""
+
+
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
