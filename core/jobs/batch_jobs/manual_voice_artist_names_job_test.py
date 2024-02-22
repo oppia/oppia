@@ -38,12 +38,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
 
-class GetVoiceArtistNamesFromExplorationsJobTests(
+class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
 
     JOB_CLASS: Type[
-        manual_voice_artist_names_job.GetVoiceArtistNamesFromExplorationsJob
-    ] = manual_voice_artist_names_job.GetVoiceArtistNamesFromExplorationsJob
+        manual_voice_artist_names_job.
+        CreateVoiceArtistMetadataModelsFromExplorationsJob
+    ] = (
+        manual_voice_artist_names_job.
+        CreateVoiceArtistMetadataModelsFromExplorationsJob)
 
     EDITOR_EMAIL_1 = 'editor1@example.com'
     EDITOR_EMAIL_2 = 'editor2@example.com'
@@ -453,7 +456,15 @@ class GetVoiceArtistNamesFromExplorationsJobTests(
 
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='VOICE ARTIST METADATA MODELS ARE CREATED SUCCESS: 3')
+                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                self.editor_id_4, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Voice artist with ID %s contributed 3 voiceovers.' %
+                self.editor_id_1, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                self.editor_id_2, stderr='')
         ])
