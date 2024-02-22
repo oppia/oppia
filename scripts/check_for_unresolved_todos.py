@@ -89,7 +89,10 @@ def append_todos_to_file(
         file.write(
             f'The following TODOs are unresolved for '
             f'this issue #{issue_number}:\n')
-        for todo in todos:
+        for todo in sorted(
+            todos,
+            lambda todo: (todo['file_path'], todo['line_number'])
+        ):
             file.write(
                 f'{github_perma_link_url}/' +
                 todo['file_path'].replace(repository_path, '', 1) +
