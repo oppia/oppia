@@ -53,6 +53,9 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    (skillEditorStateService.getSkill as jasmine.Spy).and.returnValue({
+      getId: () => 'skill1',
+    });
   });
 
   beforeEach(() => {
@@ -479,6 +482,7 @@ describe('SkillSelectorComponent', () => {
 
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
+
 
   it('should filter based on search text and exclude active skill', () => {
     const mockSkill: Partial<Skill> = {
