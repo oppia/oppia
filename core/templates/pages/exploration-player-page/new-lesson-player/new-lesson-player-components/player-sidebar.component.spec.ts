@@ -87,6 +87,8 @@ describe('PlayerSidebarComponent', () => {
   }));
 
   beforeEach(() => {
+    fixture = TestBed.createComponent(PlayerSidebarComponent);
+    component = fixture.componentInstance;
     ratingComputationService = TestBed.inject(RatingComputationService);
     newLearnerViewRatingBackendApiService = TestBed.inject(
       NewLearnerViewRatingBackendApiService);
@@ -95,9 +97,6 @@ describe('PlayerSidebarComponent', () => {
       ReadOnlyExplorationBackendApiService);
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    fixture = TestBed.createComponent(PlayerSidebarComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {
@@ -117,6 +116,7 @@ describe('PlayerSidebarComponent', () => {
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(urlService, 'getPidFromUrl').and.returnValue('');
     spyOn(component, 'setRatings');
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey');
 
     component.ngOnInit();
     tick();
