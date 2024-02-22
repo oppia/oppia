@@ -91,7 +91,7 @@ def append_todos_to_file(
             f'this issue #{issue_number}:\n')
         for todo in sorted(
             todos,
-            lambda todo: (todo['file_path'], todo['line_number'])
+            key=lambda todo: (todo['file_path'], todo['line_number'])
         ):
             file.write(
                 f'{github_perma_link_url}/' +
