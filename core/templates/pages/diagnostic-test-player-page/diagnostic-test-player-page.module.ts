@@ -52,9 +52,10 @@ import { RouterModule } from '@angular/router';
   ],
   declarations: [
     DiagnosticTestPlayerComponent,
+    DiagnosticTestPlayerPageRootComponent
   ],
   entryComponents: [
     DiagnosticTestPlayerComponent,
   ],
 })
-class DiagnosticTestPlayerPageModule {}
+export class DiagnosticTestPlayerPageModule {}
