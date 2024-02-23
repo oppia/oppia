@@ -16,8 +16,6 @@
  * @fileoverview Component for the hint editor.
  */
 
-const CALCULATION_TYPE_CHARACTER = 'character';
-
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -28,7 +26,7 @@ import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Hint } from 'domain/exploration/hint-object.model';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { HtmlLengthService } from 'services/html-length.service';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface HintFormSchema {
   type: string;
