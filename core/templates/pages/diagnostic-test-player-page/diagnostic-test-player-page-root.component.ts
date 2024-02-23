@@ -26,7 +26,8 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 })
 export class DiagnosticTestPlayerPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-  .DIAGNOSTIC_TEST_PLAYER.TITLE;
+    .DIAGNOSTIC_TEST_PLAYER.TITLE;
+
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.META as
     unknown as Readonly<MetaTagData>[];
