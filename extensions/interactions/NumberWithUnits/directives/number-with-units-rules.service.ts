@@ -47,22 +47,12 @@ export class NumberWithUnitsRulesService {
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
 
-    var answerString = answerObject.toMathjsCompatibleString();
-    var inputsString = inputsObject.toMathjsCompatibleString();
-
-    var answerList: Partial<NumberWithUnitsAnswer> = this.unitsObjectFactory
-      .fromRawInputString(
-        answerString).toDict();
-    var inputsList: Partial<NumberWithUnitsAnswer> = this.unitsObjectFactory
-      .fromRawInputString(
-        inputsString).toDict();
-
-    delete answerList.units;
-    delete inputsList.units;
+    var answerNum = answerObject.toMathjsCompatibleString().split(' ')[0];
+    var inputNum = inputsObject.toMathjsCompatibleString().split(' ')[0];
 
     return (
       this.IsEquivalentTo(answer, inputs) &&
-      this.utilsService.isEquivalent(answerList, inputsList)
+      answerNum === inputNum
     );
   }
 
