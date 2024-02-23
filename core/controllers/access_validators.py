@@ -147,8 +147,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
             feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
         ):
             raise self.PageNotFoundException
-        
-            
+
+
 class ReleaseCoordinatorAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

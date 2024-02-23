@@ -18,12 +18,10 @@ from __future__ import annotations
 
 import collections
 
-from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import feature_flag_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers

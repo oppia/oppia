@@ -125,6 +125,7 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 class DiagnosticTestPlayerAccessValidationHandlerTests(
         test_utils.GenericTestBase):
     """Test for diagnostic test player access validation."""
+    
 
 
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
