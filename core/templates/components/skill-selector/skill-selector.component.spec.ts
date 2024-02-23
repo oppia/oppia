@@ -20,7 +20,6 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
 
 
 /**
