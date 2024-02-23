@@ -458,12 +458,12 @@ describe('SkillSelectorComponent', () => {
   });
 
   it('should exclude the active skill from the search results', () => {
-    const mockSkill: Partial<Skill> = {
-      getId: () => 'skill1',
-    };
+    const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
+    mockSkill.getId.and.returnValue('skill1');
 
-    spyOn(SkillEditorStateService, 'getSkill')
-      .and.returnValue(mockSkill as Skill);
+    const skillEditorStateService: SkillEditorStateService = TestBed
+      .inject(SkillEditorStateService);
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
 
     component.untriagedSkillSummaries = [
       new SkillSummary('skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456),
@@ -472,26 +472,22 @@ describe('SkillSelectorComponent', () => {
     ];
 
     const searchText = 'Skill';
-    const filteredSkills = component
-      .searchInUntriagedSkillSummaries(searchText);
-
-    const expectedFilteredSkills = [
-      component.untriagedSkillSummaries[1],
-      component.untriagedSkillSummaries[2],
-    ];
+    const filteredSkills = component.
+      searchInUntriagedSkillSummaries(searchText);
+    const expectedFilteredSkills = [component.
+      untriagedSkillSummaries[1], component.untriagedSkillSummaries[2]];
 
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 
 
+
   it('should filter based on search text and exclude active skill', () => {
-    const mockSkill: Partial<Skill> = {
-      getId: () => 'skill1',
-    };
+    const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
+    mockSkill.getId.and.returnValue('skill1');
 
     const skillEditorStateService: SkillEditorStateService = TestBed
       .inject(SkillEditorStateService);
-
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
 
     component.untriagedSkillSummaries = [
@@ -503,15 +499,11 @@ describe('SkillSelectorComponent', () => {
     const searchText = 'Two';
     const filteredSkills = component
       .searchInUntriagedSkillSummaries(searchText);
+    const expectedFilteredSkills = [component.untriagedSkillSummaries[1]];
 
-    const expectedFilteredSkills = [
-      component.untriagedSkillSummaries[1],
-      component.untriagedSkillSummaries[2],
-    ];
-
-    // Verify the active skill is excluded from the results.
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
+
 
 
   it('should include skills with exact description match', () => {
