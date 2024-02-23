@@ -438,10 +438,6 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-        diagnostic_test_player.DiagnosticTestPlayerPage
-    ),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
