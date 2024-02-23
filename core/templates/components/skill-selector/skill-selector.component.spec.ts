@@ -58,12 +58,13 @@ describe('SkillSelectorComponent', () => {
   });
 
   beforeEach(() => {
-    spyOn(
-      userService, 'canUserAccessTopicsAndSkillsDashboard'
-    ).and.returnValue(Promise.resolve(true));
-    skillEditorStateService.getSkill
-      .and.returnValue({ getId: () => 'mockSkillId' });
+    spyOn(userService, 'canUserAccessTopicsAndSkillsDashboard')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
+      getId: () => 'mockSkillId'
+    });
   });
+
 
   it('should initialize topic and subtopic filters to unchecked state', () => {
     component.categorizedSkills = {
