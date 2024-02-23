@@ -130,7 +130,7 @@ describe('Access validation backend api service', () => {
     expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
- 
+
   it('should validate access to learner group editor page', fakeAsync(() => {
     let learnerGroupId = 'test_id';
 
