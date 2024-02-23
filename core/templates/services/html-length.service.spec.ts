@@ -112,7 +112,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute word count of content with text and non-text ' +
-  '(1 math tag)', () => {
+    '(1 math tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
       '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
@@ -133,7 +133,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute word count of content with both text and non-text' +
-  '(1 image tag)', () => {
+    '(1 image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
       'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
@@ -154,7 +154,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute word count of content with text and non-text ' +
-  '(1 math tag and 1 image tag)', () => {
+    '(1 math tag and 1 image tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
       '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
@@ -181,8 +181,8 @@ describe('Html Length Service', () => {
 
 
   it('should compute word count of content with text and all non-text' +
-  '(1 Collapsible, 1 Tabs, 1 Image, 1 Link, 1 Math, 1 SkillReview,' +
-  ' 1 Video)', () => {
+    '(1 Collapsible, 1 Tabs, 1 Image, 1 Link, 1 Math, 1 SkillReview,' +
+    ' 1 Video)', () => {
     const htmlString = (
       '<oppia-noninteractive-tabs ng-version="11.2.14"' +
       'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
@@ -243,22 +243,22 @@ describe('Html Length Service', () => {
   });
 
   it('should compute word count of content with text and non-text ' +
-  '(1 Collapsible tag and 1 tab tag)', () => {
+    '(1 Collapsible tag and 1 tab tag)', () => {
     const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
-     'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
-     ':&amp;quot;Hint introduction&amp;quot;' +
-     ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
-     'p&amp;gt;This set of tabs shows' +
+      'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
+      ':&amp;quot;Hint introduction&amp;quot;' +
+      ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
+      'p&amp;gt;This set of tabs shows' +
       'some hints. Click on the other tabs to display' +
-       'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
+      'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
       '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;' +
       ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
-       'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
-       '"></oppia-noninteractive-tabs>' +
-     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
+      'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
+      '"></oppia-noninteractive-tabs>' +
+      '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
       '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
       ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
-       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
+      'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
         'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
@@ -272,11 +272,11 @@ describe('Html Length Service', () => {
   });
 
   it('should compute word count of content with text and non-text ' +
-  '(1 link tag and 1 concept card tag)', () => {
+    '(1 link tag and 1 concept card tag)', () => {
     const htmlString = '<p><oppia-noninteractive-skillreview ' +
     'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
-     'text-with-value="&amp;quot;concept card&amp;quot;">' +
-     '</oppia-noninteractive-skillreview></p>' +
+    'text-with-value="&amp;quot;concept card&amp;quot;">' +
+    '</oppia-noninteractive-skillreview></p>' +
     '<p>Demo hint just to check</p>' +
     '<p><oppia-noninteractive-link ng-version="11.2.14"' +
     'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
@@ -298,7 +298,7 @@ describe('Html Length Service', () => {
                         '<li>This is the first item</li>' +
                         '<li> This is second item</li>' +
                         '<li> This is the third item</li>' +
-                       '</ol>';
+                        '</ol>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
@@ -310,7 +310,7 @@ describe('Html Length Service', () => {
                         '<li>This is the first item</li>' +
                         '<li> This is second item</li>' +
                         '<li> This is the third item</li>' +
-                       '</ul>';
+                        '</ul>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
 
@@ -329,7 +329,7 @@ describe('Html Length Service', () => {
     () => {
       const htmlString = (
         '<p>Earth Our home planet is the third planet' +
-      ' from the sun.</p>');
+        ' from the sun.</p>');
 
       const result = htmlLengthService
         .computeHtmlLength(htmlString, 'character');
@@ -375,7 +375,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute character count of content with text and non-text ' +
-  '(1 math tag)', () => {
+    '(1 math tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
       '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
@@ -395,7 +395,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute character count of content with both text and non-text' +
-  '(1 image tag)', () => {
+    '(1 image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
       'file for demo&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
@@ -416,7 +416,7 @@ describe('Html Length Service', () => {
   });
 
   it('should compute character count of content with text and non-text ' +
-  '(1 math tag and 1 image tag)', () => {
+    '(1 math tag and 1 image tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
       '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
@@ -443,23 +443,23 @@ describe('Html Length Service', () => {
 
 
   it('should compute character count of content with text and non-text ' +
-  '(1 Collapsible tag and 1 tab tag)', () => {
+    '(1 Collapsible tag and 1 tab tag)', () => {
     const htmlString = '<oppia-noninteractive-tabs ng-version="11.2.14"' +
-     'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
-     ':&amp;quot;Hint introduction&amp;quot;' +
-     ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
-     'p&amp;gt;This set of tabs shows' +
+      'tab_contents-with-value="[{&amp;quot;title&amp;quot;;' +
+      ':&amp;quot;Hint introduction&amp;quot;' +
+      ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;' +
+      'p&amp;gt;This set of tabs shows' +
       'some hints. Click on the other tabs to display' +
-       'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
+      'the relevant hints.&amp;lt;/p&amp;gt;&amp;quot;},' +
       '{&amp;quot;title&amp;quot;:&amp;quot;Hint 1&amp;quot;' +
       ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;This is a' +
-       'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
-       '"></oppia-noninteractive-tabs>' +
-     '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
+      'first hint.&amp;lt;/p&amp;gt;&amp;quot;}]' +
+      '"></oppia-noninteractive-tabs>' +
+      '<p>Demo hint just to check</p><oppia-noninteractive-collapsible ' +
       '_nghost-xvp-c48="" content-with-value="&amp;quot;&amp;lt;p&amp;gt' +
       ';You have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;quot;"' +
-       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
-        'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
+      'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
+      'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
@@ -474,15 +474,15 @@ describe('Html Length Service', () => {
 
 
   it('should compute character count of content with text and non-text ' +
-  '(1 link tag and 1 concept card tag)', () => {
+    '(1 link tag and 1 concept card tag)', () => {
     const htmlString = '<p><oppia-noninteractive-skillreview ' +
-    'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
-     'text-with-value="&amp;quot;concept card&amp;quot;">' +
-     '</oppia-noninteractive-skillreview></p>' +
-    '<p>Demo hint just to check</p>' +
-    '<p><oppia-noninteractive-link ng-version="11.2.14"' +
-    'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
-    'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
+      'ng-version="11.2.14" skill_id-with-value="&amp;quot;&amp;quot;"' +
+      'text-with-value="&amp;quot;concept card&amp;quot;">' +
+      '</oppia-noninteractive-skillreview></p>' +
+      '<p>Demo hint just to check</p>' +
+      '<p><oppia-noninteractive-link ng-version="11.2.14"' +
+      'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
+      'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
@@ -498,8 +498,8 @@ describe('Html Length Service', () => {
 
 
   it('should compute character count of content with text and all non-text' +
-  '(1 Collapsible, 1 Tabs, 1 Image, 1 Link, 1 Math, 1 SkillReview,' +
-  ' 1 Video)', () => {
+    '(1 Collapsible, 1 Tabs, 1 Image, 1 Link, 1 Math, 1 SkillReview,' +
+    ' 1 Video)', () => {
     const htmlString = (
       '<oppia-noninteractive-tabs ng-version="11.2.14"' +
       'tab_contents-with-value="[{&amp;quot;title&amp;quot;' +
@@ -551,7 +551,7 @@ describe('Html Length Service', () => {
       to 28 characters. The 'math' tag is counted as 1 character.
       "Code image for testing" is the alt text for an image, contributing
       22 characters, and the image itself counts as 10 characters.
-       The 'skillreview' tag contains "Concept card" and
+      The 'skillreview' tag contains "Concept card" and
       the 'link' tag contains "oppia link", each contributing
       12 and 10 characters respectively. Therefore, the total character
       count is 2000 (tag counts) + 28 (paragraphs) + 1 ('math' tag)
@@ -566,7 +566,7 @@ describe('Html Length Service', () => {
                         '<li>This is the first item</li>' +
                         '<li> This is second item</li>' +
                         '<li> This is the third item</li>' +
-                       '</ol>';
+                        '</ol>';
 
     const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
 
@@ -587,7 +587,7 @@ describe('Html Length Service', () => {
 
   describe('getWeightForNonTextNodes', () => {
     it('should throw an error when unable to determine ' +
-    'weight for non-text node', () => {
+      'weight for non-text node', () => {
       const nonTextNode = (
         '<oppia-noninteractive-xyz>This is not a ' +
         'text node</oppia-noninteractive-xyz>');
