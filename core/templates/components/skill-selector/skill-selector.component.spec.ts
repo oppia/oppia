@@ -20,13 +20,13 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-
 
 
 /**
  * @fileoverview Unit tests for SkillSelectorComponent.
  */
+
+
 
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
@@ -40,10 +40,11 @@ describe('SkillSelectorComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        SkillSelectorComponent,
+        SkillSelectorComponent
       ],
       providers: [
         UserService,
+        SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -54,22 +55,14 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    (skillEditorStateService.getSkill as jasmine.Spy).and.returnValue({
-      getId: () => 'skill1',
-    });
   });
 
   beforeEach(() => {
-    spyOn(userService, 'canUserAccessTopicsAndSkillsDashboard')
-      .and.returnValue(Promise.resolve(true));
-
-    const mockSkill: Partial<Skill> = {
-      getId: () => 'mockSkillId',
-    };
-
-    spyOn(skillEditorStateService, 'getSkill')
-      .and.returnValue(mockSkill as Skill);
+    spyOn(
+      userService, 'canUserAccessTopicsAndSkillsDashboard'
+    ).and.returnValue(Promise.resolve(true));
   });
+
 
 
   it('should initialize topic and subtopic filters to unchecked state', () => {
@@ -466,9 +459,6 @@ describe('SkillSelectorComponent', () => {
   it('should exclude the active skill from the search results', () => {
     const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
     mockSkill.getId.and.returnValue('skill1');
-
-    const skillEditorStateService: SkillEditorStateService = TestBed
-      .inject(SkillEditorStateService);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
 
     component.untriagedSkillSummaries = [
@@ -478,22 +468,20 @@ describe('SkillSelectorComponent', () => {
     ];
 
     const searchText = 'Skill';
-    const filteredSkills = component.
-      searchInUntriagedSkillSummaries(searchText);
-    const expectedFilteredSkills = [component.
-      untriagedSkillSummaries[1], component.untriagedSkillSummaries[2]];
+    const filteredSkills = component
+      .searchInUntriagedSkillSummaries(searchText);
+    const expectedFilteredSkills = [
+      component.untriagedSkillSummaries[1],
+      component.untriagedSkillSummaries[2],
+    ];
 
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 
-
-
+  // Test case: Filter based on search text and exclude active skill.
   it('should filter based on search text and exclude active skill', () => {
     const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
     mockSkill.getId.and.returnValue('skill1');
-
-    const skillEditorStateService: SkillEditorStateService = TestBed
-      .inject(SkillEditorStateService);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
 
     component.untriagedSkillSummaries = [
@@ -509,7 +497,6 @@ describe('SkillSelectorComponent', () => {
 
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
-
 
 
   it('should include skills with exact description match', () => {
