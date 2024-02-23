@@ -19,7 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from '../../../domain/utilities/url-interpolation.service';
 import { AccessValidationBackendApiService } from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
@@ -104,6 +104,19 @@ describe('Access validation backend api service', () => {
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_release_coordinator_page');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should validate access to diagnostic test player page', fakeAsync(() => {
+    avbas.validateAccessToDiagnosticTestPlayerPage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_diagnostic_test_player_page');
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
