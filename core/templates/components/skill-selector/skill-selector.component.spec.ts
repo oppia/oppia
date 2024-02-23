@@ -20,6 +20,8 @@ import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+
 
 
 /**
@@ -60,9 +62,13 @@ describe('SkillSelectorComponent', () => {
   beforeEach(() => {
     spyOn(userService, 'canUserAccessTopicsAndSkillsDashboard')
       .and.returnValue(Promise.resolve(true));
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue({
-      getId: () => 'mockSkillId'
-    });
+
+    const mockSkill: Partial<Skill> = {
+      getId: () => 'mockSkillId',
+    };
+
+    spyOn(skillEditorStateService, 'getSkill')
+      .and.returnValue(mockSkill as Skill);
   });
 
 
