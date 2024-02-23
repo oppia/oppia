@@ -268,14 +268,21 @@ URLS = [
     ),
 
     get_redirect_route(
-        r'%s/can_access_diagnostic_test_player_page' %
+        r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.DiagnosticTestPlayerAccessValidationHandler),
+        access_validators.EditLearnerGroupPageAccessValidationHandler
+    ),
 
     get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_diagnostic_test_player_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.DiagnosticTestPlayerAccessValidationHandler
+    ),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -430,6 +437,10 @@ URLS = [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+        diagnostic_test_player.DiagnosticTestPlayerPage
+    ),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
@@ -1114,8 +1125,6 @@ URLS = [
     get_redirect_route(
         r'/exit_learner_group_handler/<learner_group_id>',
         learner_group.ExitLearnerGroupHandler),
-    get_redirect_route(
-        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),

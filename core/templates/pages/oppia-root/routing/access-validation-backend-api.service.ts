@@ -36,6 +36,11 @@ export class AccessValidationBackendApiService {
   RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_release_coordinator_page');
 
+  LEARNER_GROUP_EDITOR_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_edit_learner_group_page/' +
+    '<learner_group_id>'
+  );
+
   DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_diagnostic_test_player_page');
 
@@ -109,6 +114,16 @@ export class AccessValidationBackendApiService {
   Promise<void> {
     return this.http.get<void>(
       this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  validateAccessToLearnerGroupEditorPage(
+      learnerGroupId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.LEARNER_GROUP_EDITOR_PAGE_ACCESS_VALIDATOR, {
+        learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
   }
 
   validateAccessToDiagnosticTestPlayerPage():
