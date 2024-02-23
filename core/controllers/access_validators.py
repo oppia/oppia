@@ -16,20 +16,22 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list
+from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import blog_services, feature_flag_services
+from core.domain import blog_services
 from core.domain import classroom_config_services
+from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import user_services
 
 from typing import Dict, TypedDict
 
-
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
+
 
 class ClassroomAccessValidationHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ClassroomAccessValidationHandler's
