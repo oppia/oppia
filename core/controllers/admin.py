@@ -31,7 +31,6 @@ from core.domain import blog_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -326,10 +325,12 @@ class AdminHandler(
             )
         ]
 
-        config_properties = config_domain.Registry.get_config_property_schemas()
-
+        # Remove the config_properties from here once the classroom
+        # configuration and new platform parameter tabs are prepared for
+        # onboarding the existing field. This action is being tracked under
+        # issue #19810.
         self.render_json({
-            'config_properties': config_properties,
+            'config_properties': {},
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
