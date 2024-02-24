@@ -158,7 +158,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn(languageUpdateBar);
     await this.clickOn(addLanguage);
   }
-  
+
   /**
    * This function helps in adding tags.
    */
