@@ -277,7 +277,7 @@ URLS = [
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
-    
+
     get_redirect_route(
         r'%s/can_access_topic_editor/<topic_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
