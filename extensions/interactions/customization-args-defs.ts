@@ -471,6 +471,6 @@ export type InteractionCustomizationArgs = (
   TextInputCustomizationArgs);
 
 export interface InteractionData {
-  interactionId: string;
+  interactionId: string | null;
   customizationArgs: InteractionCustomizationArgs;
 }

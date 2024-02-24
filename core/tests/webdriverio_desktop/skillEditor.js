@@ -143,11 +143,13 @@ describe('Skill Editor functionality', function() {
       'Hard', ['Hard explanation 1 edited', 'Hard explanation 2 edited']);
   });
 
-  it('should create a question for the skill', async function() {
+  it('should create and edit a question for the skill', async function() {
     await workflow.createQuestion();
     await skillEditorPage.get(skillId);
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.expectNumberOfQuestionsToBe(1);
+    await skillEditorPage.editQuestion();
+    await workflow.changeQuestionInteraction();
   });
 
   it('should create and delete misconceptions', async function() {

@@ -41,6 +41,7 @@ var SkillEditorPage = function() {
   var confirmSkillDifficultyButton = $(
     '.e2e-test-confirm-skill-difficulty-button');
   var createQuestionButton = $('.e2e-test-create-question-button');
+  var editQuestionButton = $('.e2e-test-edit-question-button');
   var deleteExampleButtonLocator = '.e2e-test-delete-example-button';
   var deleteMisconceptionButton = function(index) {
     return $(`.e2e-test-misconception-${index}`)
@@ -192,6 +193,11 @@ var SkillEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.editQuestion = async function() {
+    await action.click('Edit Question Button', editQuestionButton);
+    await waitFor.pageToFullyLoad();
+  };
+
   this.moveToQuestionsTab = async function() {
     await action.click('Questions tab button', questionsTab);
   };
@@ -232,6 +238,16 @@ var SkillEditorPage = function() {
       skillChangeCount, 'Skill change count takes too long to update.');
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
+  };
+
+  this.updateQuestion = async function(commitMessage) {
+    await general.scrollToTop();
+    await action.click('Save Question Button', saveQuestionButton);
+    await waitFor.pageToFullyLoad();
+    await action.setValue('Commit message', commitMessageField, commitMessage);
+    await action.click('Close save modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton, 'Save modal takes too long to disappear.');
   };
 
   this.editConceptCard = async function(explanation) {
