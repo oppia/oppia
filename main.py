@@ -277,6 +277,11 @@ URLS = [
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
+    
+    get_redirect_route(
+        r'%s/can_access_topic_editor/<topic_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicEditorPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -882,9 +887,6 @@ URLS = [
         r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
         collection_editor.CollectionUnpublishHandler),
 
-    get_redirect_route(
-        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
-        topic_editor.TopicEditorPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),

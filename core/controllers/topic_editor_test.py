@@ -553,30 +553,6 @@ class TopicEditorTests(
             expected_status_int=404)
         self.logout()
 
-    def test_access_topic_editor_page(self) -> None:
-        """Test access to editor pages for the sample topic."""
-
-        # Check that non-admin and topic_manager cannot access the editor
-        # page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access the editor page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
-        # Check that any topic manager can access the editor page.
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
     def test_editable_topic_handler_get(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
