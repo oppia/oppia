@@ -136,9 +136,9 @@
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
           <div class="row oppia-android-carousel-direction">
-            <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
-            </div>
+            <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right "></i>
+            </button>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
               <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="Image showing a lesson being played">
@@ -205,8 +205,8 @@
               Please confirm before subscribing.
             </div>
             <div class="oppia-android-updates-input-padding text-center">
-              <oppia-primary-button [disabled]="!userCanSubscribe || !validateEmailAddress()"
-                                    (onClickPrimaryButton)="subscribeToAndroidList()"
+              <oppia-primary-button (onClickPrimaryButton)="subscribeToAndroidList()"
+                                    [disabled]="!userCanSubscribe || !validateEmailAddress()"
                                     [customClasses]="'btn oppia-android-updates-button w-100'"
                                     [buttonText]="'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate">
               </oppia-primary-button>

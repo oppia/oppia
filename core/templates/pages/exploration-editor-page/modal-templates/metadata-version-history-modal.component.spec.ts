@@ -69,7 +69,7 @@ describe('Metadata version history modal', () => {
     explorationMetadata = new ExplorationMetadata(
       'title', 'category', 'objective', 'en',
       [], '', '', 55, 'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+      new ParamSpecs({}, paramSpecObjectFactory), [], false, true
     );
   });
 

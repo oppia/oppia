@@ -433,14 +433,6 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             learner_dashboard_activity_ids['topic_ids_to_learn'],
             [self.TOPIC_ID_3])
 
-    def test_learner_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
-
-        self.logout()
-
 
 class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 
@@ -666,14 +658,6 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         self.assertEqual(len(response['collection_playlist']), 1)
         self.assertEqual(
             response['collection_playlist'][0]['id'], self.COL_ID_1)
-        self.logout()
-
-    def test_learner_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn(b'{"title": "Learner Dashboard | Oppia"})', response.body)
-
         self.logout()
 
 

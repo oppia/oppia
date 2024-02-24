@@ -446,13 +446,13 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_7, self.admin_id, title='Title 3',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
@@ -698,10 +698,10 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         # Set up topics, subtopics and stories for learner group syllabus.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.admin_id, title='Title 2',
-            end_state_name='End', correctness_feedback_enabled=True)
+            end_state_name='End')
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
 
@@ -1004,70 +1004,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         assert user_settings is not None
         self.assertEqual(response['username'], user_settings.username)
         self.assertEqual(response['error'], '')
-        self.logout()
-
-
-class EditLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the edit learner page."""
-
-    LEARNER_ID: Final = 'learner_user_1'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.OWNER_EMAIL)
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
-        self.learner_group = learner_group_services.create_learner_group(
-            self.learner_group_id, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
-            ['story_id_1'])
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
-        self
-    ) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            response = self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id)
-        response.mustcontain(
-            '<oppia-edit-learner-group-page>'
-            '</oppia-edit-learner-group-page>')
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
-        self
-    ) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        self.logout()
-        self.login(self.NEW_USER_EMAIL)
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
         self.logout()
 
 

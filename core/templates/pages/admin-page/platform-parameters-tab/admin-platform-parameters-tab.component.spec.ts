@@ -29,15 +29,15 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
   // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType } from
-  'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+  'domain/platform-parameter/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 class MockWindowRef {
@@ -59,7 +59,7 @@ describe('Admin page platform parameters tab', () => {
   let component: AdminPlatformParametersTabComponent;
   let fixture: ComponentFixture<AdminPlatformParametersTabComponent>;
   let adminDataService: AdminDataService;
-  let featureApiService: PlatformFeatureAdminBackendApiService;
+  let parameterApiService: PlatformParameterAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
   let mockWindowRef: MockWindowRef;
 
@@ -83,7 +83,7 @@ describe('Admin page platform parameters tab', () => {
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
     component = fixture.componentInstance;
     adminDataService = TestBed.get(AdminDataService);
-    featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
+    parameterApiService = TestBed.get(PlatformParameterAdminBackendApiService);
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
     spyOn(adminDataService, 'getDataAsync').and.resolveTo({
@@ -92,8 +92,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform parameter.',
-          feature_stage: null,
-          is_feature: false,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [{
@@ -112,7 +110,7 @@ describe('Admin page platform parameters tab', () => {
       ]
     } as AdminPageData);
 
-    updateApiSpy = spyOn(featureApiService, 'updatePlatformParameter')
+    updateApiSpy = spyOn(parameterApiService, 'updatePlatformParameter')
       .and.resolveTo();
 
     component.ngOnInit();
@@ -698,8 +696,6 @@ describe('Admin page platform parameters tab', () => {
         data_type: 'bool',
         default_value: false,
         description: 'This is a dummy feature flag.',
-        feature_stage: FeatureStage.DEV,
-        is_feature: true,
         name: 'invalid',
         rule_schema_version: 1,
         rules: [
@@ -732,8 +728,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -772,8 +766,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -812,8 +804,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -844,8 +834,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -872,8 +860,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -900,8 +886,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [
@@ -923,8 +907,6 @@ describe('Admin page platform parameters tab', () => {
           data_type: 'bool',
           default_value: false,
           description: 'This is a dummy platform param.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [

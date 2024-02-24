@@ -69,49 +69,53 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - accessibility
-          - additionalEditorFeatures
-          - additionalEditorFeaturesModals
-          - additionalPlayerFeatures
-          - adminPage
-          - blogDashboard
-          - blog
-          - checkpointFeatures
-          - classroomPage
-          - classroomPageFileUploadFeatures
-          - collections
-          - contributorDashboard
-          - contributorAdminDashboard
-          - coreEditorAndPlayerFeatures
-          - creatorDashboard
-          - embedding
-          - explorationFeedbackTab
-          - explorationImprovementsTab
-          - explorationHistoryTab
-          - explorationStatisticsTab
-          - explorationTranslationTab
-          - extensions
-          - featureGating
-          - feedbackUpdates
-          - fileUploadExtensions
-          - fileUploadFeatures
-          - learner
-          - learnerDashboard
-          - library
-          - navigation
-          - playVoiceovers
-          - preferences
-          - profileFeatures
-          - profileMenu
-          - publication
-          - skillEditor
-          - subscriptions
-          - topicsAndSkillsDashboard
-          - topicAndStoryEditor
-          - topicAndStoryEditorFileUploadFeatures
-          - topicAndStoryViewer
-          - users
-          - wipeout
+          - name: accessibility
+          - name: additionalEditorFeatures
+          - name: additionalEditorFeaturesModals
+          - name: additionalPlayerFeatures
+          - name: adminPage
+          - name: blogDashboard
+          - name: blog
+          - name: checkpointFeatures
+          - name: classroomPage
+          - name: classroomPageFileUploadFeatures
+          - name: collections
+          - name: contributorDashboard
+          - name: contributorAdminDashboard
+          - name: coreEditorAndPlayerFeatures
+          - name: creatorDashboard
+          - name: embedding
+          - name: explorationFeedbackTab
+          - name: explorationImprovementsTab
+          - name: explorationHistoryTab
+          - name: explorationStatisticsTab
+          - name: explorationTranslationTab
+          - name: extensions
+          - name: featureGating
+          - name: feedbackUpdates
+          - name: fileUploadExtensions
+          - name: fileUploadFeatures
+            flaky_indicators: |
+              Play record button is not clickable
+              Translation tab button is not clickable
+          - name: learner
+          - name: learnerDashboard
+          - name: library
+          - name: navigation
+          - name: playVoiceovers
+          - name: preferences
+          - name: profileFeatures
+          - name: profileMenu
+          - name: publication
+          - name: skillEditor
+          - name: subscriptions
+          - name: topicsAndSkillsDashboard
+          - name: topicAndStoryEditor
+          - name: topicAndStoryEditorFileUploadFeatures
+          - name: topicAndStoryViewer
+          - name: users
+          - name: wipeout
+    name: e2e_test (${{ matrix.os }}, ${{ matrix.suite.name }})
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -181,10 +185,16 @@ jobs:
       - name: (Artifact re-build) Build Webpack
         if: steps.download_artifact_1.outcome == 'failure'
         run: python -m scripts.build --prod_env
-      - name: Run E2E Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
-        env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Run E2E Test ${{ matrix.suite.name }}
+        uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
+        with:
+          max_attempts: 2
+          substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
+          command: >
+            VIDEO_RECORDING_IS_ENABLED=0;
+            xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+            python -m scripts.run_e2e_tests --skip-install
+            --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3

@@ -183,7 +183,6 @@ describe('Exploration editor page component', () => {
     param_specs: [],
     param_changes: [],
     auto_tts_enabled: {},
-    correctness_feedback_enabled: {},
     edits_allowed: true,
     state_classifier_mapping: [],
     user: {},
