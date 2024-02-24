@@ -100,7 +100,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             ):
                 check_for_unresolved_todos.main([
                     '--repository_path=dummy_dir',
-                    '--issue_number=4151',
+                    '--issue=4151',
                     '--commit_sha=abcdefg'])
 
         expected_failure_log = textwrap.dedent(
@@ -139,10 +139,10 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         with stdout_write_swap:
             check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
-                '--issue_number=4157',
+                '--issue=4157',
                 '--commit_sha=abcdefg'])
         self.assertEqual(
-            mock_stdout.getvalue(),
+            mock_stdout.getvalue().lstrip('\n'),
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
 
     def test_get_unresolved_todos_by_issue_file_should_fail(self) -> None:
@@ -157,7 +157,6 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             ):
                 check_for_unresolved_todos.main([
                     '--repository_path=dummy_dir',
-                    '--issue_file=issue_list.txt',
                     '--commit_sha=abcdefg'])
 
         expected_failure_log = textwrap.dedent(

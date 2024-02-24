@@ -40,29 +40,12 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             shutil.rmtree('dummy_dir')
         os.mkdir('dummy_dir', mode=0o777)
         with open(
-            'dummy_dir/latest_comment_one.txt', 'w',
-            encoding='utf-8'
-        ) as file:
-            file.write('')
-        with open(
             'dummy_dir/unresolved_todo_list_one.txt', 'w',
             encoding='utf-8'
         ) as file:
             content = (
                 f"""
                 The following TODOs are unresolved for this issue #4175:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
-                """).lstrip('\n')
-            file.write(textwrap.dedent(content))
-        with open(
-            'dummy_dir/latest_comment_two.txt', 'w',
-            encoding='utf-8'
-        ) as file:
-            content = (
-                f"""
-                The following TODOs are unresolved for this issue #4176:
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
@@ -80,18 +63,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open(
-            'dummy_dir/latest_comment_three.txt', 'w',
-            encoding='utf-8'
-        ) as file:
-            content = (
-                f"""
-                The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
-                """).lstrip('\n')
-            file.write(textwrap.dedent(content))
-        with open(
             'dummy_dir/unresolved_todo_list_three.txt', 'w',
             encoding='utf-8'
         ) as file:
@@ -101,18 +72,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
                 {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L41
-                """).lstrip('\n')
-            file.write(textwrap.dedent(content))
-        with open(
-            'dummy_dir/latest_comment_four.txt', 'w',
-            encoding='utf-8'
-        ) as file:
-            content = (
-                f"""
-                The following TODOs are unresolved for this issue #4177:
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L38
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L39
-                {GITHUB_PERMA_LINK_URL}/{DUMMY_SHA_ONE}/scripts/common.py#L40
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
         with open(
@@ -139,7 +98,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
-                '--latest_comment_file=latest_comment_one.txt',
                 '--new_comment_file=unresolved_todo_list_one.txt'
             ])
 
@@ -152,7 +110,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
-                '--latest_comment_file=latest_comment_two.txt',
                 '--new_comment_file=unresolved_todo_list_two.txt'
             ])
 
@@ -165,7 +122,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         ):
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
-                '--latest_comment_file=latest_comment_three.txt',
                 '--new_comment_file=unresolved_todo_list_three.txt'
             ])
 
@@ -177,7 +133,6 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
         with stdout_write_swap:
             check_for_duplicate_todo_comment.main([
                 '--repository_path=dummy_dir',
-                '--latest_comment_file=latest_comment_four.txt',
                 '--new_comment_file=unresolved_todo_list_four.txt'
             ])
         self.assertEqual(

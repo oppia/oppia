@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import argparse
 
+from scripts import github_api
+
 from typing import List, Optional
 
 COMMIT_SHA_HASH_LENGTH = 40
@@ -34,11 +36,15 @@ Checks if the new todo comment is a duplicate of the latest comment.
 
 _PARSER.add_argument(
     '--repository_path', type=str,
-    help='The path to the repository to check for todos.')
+    help='The path to the repository.')
 
 _PARSER.add_argument(
-    '--latest_comment_file', type=str,
-    help='The latest comment.')
+    '--issue', type=int,
+    help='The issue number to check for duplicate todo comment.')
+
+_PARSER.add_argument(
+    '--pull_request', type=int,
+    help='The pull request number to check for duplicate todo comment.')
 
 _PARSER.add_argument(
     '--new_comment_file', type=str,
@@ -52,16 +58,23 @@ def main(args: Optional[List[str]] = None) -> None:
 
     repository_path = f'{parsed_args.repository_path}/'
     github_perma_link_url = 'https://github.com/oppia/oppia/blob/'
-    # Only start comparing after the commit SHA hash as the commit SHA hash 
+    # Only start comparing after the commit SHA hash as the commit SHA hash
     # might change depending on the workflow.
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
     latest_comment_lines: List[str] = []
-    with open(
-        repository_path + parsed_args.latest_comment_file, 'r',
-        encoding='utf-8'
-    ) as latest_comment_file:
-        latest_comment_lines = latest_comment_file.read().splitlines()
+    if parsed_args.issue:
+        latest_comment_lines = (
+            github_api.GithubApi()
+                .fetch_latest_comment_from_issue(
+                    parsed_args.issue)['body'].splitlines())
+    elif parsed_args.pull_request:
+        latest_comment_lines = (
+            github_api.GithubApi()
+                .fetch_latest_comment_from_pull_request(
+                    parsed_args.pull_request)['body'].splitlines())
+    else:
+        raise Exception('No issue or pull request number provided.')
 
     new_comment_lines: List[str] = []
     with open(

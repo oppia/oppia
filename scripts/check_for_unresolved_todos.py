@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 
+from scripts import github_api
 from scripts import todo_finder
 
 from typing import List, Optional
@@ -34,15 +35,15 @@ Checks if there are any todos associated with the provided issues.
 
 _PARSER.add_argument(
     '--repository_path', type=str,
-    help='The path to the repository to check for todos.')
+    required=True, help='The path to the repository to check for todos.')
 
 _PARSER.add_argument(
-    '--issue_number', type=str,
+    '--issue', type=int,
     help='The issue number to check for todos.')
 
 _PARSER.add_argument(
-    '--issue_file', type=str,
-    help='The issue file where the issues to check for todos are stored.')
+    '--pull_request', type=int,
+    help='The pull request number to check for todos.')
 
 _PARSER.add_argument(
     '--commit_sha', type=str,
@@ -51,13 +52,13 @@ _PARSER.add_argument(
 
 def check_if_todo_is_associated_with_issue(
     todo: todo_finder.TodoDict,
-    issue_number: str
+    issue_number: int
 ) -> bool:
     """Checks if the todo is associated with the issue.
 
     Args:
         todo: TodoDict. The todo to check.
-        issue_number: str. The issue number to check for.
+        issue_number: int. The issue number to check for.
 
     Returns:
         bool. Whether the todo is associated with the issue.
@@ -71,7 +72,7 @@ def append_todos_to_file(
     repository_path: str,
     todos: List[todo_finder.TodoDict],
     github_perma_link_url: str,
-    issue_number: str
+    issue_number: int
 ) -> None:
     """Appends to the todo list file with the todos information and the github 
     perma link for the line.
@@ -80,7 +81,7 @@ def append_todos_to_file(
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to generate the file with.
         github_perma_link_url: str. The github perma link url.
-        issue_number: str. The issue number that the todos are associated with.
+        issue_number: int. The issue number that the todos are associated with.
     """
     with open(
         repository_path + 'unresolved_todo_list.txt', 'a',
@@ -88,7 +89,7 @@ def append_todos_to_file(
     ) as file:
         file.write(
             f'The following TODOs are unresolved for '
-            f'this issue #{issue_number}:\n')
+            f'this issue #{str(issue_number)}:\n')
         for todo in sorted(
             todos,
             key=lambda todo: (todo['file_path'], todo['line_number'])
@@ -102,16 +103,18 @@ def append_todos_to_file(
 def log_unresolved_todos_failure(
     repository_path: str,
     todos: List[todo_finder.TodoDict],
-    issue_number: str
+    issue_number: int
 ) -> None:
     """Logs the unresolved todos to the console.
 
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to log.
-        issue_number: str. The issue number that the todos are associated with.
+        issue_number: int. The issue number that the todos are associated with.
     """
-    print(f'The following TODOs are unresolved for this issue #{issue_number}:')
+    print(
+        'The following TODOs are unresolved ' +
+        'for this issue #' + str(issue_number) + ':')
     for todo in sorted(
         todos,
         key=lambda todo: (todo['file_path'], todo['line_number'])
@@ -130,15 +133,16 @@ def main(args: Optional[List[str]] = None) -> None:
     github_perma_link_url = (
         f'https://github.com/oppia/oppia/blob/{parsed_args.commit_sha}')
 
-    issues_to_check: List[str] = []
-    if parsed_args.issue_number:
-        issues_to_check.append(parsed_args.issue_number)
-    if parsed_args.issue_file:
-        with open(
-            repository_path + parsed_args.issue_file, 'r', encoding='utf-8'
-        ) as file:
-            for issue_number in file:
-                issues_to_check.append(issue_number.strip())
+    issues_to_check: List[int] = []
+    if parsed_args.issue:
+        issues_to_check.append(parsed_args.issue)
+    if parsed_args.pull_request:
+        linked_issues = (
+            github_api.GithubApi()
+                .fetch_linked_issues_for_pull_request(
+                    parsed_args.pull_request))
+        for linked_issue in linked_issues:
+            issues_to_check.append(linked_issue['number'])
 
     todos: List[todo_finder.TodoDict] = (
         todo_finder.get_correctly_formated_todos(
@@ -162,7 +166,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 issue_number)
     if todos_found:
         raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
-    print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR, end='')
+    print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

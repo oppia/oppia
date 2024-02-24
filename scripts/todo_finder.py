@@ -128,18 +128,18 @@ def get_todos(repository_path: str) -> List[TodoDict]:
     return todos
 
 
-def get_issue_number_from_todo(line_content: str) -> Optional[str]:
+def get_issue_number_from_todo(line_content: str) -> Optional[int]:
     """Gets the issue number from the todo.
 
     Args:
         line_content: str. The content of the line.
 
     Returns:
-        Optional[str]. The issue number if it exists.
+        Optional[int]. The issue number if it exists.
     """
     issue_number = CORRECT_TODO_REGEX.search(line_content)
     if issue_number:
-        return issue_number.group(1)
+        return int(issue_number.group(1))
     return None
 
 
