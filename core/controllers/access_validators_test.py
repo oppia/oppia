@@ -266,46 +266,29 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_json(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
 
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_json(
-                '%s/can_access_edit_learner_group_page/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                    expected_status_int=404)
-
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_false_with_user_not_being_a_facilitator(
         self
     ) -> None:
         self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
 
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_json(
-                '%s/can_access_edit_learner_group_page/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                    expected_status_int=404)
-
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_true_for_valid_facilitator(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                '%s/can_access_edit_learner_group_page/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+        self.get_html_response(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
