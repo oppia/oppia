@@ -15,7 +15,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a Blog Admin.
+ * if the user is not a Blog Admin or Blog Editor.
  */
 
 import { Location } from '@angular/common';
