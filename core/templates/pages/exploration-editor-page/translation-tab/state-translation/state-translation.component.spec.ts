@@ -610,10 +610,10 @@ describe('State translation component', () => {
 
     it('should get subtitled Unicode data translation', () => {
       let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict(
-      {
-        content_id: 'content_1',
-        unicode_str: 'This is the unicode'
-      });
+        {
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode'
+        });
       expect(component.getRequiredUnicode(subtitledObject)).toBe(
         'This is the unicode');
       expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
@@ -1498,7 +1498,8 @@ describe('State translation component', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
-          content_0: new TranslatedContent('Translated unicode', 'unicode', true
+          content_0: new TranslatedContent
+          ('Translated unicode', 'unicode', true
           )
         })
     );
@@ -1507,7 +1508,8 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode'
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
-    expect(unicodeData).toBe('This is the unicode')
+    
+    expect(unicodeData).toBe('This is the unicode');
   });  
 
   it('should return translation html when translation no available', () => {
