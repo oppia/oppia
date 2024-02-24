@@ -761,44 +761,6 @@ class LearnerGroupSearchLearnerHandler(
         })
 
 
-class EditLearnerGroupPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page for editing a learner group."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'group_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
-
-    @acl_decorators.can_access_learner_groups
-    def get(self, group_id: str) -> None:
-        """Handles GET requests."""
-        assert self.user_id is not None
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
-            raise self.PageNotFoundException
-
-        is_valid_request = learner_group_services.is_user_facilitator(
-            self.user_id, group_id)
-
-        if not is_valid_request:
-            raise self.PageNotFoundException
-
-        self.render_template('edit-learner-group-page.mainpage.html')
-
-
 class LearnerGroupLearnersInfoHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
