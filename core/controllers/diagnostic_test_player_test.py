@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core import feconf
-from core.domain import feature_flag_services
 from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import topic_domain

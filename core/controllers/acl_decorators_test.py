@@ -35,7 +35,6 @@ from core.domain import classroom_config_services
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
