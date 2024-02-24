@@ -209,7 +209,7 @@ export class RteHelperModalComponent {
 
     setTimeout(() => {
       this.modalIsLoading = false;
-    });
+    },100);
   }
 
   cancel(): void {
