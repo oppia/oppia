@@ -107,7 +107,7 @@ export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   @Input() componentIsNewlyCreated: boolean;
-  modalIsLoading: boolean = false;
+  modalIsLoading: boolean = true;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
@@ -209,7 +209,7 @@ export class RteHelperModalComponent {
 
     setTimeout(() => {
       this.modalIsLoading = false;
-    },100);
+    });
   }
 
   cancel(): void {
