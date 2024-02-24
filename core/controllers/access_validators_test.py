@@ -25,6 +25,8 @@ from core.domain import config_services
 from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
