@@ -7,9 +7,9 @@
     <mat-card class="oppia-page-card">
       <div *ngIf="hasPageLoaded">
         <!--
-            The 'hasPageLoaded' variable is used to ensure that the 'userPreferences' object is created.
+            The 'hasPageLoaded' variable is used to ensure that the form group is created.
             else it will be undefined and we cannot access its properties below, so it throws an error in the console.
-            Eg: 'userPreferences.profilePicturePngDataUrl'.
+            Eg: formControlName="userBio".
         -->
         <div class="container">
           <div class="form-group row">
@@ -51,7 +51,7 @@
                 <picture *ngIf="preferencesForm.get('profilePicturePngDataUrl').value">
                   <source type="image/webp" [srcset]="preferencesForm.get('profilePictureWebpDataUrl').value" >
                   <source type="image/png" [srcset]="preferencesForm.get('profilePicturePngDataUrl').value">
-                  <img [src]="userPreferences.profilePicturePngDataUrl"
+                  <img [src]="preferencesForm.get('profilePicturePngDataUrl').value"
                        class="img-thumbnail e2e-test-custom-photo"
                        alt="Profile photo picture">
                 </picture>

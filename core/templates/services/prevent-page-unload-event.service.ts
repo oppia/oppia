@@ -45,8 +45,6 @@ export class PreventPageUnloadEventService {
       this._preventPageUnloadEventHandler.bind(null, this.validationCallback);
     this.windowRef.nativeWindow.addEventListener(
       'beforeunload', this._preventPageUnloadEventHandlerBind, true);
-    this.windowRef.nativeWindow.removeEventListener(
-      'beforeunload', this._preventPageUnloadEventHandlerBind, true);
     this.listenerActive = true;
   }
 
