@@ -1499,7 +1499,8 @@ describe('State translation component', () => {
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
           content_0: new TranslatedContent
-          ('Translated unicode', 'unicode', true
+          (
+            'Translated unicode', 'unicode', true
           )
         })
     );
@@ -1508,9 +1509,8 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode'
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
-    
     expect(unicodeData).toBe('This is the unicode');
-  });  
+  });
 
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
