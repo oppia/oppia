@@ -26,8 +26,6 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
  * @fileoverview Unit tests for SkillSelectorComponent.
  */
 
-
-
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
@@ -62,8 +60,6 @@ describe('SkillSelectorComponent', () => {
       userService, 'canUserAccessTopicsAndSkillsDashboard'
     ).and.returnValue(Promise.resolve(true));
   });
-
-
 
   it('should initialize topic and subtopic filters to unchecked state', () => {
     component.categorizedSkills = {
@@ -456,48 +452,21 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
-  it('should exclude the active skill from the search results', () => {
-    const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
-    mockSkill.getId.and.returnValue('skill1');
-    spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
-
-    component.untriagedSkillSummaries = [
-      new SkillSummary('skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456),
-      new SkillSummary('skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101),
-      new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314),
-    ];
-
-    const searchText = 'Skill';
-    const filteredSkills = component
-      .searchInUntriagedSkillSummaries(searchText);
-    const expectedFilteredSkills = [
-      component.untriagedSkillSummaries[1],
-      component.untriagedSkillSummaries[2],
-    ];
-
-    expect(filteredSkills).toEqual(expectedFilteredSkills);
-  });
-
-  // Test case: Filter based on search text and exclude active skill.
   it('should filter based on search text and exclude active skill', () => {
     const mockSkill = jasmine.createSpyObj('Skill', ['getId']);
     mockSkill.getId.and.returnValue('skill1');
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(mockSkill);
-
     component.untriagedSkillSummaries = [
       new SkillSummary('skill1', 'Existing Skill One', 'en', 1, 2, 3, 123, 456),
       new SkillSummary('skill2', 'Skill Two', 'en', 4, 5, 6, 789, 101),
       new SkillSummary('skill3', 'Skill Three', 'en', 7, 8, 9, 1112, 1314),
     ];
-
     const searchText = 'Two';
     const filteredSkills = component
       .searchInUntriagedSkillSummaries(searchText);
     const expectedFilteredSkills = [component.untriagedSkillSummaries[1]];
-
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
-
 
   it('should include skills with exact description match', () => {
     // Prepare test data with one exact description match.
@@ -522,7 +491,6 @@ describe('SkillSelectorComponent', () => {
       )
     ];
 
-    // Assert only exact matches are included.
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 });
