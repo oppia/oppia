@@ -49,10 +49,6 @@ var PreferencesPage = function() {
   var userInterestsInput = $('.e2e-test-subject-interests-input');
 
   var saveNewChanges = async function(fieldName) {
-    // Click on a neutral element to blur the user bio 'textarea' element.
-    // If the following click event is omitted, the '(change)' event
-    // won't be triggered for the textarea, failing to register changes.
-    await action.click('Navbar Button', navBar);
     await clickSaveChangesButton();
     // Due to screen dimensions in e2e tests, the Info toast overlaps
     // with the 'Save Changes' button. To avoid this collision, we click
@@ -229,7 +225,7 @@ var PreferencesPage = function() {
   this.expectUserBioToBe = async function(bio) {
     await waitFor.visibilityOf(
       userBioElement, 'User bio field takes too long to appear.');
-    expect(await userBioElement.getAttribute('value')).toMatch(bio);
+    expect(await userBioElement.getValue()).toMatch(bio);
   };
 
   this.selectCreatorDashboard = async function() {
