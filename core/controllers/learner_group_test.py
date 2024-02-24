@@ -987,56 +987,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class EditLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the edit learner page."""
-
-    LEARNER_ID: Final = 'learner_user_1'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.OWNER_EMAIL)
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
-        self.learner_group = learner_group_services.create_learner_group(
-            self.learner_group_id, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
-            ['story_id_1'])
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id,
-            expected_status_int=404)
-        self.logout()
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
-    def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
-        self
-    ) -> None:
-        response = self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id)
-        response.mustcontain(
-            '<oppia-edit-learner-group-page>'
-            '</oppia-edit-learner-group-page>')
-        self.logout()
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
-    def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
-        self
-    ) -> None:
-        self.logout()
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '/edit-learner-group/%s' % self.learner_group_id,
-            expected_status_int=404)
-        self.logout()
-
-
 class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
     """Checks learner successfully accepting or declining a learner group
     invitation.
