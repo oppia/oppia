@@ -341,16 +341,14 @@ def swap_is_feature_flag_enabled_function(
     Yields:
         context. The context with function replaced.
     """
-    # Here we use unused-argument because as we are mocking a function,
-    # the args names should be similar to our mocking function args.
     def mock_is_feature_flag_enabled(
-        user_id: Optional[str], feature_flag_name: str # pylint: disable=unused-argument
+        _: Optional[str], feature_flag_name: str
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
-            user_id: str|None. The id of the user, can be None.
+            _: str|None. The id of the user, can be None.
             feature_flag_name: str. The name of the target feature flag.
 
         Returns:
