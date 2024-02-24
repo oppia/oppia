@@ -198,3 +198,41 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read()))
         return autogeneratable_language_accent_list
+
+
+def get_curated_exploration_ids():
+    exploration_ids = []
+
+    voice_artist_metadata_models = (
+        voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+
+    for voice_artist_metadata_model in voice_artist_metadata_models:
+        metadata_mapping = (
+            voice_artist_metadata_model.voiceovers_and_contents_mapping)
+        exploration_mapping = metadata_mapping.get(
+            'exploration_id_to_content_ids', {})
+        for exp_id in exploration_mapping.keys():
+            exploration_ids.append(exp_id)
+
+    return exploration_ids
+
+
+def get_voice_artists_metadata_mapping_from_exploration_id(exploration_id):
+    voice_artist_id_to_metadata_mapping = {}
+
+    voice_artist_metadata_models = (
+        voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+
+    for voice_artist_metadata_model in voice_artist_metadata_models:
+        voice_artist_id = voice_artist_metadata_model.id
+        metadata_mapping = (
+            voice_artist_metadata_model.voiceovers_and_contents_mapping)
+
+        exploration_mapping = metadata_mapping.get(
+            'exploration_id_to_content_ids', {})
+
+        if exploration_id in exploration_mapping:
+            voice_artist_id_to_metadata_mapping[voice_artist_id] = (
+                    metadata_mapping)
+
+    return voice_artist_id_to_metadata_mapping
