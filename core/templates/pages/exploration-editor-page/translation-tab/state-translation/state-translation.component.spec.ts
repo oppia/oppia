@@ -110,6 +110,7 @@ describe('State translation component', () => {
   let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
+  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService:
     TranslationTabActiveContentIdService;
@@ -314,6 +315,8 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
+    subtitledUnicodeObjectFactory = TestBed.inject(
+      SubtitledUnicodeObjectFactory);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService);
@@ -603,6 +606,17 @@ describe('State translation component', () => {
         'This is the html');
       expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
         'This is the html');
+    });
+
+    it('should get subtitled Unicode data translation', () => {
+      let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+        content_id: 'content_1',
+        unicode_str: 'This is the unicode'
+      });
+      expect(component.getRequiredUnicode(subtitledObject)).toBe(
+        'This is the unicode');
+      expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the unicode');
     });
 
     it('should get empty content message when text translations haven\'t' +
@@ -1048,6 +1062,7 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
+  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService:
     TranslationTabActiveContentIdService;
@@ -1312,6 +1327,8 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
+    subtitledUnicodeObjectFactory = TestBed.inject(
+      SubtitledUnicodeObjectFactory);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService);
@@ -1444,6 +1461,24 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
+  it('should return translated unicode when voiceover mode is active', () => {
+    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
+    });
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('This is the unicode');
+  });
+
+  it('should return translated unicode when voiceovermode is active', () => {
+    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
+    });
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('This is the unicode');
+  });
+
   it('should return translation html when translation available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
@@ -1458,6 +1493,21 @@ describe('State translation component', () => {
     expect(htmlData).toBe('Translated HTML');
   });
 
+  it('should return translated unicode when translation available', () => {
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+          content_0: new TranslatedContent('Translated unicode', 'unicode', true)
+        })
+    );
+    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
+    });
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('This is the unicode')
+  })
+
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
@@ -1471,6 +1521,21 @@ describe('State translation component', () => {
 
     expect(htmlData).toBe('<p>HTML data</p>');
   });
+
+  it('should return translation unicode when translation no available', () => {
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+          content_1: new TranslatedContent('Translated HTML', 'html', true)
+        })
+    );
+    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
+    });
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('Translated HTML')
+  })
 
   describe('when rules input tab is accessed but with no rules', () => {
     it('should throw an error when there are no rules', () => {
