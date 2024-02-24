@@ -146,15 +146,6 @@ export class PreferencesPageComponent {
     webpControl.updateValueAndValidity();
   }
 
-  private preserveProfileImageUrls(
-      profilePicturePngDataUrl: string,
-      profilePicturewebpDataUrl: string): void {
-    this.preferencesForm.controls.profilePicturePngDataUrl.setValue(
-      profilePicturePngDataUrl);
-    this.preferencesForm.controls.profilePictureWebpDataUrl.setValue(
-      profilePicturewebpDataUrl);
-  }
-
   // TODO(#19737): Remove the following function.
   private _saveProfileImageToLocalStorage(image: string): void {
     const newImageFile = (
