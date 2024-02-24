@@ -448,6 +448,7 @@ import { VoiceoverBackendApiService } from
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { TopicEditorAccessGuard } from 'pages/topic-editor-page/topic-editor-access.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -664,6 +665,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['IsLoggedInGuard', IsLoggedInGuard],
   ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
+  ['TopiEditorAccessGuard', TopicEditorAccessGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',

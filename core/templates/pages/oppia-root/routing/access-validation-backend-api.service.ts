@@ -53,6 +53,9 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'); // eslint-disable-line max-len
 
+  TOPIC_EDITOR_ACCESS_VALIDATOR_URL = (
+    '/access_validation_handler/can_access_topic_editor/<topic_id>');
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -127,6 +130,15 @@ export class AccessValidationBackendApiService {
     let url = this.urlInterpolationService.interpolateUrl(
       this.DOES_LEARNER_GROUP_EXIST, {
         learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToTopicEditorPage(topicId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.TOPIC_EDITOR_ACCESS_VALIDATOR_URL, {
+        topic_id: topicId
       });
 
     return this.http.get<void>(url).toPromise();

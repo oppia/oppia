@@ -315,6 +315,13 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/blog-post-page/blog-post-page.module')
       .then(m => m.BlogPostPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-editor-page/topic-editor-page.module')
+        .then(m => m.TopicEditorPageModule),
+    canActivate: [IsLoggedInGuard]
   }
 ];
 
