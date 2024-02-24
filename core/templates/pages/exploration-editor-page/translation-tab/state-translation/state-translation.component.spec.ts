@@ -1463,6 +1463,8 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode when voiceover mode is active', () => {
+    spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
+      .returnValue(true);
     let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode'
