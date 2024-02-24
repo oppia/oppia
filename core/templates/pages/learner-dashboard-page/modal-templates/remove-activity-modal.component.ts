@@ -16,7 +16,6 @@
  * @fileoverview Component for removeActivityModal.
  */
 
-import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -100,8 +99,3 @@ export class RemoveActivityModalComponent implements OnInit {
     this.activeModal.dismiss();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRemoveActivityModalComponent',
-  downgradeComponent(
-    {component: RemoveActivityModalComponent}));

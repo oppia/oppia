@@ -132,8 +132,8 @@
 
       <div>
         <strong class="oppia-outcome-heading" *ngIf="displayFeedback" tabindex="0">And afterwards, directs the learner
-        to...</strong>
-        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to...</strong>
+        to ... </strong>
+        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to ... </strong>
         <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative" tabindex="0">
           {{ outcome.dest }}
         </span>
@@ -196,12 +196,12 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback" tabindex="0">(Optional) If the learner is really stuck, direct them to</strong>
-        <strong *ngIf="!displayFeedback" tabindex="0">(Optional) Oppia directs the stuck learner to...</strong>
+        <strong *ngIf="displayFeedback" tabindex="0">(Optional) If the learner is really stuck, direct them to ... </strong>
+        <strong *ngIf="!displayFeedback" tabindex="0">(Optional) Oppia directs the stuck learner to ... </strong>
         <span tabindex="0" *ngIf="outcome && outcome.destIfReallyStuck !== null" class="position-relative">
           {{ outcome.destIfReallyStuck }}
         </span>
-        <span tabindex="0" *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative"></span>
+        <span tabindex="0" *ngIf="!outcome || outcome.destIfReallyStuck === null" class="position-relative">(none)</span>
       </div>
     </div>
   </div>
@@ -235,7 +235,7 @@
   </div>
 </div>
 
-<div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+<div class="oppia-correctness-label-editor" *ngIf="!isCurrentInteractionLinear()">
   <div *ngIf="!isEditable"
        title="{{ isEditable ? 'Edit correctness setting' : '' }}"
        class="h-100">
