@@ -665,7 +665,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['IsLoggedInGuard', IsLoggedInGuard],
   ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
-  ['TopiEditorAccessGuard', TopicEditorAccessGuard],
+  ['TopicEditorAccessGuard', TopicEditorAccessGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
