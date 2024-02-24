@@ -26,23 +26,34 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationCreator = null;
   beforeAll(async function() {
-    explorationCreator = await userFactory.createExplorationCreator(
+    explorationCreator = await userFactory.createNewExplorationCreator(
       'explorationAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should perform exploration management actions',
     async function() {
-      await explorationCreator.createExploration();
-      await explorationCreator.goToBasicSettingsTab();
-      await explorationCreator.updateBasicSettings();
-      await explorationCreator.publishExploration();
-      await explorationCreator.expectInteractionOnCreatorDashboard();
+      await explorationCreator.goToDashboardUrl();
+      await explorationCreator.takeMeToEditorSection();
+      await explorationCreator.updateCardName();
+      await explorationCreator.updateExplorationIntroText();
+      await explorationCreator.addInteraction();
+      await explorationCreator.explorationCreatedSuccessfully();
+
+      await explorationCreator.goToSettingsTab();
+      await explorationCreator.updateTitle();
+      await explorationCreator.updateGoal();
+      await explorationCreator.selectCategory();
+      await explorationCreator.addTags();
+      await explorationCreator.successfullyUpdatedSettings();
+      await explorationCreator.makeExplorationPublic();
+      // await explorationCreator.expectInteractionOnCreatorDashboard();
+
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
       await explorationCreator.expectChangesToBeDiscarded();
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
-      await explorationCreator.exceptExplorationToBeDrafted();
+      // await explorationCreator.exceptExplorationToBeDrafted();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

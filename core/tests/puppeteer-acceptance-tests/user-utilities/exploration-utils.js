@@ -33,7 +33,7 @@ const interactionAddbutton = '.oppia-add-interaction-button';
 const endExplorationTab =
 'img[src="/extensions/interactions/EndExploration/static/EndExploration.png"]';
 const saveInteractionButton = '.e2e-test-save-interaction';
-const basicSettingsTab =
+const settingsTab =
 '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = '.e2e-test-exploration-title-input';
 const addTitle = '.e2e-test-exploration-title-input';
@@ -47,7 +47,7 @@ const addTags = '#mat-chip-list-input-0';
 const previewSummaryButton = '#clickToSeePreviewSummary';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
-const feedbackToggle = 'label[for="feedback-switch"]';
+const feedbackToggleOff = 'label[for="feedback-switch"]';
 
 const editbutton = '.oppia-edit-roles-btn';
 const addUserName = '#newMemberUsername';
@@ -72,52 +72,105 @@ const addVoiceArtistUserName = '#newVoicAartistUsername';
 let titleBeforeChanges = '';
 
 module.exports = class e2eExplorationCreator extends baseUser {
+  
   /**
-   * This function helps in making a new exploration.
+   * This function helps in reaching dashboard Url.
    */
-  async createExploration() {
+  async goToDashboardUrl(){
     await this.goto(creatorDashboardUrl);
+  }
+
+   /**
+   * This function helps in reaching editor section.
+   */
+  async takeMeToEditorSection() {
     await this.clickOn(createNewExplorationButton);
     await this.clickOn(takeMeToEditorButton);
+  }
+
+   /**
+   * This function helps in updating Card Name.
+   */
+  async updateCardName(){
     await this.clickOn(addCardName);
     await this.type('.e2e-test-state-name-input', 'Test question');
     await this.page.waitForSelector(forButtonToBeEnabled);
     await this.clickOn(introSubmitButton);
+  }
+
+   /**
+   * This function helps in updating exploration intro text.
+   */
+  async updateExplorationIntroText(){
+    await this.page.waitForTimeout(600);
     await this.clickOn('.e2e-test-edit-content-pencil-button');
     await this.type('.e2e-test-rte', 'Exploration intro text');
     await this.clickOn(introTitleSubmitButton);
+  }
+
+   /**
+   * This function helps in adding interaction.
+   */
+  async addInteraction(){
     await this.clickOn(interactionAddbutton);
     await this.clickOn(endExplorationTab);
     await this.clickOn(saveInteractionButton);
+  }
 
+  async explorationCreatedSuccessfully(){
     showMessage('Successfully created a exploration!');
   }
 
   /**
    * This function helps in reaching setting tab successfully.
    */
-  async goToBasicSettingsTab() {
-    await this.clickOn(basicSettingsTab);
+  async goToSettingsTab() {
+    await this.clickOn(settingsTab);
   }
 
   /**
-   * This function helps in updating basic settings.
+   * This function helps in updating Title.
    */
-  async updateBasicSettings() {
+  async updateTitle(){
     await this.clickOn(addTitleBar);
     await this.type(addTitle, 'Your Title Here');
-    await this.clickOn(addGoalBar);
-    await this.type(addGoal, 'Your Goal Here Please');
-    await this.clickOn(cateogryDropDawn);
-    await this.clickOn(addCateogry);
-    await this.clickOn(languageUpdateBar);
-    await this.clickOn(addLanguage);
-    await this.clickOn(addTags);
-    await this.type(addTags, 'Your Tag Here');
-
-    showMessage('Successfully updated basic settings!');
   }
 
+  /**
+   * This function helps in adding a goal.
+   */  
+  async updateGoal(){
+    await this.clickOn(addGoalBar);
+    await this.type(addGoal, 'Your Goal Here Please');
+  }
+
+  /**
+   * This function helps in selecting a category from dropdawn.
+   */ 
+  async selectCategory(){
+    await this.clickOn(cateogryDropDawn);
+    await this.clickOn(addCateogry);
+  }
+
+  /**
+   * This function helps in selecting language from dropdawn.
+   */  
+  async selectLanguage(){
+    await this.clickOn(languageUpdateBar);
+    await this.clickOn(addLanguage);
+  }
+  
+  /**
+   * This function helps in adding tags.
+   */
+  async addTags(){
+    await this.clickOn(addTags);
+    await this.type(addTags, 'Your Tag Here');
+  }
+
+  async successfullyUpdatedSettings(){
+    showMessage('Successfully updated basic settings!');
+  }
   /**
    * This function checks length of title bar at basic settings tab
    * @param {Number} maxLength
@@ -234,7 +287,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in updating advanced settings
    */
-  async updateAdvancedSettings() {
+  async updateAutomaticTextToSpeech() {
     await this.clickOn(textToSpeechToggle);
 
     showMessage('Successfully updated advanced settings!');
@@ -270,21 +323,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in assigning role of Playtester to guest user.
    */
-  async assignUserToPlayTesterRole() {
+  async assignUserToPlaytesterRole() {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
     await this.type(addUserName, 'guestUsr2');
     await this.clickOn(addRoleBar);
     await this.clickOn(playTesterRoleOption);
     await this.clickOn(saveRole);
-  }
-
-  /**
-   * This function helps in making exploration Public.
-   */
-  async makeExplorationPublic() {
-    await this.publishExploration();
-  }
+  } 
 
   /**
    *Exception function to verify the setting
@@ -305,7 +351,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in adding voice artist.
    */
-  async voiceArtistAdded() {
+  async addVoiceArtist() {
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
     await this.type(addVoiceArtistUserName, 'guestUsr3');
@@ -330,8 +376,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps to choose notification type.
    */
-  async chooseToRecieveNotification() {
-    await this.clickOn(feedbackToggle);
+  async chooseToReceiveSuggestedEmailsAsNotification() {
+    await this.clickOn(feedbackToggleOff);
   }
 
   /**
@@ -395,7 +441,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in publishing the exploration
    */
-  async publishExploration() {
+  async makeExplorationPublic() {
     await this.saveDraftExploration();
     await this.page.waitForSelector(publishButton);
     await this.clickOn(publishButton);
@@ -403,13 +449,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn(publishConfirmButton);
     await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
-  }
-
-  /**
-   * This function helps in publishing changes.
-   */
-  async publishChanges() {
-    await this.saveDraftExploration();
   }
 
   /**
@@ -443,7 +482,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in doing some changes in exploration.
    */
   async addSomeChanges() {
-    await this.clickOn(basicSettingsTab);
+    await this.clickOn(settingsTab);
     titleBeforeChanges = await this.page.$eval(
       '.e2e-test-exploration-title-input', title => title.value);
     await this.clickOn(addTitleBar);
@@ -451,7 +490,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   async discardCurrentChanges() {
-    await this.clickOn('.e2e-test-save-discard-toggle');
+    await this.clickOn('oppia-discard-button');
+    await this.clickOn('oppia-discard-button');
     await this.clickOn(discardDraftButton);
   }
 

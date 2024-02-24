@@ -24,7 +24,7 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Creator and Exploration Manager', function() {
+describe('Exploration Creator', function() {
   let explorationCreator = null;
   let superAdmin = null;
 
@@ -35,39 +35,66 @@ describe('Exploration Creator and Exploration Manager', function() {
       'guestUsr2', 'guest_user2@example.com');
     guestUser3 = await userFactory.createNewGuestUser(
       'guestUsr3', 'guest_user3@example.com');
-    explorationCreator = await userFactory.createExplorationCreator(
+    explorationCreator = await userFactory.createNewExplorationCreator(
       'explorationAdm');
     superAdmin = await userFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should perform exploration creation and basic actions',
+  it('should create exploration and can modify it from settings tab',
     async function() {
       await superAdmin.assignRoleToUser(
         'explorationAdm', 'voiceover admin');
+      await superAdmin.expectUserToHaveRole(
+        'explorationAdm', 'voiceover admin');
 
-      await explorationCreator.createExploration();
-      await explorationCreator.goToBasicSettingsTab();
+      await superAdmin.assignRoleToUser(
+        'explorationAdm', 'curriculum admin');
+      await superAdmin.expectUserToHaveRole(
+        'explorationAdm', 'curriculum admin');    
+      
+      await explorationCreator.goToDashboardUrl();
+      await explorationCreator.takeMeToEditorSection();
+      await explorationCreator.updateCardName();
+      await explorationCreator.updateExplorationIntroText();
+      await explorationCreator.addInteraction();
+      await explorationCreator.explorationCreatedSuccessfully();
+
+      await explorationCreator.goToSettingsTab();
       await explorationCreator.expectTitleToHaveMaxLength(36);
-      await explorationCreator.updateBasicSettings();
+
+      await explorationCreator.updateTitle();
+      await explorationCreator.updateGoal();
+      await explorationCreator.selectCategory();
+      await explorationCreator.addTags();
+      await explorationCreator.successfullyUpdatedSettings();
+
       await explorationCreator.expectGoalToBeSet();
       await explorationCreator.expectCategoryToBeSelected();
       await explorationCreator.expectLanguageToBeSelected();
+
       await explorationCreator.previewSummary();
       await explorationCreator.expectPreviewSummaryToBeVisible();
-      await explorationCreator.updateAdvancedSettings();
+
+      await explorationCreator.updateAutomaticTextToSpeech();
       await explorationCreator.
         expectAutomaticTextToSpeechToBeEnabledOrDisabled();
+
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
-      await explorationCreator.assignUserToPlayTesterRole('guestUsr2');
+      await explorationCreator.assignUserToPlaytesterRole('guestUsr2');
+
       await explorationCreator.makeExplorationPublic();
       await explorationCreator.expectExplorationAccessibility();
-      await explorationCreator.voiceArtistAdded();
+
+      await explorationCreator.addVoiceArtist();
       await explorationCreator.expectVoiceArtistToBeAdded();
-      await explorationCreator.selectVoiceArtist();
-      await explorationCreator.chooseToRecieveNotification();
+
+      await explorationCreator.
+        chooseToReceiveSuggestedEmailsAsNotification();
       await explorationCreator.expectFeedbackNotificationChoice();
+
       await explorationCreator.deleteExploration();
       await explorationCreator.expectExplorationToBeDeleted();
+
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
