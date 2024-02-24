@@ -17,8 +17,8 @@
  */
 
 import { ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
 import { Observable } from 'rxjs';
@@ -26,12 +26,17 @@ import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'oppia-subject-interests',
-  templateUrl: './subject-interests.component.html'
+  templateUrl: './subject-interests.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SubjectInterestsComponent),
+      multi: true
+    }
+  ]
 })
-export class SubjectInterestsComponent {
+export class SubjectInterestsComponent implements ControlValueAccessor {
   @Input() subjectInterests: string[] = [];
-  @Output() subjectInterestsChange: EventEmitter<string[]> = (
-    new EventEmitter());
 
   selectable = true;
   removable = true;
@@ -51,6 +56,25 @@ export class SubjectInterestsComponent {
       startWith(null),
       map((interest: string | null) => interest ? this.filter(
         interest) : this.allSubjectInterests.slice()));
+  }
+
+  // Implementing the ControlValueAccessor interface through the following
+  // 5 methods to make the component work as a form field.
+  onChange: (value: string[]) => void = () => {};
+  onTouched: () => void = () => {};
+
+  writeValue(value: string[]): void {
+    if (value !== undefined) {
+      this.subjectInterests = value;
+    }
+  }
+
+  registerOnChange(fn: (value: string[]) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
   }
 
   ngOnInit(): void {
@@ -83,7 +107,7 @@ export class SubjectInterestsComponent {
       if (this.allSubjectInterests.indexOf(value) < 0) {
         this.allSubjectInterests.push(value);
       }
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
       this.subjectInterestInput.nativeElement.value = '';
     }
   }
@@ -93,7 +117,7 @@ export class SubjectInterestsComponent {
 
     if (index >= 0) {
       this.subjectInterests.splice(index, 1);
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
     }
   }
 

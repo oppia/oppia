@@ -38,17 +38,18 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
+import { FormControl, FormGroup } from '@angular/forms';
 
 interface AudioLangaugeChoice {
   id: string;
   text: string;
 }
 
-// A Dict that maps the UserPreferences model field names
+// A Dict that maps the form Control names in the frontend
 // to the backend update_types.
 const BACKEND_UPDATE_TYPE_DICT: (
   { [key: string]: BackendPreferenceUpdateType }) = {
-  newProfilePictureDataUrl: 'profile_picture_data_url',
+  profilePicturePngDataUrl: 'profile_picture_data_url',
   userBio: 'user_bio',
   defaultDashboard: 'default_dashboard',
   subjectInterests: 'subject_interests',
@@ -57,92 +58,6 @@ const BACKEND_UPDATE_TYPE_DICT: (
   preferredAudioLanguageCode: 'preferred_audio_language_code',
   emailPreferences: 'email_preferences'
 };
-
-type ValidPreferenceFields = {
-  [K in keyof UserPreferences]: UserPreferences[K] extends string |
-  string[] | EmailPreferencesBackendDict ? K : never;
-}[keyof UserPreferences];
-
-class UserPreferences {
-  // The following property is used to track if there are any unsaved changes
-  // for each field in the preferences page.
-  private fieldsWithChangedValues: { [key: string]: boolean } = {
-    newProfilePictureDataUrl: false,
-    userBio: false,
-    defaultDashboard: false,
-    subjectInterests: false,
-    preferredLanguageCodes: false,
-    preferredSiteLanguageCode: false,
-    preferredAudioLanguageCode: false,
-    emailPreferences: false
-  };
-
-  // The following property is the new profile picture data url that is
-  // uploaded by the user and will be sent to the server.
-  newProfilePictureDataUrl!: string;
-
-  constructor(
-    public profilePicturePngDataUrl: string,
-    public profilePictureWebpDataUrl: string,
-    public userBio: string,
-    public defaultDashboard: string,
-    public subjectInterests: string,
-    public preferredLanguageCodes: string[],
-    public preferredSiteLanguageCode: string,
-    public preferredAudioLanguageCode: string,
-    public canReceiveEmailUpdates: boolean,
-    public canReceiveEditorRoleEmail: boolean,
-    public canReceiveFeedbackMessageEmail: boolean,
-    public canReceiveSubscriptionEmail: boolean,
-    public subscriptionList: SubscriptionSummary[]
-  ) {}
-
-  hasUnsavedChanges(): boolean {
-    // Checks if there are any unsaved changes in the preferences.
-    return Object.values(this.fieldsWithChangedValues).some((value) => value);
-  }
-
-  markPreferenceAsChanged(preferenceField: string): void {
-    this.fieldsWithChangedValues[preferenceField] = true;
-  }
-
-  isFieldChanged(preferenceField: string): boolean {
-    return this.fieldsWithChangedValues[preferenceField];
-  }
-
-  resetFieldsWithChangedValues(): void {
-    for (let key in this.fieldsWithChangedValues) {
-      this.fieldsWithChangedValues[key] = false;
-    }
-  }
-
-  getUpdates(): UpdatePreferenceDict[] {
-    const updates: UpdatePreferenceDict[] = [];
-    for (const preferenceField in this.fieldsWithChangedValues) {
-      if (this.fieldsWithChangedValues[preferenceField]) {
-        if (preferenceField === 'emailPreferences') {
-          let emailData: EmailPreferencesBackendDict = {
-            can_receive_email_updates: this.canReceiveEmailUpdates,
-            can_receive_editor_role_email: this.canReceiveEditorRoleEmail,
-            can_receive_feedback_message_email: (
-              this.canReceiveFeedbackMessageEmail),
-            can_receive_subscription_email: this.canReceiveSubscriptionEmail
-          };
-          updates.push({
-            update_type: BACKEND_UPDATE_TYPE_DICT[preferenceField],
-            data: emailData
-          });
-          continue;
-        }
-        updates.push({
-          update_type: BACKEND_UPDATE_TYPE_DICT[preferenceField],
-          data: this[preferenceField as ValidPreferenceFields]
-        });
-      }
-    }
-    return updates;
-  }
-}
 
 @Component({
   selector: 'oppia-preferences-page',
@@ -153,7 +68,6 @@ export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  userPreferences!: UserPreferences;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   TAG_REGEX_STRING!: string;
   LANGUAGE_CHOICES!: LanguageIdAndText[];
@@ -172,10 +86,8 @@ export class PreferencesPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
-  // The following property is used to track if the page should be reloaded,
-  // after saving preferences, it is set to true when profile picture
-  // is to be updated.
-  pageShouldBeReloaded: boolean = false;
+  subscriptionList: SubscriptionSummary[] = [];
+  preferencesForm!: FormGroup;
 
   @ViewChild('firstRadio') firstRadio!: ElementRef;
 
@@ -202,49 +114,6 @@ export class PreferencesPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  markUserBioAsChanged(): void {
-    this.userPreferences.markPreferenceAsChanged('userBio');
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  markDefaultDashboardAsChanged(): void {
-    this.userPreferences.markPreferenceAsChanged('defaultDashboard');
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  onSubjectInterestsSelectionChange(subjectInterests: string): void {
-    this.alertsService.clearWarnings();
-    this.userPreferences.markPreferenceAsChanged('subjectInterests');
-    this.userPreferences.subjectInterests = subjectInterests;
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  updateAndMarkLanguageCodesAsChanged(preferredLanguageCodes: string[]): void {
-    this.userPreferences.markPreferenceAsChanged('preferredLanguageCodes');
-    this.userPreferences.preferredLanguageCodes = preferredLanguageCodes;
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  updateAndMarkSiteLanguageCodeAsChanged(
-      preferredSiteLanguageCode: string): void {
-    this.userPreferences.markPreferenceAsChanged('preferredSiteLanguageCode');
-    this.userPreferences.preferredSiteLanguageCode = preferredSiteLanguageCode;
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  updateAndMarkAudioLanguageCodeAsChanged(
-      preferredAudioLanguageCode: string): void {
-    this.userPreferences.markPreferenceAsChanged('preferredAudioLanguageCode');
-    this.userPreferences.preferredAudioLanguageCode = (
-      preferredAudioLanguageCode);
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  markEmailPreferencesAsChanged(): void {
-    this.userPreferences.markPreferenceAsChanged('emailPreferences');
-    this.preventPageUnloadEventService.addListener();
-  }
-
   showUsernamePopover(creatorUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the creator username is greater than 10 and the user hovers
@@ -264,11 +133,26 @@ export class PreferencesPageComponent {
 
   private updateAndMarkProfileImageAsChanged(
       newProfilePictureDataUrl: string): void {
-    this.pageShouldBeReloaded = true;
-    this.userPreferences.markPreferenceAsChanged('newProfilePictureDataUrl');
-    this.userPreferences.newProfilePictureDataUrl = newProfilePictureDataUrl;
-    this.userPreferences.profilePicturePngDataUrl = newProfilePictureDataUrl;
-    this.userPreferences.profilePictureWebpDataUrl = newProfilePictureDataUrl;
+    const pngControl = this.preferencesForm.controls.profilePicturePngDataUrl;
+    const webpControl = this.preferencesForm.controls.profilePictureWebpDataUrl;
+    pngControl.setValue(newProfilePictureDataUrl);
+    webpControl.setValue(newProfilePictureDataUrl);
+    // We need to mark the control as dirty programmatically because it
+    // is not changed by the user but by the component.
+    pngControl.markAsDirty();
+    webpControl.markAsDirty();
+    // The following line is needed to emit the statusChanges observable.
+    pngControl.updateValueAndValidity();
+    webpControl.updateValueAndValidity();
+  }
+
+  private preserveProfileImageUrls(
+      profilePicturePngDataUrl: string,
+      profilePicturewebpDataUrl: string): void {
+    this.preferencesForm.controls.profilePicturePngDataUrl.setValue(
+      profilePicturePngDataUrl);
+    this.preferencesForm.controls.profilePictureWebpDataUrl.setValue(
+      profilePicturewebpDataUrl);
   }
 
   // TODO(#19737): Remove the following function.
@@ -294,7 +178,9 @@ export class PreferencesPageComponent {
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+      if (newProfilePictureDataUrl) {
+        this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+      }
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -372,21 +258,43 @@ export class PreferencesPageComponent {
             this.urlInterpolationService.getStaticImageUrl(
               AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
         }
-        this.userPreferences = new UserPreferences(
-          profilePicturePngDataUrl,
-          profilePictureWebpDataUrl,
-          preferencesData.user_bio,
-          preferencesData.default_dashboard,
-          preferencesData.subject_interests,
-          preferencesData.preferred_language_codes,
-          preferencesData.preferred_site_language_code,
-          preferencesData.preferred_audio_language_code,
-          preferencesData.can_receive_email_updates,
-          preferencesData.can_receive_editor_role_email,
-          preferencesData.can_receive_feedback_message_email,
-          preferencesData.can_receive_subscription_email,
-          preferencesData.subscription_list
-        );
+        this.preferencesForm = new FormGroup({
+          profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
+          profilePictureWebpDataUrl: new FormControl(
+            profilePictureWebpDataUrl),
+          userBio: new FormControl(preferencesData.user_bio),
+          defaultDashboard: new FormControl(preferencesData.default_dashboard),
+          subjectInterests: new FormControl(preferencesData.subject_interests),
+          preferredLanguageCodes: new FormControl(
+            preferencesData.preferred_language_codes),
+          preferredSiteLanguageCode: new FormControl(
+            preferencesData.preferred_site_language_code),
+          preferredAudioLanguageCode: new FormControl(
+            preferencesData.preferred_audio_language_code),
+          emailPreferences: new FormGroup({
+            canReceiveEmailUpdates: new FormControl(
+              preferencesData.can_receive_email_updates),
+            canReceiveEditorRoleEmail: new FormControl(
+              preferencesData.can_receive_editor_role_email),
+            canReceiveFeedbackMessageEmail: new FormControl(
+              preferencesData.can_receive_feedback_message_email),
+            canReceiveSubscriptionEmail: new FormControl(
+              preferencesData.can_receive_subscription_email)
+          })
+        });
+
+        this.subscriptionList = preferencesData.subscription_list;
+
+        // Subscribe to the statusChanges observable of the form.
+        this.preferencesForm.statusChanges.subscribe(() => {
+          // Check if any of the controls is dirty.
+          if (this.preferencesForm.dirty) {
+            this.preventPageUnloadEventService.addListener();
+          } else {
+            this.preventPageUnloadEventService.removeListener();
+          }
+        });
+
         this.hasPageLoaded = true;
         this.loaderService.hideLoadingScreen();
       });
@@ -397,19 +305,51 @@ export class PreferencesPageComponent {
   }
 
   savePreferences(): void {
-    if (!this.userPreferences.hasUnsavedChanges()) {
+    if (!this.preferencesForm.dirty) {
       return;
     }
     this.alertsService.clearWarnings();
 
     // Get the updated fields to send to the backend on-save.
-    let updates: UpdatePreferenceDict[] = this.userPreferences.getUpdates();
+    let updates: UpdatePreferenceDict[] = [];
+    for (let key in this.preferencesForm.value) {
+      if (!this.preferencesForm.controls[key].dirty) {
+        // We don't send unchanged fields to the backend.
+        continue;
+      }
+      if (key === 'profilePictureWebpDataUrl') {
+        // We send only png data url because png and webp urls same here as
+        // we are not converting the image to webp format.
+        continue;
+      }
+      if (key === 'emailPreferences') {
+        let emailFormData = this.preferencesForm.controls[key].value;
+        let emailData: EmailPreferencesBackendDict = {
+          can_receive_email_updates: emailFormData.canReceiveEmailUpdates,
+          can_receive_editor_role_email: (
+            emailFormData.canReceiveEditorRoleEmail),
+          can_receive_feedback_message_email: (
+            emailFormData.canReceiveFeedbackMessageEmail),
+          can_receive_subscription_email: (
+            emailFormData.canReceiveSubscriptionEmail)
+        };
+        updates.push({
+          update_type: BACKEND_UPDATE_TYPE_DICT[key],
+          data: emailData
+        });
+        continue;
+      }
+      updates.push({
+        update_type: BACKEND_UPDATE_TYPE_DICT[key],
+        data: this.preferencesForm.controls[key].value
+      });
+    }
 
     // TODO(#19737): Remove the following condition.
     if (AssetsBackendApiService.EMULATOR_MODE) {
       // Remove 'profile_picture_data_url' from updates if the emulator mode is
       // on because the backend doesn't support updating profile picture in
-      // emulator(DEV) mode.
+      // emulator mode.
       updates = updates.filter((update) => {
         return update.update_type !== 'profile_picture_data_url';
       });
@@ -417,31 +357,32 @@ export class PreferencesPageComponent {
 
     this.userBackendApiService.updateMultiplePreferencesDataAsync(updates)
       .then((returnData) => {
-        this.preventPageUnloadEventService.removeListener();
-        if (this.userPreferences.isFieldChanged(
-          'preferredSiteLanguageCode')) {
+        if (this.preferencesForm.controls.preferredSiteLanguageCode.dirty) {
           this.i18nLanguageCodeService.setI18nLanguageCode(
-            this.userPreferences.preferredSiteLanguageCode);
+            this.preferencesForm.controls.preferredSiteLanguageCode.value);
         }
         if (returnData.bulk_email_signup_message_should_be_shown) {
-          this.userPreferences.canReceiveEmailUpdates = false;
+          const formGrp = this.preferencesForm.controls
+            .emailPreferences as FormGroup;
+          formGrp.controls.canReceiveEmailUpdates.setValue(false);
           this.showEmailSignupLink = true;
         } else {
           this.alertsService.addInfoMessage('Saved!', 1000);
         }
-        // TODO(#19737): Remove the following condition.
-        if (this.userPreferences.isFieldChanged(
-          'newProfilePictureDataUrl') &&
-          AssetsBackendApiService.EMULATOR_MODE) {
-          this._saveProfileImageToLocalStorage(
-            this.userPreferences.newProfilePictureDataUrl);
-        }
-        if (this.pageShouldBeReloaded) {
+        if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
+          // TODO(#19737): Remove the following 'if' condition.
+          if (AssetsBackendApiService.EMULATOR_MODE) {
+            this._saveProfileImageToLocalStorage(
+              this.preferencesForm.controls.profilePicturePngDataUrl.value);
+          }
           // The reload is needed in order to update the profile picture
           // in the top-right corner(Nav Bar).
+          this.preventPageUnloadEventService.removeListener();
           this.windowRef.nativeWindow.location.reload();
         }
-        this.userPreferences.resetFieldsWithChangedValues();
+        // Marks all the preferences as unchanged and updates the form status.
+        this.preferencesForm.markAsPristine();
+        this.preferencesForm.updateValueAndValidity();
       });
   }
 }

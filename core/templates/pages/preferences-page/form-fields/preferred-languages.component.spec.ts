@@ -117,7 +117,7 @@ describe('Preferred Languages Component', () => {
   });
 
   it('should add language', () => {
-    spyOn(componentInstance.preferredLanguagesChange, 'emit');
+    spyOn(componentInstance, 'onChange');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
@@ -132,7 +132,7 @@ describe('Preferred Languages Component', () => {
     } as ElementRef;
     componentInstance.add({value: 'en'});
     componentInstance.add({value: ''});
-    expect(componentInstance.preferredLanguagesChange.emit).toHaveBeenCalled();
+    expect(componentInstance.onChange).toHaveBeenCalled();
   });
 
   it('should remove language', () => {
@@ -160,5 +160,23 @@ describe('Preferred Languages Component', () => {
     componentInstance.selected(
       { option: { value: 'en' }});
     expect(componentInstance.add).toHaveBeenCalled();
+  });
+
+  it('should write value', () => {
+    const codes = ['en', 'hi'];
+    componentInstance.writeValue(codes);
+    expect(componentInstance.preferredLanguages).toEqual(codes);
+  });
+
+  it('should register onChange function', () => {
+    const fn = (value: string[]) => {};
+    componentInstance.registerOnChange(fn);
+    expect(componentInstance.onChange).toBe(fn);
+  });
+
+  it('should register onTouched function', () => {
+    const fn = () => {};
+    componentInstance.registerOnTouched(fn);
+    expect(componentInstance.onTouched).toBe(fn);
   });
 });
