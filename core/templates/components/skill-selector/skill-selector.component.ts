@@ -196,14 +196,15 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
-    let skills: string[] = this.
-      untriagedSkillSummaries.map(val => val.description);
-    let filteredSkills = this.
-      filterForMatchingSubstringPipe.transform(skills, searchText);
-    let activeSkillId = this.skillEditorStateService.getSkill()?.getId();
+    const skills: string[] = this
+      .untriagedSkillSummaries.map(val => val.description);
+    const filteredSkills = this
+      .filterForMatchingSubstringPipe.transform(skills, searchText);
+    const currentSkill = this.skillEditorStateService.getSkill();
+    const activeSkillId = currentSkill?.getId();
     return this.untriagedSkillSummaries.filter(
-      val => filteredSkills
-        .includes(val.description) && val.id !== activeSkillId
+      val => filteredSkills.
+        includes(val.description) && val.id !== activeSkillId
     );
   }
 
