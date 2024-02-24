@@ -17,7 +17,6 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
@@ -250,7 +249,3 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerGroupPreferences',
-  downgradeComponent({component: LearnerGroupPreferencesComponent}));

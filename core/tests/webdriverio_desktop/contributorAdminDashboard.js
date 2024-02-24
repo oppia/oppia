@@ -306,7 +306,7 @@ describe('Contributor Admin Dashboard', function() {
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
 
-      await contributorDashboardAdminPage.switchLanguage('shqip (Albanian)');
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
       await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
