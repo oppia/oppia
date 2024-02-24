@@ -50,8 +50,8 @@ describe('Exploration Creator', function() {
       await superAdmin.assignRoleToUser(
         'explorationAdm', 'curriculum admin');
       await superAdmin.expectUserToHaveRole(
-        'explorationAdm', 'curriculum admin');    
-      
+        'explorationAdm', 'curriculum admin');
+
       await explorationCreator.goToDashboardUrl();
       await explorationCreator.takeMeToEditorSection();
       await explorationCreator.updateCardName();
@@ -94,7 +94,6 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.deleteExploration();
       await explorationCreator.expectExplorationToBeDeleted();
-
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

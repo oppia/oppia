@@ -46,14 +46,14 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.addTags();
       await explorationCreator.successfullyUpdatedSettings();
       await explorationCreator.makeExplorationPublic();
-      // await explorationCreator.expectInteractionOnCreatorDashboard();
+      await explorationCreator.expectInteractionOnCreatorDashboard();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
       await explorationCreator.expectChangesToBeDiscarded();
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
-      // await explorationCreator.exceptExplorationToBeDrafted();
+      await explorationCreator.exceptExplorationToBeDrafted();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
