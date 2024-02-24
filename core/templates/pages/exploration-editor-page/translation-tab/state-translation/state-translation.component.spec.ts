@@ -609,7 +609,8 @@ describe('State translation component', () => {
     });
 
     it('should get subtitled Unicode data translation', () => {
-      let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict(
+      {
         content_id: 'content_1',
         unicode_str: 'This is the unicode'
       });
@@ -1497,7 +1498,8 @@ describe('State translation component', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
-          content_0: new TranslatedContent('Translated unicode', 'unicode', true)
+          content_0: new TranslatedContent('Translated unicode', 'unicode', true
+          )
         })
     );
     let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
@@ -1506,7 +1508,7 @@ describe('State translation component', () => {
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
     expect(unicodeData).toBe('This is the unicode')
-  })
+  });  
 
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
@@ -1534,8 +1536,8 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode'
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
-    expect(unicodeData).toBe('Translated HTML')
-  })
+    expect(unicodeData).toBe('Translated HTML');
+  });
 
   describe('when rules input tab is accessed but with no rules', () => {
     it('should throw an error when there are no rules', () => {
