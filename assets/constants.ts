@@ -7121,7 +7121,7 @@ export default {
     },
     "BLOG_DASHBOARD": {
       "ROUTE": "blog-dashboard",
-      "TITLE": "Blog Dashboard",
+      "TITLE": "Blog Dashboard - Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
