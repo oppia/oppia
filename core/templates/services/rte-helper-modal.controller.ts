@@ -107,7 +107,7 @@ export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
   @Input() componentIsNewlyCreated: boolean;
-  modalIsLoading: boolean = true;
+  modalIsLoading: boolean = false;
   currentRteIsMathExpressionEditor: boolean = false;
   currentRteIsLinkEditor: boolean = false;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
