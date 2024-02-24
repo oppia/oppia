@@ -92,7 +92,7 @@ export class HtmlLengthService {
 
     if (customTags) {
       for (const customTag of customTags) {
-        totalLength += this.getWeightForNonTextNodes(
+        totalLength += this.getLengthForNonTextNodes(
           customTag, calculationType);
       }
     }
@@ -123,18 +123,18 @@ export class HtmlLengthService {
     let dom: Document;
     dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
-    let totalWeight = 0;
+    let totalLength = 0;
     for (let tag of Array.from(dom.body.children)) {
     /**
-      * Guarding against null due to special cases as
-      * explained in the following reference:
+      * Guarding against tag.textContent === null, which can
+      * arise in special cases as explained in the following reference:
       * (https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent)
       */
       const textContent = tag.textContent || '';
-      totalWeight += this.calculateTextWeight(
+      totalLength += this.calculateTextLength(
         textContent, calculationType);
     }
-    return totalWeight;
+    return totalLength;
   }
 
   /**
@@ -155,17 +155,17 @@ export class HtmlLengthService {
     *    content, depending on the calculation type.
     */
 
-  private calculateTextWeight(
+  private calculateTextLength(
       textContent: string, calculationType: CalculationType): number {
     let trimmedTextContent = textContent.trim();
-    let totalWeight = 0;
+    let totalLength = 0;
     if (calculationType === CALCULATION_TYPE_WORD && trimmedTextContent) {
       const words = trimmedTextContent.split(' ');
-      totalWeight = words.length;
+      totalLength = words.length;
     } else {
-      totalWeight = trimmedTextContent.length;
+      totalLength = trimmedTextContent.length;
     }
-    return totalWeight;
+    return totalLength;
   }
 
   /**
@@ -188,7 +188,7 @@ export class HtmlLengthService {
 
   // TODO(#19729): Create RTE-component-specific logic
   // for calculating the lengths of RTE-components.
-  getWeightForNonTextNodes(
+  getLengthForNonTextNodes(
       nonTextNode: string, calculationType: CalculationType): number {
     nonTextNode = this.htmlEscaperService.escapedStrToUnescapedStr(nonTextNode);
     let domparser = new DOMParser();
@@ -208,14 +208,14 @@ export class HtmlLengthService {
       case 'oppia-noninteractive-skillreview': {
         const textValueAttr = domTag.getAttribute('text-with-value');
         const textValue = textValueAttr ? textValueAttr.slice(1, -1) : '';
-        const weight = this.calculateTextWeight(textValue, calculationType);
-        return weight;
+        const length = this.calculateTextLength(textValue, calculationType);
+        return length;
       }
       case 'oppia-noninteractive-image': {
         const altTextAttr = domTag.getAttribute('alt-with-value');
         const altTextValue = altTextAttr ? altTextAttr.slice(1, -1) : '';
-        const weight = this.calculateTextWeight(altTextValue, calculationType);
-        return weight + 10;
+        const length = this.calculateTextLength(altTextValue, calculationType);
+        return length + 10;
       }
       default:
         throw new Error(`Invalid non-text node: ${domId}`);

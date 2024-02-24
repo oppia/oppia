@@ -585,15 +585,15 @@ describe('Html Length Service', () => {
     expect(result).toBe(65);
   });
 
-  describe('getWeightForNonTextNodes', () => {
+  describe('getLengthForNonTextNodes', () => {
     it('should throw an error when unable to determine ' +
-      'weight for non-text node', () => {
+      'length for non-text node', () => {
       const nonTextNode = (
         '<oppia-noninteractive-xyz>This is not a ' +
         'text node</oppia-noninteractive-xyz>');
       const calculationType = 'character';
       expect(() => {
-        htmlLengthService.getWeightForNonTextNodes(
+        htmlLengthService.getLengthForNonTextNodes(
           nonTextNode, calculationType);
       }).toThrowError('Invalid non-text node: oppia-noninteractive-xyz');
     });
