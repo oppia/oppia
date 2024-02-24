@@ -342,24 +342,23 @@ def swap_is_feature_flag_enabled_function(
         context. The context with function replaced.
     """
     def mock_is_feature_flag_enabled(
-        _: str, target_feature_flag_name: str
+        user_id: Optional[str], feature_flag_name: str
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
-            _: str. The id of the user.
-            target_feature_flag_name: str. The name of the target feature flag.
+            user_id: str|None. The id of the user, can be None.
+            feature_flag_name: str. The name of the target feature flag.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
             name is in feature_flag_names list.
         """
-        enable_feature_flag = False
-        for feature_flag_name in feature_flag_names:
-            if feature_flag_name.value == target_feature_flag_name:
-                enable_feature_flag = True
-        return enable_feature_flag
+        return any(
+            expected_feature_flag_name.value == feature_flag_name
+            for expected_feature_flag_name in feature_flag_names
+        )
 
     original_is_feature_flag_enabled = getattr(
        feature_flag_services, 'is_feature_flag_enabled')

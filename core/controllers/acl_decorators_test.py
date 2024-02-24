@@ -3321,15 +3321,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self
     ) -> None:
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            True,
-            0,
-            []
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
@@ -3343,15 +3339,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_coordinator_can_access_new_cd_admin_page(
         self
     ) -> None:
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            True,
-            0,
-            []
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)

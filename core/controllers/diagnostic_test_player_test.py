@@ -45,12 +45,6 @@ class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
 
     def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
         self) -> None:
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
-            False,
-            0,
-            []
-        )
         self.get_html_response(
             feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
             expected_status_int=404
