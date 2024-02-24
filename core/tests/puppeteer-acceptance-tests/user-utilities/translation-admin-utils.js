@@ -25,7 +25,7 @@ const ContributorDashboardAdminUrl =
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const translationRightValue = 'string:translation';
+const translationRightValue = 'translation';
 const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
