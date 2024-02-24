@@ -33,7 +33,7 @@ import { UserService } from 'services/user.service';
 @Injectable({
   providedIn: 'root'
 })
-export class BlogDashboardAuthGuard implements CanActivate {
+export class BlogDashboardPageAuthGuard implements CanActivate {
   constructor(
     private userService: UserService,
     private router: Router,

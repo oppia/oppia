@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for BlogDashboardAuthGuard
+ * @fileoverview Tests for BlogDashboardPageAuthGuard
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -23,7 +23,7 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras }
 import { AppConstants } from 'app.constants';
 import { UserInfo, UserRoles } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
-import { BlogDashboardAuthGuard } from './blog-dashboard-page-auth.guard';
+import { BlogDashboardPageAuthGuard } from './blog-dashboard-page-auth.guard';
 
 class MockRouter {
   navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
@@ -31,10 +31,10 @@ class MockRouter {
   }
 }
 
-describe('BlogDashboardAuthGuard', () => {
+describe('BlogDashboardPageAuthGuard', () => {
   let userService: UserService;
   let router: Router;
-  let guard: BlogDashboardAuthGuard;
+  let guard: BlogDashboardPageAuthGuard;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +42,7 @@ describe('BlogDashboardAuthGuard', () => {
       providers: [UserService, { provide: Router, useClass: MockRouter }],
     }).compileComponents();
 
-    guard = TestBed.inject(BlogDashboardAuthGuard);
+    guard = TestBed.inject(BlogDashboardPageAuthGuard);
     userService = TestBed.inject(UserService);
     router = TestBed.inject(Router);
   });
