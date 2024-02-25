@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts.linters.pre_commit_linter`)
+(By providing the list of files to `scripts.linters.run_lint_checks`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -55,7 +55,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 GIT_NULL_COMMIT: Final = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
-LINTER_MODULE: Final = 'scripts.linters.pre_commit_linter'
+LINTER_MODULE: Final = 'scripts.linters.run_lint_checks'
 MYPY_TYPE_CHECK_MODULE: Final = 'scripts.run_mypy_checks'
 FILE_DIR: Final = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir)
@@ -70,9 +70,10 @@ BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 CI_PROTRACTOR_CHECK_CMDS: Final = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
-TYPESCRIPT_CHECKS_CMDS: Final = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
+TYPESCRIPT_CHECKS_CMDS: Final = [
+    PYTHON_CMD, '-m', 'scripts.run_typescript_checks']
 STRICT_TYPESCRIPT_CHECKS_CMDS: Final = [
-    PYTHON_CMD, '-m', 'scripts.typescript_checks', '--strict_checks']
+    PYTHON_CMD, '-m', 'scripts.run_typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD: Final = 'git status --porcelain --untracked-files=no'
 
 

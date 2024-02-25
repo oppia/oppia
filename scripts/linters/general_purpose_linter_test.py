@@ -27,11 +27,11 @@ from core.tests import test_utils
 from typing import Final, Pattern, Tuple
 
 from . import general_purpose_linter
-from . import pre_commit_linter
+from . import run_lint_checks
 from . import warranted_angular_security_bypasses
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
-NAME_SPACE.files = pre_commit_linter.FileCache()
+NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
 LINTER_TESTS_DIR: Final = os.path.join(

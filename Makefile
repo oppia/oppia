@@ -117,7 +117,7 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
 run_tests.lint: ## Runs the linter tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
 
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
@@ -135,7 +135,7 @@ run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop

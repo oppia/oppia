@@ -248,7 +248,7 @@ TS_STRICT_EXCLUDE_PATHS = [
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
-    python -m scripts.typescript_checks
+    python -m scripts.run_typescript_checks
 Note that the root folder MUST be named 'oppia'.
 """)
 
@@ -409,6 +409,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when typescript_checks.py is used as a script.
+# it will only be called when run_typescript_checks.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
     main()

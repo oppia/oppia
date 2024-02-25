@@ -9,7 +9,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/linters/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/run_lint_checks.py in sync with the modifications.
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
