@@ -60,7 +60,7 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
 
         self.question_id_1 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.question_1 = self.sa_new_question(
+        self.question_1 = self.save_new_question(
             self.question_id_1, self.editor_id,
             self._create_valid_question_data(
                 'ABC', content_id_generator),
