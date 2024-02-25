@@ -79,7 +79,7 @@
 # TS typing
 /typings/ @oppia/dev-workflow-reviewers
 /tsconfig*.json @oppia/dev-workflow-reviewers
-/scripts/typescript_checks*.py @oppia/dev-workflow-reviewers
+/scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
 
 
 # Answer classification team.
