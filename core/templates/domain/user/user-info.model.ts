@@ -16,7 +16,7 @@
  * @fileoverview Frontend Model for user info.
  */
 
-enum UserRoles {
+export enum UserRoles {
   QUESTION_COORDINATOR='QUESTION_COORDINATOR',
   QUESTION_ADMIN='QUESTION_ADMIN',
   BLOG_ADMIN='BLOG_ADMIN',
