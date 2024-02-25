@@ -31,7 +31,6 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: ./.github/actions/merge
     
       - name: Check for unresolved todos
         id: check_for_unresolved_todos

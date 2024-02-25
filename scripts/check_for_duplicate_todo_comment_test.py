@@ -213,6 +213,25 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             mock_stdout.getvalue().strip(),
             check_for_duplicate_todo_comment.NEW_COMMENT_SHOULD_NOT_BE_POSTED)
 
+    def test_check_for_duplicate_todo_comment_no_comment_error(self) -> None:
+        def mock_fetch_latest_comment_from_pull_request(
+            _: int
+        ) -> Optional[github_api.GithubCommentDict]:
+            return None
+
+        fetch_latest_comment_swap = self.swap(
+            github_api, 'fetch_latest_comment_from_pull_request',
+            mock_fetch_latest_comment_from_pull_request)
+        with fetch_latest_comment_swap, self.assertRaisesRegex(
+            Exception,
+            check_for_duplicate_todo_comment.NEW_COMMENT_SHOULD_BE_POSTED
+        ):
+            check_for_duplicate_todo_comment.main([
+                '--repository_path=dummy_dir',
+                '--pull_request=1234',
+                '--new_comment_file=unresolved_todo_list_four.txt'
+            ])
+
     def test_check_for_duplicate_todo_comment_no_issue_or_pull_request_error(
         self
     ) -> None:
