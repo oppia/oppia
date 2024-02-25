@@ -138,6 +138,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
 ):
     """Validates access to diagnostic test player page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
