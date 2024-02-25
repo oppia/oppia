@@ -447,6 +447,7 @@ import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { TopicEditorAccessGuard } from 'pages/topic-editor-page/topic-editor-access.guard';
+import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
@@ -485,6 +486,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageAuthGuard', BlogDashboardPageAuthGuard],
   ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostPageService', BlogPostPageService],
