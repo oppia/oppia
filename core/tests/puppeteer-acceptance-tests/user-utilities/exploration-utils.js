@@ -41,8 +41,8 @@ const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
 const cateogryDropDawn = '.mat-select-arrow-wrapper';
 const addCateogry = '#mat-option-69';
-const languageUpdateBar = '#mat-select-value-9';
-const addLanguage = '#mat-option-6';
+const languageUpdateBar = '#mat-select-value-35';
+const addLanguage = '#mat-option-480';
 const addTags = '#mat-chip-list-input-0';
 const previewSummaryButton = '#clickToSeePreviewSummary';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
@@ -82,7 +82,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in reaching editor section.
    */
-  async takeMeToEditorSection() {
+  async goToEditorSection() {
     await this.clickOn(createNewExplorationButton);
     await this.clickOn(takeMeToEditorButton);
   }
@@ -140,7 +140,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async updateGoal() {
     await this.clickOn(addGoalBar);
-    await this.type(addGoal, 'Your Goal Here Please');
+    await this.type(addGoal, 'NeedSuccessInLifeAndMoney');
   }
 
   /**
@@ -195,13 +195,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function checks if the goal has been set in the exploration.
+   * @param {string} expectedGoal The Goal expected.
    */
-  async expectGoalToBeSet() {
+  async expectGoalToBeSet(expectedGoal) {
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input');
     const goal = await this.page.evaluate(
       input => input.value, goalInput);
-    if (goal.trim().length > 0) {
+    if (goal === expectedGoal) {
       showMessage('The goal has been set for the exploration.');
     } else {
       throw new Error('The goal has not been set for the exploration.');
@@ -210,38 +211,35 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function checks if a category has been selected for the exploration.
+   * @param {string} expectedCategory The Category expected.
    */
-  async expectCategoryToBeSelected() {
+  async expectCategoryToBeSelected(expectedCategory) {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     await categoryDropdown.click();
 
+    await this.page.waitForTimeout(500);
     const selectedCategory = await this.page.evaluate(() => {
-      const selectedOption = document.querySelector(
-        '.e2e-test-exploration-category-selector-choice[aria-selected="true"]');
-      if (selectedOption) {
-        return selectedOption.innerText.trim();
-      } else {
-        return null;
-      }
+      return document.querySelector('#mat-option-69').innerText;
     });
 
-    if (selectedCategory !== null) {
+    if (selectedCategory === expectedCategory) {
       showMessage(
         `The category ${selectedCategory}` +
-        ' has been selected for the exploration.');
+        ' is same as expectedCategory.');
     } else {
-      throw new Error('No category has been selected for the exploration.');
+      throw new Error('Category is not correct.');
     }
   }
 
   /**
    *  This function verifies that the selected language is displayed correctly.
+   * @param {string} expectedLanguage
    */
-  async expectLanguageToBeSelected() {
-    const languageDropdown = await this.page.$('#mat-select-value-9');
+  async expectLanguageToBeSelected(expectedLanguage) {
+    const languageDropdown = await this.page.$('#mat-select-value-35');
     const language = await this.page.evaluate(
       option => option.textContent, languageDropdown);
-    if (language) {
+    if (language === expectedLanguage) {
       showMessage(`Language ${language} is selected.`);
     } else {
       throw new Error('Language is not selected.');
@@ -297,7 +295,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks whether the Automatic Text-to-Speech
    * setting is enabled or disabled.
    */
-  async expectAutomaticTextToSpeechToBeEnabledOrDisabled() {
+  async expectAutomaticTextToSpeechToBeDisabled() {
     const autoTTSwitch = await this.page.$('#text-speech-switch');
     const isAutoTTSwitchOn = await this.page.evaluate(
       switchElement => switchElement.checked, autoTTSwitch);
@@ -336,7 +334,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    *Exception function to verify the setting
    *of the exploration to Public/Private
    */
-  async expectExplorationAccessibility() {
+  async expectExplorationToBePublished() {
     const publishButton = await this.page.$('.e2e-test-publish-exploration');
     if (publishButton) {
       showMessage(
@@ -362,11 +360,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function verifies the selection of a voice artist.
    * @param {string} expectedUsername The username of the expected voice artist.
    */
-  async expectVoiceArtistToBeAdded() {
+  async expectVoiceArtistToBeAdded(expectedUsername) {
     const voiceArtistInput = await this.page.$(addVoiceArtistUserName);
     const voiceArtistUsername = await this.page.evaluate(
       input => input.value, voiceArtistInput);
-    if (voiceArtistUsername === 'guestUsr3') {
+    if (voiceArtistUsername === expectedUsername) {
       showMessage('Voice artist guestUsr3 has been successfully added.');
     } else {
       throw new Error('Voice artist guestUsr3  was not added.');
@@ -384,7 +382,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * Exception function to verify the choice of receiving feedback
    * and suggestion notifications via email
    */
-  async expectFeedbackNotificationChoice() {
+  async expectEmailNotificationToBeActivated() {
     const isChecked = await this.page.$eval(
       'input[id="feedback-switch"]', input => input.checked);
     if (isChecked) {
@@ -406,7 +404,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in verifying , if exploration is
    * deleted successfully?
    */
-  async expectExplorationToBeDeleted() {
+  async expectExplorationToBeDeletedSuccessfully() {
     const deleteButton = await this.page.$('.oppia-delete-button');
     if (!deleteButton) {
       showMessage('Exploration has been successfully deleted.');
@@ -428,7 +426,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function checks whether changes has been drafted or not.
    */
-  async exceptExplorationToBeDrafted() {
+  async expectExplorationToBeDraftedSuccessfully() {
     const isDraftButtonDisabled = await this.page.$eval(
       '#tutorialSaveButton', button => button.disabled);
     if (isDraftButtonDisabled) {
@@ -498,7 +496,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
   *This function checks whether changes has discarded successfully or not
   */
-  async expectChangesToBeDiscarded() {
+  async expectChangesToBeDiscardedSuccessfully() {
     const titleAfterChanges = await this.page.$eval(
       '.e2e-test-exploration-title-input', title => title.value);
     if (titleBeforeChanges === titleAfterChanges) {

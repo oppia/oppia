@@ -33,7 +33,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
   it('should perform exploration management actions',
     async function() {
       await explorationCreator.goToDashboardUrl();
-      await explorationCreator.takeMeToEditorSection();
+      await explorationCreator.goToEditorSection();
       await explorationCreator.updateCardName();
       await explorationCreator.updateExplorationIntroText();
       await explorationCreator.addInteraction();
@@ -45,15 +45,20 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.selectCategory();
       await explorationCreator.addTags();
       await explorationCreator.successfullyUpdatedSettings();
+
       await explorationCreator.makeExplorationPublic();
-      await explorationCreator.expectInteractionOnCreatorDashboard();
+      await explorationCreator.
+        expectInteractionToBeVisibleOnCreatorDashboard();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
-      await explorationCreator.expectChangesToBeDiscarded();
+      await explorationCreator.
+        expectChangesToBeDiscardedSuccessfully();
+
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
-      await explorationCreator.exceptExplorationToBeDrafted();
+      await explorationCreator.
+        expectExplorationToBeDraftedSuccessfully();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

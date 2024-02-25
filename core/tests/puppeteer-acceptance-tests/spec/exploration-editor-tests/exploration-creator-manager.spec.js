@@ -53,47 +53,52 @@ describe('Exploration Creator', function() {
         'explorationAdm', 'curriculum admin');
 
       await explorationCreator.goToDashboardUrl();
-      await explorationCreator.takeMeToEditorSection();
+      await explorationCreator.goToEditorSection();
       await explorationCreator.updateCardName();
       await explorationCreator.updateExplorationIntroText();
       await explorationCreator.addInteraction();
       await explorationCreator.explorationCreatedSuccessfully();
 
       await explorationCreator.goToSettingsTab();
-      await explorationCreator.expectTitleToHaveMaxLength(36);
 
       await explorationCreator.updateTitle();
-      await explorationCreator.updateGoal();
-      await explorationCreator.selectCategory();
-      await explorationCreator.addTags();
-      await explorationCreator.successfullyUpdatedSettings();
+      await explorationCreator.expectTitleToHaveMaxLength(36);
 
-      await explorationCreator.expectGoalToBeSet();
-      await explorationCreator.expectCategoryToBeSelected();
-      await explorationCreator.expectLanguageToBeSelected();
+      await explorationCreator.updateGoal();
+      await explorationCreator.expectGoalToBeSet('NeedSuccessInLifeAndMoney');
+
+      await explorationCreator.selectCategory();
+      await explorationCreator.expectCategoryToBeSelected('Algebra');
+
+      await explorationCreator.selectLanguage();
+      await explorationCreator.expectLanguageToBeSelected('English');
+
+      await explorationCreator.addTags();
+
+      await explorationCreator.successfullyUpdatedSettings();
 
       await explorationCreator.previewSummary();
       await explorationCreator.expectPreviewSummaryToBeVisible();
 
       await explorationCreator.updateAutomaticTextToSpeech();
       await explorationCreator.
-        expectAutomaticTextToSpeechToBeEnabledOrDisabled();
+        expectAutomaticTextToSpeechToBeDisabled();
 
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
       await explorationCreator.assignUserToPlaytesterRole('guestUsr2');
 
       await explorationCreator.makeExplorationPublic();
-      await explorationCreator.expectExplorationAccessibility();
+      await explorationCreator.expectExplorationToBePublished();
 
       await explorationCreator.addVoiceArtist();
-      await explorationCreator.expectVoiceArtistToBeAdded();
+      await explorationCreator.expectVoiceArtistToBeAdded('guestUsr3');
 
       await explorationCreator.
         chooseToReceiveSuggestedEmailsAsNotification();
-      await explorationCreator.expectFeedbackNotificationChoice();
+      await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
-      await explorationCreator.expectExplorationToBeDeleted();
+      await explorationCreator.expectExplorationToBeDeletedSuccessfully();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
