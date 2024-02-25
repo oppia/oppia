@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import textwrap
 import urllib.request
 
 from core import utils
@@ -34,7 +35,6 @@ GITHUB_API_URL = 'https://api.github.com'
 class GithubIssueDict(TypedDict):
     """Dict representation of a Github issue."""
 
-    id: int
     body: str
     number: int
     title: str
@@ -43,7 +43,6 @@ class GithubIssueDict(TypedDict):
 class GithubCommentDict(TypedDict):
     """Dict representation of a Github comment."""
 
-    id: int
     body: str
 
 
@@ -93,7 +92,7 @@ def get_github_auth_token() -> str:
         env=env, check=False)
     if process.returncode:
         raise RuntimeError(
-            'Failed to get Github auth token from the Github CLI.')
+            'Failed to get Github Auth Token from the Github CLI.')
     return process.stdout.strip()
 
 
@@ -118,7 +117,7 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         RuntimeError. Failed to run GraphQL query due to an API error.
     """
 
-    constructed_query = (
+    constructed_query = textwrap.dedent(
         """
         query {
             repository(owner: "%s", name: "%s") {
@@ -136,11 +135,6 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         request_data = (
             json.dumps({'query': constructed_query}).encode('utf-8'))
         request = urllib.request.Request(url, request_data, headers)
-    except Exception as e:
-        raise RuntimeError(
-            'Failed to run the GraphQL query due to a ' +
-            'request error: %s' % e) from e
-    else:
         with utils.url_open(request) as response:
             if response.getcode() == 200:
                 # Here we use type Any because the API returns a generic
@@ -153,6 +147,10 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
                 raise RuntimeError(
                     'Failed to run the GraphQL query due to an ' +
                     'API error: %s' % response.read().decode('utf-8'))
+    except Exception as e:
+        raise RuntimeError(
+            'Failed to run the GraphQL query due to a ' +
+            'request error: %s' % e) from e
 
 
 def fetch_linked_issues_for_pull_request(
@@ -167,19 +165,18 @@ def fetch_linked_issues_for_pull_request(
         List[GithubIssueDict]. The linked issues for the pull request.
     """
 
-    query = (
+    query = textwrap.dedent(
         """
         pullRequest(number: %s) {
-            closingIssuesReferences (first: 50) {
+            closingIssuesReferences(first: 50) {
                 nodes {
-                    id
                     body
                     number
                     title
                 }
             }
         }
-        """) % (pull_request)
+        """) % pull_request
     response = run_graphql_query(query)
     linked_issues: List[GithubIssueDict] = (
         deep_get(response, [
@@ -190,7 +187,9 @@ def fetch_linked_issues_for_pull_request(
     return linked_issues
 
 
-def fetch_latest_comment_from_issue(issue: int) -> GithubCommentDict:
+def fetch_latest_comment_from_issue(
+    issue: int
+) -> Optional[GithubCommentDict]:
     """Fetches the latest comment from an issue.
 
     Args:
@@ -200,12 +199,11 @@ def fetch_latest_comment_from_issue(issue: int) -> GithubCommentDict:
         str. The latest comment from the issue.
     """
 
-    query = (
+    query = textwrap.dedent(
         """
         issue(number: %s) {
             comments(last: 1) {
                 nodes {
-                    id
                     body
                 }
             }
@@ -217,14 +215,13 @@ def fetch_latest_comment_from_issue(issue: int) -> GithubCommentDict:
             'repository',
             'issue',
             'comments',
-            'nodes',
-            '0']))
+            'nodes'])[0])
     return latest_comment
 
 
 def fetch_latest_comment_from_pull_request(
     pull_request: int
-) -> GithubCommentDict:
+) -> Optional[GithubCommentDict]:
     """Fetches the latest comment from a pull request.
 
     Args:
@@ -234,12 +231,11 @@ def fetch_latest_comment_from_pull_request(
         str. The latest comment from the pull request.
     """
 
-    query = (
+    query = textwrap.dedent(
         """
         pullRequest(number: %s) {
             comments(last: 1) {
                 nodes {
-                    id
                     body
                 }
             }
@@ -251,6 +247,5 @@ def fetch_latest_comment_from_pull_request(
             'repository',
             'pullRequest',
             'comments',
-            'nodes',
-            '0']))
+            'nodes'])[0])
     return latest_comment

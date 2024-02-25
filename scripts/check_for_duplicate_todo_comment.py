@@ -24,9 +24,9 @@ from typing import List, Optional
 
 COMMIT_SHA_HASH_LENGTH = 40
 
-DUPLICATE_TODO_COMMENT_INDICATOR = (
+NEW_COMMENT_SHOULD_BE_POSTED = (
     'NEW TODO COMMENT SHOULD BE POSTED')
-NO_DUPLICATE_TODO_COMMENT_INDICATOR = (
+NEW_COMMENT_SHOULD_NOT_BE_POSTED = (
     'THE LATEST COMMENT IS THE SAME AS THE NEW TODO COMMENT')
 
 _PARSER = argparse.ArgumentParser(
@@ -62,17 +62,21 @@ def main(args: Optional[List[str]] = None) -> None:
     # might change depending on the workflow.
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
-    latest_comment_lines: List[str] = []
+    latest_comment: Optional[github_api.GithubCommentDict] = None
     if parsed_args.issue:
-        latest_comment_lines = (
-            github_api.fetch_latest_comment_from_issue(
-                    parsed_args.issue))['body'].splitlines()
+        latest_comment = github_api.fetch_latest_comment_from_issue(
+            parsed_args.issue)
     elif parsed_args.pull_request:
-        latest_comment_lines = (
-            github_api.fetch_latest_comment_from_pull_request(
-                parsed_args.pull_request))['body'].splitlines()
+        latest_comment = github_api.fetch_latest_comment_from_pull_request(
+            parsed_args.pull_request)
     else:
         raise Exception('No issue or pull request number provided.')
+
+    latest_comment_lines: List[str] = []
+    if latest_comment is None:
+        raise Exception(NEW_COMMENT_SHOULD_BE_POSTED)
+    else:
+        latest_comment_lines = latest_comment['body'].splitlines()
 
     new_comment_lines: List[str] = []
     with open(
@@ -86,18 +90,18 @@ def main(args: Optional[List[str]] = None) -> None:
         len(latest_comment_lines) != len(new_comment_lines) or
         latest_comment_lines[0] != new_comment_lines[0]
     ):
-        raise Exception(NO_DUPLICATE_TODO_COMMENT_INDICATOR)
+        raise Exception(NEW_COMMENT_SHOULD_BE_POSTED)
 
-    # Loop through each line and check if the lines differ.
+    # Loop through each line and check if the line content differs.
     for index in range(1, len(latest_comment_lines)):
         latest_comment_line_content = (
             latest_comment_lines[index][compare_start_index:])
         new_comment_line_content = (
             new_comment_lines[index][compare_start_index:])
         if latest_comment_line_content != new_comment_line_content:
-            raise Exception(NO_DUPLICATE_TODO_COMMENT_INDICATOR)
+            raise Exception(NEW_COMMENT_SHOULD_BE_POSTED)
 
-    print(DUPLICATE_TODO_COMMENT_INDICATOR, end='')
+    print(NEW_COMMENT_SHOULD_NOT_BE_POSTED)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

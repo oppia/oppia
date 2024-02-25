@@ -342,4 +342,4 @@ class TodoFinderTests(test_utils.GenericTestBase):
 
         valid_issue_number = todo_finder.get_issue_number_from_todo(
             '// TODO(#1234): Test Description')
-        self.assertEqual(valid_issue_number, '1234')
+        self.assertEqual(valid_issue_number, 1234)

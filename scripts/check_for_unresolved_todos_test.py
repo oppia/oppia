@@ -23,6 +23,9 @@ import sys
 import textwrap
 
 from core.tests import test_utils
+from scripts import github_api
+
+from typing import List
 
 from . import check_for_unresolved_todos
 
@@ -91,9 +94,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
     def test_get_unresolved_todos_should_fail(self) -> None:
         mock_stdout = io.StringIO()
 
-        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+        swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
 
-        with stdout_write_swap:
+        with swap_stdout_write:
             with self.assertRaisesRegex(
                 Exception,
                 check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
@@ -134,29 +137,54 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
     def test_get_unresolved_todos_should_succeed(self) -> None:
         mock_stdout = io.StringIO()
 
-        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+        swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
 
-        with stdout_write_swap:
+        with swap_stdout_write:
             check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue=4157',
                 '--commit_sha=abcdefg'])
         self.assertEqual(
-            mock_stdout.getvalue().lstrip('\n'),
+            mock_stdout.getvalue().strip(),
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
 
-    def test_get_unresolved_todos_by_issue_file_should_fail(self) -> None:
+    def test_get_unresolved_todos_by_pull_request_should_fail(self) -> None:
         mock_stdout = io.StringIO()
 
-        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+        def mock_fetch_linked_issues_for_pull_request(
+            pull_request: int
+        ) -> List[github_api.GithubIssueDict]:
+            return [
+                {
+                    'body': 'Issue 4151',
+                    'number': 4151,
+                    'title': 'Issue 4151'
+                },
+                {
+                    'body': 'Issue 4156',
+                    'number': 4156,
+                    'title': 'Issue 4156'
+                },
+                {
+                    'body': 'Issue 4153',
+                    'number': 4153,
+                    'title': 'Issue 4153',
+                }
+            ] if pull_request == 1234 else []
 
-        with stdout_write_swap:
+        swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
+        swap_fetch_linked_issues_for_pull_request = self.swap(
+            github_api, 'fetch_linked_issues_for_pull_request',
+            mock_fetch_linked_issues_for_pull_request)
+
+        with swap_stdout_write, swap_fetch_linked_issues_for_pull_request:
             with self.assertRaisesRegex(
                 Exception,
                 check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
             ):
                 check_for_unresolved_todos.main([
                     '--repository_path=dummy_dir',
+                    '--pull_request=1234',
                     '--commit_sha=abcdefg'])
 
         expected_failure_log = textwrap.dedent(
