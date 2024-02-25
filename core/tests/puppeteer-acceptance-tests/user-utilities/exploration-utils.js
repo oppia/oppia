@@ -41,8 +41,8 @@ const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
 const cateogryDropDawn = '.mat-select-arrow-wrapper';
 const addCateogry = '#mat-option-69';
-const languageUpdateBar = '#mat-select-value-35';
-const addLanguage = '#mat-option-480';
+const languageUpdateBar = '#mat-select-value-9';
+const addLanguage = '#mat-option-6';
 const addTags = '#mat-chip-list-input-0';
 const previewSummaryButton = '#clickToSeePreviewSummary';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
@@ -136,42 +136,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   * This function helps in adding a goal.
-   */
-  async updateGoal() {
-    await this.clickOn(addGoalBar);
-    await this.type(addGoal, 'NeedSuccessInLifeAndMoney');
-  }
-
-  /**
-   * This function helps in selecting a category from dropdawn.
-   */
-  async selectCategory() {
-    await this.clickOn(cateogryDropDawn);
-    await this.clickOn(addCateogry);
-  }
-
-  /**
-   * This function helps in selecting language from dropdawn.
-   */
-  async selectLanguage() {
-    await this.clickOn(languageUpdateBar);
-    await this.clickOn(addLanguage);
-  }
-
-  /**
-   * This function helps in adding tags.
-   */
-  async addTags() {
-    await this.clickOn(addTags);
-    await this.type(addTags, 'Your Tag Here');
-  }
-
-  async successfullyUpdatedSettings() {
-    showMessage('Successfully updated basic settings!');
-  }
-
-  /**
    * This function checks length of title bar at basic settings tab.
    * @param {Number} maxLength
    */
@@ -194,6 +158,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
+   * This function helps in adding a goal.
+   */
+  async updateGoal() {
+    await this.clickOn(addGoalBar);
+    await this.type(addGoal, 'NeedSuccessInLifeAndMoney');
+  }
+
+  /**
    * This function checks if the goal has been set in the exploration.
    * @param {string} expectedGoal The Goal expected.
    */
@@ -210,6 +182,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
+   * This function helps in selecting a category from dropdawn.
+   */
+  async selectCategory() {
+    await this.clickOn(cateogryDropDawn);
+    await this.clickOn(addCateogry);
+  }
+
+  /**
    * This function checks if a category has been selected for the exploration.
    * @param {string} expectedCategory The Category expected.
    */
@@ -217,7 +197,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     await categoryDropdown.click();
 
-    await this.page.waitForTimeout(500);
     const selectedCategory = await this.page.evaluate(() => {
       return document.querySelector('#mat-option-69').innerText;
     });
@@ -229,6 +208,16 @@ module.exports = class e2eExplorationCreator extends baseUser {
     } else {
       throw new Error('Category is not correct.');
     }
+    await categoryDropdown.click();
+  }
+
+  /**
+   * This function helps in selecting language from dropdawn.
+   */
+  async selectLanguage() {
+    await this.page.waitForTimeout(500);
+    await this.clickOn(languageUpdateBar);
+    await this.clickOn(addLanguage);
   }
 
   /**
@@ -236,14 +225,34 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * @param {string} expectedLanguage
    */
   async expectLanguageToBeSelected(expectedLanguage) {
-    const languageDropdown = await this.page.$('#mat-select-value-35');
-    const language = await this.page.evaluate(
-      option => option.textContent, languageDropdown);
-    if (language === expectedLanguage) {
-      showMessage(`Language ${language} is selected.`);
+    const languageDropdown = await this.page.$('#mat-select-value-9');
+    await languageDropdown.click();
+
+    const selectedLanguage = await this.page.evaluate(() => {
+      return document.querySelector('#mat-option-6').innerText;
+    });
+
+    if (selectedLanguage === expectedLanguage) {
+      showMessage(
+        `The language ${selectedLanguage}` +
+        ' is same as expectedLanguage.');
     } else {
-      throw new Error('Language is not selected.');
+      throw new Error('Language is not correct.');
     }
+    await languageDropdown.click();
+  }
+
+  /**
+   * This function helps in adding tags.
+   */
+  async addTags() {
+    await this.page.waitForTimeout(500);
+    await this.clickOn(addTags);
+    await this.type(addTags, 'Your Tag Here');
+  }
+
+  async successfullyUpdatedSettings() {
+    showMessage('Successfully updated basic settings!');
   }
 
   /**
@@ -264,7 +273,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async previewSummary() {
     await this.page.waitForSelector(
       '#clickToSeePreviewSummary:not([disabled])');
-    await this.clickOn(previewSummaryButton);
+    await this.clickOn('#clickToSeePreviewSummary');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
   }
@@ -441,9 +450,9 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async makeExplorationPublic() {
     await this.saveDraftExploration();
-    await this.page.waitForSelector(publishButton);
+    await this.page.waitForTimeout(500);
     await this.clickOn(publishButton);
-    await this.page.waitForSelector(publishConfirmButton);
+    await this.page.waitForTimeout(500);
     await this.clickOn(publishConfirmButton);
     await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
@@ -488,8 +497,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   async discardCurrentChanges() {
-    await this.clickOn('oppia-discard-button');
-    await this.clickOn('oppia-discard-button');
+    await this.clickOn('.e2e-test-settings-container');
+    await this.clickOn('button.e2e-test-save-discard-toggle');
     await this.clickOn(discardDraftButton);
   }
 

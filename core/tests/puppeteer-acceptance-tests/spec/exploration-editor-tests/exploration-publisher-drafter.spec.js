@@ -48,7 +48,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.makeExplorationPublic();
       await explorationCreator.
-        expectInteractionToBeVisibleOnCreatorDashboard();
+      expectInteractionOnCreatorDashboard();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
