@@ -30,9 +30,9 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
@@ -660,7 +660,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, topic_id, story_id)
 
         with self.swap_to_always_return(
-                platform_feature_services, 'is_feature_enabled', False):
+                feature_flag_services, 'is_feature_enabled', False):
             topic_services.publish_story(topic_id, story_id, self.admin_id)
             story_services.update_story(
                 owner_id, story_id, [story_domain.StoryChange({

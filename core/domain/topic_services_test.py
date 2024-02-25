@@ -2947,8 +2947,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_summary_without_exp_ids = (
             topic_services.compute_summary_of_topic(self.topic))
+        # Here we ignore type checks in order for us to introduce
+        # the mapping value of None.
         topic_summary_without_exp_ids.published_story_exploration_mapping = (
-            None)
+            None) # type: ignore
 
         with self.swap_to_always_return(
                 topic_fetchers, 'get_topic_summary_by_id',
