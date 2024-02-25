@@ -167,9 +167,8 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchTranslationOpportunitiesAsync(
-      languageCode: string, topicName: string, cursor: string):
-    Promise<TranslationContributionOpportunities> {
-
+      languageCode: string, topicName: string, cursor: string
+  ): Promise<TranslationContributionOpportunities> {
     const params = {
       language_code: languageCode,
       topic_name: topicName,
