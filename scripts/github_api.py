@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, TypedDict
 REPOSITORY_OWNER = 'oppia'
 REPOSITORY_NAME = 'oppia'
 
-GRAPHQL_API_URL = 'https://api.github.com'
+GITHUB_API_URL = 'https://api.github.com'
 
 
 class GithubIssueDict(TypedDict):
@@ -85,7 +85,7 @@ def get_github_auth_token() -> str:
         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     if process.returncode:
         raise RuntimeError(
-            'Github CLI is not installed. Please install the Github CLI' +
+            'Github CLI is not installed. Please install the Github CLI ' +
             'before running Github API functions.')
 
     process = subprocess.run(
@@ -93,9 +93,7 @@ def get_github_auth_token() -> str:
         env=env, check=False)
     if process.returncode:
         raise RuntimeError(
-            'Failed to get Github auth token. ' +
-            '\nOUTPUT: %s\nERROR: %s' % (process.stdout, process.stderr)
-        )
+            'Failed to get Github auth token from the Github CLI.')
     return process.stdout.strip()
 
 
@@ -130,7 +128,7 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         """) % (REPOSITORY_OWNER, REPOSITORY_NAME, query)
 
     try:
-        url = f'{GRAPHQL_API_URL}/graphql'
+        url = f'{GITHUB_API_URL}/graphql'
         headers = {
             'Authorization': get_authorization_bearer(),
             'Content-Type': 'application/json'
@@ -183,13 +181,13 @@ def fetch_linked_issues_for_pull_request(
         }
         """) % (pull_request)
     response = run_graphql_query(query)
-    issues: List[GithubIssueDict] = (
+    linked_issues: List[GithubIssueDict] = (
         deep_get(response, [
             'repository',
             'pullRequest',
             'closingIssuesReferences',
             'nodes']))
-    return issues
+    return linked_issues
 
 
 def fetch_latest_comment_from_issue(issue: int) -> GithubCommentDict:
