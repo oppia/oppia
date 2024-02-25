@@ -185,9 +185,7 @@ class ContributionOpportunitiesHandler(
         classroom_topic_ids: List[str] = []
         classrooms = classroom_config_services.get_all_classrooms()
         for classroom in classrooms:
-            topic_ids = (
-                classroom.topic_id_to_prerequisite_topic_ids.keys())
-            classroom_topic_ids.extend(topic_ids)
+            classroom_topic_ids.extend(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked

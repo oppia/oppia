@@ -212,9 +212,7 @@ def _get_augmented_skill_summaries_in_batches(
     classrooms = classroom_config_services.get_all_classrooms()
 
     for classroom in classrooms:
-        topic_ids = (
-            classroom.topic_id_to_prerequisite_topic_ids.keys())
-        for topic_id in topic_ids:
+        for topic_id in classroom.get_topic_ids():
             topic_classroom_dict[topic_id] = classroom.name
 
     for topic in all_topics:

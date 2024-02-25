@@ -1583,9 +1583,7 @@ def get_all_and_untracked_topic_ids_for_user(
     classrooms = classroom_config_services.get_all_classrooms()
     all_topic_ids = []
     for classroom in classrooms:
-        topic_ids = (
-            classroom.topic_id_to_prerequisite_topic_ids.keys())
-        for topic_id in topic_ids:
+        for topic_id in classroom.get_topic_ids():
             all_topic_ids.append(topic_id)
     tracked_topic_ids = (
         partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn)
