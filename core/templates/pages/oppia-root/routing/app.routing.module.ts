@@ -65,7 +65,6 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/diagnostic-test-player-page/diagnostic-test-player-page.module')
       .then(m => m.DiagnosticTestPlayerPageModule),
-    canActivate: [IsLoggedInGuard]
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
