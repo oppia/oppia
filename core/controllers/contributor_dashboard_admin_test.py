@@ -62,12 +62,13 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
     def test_non_admin_access_page_raise_401(self) -> None:
         self.login(self.USER_A_EMAIL)
         self.get_html_response(
-            '/contributor-admin-dashboard', expected_status_int=401)
+            feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL, expected_status_int=401)
         self.logout()
 
     def test_question_admin_can_access_page(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
-        response = self.get_html_response('/contributor-admin-dashboard')
+        response = self.get_html_response(
+            feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         response.mustcontain(
             '<contributor-dashboard-admin-page>'
             '</contributor-dashboard-admin-page>')
@@ -75,7 +76,8 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
 
     def test_translation_admin_can_access_page(self) -> None:
         self.login(self.TRANSLATION_ADMIN_EMAIL)
-        response = self.get_html_response('/contributor-admin-dashboard')
+        response = self.get_html_response(
+            feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL)
         response.mustcontain(
             '<contributor-dashboard-admin-page>'
             '</contributor-dashboard-admin-page>')
