@@ -5858,8 +5858,10 @@ class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
         """
         self.exploration = exploration
         self.draft_change_list_id = draft_change_list_id
-        self.show_state_editor_tutorial_on_load = show_state_editor_tutorial_on_load # pylint: disable=line-too-long
-        self.show_state_translation_tutorial_on_load = show_state_translation_tutorial_on_load # pylint: disable=line-too-long
+        self.show_state_editor_tutorial_on_load = (
+            show_state_editor_tutorial_on_load)
+        self.show_state_translation_tutorial_on_load = (
+            show_state_translation_tutorial_on_load)
         self.draft_changes = draft_changes
         self.states = states
         self.rights = rights
