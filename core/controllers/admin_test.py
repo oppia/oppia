@@ -660,7 +660,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             owner_id, topic_id, story_id)
 
         with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_enabled', False):
+                feature_flag_services, 'is_feature_flag_enabled', False):
             topic_services.publish_story(topic_id, story_id, self.admin_id)
             story_services.update_story(
                 owner_id, story_id, [story_domain.StoryChange({

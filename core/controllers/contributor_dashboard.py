@@ -360,6 +360,7 @@ class ReviewableOpportunitiesHandler(
         #    of explorations.
         # 4. Moved any pinned summaries to the top.
 
+        pinned_opportunity_summary = None
         if topic_name is None:
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids())
@@ -371,6 +372,13 @@ class ReviewableOpportunitiesHandler(
             topic_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids(
                     topic_id=topic.id))
+            if language and self.user_id:
+                pinned_opportunity_summary = (
+                    opportunity_services.get_pinned_lesson(
+                        self.user_id,
+                        language,
+                        topic.id
+                    ))
 
         # TODO (#19664): Implement fetching target IDs using GAE projection
         # queries.
@@ -387,16 +395,6 @@ class ReviewableOpportunitiesHandler(
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
         ]
-        pinned_opportunity_summary = None
-        if topic_name:
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if language and self.user_id:
-                pinned_opportunity_summary = (
-                    opportunity_services.get_pinned_lesson(
-                        self.user_id,
-                        language,
-                        topic.id
-                    ))
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
