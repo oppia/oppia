@@ -125,6 +125,8 @@ var PreferencesPage = function() {
   this.selectSystemLanguage = async function(language) {
     await action.click('system language selector', languageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
+    await dropdownOption.waitForDisplayed({ timeout: 5000 });
+    await dropdownOption.waitForClickable({ timeout: 5000 });
     await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
