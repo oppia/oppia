@@ -190,7 +190,6 @@ export class HtmlLengthService {
   // for calculating the lengths of RTE-components.
   getLengthForNonTextNodes(
       nonTextNode: string, calculationType: CalculationType): number {
-    nonTextNode = this.htmlEscaperService.escapedStrToUnescapedStr(nonTextNode);
     let domparser = new DOMParser();
     let dom: Document;
     dom = domparser.parseFromString(nonTextNode, 'text/html');
@@ -206,14 +205,16 @@ export class HtmlLengthService {
         return 0;
       case 'oppia-noninteractive-link':
       case 'oppia-noninteractive-skillreview': {
-        const textValueAttr = domTag.getAttribute('text-with-value');
-        const textValue = textValueAttr ? textValueAttr.slice(1, -1) : '';
+        const textValueAttr = domTag.getAttribute('text-with-value') || '';
+        const textValue = String(
+          this.htmlEscaperService.escapedJsonToObj(textValueAttr));
         const length = this.calculateTextLength(textValue, calculationType);
         return length;
       }
       case 'oppia-noninteractive-image': {
-        const altTextAttr = domTag.getAttribute('alt-with-value');
-        const altTextValue = altTextAttr ? altTextAttr.slice(1, -1) : '';
+        const altTextAttr = domTag.getAttribute('alt-with-value') || '';
+        const altTextValue = String(
+          this.htmlEscaperService.escapedJsonToObj(altTextAttr));
         const length = this.calculateTextLength(altTextValue, calculationType);
         return length + 10;
       }
