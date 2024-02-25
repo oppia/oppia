@@ -245,3 +245,92 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         self.assertTrue(
             set(language_accent_master_list).issuperset(
                 set(autogeneratable_langauge_accent_codes)))
+
+
+class VoiceArtistMetadataTests(test_utils.GenericTestBase):
+    """Unit test to validate voice artists metadata informations."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        self.voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        self.voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.voice_artist_id = 'voice_artist_id'
+        self.voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [
+                    self.voiceover1,
+                    self.voiceover2,
+                    self.voiceover3
+                ]
+            }
+        }
+
+    def test_should_create_and_put_new_voice_artist_model(self) -> None:
+        initial_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        self.assertIsNone(initial_retrieved_model)
+
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id,
+            self.voiceovers_and_contents_mapping
+        )
+
+        final_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        self.assertIsNotNone(final_retrieved_model)
+
+    def test_should_update_and_put_existing_voice_artist_model(self) -> None:
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, {})
+        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        assert retrieved_model is not None
+
+        self.assertDictEqual(
+            retrieved_model.voiceovers_and_contents_mapping, {})
+
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        assert retrieved_model is not None
+
+        self.assertDictEqual(
+            retrieved_model.voiceovers_and_contents_mapping,
+            self.voiceovers_and_contents_mapping)
+
+    def test_should_create_voice_artist_metadata_model_successfully(
+        self
+    ) -> None:
+        voice_artist_metadata_model = (
+            voiceover_services.create_voice_artist_metadata_model_instance(
+                self.voice_artist_id,
+                self.voiceovers_and_contents_mapping
+            )
+        )
+
+        self.assertEqual(voice_artist_metadata_model.id, self.voice_artist_id)
+        self.assertDictEqual(
+            voice_artist_metadata_model.voiceovers_and_contents_mapping,
+            self.voiceovers_and_contents_mapping)
