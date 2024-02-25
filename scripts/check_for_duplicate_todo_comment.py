@@ -73,11 +73,10 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         raise Exception('No issue or pull request number provided.')
 
-    latest_comment_lines: List[str] = []
     if latest_comment is None:
         raise Exception(NEW_COMMENT_SHOULD_BE_POSTED)
-    else:
-        latest_comment_lines = latest_comment['body'].splitlines()
+
+    latest_comment_lines: List[str] = latest_comment['body'].splitlines()
 
     new_comment_lines: List[str] = []
     with open(

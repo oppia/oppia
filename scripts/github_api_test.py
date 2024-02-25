@@ -22,9 +22,8 @@ import json
 import subprocess
 import textwrap
 from unittest import mock
-import urllib.request
+import urllib.request as urlrequest
 
-from core import utils
 from core.tests import test_utils
 
 from typing import List
@@ -153,12 +152,12 @@ class GithubApiTests(test_utils.GenericTestBase):
                 'Bearer github_pat_11A')
 
     def test_run_graphql_query_unauthorized_throws_error(self) -> None:
-        def mock_urlopen(_: urllib.request.Request) -> MockUrlOpenResponse:
+        def mock_urlopen(_: urlrequest.Request) -> MockUrlOpenResponse:
             return MockUrlOpenResponse(401, 'Unauthorized')
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         error_message = (
             'Failed to run the GraphQL query due to an API error: Unauthorized')
         with swap_subprocess_run, swap_urlopen, self.assertRaisesRegex(
@@ -170,7 +169,7 @@ class GithubApiTests(test_utils.GenericTestBase):
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         error_message = (
             'Failed to run the GraphQL query due to a request error: Timeout')
         with swap_subprocess_run, swap_urlopen, self.assertRaisesRegex(
@@ -179,7 +178,7 @@ class GithubApiTests(test_utils.GenericTestBase):
 
     def test_run_graphql_query_successful(self) -> None:
         def mock_urlopen(
-            request: urllib.request.Request
+            request: urlrequest.Request
         ) -> MockUrlOpenResponse:
             self.assertEqual(
                 request.headers['Authorization'], 'Bearer github_pat_11A')
@@ -205,14 +204,14 @@ class GithubApiTests(test_utils.GenericTestBase):
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         with swap_subprocess_run, swap_urlopen:
             self.assertEqual(
                 github_api.run_graphql_query('query'), 'response')
 
     def test_fetch_linked_issues_for_pull_request_successful(self) -> None:
         def mock_urlopen(
-            request: urllib.request.Request
+            request: urlrequest.Request
         ) -> MockUrlOpenResponse:
             self.assertEqual(
                 request.headers['Authorization'], 'Bearer github_pat_11A')
@@ -246,36 +245,33 @@ class GithubApiTests(test_utils.GenericTestBase):
                 request.data,
                 json.dumps(
                     {'query': expected_constructed_query}).encode('utf-8'))
-            body = (
-                """
-                {
-                    'data': {
-                        'repository': {
-                            'pullRequest': {
-                                'closingIssuesReferences': {
-                                    'nodes': [
-                                        {
-                                            'body': 'Body Number 1',
-                                            'number': 1,
-                                            'title': 'Issue Title Number 1'
-                                        },
-                                        {
-                                            'body': 'Body Number 4252',
-                                            'number': 4252,
-                                            'title': 'Issue Title Number 4252'
-                                        }
-                                    ]
-                                }
+            body = json.dumps({
+                'data': {
+                    'repository': {
+                        'pullRequest': {
+                            'closingIssuesReferences': {
+                                'nodes': [
+                                    {
+                                        'body': 'Body Number 1',
+                                        'number': 1,
+                                        'title': 'Issue Title Number 1'
+                                    },
+                                    {
+                                        'body': 'Body Number 4252',
+                                        'number': 4252,
+                                        'title': 'Issue Title Number 4252'
+                                    }
+                                ]
                             }
                         }
                     }
                 }
-                """)
+            })
             return MockUrlOpenResponse(200, body)
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         with swap_subprocess_run, swap_urlopen:
             self.assertEqual(
                 github_api.fetch_linked_issues_for_pull_request(12345), [
@@ -293,7 +289,7 @@ class GithubApiTests(test_utils.GenericTestBase):
 
     def test_fetch_latest_comment_from_issue_successful(self) -> None:
         def mock_urlopen(
-            request: urllib.request.Request
+            request: urlrequest.Request
         ) -> MockUrlOpenResponse:
             self.assertEqual(
                 request.headers['Authorization'], 'Bearer github_pat_11A')
@@ -325,29 +321,26 @@ class GithubApiTests(test_utils.GenericTestBase):
                 request.data,
                 json.dumps(
                     {'query': expected_constructed_query}).encode('utf-8'))
-            body = (
-                """
-                {
-                    'data': {
-                        'repository': {
-                            'issue': {
-                                'comments': {
-                                    'nodes': [
-                                        {
-                                            'body': 'Comment Body Number 1'
-                                        }
-                                    ]
-                                }
+            body = json.dumps({
+                'data': {
+                    'repository': {
+                        'issue': {
+                            'comments': {
+                                'nodes': [
+                                    {
+                                        'body': 'Comment Body Number 1'
+                                    }
+                                ]
                             }
                         }
                     }
                 }
-                """)
+            })
             return MockUrlOpenResponse(200, body)
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         with swap_subprocess_run, swap_urlopen:
             self.assertEqual(
                 github_api.fetch_latest_comment_from_issue(12345), {
@@ -356,7 +349,7 @@ class GithubApiTests(test_utils.GenericTestBase):
 
     def test_fetch_latest_comment_from_pull_request_successful(self) -> None:
         def mock_urlopen(
-            request: urllib.request.Request
+            request: urlrequest.Request
         ) -> MockUrlOpenResponse:
             self.assertEqual(
                 request.headers['Authorization'], 'Bearer github_pat_11A')
@@ -388,29 +381,26 @@ class GithubApiTests(test_utils.GenericTestBase):
                 request.data,
                 json.dumps(
                     {'query': expected_constructed_query}).encode('utf-8'))
-            body = (
-                """
-                {
-                    'data': {
-                        'repository': {
-                            'pullRequest': {
-                                'comments': {
-                                    'nodes': [
-                                        {
-                                            'body': 'Comment Body Number 1'
-                                        }
-                                    ]
-                                }
+            body = json.dumps({
+                'data': {
+                    'repository': {
+                        'pullRequest': {
+                            'comments': {
+                                'nodes': [
+                                    {
+                                        'body': 'Comment Body Number 1'
+                                    }
+                                ]
                             }
                         }
                     }
                 }
-                """)
+            })
             return MockUrlOpenResponse(200, body)
         swap_subprocess_run = self.swap(
             subprocess, 'run', self.mock_successful_gh_subprocess_run)
         swap_urlopen = self.swap(
-            utils, 'url_open', mock_urlopen)
+            urlrequest, 'urlopen', mock_urlopen)
         with swap_subprocess_run, swap_urlopen:
             self.assertEqual(
                 github_api.fetch_latest_comment_from_pull_request(12345), {

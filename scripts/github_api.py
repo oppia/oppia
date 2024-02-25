@@ -22,8 +22,6 @@ import subprocess
 import textwrap
 import urllib.request
 
-from core import utils
-
 from typing import Any, Dict, List, Optional, TypedDict
 
 REPOSITORY_OWNER = 'jnvtnguyen'
@@ -138,7 +136,7 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         request_data = (
             json.dumps({'query': constructed_query}).encode('utf-8'))
         request = urllib.request.Request(url, request_data, headers)
-        with utils.url_open(request) as response:
+        with urllib.request.urlopen(request) as response:
             if response.getcode() == 200:
                 # Here we use type Any because the API returns a generic
                 # JSON object and is in the form of Dict[str, Any]
