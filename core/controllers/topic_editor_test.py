@@ -529,6 +529,30 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
+    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX,
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self
+    ) -> None:
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_id'),
+            expected_status_int=404)
+        self.logout()
+
     def test_editable_topic_handler_get(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
