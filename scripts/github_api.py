@@ -26,7 +26,7 @@ from core import utils
 
 from typing import Any, Dict, List, Optional, TypedDict
 
-REPOSITORY_OWNER = 'oppia'
+REPOSITORY_OWNER = 'jnvtnguyen'
 REPOSITORY_NAME = 'oppia'
 
 GITHUB_API_URL = 'https://api.github.com'
