@@ -23,8 +23,10 @@ import os
 import re
 from unittest import mock
 
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import auth_domain
+from core.domain import feature_flag_services
 from core.domain import param_domain
 from core.domain import user_services
 from core.platform import models
@@ -35,6 +37,28 @@ from typing import Callable, Final, List, OrderedDict, Tuple
 import webapp2
 
 email_services = models.Registry.import_email_services()
+
+
+class EnableFeatureFlagTests(test_utils.GenericTestBase):
+    """Tests for testing test_utils.enable_feature_flags."""
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS])
+    def test_enable_feature_flags_decorator(self) -> None:
+        """Tests if single feature-flag is enabled."""
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            None, 'dummy_feature_flag_for_e2e_tests'))
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
+        feature_flag_list.FeatureNames.DIAGNOSTIC_TEST
+    ])
+    def test_enable_multiple_feature_flags_decorator(self) -> None:
+        """Tests if multiple feature flags are enabled."""
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            None, 'dummy_feature_flag_for_e2e_tests'))
+        self.assertTrue(feature_flag_services.is_feature_flag_enabled(
+            None, 'diagnostic_test'))
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
