@@ -211,10 +211,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'duplicate-blog-post.spec.js',
     'exploration-editor-tests/exploration-creator-manager.spec.js',
     'exploration-editor-tests/exploration-publisher-drafter.spec.js',
-    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
-    'translation-admin-tests/add-translation-rights.spec.js',
-    'translation-admin-tests/remove-translation-rights.spec.js'
-
+    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked' +
+    '.spec.js',
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

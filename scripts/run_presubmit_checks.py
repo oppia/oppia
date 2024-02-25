@@ -29,7 +29,7 @@ from typing import Final, List, Optional
 from . import common
 from . import run_backend_tests
 from . import run_frontend_tests
-from .linters import pre_commit_linter
+from .linters import run_lint_checks
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -60,7 +60,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run Javascript and Python linters.
     print('Linting files since the last commit')
-    pre_commit_linter.main(args=[])
+    run_lint_checks.main(args=[])
     print('Linting passed.')
     print('')
 

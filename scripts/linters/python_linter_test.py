@@ -24,8 +24,8 @@ import os
 from core.tests import test_utils
 from typing import Dict, List
 
-from . import pre_commit_linter
 from . import python_linter
+from . import run_lint_checks
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
@@ -41,7 +41,7 @@ INVALID_DOCSTRING_FILEPATH = os.path.join(
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
-NAME_SPACE.files = pre_commit_linter.FileCache()
+NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
 
