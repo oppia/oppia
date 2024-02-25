@@ -25,7 +25,7 @@
     <div class="mx-auto row w-75">
       <div class="col-lg-8 d-flex flex-column justify-content-center">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF' | translate }}</h1>
-        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT' | translate"></p>
+        <p class="e2e-test-about-foundation-page-millions-of-content" [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT' | translate"></p>
       </div>
       <div class="col-lg-4 d-flex justify-content-center oppia-about-foundation-image-with-caption text-center">
         <figure>
@@ -41,7 +41,7 @@
                  width="640">
           </picture>
           <figcaption>
-            <a class="text-center" href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
+            <a class="text-center e2e-test-about-foundation-page-source-unesco-button" href="http://uis.unesco.org/en/news/new-report-how-measure-equity-education">
               Source: UNESCO
             </a>
           </figcaption>
@@ -67,7 +67,7 @@
       </div>
       <div class="col-lg-8 d-flex flex-column info-right justify-content-center pl-md-5">
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT' | translate }}</h1>
-        <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
+        <p class="e2e-test-about-foundation-page-we-cannot-content" [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_WE_CANNOT_CONTENT' | translate"></p>
       </div>
     </div>
   </div>
@@ -78,7 +78,7 @@
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_CONTENT' | translate }}</p>
         <span class="about-foundation-page-button-area">
-          <oppia-primary-button
+          <oppia-primary-button class="e2e-test-about-foundation-page-learn-more-about-oppia-button"
               buttonHref="/about"
               customClasses="about-foundation-page-button"
               buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON' | translate }}">
@@ -120,7 +120,7 @@
         <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM' | translate }}</h1>
         <p>{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT' | translate }}</p>
         <span class="about-foundation-page-button-area">
-          <oppia-primary-button
+          <oppia-primary-button class="e2e-test-about-foundation-page-become-a-volunteer-button"
               buttonHref="/volunteer"
               customClasses="about-foundation-page-button"
               buttonText="{{ 'I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON' | translate }}">
@@ -133,9 +133,9 @@
   <div class="card-gray oppia-about-foundation-info-card oppia-about-foundation-cta">
     <div class="d-flex flex-column justify-content-center mx-auto px-3 w-75">
       <h1>{{ 'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX' | translate }}</h1>
-      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
-      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
-      <p [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_3' | translate"></p>
+      <p class="e2e-test-about-foundation-page-section-six-part-1" [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_1' | translate"></p>
+      <p class="e2e-test-about-foundation-page-section-six-part-2" [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_2' | translate"></p>
+      <p class="e2e-test-about-foundation-page-section-six-part-3" [innerHTML]="'I18N_ABOUT_FOUNDATION_PAGE_SECTION_SIX_PART_3' | translate"></p>
     </div>
   </div>
 </div>

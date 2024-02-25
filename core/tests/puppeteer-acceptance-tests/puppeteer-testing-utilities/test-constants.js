@@ -20,14 +20,30 @@ const path = require('path');
 
 let testConstants = {
   URLs: {
-    home: 'http://localhost:8181/',
-    BlogDashboard: 'http://localhost:8181/blog-dashboard',
-    BlogAdmin: 'http://localhost:8181/blog-admin',
-    CreatorDashboard: 'http://localhost:8181/creator-dashboard',
-    ContributorDashboardAdmin: 'http://localhost:8181/contributor-dashboard-admin/',
+    About: 'http://localhost:8181/about',
+    AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',
-    RolesEditorTab: 'http://localhost:8181/admin#/roles',
-    logout: 'http://localhost:8181/logout'
+    AdminPageRolesTab: 'http://localhost:8181/admin#/roles',
+    Android: 'http://localhost:8181/android',
+    Blog: 'http://localhost:8181/blog',
+    BlogAdmin: 'http://localhost:8181/blog-admin',
+    BlogDashboard: 'http://localhost:8181/blog-dashboard',
+    CommunityLibrary: 'http://localhost:8181/community-library',
+    Contact: 'http://localhost:8181/contact',
+    ContributorDashboardAdmin: 'http://localhost:8181/contributor-dashboard-admin/',
+    CreatorDashboard: 'http://localhost:8181/creator-dashboard',
+    CreatorDashboardCreateMode: 'http://localhost:8181/creator-dashboard?mode=create',
+    Donate: 'http://localhost:8181/donate',
+    DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
+    ExternalLink61MillionChildren: 'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
+    ExternalLinkEvenThoseWhoAreInSchool: 'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
+    ExternalLinkSourceUnesco: 'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
+    ExternalLinkWatchAVideo: 'https://www.facebook.com/oppiaorg/videos/189487953721583/',
+    Home: 'http://localhost:8181/',
+    Logout: 'http://localhost:8181/logout',
+    MathClassroom: 'http://localhost:8181/learn/math',
+    Partnerships: 'http://localhost:8181/partnerships',
+    Volunteer: 'http://localhost:8181/volunteer'
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

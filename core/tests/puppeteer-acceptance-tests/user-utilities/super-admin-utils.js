@@ -23,7 +23,7 @@ const testConstants = require(
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const rolesEditorTab = testConstants.URLs.RolesEditorTab;
+const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
@@ -36,7 +36,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
    * @param {string} role - The role that would be assigned to the user.
    */
   async assignRoleToUser(username, role) {
-    await this.goto(rolesEditorTab);
+    await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.clickOn(addRoleButton);
@@ -60,7 +60,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
    */
   async expectUserToHaveRole(username, role) {
     const currentPageUrl = this.page.url();
-    await this.goto(rolesEditorTab);
+    await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
@@ -85,7 +85,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
    */
   async expectUserNotToHaveRole(username, role) {
     const currentPageUrl = this.page.url();
-    await this.goto(rolesEditorTab);
+    await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
