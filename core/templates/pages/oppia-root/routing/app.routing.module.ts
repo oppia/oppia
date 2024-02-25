@@ -53,6 +53,13 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/blog-dashboard-page/blog-dashboard-page.module')
+      .then(m => m.BlogDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
     loadChildren: () => import(
       'pages/email-dashboard-pages/email-dashboard-page.module')
@@ -77,6 +84,14 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/learner-dashboard-page/learner-dashboard-page.module')
       .then(m => m.LearnerDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR
+      .ROUTE,
+    loadChildren: () => import(
+      'pages/learner-group-pages/edit-group/edit-learner-group-page.module')
+      .then(m => m.EditLearnerGroupPageModule),
     canActivate: [IsLoggedInGuard]
   },
   {
