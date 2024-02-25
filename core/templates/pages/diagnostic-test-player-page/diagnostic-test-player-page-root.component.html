@@ -1,4 +1,4 @@
-<oppia-angular-root>
+<oppia-angular-root *ngIf="pageIsShown">
   <oppia-base-content>
     <navbar-breadcrumb>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
@@ -16,3 +16,5 @@
     <page-footer></page-footer>
   </oppia-base-content>
 </oppia-angular-root>
+
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>
