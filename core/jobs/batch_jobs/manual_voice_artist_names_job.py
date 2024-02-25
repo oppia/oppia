@@ -33,8 +33,11 @@ from typing import Dict, Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import voiceover_models
+
+datastore_services = models.Registry.import_datastore_services()
 
 (voiceover_models, exp_models) = models.Registry.import_models([
     models.Names.VOICEOVER, models.Names.EXPLORATION])
@@ -97,13 +100,15 @@ class GetVoiceArtistMetadataModelsFromDict(beam.DoFn): # type: ignore[misc]
 
         vocie_artist_metadata_models = []
 
-        for voice_artist_id, metadata_mapping in (
-                voice_artist_id_to_metadata_mapping.items()):
-
-            vocie_artist_model = (
-                voiceover_services.create_voice_artist_metadata_model_instance(
-                    voice_artist_id, metadata_mapping))
-            vocie_artist_metadata_models.append(vocie_artist_model)
+        with datastore_services.get_ndb_context():
+            for voice_artist_id, metadata_mapping in (
+                    voice_artist_id_to_metadata_mapping.items()):
+                vocie_artist_model = (
+                    voiceover_services.
+                    create_voice_artist_metadata_model_instance(
+                        voice_artist_id, metadata_mapping)
+                )
+                vocie_artist_metadata_models.append(vocie_artist_model)
 
         return vocie_artist_metadata_models
 
@@ -421,14 +426,31 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
 
         return total_voiceovers
 
+    @staticmethod
+    def check_exploration_is_curated(exp_id: str) -> bool:
+        """The method verifies if the provided exploration ID has been
+        curated or not.
+
+        Args:
+            exp_id: str. The given exploration ID.
+
+        Returns:
+            bool. A boolean value indicating if the exploration has been
+            curated or not.
+        """
+        with datastore_services.get_ndb_context():
+            return (
+                opportunity_services.
+                is_exploration_available_for_contribution(exp_id)
+            )
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         curated_exploration_model_ids = (
             self.pipeline
             | 'Get exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all())
             | 'Get curated exploration models' >> beam.Filter(
-                lambda model: opportunity_services.
-                is_exploration_available_for_contribution(model.id))
+                lambda model: self.check_exploration_is_curated(model.id))
             | 'Get curated exploration model ids' >> beam.Map(
                 lambda exploration: exploration.id
             )
