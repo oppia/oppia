@@ -38,6 +38,7 @@ TODO_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
 CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\): .+')
 
 
+# TODO(#7): Testing.
 class TodoDict(TypedDict):
     """Dict representation of a todo."""
 
@@ -46,6 +47,7 @@ class TodoDict(TypedDict):
     line_number: int
 
 
+# TODO(#7): Testing.
 def is_file_excluded(file_path: str) -> bool:
     """Checks if the file should be excluded from the search.
 
@@ -83,6 +85,7 @@ def get_search_files(repository_path: str) -> List[str]:
     return search_files
 
 
+# TODO(#8): Testing.
 def get_todo_in_line(
     file_path: str,
     line_content: str,

@@ -40,6 +40,7 @@ class GithubIssueDict(TypedDict):
     title: str
 
 
+# TODO(#8): Testing.
 class GithubCommentDict(TypedDict):
     """Dict representation of a Github comment."""
 
@@ -96,6 +97,7 @@ def get_github_auth_token() -> str:
     return process.stdout.strip()
 
 
+# TODO(#8): Testing.
 def get_authorization_bearer() -> str:
     """Formats the Github auth token to be used as a bearer token."""
     return f'Bearer {get_github_auth_token()}'
@@ -117,6 +119,7 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         RuntimeError. Failed to run GraphQL query due to an API error.
     """
 
+    # TODO(#8): Testing.
     constructed_query = textwrap.dedent(
         """
         query {
@@ -165,6 +168,7 @@ def fetch_linked_issues_for_pull_request(
         List[GithubIssueDict]. The linked issues for the pull request.
     """
 
+    # TODO(#7): Testing.
     query = textwrap.dedent(
         """
         pullRequest(number: %s) {
@@ -187,6 +191,7 @@ def fetch_linked_issues_for_pull_request(
     return linked_issues
 
 
+# TODO(#7): Testing.
 def fetch_latest_comment_from_issue(
     issue: int
 ) -> Optional[GithubCommentDict]:
