@@ -102,7 +102,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             ])
 
     def test_check_for_duplicate_todo_comment_two_shas_with_no_duplicate(
-            self
+        self
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -114,7 +114,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             ])
 
     def test_check_for_duplicate_todo_comment_different_lines_with_no_duplicate(
-            self
+        self
     ) -> None:
         with self.assertRaisesRegex(
             Exception,

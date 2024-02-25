@@ -65,14 +65,12 @@ def main(args: Optional[List[str]] = None) -> None:
     latest_comment_lines: List[str] = []
     if parsed_args.issue:
         latest_comment_lines = (
-            github_api.GithubApi()
-                .fetch_latest_comment_from_issue(
-                    parsed_args.issue)['body'].splitlines())
+            github_api.fetch_latest_comment_from_issue(
+                    parsed_args.issue))['body'].splitlines()
     elif parsed_args.pull_request:
         latest_comment_lines = (
-            github_api.GithubApi()
-                .fetch_latest_comment_from_pull_request(
-                    parsed_args.pull_request)['body'].splitlines())
+            github_api.fetch_latest_comment_from_pull_request(
+                parsed_args.pull_request))['body'].splitlines()
     else:
         raise Exception('No issue or pull request number provided.')
 

@@ -42,8 +42,6 @@ jobs:
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --new_comment_file=unresolved_todo_list.txt
 
@@ -75,8 +73,6 @@ jobs:
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --new_comment_file=unresolved_todo_list.txt
 

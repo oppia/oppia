@@ -138,9 +138,8 @@ def main(args: Optional[List[str]] = None) -> None:
         issues_to_check.append(parsed_args.issue)
     if parsed_args.pull_request:
         linked_issues = (
-            github_api.GithubApi()
-                .fetch_linked_issues_for_pull_request(
-                    parsed_args.pull_request))
+            github_api.fetch_linked_issues_for_pull_request(
+                parsed_args.pull_request))
         for linked_issue in linked_issues:
             issues_to_check.append(linked_issue['number'])
 
