@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Moderator Page Root component.
+ * @fileoverview Unit tests for Creator Dashboard Root component.
  */
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -23,28 +23,28 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
-import { ModeratorPageRootComponent } from './moderator-page-root.component';
+import { CreatorDashboardPageRootComponent } from './creator-dashboard-page-root.component';
 
-describe('ModeratorPageRootComponent', () => {
-  let fixture: ComponentFixture<ModeratorPageRootComponent>;
-  let component: ModeratorPageRootComponent;
+describe('CreatorDashboardPageRootComponent', () => {
+  let fixture: ComponentFixture<CreatorDashboardPageRootComponent>;
+  let component: CreatorDashboardPageRootComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      declarations: [ModeratorPageRootComponent],
+      declarations: [CreatorDashboardPageRootComponent],
       providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ModeratorPageRootComponent);
+    fixture = TestBed.createComponent(CreatorDashboardPageRootComponent);
     component = fixture.componentInstance;
   });
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.TITLE);
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.META);
   });
 });

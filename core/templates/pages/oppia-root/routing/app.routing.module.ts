@@ -41,6 +41,23 @@ const routes: Route[] = [
       .then(m => m.ContributorDashboardPageModule)
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+        .TOPICS_AND_SKILLS_DASHBOARD.ROUTE),
+    loadChildren: () => import(
+      // eslint-disable-next-line max-len
+      'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module')
+      .then(m => m.TopicsAndSkillsDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/creator-dashboard-page/creator-dashboard-page.module')
+      .then(m => m.CreatorDashboardPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () => import('pages/moderator-page/moderator-page.module')
       .then(m => m.ModeratorPageModule),

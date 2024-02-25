@@ -67,9 +67,6 @@ module.exports = {
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
-    creator_dashboard:
-      commonPrefix + '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.import.ts',
     contributor_dashboard_admin:
       commonPrefix + '/pages/contributor-dashboard-admin-page/' +
       'contributor-dashboard-admin-page.import.ts',
@@ -111,11 +108,6 @@ module.exports = {
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
-    topics_and_skills_dashboard: (
-      commonPrefix +
-      '/pages/topics-and-skills-dashboard-page/' +
-      'topics-and-skills-dashboard-page.import.ts'
-    ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
     voiceover_admin:
@@ -200,17 +192,6 @@ module.exports = {
           'how to get involved with the Oppia project.'
       },
       template: commonPrefix + '/tests/console_errors.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['creator_dashboard'],
-      filename: 'creator-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/creator-dashboard-page/' +
-        'creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -377,19 +358,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-editor-page/' +
         'topic-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['topics_and_skills_dashboard'],
-      filename: 'topics-and-skills-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/topics-and-skills-dashboard-page/' +
-        'topics-and-skills-dashboard-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),

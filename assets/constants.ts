@@ -6620,6 +6620,42 @@ export default {
         }
       ]
     },
+    "CREATOR_DASHBOARD": {
+      "ROUTE": "creator-dashboard",
+      "TITLE": "Creator Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "TOPICS_AND_SKILLS_DASHBOARD": {
+      "ROUTE": "topics-and-skills-dashboard",
+      "TITLE": "Topics and Skills Dashboard | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "EMAIL_DASHBOARD": {
       "ROUTE": "emaildashboard",
       "TITLE": "Email Dashboard - Oppia",

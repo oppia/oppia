@@ -449,6 +449,7 @@ import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard'
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -861,6 +862,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicCreationService', TopicCreationService],
+  ['TopicsAndSkillsDashboardAuthGuard', TopicsAndSkillsDashboardAuthGuard],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
