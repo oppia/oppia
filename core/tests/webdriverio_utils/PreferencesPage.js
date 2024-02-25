@@ -49,6 +49,9 @@ var PreferencesPage = function() {
   var userInterestsInput = $('.e2e-test-subject-interests-input');
 
   var saveNewChanges = async function(fieldName) {
+    // If the following click event is omitted, the '(change)' event
+    // won't be triggered for language-selector, failing to register changes.
+    await action.click('Navbar Button', navBar);
     await clickSaveChangesButton();
     // Due to screen dimensions in e2e tests, the Info toast overlaps
     // with the 'Save Changes' button. To avoid this collision, we click
