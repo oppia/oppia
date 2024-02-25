@@ -55,13 +55,13 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
-    # rights_domain and user_domain are imported under the 
+    # rights_domain and user_domain are imported under the
     # `if MYPY` clause only for type checking purposes
     # and to avoid circular import and they are not expected to be executed
     # at runtime.
     from core.domain import rights_domain
     from core.domain import user_domain
+    from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
