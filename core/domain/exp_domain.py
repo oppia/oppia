@@ -42,17 +42,13 @@ from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    TYPE_CHECKING, Callable, Dict, Final, List, Literal, Mapping, Optional,
-    Sequence, Set, Tuple, TypedDict, Union, cast, overload)
+    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence,
+    Set, Tuple, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-
-if TYPE_CHECKING:
-    from core.domain import rights_domain
-    from core.domain import user_domain
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -60,6 +56,12 @@ if TYPE_CHECKING:
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
+    # rights_domain and user_domain are imported under the 
+    # `if MYPY` clause only for type checking purposes
+    # and to avoid circular import and they are not expected to be executed
+    # at runtime.
+    from core.domain import rights_domain
+    from core.domain import user_domain
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
