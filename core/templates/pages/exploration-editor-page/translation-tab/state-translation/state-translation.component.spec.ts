@@ -1485,9 +1485,12 @@ describe('State translation component', () => {
   it('should return translated unicode when translation no available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
-        'entityId', 'entityType', 'entityVersion', 'hi', {
-        content_1: new TranslatedContent('Translated UNICODE', 'unicode', true)
-        })
+        'entityId',
+        'entityType',
+        'entityVersion',
+        'hi', {
+          content_1: (
+            new TranslatedContent('Translated UNICODE', 'unicode', true))})
     );
     let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
       content_id: 'content_1',
@@ -1546,8 +1549,14 @@ describe('State translation component', () => {
   it('should return translated unicode when translation no available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
-        'entityId', 'entityType', 'entityVersion', 'hi', {
-          content_1: new TranslatedContent('Translated UNICODE', 'unicode', true
+        'entityId',
+        'entityType',
+        'entityVersion',
+        'hi',
+        {
+          content_1: new TranslatedContent
+          (
+            'Translated UNICODE', 'unicode', true
           )
         })
     );
