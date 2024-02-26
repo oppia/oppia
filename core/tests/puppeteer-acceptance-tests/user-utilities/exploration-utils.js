@@ -468,7 +468,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     explorationUrlAfterPublished = await this.page.url();
   }
 
-  async publishExploration(){
+  async publishExploration() {
     await this.makeExplorationPublic();
   }
 
@@ -480,8 +480,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     try {
       await this.page.goto(explorationUrlAfterPublished);
       showMessage('Exploration is available on creator dashboard.');
-    }
-    catch (error) {
+    } catch (error) {
       throw new Error('Failed to navigate to the exploration URL.');
     }
   }
@@ -492,10 +491,9 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async addSomeChanges() {
     await this.clickOn(settingsTab);
     await this.clickOn(addTitleBar);
-    // titleBeforeChanges = await this.page.$eval(
-    //   '.e2e-test-exploration-title-input', title => title.value);
     titleBeforeChanges = await this.page.evaluate(() => {
-      return document.querySelector('.e2e-test-exploration-title-input').innerText;
+      return document.querySelector(
+        '.e2e-test-exploration-title-input').innerText;
     });
     await this.type(addTitle, 'Your Title Here please');
   }
@@ -514,8 +512,9 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await titleInput.click();
 
     const titleAfterChanges = await this.page.evaluate(()=> {
-      return document.querySelector('.e2e-test-exploration-title-input').innerText;
-    })
+      return document.querySelector(
+        '.e2e-test-exploration-title-input').innerText;
+    });
 
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
