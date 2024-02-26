@@ -22,7 +22,6 @@ import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
-import { TopicEditorAccessGuard } from 'pages/topic-editor-page/topic-editor-access.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -329,7 +328,7 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/topic-editor-page/topic-editor-page.module')
         .then(m => m.TopicEditorPageModule),
-    canActivate: [TopicEditorAccessGuard]
+    canActivate: [IsLoggedInGuard]
   },
 ];
 
