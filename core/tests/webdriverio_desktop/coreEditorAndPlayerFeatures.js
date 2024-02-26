@@ -79,7 +79,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'after the interaction is created', async function() {
+    'after the interaction is created', async function() {
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -120,7 +120,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'during set the interaction', async function() {
+    'during set the interaction', async function() {
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -411,8 +411,60 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToBeOver();
     });
 
+  it('should not show self-loop warning when current and ' +
+    'destination states are different', async function() {
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('some content'));
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.addResponse(
+      'NumericInput', async function(richTextEditor) {
+        await richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.expectRuleToBe(
+      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.expectFeedbackInstructionToBe('correct');
+    await responseEditor.markAsCorrect();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(
+      await forms.toRichText('try again'));
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.expectFeedbackInstructionToBe('try again');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setDestination(null, false, null);
+
+    // Setup a terminating state.
+
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+
+    await general.moveToPlayer();
+    await explorationPlayerPage.submitAnswer('NumericInput', 5);
+    await explorationPlayerPage.expectLatestFeedbackToMatch(
+      await forms.toRichText('try again'));
+    await explorationPlayerPage.expectExplorationToNotBeOver();
+    // It's important to test the value 0 in order to ensure that it would
+    // still get submitted even though it is a falsy value in JavaScript.
+    await explorationPlayerPage.submitAnswer('NumericInput', 1);
+    await explorationPlayerPage.expectLatestFeedbackToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readBoldText('correct');
+      });
+    await explorationPlayerPage.clickThroughToNextCard();
+    await general.moveToEditor(false);
+    await explorationEditorMainTab.moveToState('Introduction');
+    var responseSelfLoopWarning = $('.e2e-test-response-self-loop-warning');
+    await waitFor.invisibilityOf(
+      responseSelfLoopWarning, 'inaccurate self-loop warning appears');
+  });
+
   it('should skip the customization modal for interactions having no ' +
-      'customization options', async function() {
+    'customization options', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -427,7 +479,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
-     'customize it', async function() {
+    'customize it', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -465,7 +517,7 @@ describe('Core exploration functionality', function() {
     await action.click('Use Image Button', useImageBtn);
     var svgElem = $('.e2e-test-svg');
     await svgElem.moveTo(0, 0);
-    await svgElem.dragAndDrop({x: 1, y: 1});
+    await svgElem.dragAndDrop({ x: 1, y: 1 });
     await action.click('Save Interaction Button', saveInteractionBtn);
     var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
     await action.click('Close Add Response Button', closeAddResponseButton);
@@ -559,7 +611,7 @@ describe('Core exploration functionality', function() {
     });
 
   it('should be able to create new category which is not' +
-  ' in the dropdown menu', async function() {
+    ' in the dropdown menu', async function() {
     await explorationEditorPage.navigateToSettingsTab();
 
     await explorationEditorSettingsTab.expectCategoryToBe('');
