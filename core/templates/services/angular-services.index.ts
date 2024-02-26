@@ -58,6 +58,7 @@ import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { ContributorDashboardAdminAuthGuard } from 'pages/contributor-dashboard-admin-page/contributor-dashboard-admin-auth.guard';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -446,6 +447,7 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
+import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
@@ -483,6 +485,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageAuthGuard', BlogDashboardPageAuthGuard],
   ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostPageService', BlogPostPageService],
@@ -528,6 +531,8 @@ export const angularServices: [string, Type<{}>][] = [
     ContributionOpportunitiesBackendApiService],
   ['ContributorDashboardAdminBackendApiService',
     ContributorDashboardAdminBackendApiService],
+  ['ContributorDashboardAdminAuthGuard',
+    ContributorDashboardAdminAuthGuard],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
   ['ChangeListService', ChangeListService],
