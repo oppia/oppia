@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,14 @@
  * @fileoverview Unit tests for the Contributor dashboard admin page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { UserService } from 'services/user.service';
-import { UserInfo } from 'domain/user/user-info.model';
+import { ContributorDashboardAdminPageComponent } from './contributor-dashboard-admin-page.component';
 import { ContributorDashboardAdminBackendApiService } from './services/contributor-dashboard-admin-backend-api.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { UserInfo } from 'domain/user/user-info.model';
 
 class MockPlatformFeatureService {
   status = {
@@ -38,42 +34,40 @@ class MockPlatformFeatureService {
   };
 }
 
-describe('Contributor dashboard admin page ', function() {
-  let $scope = null;
-  let ctrl = null;
-  let $rootScope = null;
-  let directive = null;
-  let userService: UserService = null;
-  let contributorDashboardAdminBackendApiService:
-    ContributorDashboardAdminBackendApiService = null;
-
-  let userInfo: UserInfo = null;
-
+describe('ContributorDashboardAdminPageComponent', () => {
+  let fixture: ComponentFixture<ContributorDashboardAdminPageComponent>;
+  let component: ContributorDashboardAdminPageComponent;
+  let userService: UserService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let contributorDashboardAdminBackendApiService:
+   ContributorDashboardAdminBackendApiService;
+  let userInfo: UserInfo;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      declarations: [
+        ContributorDashboardAdminPageComponent
+      ],
       providers: [
+        UserService,
+        ContributorDashboardAdminBackendApiService,
+
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService
         }
-      ]
-    });
-  });
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    directive = $injector.get('contributorDashboardAdminPageDirective')[0];
-    userService = $injector.get('UserService');
-    contributorDashboardAdminBackendApiService = $injector.get(
-      'ContributorDashboardAdminBackendApiService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ContributorDashboardAdminPageComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    contributorDashboardAdminBackendApiService =
+     TestBed.inject(ContributorDashboardAdminBackendApiService);
 
     userInfo = {
       _roles: ['USER_ROLE'],
@@ -95,36 +89,31 @@ describe('Contributor dashboard admin page ', function() {
       isQuestionCoordinator: () => true,
       isTranslationCoordinator: () => true,
       canCreateCollections: () => true,
-      getPreferredSiteLanguageCode: () =>'en',
+      getPreferredSiteLanguageCode: () => 'en',
       getUsername: () => 'username1',
       getEmail: () => 'tester@example.org',
       isLoggedIn: () => true
     } as UserInfo;
+  });
 
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope,
-      $scope: $scope
-    });
-  }));
-
-  it('should fetch user info when initialized', fakeAsync(function() {
+  it('should fetch user info when initialized', fakeAsync(() => {
     const userInfoSpy = spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfo));
 
-    ctrl.$onInit();
+    component.ngOnInit();
     tick();
 
     expect(userInfoSpy).toHaveBeenCalled();
   }));
 
-  it('should account for feature flag when initialized', fakeAsync(function() {
+  it('should account for feature flag when initialized', fakeAsync(() => {
     mockPlatformFeatureService.status.CdAdminDashboardNewUi.isEnabled = (
       true);
 
-    ctrl.$onInit();
+    component.ngOnInit();
     tick();
 
-    expect(ctrl.isNewUiEnabled).toBeTrue();
+    expect(component.isNewUiEnabled).toBeTrue();
   }));
 
   describe('on clicking add rights button ', () => {
@@ -132,7 +121,7 @@ describe('Contributor dashboard admin page ', function() {
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       const addContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -140,21 +129,21 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.submitAddContributionRightsForm(addContributionRightsAction);
+      component.submitAddContributionRightsForm(addContributionRightsAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
-      expect(ctrl.statusMessage).toBe('Success.');
+      expect(component.statusMessage).toBe('Success.');
     }));
 
     it('should not send request to backend if a task ' +
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
-      ctrl.taskRunningInBackground = true;
+      component.taskRunningInBackground = true;
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'addContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       const addContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -162,63 +151,84 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.submitAddContributionRightsForm(addContributionRightsAction);
+      component.submitAddContributionRightsForm(addContributionRightsAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy)
         .not.toHaveBeenCalled();
     }));
+
+    it('should not update the rights of the user in case of a backend error',
+      fakeAsync(() => {
+        const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+          contributorDashboardAdminBackendApiService,
+          'addContributionReviewerAsync')
+          .and.returnValue(Promise.reject(
+            'User user1 already has rights' +
+            ' to review translation in language code en'));
+        const addContributionRightsAction = {
+          category: 'translation',
+          isValid: () => true,
+          languageCode: 'en',
+          username: 'user1'
+        };
+
+        component.submitAddContributionRightsForm(addContributionRightsAction);
+        tick();
+
+        expect(
+          contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe(
+          'Server error: User user1 already has rights' +
+        ' to review translation in language code en');
+      }));
   });
 
   describe('in the add contribution rights section ', () => {
     it('should return true if there are no validation errors ' +
       'when updating user rights for category translation', fakeAsync(() => {
-      ctrl.$onInit();
+      component.ngOnInit();
       // Setting category to be translation.
-      ctrl.formData.addContributionReviewer.category = 'translation';
-      ctrl.formData.addContributionReviewer.languageCode = 'en';
-      ctrl.formData.addContributionReviewer.username = 'user1';
-      $scope.$apply();
+      component.formData.addContributionReviewer.category = 'translation';
+      component.formData.addContributionReviewer.languageCode = 'en';
+      component.formData.addContributionReviewer.username = 'user1';
 
-      const result = ctrl.formData.addContributionReviewer.isValid();
+      const result = component.formData.addContributionReviewer.isValid();
 
       expect(result).toBe(true);
     }));
 
     it('should return true if there are no validation errors ' +
       'when updating user rights for category voiceover', fakeAsync(() => {
-      ctrl.$onInit();
+      component.ngOnInit();
       // Setting category to be voiceover.
-      ctrl.formData.addContributionReviewer.category = 'voiceOver';
-      ctrl.formData.addContributionReviewer.username = 'user1';
-      $scope.$apply();
+      component.formData.addContributionReviewer.category = 'voiceOver';
+      component.formData.addContributionReviewer.username = 'user1';
 
-      const result = ctrl.formData.addContributionReviewer.isValid();
+      const result = component.formData.addContributionReviewer.isValid();
 
       expect(result).toBe(true);
     }));
 
     it('should return false if there are validation errors ' +
       'when updating user rights', fakeAsync(() => {
-      ctrl.$onInit();
+      component.ngOnInit();
       // Setting category to be null.
-      ctrl.formData.addContributionReviewer.category = null;
-      ctrl.formData.addContributionReviewer.username = 'user1';
-      $scope.$apply();
+      component.formData.addContributionReviewer.category = null;
+      component.formData.addContributionReviewer.username = 'user1';
 
-      const result = ctrl.formData.addContributionReviewer.isValid();
+      const result = component.formData.addContributionReviewer.isValid();
 
       expect(result).toBe(false);
     }));
 
     it('should return false if user name is empty ' +
       'when updating user rights', fakeAsync(() => {
-      ctrl.$onInit();
+      component.ngOnInit();
       // Setting username to be empty.
-      ctrl.formData.addContributionReviewer.username = '';
-      $scope.$apply();
+      component.formData.addContributionReviewer.username = '';
 
-      const result = ctrl.formData.addContributionReviewer.isValid();
+      const result = component.formData.addContributionReviewer.isValid();
 
       expect(result).toBe(false);
     }));
@@ -248,16 +258,16 @@ describe('Contributor dashboard admin page ', function() {
         'contributionReviewerRightsAsync')
         .and.returnValue(Promise.resolve(viewContributorsResponse));
 
-      expect(ctrl.contributionReviewersDataFetched).toBe(undefined);
+      expect(component.contributionReviewersDataFetched).toBe(false);
 
-      ctrl.$onInit();
+      component.ngOnInit();
       tick();
 
-      ctrl.submitViewContributorUsersForm(viewContributionReviewersAction);
+      component.submitViewContributorUsersForm(viewContributionReviewersAction);
       tick();
 
-      expect(ctrl.contributionReviewersDataFetched).toBe(true);
-      expect(ctrl.statusMessage).toBe('Success.');
+      expect(component.contributionReviewersDataFetched).toBe(true);
+      expect(component.statusMessage).toBe('Success.');
     }));
 
     it('should successfully show users given the ' +
@@ -280,24 +290,24 @@ describe('Contributor dashboard admin page ', function() {
         'viewContributionReviewersAsync')
         .and.returnValue(Promise.resolve(viewContributorsResponse));
 
-      expect(ctrl.contributionReviewersResult).toEqual(undefined);
-      expect(ctrl.contributionReviewersDataFetched).toBe(undefined);
+      expect(component.contributionReviewersResult).toEqual({ });
+      expect(component.contributionReviewersDataFetched).toBe(false);
 
-      ctrl.$onInit();
+      component.ngOnInit();
       tick();
-      ctrl.submitViewContributorUsersForm(viewContributionReviewersAction);
+      component.submitViewContributorUsersForm(viewContributionReviewersAction);
       tick();
 
-      expect(ctrl.contributionReviewersResult.usernames)
+      expect(component.contributionReviewersResult.usernames)
         .toEqual(viewContributorsResponse.usernames);
-      expect(ctrl.contributionReviewersDataFetched).toBe(true);
-      expect(ctrl.statusMessage).toBe('Success.');
+      expect(component.contributionReviewersDataFetched).toBe(true);
+      expect(component.statusMessage).toBe('Success.');
     }));
 
     it('should not send request to backend if a task ' +
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
-      ctrl.taskRunningInBackground = true;
+      component.taskRunningInBackground = true;
       const viewContributorsResponse = {
         usernames: ['user1']
       };
@@ -314,16 +324,38 @@ describe('Contributor dashboard admin page ', function() {
         languageCode: 'en',
         username: 'user1'
       };
-      expect(ctrl.contributionReviewersDataFetched).toBe(undefined);
+      expect(component.contributionReviewersDataFetched).toBe(false);
 
-      ctrl.$onInit();
+      component.ngOnInit();
       tick();
-      ctrl.submitViewContributorUsersForm(viewContributionReviewersAction);
+      component.submitViewContributorUsersForm(viewContributionReviewersAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy)
         .not.toHaveBeenCalled();
-      expect(ctrl.contributionReviewersDataFetched).toBe(false);
+      expect(component.contributionReviewersDataFetched).toBe(false);
+    }));
+
+    it('should handle backend failure appropriately', fakeAsync(() => {
+      const viewContributionReviewersAction = {
+        category: 'category',
+        filterCriterion: 'username',
+        isValid: () => true,
+        languageCode: 'en',
+        username: 'random'
+      };
+
+      const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync')
+        .and.returnValue(Promise.reject('Invalid username: random'));
+
+      component.submitViewContributorUsersForm(viewContributionReviewersAction);
+      tick();
+
+      expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+      expect(component.statusMessage).toBe(
+        'Server error: Invalid username: random');
     }));
   });
 
@@ -332,7 +364,7 @@ describe('Contributor dashboard admin page ', function() {
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       const removeContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -341,24 +373,23 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.$onInit();
-      $scope.$apply();
-      ctrl.submitRemoveContributionRightsForm(
+      component.ngOnInit();
+      component.submitRemoveContributionRightsForm(
         removeContributionRightsAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
-      expect(ctrl.statusMessage).toBe('Success.');
+      expect(component.statusMessage).toBe('Success.');
     }));
 
     it('should not send request to backend if a task ' +
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
-      ctrl.taskRunningInBackground = true;
+      component.taskRunningInBackground = true;
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'removeContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       const removeContributionRightsAction = {
         category: 'translation',
         isValid: () => true,
@@ -367,15 +398,39 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.$onInit();
-      $scope.$apply();
-      ctrl.submitRemoveContributionRightsForm(
+      component.ngOnInit();
+      component.submitRemoveContributionRightsForm(
         removeContributionRightsAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy)
         .not.toHaveBeenCalled();
     }));
+
+    it('should not remove the rights of the user in case of a backend error',
+      fakeAsync(() => {
+        const contributorDashboardAdminBackendApiServiceSpy = spyOn(
+          contributorDashboardAdminBackendApiService,
+          'removeContributionReviewerAsync')
+          .and.returnValue(Promise.reject('Invalid username: random'));
+        const removeContributionRightsAction = {
+          category: 'translation',
+          isValid: () => true,
+          languageCode: 'en',
+          method: 'all',
+          username: 'random'
+        };
+
+        component.ngOnInit();
+        component.submitRemoveContributionRightsForm(
+          removeContributionRightsAction);
+        tick();
+
+        expect(
+          contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe(
+          'Server error: Invalid username: random');
+      }));
   });
 
   describe('on clicking \'View Translation Stats\' button ', () => {
@@ -392,31 +447,31 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.$onInit();
-      $scope.$apply();
-      ctrl.submitViewTranslationContributionStatsForm(viewTranslationAction);
+      component.ngOnInit();
+      component.submitViewTranslationContributionStatsForm(
+        viewTranslationAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy).toHaveBeenCalled();
-      expect(ctrl.statusMessage).toBe('Success.');
+      expect(component.statusMessage).toBe('Success.');
     }));
 
     it('should not send request to backend if a task ' +
       'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
-      ctrl.taskRunningInBackground = true;
+      component.taskRunningInBackground = true;
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
         contributorDashboardAdminBackendApiService,
         'viewTranslationContributionStatsAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       const viewTranslationAction = {
         isValid: () => true,
         username: 'user1'
       };
 
-      ctrl.$onInit();
-      $scope.$apply();
-      ctrl.submitViewTranslationContributionStatsForm(viewTranslationAction);
+      component.ngOnInit();
+      component.submitViewTranslationContributionStatsForm(
+        viewTranslationAction);
       tick();
 
       expect(contributorDashboardAdminBackendApiServiceSpy)
@@ -434,12 +489,12 @@ describe('Contributor dashboard admin page ', function() {
         username: 'user1'
       };
 
-      ctrl.$onInit();
-      $scope.$apply();
-      ctrl.submitViewTranslationContributionStatsForm(viewTranslationAction);
+      component.ngOnInit();
+      component.submitViewTranslationContributionStatsForm(
+        viewTranslationAction);
       tick();
 
-      expect(ctrl.statusMessage)
+      expect(component.statusMessage)
         .toBe('Server error: Internal Server Error.');
     }));
   });
@@ -451,30 +506,28 @@ describe('Contributor dashboard admin page ', function() {
       it('should return true if there are no validation errors ' +
         'when fetching user rights with filter criterion as ' +
         'rights and category as voiceover', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Note that rights is filter criterion here.
-        ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
-        ctrl.formData.viewContributionReviewers.category = 'voiceOver';
-        ctrl.formData.viewContributionReviewers.username = 'user1';
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.viewContributionReviewers.isValid();
+        // Note that rights is filter criterion here.
+        component.formData.viewContributionReviewers.filterCriterion = 'role';
+        component.formData.viewContributionReviewers.category = 'voiceOver';
+        component.formData.viewContributionReviewers.username = 'user1';
+
+        const result = component.formData.viewContributionReviewers.isValid();
 
         expect(result).toBe(true);
       }));
 
       it('should return false if there are no validation errors ' +
         'when fetching user rights', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Note that rights is filter criterion here.
-        ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
-        // Setting category to null.
-        ctrl.formData.viewContributionReviewers.category = null;
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.viewContributionReviewers.isValid();
+        // Note that rights is filter criterion here.
+        component.formData.viewContributionReviewers.filterCriterion = 'role';
+        // Setting category to null.
+        component.formData.viewContributionReviewers.category = null;
+
+        const result = component.formData.viewContributionReviewers.isValid();
 
         expect(result).toBe(false);
       }));
@@ -482,16 +535,15 @@ describe('Contributor dashboard admin page ', function() {
       it('should return true if there are no validation errors ' +
         'when fetching user rights with filter criterion as ' +
         'rights and category as translation', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Note that rights is filter criterion here.
-        ctrl.formData.viewContributionReviewers.filterCriterion = 'role';
-        ctrl.formData.viewContributionReviewers.category = 'translation';
-        ctrl.formData.viewContributionReviewers.languageCode = 'en';
-        ctrl.formData.viewContributionReviewers.username = 'user1';
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.viewContributionReviewers.isValid();
+        // Note that rights is filter criterion here.
+        component.formData.viewContributionReviewers.filterCriterion = 'role';
+        component.formData.viewContributionReviewers.category = 'translation';
+        component.formData.viewContributionReviewers.languageCode = 'en';
+        component.formData.viewContributionReviewers.username = 'user1';
+
+        const result = component.formData.viewContributionReviewers.isValid();
 
         expect(result).toBe(true);
       }));
@@ -499,15 +551,14 @@ describe('Contributor dashboard admin page ', function() {
       it('should return true if there are no validation errors ' +
         'when fetching user rights with filter criterion as ' +
         'username', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Note that username is filter criterion here.
-        ctrl.formData.viewContributionReviewers.filterCriterion = (
-          'username');
-        ctrl.formData.viewContributionReviewers.username = 'user1';
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.viewContributionReviewers.isValid();
+        // Note that username is filter criterion here.
+        component.formData.viewContributionReviewers.filterCriterion = (
+          'username');
+        component.formData.viewContributionReviewers.username = 'user1';
+
+        const result = component.formData.viewContributionReviewers.isValid();
 
         expect(result).toBe(true);
       }));
@@ -516,25 +567,24 @@ describe('Contributor dashboard admin page ', function() {
     describe('in the view translation contribution stats section ', () => {
       it('should return true if there are no validation errors ' +
         'when fetching translation stats', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        ctrl.formData.viewTranslationContributionStats.username = 'user1';
-        $scope.$apply();
+        component.ngOnInit();
+        component.formData.viewTranslationContributionStats.username = 'user1';
 
-        const result = ctrl.formData.viewTranslationContributionStats.isValid();
+        const result =
+         component.formData.viewTranslationContributionStats.isValid();
 
         expect(result).toBe(true);
       }));
 
       it('should return false if there are validation errors ' +
         'when fetching translation stats', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Setting user name as empty.
-        ctrl.formData.viewTranslationContributionStats.username = '';
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.viewTranslationContributionStats.isValid();
+        // Setting user name as empty.
+        component.formData.viewTranslationContributionStats.username = '';
+
+        const result =
+         component.formData.viewTranslationContributionStats.isValid();
 
         expect(result).toBe(false);
       }));
@@ -543,62 +593,56 @@ describe('Contributor dashboard admin page ', function() {
     describe('in the remove contribution rights section ', () => {
       it('should return true if there are no validation errors ' +
         'when removing user rights for all categories', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
-        // Setting method to all.
-        ctrl.formData.removeContributionReviewer.category = 'all';
-        ctrl.formData.removeContributionReviewer.languageCode = 'en';
-        ctrl.formData.removeContributionReviewer.username = 'user1';
-        ctrl.formData.removeContributionReviewer.method = 'all';
-        $scope.$apply();
+        component.ngOnInit();
 
-        const result = ctrl.formData.removeContributionReviewer.isValid();
+        // Setting method to all.
+        component.formData.removeContributionReviewer.category = 'all';
+        component.formData.removeContributionReviewer.languageCode = 'en';
+        component.formData.removeContributionReviewer.username = 'user1';
+        component.formData.removeContributionReviewer.method = 'all';
+
+        const result = component.formData.removeContributionReviewer.isValid();
 
         expect(result).toBe(true);
       }));
 
       it('should return true if there are no validation errors ' +
         'when removing user rights for category translation', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
+        component.ngOnInit();
         // Setting category to translation.
-        ctrl.formData.removeContributionReviewer.category = 'translation';
-        ctrl.formData.removeContributionReviewer.languageCode = 'en';
-        ctrl.formData.removeContributionReviewer.username = 'user1';
-        ctrl.formData.removeContributionReviewer.method = 'specific';
-        $scope.$apply();
+        component.formData.removeContributionReviewer.category = 'translation';
+        component.formData.removeContributionReviewer.languageCode = 'en';
+        component.formData.removeContributionReviewer.username = 'user1';
+        component.formData.removeContributionReviewer.method = 'specific';
 
-        const result = ctrl.formData.removeContributionReviewer.isValid();
+
+        const result = component.formData.removeContributionReviewer.isValid();
 
         expect(result).toBe(true);
       }));
 
       it('should return true if there are no validation errors ' +
         'when removing user rights for category voiceover', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
+        component.ngOnInit();
         // Setting category to voiceover.
-        ctrl.formData.removeContributionReviewer.category = 'voiceOver';
-        ctrl.formData.removeContributionReviewer.username = 'user1';
-        ctrl.formData.removeContributionReviewer.method = 'specific';
-        $scope.$apply();
+        component.formData.removeContributionReviewer.category = 'voiceOver';
+        component.formData.removeContributionReviewer.username = 'user1';
+        component.formData.removeContributionReviewer.method = 'specific';
 
-        const result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = component.formData.removeContributionReviewer.isValid();
 
         expect(result).toBe(true);
       }));
 
       it('should return false if there are validation errors ' +
         'when removing user rights', fakeAsync(() => {
-        ctrl.$onInit();
-        $scope.$apply();
+        component.ngOnInit();
         // Setting category to be null.
-        ctrl.formData.removeContributionReviewer.category = null;
-        ctrl.formData.removeContributionReviewer.username = 'user1';
-        ctrl.formData.removeContributionReviewer.method = 'specific';
-        $scope.$apply();
+        component.formData.removeContributionReviewer.category = null;
+        component.formData.removeContributionReviewer.username = 'user1';
+        component.formData.removeContributionReviewer.method = 'specific';
 
-        const result = ctrl.formData.removeContributionReviewer.isValid();
+        const result = component.formData.removeContributionReviewer.isValid();
 
         expect(result).toBe(false);
       }));
@@ -606,15 +650,17 @@ describe('Contributor dashboard admin page ', function() {
   });
 
   it('should clear result when calling \'clearResults\'', () => {
-    ctrl.contributionReviewersDataFetched = true;
-    ctrl.contributionReviewersResult = {
-      property1: 'property1',
-      property2: 'property2'
+    component.contributionReviewersDataFetched = true;
+    component.contributionReviewersResult = {
+      usernames: ['property1', 'property2'],
+      REVIEW_TRANSLATION: ['property3', 'property4'],
+      REVIEW_QUESTION: true,
+      SUBMIT_QUESTION: true,
     };
 
-    ctrl.clearResults();
+    component.clearResults();
 
-    expect(ctrl.contributionReviewersDataFetched).toBe(false);
-    expect(ctrl.contributionReviewersResult).toEqual({});
+    expect(component.contributionReviewersDataFetched).toBe(false);
+    expect(component.contributionReviewersResult).toEqual({});
   });
 });

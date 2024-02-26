@@ -315,14 +315,6 @@ describe('URL Interpolation Service', () => {
       '/build/extensions/interactions/interTest/static/interTest.' +
         hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
-    expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
-      '/build/templates/test.html');
-    expect(uis.getDirectiveTemplateUrl('/test_url/test.html')).toBe(
-      '/build/templates/test_url/test.html');
-    expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
-      '/build/templates/pages_test/hash_test.' +
-        hashes['/pages_test/hash_test.html'] + '.html');
-
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
       '/build/assets/test.json');
     expect(uis.getStaticAssetUrl('/test_url/test.json')).toBe(
@@ -363,9 +355,6 @@ describe('URL Interpolation Service', () => {
     expect(uis.getInteractionThumbnailImageUrl.bind(uis, '')).toThrowError(
       'Empty interactionId passed in getInteractionThumbnailImageUrl.');
 
-    expect(uis.getDirectiveTemplateUrl.bind(uis, '')).toThrowError(
-      'Empty path passed in method.');
-
     expect(uis.getStaticAssetUrl.bind(uis, ''))
       .toThrowError('Empty path passed in method.');
 
@@ -392,14 +381,6 @@ describe('URL Interpolation Service', () => {
       expect(uis.getStaticVideoUrl.bind(uis, 'test_url/fail.png'))
         .toThrowError(
           'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
-
-      expect(uis.getDirectiveTemplateUrl.bind(uis, 'test_fail.html'))
-        .toThrowError(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.');
-      expect(
-        uis.getDirectiveTemplateUrl.bind(uis, 'test_url/fail.html'))
-        .toThrowError(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.');
 
       expect(uis.getStaticAssetUrl.bind(uis, 'test_fail.html'))
         .toThrowError(

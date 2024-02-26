@@ -25,7 +25,7 @@ const ContributorDashboardAdminUrl =
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const translationRightValue = 'string:translation';
+const translationRightValue = 'translation';
 const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
@@ -78,12 +78,13 @@ module.exports = class TranslationAdmin extends baseUser {
    * @param {string} username - the username of the user.
    * @param {string} languageCode - the language code of the language to add.
    */
+
   async addTranslationLanguageReviewRights(username, languageCode) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
     await this.select(
-      addContributonRightsLanguageDropdown, 'string:' + languageCode);
+      addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -99,7 +100,7 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.select(
       removeContributonRightsCategorySelect, translationRightValue);
     await this.select(
-      removeContributonRightsLanguageSelect, 'string:' + languageCode);
+      removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -124,7 +125,7 @@ module.exports = class TranslationAdmin extends baseUser {
   async viewContributorTranslationRightsByLanguageCode(languageCode) {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
-    await this.select(viewContributorLanguageSelect, 'string:' + languageCode);
+    await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();

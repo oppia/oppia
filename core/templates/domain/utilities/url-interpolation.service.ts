@@ -246,19 +246,6 @@ export class UrlInterpolationService {
     return this.getExtensionResourceUrl(
       '/interactions/' + interactionId + '/static/' + interactionId + '.png');
   }
-
-  /**
-   * @param {string} path - A directive path relative to head folder.
-   * @return {string} The complete url path to that directive.
-   */
-  getDirectiveTemplateUrl(path: string): string {
-    this.validateResourcePath(path);
-    if (this.DEV_MODE) {
-      return '/templates' + this._getUrlWithSlug(path);
-    } else {
-      return '/build/templates' + this._getUrlWithSlug(path);
-    }
-  }
 }
 
 angular.module('oppia').factory(
