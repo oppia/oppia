@@ -4,11 +4,11 @@
       <h3 class="history-card-header-text" tabindex="0">History</h3>
     </div>
     <div class="oppia-mobile-collapsible-card-content">
-      <div class="history-tab-header">''
+      <div class="history-tab-header">
         <mat-paginator [length]="versionCheckboxArray.length"
                        [pageSize]="VERSIONS_PER_PAGE"
                        class="pagination"
-                       [pageSizeOptions]="versionChoices "
+                       [pageSizeOptions]="versionChoices"
                        (page)="paginator($event)">
         </mat-paginator>
       </div>
