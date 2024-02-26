@@ -31,22 +31,23 @@ describe('Exploration Admin', function() {
       'explorationAdm', 'exploration_creator@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to view, compare, revert, and download multiple revisions of an exploration.',
+  it('should be able to view, compare, revert, and download revisions',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
       await explorationAdmin.createExploration('Test-revision');
-      await explorationAdmin.createMultipleRevisionsOfTheSameExploration('Test-revision');
+      await explorationAdmin.createMultipleRevisionsOfTheSameExploration(
+        'Test-revision');
 
       await explorationAdmin.navigateToHistoryTab();
       await explorationAdmin.expectRevisionsToHaveVersionNoNotesUsernameDate();
-      await explorationAdmin.expectRevisionInChronologicalOrderAndHave10ItemPerPage();
+      await explorationAdmin.expectRevisionsToBeDateOrderedAnd10ItemsPerPage();
       await explorationAdmin.filterRevisionsByUsername();
       await explorationAdmin.ExpectPaginatorToChangeItemsPerPage();
 
       await explorationAdmin.CompareDifferentRevisions();
-      await explorationAdmin.expectCompareRevisionToDisplayMetadataChanges();
-      await explorationAdmin.expectCompareRevisionToDisplayExplorationStateChanges();
-      await explorationAdmin.expectInteractionToDownloadAndRevertSelectedRevision();
+      await explorationAdmin.expectCompareToDisplayMetadataChanges();
+      await explorationAdmin.expectCompareToDisplayExplorationStateChanges();
+      await explorationAdmin.expectInteractionToDownloadAndRevertRevision();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

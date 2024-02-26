@@ -136,30 +136,35 @@ module.exports = class explorationAdmin extends baseUser {
   */
 
   async navigateToHistoryTab() {
-    await this.page.waitForSelector(navigateToHistoryTabButton + ':not([disabled])');
+    await this.page.waitForSelector(navigateToHistoryTabButton);
     await this.clickOn(navigateToHistoryTabButton);
   }
 
   /**
   * Function to create a list of all the revisions created.
-  * @param {string} versionsListSelector - common selector of the all the revisions on the screen. 
+  * @param {string} versionsListSelector - common selector of the all the revisions
   */
 
   async getRevisionsList(versionsListSelector) {
     let elements = await this.page.$$(versionsListSelector);
     let revisions = [];
     for (let element of elements) {
-      let versionNo = await element.$eval(revisionVersionNoSelector, async(el) => el.textContent);
-      let notes = await element.$eval(revisionNoteSelector, async(el) => el.textContent);
-      let user = await element.$eval(revisionUsernameSelector, async(el) => el.textContent);
-      let date = await element.$eval(revisionDateSelector, async(el) => el.textContent);
+      let versionNo = await element.$eval(
+        revisionVersionNoSelector, async(el) => el.textContent);
+      let notes = await element.$eval(
+        revisionNoteSelector, async(el) => el.textContent);
+      let user = await element.$eval(
+        revisionUsernameSelector, async(el) => el.textContent);
+      let date = await element.$eval(
+        revisionDateSelector, async(el) => el.textContent);
       revisions.push({ versionNo, notes, user, date });
     }
     return revisions;
   }
 
   /**
-  * Function to confirm the existence of the Version number, Notes, Username, and Date for a given revision.
+  * Function to confirm the existence of the Version number, Notes, Username, 
+  * and Date for a given revision.
   */
 
   async expectRevisionsToHaveVersionNoNotesUsernameDate() {
@@ -168,25 +173,30 @@ module.exports = class explorationAdmin extends baseUser {
     if (!element) {
       throw new Error('No revisions found');
     }
-    let versionNo = await element.$eval(revisionVersionNoSelector, async(el) => el.textContent);
-    let notes = await element.$eval(revisionNoteSelector, async(el) => el.textContent);
-    let user = await element.$eval(revisionUsernameSelector, async(el) => el.textContent);
-    let date = await element.$eval(revisionDateSelector, async(el) => el.textContent);
+    let versionNo = await element.$eval(
+        revisionVersionNoSelector, async(el) => el.textContent);
+    let notes = await element.$eval(
+        revisionNoteSelector, async(el) => el.textContent);
+    let user = await element.$eval(
+        revisionUsernameSelector, async(el) => el.textContent);
+    let date = await element.$eval(
+        revisionDateSelector, async(el) => el.textContent);
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
 
     showMessage('The versions are not missing any properties');
     return { versionNo, notes, user, date };
-    }
+  }
 
-    /**
-     * Function to verify whether the revisions are sorted by dates and if the current page displays 10 items as per the default paginator settings.
-     */
+  /**
+  * Function to verify whether the revisions are sorted by dates and if the current page
+  *  displays 10 items as per the default paginator settings.
+  */
 
- async expectRevisionInChronologicalOrderAndHave10ItemPerPage() {
-   let revisions = await this.getRevisionsList(versionsList);
-   for (let i = 0; i < revisions.length - 1; i++) {
+  async expectRevisionsToBeDateOrderedAnd10ItemsPerPage() {
+    let revisions = await this.getRevisionsList(versionsList);
+    for (let i = 0; i < revisions.length - 1; i++) {
       let date1 = new Date(revisions[i].date);
       let date2 = new Date(revisions[i + 1].date);
       if (date1 < date2) {
@@ -194,8 +204,9 @@ module.exports = class explorationAdmin extends baseUser {
       }
     }
     showMessage('Revisions are sorted by date');
-    if(revisions.length != 10) {
-      throw new Error(`Pagination Error: When the items per page is set to 10, expected 10 user revisions, but got ${revisions.length}`);
+    if (revisions.length !== 10) {
+      throw new Error(`Pagination Error: When the items per page is set to 10, 
+      expected 10 user revisions, but got ${revisions.length}`);
     } else {
       showMessage('When the items per page is set to 10, correctly shows 10 user revisions.');
     }
@@ -211,7 +222,8 @@ module.exports = class explorationAdmin extends baseUser {
   }
 
   /**
-  * Function to verify if the number of items per page adjusts according to changes in the paginator settings.
+  * Function to verify if the number of items per page adjusts according
+  *  to changes in the paginator settings.
   */
 
   async ExpectPaginatorToChangeItemsPerPage() {
@@ -221,7 +233,8 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(versionsList);
     if (revisions.length != 7) {
-      throw new Error(`Pagination Error: When the items per page is set to 15, expected 15 user revisions, but got ${revisions.length}`);
+      throw new Error(`Pagination Error: When the items per page is set to 15,
+       expected 15 user revisions, but got ${revisions.length}`);
     } else {
       showMessage('When the items per page is set to 15, correctly shows 15 user revisions.');
     }
@@ -243,33 +256,36 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to check if modifications in the metadata are being reflected or not.
   */
 
-  async expectCompareRevisionToDisplayMetadataChanges() {
+  async expectCompareToDisplayMetadataChanges() {
     await this.clickOn(viewMatadataChanges);
     const elements = await page.$$('.CodeMirror-merge-r-chunk-start');
     const element1Content = await (await elements[0].getProperty('textContent')).jsonValue();
     const element2Content = await (await elements[1].getProperty('textContent')).jsonValue();
 
     if (element1Content === element2Content) {
-      console.log('Changes are appearing');
+      showMessage('Changes are appearing');
     } else {
-      console.log('Changes are not appearing');
+      throw new Error('Changes are not appearing');
     }
     await this.clickOn(resetGraphButton);
   }
 
- /**
-  * Function to check if modifications in the exploration state are being reflected or not.
+  /**
+  * Function to check if modifications in the exploration state are being 
+  * reflected or not.
   */
 
-  async expectCompareRevisionToDisplayExplorationStateChanges() {
+  async expectCompareToDisplayExplorationStateChanges() {
     await this.clickOn(testNodeBackground);
     const elements = await page.$$('.CodeMirror-merge-r-chunk-start');
-    const element1Content = await (await elements[0].getProperty('textContent')).jsonValue();
-    const element2Content = await (await elements[1].getProperty('textContent')).jsonValue();
-    if (element1Content === element2Content) {
-      console.log('Changes are appearing');
+    const element1Content = await (
+        await elements[0].getProperty('textContent')).jsonValue();
+    const element2Content = await (
+        await elements[1].getProperty('textContent')).jsonValue();
+    if (element1Content !== element2Content) {
+      showMessage('Changes are appearing');
     } else {
-      console.log('Changes are not appearing');
+      throw new Error('Changes are not appearing');
     }
     await this.clickOn(resetGraphButton);
   }
@@ -280,11 +296,12 @@ module.exports = class explorationAdmin extends baseUser {
   * */
 
   async expectRevertToVersion(version) {
-    await this.waitFor.numberOfElementsToBe(revisionNoteSelector, 'History Table message', 4);
-    const isReverted = await this.waitFor.textToBePresentInElement(revisionNoteSelector,
-      'Reverted exploration to version ' + version, 'Revert message takes too long to appear');
+    await this.waitFor.numberOfElementsToBe(
+        revisionNoteSelector, 'History Table message', 4);
+    const isReverted = await this.waitFor.textToBePresentInElement(
+        revisionNoteSelector, 'Reverted exploration to version ' + version, 'Revert message does not appear');
     return isReverted;
-  };
+  }
 
   /**
   * Function verify if revision are reverting and downloading or not.
@@ -297,14 +314,14 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(historyListOptions);
     const elements = await this.page.$$(historyListOptions);
     await elements[2].click();
-    await this.page.waitForSelector(revertVersionButton, { visible: true, timeout: 5000 });
+    await this.page.waitForSelector(revertVersionButton);
     await this.clickOn(revertVersionButton);
     await this.clickOn(confirmRevertVersionButton);
     await this.page.waitForTimeout(1000);
     if (await this.expectRevertToVersion(15)) {
-      console.log('Reverts successfully');
+      showMessage('Reverts successfully');
     } else {
-      console.log('Does not revert successfully');
+      throw new Error('Does not revert successfully');
     }
   }
 
@@ -328,23 +345,24 @@ module.exports = class explorationAdmin extends baseUser {
   }
 
   /**
-  * Function to open the next card in the exploration journey. 
+  * Function to open the next card in the exploration journey.
   * @param {number} card_num - card number to switch to.
   */
 
-  async openNextCard(card_num) {
+  async openNextCard(cardNum) {
     const selector = testNodeBackground;
     await this.page.waitForSelector(selector);
     const elements = await this.page.$$(selector);
-    if (elements.length > card_num) {
-      await elements[card_num].click();
+    if (elements.length > cardNum) {
+      await elements[cardNum].click();
     } else {
-      console.log(`There are not enough elements to click on the ${card_num}th element.`);
+      throw new Error(
+        `There are not enough elements to click on the ${cardNum}th element.`);
     }
   }
 
   /**
-  * Function to create questions in the exploration card. 
+  * Function to create questions in the exploration card.
   * @param {string} question - question to be added.
   * @param {number} answer - answer of the question.
   */
@@ -367,7 +385,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.type(giveTitle, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
-}
+  }
 
   /**
   * Function for creating an exploration containing questions
@@ -390,11 +408,11 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn('.oppia-response-header');
     await this.callNewCard('Less Than or equal to 1');
     await this.openNextCard(1);
-    await this.createQuestion('mention a number less than or equal to 5', '-3')
+    await this.createQuestion('mention a number less than or equal to 5', '-3');
     await this.callNewCard('Less than or equal to 4');
     await this.openNextCard(2);
-    await this.createQuestion('mention a number less than or equal 4', '-3')
-    await this.callNewCard('end')
+    await this.createQuestion('mention a number less than or equal 4', '-3');
+    await this.callNewCard('end');
     await this.openNextCard(3);
     await this.page.waitForSelector(stateEditSelector + ':not([disabled])');
     await this.clickOn(stateEditSelector);
@@ -409,28 +427,29 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(saveDraftButton + ':not([disabled])');
     await this.clickOn(saveDraftButton);
-}
+  }
 
   /**
   * Function to navigate the preview tab.
   */
 
   async navigateToPreviewTab() {
-    await this.page.waitForSelector(navigateToPreviewTabButton + ':not([disabled])');
+    await this.page.waitForSelector(navigateToPreviewTabButton);
     await this.clickOn(navigateToPreviewTabButton);
   }
 
   /**
-  * Function to verify if the exploration tab is loading correctly in the preview tab or not.
+  * Function to verify if the exploration tab is loading correctly in 
+  * the preview tab or not.
   */
 
   async expectTheExplorationToLoadInPreviewTab() {
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
-    const text = await this.page.evaluate(element => element.textContent, element);
-    console.log(text);
-    if (text == 'Test-revision') {
-      showMessage('exploration is loading well in preview tab')
+    const text = await this.page.evaluate(
+        element => element.textContent, element);
+    if (text === 'Test-revision') {
+      showMessage('exploration is loading well in preview tab');
     } else {
       throw new Error('exploration is not loading in preview tab');
     }
@@ -448,12 +467,12 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(nextCardButton);
     await this.clickOn(nextCardButton);
     await this.page.waitForSelector(testFloatFormInput);
-    await this.type(e2e-test-float-form-input, '-3');
+    await this.type(".e2e-test-float-form-input", '-3');
     await this.clickOn(submitAnswerButton);
     await this.page.waitForSelector(nextCardButton);
     await this.clickOn(nextCardButton);
     showMessage('Exploration has completed Successfully');
-    }
+  }
 
   /**
   * Function to verify if the exploration is completed in the preview tab.
@@ -461,17 +480,18 @@ module.exports = class explorationAdmin extends baseUser {
 
 
   async expectTheExplorationToComplete() {
-    const element = await this.page.waitForSelector('div.toast-message', { timeout: 5000 }).catch(() => null);
+    const element = await this.page.waitForSelector('div.toast-message')
 
     if (element) {
-      console.log('Journey completed successfully');
+      showMessage('Journey completed successfully');
     } else {
       throw new Error('Journey did not complete successfully');
     }
-}
+  }
 
   /**
-  * Function to verify if the exploration is restarting after getting completed or not.
+  * Function to verify if the exploration is restarting after
+  * getting completed or not.
   */
 
   async expectTheExplorationToRestart() {
@@ -479,12 +499,12 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
-    const text = await this.page.evaluate(element => element.textContent, element);
-    console.log(text);
-    if(text == 'Test-revision') {
-      showMessage('exploration has restarted successfully')
+    const text = await this.page.evaluate(
+        element => element.textContent, element);
+    if (text === 'Test-revision') {
+      showMessage('exploration has restarted successfully');
     } else {
       throw new Error('exploration has not restarted successfully');
-    } 
+    }
   }
-}
+};

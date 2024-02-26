@@ -25,16 +25,17 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Admin', function() {
   let explorationAdmin = null;
- 
+
   beforeAll(async function() {
     explorationAdmin = await userFactory.createNewExplorationAdmin(
       'explorationAdm', 'exploration_creator@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to load, complete and restart an exploration in preview tab',
+  it('should be able to load, complete and restart an exploration',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
-      await explorationAdmin.createExplorationLoadedWithQuestions('Test-revision');
+      await explorationAdmin.createExplorationLoadedWithQuestions(
+        'Test-revision');
 
       await explorationAdmin.navigateToPreviewTab();
       await explorationAdmin.expectTheExplorationToLoadInPreviewTab();
@@ -45,6 +46,6 @@ describe('Exploration Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-        await userFactory.closeAllBrowsers();
+    await userFactory.closeAllBrowsers();
   });
 });
