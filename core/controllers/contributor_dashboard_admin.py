@@ -50,19 +50,6 @@ class TranslationContributionStatsDict(TypedDict):
     language: str
 
 
-class ContributorDashboardAdminPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler for the contributor dashboard admin page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(self) -> None:
-        self.render_template('contributor-dashboard-admin-page.mainpage.html')
-
-
 class ContributionRightsHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of ContributionRightsHandler's normalized_payload
     dictionary.
