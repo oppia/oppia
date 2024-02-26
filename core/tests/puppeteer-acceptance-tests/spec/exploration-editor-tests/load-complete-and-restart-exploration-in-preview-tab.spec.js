@@ -17,34 +17,34 @@
  */
 
 const userFactory = require(
-    '../../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-    '../../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Admin', function () {
-    let explorationAdmin = null;
+describe('Exploration Admin', function() {
+  let explorationAdmin = null;
+ 
+  beforeAll(async function() {
+    explorationAdmin = await userFactory.createNewExplorationAdmin(
+      'explorationAdm', 'exploration_creator@example.com');
+  }, DEFAULT_SPEC_TIMEOUT);
 
-    beforeAll(async function () {
-        explorationAdmin = await userFactory.createNewExplorationAdmin(
-            'explorationAdm', 'exploration_creator@example.com');
+  it('should be able to load, complete and restart an exploration in preview tab',
+    async function() {
+      await explorationAdmin.navigateToCreatorDashboard();
+      await explorationAdmin.createExplorationLoadedWithQuestions('Test-revision');
+
+      await explorationAdmin.navigateToPreviewTab();
+      await explorationAdmin.expectTheExplorationToLoadInPreviewTab();
+      await explorationAdmin.completeTheExplorationInPreviewTab();
+
+      await explorationAdmin.expectTheExplorationToComplete();
+      await explorationAdmin.expectTheExplorationToRestart();
     }, DEFAULT_SPEC_TIMEOUT);
 
-    it('should be able to load, complete and restart an exploration in the preview tab of the Exploration Editor.',
-        async function () {
-            await explorationAdmin.navigateToCreatorDashboard(); 
-            await explorationAdmin.createExplorationLoadedWithQuestions("Test-revision");
-
-            await explorationAdmin.navigateToPreviewTab(); 
-            await explorationAdmin.expectTheExplorationToLoadInPreviewTab()
-            await explorationAdmin.completeTheExplorationInPreviewTab()
-
-            await explorationAdmin.expectTheExplorationToComplete();
-            await explorationAdmin.expectTheExplorationToRestart();
-        }, DEFAULT_SPEC_TIMEOUT);
-
-    afterAll(async function () {
+  afterAll(async function() {
         await userFactory.closeAllBrowsers();
-    });
+  });
 });

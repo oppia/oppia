@@ -24,7 +24,8 @@ let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 let e2eQuestionAdmin = require(
   '../user-utilities/question-admin-utils.js');
-let e2eExplorationAdmin = require('../user-utilities/exploration-editor.utils.js');
+let e2eExplorationAdmin = require(
+  '../user-utilities/exploration-editor.utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
