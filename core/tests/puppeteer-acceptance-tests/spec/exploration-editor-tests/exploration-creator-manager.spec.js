@@ -36,7 +36,7 @@ describe('Exploration Creator', function() {
     guestUser3 = await userFactory.createNewGuestUser(
       'guestUsr3', 'guest_user3@example.com');
     explorationCreator = await userFactory.createNewExplorationCreator(
-      'explorationAdm');
+      'explorationAdm', 'exploration_creator@example.com');
     superAdmin = await userFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 

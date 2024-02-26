@@ -120,6 +120,7 @@ let createNewGuestUser = async function(username, email) {
 /**
  * Function to create a new exploration creator user and return the instance
  * @param {string} username - The username of the exploration creator.
+ * @param {string} email - The user email.
  * @returns {e2eExplorationCreator} - The instance of the exploration creator.
  */
 let createNewExplorationCreator = async function(username, email) {

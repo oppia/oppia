@@ -220,8 +220,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in selecting language from dropdawn.
    */
   async selectLanguage() {
-    await this.page.waitForTimeout(500);
     await this.clickOn(languageUpdateBar);
+    await this.page.waitForTimeout(500);
     await this.clickOn(addLanguage);
   }
 
@@ -492,8 +492,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async addSomeChanges() {
     await this.clickOn(settingsTab);
     await this.clickOn(addTitleBar);
-    titleBeforeChanges = await this.page.$eval(
-      '.e2e-test-exploration-title-input', title => title.value);
+    // titleBeforeChanges = await this.page.$eval(
+    //   '.e2e-test-exploration-title-input', title => title.value);
+    titleBeforeChanges = await this.page.evaluate(() => {
+      return document.querySelector('.e2e-test-exploration-title-input').innerText;
+    });
     await this.type(addTitle, 'Your Title Here please');
   }
 
@@ -507,9 +510,13 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *This function checks whether changes has discarded successfully or not
   */
   async expectChangesToBeDiscardedSuccessfully() {
-    await this.clickOn(addTitleBar);
-    const titleAfterChanges = await this.page.$eval(
-      '.e2e-test-exploration-title-input', title => title.value);
+    const titleInput = await this.page.$(addTitleBar);
+    await titleInput.click();
+
+    const titleAfterChanges = await this.page.evaluate(()=> {
+      return document.querySelector('.e2e-test-exploration-title-input').innerText;
+    })
+
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
     } else {

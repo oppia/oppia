@@ -54,8 +54,8 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
-      // await explorationCreator.
-      //   expectChangesToBeDiscardedSuccessfully();
+      await explorationCreator.
+        expectChangesToBeDiscardedSuccessfully();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
