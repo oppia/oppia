@@ -311,17 +311,14 @@ jobs:
           os: [ubuntu-22.04]
           suite:
             - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
-<<<<<<< HEAD
             - exploration-editor-tests/exploration-creator-manager.spec.js
             - exploration-editor-tests/exploration-publisher-drafter.spec.js
             - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
-=======
             - blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked.spec.js
             - logged-in-user-tests/click-all-buttons-on-navbar.spec.js
             - logged-in-user-tests/click-all-buttons-in-about-page.spec.js
             - logged-in-user-tests/click-all-buttons-in-about-foundation-page.spec.js
             - logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page.spec.js
->>>>>>> 07e8491ea51cc360837f3f94d3468dd5414cb4eb
             - practice-question-admin-tests/add-and-remove-contribution-rights.spec.js
             - translation-admin-tests/add-translation-rights.spec.js
             - translation-admin-tests/remove-translation-rights.spec.js
