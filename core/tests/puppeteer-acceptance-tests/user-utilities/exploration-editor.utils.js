@@ -78,7 +78,6 @@ const explorationRestartButton = '.oppia-restart-text';
 const explorationConversationContent = '.e2e-test-conversation-content';
 
 module.exports = class explorationAdmin extends baseUser {
-
   /**
   * Function for navigating to the contributor dashboard page.
   */
@@ -179,7 +178,7 @@ module.exports = class explorationAdmin extends baseUser {
   }
 
   /**
-  * Function to verify whether the revisions are sorted by dates and if the 
+  * Function to verify whether the revisions are sorted by dates and if the
   * current page displays 10 items as per the default paginator settings.
   */
   async expectRevisionsToBeDateOrderedAnd10ItemsPerPage() {
@@ -197,8 +196,9 @@ module.exports = class explorationAdmin extends baseUser {
         `Pagination Error: When the items per page is set to 10,
          expected 10 user revisions, but got ${revisions.length}`);
     } else {
-      showMessage(`When the items per page is set to 10, 
-      correctly shows 10 user revisions.`);
+      showMessage(
+        `When the items per page is set to 10, 
+         correctly shows 10 user revisions.`);
     }
   }
 
@@ -225,8 +225,9 @@ module.exports = class explorationAdmin extends baseUser {
         `Pagination Error: When the items per page is set to 15,
          expected 15 user revisions, but got ${revisions.length}`);
     } else {
-      showMessage(`When the items per page is set to 15, 
-      correctly shows 15 user revisions.`);
+      showMessage(
+        `When the items per page is set to 15, 
+        correctly shows 15 user revisions.`);
     }
   }
 
@@ -248,9 +249,9 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(viewMatadataChanges);
     const elements = await page.$$('.CodeMirror-merge-r-chunk-start');
     const element1Content = await (
-        await elements[0].getProperty('textContent')).jsonValue();
+      await elements[0].getProperty('textContent')).jsonValue();
     const element2Content = await (
-        await elements[1].getProperty('textContent')).jsonValue();
+      await elements[1].getProperty('textContent')).jsonValue();
 
     if (element1Content === element2Content) {
       showMessage('Changes are appearing');
