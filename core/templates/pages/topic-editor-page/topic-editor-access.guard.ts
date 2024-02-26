@@ -43,7 +43,7 @@ export class TopicEditorAccessGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin()) {
+    if (userInfo.isLoggedIn()) {
       return true;
     }
 
