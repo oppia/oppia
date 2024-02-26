@@ -514,6 +514,16 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
                 self.topic_id), expected_status_int=200)
         self.logout()
 
+    def test_cannot_access_topic_editor_page_with_non_existent_topic_id(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_json(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
+        self.logout()
+
     def test_cannot_access_topic_editor_page_with_invalid_topic_id(
         self
     ) -> None:
