@@ -31,13 +31,11 @@ import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module'
 import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
 import { CommonModule } from '@angular/common';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { BaseModule } from 'base-components/base.module';
 import { DiagnosticTestPlayerPageRoutingModule } from './diagnostic-test-player-page-routing.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    BaseModule,
     FormsModule,
     DiagnosticTestPlayerPageRoutingModule,
     // TODO(#13443): Remove smart router module provider once all pages are
