@@ -1479,23 +1479,23 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode'
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
-    expect(unicodeData).toBe('This is the unicode'); 
+    expect(unicodeData).toBe('This is the unicode');
   });
 
   it('should return translated unicode when translation no available', () => {
-      entityTranslationsService.languageCodeToEntityTranslations.en = (
-        new EntityTranslation(
-          'entityId', 'entityType', 'entityVersion', 'hi', {
-            content_1: new TranslatedContent('Translated UNICODE', 'unicode', true)
-          })
-      );
-      let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
-        content_id: 'content_1',
-        unicode_str: 'This is the unicode'
-      });
-      const unicodeData = component.getRequiredUnicode(subtitledObject);
-      expect(unicodeData).toBe('Translated UNICODE');
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+        content_1: new TranslatedContent('Translated UNICODE', 'unicode', true)
+        })
+    );
+    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
     });
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('Translated UNICODE');
+  });
 
   it('should return translation html when translation available', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
@@ -1547,7 +1547,8 @@ describe('State translation component', () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
-          content_1: new TranslatedContent('Translated UNICODE', 'unicode', true)
+          content_1: new TranslatedContent('Translated UNICODE', 'unicode', true
+          )
         })
     );
     let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
