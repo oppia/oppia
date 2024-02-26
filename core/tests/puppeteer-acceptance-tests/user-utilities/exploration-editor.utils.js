@@ -234,7 +234,7 @@ module.exports = class explorationAdmin extends baseUser {
   /**
   * Function for camparing different revision.
   */
-  async CompareDifferentRevisions() {
+  async compareDifferentRevisions() {
     await this.clickOn(firstVersionDropdown);
     await this.clickOn('#mat-option-1523');
     await this.clickOn(secondVersionDropdown);

@@ -44,7 +44,7 @@ describe('Exploration Admin', function() {
       await explorationAdmin.filterRevisionsByUsername();
       await explorationAdmin.ExpectPaginatorToChangeItemsPerPage();
 
-      await explorationAdmin.CompareDifferentRevisions();
+      await explorationAdmin.compareDifferentRevisions();
       await explorationAdmin.expectCompareToDisplayMetadataChanges();
       await explorationAdmin.expectCompareToDisplayExplorationStateChanges();
       await explorationAdmin.expectInteractionToDownloadAndRevertRevision();
