@@ -86,6 +86,24 @@ describe('InteractiveSetInputComponent', () => {
     component.buttonTextWithValue = 'Add New Item';
   });
 
+  it('should update answer and set error message if duplicates', () => {
+    component.errorMessage = '';
+
+    component.updateAnswer(['duplicate', 'duplicate']);
+    expect(component.answer).toEqual(['duplicate', 'duplicate']);
+    expect(component.errorMessage)
+      .toBe('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+  });
+
+  it('should update answer and clear error message if no duplicates', () => {
+    component.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
+
+    component.updateAnswer(['unique1', 'unique2']);
+
+    expect(component.answer).toEqual(['unique1', 'unique2']);
+    expect(component.errorMessage).toBe('');
+  });
+
   it('should initialise component when user adds interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction').and
       .callThrough();
