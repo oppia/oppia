@@ -78,43 +78,63 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 # TODO(#4122): Description 11
                 """).lstrip('\n')
             file.write(textwrap.dedent(content))
-        with open('dummy_dir/issue_list.txt', 'w', encoding='utf-8') as file:
-            content = (
-                """
-                4151
-                4156
-                4153
-                """).lstrip('\n')
-            file.write(textwrap.dedent(content))
 
     def tearDown(self) -> None:
         super().tearDown()
-        shutil.rmtree('dummy_dir')
+        if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
+            shutil.rmtree('dummy_dir')
+
+    def test_get_unresolved_todos_no_generate_file_should_fail(self) -> None:
+        mock_stdout = io.StringIO()
+
+        swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
+
+        with swap_stdout_write, self.assertRaisesRegex(
+            Exception,
+            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
+        ):
+            check_for_unresolved_todos.main([
+                '--repository_path=dummy_dir',
+                '--issue=4151',
+                '--commit_sha=abcdefg'])
+        
+        expected_failure_log_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
+            '- file1.txt:L4',
+            '- file1.txt:L11',
+            '- file1.txt:L13',
+            '- file2.txt:L3'
+        ]
+        self.assertEqual(
+            mock_stdout.getvalue().splitlines(), expected_failure_log_lines)
+        
+        self.assertFalse(
+            os.path.exists('dummy_dir/unresolved_todo_list.txt'))
 
     def test_get_unresolved_todos_should_fail(self) -> None:
         mock_stdout = io.StringIO()
 
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
 
-        with swap_stdout_write:
-            with self.assertRaisesRegex(
-                Exception,
-                check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
-            ):
-                check_for_unresolved_todos.main([
-                    '--repository_path=dummy_dir',
-                    '--issue=4151',
-                    '--commit_sha=abcdefg'])
+        with swap_stdout_write, self.assertRaisesRegex(
+            Exception,
+            check_for_unresolved_todos.UNRESOLVED_TODOS_PRESENT_INDICATOR
+        ):
+            check_for_unresolved_todos.main([
+                '--repository_path=dummy_dir',
+                '--issue=4151',
+                '--commit_sha=abcdefg',
+                '--generate_file'])
 
-        expected_failure_log = textwrap.dedent(
-            """
-            The following TODOs are unresolved for this issue #4151:
-            - file1.txt:L4
-            - file1.txt:L11
-            - file1.txt:L13
-            - file2.txt:L3
-            """).lstrip('\n')
-        self.assertEqual(mock_stdout.getvalue(), expected_failure_log)
+        expected_failure_log_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
+            '- file1.txt:L4',
+            '- file1.txt:L11',
+            '- file1.txt:L13',
+            '- file2.txt:L3'
+        ]
+        self.assertEqual(
+            mock_stdout.getvalue().splitlines(), expected_failure_log_lines)
 
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')
@@ -131,7 +151,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             'dummy_dir/unresolved_todo_list.txt', 'r',
             encoding='utf-8'
         ) as file:
-            self.assertItemsEqual(
+            self.assertEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines)
 
     def test_get_unresolved_todos_should_succeed(self) -> None:
@@ -143,7 +163,8 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             check_for_unresolved_todos.main([
                 '--repository_path=dummy_dir',
                 '--issue=4157',
-                '--commit_sha=abcdefg'])
+                '--commit_sha=abcdefg',
+                '--generate_file'])
         self.assertEqual(
             mock_stdout.getvalue().strip(),
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
@@ -185,21 +206,22 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 check_for_unresolved_todos.main([
                     '--repository_path=dummy_dir',
                     '--pull_request=1234',
-                    '--commit_sha=abcdefg'])
+                    '--commit_sha=abcdefg',
+                    '--generate_file'])
 
-        expected_failure_log = textwrap.dedent(
-            """
-            The following TODOs are unresolved for this issue #4151:
-            - file1.txt:L4
-            - file1.txt:L11
-            - file1.txt:L13
-            - file2.txt:L3
-            The following TODOs are unresolved for this issue #4156:
-            - file1.txt:L6
-            The following TODOs are unresolved for this issue #4153:
-            - file1.txt:L7
-            """).lstrip('\n')
-        self.assertEqual(mock_stdout.getvalue(), expected_failure_log)
+        expected_failure_log_lines = [
+            'The following TODOs are unresolved for this issue #4151:',
+            '- file1.txt:L4',
+            '- file1.txt:L11',
+            '- file1.txt:L13',
+            '- file2.txt:L3',
+            'The following TODOs are unresolved for this issue #4156:',
+            '- file1.txt:L6',
+            'The following TODOs are unresolved for this issue #4153:',
+            '- file1.txt:L7'
+        ]
+        self.assertEqual(
+            mock_stdout.getvalue().splitlines(), expected_failure_log_lines)
 
         github_perma_link_url = (
             'https://github.com/oppia/oppia/blob/abcdefg')
@@ -220,5 +242,5 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
             'dummy_dir/unresolved_todo_list.txt', 'r',
             encoding='utf-8'
         ) as file:
-            self.assertListEqual(
+            self.assertEqual(
                 file.read().splitlines(), expected_unresolved_todo_list_lines)

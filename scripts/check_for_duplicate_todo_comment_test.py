@@ -93,7 +93,8 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        shutil.rmtree('dummy_dir')
+        if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
+            shutil.rmtree('dummy_dir')
 
     def test_check_for_duplicate_todo_comment_with_no_duplicate_error(
         self

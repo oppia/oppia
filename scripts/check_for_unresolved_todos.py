@@ -28,6 +28,8 @@ UNRESOLVED_TODOS_PRESENT_INDICATOR = (
 UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR = (
     'THERE ARE NO TODOS ASSOCIATED WITH THE PROVIDED ISSUES.')
 
+UNRESOLVED_TODO_LIST_FILE_PATH = 'unresolved_todo_list.txt'
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Checks if there are any todos associated with the provided issues.
@@ -43,11 +45,17 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--pull_request', type=int,
-    help='The pull request number to check for todos.')
+    help='The pull request to check for todos.')
 
 _PARSER.add_argument(
     '--commit_sha', type=str,
     help='The commit SHA to which we will display the todo in.')
+
+_PARSER.add_argument(
+    '--generate_file',
+    help='If true, generates a file with the todos. '
+         'The default value is false.',
+    action='store_true')
 
 
 def check_if_todo_is_associated_with_issue(
@@ -84,7 +92,7 @@ def append_todos_to_file(
         issue_number: int. The issue number that the todos are associated with.
     """
     with open(
-        repository_path + 'unresolved_todo_list.txt', 'a',
+        repository_path + UNRESOLVED_TODO_LIST_FILE_PATH, 'a',
         encoding='utf-8'
     ) as file:
         file.write(
@@ -158,11 +166,12 @@ def main(args: Optional[List[str]] = None) -> None:
                 repository_path,
                 todos_associated_with_issue,
                 issue_number)
-            append_todos_to_file(
-                repository_path,
-                todos_associated_with_issue,
-                github_perma_link_url,
-                issue_number)
+            if parsed_args.generate_file:
+                append_todos_to_file(
+                    repository_path,
+                    todos_associated_with_issue,
+                    github_perma_link_url,
+                    issue_number)
     if todos_found:
         raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
     print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)

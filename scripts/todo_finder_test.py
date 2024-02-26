@@ -77,7 +77,8 @@ class TodoFinderTests(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        shutil.rmtree('dummy_dir')
+        if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
+            shutil.rmtree('dummy_dir')
 
     def test_should_exclude_bad_files(self) -> None:
         search_files = todo_finder.get_search_files('dummy_dir')

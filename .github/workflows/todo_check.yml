@@ -31,11 +31,12 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-    
+      - uses: ./.github/actions/merge
+
       - name: Check for unresolved todos
         id: check_for_unresolved_todos
         run: |
-          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --commit_sha=${{ github.sha }}
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --commit_sha=${{ github.sha }} --generate_file
 
       - name: Reopen issue
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
@@ -71,7 +72,7 @@ jobs:
       - name: Check for unresolved todos
         id: check_for_unresolved_todos
         run: |
-          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --commit_sha=${{ github.sha }}
+          python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --commit_sha=${{ github.sha }} --generate_file
 
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
