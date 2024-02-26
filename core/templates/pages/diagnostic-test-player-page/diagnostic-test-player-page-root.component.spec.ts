@@ -25,7 +25,7 @@ import { AppConstants } from '../../app.constants';
 import { PageHeadService } from '../../services/page-head.service';
 import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
 
-describe('DiagnosticTestPageRootComponent', () => {
+describe('DiagnosticTestPlayerPageRootComponent', () => {
   let fixture: ComponentFixture<DiagnosticTestPlayerPageRootComponent>;
   let component: DiagnosticTestPlayerPageRootComponent;
 
