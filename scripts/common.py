@@ -217,8 +217,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js',
-    'exploration-editor-tests/load-complete-and-restart-exploration-in-preview-tab.spec.js',
-    'exploration-editor-tests/view-compare-revert-and-download-revisions-in-history-tab.spec.js'
+    'exploration-editor-tests/load-complete-and-restart-exploration.spec.js',
+    'exploration-editor-tests/view-compare-and-revert-explorations.spec.js'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
