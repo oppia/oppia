@@ -6,14 +6,13 @@
         <button *ngIf="editabilityService.isEditable()" class="fas fa-pen oppia-editor-edit-icon oppia-autofocus"
                 (keydown.enter)="openStateNameEditor()"
                 aria-label="Edit State Name"
-                id="card-title-pencil-edit-button"
                 title="Edit State Name">&#xE254;
         </button>
       </span>
 
       <span *ngIf="stateNameService.isStateNameEditorShown()">
         <form class="form-horizontal" role="form" #f="ngForm" (ngSubmit)="saveStateNameAndRefresh(tmpStateName)">
-          <input type="text" name="tmpStateName" [(ngModel)]="tmpStateName" [maxlength]="maxLen" (focus)="stateNameEditorOpened" autofocus class="e2e-test-state-name-input" id="title-input-box">
+          <input type="text" name="tmpStateName" [(ngModel)]="tmpStateName" [maxlength]="maxLen" (focus)="stateNameEditorOpened" autofocus class="e2e-test-state-name-input">
           <button type="submit" class="btn btn-success btn-sm e2e-test-state-name-submit">Save</button>
         </form>
       </span>

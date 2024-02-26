@@ -44,7 +44,7 @@ const addCateogry = '#mat-option-69';
 const languageUpdateBar = '#mat-select-value-9';
 const addLanguage = '#mat-option-6';
 const addTags = '#mat-chip-list-input-0';
-const previewSummaryButton = '#clickToSeePreviewSummary';
+const previewSummaryButton = '.click-to-See-preview-Summary';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
 const feedbackToggleOff = 'label[for="feedback-switch"]';
@@ -272,8 +272,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async previewSummary() {
     await this.page.waitForSelector(
-      '#clickToSeePreviewSummary:not([disabled])');
-    await this.clickOn('#clickToSeePreviewSummary');
+      '.click-to-See-preview-Summary:not([disabled])');
+    await this.clickOn('.click-to-See-preview-Summary');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
   }
