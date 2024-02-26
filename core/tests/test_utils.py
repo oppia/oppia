@@ -51,6 +51,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import interaction_registry
@@ -343,14 +344,18 @@ def swap_is_feature_flag_enabled_function(
         context. The context with function replaced.
     """
     def mock_is_feature_flag_enabled(
-        _: Optional[str], feature_flag_name: str
+        feature_flag_name: str,
+        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
-            _: str|None. The id of the user, can be None.
             feature_flag_name: str. The name of the target feature flag.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
+            user_id: str|None. The id of the user, if logged-out user
+                then None.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
