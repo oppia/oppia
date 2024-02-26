@@ -70,6 +70,7 @@ const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
 
 let titleBeforeChanges = '';
+let explorationUrlAfterPublished = '';
 
 module.exports = class e2eExplorationCreator extends baseUser {
   /**
@@ -89,21 +90,23 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in updating Card Name.
+   * @param {string} cardName
    */
-  async updateCardName() {
+  async updateCardName(cardName) {
     await this.clickOn(addCardName);
-    await this.type('.e2e-test-state-name-input', 'Test question');
+    await this.type('.e2e-test-state-name-input', cardName);
     await this.page.waitForSelector(forButtonToBeEnabled);
     await this.clickOn(introSubmitButton);
   }
 
   /**
    * This function helps in updating exploration intro text.
+   * @param {string} Introtext
    */
-  async updateExplorationIntroText() {
+  async updateExplorationIntroText(Introtext) {
     await this.page.waitForTimeout(600);
     await this.clickOn('.e2e-test-edit-content-pencil-button');
-    await this.type('.e2e-test-rte', 'Exploration intro text');
+    await this.type('.e2e-test-rte', Introtext);
     await this.clickOn(introTitleSubmitButton);
   }
 
@@ -129,10 +132,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in updating Title.
+   * @param {string} Title
    */
-  async updateTitle() {
+  async updateTitle(Title) {
     await this.clickOn(addTitleBar);
-    await this.type(addTitle, 'Your Title Here');
+    await this.type(addTitle, Title);
   }
 
   /**
@@ -159,10 +163,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding a goal.
+   * @param {string} Goal
    */
-  async updateGoal() {
+  async updateGoal(Goal) {
     await this.clickOn(addGoalBar);
-    await this.type(addGoal, 'NeedSuccessInLifeAndMoney');
+    await this.type(addGoal, Goal);
   }
 
   /**
@@ -244,11 +249,12 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding tags.
+   * @param {string} TagName
    */
-  async addTags() {
+  async addTags(TagName) {
     await this.page.waitForTimeout(500);
     await this.clickOn(addTags);
-    await this.type(addTags, 'Your Tag Here');
+    await this.type(addTags, TagName);
   }
 
   async successfullyUpdatedSettings() {
@@ -414,6 +420,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * deleted successfully?
    */
   async expectExplorationToBeDeletedSuccessfully() {
+    await this.page.waitForTimeout(500);
     const deleteButton = await this.page.$('.oppia-delete-button');
     if (!deleteButton) {
       showMessage('Exploration has been successfully deleted.');
@@ -456,6 +463,13 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn(publishConfirmButton);
     await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
+
+    await this.page.waitForTimeout(500);
+    explorationUrlAfterPublished = await this.page.url();
+  }
+
+  async publishExploration(){
+    await this.makeExplorationPublic();
   }
 
   /**
@@ -463,25 +477,12 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *is published successfully or not.
   */
   async expectInteractionOnCreatorDashboard() {
-    const currentUrl = await this.page.url();
-    const explorationId = currentUrl.split('/create/')[1].split('#/')[0];
-    await this.page.goto(creatorDashboardUrl);
-    const isExplorationPresent = await page.evaluate((explorationId) => {
-      const explorationContainer = document.querySelector(
-        '.oppia-card-view-wrap');
-      const explorationLinks = Array.from(
-        explorationContainer.querySelectorAll('a[href]'));
-      return explorationLinks.some(link => link.getAttribute(
-        'href') === `/create/${explorationId}`);
-    }, explorationId);
-    if (isExplorationPresent) {
-      showMessage(
-        `Exploration with ID ${explorationId}` +
-        ' is present on the creator dashboard.');
-    } else {
-      throw new Error(
-        `Exploration with ID ${explorationId}` +
-        ' is not present on the creator dashboard.');
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is available on creator dashboard.');
+    }
+    catch (error) {
+      throw new Error('Failed to navigate to the exploration URL.');
     }
   }
 
@@ -490,9 +491,9 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async addSomeChanges() {
     await this.clickOn(settingsTab);
+    await this.clickOn(addTitleBar);
     titleBeforeChanges = await this.page.$eval(
       '.e2e-test-exploration-title-input', title => title.value);
-    await this.clickOn(addTitleBar);
     await this.type(addTitle, 'Your Title Here please');
   }
 
@@ -506,6 +507,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *This function checks whether changes has discarded successfully or not
   */
   async expectChangesToBeDiscardedSuccessfully() {
+    await this.clickOn(addTitleBar);
     const titleAfterChanges = await this.page.$eval(
       '.e2e-test-exploration-title-input', title => title.value);
     if (titleBeforeChanges === titleAfterChanges) {

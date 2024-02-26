@@ -54,17 +54,18 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.goToDashboardUrl();
       await explorationCreator.goToEditorSection();
-      await explorationCreator.updateCardName();
-      await explorationCreator.updateExplorationIntroText();
+      await explorationCreator.updateCardName('Test question');
+      await explorationCreator.updateExplorationIntroText(
+        'Exploration intro text');
       await explorationCreator.addInteraction();
       await explorationCreator.explorationCreatedSuccessfully();
 
       await explorationCreator.goToSettingsTab();
 
-      await explorationCreator.updateTitle();
+      await explorationCreator.updateTitle('Your Title Here');
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
-      await explorationCreator.updateGoal();
+      await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
       await explorationCreator.expectGoalToBeSet('NeedSuccessInLifeAndMoney');
 
       await explorationCreator.selectCategory();
@@ -73,7 +74,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.selectLanguage();
       await explorationCreator.expectLanguageToBeSelected('English');
 
-      await explorationCreator.addTags();
+      await explorationCreator.addTags('Your Tag Here');
 
       await explorationCreator.successfullyUpdatedSettings();
 

@@ -122,11 +122,10 @@ let createNewGuestUser = async function(username, email) {
  * @param {string} username - The username of the exploration creator.
  * @returns {e2eExplorationCreator} - The instance of the exploration creator.
  */
-let createNewExplorationCreator = async function(username) {
+let createNewExplorationCreator = async function(username, email) {
   const explorationCreator = new e2eExplorationCreator();
   await explorationCreator.openBrowser();
-  await explorationCreator.signUpNewUser(
-    username, 'exploration_creator@example.com');
+  await explorationCreator.signUpNewUser(username, email);
   activeUsers.push(explorationCreator);
   return explorationCreator;
 };

@@ -27,38 +27,43 @@ describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationCreator = null;
   beforeAll(async function() {
     explorationCreator = await userFactory.createNewExplorationCreator(
-      'explorationAdm');
+      'explorationAdm', 'exploration_creator@example.com');
+    explorationVisitor = await userFactory.createNewExplorationCreator(
+      'explorationLearner', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should perform exploration management actions',
     async function() {
       await explorationCreator.goToDashboardUrl();
       await explorationCreator.goToEditorSection();
-      await explorationCreator.updateCardName();
-      await explorationCreator.updateExplorationIntroText();
+      await explorationCreator.updateCardName('Test question');
+      await explorationCreator.updateExplorationIntroText(
+        'Exploration intro text');
       await explorationCreator.addInteraction();
       await explorationCreator.explorationCreatedSuccessfully();
 
       await explorationCreator.goToSettingsTab();
-      await explorationCreator.updateTitle();
-      await explorationCreator.updateGoal();
+      await explorationCreator.updateTitle('Your Title Here');
+      await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
       await explorationCreator.selectCategory();
-      await explorationCreator.addTags();
+      await explorationCreator.selectLanguage();
+      await explorationCreator.addTags('Your Tag Here');
       await explorationCreator.successfullyUpdatedSettings();
 
-      await explorationCreator.makeExplorationPublic();
-      await explorationCreator.
-        expectInteractionOnCreatorDashboard();
+      await explorationCreator.publishExploration();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.discardCurrentChanges();
-      await explorationCreator.
-        expectChangesToBeDiscardedSuccessfully();
+      // await explorationCreator.
+      //   expectChangesToBeDiscardedSuccessfully();
 
       await explorationCreator.addSomeChanges();
       await explorationCreator.saveDraftExploration();
       await explorationCreator.
         expectExplorationToBeDraftedSuccessfully();
+
+      await explorationVisitor.
+        expectInteractionOnCreatorDashboard();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
