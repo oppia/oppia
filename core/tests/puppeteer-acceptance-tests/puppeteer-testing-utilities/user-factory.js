@@ -24,6 +24,7 @@ let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 let e2eQuestionAdmin = require(
   '../user-utilities/question-admin-utils.js');
+let e2eExplorationAdmin = require('../user-utilities/exploration-editor.utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -166,6 +167,20 @@ let createNewQuestionAdmin = async function(username, email) {
   activeUsers.push(questionAdmin);
   return questionAdmin;
 };
+/**
+ * Function to create a user with the question admin role.
+ * @param {string} username - the username of the question admin.
+ * @param {string} email - the email of the user.
+ * @returns the instance of the question admin.
+ */
+
+let createNewExplorationAdmin = async function(username, email) {
+  const explorationAdmin = new e2eExplorationAdmin();
+  await explorationAdmin.openBrowser();
+  await explorationAdmin.signUpNewUser(username, email);
+  activeUsers.push(explorationAdmin);
+  return explorationAdmin;
+};
 
 /**
  * The function closes all the browsers opened by different users.
@@ -195,5 +210,6 @@ module.exports = {
   createNewTranslationAdmin,
   createNewQuestionAdmin,
   closeAllBrowsers,
-  closeBrowserForUser
+  closeBrowserForUser,
+  createNewExplorationAdmin
 };
