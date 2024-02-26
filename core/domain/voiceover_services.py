@@ -24,6 +24,7 @@ import os
 from core import feconf
 from core import utils
 from core.domain import state_domain
+from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
@@ -200,25 +201,10 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         return autogeneratable_language_accent_list
 
 
-def get_curated_exploration_ids():
-    exploration_ids = []
-
-    voice_artist_metadata_models = (
-        voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
-
-    for voice_artist_metadata_model in voice_artist_metadata_models:
-        metadata_mapping = (
-            voice_artist_metadata_model.voiceovers_and_contents_mapping)
-        exploration_mapping = metadata_mapping.get(
-            'exploration_id_to_content_ids', {})
-        for exp_id in exploration_mapping.keys():
-            exploration_ids.append(exp_id)
-
-    return exploration_ids
-
-
-def get_voice_artists_metadata_mapping_from_exploration_id(exploration_id):
-    voice_artist_id_to_metadata_mapping = {}
+def get_all_voice_artist_language_accent_mapping():
+    """
+    """
+    voice_artist_id_to_language_mapping = {}
 
     voice_artist_metadata_models = (
         voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
@@ -227,12 +213,46 @@ def get_voice_artists_metadata_mapping_from_exploration_id(exploration_id):
         voice_artist_id = voice_artist_metadata_model.id
         metadata_mapping = (
             voice_artist_metadata_model.voiceovers_and_contents_mapping)
+        voice_artist_id_to_language_mapping[voice_artist_id] = {}
 
-        exploration_mapping = metadata_mapping.get(
-            'exploration_id_to_content_ids', {})
+        for lang_code, contents_mapping in metadata_mapping.items():
+            language_accent_code = contents_mapping['language_accent_code']
+            voice_artist_id_to_language_mapping[voice_artist_id][lang_code] = (
+                language_accent_code)
 
-        if exploration_id in exploration_mapping:
-            voice_artist_id_to_metadata_mapping[voice_artist_id] = (
-                    metadata_mapping)
+    return voice_artist_id_to_language_mapping
 
-    return voice_artist_id_to_metadata_mapping
+
+def update_voice_artists_language_mapping(voice_artist_id_to_language_mapping):
+    voice_artist_ids = voice_artist_id_to_language_mapping.keys()
+    voice_artist_models = voiceover_models.VoiceArtistMetadataModel.get_multi(
+        voice_artist_ids)
+    voice_artist_models_to_put = []
+
+    for voice_artist_model in voice_artist_models:
+        voice_artist_id = voice_artist_model.id
+        language_mapping = voice_artist_id_to_language_mapping[voice_artist_id]
+
+        for language_code, language_accent_code in language_mapping.items():
+            voice_artist_model.voiceovers_and_contents_mapping[language_code][
+                'language_accent_code'] = language_accent_code
+            voice_artist_models_to_put.append(voice_artist_model)
+
+    voiceover_models.VoiceArtistMetadataModel.put_multi(
+        voice_artist_models_to_put)
+
+
+def get_voice_artist_ids_to_voice_artist_names():
+    voice_artist_id_to_voice_artist_name = {}
+
+    voice_artist_metadata_models = (
+        voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+
+    for voice_artist_metadata_model in voice_artist_metadata_models:
+        voice_artist_id = voice_artist_metadata_model.id
+        voice_artist_name = user_services.get_username(voice_artist_id)
+
+        voice_artist_id_to_voice_artist_name[voice_artist_id] = (
+            voice_artist_name)
+
+    return voice_artist_id_to_voice_artist_name

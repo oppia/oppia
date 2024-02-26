@@ -470,6 +470,10 @@ URLS = [
         r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
         voiceover.VoiceoverLanguageCodesMappingHandler
     ),
+    get_redirect_route(
+        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
+        voiceover.VoiceArtistMetadataHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'

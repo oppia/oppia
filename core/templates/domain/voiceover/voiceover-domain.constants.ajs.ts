@@ -28,3 +28,7 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'VOICEOVER_LANGUAGE_CODES_MAPPING_URL',
   VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL);
+
+angular.module('oppia').constant(
+  'VOICE_ARTIST_METADATA_HANDLER_URL',
+  VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL);

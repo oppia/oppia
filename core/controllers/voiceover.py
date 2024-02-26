@@ -122,3 +122,67 @@ class VoiceoverLanguageCodesMappingHandler(
         voiceover_services.save_language_accent_support(
             language_codes_mapping)
         self.render_json(self.values)
+
+
+class VoiceArtistMetadataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to manage voice artist data for the voiceover admin page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {},
+        'PUT': {
+            'voice_artist_id_to_language_mapping': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'variable_keys_dict',
+                            'keys': {
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            },
+                            'values': {
+                                'schema': {
+                                    'type': 'basestring'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }}
+
+    def get(self) -> None:
+        """Retrieves voice artist data for the voiceover admin page."""
+        voice_artist_id_to_language_mapping = (
+            voiceover_services.get_all_voice_artist_language_accent_mapping())
+        voice_artist_id_to_voice_artist_name = (
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names())
+
+        self.values.update({
+            'voice_artist_id_to_language_mapping':
+                voice_artist_id_to_language_mapping,
+            'voice_artist_id_to_voice_artist_name':
+                voice_artist_id_to_voice_artist_name
+        })
+        self.render_json(self.values)
+
+    def put(self) -> None:
+        """Updates voice artist data from the voiceover admin page."""
+        assert self.normalized_payload is not None
+        voice_artist_id_to_language_mapping = (
+            self.normalized_payload['voice_artist_id_to_language_mapping'])
+        voiceover_services.update_voice_artists_language_mapping(
+            voice_artist_id_to_language_mapping)
+
+        self.render_json(self.values)

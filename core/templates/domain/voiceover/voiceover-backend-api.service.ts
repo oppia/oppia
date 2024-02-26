@@ -55,6 +55,29 @@ export interface VoiceoverAdminDataResponse {
   languageCodesMapping: LanguageCodesMapping;
 }
 
+export interface VoiceArtistIdToLanguageMapping {
+  [voiceArtistId: string]: {
+    [languageCode: string]: string;
+  };
+}
+
+interface VoiceArtistMetaDataBackendDict {
+  'voice_artist_id_to_language_mapping': {
+    [voiceArtistId: string]: {
+      [languageCode: string]: string;
+    };
+  };
+  'voice_artist_id_to_voice_artist_name': {
+    [voiceArtistId: string]: string;
+  };
+}
+export interface VoiceArtistMetadataResponse {
+  voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
+  voiceArtistIdToVoiceArtistName: {
+    [voiceArtistId: string]: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -93,6 +116,40 @@ export class VoiceoverBackendApiService {
           reject(errorResopnse?.error);
         }
       );
+    });
+  }
+
+  async fetchVoiceArtistMetadtaAsync(): Promise<VoiceArtistMetadataResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<VoiceArtistMetaDataBackendDict>(
+        VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL
+      ).toPromise().then(response => {
+        resolve({
+          voiceArtistIdToLanguageMapping:
+            response.voice_artist_id_to_language_mapping,
+          voiceArtistIdToVoiceArtistName:
+            response.voice_artist_id_to_voice_artist_name
+        });
+      }, errorResponse => {
+        reject(errorResponse?.error);
+      });
+    });
+  }
+
+  async updateVoiceArtistToLanguageMapping(
+      voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL,
+        {voice_artist_id_to_language_mapping: voiceArtistIdToLanguageMapping}
+      ).toPromise().then(
+        response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse?.error);
+        }
+      )
     });
   }
 }
