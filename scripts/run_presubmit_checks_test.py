@@ -25,7 +25,7 @@ from core.tests import test_utils
 from scripts import run_backend_tests
 from scripts import run_frontend_tests
 from scripts import run_presubmit_checks
-from scripts.linters import pre_commit_linter
+from scripts.linters import run_lint_checks
 
 
 class RunPresubmitChecksTests(test_utils.GenericTestBase):
@@ -51,14 +51,14 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         self.scripts_called = {
             'run_frontend_tests': False,
             'run_backend_tests': False,
-            'pre_commit_linter': False
+            'run_lint_checks': False
         }
         def mock_frontend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_frontend_tests'] = True
         def mock_backend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             self.scripts_called['run_backend_tests'] = True
-        def mock_pre_commit_linter(args: list[str]) -> None:  # pylint: disable=unused-argument
-            self.scripts_called['pre_commit_linter'] = True
+        def mock_run_lint_checks(args: list[str]) -> None:  # pylint: disable=unused-argument
+            self.scripts_called['run_lint_checks'] = True
 
         self.swap_frontend_tests = self.swap_with_checks(
             run_frontend_tests, 'main', mock_frontend_tests,
@@ -68,8 +68,8 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         self.swap_backend_tests = self.swap_with_checks(
             run_backend_tests, 'main', mock_backend_tests,
             expected_kwargs=[{'args': []}])
-        self.swap_pre_commit_linter = self.swap_with_checks(
-            pre_commit_linter, 'main', mock_pre_commit_linter,
+        self.swap_run_lint_checks = self.swap_with_checks(
+            run_lint_checks, 'main', mock_run_lint_checks,
             expected_kwargs=[{'args': []}])
 
     def test_run_presubmit_checks_when_branch_is_specified(self) -> None:
@@ -89,7 +89,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
 
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
+        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=['-b', specified_branch])
 
@@ -119,7 +119,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
 
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
+        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=[])
 
@@ -149,12 +149,12 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
 
         swap_check_output = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with self.print_swap, swap_check_output, self.swap_pre_commit_linter:
+        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests:
                 run_presubmit_checks.main(args=[])
 
         self.assertFalse(self.scripts_called['run_frontend_tests'])
-        self.assertTrue(self.scripts_called['pre_commit_linter'])
+        self.assertTrue(self.scripts_called['run_lint_checks'])
         self.assertTrue(self.scripts_called['run_backend_tests'])
         self.assertIn('Linting passed.', self.print_arr)
         self.assertIn(
