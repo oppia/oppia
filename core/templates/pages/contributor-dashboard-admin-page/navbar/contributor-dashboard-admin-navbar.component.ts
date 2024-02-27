@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
@@ -84,7 +83,3 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
       '/logo/288x128_logo_white.webp');
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaContributorDashboardAdminNavbar', downgradeComponent(
-    {component: ContributorDashboardAdminNavbarComponent}));

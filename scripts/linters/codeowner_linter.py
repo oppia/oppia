@@ -29,7 +29,7 @@ from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from scripts.linters import pre_commit_linter
+    from scripts.linters import run_lint_checks
 
 CODEOWNER_FILEPATH: Final = '.github/CODEOWNERS'
 
@@ -78,7 +78,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
 class CodeownerLintChecksManager(linter_utils.BaseLinter):
     """Manages codeowner checks."""
 
-    def __init__(self, file_cache: pre_commit_linter.FileCache) -> None:
+    def __init__(self, file_cache: run_lint_checks.FileCache) -> None:
         """Constructs a CodeownerLintChecksManager object.
 
         Args:
@@ -354,7 +354,7 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
 
 
 def get_linters(
-    file_cache: pre_commit_linter.FileCache
+    file_cache: run_lint_checks.FileCache
 ) -> Tuple[CodeownerLintChecksManager, None]:
     """Creates CodeownerLintChecksManager object and returns it.
 

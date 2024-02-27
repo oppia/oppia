@@ -72,7 +72,7 @@ module.exports = class baseUser {
    * @param {string} email - The email of the user.
    */
   async signInWithEmail(email) {
-    await this.goto(testConstants.URLs.home);
+    await this.goto(testConstants.URLs.Home);
     if (!this.userHasAcceptedCookies) {
       await this.clickOn('OK');
       this.userHasAcceptedCookies = true;
@@ -166,7 +166,7 @@ module.exports = class baseUser {
    * This function logs out the current user.
    */
   async logout() {
-    await this.goto(testConstants.URLs.logout);
+    await this.goto(testConstants.URLs.Logout);
     await this.page.waitForSelector(testConstants.Dashboard.MainDashboard);
   }
 
