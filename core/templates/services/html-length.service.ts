@@ -206,15 +206,15 @@ export class HtmlLengthService {
       case 'oppia-noninteractive-link':
       case 'oppia-noninteractive-skillreview': {
         const textValueAttr = domTag.getAttribute('text-with-value') || '';
-        const textValue = String(
-          this.htmlEscaperService.escapedJsonToObj(textValueAttr));
+        const textValue = this.htmlEscaperService.escapedJsonToObj(
+          textValueAttr) as string;
         const length = this.calculateTextLength(textValue, calculationType);
         return length;
       }
       case 'oppia-noninteractive-image': {
         const altTextAttr = domTag.getAttribute('alt-with-value') || '';
-        const altTextValue = String(
-          this.htmlEscaperService.escapedJsonToObj(altTextAttr));
+        const altTextValue = this.htmlEscaperService.escapedJsonToObj(
+          altTextAttr) as string;
         const length = this.calculateTextLength(altTextValue, calculationType);
         return length + 10;
       }
