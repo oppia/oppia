@@ -1892,8 +1892,8 @@ class DataExtractionQueryHandler(
         if exploration is None:
             raise self.PageNotFoundException(
                 Exception(
-                    'Entity for exploration with id %s and version %s not found.'
-                    % (exp_id, exp_version)
+                    'Entity for exploration with id %s and version '
+                    '%s not found.' % (exp_id, exp_version)
                 ))
 
         state_name = self.normalized_request['state_name']
