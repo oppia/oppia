@@ -298,6 +298,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/edit-group/edit-learner-group-page-auth.guard';
+import { CreateLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/create-group/create-learner-group-page-auth.guard';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -552,6 +553,7 @@ export const angularServices: [string, Type<{}>][] = [
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
   ['EditLearnerGroupPageAuthGuard', EditLearnerGroupPageAuthGuard],
+  ['CreateLearnerGroupPageAuthGuard', CreateLearnerGroupPageAuthGuard],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',
     EditableExplorationBackendApiService],

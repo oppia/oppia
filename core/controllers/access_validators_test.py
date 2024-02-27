@@ -291,6 +291,32 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
 
 
+class CreateLearnerGroupPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
+    def test_validation_returns_false_with_learner_groups_feature_disabled(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_create_learner_group_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_validation_returns_true_for_valid_user(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_create_learner_group_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+
+
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 

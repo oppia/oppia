@@ -128,6 +128,19 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
+  it('should validate access to learner group creator page', fakeAsync(() => {
+    avbas.validateAccessToLearnerGroupCreatorPage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_create_learner_group_page');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
   it('should validate whether given learner group exists', fakeAsync(() => {
     let learnerGroupId = 'groupId';
 

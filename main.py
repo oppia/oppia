@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_create_learner_group_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CreateLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.EditLearnerGroupPageAccessValidationHandler
@@ -1096,9 +1102,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
-    get_redirect_route(
-        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
-        learner_group.CreateLearnerGroupPage),
     get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),
