@@ -73,7 +73,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
 ];
 
 var checkForConsoleErrors = async function(
-    errorsToIgnore, skipDebugging = true) {
+    errorsToIgnore = [], skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
@@ -83,10 +83,27 @@ var checkForConsoleErrors = async function(
   }
 
   var browserLogs = await browser.getLogs('browser');
-  var browserErrors = browserLogs.filter(logEntry => (
-    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
-  expect(browserErrors).toEqual([]);
+  var unexpectedErrors = [];
+  var expectedErrorsNotFound = [...EXPECTED_CONSOLE_ERRORS];
+  browserLogs.forEach(logEntry => {
+    const errorIsIgnored = errorsToIgnore.some(e => logEntry.message.match(e));
+    const errorIsExpected = EXPECTED_CONSOLE_ERRORS.some((expectedError, index) => {
+      if (logEntry.message.includes(expectedError)) {
+        expectedErrorsNotFound.splice(index, 1);
+        return true;
+      }
+      return false;
+    });
+    if (logEntry.level.value > CONSOLE_LOG_THRESHOLD && !errorIsIgnored && !errorIsExpected) {
+      unexpectedErrors.push(logEntry.message);
+    }
+  });
+  if (expectedErrorsNotFound.length > 0) {
+    throw new Error(`Expected errors not found: ${expectedErrorsNotFound.join(', ')}`);
+  }
+  if (unexpectedErrors.length > 0) {
+    throw new Error(`Unexpected errors found: ${unexpectedErrors.join(', ')}`);
+  }
 };
 
 var isInDevMode = async function() {
