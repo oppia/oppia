@@ -106,6 +106,15 @@ const routes: Route[] = [
       .then(m => m.AboutFoundationPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
+    loadChildren: () => import(
+      'pages/contributor-dashboard-admin-page' +
+      '/contributor-dashboard-admin-page.module')
+      .then(m => m.ContributorDashboardAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
     loadChildren: () => import(
       'pages/exploration-player-page/exploration-player-page.module')

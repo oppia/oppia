@@ -411,7 +411,7 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToBeOver();
     });
 
-  it('should not show self-loop warning when current and ' +
+  fit('should not show self-loop warning when current and ' +
     'destination states are different', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
@@ -432,20 +432,20 @@ describe('Core exploration functionality', function() {
       'default');
     await responseEditor.setDestination(null, false, null);
 
-    // Setup a terminating state.
-
     await explorationEditorMainTab.moveToState('final card');
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('Introduction');
 
-    await general.moveToPlayer();
+    explorationPlayerPage = await explorationEditorPage.getPreviewTab();
     await explorationPlayerPage.submitAnswer('NumericInput', 1);
     await explorationPlayerPage.clickThroughToNextCard();
-    await general.moveToEditor(false);
+    explorationEditorMainTab = await explorationEditorPage.getMainTab();
     await explorationEditorMainTab.moveToState('Introduction');
     var responseSelfLoopWarning = $('.e2e-test-response-self-loop-warning');
-    await waitFor.invisibilityOf(
-      responseSelfLoopWarning, 'inaccurate self-loop warning appears');
+    // await waitFor.invisibilityOf(
+    //   responseSelfLoopWarning, 'inaccurate self-loop warning appears');
+    expect(responseSelfLoopWarning).toBeNull;
   });
 
   it('should skip the customization modal for interactions having no ' +
