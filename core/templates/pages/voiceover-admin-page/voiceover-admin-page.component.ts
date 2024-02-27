@@ -23,8 +23,10 @@ import { VoiceoverRemovalConfirmModalComponent } from
   './modals/language-accent-removal-confirm-modal.component';
 import {
   VoiceoverBackendApiService, LanguageAccentToDescription,
-  LanguageCodesMapping, LanguageAccentMasterList
+  LanguageCodesMapping, LanguageAccentMasterList,
+  VoiceArtistIdToLanguageMapping, VoiceArtistIdToVoiceArtistName
 } from 'domain/voiceover/voiceover-backend-api.service';
+import { VoiceArtistLanguageMapping } from './voice-artist-language-mappinng.model';
 
 
 interface LanguageAccentCodeToLanguageCode {
@@ -53,6 +55,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
   pageIsInitialized: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
+  voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
+  voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
+
 
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
@@ -67,6 +72,37 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.pageIsInitialized = true;
       }
     );
+    this.voiceoverBackendApiService.fetchVoiceArtistMetadtaAsync().then(
+      response => {
+        this.voiceArtistIdToLanguageMappingList = (
+          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
+            response.voiceArtistIdToLanguageMapping)
+        );
+        this.voiceArtistIdToVoiceArtistName = (
+          response.voiceArtistIdToVoiceArtistName);
+      }
+    );
+  }
+
+  addLanguageAccentForVoiceArtist(
+      voiceArtistId: string, languageCode: string
+  ) {
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(VoiceoverRemovalConfirmModalComponent, {
+        backdrop: 'static'
+      });
+
+      modalRef.componentInstance.languageCode = languageCode;
+      modalRef.componentInstance.voiceArtistID = voiceArtistId;
+      modalRef.componentInstance.voiceArtistName = (
+        this.voiceArtistIdToVoiceArtistName[voiceArtistId]);
+
+    modalRef.result.then(() => {
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
   }
 
   initializeLanguageAccentCodesFields(

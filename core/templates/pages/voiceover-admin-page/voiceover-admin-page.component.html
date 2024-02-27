@@ -69,7 +69,24 @@
 <mat-card>
   <h3>Label manual voiceovers</h3>
   <div>
-    <div class="mat-elevation-z8">
+    <div *ngFor="let voiceArtistLanguageMapping of voiceArtistIdToLanguageMappingList">
+      <div>
+        <span>{{voiceArtistIdToVoiceArtistName[voiceArtistLanguageMapping.getVoiceArtistID()]}}</span>
+      </div>
+      <div>
+        <span>{{voiceArtistLanguageMapping.getLanguageCode()}}</span>
+      </div>
+      <div>
+        <div>
+          <span>{{voiceArtistLanguageMapping.getLanguageAccentCode()}}</span>
+          <span>Edit</span>
+        </div>
+        <div><span>Add Accent</span></div>
+      </div>
+
+    </div>
+
+    <!-- <div class="mat-elevation-z8">
       <table mat-table [dataSource]="dataSource">
 
         <ng-container matColumnDef="position">
@@ -95,7 +112,7 @@
                      showFirstLastButtons
                      aria-label="Select page of periodic elements">
       </mat-paginator>
-    </div>
+    </div> -->
   </div>
 </mat-card>
 

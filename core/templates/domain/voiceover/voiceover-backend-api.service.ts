@@ -61,6 +61,10 @@ export interface VoiceArtistIdToLanguageMapping {
   };
 }
 
+export interface VoiceArtistIdToVoiceArtistName {
+  [voiceArtistId: string]: string;
+}
+
 interface VoiceArtistMetaDataBackendDict {
   'voice_artist_id_to_language_mapping': {
     [voiceArtistId: string]: {
@@ -73,9 +77,7 @@ interface VoiceArtistMetaDataBackendDict {
 }
 export interface VoiceArtistMetadataResponse {
   voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
-  voiceArtistIdToVoiceArtistName: {
-    [voiceArtistId: string]: string;
-  };
+  voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
 }
 
 @Injectable({
@@ -136,7 +138,7 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async updateVoiceArtistToLanguageMapping(
+  async updateVoiceArtistToLanguageMappingAsync(
       voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -151,6 +153,12 @@ export class VoiceoverBackendApiService {
         }
       )
     });
+  }
+
+  async fetchSpecificVoiceArtistLanguageInformationAsync(
+      voiceArtistId: string, languageCode: string
+  ) {
+
   }
 }
 
