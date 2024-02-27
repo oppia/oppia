@@ -127,8 +127,7 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  validateAccessToLearnerGroupCreatorPage():
-  Promise<void> {
+  validateAccessToLearnerGroupCreatorPage(): Promise<void> {
     return this.http.get<void>(
       this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR).toPromise();
   }
