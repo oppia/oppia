@@ -213,13 +213,14 @@ def fetch_latest_comment_from_issue(
         }
         """) % issue
     response = run_graphql_query(query)
-    latest_comment: GithubCommentDict = (
+    latest_comment_nodes = (
         deep_get(response, [
             'repository',
             'issue',
             'comments',
-            'nodes'])[0])
-    return latest_comment
+            'nodes']))
+ 
+    return next(iter(latest_comment_nodes), None)
 
 
 def fetch_latest_comment_from_pull_request(
@@ -245,10 +246,10 @@ def fetch_latest_comment_from_pull_request(
         }
         """) % pull_request
     response = run_graphql_query(query)
-    latest_comment: GithubCommentDict = (
+    latest_comment_nodes = (
         deep_get(response, [
             'repository',
             'pullRequest',
             'comments',
-            'nodes'])[0])
-    return latest_comment
+            'nodes']))
+    return next(iter(latest_comment_nodes), None)
