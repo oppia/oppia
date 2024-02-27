@@ -30,6 +30,7 @@ export class MobileMenuService {
   }
 
   toggleMenuVisibility(): void {
-    this.menuVisibleSubject.next(!this.menuVisibleSubject.value);
+    const currentValue = this.menuVisibleSubject.getValue();
+    this.menuVisibleSubject.next(!currentValue);
   }
 }

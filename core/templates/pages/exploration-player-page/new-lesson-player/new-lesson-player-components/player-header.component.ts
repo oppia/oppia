@@ -172,7 +172,7 @@ export class PlayerHeaderComponent {
     this.mobileMenuService.toggleMenuVisibility();
   }
 
-  ngOnDestory(): void {
+  ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }

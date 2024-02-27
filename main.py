@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.EditLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
@@ -298,9 +304,6 @@ URLS = [
         r'/contributionrightsdatahandler',
         contributor_dashboard_admin.ContributionRightsDataHandler),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
-        contributor_dashboard_admin.ContributorDashboardAdminPage),
-    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
         contributor_dashboard_admin.ContributorDashboardAdminStatsHandler),
@@ -310,9 +313,6 @@ URLS = [
     get_redirect_route(
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
-        contributor_dashboard.ContributorDashboardPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
@@ -437,11 +437,8 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
-        classroom.ClassroomAdminPage),
-    get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
-        classroom.ClassroomAdminDataHandler),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
+        classroom.ClassroomIdToNameHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),
@@ -510,9 +507,6 @@ URLS = [
     get_redirect_route(
         '/learner_dashboard',
         learner_dashboard.OldLearnerDashboardRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.LEARNER_DASHBOARD_URL,
-        learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
@@ -951,7 +945,6 @@ URLS = [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
-    get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
         email_dashboard.EmailDashboardDataHandler),
@@ -1025,8 +1018,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1124,8 +1115,6 @@ URLS = [
         r'/exit_learner_group_handler/<learner_group_id>',
         learner_group.ExitLearnerGroupHandler),
     get_redirect_route(
-        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
-    get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
     get_redirect_route(
@@ -1220,6 +1209,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
+        cron.CronMailReviewerNewSuggestionsHandler),
 ))
 
 # Add tasks urls.

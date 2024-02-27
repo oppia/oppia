@@ -1,16 +1,18 @@
 /*
   NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
+  compilation, here are some additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
+.lesson-player-page-container {
+  display: flex;
+  flex-direction: column;
+}
 
 .oppia-new-player-content {
   background-color: #aed2e9;
   display: flex;
-  height: calc(100vh - 104px);
-  position: fixed;
-  top: 104px;
-  width: 100%;
+  min-height: calc(100vh - 104px);
 }
 
 .oppia-new-player-main-content {

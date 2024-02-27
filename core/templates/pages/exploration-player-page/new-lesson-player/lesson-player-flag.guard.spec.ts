@@ -23,7 +23,7 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras }
 import { AppConstants } from 'app.constants';
 import { IsNewLessonPlayerGuard } from './lesson-player-flag.guard';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
+import { FeatureStatusChecker } from 'domain/feature-flag/feature-status-summary.model';
 
 
 class MockPlatformFeatureService {

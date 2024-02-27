@@ -23,9 +23,6 @@ import { ExplorationEngineService } from './exploration-engine.service';
 
 interface LearnerViewRatingBackendResponse {
   'user_rating': number;
-  'overall_ratings': {
-    [key: string]: number;
-  };
 }
 
 @Injectable({

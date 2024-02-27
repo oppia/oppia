@@ -1,16 +1,21 @@
 /*
   NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
+  compilation, here are some additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
 .oppia-lesson-player-sidebar {
+  display: flex;
   height: 100%;
 }
 
 .lesson-player-sidebar-top {
   display: flex;
   flex-direction: column;
+}
+
+.lesson-player-sidebar-chevron {
+  width: 24px;
 }
 
 .player-sidebar-toggle {
@@ -98,6 +103,10 @@
   width: 45px;
 }
 
+.player-sidebar-button i {
+  color: #0d48a1;
+}
+
 .player-sidebar-button div {
   align-items: center;
   display: flex;
@@ -126,7 +135,7 @@
   border-radius: 28px 28px 0 0;
   bottom: 0;
   display: none;
-  height: 240px;
+  height: 232px;
   position: fixed;
   width: 100%;
   z-index: 40;
@@ -136,6 +145,7 @@
   align-self: flex-end;
   height: 48px;
   padding: 12px;
+  vertical-align: sub;
   width: 48px;
 }
 
@@ -159,6 +169,17 @@
   height: 40px;
   line-height: 23px;
   padding: 8px;
+}
+
+.rating-star-block {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+}
+
+.rating-star-block svg {
+  height: 24px;
+  width: 24px;
 }
 
 @media screen and (max-width: 574px) {

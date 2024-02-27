@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the NEW lesson player page.
+ * @fileoverview Module for the new lesson player page.
  */
 
 import { NgModule } from '@angular/core';
