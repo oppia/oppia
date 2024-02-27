@@ -14,6 +14,10 @@
   flex-direction: column;
 }
 
+.lesson-player-sidebar-chevron {
+  width: 24px;
+}
+
 .player-sidebar-toggle {
   background: none;
   border: none;
@@ -99,6 +103,10 @@
   width: 45px;
 }
 
+.player-sidebar-button i {
+  color: #0D48A1;
+}
+
 .player-sidebar-button div {
   align-items: center;
   display: flex;
@@ -127,7 +135,7 @@
   border-radius: 28px 28px 0 0;
   bottom: 0;
   display: none;
-  height: 240px;
+  height: 232px;
   position: fixed;
   width: 100%;
   z-index: 40;
@@ -138,6 +146,10 @@
   height: 48px;
   padding: 12px;
   width: 48px;
+}
+
+.player-mobile-menu-close {
+  vertical-align: sub;
 }
 
 .player-mobile-menu-options {

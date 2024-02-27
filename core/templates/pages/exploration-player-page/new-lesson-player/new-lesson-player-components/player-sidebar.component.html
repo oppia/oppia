@@ -7,11 +7,11 @@
               [class.expanded]="isExpanded">
         <div *ngIf="!isExpanded">
           Open options
-          <img src="/assets/images/lesson_player/sidebar-chevron-right.svg" alt="Open options">
+          <i class="fa fa-lg fa-chevron-right"></i>
         </div>
         <div *ngIf="isExpanded">
           Close options
-          <img src="/assets/images/lesson_player/sidebar-chevron-left.svg" alt="Close options">
+          <i class="fa fa-lg fa-chevron-left lesson-player-sidebar-chevron"></i>
         </div>
       </button>
       <div *ngIf="isExpanded">
@@ -50,30 +50,30 @@
     </div>
     <div class="player-sidebar-button-container">
       <button class="player-sidebar-button">
-        <img *ngIf="!isExpanded" src="/assets/images/lesson_player/share-button.svg" alt="Share button">
+        <i *ngIf="!isExpanded" class="fa fa-lg fa-share-alt"></i>
         <div *ngIf="isExpanded">
-          <img src="/assets/images/lesson_player/share-button.svg" alt="Share button">
+          <i class="fa fa-lg fa-share-alt"></i>
           Share this lesson
         </div>
       </button>
       <button class="player-sidebar-button">
-        <img *ngIf="!isExpanded" src="/assets/images/lesson_player/feedback-button.svg" alt="Feedback button">
+        <i *ngIf="!isExpanded" class="fa fa-lg fa-comments"></i>
         <div *ngIf="isExpanded">
-          <img src="/assets/images/lesson_player/feedback-button.svg" alt="Feedback button">
+          <i class="fa fa-lg fa-comments"></i>
           Feedback
         </div>
       </button>
       <button class="player-sidebar-button">
-        <img *ngIf="!isExpanded" src="/assets/images/lesson_player/report-button.svg" alt="Report button">
+        <i *ngIf="!isExpanded" class="fa fa-lg fa-flag"></i>
         <div *ngIf="isExpanded">
-          <img src="/assets/images/lesson_player/report-button.svg" alt="Report button">
+          <i class="fa fa-lg fa-flag"></i>
           Report
         </div>
       </button>
       <button class="player-sidebar-button">
-        <img *ngIf="!isExpanded" src="/assets/images/lesson_player/help-button.svg" alt="Help button">
+        <i *ngIf="!isExpanded" class="fa fa-lg fa-question-circle"></i>
         <div *ngIf="isExpanded">
-          <img src="/assets/images/lesson_player/help-button.svg" alt="Help button">
+          <i class="fa fa-lg fa-question-circle"></i>
           Get help
         </div>
       </button>
@@ -86,23 +86,23 @@
     <div class="player-mobile-menu">
       <div class="player-mobile-menu-close"
            (click)="mobileMenuService.toggleMenuVisibility()">
-        <img src="/assets/images/lesson_player/cancel-mobile.svg" alt="Close button">
+          <i class="fa fa-lg fa-times"></i>
       </div>
       <div class="player-mobile-menu-options">
         <button>
-          <img src="/assets/images/lesson_player/share-mobile.svg" alt="Share button">
+          <i class="fa fa-lg fa-share-alt"></i>
           Share this lesson
         </button>
         <button>
-          <img src="/assets/images/lesson_player/feedback-mobile.svg" alt="Feedback button">
+          <i class="fa fa-lg fa-comments"></i>
           Give feedback
         </button>
         <button>
-          <img src="/assets/images/lesson_player/report-mobile.svg" alt="Report button">
+          <i class="fa fa-lg fa-flag"></i>
           Report lesson
         </button>
         <button>
-          <img src="/assets/images/lesson_player/help-mobile.svg" alt="Help button">
+          <i class="fa fa-lg fa-question-circle"></i>
           Help
         </button>
       </div>
