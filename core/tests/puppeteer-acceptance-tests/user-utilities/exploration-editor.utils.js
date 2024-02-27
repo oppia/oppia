@@ -220,7 +220,7 @@ module.exports = class explorationAdmin extends baseUser {
 
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(versionsList);
-    if (revisions.length !== 7) {
+    if (revisions.length !== 15) {
       throw new Error(
         `Pagination Error: When the items per page is set to 15,
          expected 15 user revisions, but got ${revisions.length}`);
