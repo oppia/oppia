@@ -23,7 +23,7 @@ The type checks run with the typescript tests. So you can run the following comm
 
 ```bash
 
-python -m scripts.typescript_checks
+python -m scripts.run_typescript_checks
 
 ```
 
