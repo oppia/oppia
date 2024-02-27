@@ -25,8 +25,8 @@ const contributorDashboardAdminUrl =
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const reviewQuestionRightValue = 'string:question';
-const submitQuestionRightValue = 'string:submit_question';
+const reviewQuestionRightValue = 'question';
+const submitQuestionRightValue = 'submit_question';
 const usernameMethodValue = 'username';
 const roleMethodValue = 'role';
 
