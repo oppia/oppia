@@ -325,10 +325,9 @@ class AdminHandler(
             )
         ]
 
-        # Remove the config_properties from here once the classroom
-        # configuration and new platform parameter tabs are prepared for
-        # onboarding the existing field. This action is being tracked under
-        # issue #19810.
+        # TODO(#19810): Remove the ``config_properties`` key-value pair from
+        # this dict, once the classroom configuration and new platform parameter
+        # tabs are prepared for onboarding the existing field.
         self.render_json({
             'config_properties': {},
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),

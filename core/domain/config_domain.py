@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import schema_utils
 from core.domain import change_domain
 
-from typing import Any, Dict, List, Sequence, TypedDict, Union
+from typing import Dict, List, Sequence, Union
 
 
 AllowedDefaultValueTypes = Union[
@@ -35,38 +35,7 @@ AllowedDefaultValueTypes = Union[
 ]
 
 
-class ConfigPropertySchemaDict(TypedDict):
-    """Type representing the config property's schema dictionary."""
-
-    # Here we use type Any because the general structure of schemas are like
-    # {string : (string, dict, list[dict], variables defined in other modules)}.
-    schema: Dict[str, Any]
-    description: str
-    value: AllowedDefaultValueTypes
-
-
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
-
-LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'language_code',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE,
-                'validators': [{
-                    'id': 'is_supported_audio_language_code',
-                }]
-            },
-        }, {
-            'name': 'explanation',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }]
-    }
-}
 
 SET_OF_STRINGS_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_LIST,
@@ -76,23 +45,6 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
-}
-
-BOOL_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_BOOL
-}
-
-FLOAT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_FLOAT
-}
-
-INT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_INT
-}
-
-POSITIVE_INT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_CUSTOM,
-    'obj_type': 'PositiveInt'
 }
 
 
@@ -111,11 +63,3 @@ class ConfigPropertyChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
-
-
-class ChangePropertyValueCmd(ConfigPropertyChange):
-    """Class representing the ConfigPropertyChange's
-    CMD_CHANGE_PROPERTY_VALUE command.
-    """
-
-    new_value: str
