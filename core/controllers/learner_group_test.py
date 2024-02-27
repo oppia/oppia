@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import json
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
-from core.domain import feature_flag_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services
@@ -865,25 +865,15 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
     def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
+        self.get_html_response(
+            feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            response = self.get_html_response(
-                feconf.CREATE_LEARNER_GROUP_PAGE_URL)
+        response = self.get_html_response(
+            feconf.CREATE_LEARNER_GROUP_PAGE_URL)
         response.mustcontain(
             '<oppia-create-learner-group-page>'
             '</oppia-create-learner-group-page>')
@@ -899,25 +889,15 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
     def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
+        self.get_html_response(
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            response = self.get_html_response(
-                feconf.FACILITATOR_DASHBOARD_PAGE_URL)
+        response = self.get_html_response(
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL)
         response.mustcontain(
             '<oppia-facilitator-dashboard-page>'
             '</oppia-facilitator-dashboard-page>')
@@ -1004,70 +984,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         assert user_settings is not None
         self.assertEqual(response['username'], user_settings.username)
         self.assertEqual(response['error'], '')
-        self.logout()
-
-
-class EditLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the edit learner page."""
-
-    LEARNER_ID: Final = 'learner_user_1'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.OWNER_EMAIL)
-        self.learner_group_id = (
-            learner_group_fetchers.get_new_learner_group_id()
-        )
-        self.learner_group = learner_group_services.create_learner_group(
-            self.learner_group_id, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
-            ['story_id_1'])
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
-        self
-    ) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled:
-            response = self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id)
-        response.mustcontain(
-            '<oppia-edit-learner-group-page>'
-            '</oppia-edit-learner-group-page>')
-        self.logout()
-
-    def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
-        self
-    ) -> None:
-        swap_is_feature_flag_enabled = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        self.logout()
-        self.login(self.NEW_USER_EMAIL)
-        with swap_is_feature_flag_enabled:
-            self.get_html_response(
-                '/edit-learner-group/%s' % self.learner_group_id,
-                expected_status_int=404)
         self.logout()
 
 
@@ -1399,29 +1315,22 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
 
-    def test_get_request_returns_correct_status(self) -> None:
-        swap_is_feature_flag_enabled_to_false = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            False
-        )
-        with swap_is_feature_flag_enabled_to_false:
-            response = self.get_json('/learner_groups_feature_status_handler')
-        self.assertEqual(
-            response, {
-                'feature_is_enabled': False
-            })
-
-        swap_is_feature_flag_enabled_to_true = self.swap_to_always_return(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            True
-        )
-        with swap_is_feature_flag_enabled_to_true:
-            response = self.get_json('/learner_groups_feature_status_handler')
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_get_request_returns_true_when_learner_groups_featuer_flag_enabled(
+        self) -> None:
+        response = self.get_json('/learner_groups_feature_status_handler')
         self.assertEqual(
             response, {
                 'feature_is_enabled': True,
+            })
+
+    def test_get_request_returns_false_when_learner_groups_featuer_flag_disable(
+        self) -> None:
+        response = self.get_json('/learner_groups_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'feature_is_enabled': False,
             })
 
 
