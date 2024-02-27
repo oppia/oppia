@@ -66,6 +66,7 @@ var SkillEditorPage = function() {
   };
   var misconceptionNameField = $('.e2e-test-misconception-name-field');
   var misconceptionNotesField = $('.e2e-test-notes-textarea .e2e-test-rte');
+  var questionInteractionId = $('.e2e-test-question-interaction-id');
   var questionItem = $('.e2e-test-question-list-item');
   var questionItemsSelector = function() {
     return $$('.e2e-test-question-list-item');
@@ -193,7 +194,7 @@ var SkillEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.editQuestion = async function() {
+  this.clickEditQuestionButton = async function() {
     await action.click('Edit Question Button', editQuestionButton);
     await waitFor.pageToFullyLoad();
   };
@@ -240,14 +241,21 @@ var SkillEditorPage = function() {
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
   };
 
-  this.updateQuestion = async function(commitMessage) {
+  this.saveChangesToQuestion = async function(commitMessage) {
     await general.scrollToTop();
     await action.click('Save Question Button', saveQuestionButton);
-    await waitFor.pageToFullyLoad();
     await action.setValue('Commit message', commitMessageField, commitMessage);
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton, 'Save modal takes too long to disappear.');
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.expectQuestionInteractionIdToMatch = async function(interactionId) {
+    var text = await action.getText(
+      'Question Interaction Id',
+      questionInteractionId);
+    expect(text).toMatch(interactionId);
   };
 
   this.editConceptCard = async function(explanation) {

@@ -109,7 +109,11 @@ describe('State Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
     ));
     component.sendOnSaveNextContentIdIndex(0);
-    component.sendOnSaveInteractionData('');
+    let interactionData = {
+      interactionId: null,
+      customizationArgs: {}
+    };
+    component.sendOnSaveInteractionData(interactionData);
     component.sendOnSaveStateContent(
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
 

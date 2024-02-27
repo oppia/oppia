@@ -148,8 +148,11 @@ describe('Skill Editor functionality', function() {
     await skillEditorPage.get(skillId);
     await skillEditorPage.moveToQuestionsTab();
     await skillEditorPage.expectNumberOfQuestionsToBe(1);
-    await skillEditorPage.editQuestion();
+    await skillEditorPage.expectQuestionInteractionIdToMatch('TextInput');
+    await skillEditorPage.clickEditQuestionButton();
     await workflow.changeQuestionInteraction();
+    await skillEditorPage.saveChangesToQuestion('Updated Question');
+    await skillEditorPage.expectQuestionInteractionIdToMatch('NumericInput');
   });
 
   it('should create and delete misconceptions', async function() {

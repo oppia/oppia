@@ -417,7 +417,6 @@ var createQuestion = async function() {
 };
 
 var changeQuestionInteraction = async function() {
-  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.deleteInteraction();
@@ -436,7 +435,6 @@ var changeQuestionInteraction = async function() {
     correctAnswer: 4,
     explanation: 'It is correct'
   });
-  await skillEditorPage.updateQuestion('Updated Question');
 };
 
 exports.getImageSource = getImageSource;

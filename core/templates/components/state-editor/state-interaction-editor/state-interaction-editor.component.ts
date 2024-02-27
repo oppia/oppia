@@ -84,7 +84,6 @@ export class StateInteractionEditorComponent
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
   windowIsNarrow: boolean;
-  interactionData: InteractionData;
 
   constructor(
     private alertsService: AlertsService,
@@ -192,11 +191,11 @@ export class StateInteractionEditorComponent
     }
     this.stateCustomizationArgsService.saveDisplayedValue();
 
-    this.interactionData.interactionId =
-    this.stateInteractionIdService.displayed;
-    this.interactionData.customizationArgs =
-    this.stateCustomizationArgsService.displayed;
-    this.onSaveInteractionData.emit(this.interactionData);
+    let interactionData: InteractionData = {
+      interactionId: this.stateInteractionIdService.displayed,
+      customizationArgs: this.stateCustomizationArgsService.displayed
+    };
+    this.onSaveInteractionData.emit(interactionData);
 
     this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
@@ -257,14 +256,13 @@ export class StateInteractionEditorComponent
       this.interactionDetailsCacheService.removeDetails(
         this.stateInteractionIdService.savedMemento);
       this.stateInteractionIdService.saveDisplayedValue();
-      this.interactionData.interactionId =
-      this.stateInteractionIdService.displayed;
-
       this.stateCustomizationArgsService.saveDisplayedValue();
-      this.interactionData.customizationArgs =
-      this.stateCustomizationArgsService.displayed;
 
-      this.onSaveInteractionData.emit(this.interactionData);
+      let interactionData: InteractionData = {
+        interactionId: this.stateInteractionIdService.displayed,
+        customizationArgs: this.stateCustomizationArgsService.displayed
+      };
+      this.onSaveInteractionData.emit(interactionData);
 
       this.stateSolutionService.saveDisplayedValue();
       this.onSaveSolution.emit(this.stateSolutionService.displayed);
@@ -303,10 +301,6 @@ export class StateInteractionEditorComponent
     this.interactionEditorIsShown = true;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
-    this.interactionData = {
-      interactionId: null,
-      customizationArgs: {}
-    };
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateEditorInitialized.subscribe(
         (stateData) => {
