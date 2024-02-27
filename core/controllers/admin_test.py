@@ -2272,7 +2272,7 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
     def test_ban_user_with_invalid_username(self) -> None:
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response_dict = self.put_json(
+        self.put_json(
             '/bannedusershandler', {
                 'username': 'invalidUsername'
             }, csrf_token=csrf_token, expected_status_int=404)
@@ -2317,7 +2317,7 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
 
     def test_unban_user_with_invalid_username(self) -> None:
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        response_dict = self.delete_json(
+        self.delete_json(
             '/bannedusershandler',
             params={'username': 'invalidUsername'},
             expected_status_int=404)
@@ -2732,7 +2732,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             'profile_picture.png', image_png, mimetype='image/png')
 
         old_fs.delete('profile_picture.webp')
-        response = self.put_json(
+        self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': self.EDITOR_USERNAME,
