@@ -86,9 +86,9 @@ var checkForConsoleErrors = async function(
   var unexpectedErrors = [];
   var expectedErrorsNotFound = [...EXPECTED_CONSOLE_ERRORS];
   for (let i = 0; i < browserLogs.length; i++) {
-    const logEntry = browserLogs[i];
-    const ERROR_IS_IGNORED = errorsToIgnore.some(e =>
-      logEntry.message.match(e)
+    let logEntry = browserLogs[i];
+    const ERROR_IS_IGNORED = errorsToIgnore.some(
+      e => logEntry.message.match(e)
     );
     const ERROR_IS_EXPECTED = EXPECTED_CONSOLE_ERRORS.some(
       (expectedError, index) => {
@@ -107,7 +107,8 @@ var checkForConsoleErrors = async function(
     }
   }
   if (expectedErrorsNotFound.length > 0) {
-    throw new Error(`Expected errors not found: ${expectedErrorsNotFound.join(', ')}`);
+    throw new Error(`Expected errors not found:
+    ${expectedErrorsNotFound.join(', ')}`);
   }
   if (unexpectedErrors.length > 0) {
     throw new Error(`Unexpected errors found: ${unexpectedErrors.join(', ')}`);
