@@ -448,7 +448,6 @@ import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard'
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
-import { NewLearnerViewRatingBackendApiService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/new-learner-view-rating-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -706,8 +705,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
   ['NavigationService', NavigationService],
-  ['NewLearnerViewRatingBackendApiService',
-    NewLearnerViewRatingBackendApiService],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],

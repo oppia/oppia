@@ -22,6 +22,7 @@
 .header-menu-button {
   background: none;
   border: none;
+  color: #fff;
 }
 
 @media screen and (max-width: 574px) {

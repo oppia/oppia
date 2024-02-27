@@ -26,8 +26,6 @@ import { I18nLanguageCodeService } from
   'services/i18n-language-code.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { NewLearnerViewRatingBackendApiService } from '../new-lesson-player-services/new-learner-view-rating-backend-api.service';
 import { BehaviorSubject } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TranslateService } from '@ngx-translate/core';
@@ -44,9 +42,6 @@ class MockTruncteAndCapitalizePipe {
 describe('PlayerSidebarComponent', () => {
   let component: PlayerSidebarComponent;
   let fixture: ComponentFixture<PlayerSidebarComponent>;
-  let ratingComputationService: RatingComputationService;
-  let newLearnerViewRatingBackendApiService:
-    NewLearnerViewRatingBackendApiService;
   let mockMobileMenuService: Partial<MobileMenuService>;
   let contextService: ContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -72,7 +67,6 @@ describe('PlayerSidebarComponent', () => {
         ContextService,
         I18nLanguageCodeService,
         UrlService,
-        RatingComputationService,
         {
           provide: MobileMenuService,
           useValue: mockMobileMenuService
@@ -89,9 +83,6 @@ describe('PlayerSidebarComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PlayerSidebarComponent);
     component = fixture.componentInstance;
-    ratingComputationService = TestBed.inject(RatingComputationService);
-    newLearnerViewRatingBackendApiService = TestBed.inject(
-      NewLearnerViewRatingBackendApiService);
     contextService = TestBed.inject(ContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
@@ -115,7 +106,6 @@ describe('PlayerSidebarComponent', () => {
       } as FetchExplorationBackendResponse));
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(urlService, 'getPidFromUrl').and.returnValue('');
-    spyOn(component, 'setRatings');
     spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey');
 
     component.ngOnInit();
@@ -128,11 +118,9 @@ describe('PlayerSidebarComponent', () => {
     expect(contextService.getExplorationId).toHaveBeenCalled();
     expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
       .toHaveBeenCalled();
-    expect(component.setRatings).toHaveBeenCalled();
     expect(i18nLanguageCodeService.getExplorationTranslationKey)
       .toHaveBeenCalled();
   }));
-
 
   it('should toggle sidebar', () => {
     component.isExpanded = false;
@@ -142,62 +130,11 @@ describe('PlayerSidebarComponent', () => {
     expect(component.isExpanded).toBe(false);
   });
 
-  it('should set ratings', fakeAsync(() => {
-    let userRatingSpy = spyOn(
-      newLearnerViewRatingBackendApiService, 'getUserRatingAsync')
-      .and.resolveTo({
-        user_rating: 2,
-        overall_ratings: {
-          1: 1,
-          2: 2,
-          3: 3,
-          4: 4,
-          5: 0
-        }
-      });
-    tick();
-    component.setRatings();
-    tick();
-    expect(userRatingSpy).toHaveBeenCalled();
-    expect(component.ratings).toEqual({ 1: 1, 2: 2, 3: 3, 4: 4, 5: 0 });
-    expect(component.avgRating).toBe(3);
-    expect(component.fullStars).toBe(3);
-    expect(component.blankStars).toBe(2);
-  }));
-
   it('should check if hacky exp desc translation is displayed', () => {
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
     let hackyExpDescTranslationIsDisplayed = (
       component.isHackyExpDescTranslationDisplayed());
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
-  });
-
-  it('should get average rating', fakeAsync(() => {
-    let averageRating = component.getAverageRating();
-    expect(averageRating).toBe(null);
-
-    component.ratings = {
-      1: 1,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 1
-    };
-    const ratingsSpy = spyOn(
-      ratingComputationService, 'computeAverageRating')
-      .and.returnValue(3);
-
-    averageRating = component.getAverageRating();
-    tick();
-    fixture.detectChanges();
-
-    expect(ratingsSpy).toHaveBeenCalled();
-    expect(averageRating).toBe(3);
-  }));
-
-  it('should get range', () => {
-    const range = component.getRange(5);
-    expect(range).toEqual([0, 1, 2, 3, 4]);
   });
 });

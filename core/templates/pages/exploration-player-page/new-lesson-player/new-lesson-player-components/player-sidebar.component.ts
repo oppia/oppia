@@ -25,9 +25,6 @@ import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { NewLearnerViewRatingBackendApiService } from '../new-lesson-player-services/new-learner-view-rating-backend-api.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -43,7 +40,6 @@ export class PlayerSidebarComponent implements OnInit {
   avgRating!: number | null;
   fullStars: number = 0;
   blankStars: number = 5;
-  ratings!: ExplorationRatings;
 
   constructor(
     private mobileMenuService: MobileMenuService,
@@ -52,9 +48,6 @@ export class PlayerSidebarComponent implements OnInit {
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
-    private ratingComputationService: RatingComputationService,
-    private learnerViewRatingBackendApiService:
-    NewLearnerViewRatingBackendApiService,
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +70,6 @@ export class PlayerSidebarComponent implements OnInit {
 
     this.explorationId = explorationContext ?
       this.contextService.getExplorationId() : 'test_id';
-    this.setRatings();
     this.expDesc = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId,
@@ -93,22 +85,6 @@ export class PlayerSidebarComponent implements OnInit {
     );
   }
 
-  setRatings(): void {
-    this.learnerViewRatingBackendApiService.getUserRatingAsync()
-      .then(response => {
-        this.ratings = {
-          1: response.overall_ratings[1],
-          2: response.overall_ratings[2],
-          3: response.overall_ratings[3],
-          4: response.overall_ratings[4],
-          5: response.overall_ratings[5],
-        };
-        this.avgRating = this.getAverageRating();
-        this.fullStars = this.avgRating ? Math.floor(this.avgRating) : 0;
-        this.blankStars = 5 - this.fullStars;
-      });
-  }
-
   toggleSidebar(): void {
     this.isExpanded = !this.isExpanded;
   }
@@ -119,19 +95,6 @@ export class PlayerSidebarComponent implements OnInit {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
-  }
-
-  getAverageRating(): number | null {
-    if (this.ratings) {
-      return this.ratingComputationService.computeAverageRating(
-        this.ratings);
-    }
-    return null;
-  }
-
-  // For generating stars in HTML.
-  getRange(count: number): number[] {
-    return new Array(count).fill(0).map((_, i) => i);
   }
 }
 
