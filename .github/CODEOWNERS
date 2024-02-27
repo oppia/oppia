@@ -739,6 +739,11 @@
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
 /core/templates/services/platform-feature*.ts @oppia/core-reviewers
 
+# Acceptance Tests.
+/core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
+/core/tests/puppeteer/ @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 
 # Critical files.
 #
