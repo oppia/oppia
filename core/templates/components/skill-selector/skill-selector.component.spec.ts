@@ -490,7 +490,6 @@ describe('SkillSelectorComponent', () => {
         'skill1', 'Exact Match', 'en', 1, 2, 3, 123, 456
       )
     ];
-
     expect(filteredSkills).toEqual(expectedFilteredSkills);
   });
 });
