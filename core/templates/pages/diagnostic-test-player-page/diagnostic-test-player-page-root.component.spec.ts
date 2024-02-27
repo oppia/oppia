@@ -13,38 +13,79 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Diagnostic Test Player Page Root component.
+ * @fileoverview Unit tests for the Diagnostic Test Player page root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync, tick, fakeAsync } from '@angular/core/testing';
 
-import { AppConstants } from '../../app.constants';
-import { PageHeadService } from '../../services/page-head.service';
+import { PageHeadService } from 'services/page-head.service';
+
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
-describe('DiagnosticTestPlayerPageRootComponent', () => {
+describe('Diagnostic Test Player Root Page', () => {
   let fixture: ComponentFixture<DiagnosticTestPlayerPageRootComponent>;
   let component: DiagnosticTestPlayerPageRootComponent;
+  let pageHeadService: PageHeadService;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        DiagnosticTestPlayerPageRootComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        PageHeadService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      declarations: [DiagnosticTestPlayerPageRootComponent],
-      providers: [PageHeadService],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
-
     fixture = TestBed.createComponent(DiagnosticTestPlayerPageRootComponent);
     component = fixture.componentInstance;
+    pageHeadService = TestBed.inject(PageHeadService);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService);
   });
 
-  it('should have the title and meta tags set', () => {
-    expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.TITLE);
-    expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.META);
+  it('should successfully instantiate the component',
+    () => {
+      spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
+        .and.returnValue(Promise.resolve());
+      expect(component).toBeDefined();
+    });
+
+  it('should initialize', () => {
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+    spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
+      .and.returnValue(Promise.resolve());
+    component.ngOnInit();
+
+    expect(
+      accessValidationBackendApiService.validateAccessToDiagnosticTestPlayerPage)
+      .toHaveBeenCalledWith();
   });
+
+  it('should show error when Diagnostic Test Player does not exist', fakeAsync(() => {
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+    spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
+      .and.returnValue(Promise.reject());
+
+    expect(component.errorPageIsShown).toBeFalse();
+    expect(component.pageIsShown).toBeFalse();
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.pageIsShown).toBeFalse();
+    expect(component.errorPageIsShown).toBeTrue();
+  }));
 });
