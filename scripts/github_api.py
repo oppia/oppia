@@ -219,7 +219,7 @@ def fetch_latest_comment_from_issue(
             'issue',
             'comments',
             'nodes']))
- 
+
     return next(iter(latest_comment_nodes), None)
 
 
