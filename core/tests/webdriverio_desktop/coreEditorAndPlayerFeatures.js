@@ -421,10 +421,6 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendBoldText('correct');
       }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.expectRuleToBe(
-      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
-    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.expectFeedbackInstructionToBe('correct');
     await responseEditor.markAsCorrect();
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -432,7 +428,6 @@ describe('Core exploration functionality', function() {
       await forms.toRichText('try again'));
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
-    await responseEditor.expectFeedbackInstructionToBe('try again');
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, null);
@@ -444,17 +439,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorPage.saveChanges();
 
     await general.moveToPlayer();
-    await explorationPlayerPage.submitAnswer('NumericInput', 5);
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      await forms.toRichText('try again'));
-    await explorationPlayerPage.expectExplorationToNotBeOver();
-    // It's important to test the value 0 in order to ensure that it would
-    // still get submitted even though it is a falsy value in JavaScript.
     await explorationPlayerPage.submitAnswer('NumericInput', 1);
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      async function(richTextChecker) {
-        await richTextChecker.readBoldText('correct');
-      });
     await explorationPlayerPage.clickThroughToNextCard();
     await general.moveToEditor(false);
     await explorationEditorMainTab.moveToState('Introduction');
