@@ -104,7 +104,7 @@
 }
 
 .player-sidebar-button i {
-  color: #0D48A1;
+  color: #0d48a1;
 }
 
 .player-sidebar-button div {
@@ -145,11 +145,8 @@
   align-self: flex-end;
   height: 48px;
   padding: 12px;
-  width: 48px;
-}
-
-.player-mobile-menu-close {
   vertical-align: sub;
+  width: 48px;
 }
 
 .player-mobile-menu-options {
