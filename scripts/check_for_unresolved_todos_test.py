@@ -97,7 +97,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 '--repository_path=dummy_dir',
                 '--issue=4151',
                 '--commit_sha=abcdefg'])
-        
+
         expected_failure_log_lines = [
             'The following TODOs are unresolved for this issue #4151:',
             '- file1.txt:L4',
@@ -107,7 +107,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(
             mock_stdout.getvalue().splitlines(), expected_failure_log_lines)
-        
+
         self.assertFalse(
             os.path.exists('dummy_dir/unresolved_todo_list.txt'))
 
