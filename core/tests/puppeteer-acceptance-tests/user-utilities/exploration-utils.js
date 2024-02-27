@@ -93,6 +93,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * @param {string} cardName
    */
   async updateCardName(cardName) {
+    await this.page.waitForTimeout(500);
     await this.clickOn(addCardName);
     await this.type('.e2e-test-state-name-input', cardName);
     await this.page.waitForSelector(forButtonToBeEnabled);
