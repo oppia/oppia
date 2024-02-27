@@ -107,7 +107,8 @@ var checkForConsoleErrors = async function(
     }
   }
   if (expectedErrorsNotFound.length > 0) {
-    throw new Error(`Expected errors not found:
+    throw new Error(
+      `Expected errors not found:
     ${expectedErrorsNotFound.join(', ')}`);
   }
   if (unexpectedErrors.length > 0) {
