@@ -56,36 +56,46 @@ describe('Diagnostic Test Player Root Page', () => {
       AccessValidationBackendApiService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
-        .and.returnValue(Promise.resolve());
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', (
+  ) => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToDiagnosticTestPlayerPage')
+      .and.returnValue(Promise.resolve());
+    expect(component).toBeDefined();
+  });
 
-  it('should initialize', () => {
+  it('should initialize', (
+  ) => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
-    spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToDiagnosticTestPlayerPage')
       .and.returnValue(Promise.resolve());
     component.ngOnInit();
 
     expect(
-      accessValidationBackendApiService.validateAccessToDiagnosticTestPlayerPage)
+      accessValidationBackendApiService
+        .validateAccessToDiagnosticTestPlayerPage)
       .toHaveBeenCalledWith();
   });
 
-  it('should show error when Diagnostic Test Player does not exist', fakeAsync(() => {
-    spyOn(pageHeadService, 'updateTitleAndMetaTags');
-    spyOn(accessValidationBackendApiService, 'validateAccessToDiagnosticTestPlayerPage')
-      .and.returnValue(Promise.reject());
+  it('should show error when Diagnostic Test Player does not exist',
+    fakeAsync((
+    ) => {
+      spyOn(pageHeadService, 'updateTitleAndMetaTags');
+      spyOn(
+        accessValidationBackendApiService,
+        'validateAccessToDiagnosticTestPlayerPage')
+        .and.returnValue(Promise.reject());
 
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(component.pageIsShown).toBeFalse();
+      expect(component.errorPageIsShown).toBeFalse();
+      expect(component.pageIsShown).toBeFalse();
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(component.pageIsShown).toBeFalse();
-    expect(component.errorPageIsShown).toBeTrue();
-  }));
+      expect(component.pageIsShown).toBeFalse();
+      expect(component.errorPageIsShown).toBeTrue();
+    }));
 });
