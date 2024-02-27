@@ -92,18 +92,20 @@ var checkForConsoleErrors = async function(
     );
     const ERROR_IS_EXPECTED = EXPECTED_CONSOLE_ERRORS.some(
       (expectedError, index) => {
-      if (logEntry.message.includes(expectedError)) {
-        expectedErrorsNotFound.splice(index, 1);
-        return true;
+        if (logEntry.message.includes(expectedError)) {
+          expectedErrorsNotFound.splice(index, 1);
+          return true;
+        }
+        return false;
       }
-      return false;
-    });
-    if (logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-      !ERROR_IS_IGNORED && !ERROR_IS_EXPECTED) {
+    );
+    if (
+      logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+      !ERROR_IS_IGNORED && !ERROR_IS_EXPECTED
+    ) {
       unexpectedErrors.push(logEntry.message);
     }
-  };
-
+  }
   if (expectedErrorsNotFound.length > 0) {
     throw new Error(`Expected errors not found: ${expectedErrorsNotFound.join(', ')}`);
   }
