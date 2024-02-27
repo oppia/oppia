@@ -43,7 +43,6 @@ class CustomizationArgSpecDict(TypedDict):
     # Here we use type Any because values in schema dictionary can be of
     # type str, List, Dict and other types too.
     schema: Dict[str, Any]
-    default_value_obtainable_from_highlight: bool
     default_value: Union[str, int, List[str], Dict[str, str]]
 
 

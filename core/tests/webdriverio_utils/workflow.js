@@ -323,15 +323,6 @@ var getExplorationPlaytesters = async function(isEmpty = false) {
   return await _getExplorationRoles('viewer', isEmpty);
 };
 
-var createTopic = async function(
-    topicName, topicUrlFragment, description, shouldCloseTopicEditor) {
-  var topicsAndSkillsDashboardPage = (
-    new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-  await topicsAndSkillsDashboardPage.get();
-  await topicsAndSkillsDashboardPage.createTopic(
-    topicName, topicUrlFragment, description, shouldCloseTopicEditor);
-};
-
 var createSkillAndAssignTopic = async function(
     skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage = (
@@ -445,6 +436,5 @@ exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
-exports.createTopic = createTopic;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;
