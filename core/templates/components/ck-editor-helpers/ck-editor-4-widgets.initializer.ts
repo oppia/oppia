@@ -108,7 +108,8 @@ export class CkEditorInitializerService {
                 var that = this;
                 var customizationArgs = {};
                 customizationArgSpecs.forEach(function(spec) {
-                  customizationArgs[spec.name] = that.data[spec.name];
+                  customizationArgs[spec.name] = that.data[spec.name] ||
+                    spec.default_value;
                 });
 
                 const componentIsNewlyCreated: boolean = !that.isReady();
@@ -239,8 +240,6 @@ export class CkEditorInitializerService {
                     if (spec.default_value_obtainable_from_highlight &&
                         selection) {
                       that.setData(spec.name, selection);
-                    } else {
-                      that.setData(spec.name, spec.default_value);
                     }
                   }
 
