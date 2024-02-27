@@ -199,7 +199,7 @@
           <a ngbDropdownAnchor
              (click)="aboutDropdown.toggle()"
              (keydown.enter)="aboutDropdown.toggle()"
-             class="nav-link oppia-navbar-tab dropdown-toggle"
+             class="nav-link oppia-navbar-tab dropdown-toggle e2e-test-navbar-about-menu"
              aria-expanded="true"
              role="button"
              tabindex="0"
@@ -224,7 +224,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-about-foundation-button"
                  href="/about-foundation"
                  [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
@@ -254,7 +254,7 @@
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a ngbDropdownAnchor
-             class="nav-link oppia-navbar-tab dropdown-toggle get-involved"
+             class="nav-link oppia-navbar-tab dropdown-toggle get-involved e2e-test-navbar-get-involved-menu"
              aria-expanded="true"
              (click)="getInvolvedDropdown.toggle()"
              (keydown.enter)="getInvolvedDropdown.toggle()"
@@ -273,7 +273,7 @@
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <div class="d-flex flex-column">
               <div class="top-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-school-and-organizations-button"
                    href="/partnerships"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
@@ -288,7 +288,7 @@
                     {{'I18N_TOPNAV_PARTNERSHIPS_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-volunteer-button"
                    href="/volunteer"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -305,7 +305,7 @@
                 </a>
               </div>
               <div class="bottom-section d-flex">
-                <a class="item item-border d-flex flex-column innvolved-item"
+                <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-contact-us-button"
                    href="/contact"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
@@ -320,7 +320,7 @@
                     {{'I18N_TOPNAV_CONTACT_US_DESCRIPTION' | translate}}
                   </div>
                 </a>
-                <a class="item d-flex flex-column innvolved-item"
+                <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-donate-button"
                    href="/donate"
                    [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (blur)="getInvolvedDropdown.close()"
@@ -343,7 +343,7 @@
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item e2e-test-about-oppia-list-item">
-          <a class="nav-link oppia-navbar-tab donate-tab"
+          <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-button"
              tabindex="0"
              href="/donate"
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
