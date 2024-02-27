@@ -1270,7 +1270,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.put_json(
+        self.put_json(
             '/adminsuperadminhandler', {'username': 'fakeusername'},
             csrf_token=self.get_new_csrf_token(), expected_status_int=404)
 
@@ -1322,7 +1322,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.delete_json(
+        self.delete_json(
             '/adminsuperadminhandler',
             params={'username': 'fakeusername'}, expected_status_int=404)
 
@@ -1566,7 +1566,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        response = self.delete_json(
+        self.delete_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'role': feconf.ROLE_ID_TOPIC_MANAGER, 'username': username},
             expected_status_int=404)
@@ -1778,7 +1778,7 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        self.put_json(
             '/topicmanagerrolehandler', {
                 'action': 'assign',
                 'username': username,
@@ -1917,7 +1917,7 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        self.put_json(
             '/translationcoordinatorrolehandler', {
                 'action': 'assign',
                 'username': username,
@@ -2277,7 +2277,6 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
                 'username': 'invalidUsername'
             }, csrf_token=csrf_token, expected_status_int=404)
 
-
     def test_unmark_a_banned_user(self) -> None:
         user_email = 'user1@example.com'
         username = 'user1'
@@ -2322,6 +2321,7 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             '/bannedusershandler',
             params={'username': 'invalidUsername'},
             expected_status_int=404)
+
 
 class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
     """Tests for data extraction handler."""
@@ -2457,7 +2457,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
-        response = self.get_json(
+        self.get_json(
             '/explorationdataextractionhandler', params=payload,
             expected_status_int=404)
 
@@ -2472,7 +2472,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
-        response = self.get_json(
+        self.get_json(
             '/explorationdataextractionhandler', params=payload,
             expected_status_int=404)
 
@@ -2636,7 +2636,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         non_existent_username = 'invalid'
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
+        self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': non_existent_username,
@@ -2720,7 +2720,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME)
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
-        response = self.put_json(
+        self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': self.EDITOR_USERNAME,
@@ -2920,7 +2920,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     def test_update_blog_post_with_wrong_username_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json(
+        self.put_json(
             '/updateblogpostdatahandler',
             {
                 'blog_post_id': self.blog_post.id,
@@ -3124,7 +3124,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             'exp_id': 'invalid' 
         }
 
-        response = self.get_json(
+        self.get_json(
             '/interactions', params=payload,
             expected_status_int=404)
 

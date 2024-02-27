@@ -1891,8 +1891,10 @@ class DataExtractionQueryHandler(
             exp_id, strict=False, version=exp_version)
         if exploration is None:
             raise self.PageNotFoundException(
-                Exception('Entity for exploration with id %s and version %s not found.'
-                % (exp_id, exp_version)))
+                Exception(
+                    'Entity for exploration with id %s and version %s not found.'
+                    % (exp_id, exp_version)
+                ))
 
         state_name = self.normalized_request['state_name']
         num_answers = self.normalized_request['num_answers']
@@ -2015,15 +2017,15 @@ class UpdateUsernameHandler(
 
         if not old_fs.isfile('profile_picture.png'):
             raise self.PageNotFoundException(
-                Exception('The user with username %s does not have a '
-                'profile picture with png extension.' % old_username
-            ))
+                Exception(
+                    'The user with username %s does not have a '
+                    'profile picture with png extension.' % old_username))
 
         if not old_fs.isfile('profile_picture.webp'):
             raise self.PageNotFoundException(
-                Exception('The user with username %s does not have a '
-                'profile picture with webp extension.' % old_username
-            ))
+                Exception(
+                    'The user with username %s does not have a '
+                    'profile picture with webp extension.' % old_username))
 
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
@@ -2151,8 +2153,8 @@ class DeleteUserHandler(
             user_services.get_user_id_from_username(username))
         if user_id_from_username is None:
             raise self.PageNotFoundException(
-                Exception('The username doesn\'t belong to any user'
-            ))
+                Exception('The username doesn\'t belong to any user'))
+
         if user_id_from_username != user_id:
             raise self.UnauthorizedUserException(
                 'The user ID retrieved from the username and '
