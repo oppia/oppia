@@ -223,6 +223,7 @@ var LibraryPage = function() {
 
   this.clickExplorationObjective = async function() {
     await action.click('Exploration objective', explorationObjective);
+    await waitFor.pageToFullyLoad();
   };
 
   this.findExploration = async function(explorationTitle) {
