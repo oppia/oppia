@@ -39,7 +39,7 @@ describe('MobileMenuService', () => {
     });
   });
 
-  it('should toggle menu visibility', () => {
+  it('should update menu visibility when toggled', () => {
     let currentValue: boolean | undefined;
     service.getMenuVisibility().subscribe(value => currentValue = value);
     service.toggleMenuVisibility();

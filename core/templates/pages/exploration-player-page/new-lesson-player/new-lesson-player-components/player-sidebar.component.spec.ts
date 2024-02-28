@@ -123,16 +123,16 @@ describe('PlayerSidebarComponent', () => {
   }));
 
   it('should toggle sidebar', () => {
-    component.isExpanded = false;
+    component.sidebarIsExpanded = false;
     component.toggleSidebar();
-    expect(component.isExpanded).toBe(true);
+    expect(component.sidebarIsExpanded).toBe(true);
     component.toggleSidebar();
-    expect(component.isExpanded).toBe(false);
+    expect(component.sidebarIsExpanded).toBe(false);
   });
 
   it('should check if hacky exp desc translation is displayed', () => {
     // Translation is only displayed if the language is not English
-    // and it's hacky translation is available.
+    // and its hacky translation is available.
     let hackyExpDescTranslationIsDisplayed = (
       component.isHackyExpDescTranslationDisplayed());
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
