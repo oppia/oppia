@@ -47,7 +47,8 @@ describe('Exploration Admin', function() {
       await explorationAdmin.compareDifferentRevisions();
       await explorationAdmin.expectCompareToDisplayMetadataChanges();
       await explorationAdmin.expectCompareToDisplayExplorationStateChanges();
-      await explorationAdmin.expectInteractionToDownloadAndRevertRevision();
+      await explorationAdmin.downloadAndRevertRevision();
+      await explorationAdmin.expectSuccessfulReversionOfRevision();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

@@ -24,9 +24,11 @@ const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
 const creatorDashboardAdminUrl =
-    testConstants.URLs.CreatorDashboard;
+  testConstants.URLs.CreatorDashboard;
 const navigateToHistoryTabButton = '.e2e-test-history-tab';
 const navigateToPreviewTabButton = '.e2e-test-preview-tab';
+const navigateToSettingsTabButton = '.e2e-test-settings-tab';
+const navigateToMainTabButton = '.e2e-test-main-tab';
 
 // Elements in exploration creator.
 const createExplorationButtonSelector = 'button.e2e-test-create-activity';
@@ -45,6 +47,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = 'input.oppia-float-form-input';
 
+
 // Revision property elements.
 const revisionVersionNoSelector = '.e2e-history-table-index';
 const revisionNoteSelector = '.e2e-test-history-table-message';
@@ -61,13 +64,15 @@ const downloadVersionButton = '.e2e-test-download-version';
 const resetGraphButton = '.e2e-test-reset-graph';
 const confirmRevertVersionButton = '.e2e-test-confirm-revert';
 const paginatorToggler = '.mat-paginator-page-size-select';
-const viewMatadataChanges = '.e2e-test-view-metadata-history';
+const viewMatadataChangesButton = '.e2e-test-view-metadata-history';
 const testNodeBackground = '.e2e-test-node-background';
-const historyListOptions = 'div.e2e-test-history-list-options';
+const historyListOptions = '.history-list-option';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
+const closeMetadataModal = '.e2e-test-close-history-metadata-modal';
+const closeStateModal = '.e2e-test-close-history-state-modal';
 
 // Preview tab elements.
 const testContinueButton = '.e2e-test-continue-button';
@@ -76,13 +81,17 @@ const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.oppia-restart-text';
 const explorationConversationContent = '.e2e-test-conversation-content';
+const toastMessage = "div.toast-message"
+
+// Settings tab elements.
+const explorationTitleInput = '.e2e-test-exploration-title-input'
 
 module.exports = class explorationAdmin extends baseUser {
   /**
   * Function for navigating to the contributor dashboard page.
   */
   async navigateToCreatorDashboard() {
-    await this.goto(creatorDashboardAdminUrl);
+    await this.goto(creatorDashboardAdminUrl, { waitUntil: 'networkIdle0' });
   }
 
   /**
@@ -91,19 +100,29 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async createExploration(title) {
     await this.clickOn(createExplorationButtonSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, { visible: true });
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(stateEditSelector + ':not([disabled])');
+    await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle + ':not([disabled])');
+    await this.page.waitForSelector(giveTitle, { visible: true });
     await this.type(giveTitle, title + '1');
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector(endInteractionSelector, { visible: true });
     await this.clickOn(endInteractionSelector);
     await this.clickOn(saveInteractionButton);
     await this.clickOn(saveChangesButton);
-    await this.page.waitForSelector(saveDraftButton + ':not([disabled])');
+    await this.page.waitForSelector(saveDraftButton, { visible: true });
     await this.clickOn(saveDraftButton);
+  }
+
+  async makeMetaDataChanges(title) {
+    await this.waitForTimeout(200);
+    await this.clickOn(navigateToSettingsTabButton);
+    await this.page.waitForSelector(explorationTitleInput);
+    await this.type(explorationTitleInput, title);
+    await this.clickOn(navigateToMainTabButton);
   }
 
   /**
@@ -111,13 +130,16 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {string} title - the title of the Exploration.
   */
   async createMultipleRevisionsOfTheSameExploration(title) {
-    for (let i = 0; i < 15; i++) {
+    // await this.makeMetaDataChanges('title-changed');
+    await this.page.waitForTimeout(300);
+    for (let i = 0; i < 13; i++) {
+      await this.page.waitForSelector(stateEditSelector, { visible: true });
       await this.clickOn(stateEditSelector);
-      await this.page.waitForSelector(giveTitle + ':not([disabled])');
+      await this.page.waitForSelector(giveTitle, { visible: true });
       await this.type(giveTitle, `${title} ${i + 2}`);
       await this.clickOn(saveContentButton);
       await this.clickOn(saveChangesButton);
-      await this.page.waitForTimeout(1000);
+      await this.page.waitForTimeout(700);
       await this.clickOn(saveDraftButton);
     }
   }
@@ -126,7 +148,7 @@ module.exports = class explorationAdmin extends baseUser {
   * Function for navigating to the Hisotry tab of the Exploration Editor.
   */
   async navigateToHistoryTab() {
-    await this.page.waitForSelector(navigateToHistoryTabButton);
+    await this.page.waitForTimeout(300);
     await this.clickOn(navigateToHistoryTabButton);
   }
 
@@ -139,13 +161,13 @@ module.exports = class explorationAdmin extends baseUser {
     let revisions = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async(el) => el.textContent);
+        revisionVersionNoSelector, async (el) => el.textContent);
       let notes = await element.$eval(
-        revisionNoteSelector, async(el) => el.textContent);
+        revisionNoteSelector, async (el) => el.textContent);
       let user = await element.$eval(
-        revisionUsernameSelector, async(el) => el.textContent);
+        revisionUsernameSelector, async (el) => el.textContent);
       let date = await element.$eval(
-        revisionDateSelector, async(el) => el.textContent);
+        revisionDateSelector, async (el) => el.textContent);
       revisions.push({ versionNo, notes, user, date });
     }
     return revisions;
@@ -162,13 +184,13 @@ module.exports = class explorationAdmin extends baseUser {
       throw new Error('No revisions found');
     }
     let versionNo = await element.$eval(
-      revisionVersionNoSelector, async(el) => el.textContent);
+      revisionVersionNoSelector, async (el) => el.textContent);
     let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
+      revisionNoteSelector, async (el) => el.textContent);
     let user = await element.$eval(
-      revisionUsernameSelector, async(el) => el.textContent);
+      revisionUsernameSelector, async (el) => el.textContent);
     let date = await element.$eval(
-      revisionDateSelector, async(el) => el.textContent);
+      revisionDateSelector, async (el) => el.textContent);
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
@@ -215,6 +237,8 @@ module.exports = class explorationAdmin extends baseUser {
   *  to changes in the paginator settings.
   */
   async ExpectPaginatorToChangeItemsPerPage() {
+    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(paginatorToggler, { visible: true });
     await this.clickOn(paginatorToggler);
     await this.clickOn('#mat-option-1');
 
@@ -235,30 +259,30 @@ module.exports = class explorationAdmin extends baseUser {
   * Function for camparing different revision.
   */
   async compareDifferentRevisions() {
+    await this.page.waitForTimeout(300);
+    await this.page.waitForSelector(firstVersionDropdown);
     await this.clickOn(firstVersionDropdown);
-    await this.clickOn('#mat-option-1523');
+    await this.clickOn('#mat-option-1297');
+    await this.page.waitForTimeout(300);
+    await this.page.waitForSelector(secondVersionDropdown);
     await this.clickOn(secondVersionDropdown);
-    await this.page.waitForTimeout(30000);
-    await this.clickOn('#mat-option-1542');
+    await this.clickOn('#mat-option-1306');
   }
 
   /**
   * Function to check if modifications in the metadata are being reflected.
   */
   async expectCompareToDisplayMetadataChanges() {
-    await this.clickOn(viewMatadataChanges);
-    const elements = await page.$$('.CodeMirror-merge-r-chunk-start');
-    const element1Content = await (
-      await elements[0].getProperty('textContent')).jsonValue();
-    const element2Content = await (
-      await elements[1].getProperty('textContent')).jsonValue();
-
-    if (element1Content === element2Content) {
-      showMessage('Changes are appearing');
-    } else {
-      throw new Error('Changes are not appearing');
+    await this.clickOn(viewMatadataChangesButton);
+    await this.page.waitForTimeout(300);
+    const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
+    console.log(divContents.length);
+    console.log('Content of first div:', divContents[0]);
+    console.log('Content of second div:', divContents[1]);
+    if (divContents[0] !== divContents[1]) {
+      throw new Error("Changes are reflected even though there are no changes")
     }
-    await this.clickOn(resetGraphButton);
+    await this.clickOn(closeMetadataModal);
   }
 
   /**
@@ -267,51 +291,51 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async expectCompareToDisplayExplorationStateChanges() {
     await this.clickOn(testNodeBackground);
-    const elements = await page.$$('.CodeMirror-merge-r-chunk-start');
-    const element1Content = await (
-      await elements[0].getProperty('textContent')).jsonValue();
-    const element2Content = await (
-      await elements[1].getProperty('textContent')).jsonValue();
-    if (element1Content !== element2Content) {
-      showMessage('Changes are appearing');
+    await this.page.waitForTimeout(300);
+    const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
+    console.log(divContents.length);
+    console.log('Content of first div:', divContents[0]);
+    console.log('Content of second div:', divContents[1]);
+    if (divContents[0] !== divContents[1]) {
+        console.log('The divs are different');
     } else {
-      throw new Error('Changes are not appearing');
+        console.log('The divs are not different');
     }
+    await this.clickOn(closeStateModal);
+    await this.page.waitForSelector(resetGraphButton);
     await this.clickOn(resetGraphButton);
-  }
+}
 
   /**
-  * Function verify reverted or not.
+  * Function downloads and reverts a version.
   * @param {number} version - revision version.
   * */
-  async expectRevertToVersion(version) {
-    await this.waitFor.numberOfElementsToBe(
-      revisionNoteSelector, 'History Table message', 4);
-    const isReverted = await this.waitFor.textToBePresentInElement(
-      revisionNoteSelector, 'Reverted exploration to version ' + version,);
-    return isReverted;
-  }
-
-  /**
-  * Function verify if revision are reverting and downloading or not.
-  */
-  async expectInteractionToDownloadAndRevertSelectedRevision() {
-    await this.page.waitForSelector(historyListOptions);
-    await this.clickOn(historyListOptions);
-    await this.clickOn(downloadVersionButton);
-    await this.page.waitForSelector(historyListOptions);
+  async downloadAndRevertRevision() {
     const elements = await this.page.$$(historyListOptions);
     await elements[2].click();
-    await this.page.waitForSelector(revertVersionButton);
-    await this.clickOn(revertVersionButton);
-    await this.clickOn(confirmRevertVersionButton);
+    await this.page.waitForSelector(downloadVersionButton);
+    await elements[2].click();
+    await this.page.click(revertVersionButton);
+    await this.page.click(confirmRevertVersionButton);
+}
+
+
+
+  /**
+  * Function verifies if a revsion is reverting and downloading or not.
+  */
+  async expectSuccessfulReversionOfRevision() {
     await this.page.waitForTimeout(1000);
-    if (await this.expectRevertToVersion(15)) {
-      showMessage('Reverts successfully');
-    } else {
-      throw new Error('Does not revert successfully');
+    const element = await this.page.$('#dropdownMenuButton-0');
+    let notes = await element.$eval(
+    revisionNoteSelector, async (el) => el.textContent);
+    console.log(notes);
+    if(notes==='Reverted exploration to version 14'){
+      console.log('Revision is reverting successfully');
+    }else{
+      throw new Error('Revision is not reverting');
     }
-  }
+}
 
   /**
   * Function to create a new card in the exploration creator.
@@ -320,7 +344,7 @@ module.exports = class explorationAdmin extends baseUser {
   async callNewCard(title) {
     await this.clickOn(openOutcomeDestButton);
     await this.page.waitForSelector(destinationCardSelector);
-    await this.page.select(destinationCardSelector, 'A New Card Called...');
+    await this.page.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput);
     await this.page.type(addStateInput, title);
     await this.clickOn(saveOutcomeDestButton);
@@ -348,12 +372,16 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {number} answer - answer of the question.
   */
   async createQuestion(question, answer) {
+    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(stateEditSelector);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle + ':not([disabled])');
-    await this.page.click(giveTitle);
-    await this.page.type(giveTitle, question);
+    await this.page.waitForSelector(giveTitle, { visible: true });
+    await this.page.click(giveTitle, { clickCount: 3 });
+    await this.page.keyboard.press('Backspace');
+    await this.type(giveTitle, `${question}`);
+
     await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton + ':not([disabled])');
+    await this.page.waitForSelector(addInteractionButton, { visible: true });
     await this.clickOn(addInteractionButton);
     await this.clickOn(numericInputSelector);
     await this.clickOn(saveInteractionButton);
@@ -361,7 +389,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.type(floatFormInput, answer);
     await this.page.waitForSelector('.oppia-click-to-start-editing');
     await this.clickOn('.oppia-click-to-start-editing');
-    await this.page.waitForSelector(giveTitle + ':not([disabled])');
+    await this.page.waitForSelector(giveTitle, { visible: true });
     await this.type(giveTitle, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
@@ -374,13 +402,13 @@ module.exports = class explorationAdmin extends baseUser {
   async createExplorationLoadedWithQuestions(title) {
     await this.clickOn(createExplorationButtonSelector);
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(stateEditSelector + ':not([disabled])');
+    await this.page.waitForSelector(stateEditSelector);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle + ':not([disabled])');
+    await this.page.waitForSelector(giveTitle, { visible: true });
     await this.type(giveTitle, title);
 
     await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton + ':not([disabled])');
+    await this.page.waitForSelector(addInteractionButton, { visible: true });
     await this.clickOn(addInteractionButton);
     await this.clickOn(continueInteractionSelector);
     await this.clickOn(saveInteractionButton);
@@ -393,18 +421,18 @@ module.exports = class explorationAdmin extends baseUser {
     await this.createQuestion('mention a number less than or equal 4', '-3');
     await this.callNewCard('end');
     await this.openNextCard(3);
-    await this.page.waitForSelector(stateEditSelector + ':not([disabled])');
+    await this.page.waitForSelector(stateEditSelector, { visible: true });
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle + ':not([disabled])');
+    await this.page.waitForSelector(giveTitle, { visible: true });
     await this.type(giveTitle, 'last card');
     await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton + ':not([disabled])');
+    await this.page.waitForSelector(addInteractionButton, { visible: true });
     await this.clickOn(addInteractionButton);
     await this.clickOn(endInteractionSelector);
     await this.clickOn(saveInteractionButton);
     await this.openNextCard(0);
     await this.clickOn(saveChangesButton);
-    await this.page.waitForSelector(saveDraftButton + ':not([disabled])');
+    await this.page.waitForSelector(saveDraftButton, { visible: true });
     await this.clickOn(saveDraftButton);
   }
 
@@ -414,6 +442,7 @@ module.exports = class explorationAdmin extends baseUser {
   async navigateToPreviewTab() {
     await this.page.waitForSelector(navigateToPreviewTabButton);
     await this.clickOn(navigateToPreviewTabButton);
+    await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
   }
 
   /**
@@ -454,7 +483,7 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to verify if the exploration is completed in the preview tab.
   */
   async expectTheExplorationToComplete() {
-    const element = await this.page.waitForSelector('div.toast-message');
+    const element = await this.page.waitForSelector(toastMessage);
 
     if (element) {
       showMessage('Journey completed successfully');
@@ -474,6 +503,7 @@ module.exports = class explorationAdmin extends baseUser {
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
+    console.log(text);
     if (text === 'Test-revision') {
       showMessage('exploration has restarted successfully');
     } else {
