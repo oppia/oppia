@@ -20,6 +20,7 @@ import {
   Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
   ElementRef
 } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
@@ -164,3 +165,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.optionsFilter.toLowerCase()));
   }
 }
+
+angular.module('oppia').directive(
+  'translationLanguageSelector',
+  downgradeComponent({
+    component: TranslationLanguageSelectorComponent,
+    inputs: ['activeLanguageCode'],
+    outputs: ['setActiveLanguageCode']
+  }));

@@ -18,6 +18,7 @@
 
 import { AppConstants } from 'app.constants';
 import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -231,3 +232,8 @@ export class ContributorDashboardPageComponent
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
   }
 }
+
+angular.module('oppia').directive('contributorDashboardPage',
+  downgradeComponent({
+    component: ContributorDashboardPageComponent
+  }) as angular.IDirectiveFactory);
