@@ -33,9 +33,9 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class PlayerSidebarComponent implements OnInit {
   mobileMenuVisible: boolean = false;
-  isExpanded: boolean = false;
+  sidebarIsExpanded: boolean = false;
   explorationId!: string;
-  expDesc!: string;
+  expDescription!: string;
   expDescTranslationKey!: string;
   avgRating!: number | null;
   fullStars: number = 0;
@@ -70,13 +70,13 @@ export class PlayerSidebarComponent implements OnInit {
 
     this.explorationId = explorationContext ?
       this.contextService.getExplorationId() : 'test_id';
-    this.expDesc = 'Loading...';
+    this.expDescription = 'Loading...';
     this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
       this.explorationId,
       this.urlService.getExplorationVersionFromUrl(),
       this.urlService.getPidFromUrl())
       .then((response) => {
-        this.expDesc = response.exploration.objective;
+        this.expDescription = response.exploration.objective;
       });
     this.expDescTranslationKey = (
       this.i18nLanguageCodeService.
@@ -86,7 +86,7 @@ export class PlayerSidebarComponent implements OnInit {
   }
 
   toggleSidebar(): void {
-    this.isExpanded = !this.isExpanded;
+    this.sidebarIsExpanded = !this.sidebarIsExpanded;
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
