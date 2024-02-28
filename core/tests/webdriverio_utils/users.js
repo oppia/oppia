@@ -58,6 +58,7 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 var login = async function(email, useManualNavigation = true) {
   if (useManualNavigation) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+    waitFor.pageToFullyLoad();
   }
 
   var loginPage = $('.e2e-test-login-page');
