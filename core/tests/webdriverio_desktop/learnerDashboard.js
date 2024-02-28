@@ -141,7 +141,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should add exploration to play later list', async function() {
+  it('should add and remove exploration to play later list', async function() {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -185,6 +185,10 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      EXPLORATION_SINGING);
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
+      EXPLORATION_FRACTION);
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
       EXPLORATION_SINGING);
     await users.logout();
   });
