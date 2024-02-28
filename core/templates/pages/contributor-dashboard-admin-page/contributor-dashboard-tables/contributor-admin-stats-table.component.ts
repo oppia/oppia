@@ -33,6 +33,11 @@ import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-mo
 import constants from 'assets/constants';
 import isEqual from 'lodash/isEqual';
 
+interface ContributorAdminStatsTableAttribute {
+  key: string;
+  value: string;
+}
+
 @Component({
   selector: 'contributor-admin-stats-table',
   templateUrl: './contributor-admin-stats-table.component.html',
@@ -67,15 +72,7 @@ export class ContributorAdminStatsTable implements OnInit {
         filter: ContributorAdminDashboardFilter.createDefault()
       };
 
-  columnsToDisplay = [
-    'chevron',
-    'contributorName',
-    'recentPerformance',
-    'overallAccuracy',
-    'submittedTranslationsCount',
-    'lastContributedInDays',
-    'role'
-  ];
+  columnsToDisplay: string[] = [];
 
   dataSource: TranslationSubmitterStats[] |
     TranslationReviewerStats[] |
@@ -104,6 +101,8 @@ export class ContributorAdminStatsTable implements OnInit {
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
   firstTimeFetchingData: boolean = true;
+  contributorAdminStatsTableAttributes:
+    ContributorAdminStatsTableAttribute[] = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -119,6 +118,239 @@ export class ContributorAdminStatsTable implements OnInit {
     if (this.inputs.filter) {
       this.updateColumnsToDisplay();
     }
+  }
+
+  pluralise(num: number, word: string): string {
+    return num === 1 ? word : word + 's';
+  }
+
+  getCountDisplay(
+      count: number,
+      wordCount: number = 0,
+      editDisplay: string = ''): string {
+    return count + this.pluralise(count, ' card') +
+           editDisplay +
+         (
+          wordCount === 0 ?
+                       '' :
+                       ', ' + wordCount + this.pluralise(wordCount, ' word')
+         );
+  }
+
+  getAcceptedSubmittedDisplay(
+      acceptedTranslationCount: number,
+      acceptedTranslationsWithoutReviewerEditsCount: number,
+      acceptedTranslationWordCount: number = 0): string {
+    return this.getCountDisplay(
+      acceptedTranslationCount,
+      acceptedTranslationWordCount,
+      ' (' + acceptedTranslationsWithoutReviewerEditsCount +
+        ' without edits)');
+  }
+
+  getAcceptedReviewedDisplay(
+      acceptedTranslationCount: number,
+      acceptedTranslationsWithReviewerEditsCount: number,
+      acceptedTranslationWordCount: number = 0): string {
+    return this.getCountDisplay(
+      acceptedTranslationCount,
+      acceptedTranslationWordCount,
+      ' (' + acceptedTranslationsWithReviewerEditsCount + ' edited)');
+  }
+
+  getActiveTopicDisplay(topics: string[]): string {
+    return topics ? topics.join(', ') : 'No topics available';
+  }
+
+  getTranslationReviewerStatsTableAttributes(
+      element: TranslationReviewerStats): void {
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Accepted Translations',
+      value: this.getAcceptedReviewedDisplay(
+        element.acceptedTranslationsCount,
+        element.acceptedTranslationsWithReviewerEditsCount,
+        element.acceptedTranslationWordCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Rejected Translations',
+      value: this.getCountDisplay(
+        element.rejectedTranslationsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Active Topics',
+      value: this.getActiveTopicDisplay(
+        element.topicsWithTranslationReviews)
+    });
+  }
+
+  getTranslationSubmitterStatsTableAttributes(
+      element: TranslationSubmitterStats): void {
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Submitted Translations',
+      value: this.getCountDisplay(
+        element.submittedTranslationsCount,
+        element.submittedTranslationWordCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Accepted Translations',
+      value: this.getAcceptedSubmittedDisplay(
+        element.acceptedTranslationsCount,
+        element.acceptedTranslationsWithoutReviewerEditsCount,
+        element.acceptedTranslationWordCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Rejected Translations',
+      value: this.getCountDisplay(
+        element.rejectedTranslationsCount,
+        element.rejectedTranslationWordCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Active Topics',
+      value: this.getActiveTopicDisplay(
+        element.topicsWithTranslationSubmissions)
+    });
+  }
+
+  getQuestionSubmitterStatsTableAttributes(
+      element: QuestionSubmitterStats): void {
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Submitted Questions',
+      value: this.getCountDisplay(
+        element.submittedQuestionsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Accepted Questions',
+      value: this.getAcceptedSubmittedDisplay(
+        element.acceptedQuestionsCount,
+        element.acceptedQuestionsWithoutReviewerEditsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Rejected Questions',
+      value: this.getCountDisplay(
+        element.rejectedQuestionsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Active Topics',
+      value: this.getActiveTopicDisplay(
+        element.topicsWithQuestionSubmissions)
+    });
+  }
+
+  getQuestionReviewerStatsTableAttributes(
+      element: QuestionReviewerStats): void {
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Reviewed Questions',
+      value: element.reviewedQuestionsCount.toString()
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Accepted Questions',
+      value: this.getAcceptedReviewedDisplay(
+        element.acceptedQuestionsCount,
+        element.acceptedQuestionsWithReviewerEditsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Rejected Questions',
+      value: this.getCountDisplay(
+        element.rejectedQuestionsCount)
+    });
+    this.contributorAdminStatsTableAttributes.push({
+      key: 'Active Topics',
+      value: this.getActiveTopicDisplay(
+        element.topicsWithQuestionReviews)
+    });
+  }
+
+  getContributorAdminStatsTableAttributes(
+      element: TranslationSubmitterStats |
+               TranslationReviewerStats |
+               QuestionSubmitterStats |
+               QuestionReviewerStats):
+  ContributorAdminStatsTableAttribute[] {
+    this.contributorAdminStatsTableAttributes = [
+      {
+        key: 'Date Joined',
+        value: element.firstContributionDate
+      }
+    ];
+
+    if (element instanceof TranslationSubmitterStats) {
+      this.getTranslationSubmitterStatsTableAttributes(element);
+    } else if (element instanceof TranslationReviewerStats) {
+      this.getTranslationReviewerStatsTableAttributes(element);
+    } else if (element instanceof QuestionSubmitterStats) {
+      this.getQuestionSubmitterStatsTableAttributes(element);
+    } else if (element instanceof QuestionReviewerStats) {
+      this.getQuestionReviewerStatsTableAttributes(element);
+    }
+
+    return this.contributorAdminStatsTableAttributes;
+  }
+
+  getLastContributedType(activeTab: string): string {
+    let lastContributedType: string = '';
+    switch (activeTab) {
+      case this.TAB_NAME_TRANSLATION_SUBMITTER:
+        lastContributedType = 'Last Translated';
+        break;
+      case this.TAB_NAME_TRANSLATION_REVIEWER:
+        lastContributedType = 'Last Reviewed';
+        break;
+      case this.TAB_NAME_QUESTION_SUBMITTER:
+        lastContributedType = 'Last Submitted';
+        break;
+      case this.TAB_NAME_QUESTION_REVIEWER:
+        lastContributedType = 'Last Reviewed';
+        break;
+    }
+
+    return lastContributedType;
+  }
+
+  getContributionCountLabel(activeTab: string): string {
+    let contributionCountLabel: string = '';
+
+    switch (activeTab) {
+      case this.TAB_NAME_TRANSLATION_SUBMITTER:
+        contributionCountLabel = 'Translated Cards';
+        break;
+      case this.TAB_NAME_TRANSLATION_REVIEWER:
+        contributionCountLabel = 'Reviewed Cards';
+        break;
+      case this.TAB_NAME_QUESTION_SUBMITTER:
+        contributionCountLabel = 'Questions Submitted';
+        break;
+      case this.TAB_NAME_QUESTION_REVIEWER:
+        contributionCountLabel = 'Questions Reviewed';
+        break;
+    }
+
+    return contributionCountLabel;
+  }
+
+  getContributionCount(
+      activeTab: string,
+      submittedTranslationCount: number,
+      reviewedTranslationsCount: number,
+      submittedQuestionsCount: number,
+      reviewedQuestionsCount: number): number {
+    let contributionCount: number = 0;
+
+    switch (activeTab) {
+      case this.TAB_NAME_TRANSLATION_SUBMITTER:
+        contributionCount = submittedTranslationCount;
+        break;
+      case this.TAB_NAME_TRANSLATION_REVIEWER:
+        contributionCount = reviewedTranslationsCount;
+        break;
+      case this.TAB_NAME_QUESTION_SUBMITTER:
+        contributionCount = submittedQuestionsCount;
+        break;
+      case this.TAB_NAME_QUESTION_REVIEWER:
+        contributionCount = reviewedQuestionsCount;
+        break;
+    }
+
+    return contributionCount;
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {
@@ -232,152 +464,85 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  updateColumnsToDisplay(): void {
-    if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
-      this.columnsToDisplay = [
-        'chevron',
-        'contributorName',
-        'recentPerformance',
-        'overallAccuracy',
-        'submittedTranslationsCount',
-        'lastContributedInDays',
-        'role'
-      ];
-      if (this.checkMobileView()) {
-        this.columnsToDisplay = [
-          'contributorName',
-          'recentPerformance',
-          'overallAccuracy',
-          'submittedTranslationsCount',
-          'lastContributedInDays',
-          'role',
-          'chevron'
-        ];
-      }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
-    } else if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
-      this.columnsToDisplay = [
-        'chevron',
-        'contributorName',
-        'reviewedTranslationsCount',
-        'lastContributedInDays',
-        'role'
-      ];
-      if (this.checkMobileView()) {
-        this.columnsToDisplay = [
-          'contributorName',
-          'reviewedTranslationsCount',
-          'lastContributedInDays',
-          'role',
-          'chevron'
-        ];
-      }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
-    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
-      this.columnsToDisplay = [
-        'chevron',
-        'contributorName',
-        'recentPerformance',
-        'overallAccuracy',
-        'submittedQuestionsCount',
-        'lastContributedInDays',
-        'role'
-      ];
-      if (this.checkMobileView()) {
-        this.columnsToDisplay = [
-          'contributorName',
-          'recentPerformance',
-          'overallAccuracy',
-          'submittedQuestionsCount',
-          'lastContributedInDays',
-          'role',
-          'chevron'
-        ];
-      }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
-    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
-      this.columnsToDisplay = [
-        'chevron',
-        'contributorName',
-        'reviewedQuestionsCount',
-        'lastContributedInDays',
-        'role'
-      ];
-      if (this.checkMobileView()) {
-        this.columnsToDisplay = [
-          'contributorName',
-          'reviewedQuestionsCount',
-          'lastContributedInDays',
-          'role',
-          'chevron'
-        ];
-      }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
+  getContributionType(activeTab: string): string {
+    let contributionType: string = '';
+
+    switch (activeTab) {
+      case this.TAB_NAME_TRANSLATION_SUBMITTER:
+      case this.TAB_NAME_TRANSLATION_REVIEWER:
+        contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION;
+        break;
+      case this.TAB_NAME_QUESTION_SUBMITTER:
+      case this.TAB_NAME_QUESTION_REVIEWER:
+        contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION;
+        break;
     }
+
+    return contributionType;
+  }
+
+  getContributionSubType(activeTab: string): string {
+    let contributionSubType: string = '';
+
+    switch (activeTab) {
+      case this.TAB_NAME_TRANSLATION_SUBMITTER:
+      case this.TAB_NAME_QUESTION_SUBMITTER:
+        contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+        break;
+      case this.TAB_NAME_TRANSLATION_REVIEWER:
+      case this.TAB_NAME_QUESTION_REVIEWER:
+        contributionSubType = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
+        break;
+    }
+
+    return contributionSubType;
+  }
+
+  updateColumns(contributionSubType: string): void {
+    if (this.checkMobileView()) {
+      this.columnsToDisplay = ['contributorName'];
+    } else {
+      this.columnsToDisplay = ['chevron', 'contributorName'];
+    }
+    if (contributionSubType ===
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION) {
+      this.columnsToDisplay.push('recentPerformance', 'overallAccuracy');
+    }
+    this.columnsToDisplay.push(
+      'contributionCount', 'lastContributedInDays', 'role');
+
+    if (this.checkMobileView()) {
+      this.columnsToDisplay.push('chevron');
+    }
+  }
+
+  updateColumnsToDisplay(): void {
+    let contributionType: string =
+    this.getContributionType(this.inputs.activeTab);
+    let contributionSubType: string =
+    this.getContributionSubType(this.inputs.activeTab);
+
+
+    this.ContributorDashboardAdminStatsBackendApiService
+      .fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        contributionType,
+        contributionSubType).then(
+        (response) => {
+          this.dataSource = response.stats;
+          this.nextOffset = response.nextOffset;
+          this.more = response.more;
+          this.loadingMessage = '';
+          this.noDataMessage = '';
+          if (this.dataSource.length === 0) {
+            this.noDataMessage = 'No statistics to display';
+          } else {
+            this.updateColumns(contributionSubType);
+          }
+        });
   }
 
   refreshPagination(): void {
