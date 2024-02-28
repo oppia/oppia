@@ -4,11 +4,6 @@ on:
   issues:
     types: [closed, reopened]
   pull_request:
-    types: [opened]
-    branches:
-      - develop
-  merge_group:
-    types: [checks_requested]
     branches:
       - develop
 
