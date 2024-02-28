@@ -354,7 +354,9 @@ export class QuestionSuggestionReviewModalComponent
     } else {
       this.reviewMessage = ''; // Reset for next/prev.
       this.reviewer = '';
-      this._getThreadMessagesAsync(this.currentSuggestionId);
+      if (this.suggestion.status !== 'review') {
+        this._getThreadMessagesAsync(this.currentSuggestionId);
+      }
     }
     this.showQuestion = true;
   }
