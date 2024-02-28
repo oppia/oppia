@@ -38,7 +38,6 @@ class GithubIssueDict(TypedDict):
     title: str
 
 
-# TODO(#8): Testing.
 class GithubCommentDict(TypedDict):
     """Dict representation of a Github comment."""
 
@@ -51,7 +50,8 @@ def deep_get(
     data: Optional[Dict[str, Any]],
     keys: List[str]
 ) -> Any:
-    """Gets a value from a nested dictionary.
+    """Gets a value from a nested dictionary. If the key is not found, it
+    returns None.
 
     Args:
         data: dict. The dictionary to get the value from.
@@ -95,7 +95,6 @@ def get_github_auth_token() -> str:
     return process.stdout.strip()
 
 
-# TODO(#8): Testing.
 def get_authorization_bearer() -> str:
     """Formats the Github auth token to be used as a bearer token."""
     return f'Bearer {get_github_auth_token()}'
@@ -117,7 +116,6 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         RuntimeError. Failed to run GraphQL query due to an API error.
     """
 
-    # TODO(#8): Testing.
     constructed_query = textwrap.dedent(
         """
         query {
@@ -164,9 +162,11 @@ def fetch_linked_issues_for_pull_request(
 
     Returns:
         List[GithubIssueDict]. The linked issues for the pull request.
+
+    Raises:
+        Exception. The pull request does not exist.
     """
 
-    # TODO(#7): Testing.
     query = textwrap.dedent(
         """
         pullRequest(number: %s) {
@@ -186,10 +186,13 @@ def fetch_linked_issues_for_pull_request(
             'pullRequest',
             'closingIssuesReferences',
             'nodes']))
+    if linked_issues is None:
+        raise Exception(
+            'The pull request (#%s) does not exist.' % pull_request)
+
     return linked_issues
 
 
-# TODO(#7): Testing.
 def fetch_latest_comment_from_issue(
     issue: int
 ) -> Optional[GithubCommentDict]:
@@ -200,6 +203,9 @@ def fetch_latest_comment_from_issue(
 
     Returns:
         str. The latest comment from the issue.
+
+    Raises:
+        Exception. The issue does not exist.
     """
 
     query = textwrap.dedent(
@@ -219,7 +225,9 @@ def fetch_latest_comment_from_issue(
             'issue',
             'comments',
             'nodes']))
- 
+    if latest_comment_nodes is None:
+        raise Exception('The issue (#%s) does not exist.' % issue)
+
     return next(iter(latest_comment_nodes), None)
 
 
@@ -233,6 +241,9 @@ def fetch_latest_comment_from_pull_request(
 
     Returns:
         str. The latest comment from the pull request.
+
+    Raises:
+        Exception. The pull request does not exist.
     """
 
     query = textwrap.dedent(
@@ -252,4 +263,8 @@ def fetch_latest_comment_from_pull_request(
             'pullRequest',
             'comments',
             'nodes']))
+    if latest_comment_nodes is None:
+        raise Exception(
+            'The pull request (#%s) does not exist.' % pull_request)
+
     return next(iter(latest_comment_nodes), None)

@@ -34,7 +34,6 @@ DUMMY_SHA_TWO = '74cd6a0341cfb86d95a387438fc993b5eb977b83'
 GITHUB_PERMA_LINK_URL = 'https://github.com/oppia/oppia/blob'
 
 
-# TODO(#7): Testing.
 class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_duplicate_todo_comment script."""
 

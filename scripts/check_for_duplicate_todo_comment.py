@@ -51,7 +51,6 @@ _PARSER.add_argument(
     help='The new comment.')
 
 
-# TODO(#8): Testing.
 def main(args: Optional[List[str]] = None) -> None:
     """Checks if the new todo comment is a duplicate of the latest comment."""
 
