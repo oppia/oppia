@@ -103,16 +103,30 @@
           <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate }}
           </a>
-          <ng-template #continueTiles>
-            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
-              <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts" class="gap-4 w-100">
-                <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
-                  [topicName]="topicSummaryTile.name">
-                </oppia-learner-story-summary-tile>
-              </div>
-            </ng-container>
-          </ng-template>
         </ng-container>
+        <ng-template #continueTiles>
+          <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
+            <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts" class="gap-4">
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [featureFlag]="featureFlag" [displayArea]="'homeTab'"
+                [topicName]="topicSummaryTile.name">
+              </oppia-learner-story-summary-tile>
+            </div>
+          </ng-container>
+          <!-- Temporary for community lessons 
+            <div *ngFor="let lesson of incompleteExplorationsList" class="gap-4">
+              <lesson-card
+                [desc]="lesson.objective"
+                [imgColor]="lesson.thumbnailBgColor"
+                [imgUrl]="getImageUrl(lesson.thumbnailIconUrl)"
+                [lessonUrl]="'/explore/' + lesson.id"
+                [progress]="0"
+                [title]="lesson.title"
+                [topic]="'Community Lesson'"
+              >
+              </lesson-card>
+            </div>
+          -->
+        </ng-template>
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">

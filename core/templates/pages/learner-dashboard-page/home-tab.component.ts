@@ -19,6 +19,7 @@
 import {AppConstants} from 'app.constants';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -37,6 +38,7 @@ export class HomeTabComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
   @Input() currentGoals!: LearnerTopicSummary[];
   @Input() goalTopics!: LearnerTopicSummary[];
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
@@ -48,6 +50,7 @@ export class HomeTabComponent {
   goalTopicsLength!: number;
   width!: number;
   CLASSROOM_LINK_URL_TEMPLATE: string = '/learn/<classroom_url_fragment>';
+  displayCollections: boolean = false;
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   continueWhereYouLeftOffList: LearnerTopicSummary[] = [];
@@ -139,5 +142,11 @@ export class HomeTabComponent {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
     );
+  }
+
+  /**Testing */
+  getImageUrl(arg): string {
+    return this.urlInterpolationService.getStaticImageUrl(
+      arg);
   }
 }
