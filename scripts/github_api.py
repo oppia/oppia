@@ -24,7 +24,7 @@ import urllib.request
 
 from typing import Any, Dict, List, Optional, TypedDict
 
-REPOSITORY_OWNER = 'jnvtnguyen'
+REPOSITORY_OWNER = 'oppia'
 REPOSITORY_NAME = 'oppia'
 
 GITHUB_API_URL = 'https://api.github.com'
@@ -133,6 +133,7 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         }
         request_data = (
             json.dumps({'query': constructed_query}).encode('utf-8'))
+        print(constructed_query)
         request = urllib.request.Request(url, request_data, headers)
         with urllib.request.urlopen(request) as response:
             if response.getcode() == 200:
