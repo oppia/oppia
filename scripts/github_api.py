@@ -133,7 +133,6 @@ def run_graphql_query(query: str) -> Dict[str, Any]:
         }
         request_data = (
             json.dumps({'query': constructed_query}).encode('utf-8'))
-        print(constructed_query)
         request = urllib.request.Request(url, request_data, headers)
         with urllib.request.urlopen(request) as response:
             if response.getcode() == 200:
