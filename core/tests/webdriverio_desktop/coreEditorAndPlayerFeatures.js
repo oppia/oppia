@@ -411,7 +411,7 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToBeOver();
     });
 
-  fit('should not show self-loop warning when current and ' +
+  it('should not show self-loop warning when current and ' +
     'destination states are different', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
@@ -437,15 +437,20 @@ describe('Core exploration functionality', function() {
     await explorationEditorPage.saveChanges();
     await explorationEditorMainTab.moveToState('Introduction');
 
-    explorationPlayerPage = await explorationEditorPage.getPreviewTab();
+    var previewTabButton = $('.e2e-test-select-preview-tab-button');
+    await action.click('go to preview tab', previewTabButton);
     await explorationPlayerPage.submitAnswer('NumericInput', 1);
     await explorationPlayerPage.clickThroughToNextCard();
-    explorationEditorMainTab = await explorationEditorPage.getMainTab();
+    var lessonCompletionMessageModal = $('.e2e-test-lesson-completion-message');
+    await waitFor.invisibilityOf(
+      lessonCompletionMessageModal,
+      'lesson completion modal is visible for too long.');
+    var mainTabButton = $('.e2e-test-select-main-tab-button');
+    await action.click('go to main tab', mainTabButton);
     await explorationEditorMainTab.moveToState('Introduction');
     var responseSelfLoopWarning = $('.e2e-test-response-self-loop-warning');
-    // await waitFor.invisibilityOf(
-    //   responseSelfLoopWarning, 'inaccurate self-loop warning appears');
-    expect(responseSelfLoopWarning).toBeNull;
+    await waitFor.invisibilityOf(
+      responseSelfLoopWarning, 'inaccurate self-loop warning appears');
   });
 
   it('should skip the customization modal for interactions having no ' +
