@@ -60,7 +60,7 @@ MYPY_TYPE_CHECK_MODULE: Final = 'scripts.run_mypy_checks'
 FILE_DIR: Final = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG: Final = '--files'
-PYTHON_CMD: Final = 'python'
+PYTHON_CMD: Final = sys.executable  # returns path to currently running python interpreter, needed to resolve python version conflict in docker
 OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
 )
