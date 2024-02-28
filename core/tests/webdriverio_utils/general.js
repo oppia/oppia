@@ -72,6 +72,10 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   )
 ];
 
+var EXPECTED_CONSOLE_ERRORS = [
+  _.escapeRegExp('Error occurred while processing test scenario'),
+];
+
 var checkForConsoleErrors = async function(
     errorsToIgnore = [], skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
