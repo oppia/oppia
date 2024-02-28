@@ -1,0 +1,99 @@
+<mat-card class="lesson-card_container">
+  <div class="lesson-card_img relative w-100" [ngStyle]="{'background-color': imgColor}">
+    <img alt="" class="h-100" [src]="imgUrl">
+    <div class="d-flex flex-column lesson-card_tags w-100">
+     <!--If tag length (learner groups && goal) === 0-->
+    </div>
+  </div>
+  <div class="d-flex flex-column lesson-card_info justify-content-between">
+    <div class="d-flex flex-column justify-content-between"> 
+      <!--nextIncompleteNodeTitle (story-summary), explorationTitle (exploration-summary), rename to chapter-->
+      <p class="lesson-card_title mb-0"> {{ title }} </p>
+      <div> 
+        <!--topicName (story-summary)-->
+        <p class="lesson-card_topic mb-0"> {{ topic !== 'undefined' ? topic : 'Community Lessons' }} </p>
+        <!--storyTitle (story-summary), expTitleTranlationKey (exploration-summary), rename to story-->
+        <p class="lesson-card_desc mb-0"> {{ desc }} </p>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between mt-3">
+      <div class="align-items-center border border-light d-flex justify-content-center lesson-card_progress-border relative rounded-circle"
+           [ngStyle]="{'background': getProgress(40)}"
+      > 
+        <div class="align-items-center d-flex justify-content-center lesson-card_progress rounded-circle"> 
+          {{ progress }}% 
+        </div>
+      </div>
+      <a class="align-items-center d-inline-flex justify-content-center lesson-card_button text-decoration-none" [href]="lessonUrl" target="_self">
+        {{ progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume') }}
+      </a>
+    </div>
+  </div>
+</mat-card>
+
+<style>
+  .lesson-card_button {
+    background-color: #fff;
+    border: 1px solid #00645c;
+    border-radius: 4px;
+    color: #00645c;
+    font-size: 14px;
+    font-weight: 500;
+    height: 36px;
+    padding: 10px 8px;
+    width: 122px;
+  }
+
+  .lesson-card_container {
+    border-radius: 4px;
+    box-shadow: 0px 2px 2px 0px #00000040;
+    height: 286px;
+    padding: 0;
+    width: 216px;
+  }
+
+  .lesson-card_info {
+    height: 150px;
+    padding: 8px;
+  }
+
+  .lesson-card_img {
+    height: 136px;
+  }
+
+  .lesson-card_progress {
+    background-color: #fff;
+    color: #00645c;
+    font-size: 11px;
+    height: 28px;
+    width: 28px;
+  }
+
+  .lesson-card_progress-border {
+    height: 32px;
+    width: 32px;
+  }
+
+  .lesson-card_tags {
+    left: 0;
+    padding: 8px;
+    position: absolute;
+    top: 0;
+  }
+
+  .lesson-card_title {
+    color: #00645c;
+    font-family: Capriola;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .lesson-card_topic {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .lesson-card_desc {
+    font-size: 11px
+  }
+</style>
