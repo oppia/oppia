@@ -26,15 +26,17 @@ import {
 } from 'domain/voiceover/voiceover-backend-api.service';
 
 @Component({
-  selector: 'oppia-language-accent-removal-confirm-modal',
-  templateUrl: './language-accent-removal-confirm-modal.component.html'
+  selector: 'oppia-add-accent-to-voiceover-language-modal',
+  templateUrl: './add-accent-to-voiceover-language-modal.component.html'
 })
-export class VoiceoverRemovalConfirmModalComponent
+export class AddAccentToVoiceoverLanguageModalComponent
   extends ConfirmOrCancelModal {
   languageCode: string = '';
   languageAccentCode: string = '';
   voiceArtistId: string = '';
   voiceArtistName: string = '';
+  languageAccentCodes = {};
+  updateButtonIsDisabled: boolean = true;
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -52,5 +54,10 @@ export class VoiceoverRemovalConfirmModalComponent
 
   close(): void {
     this.ngbActiveModal.close();
+  }
+
+  addLanguageAccentCodeSupport(languageAccentCode) {
+    this.languageAccentCode = languageAccentCode;
+    this.updateButtonIsDisabled = false;
   }
 }

@@ -169,6 +169,27 @@ class VoiceArtistMetadataHandler(
         voice_artist_id_to_voice_artist_name = (
             voiceover_services.get_voice_artist_ids_to_voice_artist_names())
 
+
+        voice_artist_id_to_language_mapping = {
+            'voice_artist1': {
+                'en': '',
+                'hi': ''
+            },
+            'voice_artist2': {
+                'en': ''
+            },
+            'voice_artist3': {
+                'ar': ''
+            }
+        }
+        voice_artist_id_to_voice_artist_name = {
+            'voice_artist1': 'Voice Artist 1',
+            'voice_artist2': 'Voice Artist 2',
+            'voice_artist3': 'Voice Artist 3'
+        }
+        print(voice_artist_id_to_language_mapping)
+        print(voice_artist_id_to_voice_artist_name)
+
         self.values.update({
             'voice_artist_id_to_language_mapping':
                 voice_artist_id_to_language_mapping,

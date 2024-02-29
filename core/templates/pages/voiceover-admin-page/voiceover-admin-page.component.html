@@ -66,57 +66,74 @@
   </div>
 </mat-card>
 
-<mat-card>
+<mat-card class="oppia-page-card oppia-long-text-card">
   <h3>Label manual voiceovers</h3>
-  <div>
-    <div *ngFor="let voiceArtistLanguageMapping of voiceArtistIdToLanguageMappingList">
-      <div>
-        <span>{{voiceArtistIdToVoiceArtistName[voiceArtistLanguageMapping.getVoiceArtistID()]}}</span>
-      </div>
-      <div>
-        <span>{{voiceArtistLanguageMapping.getLanguageCode()}}</span>
-      </div>
-      <div>
-        <div>
-          <span>{{voiceArtistLanguageMapping.getLanguageAccentCode()}}</span>
-          <span>Edit</span>
-        </div>
-        <div><span>Add Accent</span></div>
-      </div>
 
-    </div>
+  <table mat-table [dataSource]="voiceArtistIdToLanguageMappingList" class="demo-table">
+    <ng-container matColumnDef="voiceArtist">
+      <th mat-header-cell *matHeaderCellDef> Voice Artist </th>
+      <td mat-cell *matCellDef="let element"> {{voiceArtistIdToVoiceArtistName[element.getVoiceArtistID()]}} </td>
+    </ng-container>
 
-    <!-- <div class="mat-elevation-z8">
-      <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="languageCode">
+      <th mat-header-cell *matHeaderCellDef> Language Code </th>
+      <td mat-cell *matCellDef="let element"> {{element.getLanguageCode()}} </td>
+    </ng-container>
 
-        <ng-container matColumnDef="position">
-          <th mat-header-cell *matHeaderCellDef> Voice Artist </th>
-          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-        </ng-container>
+    <ng-container matColumnDef="languageAccentCode">
+      <th mat-header-cell *matHeaderCellDef> Language Accent Code </th>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="!element.getLanguageAccentCode()">
+          <span><i>No accent selected</i></span>
+        </span>
+        <span *ngIf="element.getLanguageAccentCode()">
+          {{languageAccentCodesToDescriptionsMasterList[element.getLanguageAccentCode()]}}
+        </span>
+      </td>
+    </ng-container>
 
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Language Code</th>
-          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-        </ng-container>
+    <ng-container matColumnDef="languageAccentCodeModify">
+      <th mat-header-cell *matHeaderCellDef> Modify Language Accent Code </th>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="!element.getLanguageAccentCode()">
+          <button mat-button class="btn btn-secondary" (click)="addLanguageAccentForVoiceArtist(element.getVoiceArtistID(), element.getLanguageCode())">
+            Add Accent
+          </button>
+        </span>
+        <span *ngIf="element.getLanguageAccentCode()">
+          <button mat-button class="btn btn-secondary" (click)="addLanguageAccentForVoiceArtist(element.getVoiceArtistID(), element.getLanguageCode())">
+            Update Accent
+          </button>
+        </span>
+      </td>
+    </ng-container>
 
-        <ng-container matColumnDef="weight">
-          <th mat-header-cell *matHeaderCellDef> Language Accent Code </th>
-          <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-
-      <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-                     showFirstLastButtons
-                     aria-label="Select page of periodic elements">
-      </mat-paginator>
-    </div> -->
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+  </table>
   </div>
 </mat-card>
 
 <style>
+
+  .demo-table {
+    width: 100%;
+  }
+
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
+
+  .demo-row-is-clicked {
+    font-weight: bold;
+  }
+
   .oppia-cancel-language-accent-dropdown {
     width: fit-content;
   }

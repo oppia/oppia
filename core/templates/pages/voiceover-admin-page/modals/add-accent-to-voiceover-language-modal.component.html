@@ -4,10 +4,22 @@
 <div class="modal-body">
   <p>Voice Artist: {{voiceArtistName}}</p>
   <p>Language Code: {{languageCode}}</p>
+
+  <mat-form-field class="oppia-language-accent-dropdown-selector">
+    <mat-label>Language Accent pair</mat-label>
+    <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+      <mat-option *ngFor="let languageAccentCode of languageAccentCodes | keyvalue"
+                  [value]="languageAccentCode.key">
+        <span>
+          {{languageAccentCode.value}}
+        </span>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-danger" (click)="update()">
+  <button class="btn btn-success" (click)="update()" [disabled]="updateButtonIsDisabled">
     <span>Update</span>
   </button>
 </div>

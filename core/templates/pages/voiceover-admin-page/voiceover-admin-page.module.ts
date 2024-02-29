@@ -28,7 +28,8 @@ import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import {MatPaginatorModule} from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -41,7 +42,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
 import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
 import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
-
+import { AddAccentToVoiceoverLanguageModalComponent } from './modals/add-accent-to-voiceover-language-modal.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -59,17 +60,21 @@ declare var angular: ng.IAngularStatic;
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    MatPaginatorModule,
+    MatTableModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
+    VoiceoverRemovalConfirmModalComponent,
+    AddAccentToVoiceoverLanguageModalComponent
   ],
   entryComponents: [
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
+    VoiceoverRemovalConfirmModalComponent,
+    AddAccentToVoiceoverLanguageModalComponent
   ],
   providers: [
     {
