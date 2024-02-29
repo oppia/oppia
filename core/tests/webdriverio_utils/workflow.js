@@ -416,6 +416,8 @@ var createQuestion = async function() {
   await skillEditorPage.saveQuestion();
 };
 
+// Sets the question interaction to NumericInput after deleting the
+// existing interaction.
 var changeQuestionInteraction = async function() {
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
