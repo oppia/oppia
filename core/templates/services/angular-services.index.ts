@@ -58,6 +58,7 @@ import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { ContributorDashboardAdminAuthGuard } from 'pages/contributor-dashboard-admin-page/contributor-dashboard-admin-auth.guard';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -102,9 +103,9 @@ import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/lear
 import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from 'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
+import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
+import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -255,7 +256,6 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
 import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -297,6 +297,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { EditabilityService } from 'services/editability.service';
+import { EditLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/edit-group/edit-learner-group-page-auth.guard';
+import { CreateLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/create-group/create-learner-group-page-auth.guard';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -389,7 +391,6 @@ import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/servi
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
 import { ExplorationRightsBackendApiService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
-import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
 import { ExplorationEditsAllowedBackendApiService } from 'pages/exploration-editor-page/services/exploration-edits-allowed-backend-api.service';
 import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
@@ -443,9 +444,13 @@ import { InsertScriptService } from './insert-script.service';
 import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import { AdminAuthGuard } from 'pages/admin-page/admin-auth.guard';
 import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
+import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-admin-auth.guard';
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
+import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
+import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
+import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -481,6 +486,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogDashboardPageAuthGuard', BlogDashboardPageAuthGuard],
   ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostPageService', BlogPostPageService],
@@ -493,6 +499,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],
   ['ClassifierDataBackendApiService', ClassifierDataBackendApiService],
+  ['ClassroomAdminAuthGuard', ClassroomAdminAuthGuard],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplRulesService', CodeReplRulesService],
@@ -507,7 +514,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardManagerService', ConceptCardManagerService],
-  ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['ContentTranslationLanguageService', ContentTranslationLanguageService],
@@ -526,6 +532,8 @@ export const angularServices: [string, Type<{}>][] = [
     ContributionOpportunitiesBackendApiService],
   ['ContributorDashboardAdminBackendApiService',
     ContributorDashboardAdminBackendApiService],
+  ['ContributorDashboardAdminAuthGuard',
+    ContributorDashboardAdminAuthGuard],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
   ['ChangeListService', ChangeListService],
@@ -544,12 +552,15 @@ export const angularServices: [string, Type<{}>][] = [
   ['DragAndDropSortInputValidationService',
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
+  ['EditLearnerGroupPageAuthGuard', EditLearnerGroupPageAuthGuard],
+  ['CreateLearnerGroupPageAuthGuard', CreateLearnerGroupPageAuthGuard],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',
     EditableExplorationBackendApiService],
   ['EditableTopicBackendApiService', EditableTopicBackendApiService],
   ['EditableStoryBackendApiService', EditableStoryBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
+  ['EmailDashboardAuthGuard', EmailDashboardAuthGuard],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EmailDashboardResultBackendApiService',
@@ -562,8 +573,6 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationCreationBackendApiService],
   ['ExplorationCreationService',
     ExplorationCreationService],
-  ['ExplorationCorrectnessFeedbackService',
-    ExplorationCorrectnessFeedbackService],
   ['ExplorationEditsAllowedBackendApiService',
     ExplorationEditsAllowedBackendApiService],
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
@@ -657,9 +666,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['InteractionSpecsService', InteractionSpecsService],
   ['InteractiveMapRulesService', InteractiveMapRulesService],
   ['InteractiveMapValidationService', InteractiveMapValidationService],
+  ['InternetConnectivityService', InternetConnectivityService],
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['IsLoggedInGuard', IsLoggedInGuard],
+  ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
@@ -724,15 +735,13 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParamTypeObjectFactory', ParamTypeObjectFactory],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
-  ['PlatformFeatureAdminBackendApiService',
-    PlatformFeatureAdminBackendApiService],
-  ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
-  ['PlatformFeatureDummyBackendApiService',
-    PlatformFeatureDummyBackendApiService],
+  ['PlatformParameterAdminBackendApiService',
+    PlatformParameterAdminBackendApiService],
+  ['FeatureFlagBackendApiService', FeatureFlagBackendApiService],
+  ['FeatureFlagDummyBackendApiService',
+    FeatureFlagDummyBackendApiService],
   ['PlatformFeatureService', PlatformFeatureService],
   ['PlaythroughIssuesService', PlaythroughIssuesService],
-  ['PlayerCorrectnessFeedbackEnabledService',
-    PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
   ['PlayerTranscriptService', PlayerTranscriptService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],

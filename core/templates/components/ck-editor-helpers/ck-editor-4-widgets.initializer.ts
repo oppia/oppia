@@ -25,6 +25,7 @@ export interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
     name: string; value: string; 'default_value': string;
+    'default_value_obtainable_from_highlight': boolean;
   }[];
   id: string;
   iconDataUrl: string;
@@ -39,8 +40,8 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-    onDismissCallback
+    componentIsNewlyCreated, customizationArgSpecs, attrsCustomizationArgsDict,
+    onSubmitCallback, onDismissCallback
   ) => void;
 }
 
@@ -111,7 +112,10 @@ export class CkEditorInitializerService {
                     spec.default_value;
                 });
 
+                const componentIsNewlyCreated: boolean = !that.isReady();
+
                 rteHelperService.openCustomizationModal(
+                  componentIsNewlyCreated,
                   customizationArgSpecs,
                   customizationArgs,
                   function(customizationArgsDict) {
@@ -127,7 +131,7 @@ export class CkEditorInitializerService {
                     * has already been inserted into the RTE, we do not
                     * need to finalizeCreation again).
                     */
-                    if (!that.isReady()) {
+                    if (componentIsNewlyCreated) {
                       // Actually create the widget, if we have not already.
                       editor.widgets.finalizeCreation(container);
                     }
@@ -151,16 +155,38 @@ export class CkEditorInitializerService {
                   },
                   function(widgetShouldBeRemoved) {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
+                      const defaultValueObtainableFromHighlight = (
+                        customizationArgSpecs
+                          .some(function(spec) {
+                            return spec.default_value_obtainable_from_highlight;
+                          }));
+
                       that.data.isCopied = false;
                       var newWidgetSelector = (
                         '[data-cke-widget-id="' + that.id + '"]');
-                      if (newWidgetSelector !== null) {
-                        var widgetElement = editor.editable().findOne(
-                          newWidgetSelector);
-                        if (widgetElement) {
-                          widgetElement.remove();
-                          editor.fire('change');
-                        }
+                      if (newWidgetSelector === null) {
+                        return;
+                      }
+                      var widgetElement = editor.editable().findOne(
+                        newWidgetSelector);
+
+                      if (!widgetElement) {
+                        return;
+                      }
+
+                      /**
+                       * If the component's default value was not obtained from
+                       * a highlighted text or was not newly created, then
+                       * simply remove the component. Otherwise, load the
+                       * initial snapshot to revert back to the original text.
+                      */
+                      if (!defaultValueObtainableFromHighlight ||
+                          !componentIsNewlyCreated) {
+                        widgetElement.remove();
+                        editor.fire('change');
+                      } else {
+                        editor.loadSnapshot(that.initialSnapshot);
+                        editor.fire('change');
                       }
                     }
                   });
@@ -202,6 +228,21 @@ export class CkEditorInitializerService {
                     // eslint-disable-next-line max-len
                     index ? item.charAt(0).toUpperCase() + item.slice(1).toLowerCase() : item.toLowerCase()
                   );
+
+                  /**
+                   * If the component has not been initialized before with data,
+                   * then set the default value or highlighted value as the
+                   * component's data.
+                   */
+                  const selection = that.editor.getSelection()
+                    .getSelectedText();
+                  if (!that.data[spec.name]) {
+                    if (spec.default_value_obtainable_from_highlight &&
+                        selection) {
+                      that.setData(spec.name, selection);
+                    }
+                  }
+
                   capital.join('');
                   const customEl = that.element.getChild(0).$;
                   customEl[capital.join('') + 'WithValue'] = (
@@ -220,6 +261,7 @@ export class CkEditorInitializerService {
                   dontUpdate: true
                 });
                 var that = this;
+                that.initialSnapshot = editor.getSnapshot();
                 // On init, read values from component attributes and save them.
                 customizationArgSpecs.forEach(function(spec) {
                   var value = that.element.getChild(0).getAttribute(

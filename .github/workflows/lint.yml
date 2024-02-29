@@ -35,7 +35,7 @@ jobs:
         run: make run_tests.third_party_size_check
       - name: Run Lint Checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: make run_tests.lint PYTHON_ARGS="--verbose --shard ${{ matrix.shard }}"
+        run: make run_tests.lint PYTHON_ARGS="--shard ${{ matrix.shard }} --verbose"
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

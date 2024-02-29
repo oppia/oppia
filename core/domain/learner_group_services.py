@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.constants import constants
 from core.domain import config_domain
+from core.domain import feature_flag_services
 from core.domain import learner_group_domain
 from core.domain import learner_group_fetchers
-from core.domain import platform_feature_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -45,15 +45,18 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-def is_learner_group_feature_enabled() -> bool:
+def is_learner_group_feature_enabled(user_id: Optional[str]) -> bool:
     """Checks if the learner group feature is enabled.
+
+    Args:
+        user_id: str|None. The id of the user.
 
     Returns:
         bool. Whether the learner group feature is enabled.
     """
-    return bool(platform_feature_services.is_feature_enabled(
-        platform_feature_list.ParamNames.
-        LEARNER_GROUPS_ARE_ENABLED.value))
+    return bool(feature_flag_services.is_feature_flag_enabled(
+        user_id,
+        feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value))
 
 
 def create_learner_group(

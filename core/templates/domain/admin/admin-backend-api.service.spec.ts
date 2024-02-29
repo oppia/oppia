@@ -22,8 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { PlatformParameterFilterType } from 'domain/platform-parameter/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -103,9 +103,7 @@ describe('Admin backend api service', () => {
         value_when_matched: ''
       }],
       rule_schema_version: 1,
-      default_value: '',
-      is_feature: false,
-      feature_stage: null
+      default_value: ''
     }]
   };
   let adminDataObject: AdminPageData;
@@ -1546,5 +1544,52 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'User with given username does not exist');
     }));
+  });
+
+  describe('retrieveExplorationInteractionIdsAsync', () => {
+    it('should get interaction IDs if exploration exists'
+      , fakeAsync(() => {
+        let expId = '123';
+        let result = {
+          interactions: [{id: 'EndExploration'}]
+        };
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=123');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush(
+          { interactions: [{id: 'EndExploration'}]},
+          { status: 200, statusText: 'Success.'});
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(result);
+        expect(failHandler).not.toHaveBeenCalled();
+      }));
+
+    it('should fail to get interaction IDs if exploration does not exist'
+      , fakeAsync(() => {
+        let expId = 'invalidExpId';
+
+        abas.retrieveExplorationInteractionIdsAsync(expId)
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/interactions?exp_id=invalidExpId');
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({
+          error: 'Exploration does not exist'
+        }, {
+          status: 400, statusText: 'Bad Request'
+        });
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Exploration does not exist');
+      }));
   });
 });

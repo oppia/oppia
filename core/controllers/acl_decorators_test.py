@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -35,9 +36,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -3322,30 +3320,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self
     ) -> None:
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            self.owner_id, 'flag update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain
-                                    .ALLOWED_PLATFORM_TYPES[0]
-                                ]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ]
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
@@ -3359,30 +3338,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_coordinator_can_access_new_cd_admin_page(
         self
     ) -> None:
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            self.owner_id, 'flag update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain
-                                    .ALLOWED_PLATFORM_TYPES[0]
-                                ]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ]
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)

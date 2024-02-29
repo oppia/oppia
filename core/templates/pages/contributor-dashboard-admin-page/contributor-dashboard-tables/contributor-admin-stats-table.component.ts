@@ -31,6 +31,7 @@ import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats
 import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
+import isEqual from 'lodash/isEqual';
 
 @Component({
   selector: 'contributor-admin-stats-table',
@@ -59,9 +60,12 @@ import constants from 'assets/constants';
   ],
 })
 export class ContributorAdminStatsTable implements OnInit {
-  @Input() activeTab: string = 'Translation Submitter';
-  @Input() filter: ContributorAdminDashboardFilter = (
-    ContributorAdminDashboardFilter.createDefault());
+  @Input() inputs: { activeTab: string;
+                     filter: ContributorAdminDashboardFilter; } =
+      {
+        activeTab: 'Translation Submitter',
+        filter: ContributorAdminDashboardFilter.createDefault()
+      };
 
   columnsToDisplay = [
     'chevron',
@@ -112,7 +116,7 @@ export class ContributorAdminStatsTable implements OnInit {
 
   ngOnInit(): void {
     this.loadingMessage = 'Loading';
-    if (this.filter) {
+    if (this.inputs.filter) {
       this.updateColumnsToDisplay();
     }
   }
@@ -195,11 +199,11 @@ export class ContributorAdminStatsTable implements OnInit {
 
   openRoleEditor(username: string): void {
     this.expandedElement = null;
-    if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
-      this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+    if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
       this.openCdAdminTranslationRoleEditorModal(username);
-    } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
-      this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
+      this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.openCdAdminQuestionRoleEditorModal(username);
     }
   }
@@ -208,17 +212,28 @@ export class ContributorAdminStatsTable implements OnInit {
     return (this.windowRef.nativeWindow.innerWidth < 800);
   }
 
+  changesExist(changes: SimpleChanges): boolean {
+    let changesExist = false;
+    for (let propName in changes) {
+      if (!isEqual(changes[propName].currentValue,
+        changes[propName].previousValue)) {
+        changesExist = true;
+        break;
+      }
+    }
+    return changesExist;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes) {
+    if (this.changesExist(changes)) {
       this.loadingMessage = 'Loading';
       this.noDataMessage = '';
       this.refreshPagination();
-      this.updateColumnsToDisplay();
     }
   }
 
   updateColumnsToDisplay(): void {
-    if (this.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+    if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
@@ -241,7 +256,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          this.filter,
+          this.inputs.filter,
           this.itemsPerPage,
           this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -256,7 +271,7 @@ export class ContributorAdminStatsTable implements OnInit {
               this.noDataMessage = 'No statistics to display';
             }
           });
-    } else if (this.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
+    } else if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
@@ -275,7 +290,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          this.filter,
+          this.inputs.filter,
           this.itemsPerPage,
           this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
@@ -290,7 +305,7 @@ export class ContributorAdminStatsTable implements OnInit {
               this.noDataMessage = 'No statistics to display';
             }
           });
-    } else if (this.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
+    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
@@ -313,7 +328,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          this.filter,
+          this.inputs.filter,
           this.itemsPerPage,
           this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
@@ -328,7 +343,7 @@ export class ContributorAdminStatsTable implements OnInit {
               this.noDataMessage = 'No statistics to display';
             }
           });
-    } else if (this.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
@@ -347,7 +362,7 @@ export class ContributorAdminStatsTable implements OnInit {
       }
       this.ContributorDashboardAdminStatsBackendApiService
         .fetchContributorAdminStats(
-          this.filter,
+          this.inputs.filter,
           this.itemsPerPage,
           this.nextOffset,
           AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
