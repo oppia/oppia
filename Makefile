@@ -136,6 +136,11 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.check_overall_backend_test_coverage: ## Runs the check for overall backend test coverage
+	docker compose up dev-server -d --no-deps
+	$(SHELL_PREFIX) dev-server python -m scripts.check_overall_backend_test_coverage
+	$(MAKE) stop
+
 run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
