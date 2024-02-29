@@ -33,14 +33,6 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .CONTRIBUTOR_DASHBOARD.ROUTE),
-    loadChildren: () => import(
-      'pages/contributor-dashboard-page/contributor-dashboard-page.module')
-      .then(m => m.ContributorDashboardPageModule)
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () => import('pages/moderator-page/moderator-page.module')
       .then(m => m.ModeratorPageModule),
@@ -50,6 +42,13 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
     loadChildren: () => import('pages/blog-admin-page/blog-admin-page.module')
       .then(m => m.BlogAdminPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
+    loadChildren: () => import(
+      'pages/blog-dashboard-page/blog-dashboard-page.module')
+      .then(m => m.BlogDashboardPageModule),
     canActivate: [IsLoggedInGuard]
   },
   {
@@ -80,6 +79,22 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR
+      .ROUTE,
+    loadChildren: () => import(
+      'pages/learner-group-pages/edit-group/edit-learner-group-page.module')
+      .then(m => m.EditLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_CREATOR
+      .ROUTE,
+    loadChildren: () => import(
+      'pages/learner-group-pages/create-group/create-learner-group-page.module')
+      .then(m => m.CreateLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
@@ -89,6 +104,15 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/about-foundation-page/about-foundation-page.module')
       .then(m => m.AboutFoundationPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
+    loadChildren: () => import(
+      'pages/contributor-dashboard-admin-page' +
+      '/contributor-dashboard-admin-page.module')
+      .then(m => m.ContributorDashboardAdminPageModule),
+    canActivate: [IsLoggedInGuard]
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
