@@ -31,6 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StatsReportingService } from '../../services/stats-reporting.service';
+import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 
 import './player-header.component.css';
 
@@ -53,6 +54,7 @@ export class PlayerHeaderComponent {
   isLinkedToTopic!: boolean;
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
+  isMobileMenuVisible = false;
 
   constructor(
     private contextService: ContextService,
@@ -63,7 +65,8 @@ export class PlayerHeaderComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private topicViewerBackendApiService: TopicViewerBackendApiService
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
+    private mobileMenuService: MobileMenuService
   ) {}
 
   ngOnInit(): void {
@@ -165,7 +168,11 @@ export class PlayerHeaderComponent {
     );
   }
 
-  ngOnDestory(): void {
+  toggleMenu(): void {
+    this.mobileMenuService.toggleMenuVisibility();
+  }
+
+  ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
