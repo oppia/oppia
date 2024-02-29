@@ -65,7 +65,7 @@ const resetGraphButton = '.e2e-test-reset-graph';
 const confirmRevertVersionButton = '.e2e-test-confirm-revert';
 const paginatorToggler = '.mat-paginator-page-size-select';
 const viewMatadataChangesButton = '.e2e-test-view-metadata-history';
-const testNodeBackground = '.e2e-test-node-background';
+const testNodeBackground = '.e2e-test-node';
 const historyListOptions = '.history-list-option';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
@@ -283,6 +283,8 @@ module.exports = class explorationAdmin extends baseUser {
       throw new Error("Changes are reflected even though there are no changes")
     }
     await this.clickOn(closeMetadataModal);
+    await this.page.waitForSelector(resetGraphButton);
+    await this.clickOn(resetGraphButton);
   }
 
   /**
@@ -290,34 +292,35 @@ module.exports = class explorationAdmin extends baseUser {
   * reflected or not.
   */
   async expectCompareToDisplayExplorationStateChanges() {
-    await this.clickOn(testNodeBackground);
-    await this.page.waitForTimeout(300);
+    await this.page.waitForTimeout(1000);
+    await this.page.waitForSelector(testNodeBackground);
+    await this.page.waitForTimeout(2000);
+    await this.clickOn(testNodeBackground)
+    await this.page.waitForSelector('.CodeMirror-code');
     const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
-    console.log(divContents.length);
-    console.log('Content of first div:', divContents[0]);
-    console.log('Content of second div:', divContents[1]);
+    console.log(`Number of divs found: ${divContents.length}`);
+    console.log('Content of the first div:', divContents[0]);
+    console.log('Content of the second div:', divContents[1]);
     if (divContents[0] !== divContents[1]) {
-        console.log('The divs are different');
+      console.log('State changes are reflected in the exploration.');
     } else {
-        console.log('The divs are not different');
+      console.log('No changes detected in the exploration state.');
     }
     await this.clickOn(closeStateModal);
-    await this.page.waitForSelector(resetGraphButton);
-    await this.clickOn(resetGraphButton);
-}
+  }
 
   /**
   * Function downloads and reverts a version.
   * @param {number} version - revision version.
   * */
   async downloadAndRevertRevision() {
-    const elements = await this.page.$$(historyListOptions);
-    await elements[2].click();
+    await this.clickOn('#dropdownMenuButton-0')
+    await this.page.waitForTimeout(500);
     await this.page.waitForSelector(downloadVersionButton);
-    await elements[2].click();
-    await this.page.click(revertVersionButton);
+    await this.page.click(downloadVersionButton);
+
     await this.page.click(confirmRevertVersionButton);
-}
+  }
 
 
 
@@ -328,14 +331,14 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(1000);
     const element = await this.page.$('#dropdownMenuButton-0');
     let notes = await element.$eval(
-    revisionNoteSelector, async (el) => el.textContent);
+      revisionNoteSelector, async (el) => el.textContent);
     console.log(notes);
-    if(notes==='Reverted exploration to version 14'){
+    if (notes === 'Reverted exploration to version 14') {
       console.log('Revision is reverting successfully');
-    }else{
+    } else {
       throw new Error('Revision is not reverting');
     }
-}
+  }
 
   /**
   * Function to create a new card in the exploration creator.
@@ -372,7 +375,6 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {number} answer - answer of the question.
   */
   async createQuestion(question, answer) {
-    await this.page.waitForTimeout(500);
     await this.page.waitForSelector(stateEditSelector);
     await this.clickOn(stateEditSelector);
     await this.page.waitForSelector(giveTitle, { visible: true });
