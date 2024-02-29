@@ -78,7 +78,7 @@ const testContinueButton = '.e2e-test-continue-button';
 const testFloatFormInput = '.e2e-test-float-form-input';
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
-const explorationRestartButton = '.oppia-restart-text';
+const explorationRestartButton = '.e2e-preview-restart-button';
 const explorationConversationContent = '.e2e-test-conversation-content';
 const toastMessage = 'div.toast-message';
 
@@ -277,9 +277,10 @@ module.exports = class explorationAdmin extends baseUser {
   async expectCompareToDisplayMetadataChanges() {
     await this.clickOn(viewMatadataChangesButton);
     await this.page.waitForTimeout(300);
-    const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
+    const divContents = await this.page.$$eval(
+      '.CodeMirror-code', divs => divs.map(div => div.textContent));
     if (divContents[0] !== divContents[1]) {
-      throw new Error('Changes are reflected even though there are no changes')
+      throw new Error('Changes are reflected even though there are no changes');
     }
     await this.clickOn(closeMetadataModal);
     await this.page.waitForSelector(resetGraphButton);
@@ -294,9 +295,10 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(testNodeBackground);
     await this.page.waitForTimeout(2000);
-    await this.clickOn(testNodeBackground)
+    await this.clickOn(testNodeBackground);
     await this.page.waitForSelector('.CodeMirror-code');
-    const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
+    const divContents = await this.page.$$eval(
+      '.CodeMirror-code', divs => divs.map(div => div.textContent));
     if (divContents[0] !== divContents[1]) {
       showMessage('State changes are reflected in the exploration.');
     } else {
@@ -502,7 +504,6 @@ module.exports = class explorationAdmin extends baseUser {
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
-    await this.page.waitForTimeout(200000);
     if (text === 'Test-revision') {
       showMessage('exploration has restarted successfully');
     } else {
