@@ -133,6 +133,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - uses: ./.github/actions/merge
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -179,6 +183,10 @@ jobs:
           with:
             python-version: '3.8.15'
             architecture: 'x64'
+        - name: Deleting ubuntu files
+          run: |
+            sudo rm -rf /usr/share/dotnet
+            sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         - uses: ./.github/actions/merge
         - uses: ./.github/actions/install-chrome
         - name: Initializing Containers
