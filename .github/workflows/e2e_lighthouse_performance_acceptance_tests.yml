@@ -98,6 +98,10 @@ jobs:
           substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
           command: >
             sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite }} VIDEO_RECORDING_IS_ENABLED=1
+      - name: Get tree information
+        run: |
+          sudo apt install tree
+          cd /home/runner/work/oppia/ && tree
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
