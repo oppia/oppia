@@ -53,8 +53,7 @@
 
 <div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
   <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
-                                  (onSaveInteractionId)="sendOnSaveInteractionId($event)"
-                                  (onSaveInteractionCustomizationArgs)="sendOnSaveInteractionCustomizationArgs($event)"
+                                  (onSaveInteractionData)="sendOnSaveInteractionData($event)"
                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                   (onSaveSolution)="sendOnSaveSolution($event)"
                                   (recomputeGraph)="sendRecomputeGraph()"

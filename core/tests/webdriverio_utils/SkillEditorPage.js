@@ -41,6 +41,7 @@ var SkillEditorPage = function() {
   var confirmSkillDifficultyButton = $(
     '.e2e-test-confirm-skill-difficulty-button');
   var createQuestionButton = $('.e2e-test-create-question-button');
+  var editQuestionButton = $('.e2e-test-edit-question-button');
   var deleteExampleButtonLocator = '.e2e-test-delete-example-button';
   var deleteMisconceptionButton = function(index) {
     return $(`.e2e-test-misconception-${index}`)
@@ -65,6 +66,7 @@ var SkillEditorPage = function() {
   };
   var misconceptionNameField = $('.e2e-test-misconception-name-field');
   var misconceptionNotesField = $('.e2e-test-notes-textarea .e2e-test-rte');
+  var questionInteractionId = $('.e2e-test-question-interaction-id');
   var questionItem = $('.e2e-test-question-list-item');
   var questionItemsSelector = function() {
     return $$('.e2e-test-question-list-item');
@@ -192,6 +194,11 @@ var SkillEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.clickEditQuestionButton = async function() {
+    await action.click('Edit Question Button', editQuestionButton);
+    await waitFor.pageToFullyLoad();
+  };
+
   this.moveToQuestionsTab = async function() {
     await action.click('Questions tab button', questionsTab);
   };
@@ -232,6 +239,23 @@ var SkillEditorPage = function() {
       skillChangeCount, 'Skill change count takes too long to update.');
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
+  };
+
+  this.saveChangesToQuestion = async function(commitMessage) {
+    await general.scrollToTop();
+    await action.click('Save Question Button', saveQuestionButton);
+    await action.setValue('Commit message', commitMessageField, commitMessage);
+    await action.click('Close save modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton, 'Save modal takes too long to disappear.');
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.expectQuestionInteractionIdToMatch = async function(interactionId) {
+    var text = await action.getText(
+      'Question Interaction Id',
+      questionInteractionId);
+    expect(text).toMatch(interactionId);
   };
 
   this.editConceptCard = async function(explanation) {

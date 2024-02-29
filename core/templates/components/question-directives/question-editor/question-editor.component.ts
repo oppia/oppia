@@ -34,7 +34,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { EditabilityService } from 'services/editability.service';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionData } from 'interactions/customization-args-defs';
 import { LoaderService } from 'services/loader.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 
@@ -72,12 +72,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
   ) { }
 
-  saveInteractionId(displayedValue: string): void {
-    this._updateQuestion(() => {
-      this.stateEditorService.setInteractionId(cloneDeep(displayedValue));
-    });
-  }
-
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionAnswerGroups(
@@ -92,11 +86,12 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveInteractionCustomizationArgs(
-      displayedValue: InteractionCustomizationArgs): void {
+  saveInteractionData(displayedValue: InteractionData): void {
     this._updateQuestion(() => {
+      this.stateEditorService.setInteractionId(
+        cloneDeep(displayedValue.interactionId));
       this.stateEditorService.setInteractionCustomizationArgs(
-        cloneDeep(displayedValue));
+        cloneDeep(displayedValue.customizationArgs));
     });
   }
 

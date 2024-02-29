@@ -1,8 +1,7 @@
 <div class="oppia-editor-cards-container" *ngIf="stateEditorIsInitialized">
   <oppia-state-editor (onSaveStateContent)="saveStateContent($event)"
-                      (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
+                      (onSaveInteractionData)="saveInteractionData($event)"
                       (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
-                      (onSaveInteractionId)="saveInteractionId($event)"
                       (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
                       (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
                       (onSaveSolution)="saveSolution($event)"

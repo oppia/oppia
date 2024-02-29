@@ -29,7 +29,7 @@ import { UserExplorationPermissionsService } from '../services/user-exploration-
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RouterService } from '../services/router.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionData } from 'interactions/customization-args-defs';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -201,11 +201,18 @@ export class ExplorationEditorTabComponent
       this.tutorialInProgress = false;
     }
 
-    saveInteractionId(displayedValue: string): void {
+    saveInteractionData(displayedValue: InteractionData): void {
       this.explorationStatesService.saveInteractionId(
         this.stateEditorService.getActiveStateName(),
-        cloneDeep(displayedValue));
-      this.stateEditorService.setInteractionId(cloneDeep(displayedValue));
+        cloneDeep(displayedValue.interactionId));
+      this.stateEditorService.setInteractionId(
+        cloneDeep(displayedValue.interactionId));
+
+      this.explorationStatesService.saveInteractionCustomizationArgs(
+        this.stateEditorService.getActiveStateName(),
+        cloneDeep(displayedValue.customizationArgs));
+      this.stateEditorService.setInteractionCustomizationArgs(
+        cloneDeep(displayedValue.customizationArgs));
     }
 
     saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
@@ -226,16 +233,6 @@ export class ExplorationEditorTabComponent
       this.stateEditorService.setInteractionDefaultOutcome(
         cloneDeep(newOutcome));
       this.recomputeGraph();
-    }
-
-    saveInteractionCustomizationArgs(
-        displayedValue: InteractionCustomizationArgs): void {
-      this.explorationStatesService.saveInteractionCustomizationArgs(
-        this.stateEditorService.getActiveStateName(),
-        cloneDeep(displayedValue));
-
-      this.stateEditorService.setInteractionCustomizationArgs(
-        cloneDeep(displayedValue));
     }
 
     saveNextContentIdIndex(): void {

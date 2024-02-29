@@ -469,3 +469,8 @@ export type InteractionCustomizationArgs = (
   RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);
+
+export interface InteractionData {
+  interactionId: string | null;
+  customizationArgs: InteractionCustomizationArgs;
+}

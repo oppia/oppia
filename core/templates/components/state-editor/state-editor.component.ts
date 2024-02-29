@@ -37,7 +37,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionData } from 'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/hint-object.model';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
@@ -54,11 +54,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveInteractionAnswerGroups = (
     new EventEmitter<AnswerGroup[]>());
 
-  @Output() onSaveInteractionCustomizationArgs = (
-    new EventEmitter<InteractionCustomizationArgs>());
+  @Output() onSaveInteractionData = (
+    new EventEmitter<InteractionData>());
 
   @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
-  @Output() onSaveInteractionId = new EventEmitter<string>();
   @Output() onSaveLinkedSkillId = new EventEmitter<string>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
@@ -151,12 +150,8 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveNextContentIdIndex.emit($event);
   }
 
-  sendOnSaveInteractionCustomizationArgs($event: string): void {
-    this.onSaveInteractionCustomizationArgs.emit($event);
-  }
-
-  sendOnSaveInteractionId($event: string): void {
-    this.onSaveInteractionId.emit($event);
+  sendOnSaveInteractionData($event: InteractionData): void {
+    this.onSaveInteractionData.emit($event);
   }
 
   sendOnSaveStateContent($event: SubtitledHtml): void {

@@ -558,17 +558,41 @@ describe('Exploration editor tab component', () => {
     expect(component.interactionIsShown).toBe(true);
   });
 
-  it('should save state interaction id', () => {
+  it('should save state interaction data when customization args' +
+      ' are changed', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
 
     expect(stateEditorService.interaction.id).toBe('TextInput');
+    expect(stateEditorService.interaction.customizationArgs).toEqual({
+      rows: { value: 1 },
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
+      catchMisspellings: {
+        value: false
+      }
+    });
 
-    let newInteractionId = 'Continue';
-    component.saveInteractionId(newInteractionId);
+    let newInteractionData = {
+      interactionId: 'TextInput',
+      customizationArgs: {
+        placeholder: {
+          value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
+        },
+        rows: {
+          value: 2
+        },
+        catchMisspellings: {
+          value: false
+        }
+      }
+    };
+    component.saveInteractionData(newInteractionData);
 
-    expect(stateEditorService.interaction.id).toBe(newInteractionId);
+    expect(stateEditorService.interaction.id)
+      .toBe(newInteractionData.interactionId);
+    expect(stateEditorService.interaction.customizationArgs)
+      .toEqual(newInteractionData.customizationArgs);
   });
 
   it('should save linked skill id', () => {
@@ -664,36 +688,6 @@ describe('Exploration editor tab component', () => {
     component.saveInteractionDefaultOutcome(displayedValue);
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
-      displayedValue);
-  });
-
-  it('should save interaction customization args', () => {
-    stateEditorService.setActiveStateName('First State');
-    stateEditorService.setInteraction(
-      explorationStatesService.getState('First State').interaction);
-
-    expect(stateEditorService.interaction.customizationArgs).toEqual({
-      rows: { value: 1 },
-      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
-      catchMisspellings: {
-        value: false
-      }
-    });
-
-    let displayedValue = {
-      placeholder: {
-        value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
-      },
-      rows: {
-        value: 2
-      },
-      catchMisspellings: {
-        value: false
-      }
-    };
-    component.saveInteractionCustomizationArgs(displayedValue);
-
-    expect(stateEditorService.interaction.customizationArgs).toEqual(
       displayedValue);
   });
 
