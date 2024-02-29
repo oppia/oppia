@@ -66,7 +66,6 @@ const confirmRevertVersionButton = '.e2e-test-confirm-revert';
 const paginatorToggler = '.mat-paginator-page-size-select';
 const viewMatadataChangesButton = '.e2e-test-view-metadata-history';
 const testNodeBackground = '.e2e-test-node';
-const historyListOptions = '.history-list-option';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -81,10 +80,10 @@ const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.oppia-restart-text';
 const explorationConversationContent = '.e2e-test-conversation-content';
-const toastMessage = "div.toast-message"
+const toastMessage = 'div.toast-message';
 
 // Settings tab elements.
-const explorationTitleInput = '.e2e-test-exploration-title-input'
+const explorationTitleInput = '.e2e-test-exploration-title-input';
 
 module.exports = class explorationAdmin extends baseUser {
   /**
@@ -100,7 +99,8 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async createExploration(title) {
     await this.clickOn(createExplorationButtonSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, { visible: true });
+    await this.page.waitForSelector(
+      dismissWelcomeModalSelector, { visible: true });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
@@ -109,11 +109,13 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector(endInteractionSelector, { visible: true });
+    await this.page.waitForSelector(
+      endInteractionSelector, { visible: true });
     await this.clickOn(endInteractionSelector);
     await this.clickOn(saveInteractionButton);
     await this.clickOn(saveChangesButton);
-    await this.page.waitForSelector(saveDraftButton, { visible: true });
+    await this.page.waitForSelector(
+      saveDraftButton, { visible: true });
     await this.clickOn(saveDraftButton);
   }
 
@@ -130,7 +132,7 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {string} title - the title of the Exploration.
   */
   async createMultipleRevisionsOfTheSameExploration(title) {
-    // await this.makeMetaDataChanges('title-changed');
+    // Await this.makeMetaDataChanges('title-changed');
     await this.page.waitForTimeout(300);
     for (let i = 0; i < 13; i++) {
       await this.page.waitForSelector(stateEditSelector, { visible: true });
@@ -161,13 +163,13 @@ module.exports = class explorationAdmin extends baseUser {
     let revisions = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async (el) => el.textContent);
+        revisionVersionNoSelector, async(el) => el.textContent);
       let notes = await element.$eval(
-        revisionNoteSelector, async (el) => el.textContent);
+        revisionNoteSelector, async(el) => el.textContent);
       let user = await element.$eval(
-        revisionUsernameSelector, async (el) => el.textContent);
+        revisionUsernameSelector, async(el) => el.textContent);
       let date = await element.$eval(
-        revisionDateSelector, async (el) => el.textContent);
+        revisionDateSelector, async(el) => el.textContent);
       revisions.push({ versionNo, notes, user, date });
     }
     return revisions;
@@ -184,13 +186,13 @@ module.exports = class explorationAdmin extends baseUser {
       throw new Error('No revisions found');
     }
     let versionNo = await element.$eval(
-      revisionVersionNoSelector, async (el) => el.textContent);
+      revisionVersionNoSelector, async(el) => el.textContent);
     let notes = await element.$eval(
-      revisionNoteSelector, async (el) => el.textContent);
+      revisionNoteSelector, async(el) => el.textContent);
     let user = await element.$eval(
-      revisionUsernameSelector, async (el) => el.textContent);
+      revisionUsernameSelector, async(el) => el.textContent);
     let date = await element.$eval(
-      revisionDateSelector, async (el) => el.textContent);
+      revisionDateSelector, async(el) => el.textContent);
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
@@ -276,11 +278,8 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(viewMatadataChangesButton);
     await this.page.waitForTimeout(300);
     const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
-    console.log(divContents.length);
-    console.log('Content of first div:', divContents[0]);
-    console.log('Content of second div:', divContents[1]);
     if (divContents[0] !== divContents[1]) {
-      throw new Error("Changes are reflected even though there are no changes")
+      throw new Error('Changes are reflected even though there are no changes')
     }
     await this.clickOn(closeMetadataModal);
     await this.page.waitForSelector(resetGraphButton);
@@ -298,13 +297,10 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(testNodeBackground)
     await this.page.waitForSelector('.CodeMirror-code');
     const divContents = await this.page.$$eval('.CodeMirror-code', divs => divs.map(div => div.textContent));
-    console.log(`Number of divs found: ${divContents.length}`);
-    console.log('Content of the first div:', divContents[0]);
-    console.log('Content of the second div:', divContents[1]);
     if (divContents[0] !== divContents[1]) {
-      console.log('State changes are reflected in the exploration.');
+      showMessage('State changes are reflected in the exploration.');
     } else {
-      console.log('No changes detected in the exploration state.');
+      showMessage('No changes detected in the exploration state.');
     }
     await this.clickOn(closeStateModal);
   }
@@ -314,10 +310,11 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {number} version - revision version.
   * */
   async downloadAndRevertRevision() {
-    await this.clickOn('#dropdownMenuButton-0')
+    await this.clickOn('#dropdownMenuButton-0');
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(downloadVersionButton);
-    await this.page.click(downloadVersionButton);
+    await this.clickOn(downloadVersionButton);
+    await this.clickOn(revertVersionButton);
 
     await this.page.click(confirmRevertVersionButton);
   }
@@ -331,10 +328,9 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(1000);
     const element = await this.page.$('#dropdownMenuButton-0');
     let notes = await element.$eval(
-      revisionNoteSelector, async (el) => el.textContent);
-    console.log(notes);
+      revisionNoteSelector, async(el) => el.textContent);
     if (notes === 'Reverted exploration to version 14') {
-      console.log('Revision is reverting successfully');
+      showMessage('Revision is reverting successfully');
     } else {
       throw new Error('Revision is not reverting');
     }
@@ -380,6 +376,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(giveTitle, { visible: true });
     await this.page.click(giveTitle, { clickCount: 3 });
     await this.page.keyboard.press('Backspace');
+    await this.page.waitForTimeout(500);
     await this.type(giveTitle, `${question}`);
 
     await this.clickOn(saveContentButton);
@@ -404,7 +401,7 @@ module.exports = class explorationAdmin extends baseUser {
   async createExplorationLoadedWithQuestions(title) {
     await this.clickOn(createExplorationButtonSelector);
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(stateEditSelector);
+    await this.page.waitForTimeout(200);
     await this.clickOn(stateEditSelector);
     await this.page.waitForSelector(giveTitle, { visible: true });
     await this.type(giveTitle, title);
@@ -505,7 +502,7 @@ module.exports = class explorationAdmin extends baseUser {
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
-    console.log(text);
+    await this.page.waitForTimeout(200000);
     if (text === 'Test-revision') {
       showMessage('exploration has restarted successfully');
     } else {
