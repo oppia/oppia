@@ -441,6 +441,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorPage.waitForPreviewTabToLoad();
     await explorationPlayerPage.submitAnswer('NumericInput', 1);
     await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.waitForInvisibilityOfLessonCompletionMessage();
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.moveToState('Introduction');
     await explorationEditorMainTab.invisibilityOfSelfLoopWarningInResponse();
