@@ -20,7 +20,7 @@
     </a>
     <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
-          class="nav-item icon nav-list-item position-relative e2e-test-select-main-tab-button">
+          class="nav-item icon nav-list-item position-relative">
         <a href="#"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
@@ -65,7 +65,7 @@
         </a>
       </li>
 
-      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab e2e-test-select-preview-tab-button" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
           (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab"
            [ngbTooltip]="'Preview'"
