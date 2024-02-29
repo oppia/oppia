@@ -37,14 +37,14 @@ jobs:
       - name: Checking server reachability
         run: |
           for i in {1..50}; do
-            if [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; then
-              echo ---Dev-server is up---
-              exit 0
-            else
-              echo ---Retrying in 30 seconds---
-              curl -s http://localhost:8181
-              sleep 30
-            fi
+              if [[ $(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; then
+                  echo "---Dev-server is up---"
+                  exit 0
+              else
+                  echo "---Retrying in 30 seconds---"
+                  echo .dev/status_code.txt
+                  sleep 30
+              fi
           done
           echo ---Dev-server is not started after all retries---
           exit 1
