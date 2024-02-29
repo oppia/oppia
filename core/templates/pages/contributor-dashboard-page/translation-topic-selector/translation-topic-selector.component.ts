@@ -20,6 +20,7 @@ import {
   Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
   ElementRef
 } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
@@ -77,3 +78,11 @@ export class TranslationTopicSelectorComponent implements OnInit {
     }
   }
 }
+
+angular.module('oppia').directive(
+  'translationTopicSelector',
+  downgradeComponent({
+    component: TranslationTopicSelectorComponent,
+    inputs: ['activeTopicName'],
+    outputs: ['setActiveTopicName']
+  }));
