@@ -82,8 +82,7 @@ describe('State Editor Component', () => {
     spyOn(component.navigateToState, 'emit').and.stub();
     spyOn(component.onSaveSolution, 'emit').and.stub();
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
-    spyOn(component.onSaveInteractionCustomizationArgs, 'emit').and.stub();
-    spyOn(component.onSaveInteractionId, 'emit').and.stub();
+    spyOn(component.onSaveInteractionData, 'emit').and.stub();
     spyOn(component.onSaveStateContent, 'emit').and.stub();
 
     component.sendRecomputeGraph();
@@ -110,8 +109,11 @@ describe('State Editor Component', () => {
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
     ));
     component.sendOnSaveNextContentIdIndex(0);
-    component.sendOnSaveInteractionCustomizationArgs('');
-    component.sendOnSaveInteractionId('');
+    let interactionData = {
+      interactionId: null,
+      customizationArgs: {}
+    };
+    component.sendOnSaveInteractionData(interactionData);
     component.sendOnSaveStateContent(
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
 
@@ -127,9 +129,7 @@ describe('State Editor Component', () => {
     expect(component.navigateToState.emit).toHaveBeenCalled();
     expect(component.onSaveSolution.emit).toHaveBeenCalled();
     expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
-    expect(component.onSaveInteractionCustomizationArgs.emit)
-      .toHaveBeenCalled();
-    expect(component.onSaveInteractionId.emit).toHaveBeenCalled();
+    expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
     expect(component.onSaveStateContent.emit).toHaveBeenCalled();
   });
 
