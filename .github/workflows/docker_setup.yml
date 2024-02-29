@@ -39,6 +39,7 @@ jobs:
           for i in {1..50}; do
               if [[ $(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; then
                   echo "---Dev-server is up---"
+                  echo .dev/status_code.txt
                   exit 0
               else
                   echo "---Retrying in 30 seconds---"
