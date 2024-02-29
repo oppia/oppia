@@ -828,7 +828,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 interaction_dict['id'] is not None
             )
             else None)
-
         customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
@@ -2235,10 +2234,10 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids()
         )
-        interaction_id_is_valid = interaction_id not in all_interaction_ids
-        if interaction_id_is_valid or interaction_id is None:
+        interaction_id_is_not_valid = interaction_id not in all_interaction_ids
+        no_customization_args = len(customization_args_dict) == 0
+        if interaction_id_is_not_valid or interaction_id is None or no_customization_args:
             return {}
-
         ca_specs_dict = (
             interaction_registry.Registry
             .get_all_specs_for_state_schema_version(
@@ -4399,8 +4398,8 @@ class State(translation_domain.BaseTranslatableObject):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids()
         )
-        interaction_id_is_valid = interaction_id not in all_interaction_ids
-        if interaction_id_is_valid or interaction_id is None:
+        interaction_id_is_not_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_not_valid or interaction_id is None:
             return state_dict
 
         if state_dict['interaction']['solution'] is not None:
