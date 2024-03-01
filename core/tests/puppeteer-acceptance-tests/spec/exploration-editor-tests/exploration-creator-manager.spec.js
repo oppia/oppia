@@ -86,7 +86,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
       await explorationCreator.assignUserToPlaytesterRole('guestUsr2');
 
-      await explorationCreator.makeExplorationPublic();
+      await explorationCreator.publishExploration();
       await explorationCreator.expectExplorationToBePublished();
 
       await explorationCreator.addVoiceArtist();

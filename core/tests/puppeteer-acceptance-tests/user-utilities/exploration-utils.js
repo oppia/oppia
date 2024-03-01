@@ -457,7 +457,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in publishing the exploration
    */
-  async makeExplorationPublic() {
+  async publishExploration() {
     await this.saveDraftExploration();
     await this.page.waitForTimeout(500);
     await this.clickOn(publishButton);
@@ -468,10 +468,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
     await this.page.waitForTimeout(500);
     explorationUrlAfterPublished = await this.page.url();
-  }
-
-  async publishExploration() {
-    await this.makeExplorationPublic();
   }
 
   /**
