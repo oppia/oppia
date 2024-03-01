@@ -76,7 +76,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in reaching dashboard Url.
    */
-  async goToDashboardUrl() {
+  async openCreatorDashboardPage() {
     await this.goto(creatorDashboardUrl);
   }
 

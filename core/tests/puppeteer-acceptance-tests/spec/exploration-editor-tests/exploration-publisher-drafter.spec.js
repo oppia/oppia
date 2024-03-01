@@ -34,7 +34,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
   it('should perform exploration management actions',
     async function() {
-      await explorationCreator.goToDashboardUrl();
+      await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.goToEditorSection();
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(

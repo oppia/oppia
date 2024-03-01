@@ -58,7 +58,8 @@ describe('Exploration Creator', function() {
       await guestUser2.closeBrowser();
       await guestUser3.closeBrowser();
       await superAdmin.closeBrowser();
-      await explorationCreator.goToDashboardUrl();
+
+      await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.goToEditorSection();
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(
