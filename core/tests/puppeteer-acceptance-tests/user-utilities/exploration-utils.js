@@ -175,7 +175,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks if the goal has been set in the exploration.
    * @param {string} expectedGoal The Goal expected.
    */
-  async expectGoalToBeSet(expectedGoal) {
+  async expectGoalToEqual(expectedGoal) {
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input');
     const goal = await this.page.evaluate(

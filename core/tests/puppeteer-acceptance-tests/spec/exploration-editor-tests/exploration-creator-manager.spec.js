@@ -65,7 +65,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
       await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
-      await explorationCreator.expectGoalToBeSet('NeedSuccessInLifeAndMoney');
+      await explorationCreator.expectGoalToEqual('NeedSuccessInLifeAndMoney');
 
       await explorationCreator.selectCategory();
       await explorationCreator.expectCategoryToBeSelected('Algebra');
