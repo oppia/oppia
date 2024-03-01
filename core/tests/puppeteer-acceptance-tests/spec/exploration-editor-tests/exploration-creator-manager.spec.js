@@ -75,7 +75,7 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.addTags('Your Tag Here');
 
-      await explorationCreator.successfullyUpdatedSettings();
+      await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.previewSummary();
       await explorationCreator.expectPreviewSummaryToBeVisible();

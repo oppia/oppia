@@ -48,7 +48,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.selectCategory();
       await explorationCreator.selectLanguage();
       await explorationCreator.addTags('Your Tag Here');
-      await explorationCreator.successfullyUpdatedSettings();
+      await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.publishExploration();
 

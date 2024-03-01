@@ -258,7 +258,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.type(addTags, TagName);
   }
 
-  async successfullyUpdatedSettings() {
+  async updateSettingsSuccessfully() {
     showMessage('Successfully updated basic settings!');
   }
 
