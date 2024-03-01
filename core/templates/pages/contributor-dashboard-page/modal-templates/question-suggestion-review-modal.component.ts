@@ -17,6 +17,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -354,7 +355,9 @@ export class QuestionSuggestionReviewModalComponent
     } else {
       this.reviewMessage = ''; // Reset for next/prev.
       this.reviewer = '';
-      this._getThreadMessagesAsync(this.currentSuggestionId);
+      if (this.suggestion.status !== 'review') {
+        this._getThreadMessagesAsync(this.currentSuggestionId);
+      }
     }
     this.showQuestion = true;
   }
@@ -378,3 +381,8 @@ export class QuestionSuggestionReviewModalComponent
     this.refreshContributionState();
   }
 }
+
+angular.module('oppia').directive('oppiaQuestionSuggestionReviewModal',
+  downgradeComponent({
+    component: QuestionSuggestionReviewModalComponent
+  }) as angular.IDirectiveFactory);

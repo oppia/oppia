@@ -222,7 +222,10 @@ var LibraryPage = function() {
   };
 
   this.clickExplorationObjective = async function() {
+    // Clicking on the exploration objective navigates the user to the
+    // corresponding exploration player page.
     await action.click('Exploration objective', explorationObjective);
+    await waitFor.pageToFullyLoad();
   };
 
   this.findExploration = async function(explorationTitle) {

@@ -17,6 +17,7 @@
  */
 
 import { Component, ElementRef, HostListener, Injector, Input, ViewChild } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContributionAndReviewStatsService, QuestionContributionBackendDict, QuestionReviewBackendDict, TranslationContributionBackendDict, TranslationReviewBackendDict } from '../services/contribution-and-review-stats.service';
 import { UserService } from 'services/user.service';
@@ -408,3 +409,7 @@ export class ContributorStatsComponent {
     }
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaOpportunitiesList', downgradeComponent(
+    {component: ContributorStatsComponent}));
