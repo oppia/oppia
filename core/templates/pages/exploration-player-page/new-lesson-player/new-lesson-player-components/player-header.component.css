@@ -12,25 +12,6 @@
   height: 48px;
   justify-content: space-between;
   padding-left: 15px;
-  position: fixed;
-  width: 100%;
-}
-
-.player-header-right {
-  display: none;
-  padding: 12px;
-}
-
-.header-menu-button {
-  background: none;
-  border: none;
-  color: #fff;
-}
-
-@media screen and (max-width: 574px) {
-  .player-header-right {
-    display: block;
-  }
 }
 
 .player-header-right {
