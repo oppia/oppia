@@ -42,7 +42,7 @@ describe('Exploration Creator', function() {
     superAdmin = await userFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should create exploration and can modify it from settings tab',
+  it('should create an exploration and modify it via the Settings tab',
     async function() {
       await superAdmin.assignRoleToUser(
         'explorationAdm', 'voiceover admin');
