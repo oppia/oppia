@@ -22,6 +22,8 @@ const testConstants = require(
   '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const continueInteractionSelector = '.e2e-test-interaction-tile-Continue';
+
 
 describe('Exploration Admin', function() {
   let explorationAdmin = null;
@@ -34,8 +36,9 @@ describe('Exploration Admin', function() {
   it('should be able to load, complete and restart an exploration',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
-      await explorationAdmin.createExplorationLoadedWithQuestions(
-        'Test-revision');
+      await explorationAdmin.createExploration(
+        'Test-revision', continueInteractionSelector);
+      await explorationAdmin.LoadExplorationWithQuestions();
 
       await explorationAdmin.navigateToPreviewTab();
       await explorationAdmin.expectTheExplorationToLoadInPreviewTab();

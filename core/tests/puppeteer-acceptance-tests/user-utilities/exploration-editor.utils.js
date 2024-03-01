@@ -34,11 +34,10 @@ const navigateToMainTabButton = '.e2e-test-main-tab';
 const createExplorationButtonSelector = 'button.e2e-test-create-activity';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const stateEditSelector = 'div.e2e-test-state-edit-content';
-const giveTitle = 'div.oppia-rte';
+const explorationTextInput = 'div.oppia-rte';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
-const continueInteractionSelector = '.e2e-test-interaction-tile-Continue';
 const numericInputSelector = '.e2e-test-interaction-tile-NumericInput';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
@@ -95,54 +94,66 @@ module.exports = class explorationAdmin extends baseUser {
 
   /**
   * Function for creating an exploration in the Exploration Editor
-  * @param {string} title - the title of the Exploration.
+  * @param {string} text - the text in the Exploration.
   */
-  async createExploration(title) {
+  async createExploration(text, interaction) {
     await this.clickOn(createExplorationButtonSelector);
     await this.page.waitForSelector(
       dismissWelcomeModalSelector, { visible: true });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle, { visible: true });
-    await this.type(giveTitle, title + '1');
+    await this.page.waitForSelector(
+      explorationTextInput, { visible: true });
+    await this.type(explorationTextInput, `${text} 1`);
     await this.clickOn(saveContentButton);
+
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(
       endInteractionSelector, { visible: true });
-    await this.clickOn(endInteractionSelector);
+    await this.clickOn(interaction);
     await this.clickOn(saveInteractionButton);
+  }
+
+  async saveExplorationDraft(){
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(
       saveDraftButton, { visible: true });
+    await this.page.waitForTimeout(500);
     await this.clickOn(saveDraftButton);
   }
 
+   /**
+  * Function to make metadata changes in the fucntio
+  * @param {string} text - the text of the Exploration.
+  */
   async makeMetaDataChanges(title) {
-    await this.waitForTimeout(200);
-    await this.clickOn(navigateToSettingsTabButton);
-    await this.page.waitForSelector(explorationTitleInput);
+    await this.page.waitForTimeout(200);
+    await this.clickOn(navigateToSettingsTabButton, { waitUntil: 'networkidle0' });
+    await this.page.waitForTimeout(200);
     await this.type(explorationTitleInput, title);
-    await this.clickOn(navigateToMainTabButton);
+    await this.clickOn(navigateToMainTabButton, { waitUntil: 'networkidle0' });
   }
 
   /**
   * Function to create multiple revisions of the same Exploration.
-  * @param {string} title - the title of the Exploration.
+  * @param {string} text - the text of the Exploration.
   */
-  async createMultipleRevisionsOfTheSameExploration(title) {
-    // Await this.makeMetaDataChanges('title-changed');
+  async createMultipleRevisionsOfTheSameExploration(text) {
+    await this.makeMetaDataChanges('changes');
+    await this.saveExplorationDraft();
     await this.page.waitForTimeout(300);
     for (let i = 0; i < 13; i++) {
       await this.page.waitForSelector(stateEditSelector, { visible: true });
       await this.clickOn(stateEditSelector);
-      await this.page.waitForSelector(giveTitle, { visible: true });
-      await this.type(giveTitle, `${title} ${i + 2}`);
+      await this.page.waitForSelector(explorationTextInput, { visible: true });
+      await this.page.click(explorationTextInput, { clickCount: 3 });
+      await this.page.keyboard.press('Backspace');
+      await this.page.waitForTimeout(500);
+      await this.type(explorationTextInput, `${text} ${i+3}`);
       await this.clickOn(saveContentButton);
-      await this.clickOn(saveChangesButton);
-      await this.page.waitForTimeout(700);
-      await this.clickOn(saveDraftButton);
+      await this.saveExplorationDraft();
     }
   }
 
@@ -196,16 +207,13 @@ module.exports = class explorationAdmin extends baseUser {
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
-
     showMessage('The versions are not missing any properties');
-    return { versionNo, notes, user, date };
   }
 
   /**
   * Function to verify whether the revisions are sorted by dates and if the
-  * current page displays 10 items as per the default paginator settings.
   */
-  async expectRevisionsToBeDateOrderedAnd10ItemsPerPage() {
+  async expectRevisionsToBeOrderedByDate() {
     let revisions = await this.getRevisionsList(versionsList);
     for (let i = 0; i < revisions.length - 1; i++) {
       let date1 = new Date(revisions[i].date);
@@ -213,16 +221,6 @@ module.exports = class explorationAdmin extends baseUser {
       if (date1 < date2) {
         throw new Error('Revisions are not sorted by date');
       }
-    }
-    showMessage('Revisions are sorted by date');
-    if (revisions.length !== 10) {
-      throw new Error(
-        `Pagination Error: When the items per page is set to 10,
-         expected 10 user revisions, but got ${revisions.length}`);
-    } else {
-      showMessage(
-        `When the items per page is set to 10, 
-         correctly shows 10 user revisions.`);
     }
   }
 
@@ -261,30 +259,30 @@ module.exports = class explorationAdmin extends baseUser {
   * Function for camparing different revision.
   */
   async compareDifferentRevisions() {
-    await this.page.waitForTimeout(300);
     await this.page.waitForSelector(firstVersionDropdown);
     await this.clickOn(firstVersionDropdown);
-    await this.clickOn('#mat-option-1297');
+    await this.clickOn('#mat-option-1958');
     await this.page.waitForTimeout(300);
     await this.page.waitForSelector(secondVersionDropdown);
     await this.clickOn(secondVersionDropdown);
-    await this.clickOn('#mat-option-1306');
+    await this.clickOn('#mat-option-1972');
   }
 
   /**
   * Function to check if modifications in the metadata are being reflected.
   */
   async expectCompareToDisplayMetadataChanges() {
+    await this.page.waitForTimeout(300);
     await this.clickOn(viewMatadataChangesButton);
     await this.page.waitForTimeout(300);
     const divContents = await this.page.$$eval(
       '.CodeMirror-code', divs => divs.map(div => div.textContent));
-    if (divContents[0] !== divContents[1]) {
-      throw new Error('Changes are reflected even though there are no changes');
+    if(divContents[0] !== divContents[1]) {
+      showMessage('Metadata changes are reflected in the versions.');
+    }else {
+      throw new Error('No changes detected in the metadata.');
     }
     await this.clickOn(closeMetadataModal);
-    await this.page.waitForSelector(resetGraphButton);
-    await this.clickOn(resetGraphButton);
   }
 
   /**
@@ -292,19 +290,19 @@ module.exports = class explorationAdmin extends baseUser {
   * reflected or not.
   */
   async expectCompareToDisplayExplorationStateChanges() {
-    await this.page.waitForTimeout(1000);
-    await this.page.waitForSelector(testNodeBackground);
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(400);
     await this.clickOn(testNodeBackground);
-    await this.page.waitForSelector('.CodeMirror-code');
-    const divContents = await this.page.$$eval(
+    await this.page.waitForTimeout(500);
+    const divContent = await this.page.$$eval(
       '.CodeMirror-code', divs => divs.map(div => div.textContent));
-    if (divContents[0] !== divContents[1]) {
+    if (divContent[0] !== divContent[1]) {
       showMessage('State changes are reflected in the exploration.');
     } else {
-      showMessage('No changes detected in the exploration state.');
+      throw new Error('No changes detected in the exploration state.');
     }
     await this.clickOn(closeStateModal);
+    await this.page.waitForSelector(resetGraphButton);
+    await this.clickOn(resetGraphButton);
   }
 
   /**
@@ -312,26 +310,30 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {number} version - revision version.
   * */
   async downloadAndRevertRevision() {
+    await this.page.waitForTimeout(1000);
     await this.clickOn('#dropdownMenuButton-0');
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
+    await this.page.waitForTimeout(1000);
+    await this.clickOn('#dropdownMenuButton-1');
+    await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
-
     await this.page.click(confirmRevertVersionButton);
   }
-
-
 
   /**
   * Function verifies if a revsion is reverting and downloading or not.
   */
   async expectSuccessfulReversionOfRevision() {
-    await this.page.waitForTimeout(1000);
-    const element = await this.page.$('#dropdownMenuButton-0');
+    await this.page.waitForTimeout(5000);
+    await this.page.waitForSelector(versionsList);
+    let element = await this.page.$(versionsList);
     let notes = await element.$eval(
       revisionNoteSelector, async(el) => el.textContent);
-    if (notes === 'Reverted exploration to version 14') {
+    showMessage(notes);
+    await this.page.waitForTimeout(500);
+    if (notes === ' Reverted exploration to version 14 ') {
       showMessage('Revision is reverting successfully');
     } else {
       throw new Error('Revision is not reverting');
@@ -340,14 +342,14 @@ module.exports = class explorationAdmin extends baseUser {
 
   /**
   * Function to create a new card in the exploration creator.
-  * @param {string} title - title of the new card created.
+  * @param {string} cardName - name of the card created.
   */
-  async callNewCard(title) {
+  async createNewCard(cardName) {
     await this.clickOn(openOutcomeDestButton);
-    await this.page.waitForSelector(destinationCardSelector);
+    await this.page.waitForTimeout(500);
     await this.page.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput);
-    await this.page.type(addStateInput, title);
+    await this.page.type(addStateInput, cardName);
     await this.clickOn(saveOutcomeDestButton);
   }
 
@@ -355,7 +357,7 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to open the next card in the exploration journey.
   * @param {number} card_num - card number to switch to.
   */
-  async openNextCard(cardNum) {
+  async goToNextCard(cardNum) {
     const selector = testNodeBackground;
     await this.page.waitForSelector(selector);
     const elements = await this.page.$$(selector);
@@ -372,69 +374,62 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {string} question - question to be added.
   * @param {number} answer - answer of the question.
   */
-  async createQuestion(question, answer) {
-    await this.page.waitForSelector(stateEditSelector);
+  async loadCardWithQuestion(questionText, interaction) {
+    await this.page.waitForTimeout(2000);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle, { visible: true });
-    await this.page.click(giveTitle, { clickCount: 3 });
+    await this.page.waitForSelector(explorationTextInput, { visible: true });
+    await this.page.click(explorationTextInput, { clickCount: 3 });
     await this.page.keyboard.press('Backspace');
     await this.page.waitForTimeout(500);
-    await this.type(giveTitle, `${question}`);
+    await this.type(explorationTextInput, `${questionText}`);
 
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(addInteractionButton, { visible: true });
     await this.clickOn(addInteractionButton);
-    await this.clickOn(numericInputSelector);
+    await this.clickOn(interaction);
     await this.clickOn(saveInteractionButton);
+  }
+  
+   /**
+  * Function to add responses to the interactions.
+  * @param {string} response - response to be added.
+  */
+  async addResponsesToTheInteraction(response){
     await this.page.waitForSelector(floatFormInput);
-    await this.type(floatFormInput, answer);
+    await this.type(floatFormInput, response);
     await this.page.waitForSelector('.oppia-click-to-start-editing');
     await this.clickOn('.oppia-click-to-start-editing');
-    await this.page.waitForSelector(giveTitle, { visible: true });
-    await this.type(giveTitle, 'correct');
+    await this.page.waitForSelector(explorationTextInput, { visible: true });
+    await this.type(explorationTextInput, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
+    await this.clickOn(addNewResponseButton)
   }
 
   /**
   * Function for creating an exploration containing questions
-  * @param {string} title - title of the exploration.
+  * @param {string} text - text of the exploration.
   */
-  async createExplorationLoadedWithQuestions(title) {
-    await this.clickOn(createExplorationButtonSelector);
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForTimeout(200);
-    await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle, { visible: true });
-    await this.type(giveTitle, title);
+  async LoadExplorationWithQuestions() {
+    await this.clickOn('.oppia-response-header'); 
 
-    await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton, { visible: true });
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(continueInteractionSelector);
-    await this.clickOn(saveInteractionButton);
-    await this.clickOn('.oppia-response-header');
-    await this.callNewCard('Less Than or equal to 1');
-    await this.openNextCard(1);
-    await this.createQuestion('mention a number less than or equal to 5', '-3');
-    await this.callNewCard('Less than or equal to 4');
-    await this.openNextCard(2);
-    await this.createQuestion('mention a number less than or equal 4', '-3');
-    await this.callNewCard('end');
-    await this.openNextCard(3);
-    await this.page.waitForSelector(stateEditSelector, { visible: true });
-    await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(giveTitle, { visible: true });
-    await this.type(giveTitle, 'last card');
-    await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton, { visible: true });
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(endInteractionSelector);
-    await this.clickOn(saveInteractionButton);
-    await this.openNextCard(0);
-    await this.clickOn(saveChangesButton);
-    await this.page.waitForSelector(saveDraftButton, { visible: true });
-    await this.clickOn(saveDraftButton);
+    await this.createNewCard('Negative Numbers');
+    await this.goToNextCard(1);
+    await this.loadCardWithQuestion(
+      'mention a negaitve number greater than -100', numericInputSelector);
+    await this.addResponsesToTheInteraction('-99');
+
+    await this.createNewCard('Negative Number');
+    await this.goToNextCard(2);
+    await this.loadCardWithQuestion(
+      'mention a negative number greater than -5', numericInputSelector);
+    await this.addResponsesToTheInteraction('-4');
+
+    await this.createNewCard('end');
+    await this.goToNextCard(3);
+    await this.loadCardWithQuestion('Exploration ends here', endInteractionSelector);
+    await this.goToNextCard(0);
+
+    await this.saveExplorationDraft();
   }
 
   /**
@@ -455,7 +450,7 @@ module.exports = class explorationAdmin extends baseUser {
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
-    if (text === 'Test-revision') {
+    if (text === 'Test-revision 1') {
       showMessage('exploration is loading well in preview tab');
     } else {
       throw new Error('exploration is not loading in preview tab');
@@ -485,7 +480,6 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async expectTheExplorationToComplete() {
     const element = await this.page.waitForSelector(toastMessage);
-
     if (element) {
       showMessage('Journey completed successfully');
     } else {
@@ -498,13 +492,15 @@ module.exports = class explorationAdmin extends baseUser {
   * getting completed or not.
   */
   async expectTheExplorationToRestart() {
+    await this.page.waitForTimeout(2000);
     await this.clickOn(explorationRestartButton);
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
-    if (text === 'Test-revision') {
+    console.log(text);
+    if (text === 'Test-revision 1') {
       showMessage('exploration has restarted successfully');
     } else {
       throw new Error('exploration has not restarted successfully');

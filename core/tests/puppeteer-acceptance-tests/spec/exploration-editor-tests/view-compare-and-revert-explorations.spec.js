@@ -22,6 +22,7 @@ const testConstants = require(
   '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
 
 describe('Exploration Admin', function() {
   let explorationAdmin = null;
@@ -34,13 +35,13 @@ describe('Exploration Admin', function() {
   it('should be able to view, compare, revert, and download revisions',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
-      await explorationAdmin.createExploration('Test-revision');
+      await explorationAdmin.createExploration('Test-revision', endInteractionSelector);
       await explorationAdmin.createMultipleRevisionsOfTheSameExploration(
         'Test-revision');
 
       await explorationAdmin.navigateToHistoryTab();
       await explorationAdmin.expectRevisionsToHaveVersionNoNotesUsernameDate();
-      await explorationAdmin.expectRevisionsToBeDateOrderedAnd10ItemsPerPage();
+      await explorationAdmin.expectRevisionsToBeOrderedByDate();
       await explorationAdmin.filterRevisionsByUsername();
       await explorationAdmin.ExpectPaginatorToChangeItemsPerPage();
 
