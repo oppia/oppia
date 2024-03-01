@@ -413,6 +413,7 @@ describe('Core exploration functionality', function() {
 
   it('should not show self-loop warning when navigating between ' +
     'different states', async function() {
+    // setup initisl state
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
     await explorationEditorMainTab.setInteraction('NumericInput');
@@ -429,11 +430,13 @@ describe('Core exploration functionality', function() {
       await forms.toRichText('try again'));
     await defaultResponseEditor.setDestination(null, false, null);
 
+    // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges();
-    await explorationEditorMainTab.moveToState('Introduction');
 
+    // test the flow
+    await explorationEditorMainTab.moveToState('Introduction');
     await explorationEditorPage.navigateToPreviewTab();
     await explorationEditorPage.waitForPreviewTabToLoad();
     await explorationPlayerPage.submitAnswer('NumericInput', 1);
