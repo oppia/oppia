@@ -53,6 +53,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
+      - name: Deleting ubuntu files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - uses: ./.github/actions/merge
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
