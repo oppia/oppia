@@ -17,7 +17,6 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
@@ -257,7 +256,3 @@ export class LearnerGroupSyllabusComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerGroupSyllabus',
-  downgradeComponent({component: LearnerGroupSyllabusComponent}));
