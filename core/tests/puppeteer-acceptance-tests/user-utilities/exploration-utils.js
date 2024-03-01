@@ -230,7 +230,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    *  This function verifies that the selected language is displayed correctly.
    * @param {string} expectedLanguage
    */
-  async expectLanguageToBeSelected(expectedLanguage) {
+  async expectSelectedLanguageToBe(expectedLanguage) {
     const languageDropdown = await this.page.$('#mat-select-value-9');
     await languageDropdown.click();
 

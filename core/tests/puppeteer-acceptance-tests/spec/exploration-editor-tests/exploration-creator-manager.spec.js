@@ -71,7 +71,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
 
       await explorationCreator.selectLanguage();
-      await explorationCreator.expectLanguageToBeSelected('English');
+      await explorationCreator.expectSelectedLanguageToBe('English');
 
       await explorationCreator.addTags('Your Tag Here');
 
