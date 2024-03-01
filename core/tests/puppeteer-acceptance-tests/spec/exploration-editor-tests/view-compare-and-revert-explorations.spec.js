@@ -35,15 +35,16 @@ describe('Exploration Admin', function() {
   it('should be able to view, compare, revert, and download revisions',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
-      await explorationAdmin.createExploration('Test-revision', endInteractionSelector);
+      await explorationAdmin.createExploration(
+        'Test-revision', endInteractionSelector);
       await explorationAdmin.createMultipleRevisionsOfTheSameExploration(
-        'Test-revision');
+        'Test-revision', 13);
 
       await explorationAdmin.navigateToHistoryTab();
       await explorationAdmin.expectRevisionsToHaveVersionNoNotesUsernameDate();
       await explorationAdmin.expectRevisionsToBeOrderedByDate();
       await explorationAdmin.filterRevisionsByUsername();
-      await explorationAdmin.ExpectPaginatorToChangeItemsPerPage();
+      await explorationAdmin.ExpectPaginatorToChangeItemsPerPage(15);
 
       await explorationAdmin.compareDifferentRevisions();
       await explorationAdmin.expectCompareToDisplayMetadataChanges();
