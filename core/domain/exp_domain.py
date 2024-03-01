@@ -5873,7 +5873,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         else:
             self.exploration_email_preferences = exp_email_pref
 
-    def to_dict(self) -> UserExplorationData:
+    def to_dict(self) -> UserExplorationDataDict:
         """Gets the dict representation of UserExplorationData
             domain object.
 
