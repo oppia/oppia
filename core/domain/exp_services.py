@@ -2967,7 +2967,7 @@ def get_user_exploration_data(
     exploration_id: str,
     apply_draft: bool = False,
     version: Optional[int] = None
-) -> exp_domain.UserExplorationData:
+) -> exp_domain.UserExplorationDataDict:
     """Returns a description of the given exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id) if user_id else None
