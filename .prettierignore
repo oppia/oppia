@@ -1,0 +1,24 @@
+core/templates/expressions/parser.js
+core/templates/google-analytics.initializer.ts
+backend_prod_files/*
+integrations/*
+integrations_dev/*
+assets/scripts/*
+third_party/*
+build/*
+*.min.js
+dump.rdb
+.direnv/*
+tmpcompiledjs*
+dist/*
+local_compiled_js/*
+local_compiled_js_for_test/*
+.mypy_cache/*
+*.html
+*.yml
+*.yaml
+# this file is parsed by assets/constants.py, so disable formatting for now.
+assets/constants.ts
+*.css
+# this file is parsed by js_ts_linter, so disable formatting for now.
+core/templates/services/angular-services.index.ts
