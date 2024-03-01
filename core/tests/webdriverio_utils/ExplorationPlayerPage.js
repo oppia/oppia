@@ -220,7 +220,7 @@ var ExplorationPlayerPage = function() {
     ).toMatch(richTextInstructions);
   };
 
-  this.waitForInvisibilityOfLessonCompletionMessage = async function() {
+  this.waitForLessonCompletionMessageToDisappear = async function() {
     var lessonCompletionMessage = $('.e2e-test-lesson-completion-message');
     await waitFor.invisibilityOf(
       lessonCompletionMessage,

@@ -420,7 +420,7 @@ var ExplorationEditorMainTab = function() {
     };
   };
 
-  this.checkInvisibilityOfSelfLoopWarningInResponse = async function() {
+  this.checkSelfLoopWarningIsNotShown = async function() {
     var responseSelfLoopWarning = $('.e2e-test-response-self-loop-warning');
     await waitFor.invisibilityOf(
       responseSelfLoopWarning, 'inaccurate self-loop warning');
