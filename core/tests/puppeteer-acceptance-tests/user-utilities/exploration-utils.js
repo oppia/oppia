@@ -44,7 +44,7 @@ const addCateogry = '#mat-option-69';
 const languageUpdateBar = '#mat-select-value-9';
 const addLanguage = '#mat-option-6';
 const addTags = '#mat-chip-list-input-0';
-const previewSummaryButton = '.click-to-see-preview-summary';
+const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
 const feedbackToggleOff = 'label[for="feedback-switch"]';
@@ -120,7 +120,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn(saveInteractionButton);
   }
 
-  async explorationCreatedSuccessfully() {
+  async showMessageOfSuccessfullExplrationCreation() {
     showMessage('Successfully created a exploration!');
   }
 

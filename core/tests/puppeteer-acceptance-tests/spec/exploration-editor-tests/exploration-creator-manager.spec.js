@@ -58,7 +58,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
       await explorationCreator.addInteraction();
-      await explorationCreator.explorationCreatedSuccessfully();
+      await explorationCreator.showMessageOfSuccessfullExplrationCreation();
 
       await explorationCreator.goToSettingsTab();
 

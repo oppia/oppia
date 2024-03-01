@@ -40,7 +40,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
       await explorationCreator.addInteraction();
-      await explorationCreator.explorationCreatedSuccessfully();
+      await explorationCreator.showMessageOfSuccessfullExplrationCreation();
 
       await explorationCreator.goToSettingsTab();
       await explorationCreator.updateTitle('Your Title Here');
