@@ -224,7 +224,7 @@ var ExplorationPlayerPage = function() {
     var lessonCompletionMessage = $('.e2e-test-lesson-completion-message');
     await waitFor.invisibilityOf(
       lessonCompletionMessage,
-      'Last conversation content took took long to disappear');
+      'Lesson Completion Message took long to disappear');
   };
 
   this.expectExplorationToBeOver = async function() {

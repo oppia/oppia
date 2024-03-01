@@ -420,17 +420,14 @@ describe('Core exploration functionality', function() {
       'NumericInput', async function(richTextEditor) {
         await richTextEditor.appendBoldText('correct');
       }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.markAsCorrect();
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(
+    var firstResponseEditor = (
+      await explorationEditorMainTab.getResponseEditor(0));
+    await firstResponseEditor.markAsCorrect();
+    var defaultResponseEditor = (
+      await explorationEditorMainTab.getResponseEditor('default'));
+    await defaultResponseEditor.setFeedback(
       await forms.toRichText('try again'));
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setDestination(null, false, null);
+    await defaultResponseEditor.setDestination(null, false, null);
 
     await explorationEditorMainTab.moveToState('final card');
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -444,7 +441,8 @@ describe('Core exploration functionality', function() {
     await explorationPlayerPage.waitForInvisibilityOfLessonCompletionMessage();
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.moveToState('Introduction');
-    await explorationEditorMainTab.invisibilityOfSelfLoopWarningInResponse();
+    await (
+      explorationEditorMainTab.checkInvisibilityOfSelfLoopWarningInResponse());
   });
 
   it('should skip the customization modal for interactions having no ' +
