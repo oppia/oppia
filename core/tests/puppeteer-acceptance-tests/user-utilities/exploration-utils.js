@@ -402,7 +402,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps to choose notification type.
    */
-  async chooseToReceiveSuggestedEmailsAsNotification() {
+  async optInToEmailNotifications() {
     await this.clickOn(feedbackToggleOff);
   }
 

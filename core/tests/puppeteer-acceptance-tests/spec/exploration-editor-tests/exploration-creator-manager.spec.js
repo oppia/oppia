@@ -100,7 +100,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.expectVoiceArtistToBeAdded(['guestUsr1', 'guestUsr2', 'guestUsr3']);
 
       await explorationCreator.
-        chooseToReceiveSuggestedEmailsAsNotification();
+      optInToEmailNotifications();
       await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
