@@ -209,9 +209,9 @@ class ExplorationHandler(
                         has_seen_editor_tutorial = True
                     if user_settings.last_started_state_translation_tutorial:
                         has_seen_translation_tutorial = True
-                exploration_data['show_state_editor_tutorial_on_load'] = bool(
+                exploration_data['show_state_editor_tutorial_on_load'] = (
                     not has_seen_editor_tutorial)
-                exploration_data['show_state_translation_tutorial_on_load'] = bool(
+                exploration_data['show_state_translation_tutorial_on_load'] = (
                     not has_seen_translation_tutorial)
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
