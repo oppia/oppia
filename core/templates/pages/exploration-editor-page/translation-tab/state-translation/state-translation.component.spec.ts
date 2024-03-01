@@ -1462,13 +1462,13 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
-  it('should return unicode when translation tab  is active', () => {
+  it('should return unicode when translation tab is active', () => {
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
-        .returnValue(true);
+      .returnValue(true);
     let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
-        content_id: 'content_1',
-        unicode_str: 'This is the unicode'
-  });
+      content_id: 'content_1',
+      unicode_str: 'This is the unicode'
+    });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
     expect(unicodeData).toBe('This is the unicode');
   });
@@ -1487,7 +1487,8 @@ describe('State translation component', () => {
     expect(htmlData).toBe('Translated HTML');
   });
 
-  it('should return unicode when translation is empty in voiceover mode', () => {
+  it('should return unicode when translation is empty in voiceover mode', () =>
+  {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
@@ -1519,7 +1520,8 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
-  it('should return translated unicode in voiceover mode when translation exist', () => {
+  it('should return translated unicode in voiceover mode when translation exist'
+  , () => {
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId',
