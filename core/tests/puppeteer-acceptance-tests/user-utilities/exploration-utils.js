@@ -83,7 +83,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in reaching editor section.
    */
-  async goToEditorSection() {
+  async switchToEditorTab() {
     await this.clickOn(createNewExplorationButton);
     await this.clickOn(takeMeToEditorButton);
   }

@@ -60,7 +60,7 @@ describe('Exploration Creator', function() {
       await superAdmin.closeBrowser();
 
       await explorationCreator.openCreatorDashboardPage();
-      await explorationCreator.goToEditorSection();
+      await explorationCreator.switchToEditorTab();
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
