@@ -68,7 +68,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.expectGoalToEqual('NeedSuccessInLifeAndMoney');
 
       await explorationCreator.selectCategory();
-      await explorationCreator.expectCategoryToBeSelected('Algebra');
+      await explorationCreator.expectSelectedCategoryToBe('Algebra');
 
       await explorationCreator.selectLanguage();
       await explorationCreator.expectLanguageToBeSelected('English');

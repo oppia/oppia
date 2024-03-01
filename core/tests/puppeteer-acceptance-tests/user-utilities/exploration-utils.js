@@ -199,7 +199,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks if a category has been selected for the exploration.
    * @param {string} expectedCategory The Category expected.
    */
-  async expectCategoryToBeSelected(expectedCategory) {
+  async expectSelectedCategoryToBe(expectedCategory) {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     await categoryDropdown.click();
 
