@@ -27,7 +27,6 @@ var ExplorationPlayerPage =
   require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
   require('../webdriverio_utils/LearnerDashboardPage.js');
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
@@ -45,7 +44,6 @@ var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
   var topicsAndSkillsDashboardPage = null;
-  var adminPage = null;
   var libraryPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
@@ -80,7 +78,6 @@ describe('Learner dashboard functionality', function() {
     libraryPage = new LibraryPage.LibraryPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
