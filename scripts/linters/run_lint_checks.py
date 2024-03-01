@@ -27,25 +27,25 @@ This script ignores all filepaths contained within .eslintignore.
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
-        python -m scripts.linters.pre_commit_linter
+        python -m scripts.linters.run_lint_checks
 
 2.  To lint all files in the folder or to lint just a specific file
-        python -m scripts.linters.pre_commit_linter --path filepath
+        python -m scripts.linters.run_lint_checks --path filepath
 
 3.  To lint a specific list of files. Separate filepaths by spaces
-        python -m scripts.linters.pre_commit_linter
+        python -m scripts.linters.run_lint_checks
             --files filepath_1 filepath_2 ... filepath_n
 
 4.  To lint files in verbose mode
-        python -m scripts.linters.pre_commit_linter --verbose
+        python -m scripts.linters.run_lint_checks --verbose
 
 5. To lint a specific list of file extensions. Separate file
     extensions by spaces
-        python -m scripts.linters.pre_commit_linter
+        python -m scripts.linters.run_lint_checks
             --only-check-file-extensions py js
 
 6. To run a shard of the lint tests
-        python -m scripts.linters.pre_commit_linter --shard shard_name
+        python -m scripts.linters.run_lint_checks --shard shard_name
 
    Shards are defined in the SHARDS constant in this file.
 
@@ -743,7 +743,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when pre_commit_linter.py is used as a
+# it will only be called when run_lint_checks.py is used as a
 # script.
 if __name__ == '__main__': # pragma: no cover
     main()

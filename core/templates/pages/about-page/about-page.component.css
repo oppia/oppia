@@ -181,6 +181,7 @@
   width: 100%;
 }
 .oppia-about-page-section-seven .oppia-about-button {
+  display: inline-block;
   width: 510px;
 }
 @media (max-width: 1440px) and (min-width: 1280px) {
