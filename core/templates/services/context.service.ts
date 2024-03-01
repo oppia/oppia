@@ -257,6 +257,8 @@ export class ContextService {
   // Returns a string representing the explorationId (obtained from the
   // URL).
   getExplorationId(): string {
+    console.log('Inside context service')
+    console.log(this.explorationId);
     if (this.explorationId) {
       return this.explorationId;
     } else if (

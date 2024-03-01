@@ -101,7 +101,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       });
 
     modalRef.componentInstance.languageCode = languageCode;
-    modalRef.componentInstance.voiceArtistID = voiceArtistId;
+    modalRef.componentInstance.voiceArtistId = voiceArtistId;
     modalRef.componentInstance.voiceArtistName = (
       this.voiceArtistIdToVoiceArtistName[voiceArtistId]);
     modalRef.componentInstance.languageAccentCodes = languageAccentCodes

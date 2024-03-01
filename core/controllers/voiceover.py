@@ -33,6 +33,7 @@ class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_access_voiceover_admin_page
     def get(self) -> None:
         """Renders the voiceover admin page."""
+        print('Nikhil')
         self.render_template('voiceover-admin-page.mainpage.html')
 
 
@@ -206,4 +207,47 @@ class VoiceArtistMetadataHandler(
         voiceover_services.update_voice_artists_language_mapping(
             voice_artist_id_to_language_mapping)
 
+        self.render_json(self.values)
+
+
+class GetSampleVoiceoversForGivenVoiceArtist(
+     base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to get sample contributed voiceovers of a voice artist in
+    a given language.
+    """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+        'voice_artist_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'language_code': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    def get(self, voice_artist_id, language_code):
+        # voiceovers = (
+        #     voiceover_services.
+        #     get_sample_voiceovers_for_voice_artist_in_the_given_language(
+        #         voice_artist_id=voice_artist_id,
+        #         language_code=language_code
+        #     )
+        # )
+        exploration_id_to_filenames = {
+            'egtG9qUavylo': ['content_3-hi-2znwu1q9ni.mp3'],
+            'Jb1KbCvVatzs': ['content_0-hi-ko55h7pa05.mp3']
+        }
+
+        print('Inside handler')
+        print(exploration_id_to_filenames)
+
+        self.values.update({
+            'exploration_id_to_filenames': exploration_id_to_filenames,
+        })
         self.render_json(self.values)

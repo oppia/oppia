@@ -258,9 +258,10 @@ def get_voice_artist_ids_to_voice_artist_names():
     return voice_artist_id_to_voice_artist_name
 
 
-def get_specific_voice_artist_language_information(
+def get_sample_voiceovers_for_voice_artist_in_the_given_language(
     voice_artist_id: str, language_code: str
 ):
+    print('Inside voiceover services')
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel.get(
         voice_artist_id, strict=False)
     voiceovers_and_contents_mapping = (
@@ -269,9 +270,4 @@ def get_specific_voice_artist_language_information(
     language_mapping = voiceovers_and_contents_mapping[language_code]
     voiceovers = language_mapping['voiceovers']
 
-    voice_artist_language_information = {
-        'voice_artist_id': voice_artist_id,
-        'language_code': language_code,
-        'voiceovers': voiceovers
-    }
-    return voice_artist_language_information
+    return voiceovers

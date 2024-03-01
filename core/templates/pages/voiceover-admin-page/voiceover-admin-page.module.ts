@@ -43,6 +43,7 @@ import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
 import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
 import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
 import { AddAccentToVoiceoverLanguageModalComponent } from './modals/add-accent-to-voiceover-language-modal.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 declare var angular: ng.IAngularStatic;
 
@@ -62,7 +63,8 @@ declare var angular: ng.IAngularStatic;
     SharedComponentsModule,
     MatPaginatorModule,
     MatTableModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    SharedFormsModule
   ],
   declarations: [
     VoiceoverAdminPageComponent,

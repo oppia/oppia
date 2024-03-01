@@ -36,6 +36,16 @@ interface VoiceoverAdminDataBackendDict {
   };
 }
 
+interface ExplorationIdToFilenamesBackendDict {
+  'exploration_id_to_filenames': {
+    [explorationId: string]: string[];
+  };
+}
+
+export interface ExplorationIdToFilenames {
+  [explorationId: string]: string[];
+};
+
 export interface LanguageAccentToDescription {
   [languageAccentCode: string]: string;
 }
@@ -155,10 +165,26 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async fetchSpecificVoiceArtistLanguageInformationAsync(
+  async fetchVoiceoversForVoiceArtistAsync(
       voiceArtistId: string, languageCode: string
-  ) {
-
+  ): Promise<ExplorationIdToFilenames> {
+    return new Promise((resolve, reject) => {
+      console.log('In side fetch voiceovers');
+      console.log(voiceArtistId, languageCode);
+      this.http.get<ExplorationIdToFilenamesBackendDict>(
+        this.urlInterpolationService.interpolateUrl(
+          VoiceoverDomainConstants.GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE,
+          {
+            voice_artist_id: voiceArtistId,
+            language_code: languageCode
+          }
+        )
+      ).toPromise().then(response => {
+        resolve(response.exploration_id_to_filenames);
+      }, errorResponse => {
+        reject(errorResponse?.error);
+      })
+    })
   }
 }
 

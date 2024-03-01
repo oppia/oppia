@@ -22,8 +22,11 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import {
   VoiceoverBackendApiService, LanguageAccentToDescription,
   LanguageCodesMapping, LanguageAccentMasterList,
-  VoiceArtistIdToLanguageMapping, VoiceArtistIdToVoiceArtistName
+  VoiceArtistIdToLanguageMapping, VoiceArtistIdToVoiceArtistName,
+  ExplorationIdToFilenames
 } from 'domain/voiceover/voiceover-backend-api.service';
+import { AudioPlayerService } from 'services/audio-player.service';
+import { ContextService } from 'services/context.service';
 
 @Component({
   selector: 'oppia-add-accent-to-voiceover-language-modal',
@@ -37,15 +40,28 @@ export class AddAccentToVoiceoverLanguageModalComponent
   voiceArtistName: string = '';
   languageAccentCodes = {};
   updateButtonIsDisabled: boolean = true;
+  explorationIdsToFilenames: ExplorationIdToFilenames = {};
+  pageIsInitialized = false;
+  currentFilename = '';
 
   constructor(
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private audioPlayerService: AudioPlayerService,
+    private contextService: ContextService,
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-
+    console.log(this.voiceArtistId);
+    this.voiceoverBackendApiService.fetchVoiceoversForVoiceArtistAsync(
+      this.voiceArtistId, this.languageCode
+    ).then(explorationIdToFilenames => {
+      this.explorationIdsToFilenames = explorationIdToFilenames;
+      console.log(this.explorationIdsToFilenames);
+      this.pageIsInitialized = true;
+    });
   }
 
   update(): void {
@@ -59,5 +75,20 @@ export class AddAccentToVoiceoverLanguageModalComponent
   addLanguageAccentCodeSupport(languageAccentCode) {
     this.languageAccentCode = languageAccentCode;
     this.updateButtonIsDisabled = false;
+  }
+
+  playAudio(filename: string, explorationId: string): void {
+    this.currentFilename = filename;
+    this.contextService.explorationId = explorationId;
+    this.audioPlayerService.stop();
+
+    this.audioPlayerService.loadAsync(filename).then(() => {
+      this.audioPlayerService.play();
+    });
+  }
+
+  pauseAudio(): void {
+    this.currentFilename = '';
+    this.audioPlayerService.stop();
   }
 }

@@ -426,6 +426,24 @@ class BaseHandler(
                 request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
 
+
+        print('\n'*3)
+        print('------------'*3)
+        print('Request url = ',self.request.uri)
+        print('Handler class name = ',handler_class_name)
+        print('handler_args = ',handler_args)
+        print('Arguments = ', self.request.arguments())
+        print('Iterating over arguments...')
+        for j in self.request.arguments():
+            print(j, self.request.get(j))
+        print('URL path elements = ', self.request.route_kwargs)
+        print('Request method = ',request_method)
+        print('HANDLER_ARGS_SCHEMAS =  ', self.HANDLER_ARGS_SCHEMAS)
+        print('URL_PATH_ARGS_SCHEMAS = , ', self.URL_PATH_ARGS_SCHEMAS)
+        print('GET_HANDLER_ERROR_RETURN_TYPE', self.GET_HANDLER_ERROR_RETURN_TYPE)
+        print('------------'*3)
+        print('\n'*3)
+
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).

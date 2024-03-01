@@ -474,6 +474,11 @@ URLS = [
         r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
         voiceover.VoiceArtistMetadataHandler
     ),
+    get_redirect_route(
+        r'%s/<voice_artist_id>/<language_code>' %
+        feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
+        voiceover.GetSampleVoiceoversForGivenVoiceArtist
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
