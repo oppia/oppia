@@ -79,7 +79,7 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.previewSummary();
 
-      await explorationCreator.updateAutomaticTextToSpeech();
+      await explorationCreator.disableAutomaticTextToSpeech();
       await explorationCreator.
         expectAutomaticTextToSpeechToBeDisabled();
 

@@ -302,7 +302,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in updating advanced settings
    */
-  async updateAutomaticTextToSpeech() {
+  async disableAutomaticTextToSpeech() {
     await this.clickOn(textToSpeechToggle);
 
     showMessage('Successfully updated advanced settings!');
