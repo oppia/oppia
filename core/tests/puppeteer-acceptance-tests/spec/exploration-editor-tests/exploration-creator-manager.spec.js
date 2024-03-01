@@ -24,6 +24,9 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Creator', function() {
+  let guestUser1 = null;
+  let guestUser2 = null;
+  let guestUser3 = null;
   let explorationCreator = null;
   let superAdmin = null;
 
@@ -51,6 +54,10 @@ describe('Exploration Creator', function() {
       await superAdmin.expectUserToHaveRole(
         'explorationAdm', 'curriculum admin');
 
+      await guestUser1.closeBrowser();
+      await guestUser2.closeBrowser();
+      await guestUser3.closeBrowser();
+      await superAdmin.closeBrowser();
       await explorationCreator.goToDashboardUrl();
       await explorationCreator.goToEditorSection();
       await explorationCreator.updateCardName('Test question');
@@ -79,9 +86,9 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.previewSummary();
 
-      await explorationCreator.disableAutomaticTextToSpeech();
+      await explorationCreator.enableAutomaticTextToSpeech();
       await explorationCreator.
-        expectAutomaticTextToSpeechToBeDisabled();
+        expectAutomaticTextToSpeechToBeEnabled();
 
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
       await explorationCreator.assignUserToPlaytesterRole('guestUsr2');
@@ -89,8 +96,8 @@ describe('Exploration Creator', function() {
       await explorationCreator.publishExploration();
       await explorationCreator.expectExplorationToBePublished();
 
-      await explorationCreator.addVoiceArtist();
-      await explorationCreator.expectVoiceArtistToBeAdded('guestUsr3');
+      await explorationCreator.addVoiceArtist(['guestUsr1', 'guestUsr2', 'guestUsr3']);
+      await explorationCreator.expectVoiceArtistToBeAdded(['guestUsr1', 'guestUsr2', 'guestUsr3']);
 
       await explorationCreator.
         chooseToReceiveSuggestedEmailsAsNotification();

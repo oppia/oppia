@@ -279,8 +279,8 @@ module.exports = class e2eExplorationCreator extends baseUser {
    */
   async previewSummary() {
     await this.page.waitForSelector(
-      '.click-to-see-preview-summary:not([disabled])');
-    await this.clickOn('.click-to-see-preview-summary');
+      '.e2e-test-open-preview-summary-modal:not([disabled])');
+    await this.clickOn('.e2e-test-open-preview-summary-modal');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
     await this.expectPreviewSummaryToBeVisible();
@@ -302,7 +302,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in updating advanced settings
    */
-  async disableAutomaticTextToSpeech() {
+  async enableAutomaticTextToSpeech() {
     await this.clickOn(textToSpeechToggle);
 
     showMessage('Successfully updated advanced settings!');
@@ -312,7 +312,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks whether the Automatic Text-to-Speech
    * setting is enabled or disabled.
    */
-  async expectAutomaticTextToSpeechToBeDisabled() {
+  async expectAutomaticTextToSpeechToBeEnabled() {
     const autoTTSwitch = await this.page.$('#text-speech-switch');
     const isAutoTTSwitchOn = await this.page.evaluate(
       switchElement => switchElement.checked, autoTTSwitch);
@@ -365,11 +365,22 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding voice artist.
+   * @param {Array} voiceArtists
    */
-  async addVoiceArtist() {
+  async addVoiceArtist(voiceArtists) {
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
-    await this.type(addVoiceArtistUserName, 'guestUsr3');
+    await this.type(addVoiceArtistUserName, voiceArtists[0]);
+    await this.clickOn(voiceArtistSaveButton);
+    
+    await this.clickOn(voiceArtistEditButton);
+    await this.clickOn(addVoiceArtistUserName);
+    await this.type(addVoiceArtistUserName, voiceArtists[1]);
+    await this.clickOn(voiceArtistSaveButton);
+
+    await this.clickOn(voiceArtistEditButton);
+    await this.clickOn(addVoiceArtistUserName);
+    await this.type(addVoiceArtistUserName, voiceArtists[2]);
     await this.clickOn(voiceArtistSaveButton);
   }
 
