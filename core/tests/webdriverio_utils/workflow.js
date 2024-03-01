@@ -417,6 +417,29 @@ var createQuestion = async function() {
   await skillEditorPage.saveQuestion();
 };
 
+// Sets the question interaction to NumericInput after deleting the
+// existing interaction.
+var changeQuestionInteraction = async function() {
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await explorationEditorMainTab.deleteInteraction();
+  await explorationEditorMainTab.setInteraction('NumericInput');
+  await explorationEditorMainTab.addResponse(
+    'NumericInput', await forms.toRichText('Correct Answer'), null, false,
+    'IsGreaterThan', 2);
+  await (
+    await explorationEditorMainTab.getResponseEditor(0)
+  ).markAsCorrect();
+  await (
+    await explorationEditorMainTab.getResponseEditor('default')
+  ).setFeedback(await forms.toRichText('Try again'));
+  await explorationEditorMainTab.addHint('Hint 1');
+  await explorationEditorMainTab.addSolution('NumericInput', {
+    correctAnswer: 4,
+    explanation: 'It is correct'
+  });
+};
+
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;
 exports.uploadImage = uploadImage;
@@ -448,3 +471,4 @@ exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createTopic = createTopic;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;
+exports.changeQuestionInteraction = changeQuestionInteraction;

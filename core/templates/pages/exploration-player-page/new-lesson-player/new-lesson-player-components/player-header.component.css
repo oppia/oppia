@@ -32,3 +32,20 @@
     display: block;
   }
 }
+
+.player-header-right {
+  display: none;
+  padding: 12px;
+}
+
+.header-menu-button {
+  background: none;
+  border: none;
+  color: #fff;
+}
+
+@media screen and (max-width: 574px) {
+  .player-header-right {
+    display: block;
+  }
+}
