@@ -116,7 +116,10 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(saveInteractionButton);
   }
 
-  async saveExplorationDraft(){
+  /**
+  * Function for saving an exploration draft.
+  */
+  async saveExplorationDraft() {
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(
       saveDraftButton, { visible: true });
@@ -124,13 +127,14 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(saveDraftButton);
   }
 
-   /**
+  /**
   * Function to make metadata changes in the fucntio
   * @param {string} text - the text of the Exploration.
   */
   async makeMetaDataChanges(title) {
     await this.page.waitForTimeout(200);
-    await this.clickOn(navigateToSettingsTabButton, { waitUntil: 'networkidle0' });
+    await this.clickOn(
+      navigateToSettingsTabButton, { waitUntil: 'networkidle0' });
     await this.page.waitForTimeout(200);
     await this.type(explorationTitleInput, title);
     await this.clickOn(navigateToMainTabButton, { waitUntil: 'networkidle0' });
@@ -139,19 +143,20 @@ module.exports = class explorationAdmin extends baseUser {
   /**
   * Function to create multiple revisions of the same Exploration.
   * @param {string} text - the text of the Exploration.
+  * @param {number} numOfVersions - number of versions to created.
   */
-  async createMultipleRevisionsOfTheSameExploration(text) {
+  async createMultipleRevisionsOfTheSameExploration(text, numOfVersion) {
     await this.makeMetaDataChanges('changes');
     await this.saveExplorationDraft();
     await this.page.waitForTimeout(300);
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < numOfVersion; i++) {
       await this.page.waitForSelector(stateEditSelector, { visible: true });
       await this.clickOn(stateEditSelector);
       await this.page.waitForSelector(explorationTextInput, { visible: true });
       await this.page.click(explorationTextInput, { clickCount: 3 });
       await this.page.keyboard.press('Backspace');
       await this.page.waitForTimeout(500);
-      await this.type(explorationTextInput, `${text} ${i+3}`);
+      await this.type(explorationTextInput, `${text} ${i + 3}`);
       await this.clickOn(saveContentButton);
       await this.saveExplorationDraft();
     }
@@ -235,8 +240,9 @@ module.exports = class explorationAdmin extends baseUser {
   /**
   * Function to verify if the number of items per page adjusts according
   *  to changes in the paginator settings.
+  * @param {number} itemsPerPage - number of items/revisions to show per page.
   */
-  async ExpectPaginatorToChangeItemsPerPage() {
+  async ExpectPaginatorToChangeItemsPerPage(itemsPerPage) {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(paginatorToggler, { visible: true });
     await this.clickOn(paginatorToggler);
@@ -244,14 +250,14 @@ module.exports = class explorationAdmin extends baseUser {
 
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(versionsList);
-    if (revisions.length !== 15) {
+    if (revisions.length !== itemsPerPage) {
       throw new Error(
-        `Pagination Error: When the items per page is set to 15,
-         expected 15 user revisions, but got ${revisions.length}`);
+        `Pagination Error: When the items per page is set to ${itemsPerPage},
+         expected ${itemsPerPage} user revisions, but got ${revisions.length}`);
     } else {
       showMessage(
-        `When the items per page is set to 15, 
-        correctly shows 15 user revisions.`);
+        `When the items per page is set to ${itemsPerPage}, 
+        correctly shows ${itemsPerPage} user revisions.`);
     }
   }
 
@@ -277,9 +283,9 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForTimeout(300);
     const divContents = await this.page.$$eval(
       '.CodeMirror-code', divs => divs.map(div => div.textContent));
-    if(divContents[0] !== divContents[1]) {
+    if (divContents[0] !== divContents[1]) {
       showMessage('Metadata changes are reflected in the versions.');
-    }else {
+    } else {
       throw new Error('No changes detected in the metadata.');
     }
     await this.clickOn(closeMetadataModal);
@@ -389,12 +395,12 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(interaction);
     await this.clickOn(saveInteractionButton);
   }
-  
-   /**
-  * Function to add responses to the interactions.
-  * @param {string} response - response to be added.
-  */
-  async addResponsesToTheInteraction(response){
+
+  /**
+ * Function to add responses to the interactions.
+ * @param {string} response - response to be added.
+ */
+  async addResponsesToTheInteraction(response) {
     await this.page.waitForSelector(floatFormInput);
     await this.type(floatFormInput, response);
     await this.page.waitForSelector('.oppia-click-to-start-editing');
@@ -402,7 +408,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(explorationTextInput, { visible: true });
     await this.type(explorationTextInput, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton)
+    await this.clickOn(addNewResponseButton);
   }
 
   /**
@@ -410,7 +416,7 @@ module.exports = class explorationAdmin extends baseUser {
   * @param {string} text - text of the exploration.
   */
   async LoadExplorationWithQuestions() {
-    await this.clickOn('.oppia-response-header'); 
+    await this.clickOn('.oppia-response-header');
 
     await this.createNewCard('Negative Numbers');
     await this.goToNextCard(1);
@@ -426,7 +432,8 @@ module.exports = class explorationAdmin extends baseUser {
 
     await this.createNewCard('end');
     await this.goToNextCard(3);
-    await this.loadCardWithQuestion('Exploration ends here', endInteractionSelector);
+    await this.loadCardWithQuestion(
+      'Exploration ends here', endInteractionSelector);
     await this.goToNextCard(0);
 
     await this.saveExplorationDraft();
@@ -499,7 +506,6 @@ module.exports = class explorationAdmin extends baseUser {
     const element = await this.page.$(explorationConversationContent);
     const text = await this.page.evaluate(
       element => element.textContent, element);
-    console.log(text);
     if (text === 'Test-revision 1') {
       showMessage('exploration has restarted successfully');
     } else {
