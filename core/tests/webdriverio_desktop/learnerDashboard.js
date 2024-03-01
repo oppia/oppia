@@ -225,15 +225,6 @@ describe('Learner dashboard functionality', function() {
     var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await elem.setValue(topicId);
-      });
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
@@ -317,15 +308,6 @@ describe('Learner dashboard functionality', function() {
     var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await elem.setValue(topicId);
-      });
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
