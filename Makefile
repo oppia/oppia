@@ -130,7 +130,7 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS) || $(MAKE) stop
+	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)" || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
