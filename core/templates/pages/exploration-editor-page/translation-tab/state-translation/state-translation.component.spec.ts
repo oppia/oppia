@@ -1487,8 +1487,7 @@ describe('State translation component', () => {
     expect(htmlData).toBe('Translated HTML');
   });
 
-  it('should return unicode when translation is empty in voiceover mode', () =>
-  {
+  it('should return unicode when translation is empty in voiceover mode', () =>{
     entityTranslationsService.languageCodeToEntityTranslations.en = (
       new EntityTranslation(
         'entityId', 'entityType', 'entityVersion', 'hi', {
@@ -1521,27 +1520,28 @@ describe('State translation component', () => {
   });
 
   it('should return translated unicode in voiceover mode when translation exist'
-  , () => {
-    entityTranslationsService.languageCodeToEntityTranslations.en = (
-      new EntityTranslation(
-        'entityId',
-        'entityType',
-        'entityVersion',
-        'hi',
+    , () => {
+      entityTranslationsService.languageCodeToEntityTranslations.en = (
+        new EntityTranslation(
+          'entityId',
+          'entityType',
+          'entityVersion',
+          'hi',
+          {
+            content_1: new TranslatedContent
+            (
+              'Translated UNICODE', 'unicode', true
+            )
+          })
+      );
+      let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict(
         {
-          content_1: new TranslatedContent
-          (
-            'Translated UNICODE', 'unicode', true
-          )
-        })
-    );
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
-      content_id: 'content_1',
-      unicode_str: 'This is the unicode'
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode'
+        });
+      const unicodeData = component.getRequiredUnicode(subtitledObject);
+      expect(unicodeData).toBe('Translated UNICODE');
     });
-    const unicodeData = component.getRequiredUnicode(subtitledObject);
-    expect(unicodeData).toBe('Translated UNICODE');
-  });
 
   describe('when rules input tab is accessed but with no rules', () => {
     it('should throw an error when there are no rules', () => {
