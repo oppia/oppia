@@ -268,6 +268,18 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_create_learner_group_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CreateLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.EditLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
@@ -297,9 +309,6 @@ URLS = [
     get_redirect_route(
         r'/contributionrightsdatahandler',
         contributor_dashboard_admin.ContributionRightsDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
-        contributor_dashboard_admin.ContributorDashboardAdminPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
@@ -437,8 +446,8 @@ URLS = [
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
-        classroom.ClassroomAdminDataHandler),
+        r'%s' % feconf.CLASSROOM_ID_TO_NAME_HANDLER_URL,
+        classroom.ClassroomIdToNameHandler),
     get_redirect_route(
         r'%s' % feconf.UNUSED_TOPICS_HANDLER_URL,
         classroom.UnusedTopicsHandler),
@@ -1018,8 +1027,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1099,9 +1106,6 @@ URLS = [
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
-        learner_group.CreateLearnerGroupPage),
-    get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),
     get_redirect_route(
@@ -1116,8 +1120,6 @@ URLS = [
     get_redirect_route(
         r'/exit_learner_group_handler/<learner_group_id>',
         learner_group.ExitLearnerGroupHandler),
-    get_redirect_route(
-        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
@@ -1213,6 +1215,9 @@ URLS.extend((
     get_redirect_route(
         r'/cron/mail/curriculum_admins/chapter_publication_notfications',
         cron.CronMailChapterPublicationsNotificationsHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/new_contributor_dashboard_suggestions',
+        cron.CronMailReviewerNewSuggestionsHandler),
 ))
 
 # Add tasks urls.

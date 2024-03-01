@@ -60,8 +60,6 @@ module.exports = {
     }
   },
   entry: {
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.import.ts',
@@ -75,9 +73,6 @@ module.exports = {
     contributor_dashboard:
       commonPrefix + '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    contributor_dashboard_admin:
-      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-      'contributor-dashboard-admin-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
@@ -93,12 +88,6 @@ module.exports = {
     facilitator_dashboard:
       commonPrefix + '/pages/facilitator-dashboard-page/' +
       'facilitator-dashboard-page.import.ts',
-    learner_group_creator:
-      commonPrefix + '/pages/learner-group-pages/create-group/' +
-      'create-learner-group-page.import.ts',
-    learner_group_editor:
-      commonPrefix + '/pages/learner-group-pages/edit-group/' +
-      'edit-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root:
@@ -169,17 +158,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['blog_dashboard'],
-      filename: 'blog-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/blog-dashboard-page/' +
-        'blog-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
       filename: 'collection-editor-page.mainpage.html',
       hybrid: true,
@@ -230,17 +208,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/creator-dashboard-page/' +
         'creator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard_admin'],
-      filename: 'contributor-dashboard-admin-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-        'contributor-dashboard-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -442,28 +409,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/facilitator-dashboard-page/' +
         'facilitator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_group_creator'],
-      filename: 'create-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/create-group/' +
-        'create-learner-group-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_group_editor'],
-      filename: 'edit-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/edit-group/' +
-        'edit-learner-group-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
