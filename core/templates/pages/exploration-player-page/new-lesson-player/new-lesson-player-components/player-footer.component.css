@@ -7,7 +7,23 @@
 .oppia-lesson-player-footer {
   background-color: #fff;
   bottom: 0;
-  height: 40px;
+  display: flex;
+  flex-direction: row;
+  height: 60px;
+  justify-content: space-between;
+  padding: 8px;
   position: absolute;
   width: 100%;
+}
+
+.player-footer-previous-button {
+  background: #fcfcfd;
+  border: 1px solid #0d48a1;
+  border-radius: 4px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  color: #0d48a1;
+  height: 44px;
+  margin: 0 auto;
+  padding: 10px 0px;
+  width: 44px;
 }
