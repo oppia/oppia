@@ -126,7 +126,7 @@ run_tests.third_party_size_check: ## Runs the third party size check
 
 run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
-	$(MAKE) run-devserver
+	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
