@@ -41,8 +41,7 @@ export class HtmlLengthService {
   ) {}
 
   /**
-    * ['oppia-noninteractive-image', 'oppia-noninteractive-math']
-    * The above tags constitutes for non text nodes.
+    * The below tags constitutes for non text nodes.
     */
   nonTextTags = [
     'oppia-noninteractive-math',
