@@ -198,6 +198,21 @@ class ExplorationHandler(
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
+            if self.user_id is not None:
+                user_settings = user_services.get_user_settings(
+                    self.user_id, strict=False
+                )
+                has_seen_editor_tutorial = False
+                has_seen_translation_tutorial = False
+                if user_settings is not None:
+                    if user_settings.last_started_state_editor_tutorial:
+                        has_seen_editor_tutorial = True
+                    if user_settings.last_started_state_translation_tutorial:
+                        has_seen_translation_tutorial = True
+                exploration_data['show_state_editor_tutorial_on_load'] = bool(
+                    not has_seen_editor_tutorial)
+                exploration_data['show_state_translation_tutorial_on_load'] = bool(
+                    not has_seen_translation_tutorial)
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
             # dictionary.

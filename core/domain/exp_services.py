@@ -2967,7 +2967,7 @@ def get_user_exploration_data(
     exploration_id: str,
     apply_draft: bool = False,
     version: Optional[int] = None
-) -> exp_domain.AugmentedUserExplorationDataDict:
+) -> exp_domain.UserExplorationData:
     """Returns a description of the given exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id) if user_id else None
@@ -3000,27 +3000,13 @@ def get_user_exploration_data(
     draft_change_list_id = (
         exp_user_data.draft_change_list_id if exp_user_data else 0)
 
-    editor_dict = exp_domain.AugmentedUserExplorationData(
+    editor_dict = exp_domain.UserExplorationData(
         exploration=exploration,
         states=states,
         rights=rights_manager.get_exploration_rights(exploration_id).to_dict()
     ).to_dict()
 
     if user_id is not None:
-        user_settings = user_services.get_user_settings(
-            user_id, strict=False
-        )
-        has_seen_editor_tutorial = False
-        has_seen_translation_tutorial = False
-        if user_settings is not None:
-            if user_settings.last_started_state_editor_tutorial:
-                has_seen_editor_tutorial = True
-            if user_settings.last_started_state_translation_tutorial:
-                has_seen_translation_tutorial = True
-        editor_dict['show_state_editor_tutorial_on_load'] = bool(
-            user_id and not has_seen_editor_tutorial)
-        editor_dict['show_state_translation_tutorial_on_load'] = bool(
-            user_id and not has_seen_translation_tutorial)
         editor_dict['draft_changes'] = draft_changes
         editor_dict['draft_change_list_id'] = draft_change_list_id
         editor_dict['is_version_of_draft_valid'] = is_valid_draft_version

@@ -5792,8 +5792,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         }
 
 
-class AugmentedUserExplorationDataDict(TypedDict):
-    """Dictionary representing the AugmentedUserExplorationData object."""
+class UserExplorationDataDict(TypedDict):
+    """Dictionary representing the UserExplorationDataDict object."""
 
     exploration_id: str
     title: str
@@ -5819,7 +5819,7 @@ class AugmentedUserExplorationDataDict(TypedDict):
     exploration_metadata: ExplorationMetadataDict
 
 
-class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
+class UserExplorationData(translation_domain.BaseTranslatableObject):
     """Domain object for an User Exploration data."""
 
     default_exp_email_pref: user_domain.UserExplorationPrefsDict = {
@@ -5839,7 +5839,7 @@ class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
         is_valid_draft_version: Optional[bool] = False,
         draft_changes: Optional[Dict[str, str]] = None,
     ) -> None:
-        """Initializes a AugmentedUserExplorationData domain object.
+        """Initializes a UserExplorationData domain object.
 
         Args:
             exploration: Exploration. The exploration domain object.
@@ -5873,12 +5873,12 @@ class AugmentedUserExplorationData(translation_domain.BaseTranslatableObject):
         else:
             self.exploration_email_preferences = exp_email_pref
 
-    def to_dict(self) -> AugmentedUserExplorationDataDict:
-        """Gets the dict representation of AugmentedUserExplorationData
+    def to_dict(self) -> UserExplorationData:
+        """Gets the dict representation of UserExplorationData
             domain object.
 
         Returns:
-            dict. The dict representation of the AugmentedUserExplorationData
+            dict. The dict representation of the UserExplorationData
             domain object.
         """
 
