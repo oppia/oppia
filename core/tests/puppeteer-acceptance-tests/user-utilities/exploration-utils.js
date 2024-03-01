@@ -283,6 +283,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn('.click-to-see-preview-summary');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
+    await this.expectPreviewSummaryToBeVisible();
   }
 
   /**

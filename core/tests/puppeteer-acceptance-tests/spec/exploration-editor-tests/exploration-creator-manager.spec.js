@@ -78,7 +78,6 @@ describe('Exploration Creator', function() {
       await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.previewSummary();
-      await explorationCreator.expectPreviewSummaryToBeVisible();
 
       await explorationCreator.updateAutomaticTextToSpeech();
       await explorationCreator.
