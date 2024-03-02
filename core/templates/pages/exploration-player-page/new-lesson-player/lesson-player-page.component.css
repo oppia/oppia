@@ -9,6 +9,18 @@
   flex-direction: column;
 }
 
+.oppia-new-player-content::before {
+  content: "";
+  background-image: url('/assets/images/background/lessonPlayer.png');
+  background-repeat: repeat;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.2;
+}
+
 .oppia-new-player-content {
   background-color: #aed2e9;
   display: flex;
