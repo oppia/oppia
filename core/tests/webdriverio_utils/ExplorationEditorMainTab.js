@@ -420,6 +420,12 @@ var ExplorationEditorMainTab = function() {
     };
   };
 
+  this.checkSelfLoopWarningIsNotShown = async function() {
+    var responseSelfLoopWarning = $('.e2e-test-response-self-loop-warning');
+    await waitFor.invisibilityOf(
+      responseSelfLoopWarning, 'inaccurate self-loop warning');
+  };
+
   this.expectCannotAddResponse = async function() {
     expect(await addResponseButton.isExisting()).toBeFalsy();
   };
