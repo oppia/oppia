@@ -70,7 +70,6 @@ const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
 
-// let titleBeforeChanges = '';
 let explorationUrlAfterPublished = '';
 
 module.exports = class e2eExplorationCreator extends baseUser {
@@ -144,7 +143,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function is used to save the current input.
    */
-  async extraClickToSaveCurrentInput(){
+  async extraClickToSaveCurrentInput() {
     await this.page.waitForTimeout(500);
     await this.clickOn('.e2e-test-settings-container');
   }
@@ -381,7 +380,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.clickOn(addVoiceArtistUserName);
     await this.type(addVoiceArtistUserName, voiceArtists[0]);
     await this.clickOn(voiceArtistSaveButton);
-    
+
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
     await this.type(addVoiceArtistUserName, voiceArtists[1]);
@@ -525,12 +524,11 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.page.waitForTimeout(1000);
     await this.clickOn(discardDraftButton);
     await this.page.waitForTimeout(1000);
-    try{
-    await this.clickOn(discardConfirmButton);
-    }catch(e){
-      console.log("confirm discard is not working");
+    try {
+      await this.clickOn(discardConfirmButton);
+    } catch(e) {
+      console.log ("confirm discard is not working");
     }
-    
   }
 
   /**
@@ -538,7 +536,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *@param {string} titleBeforeChanges
   */
   async expectTitleToBe(titleBeforeChanges) {
-    await this.page.waitForTimeout(10000); //need to add 10seconds
+    await this.page.waitForTimeout(10000); //Need to add 10seconds.
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(

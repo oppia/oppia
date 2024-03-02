@@ -97,8 +97,10 @@ describe('Exploration Creator', function() {
       await explorationCreator.publishExploration();
       await explorationCreator.expectExplorationToBePublished();
 
-      await explorationCreator.addVoiceArtist(['guestUsr1', 'guestUsr2', 'guestUsr3']);
-      await explorationCreator.expectVoiceArtistToBeAdded(['guestUsr1', 'guestUsr2', 'guestUsr3']); //Needs verification
+      await explorationCreator.addVoiceArtist(
+        ['guestUsr1', 'guestUsr2', 'guestUsr3']);
+      await explorationCreator.expectVoiceArtistToBeAdded(
+        ['guestUsr1', 'guestUsr2', 'guestUsr3']); // Needs verification.
 
       await explorationCreator.optInToEmailNotifications();
       await explorationCreator.expectEmailNotificationToBeActivated();
