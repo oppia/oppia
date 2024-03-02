@@ -17,7 +17,8 @@
  */
 
 let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
-let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
+let e2eGuestUser = require('../user-utilities/logged-in-users-utils.js');
+let e2eBlogAdmin = e2eBlogPostEditor = require(
   '../user-utilities/blog-post-admin-utils.js');
 let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
