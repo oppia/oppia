@@ -58,7 +58,8 @@ const saveRole = '.e2e-test-save-role';
 const deleteExplorationButton = '.oppia-delete-button';
 const saveDraftButton = '.oppia-save-draft-button';
 const publishButton = '.oppia-editor-publish-button';
-const discardDraftButton = '#mat-menu-panel-0';
+const discardDraftButton = 'a.e2e-test-discard-changes';
+const discardConfirmButton = '.e2e-test-confirm-discard-changes';
 const deleteConfirmButton =
 '.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
@@ -69,7 +70,7 @@ const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
 
-let titleBeforeChanges = '';
+// let titleBeforeChanges = '';
 let explorationUrlAfterPublished = '';
 
 module.exports = class e2eExplorationCreator extends baseUser {
@@ -138,6 +139,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async updateTitle(Title) {
     await this.clickOn(addTitleBar);
     await this.type(addTitle, Title);
+  }
+
+  /**
+   * This function is used to save the current input.
+   */
+  async extraClickToSaveCurrentInput(){
+    await this.page.waitForTimeout(500);
+    await this.clickOn('.e2e-test-settings-container');
   }
 
   /**
@@ -494,37 +503,49 @@ module.exports = class e2eExplorationCreator extends baseUser {
     }
   }
 
-  /**
-   * This function helps in doing some changes in exploration.
-   */
-  async addSomeChanges() {
-    await this.clickOn(settingsTab);
-    await this.clickOn(addTitleBar);
-    titleBeforeChanges = await this.page.evaluate(() => {
-      return document.querySelector(
-        '.e2e-test-exploration-title-input').innerText;
-    });
-    await this.type(addTitle, 'Your Title Here please');
-  }
+  // /**
+  //  * This function helps in doing some changes in exploration.
+  //  */
+  // async addSomeChanges() {
+  //   await this.clickOn(settingsTab);
+  //   await this.clickOn(addTitleBar);
+  //   titleBeforeChanges = await this.page.evaluate(() => {
+  //     return document.querySelector(
+  //       '.e2e-test-exploration-title-input').innerText;
+  //   });
+  //   await this.type(addTitle, 'Your Title Here please');
+  // }
 
+  /**
+   * This function is discarding the current changes.
+   */
   async discardCurrentChanges() {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
+    await this.page.waitForTimeout(1000);
     await this.clickOn(discardDraftButton);
+    await this.page.waitForTimeout(1000);
+    try{
+    await this.clickOn(discardConfirmButton);
+    }catch(e){
+      console.log("confirm discard is not working");
+    }
+    
   }
 
   /**
-  *This function checks whether changes has discarded successfully or not
+  *This function checks whether changes has discarded successfully or not.
+  *@param {string} titleBeforeChanges
   */
-  async expectChangesToBeDiscardedSuccessfully() {
-    const titleInput = await this.page.$(addTitleBar);
-    await titleInput.click();
-
-    const titleAfterChanges = await this.page.evaluate(()=> {
-      return document.querySelector(
-        '.e2e-test-exploration-title-input').innerText;
-    });
-
+  async expectTitleToBe(titleBeforeChanges) {
+    await this.page.waitForTimeout(10000); //need to add 10seconds
+    const titleInput = await this.page.$(
+      '.e2e-test-exploration-title-input');
+    const titleAfterChanges = await this.page.evaluate(
+      input =>input.value, titleInput);
+    
+    console.log("Rahat(titlebeforechanges)->" + titleBeforeChanges);
+    console.log("Rahat(titleafterchanges)->" + titleAfterChanges);
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
     } else {

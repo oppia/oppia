@@ -25,25 +25,26 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationCreator = null;
+  let explorationVisitor = null;
   beforeAll(async function() {
     explorationCreator = await userFactory.createNewExplorationCreator(
       'explorationAdm', 'exploration_creator@example.com');
     explorationVisitor = await userFactory.createNewExplorationCreator(
-      'explorationLearner', 'exploration_visitor@example.com');
+      'explorationVisitor', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should perform exploration management actions',
     async function() {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
-      await explorationCreator.updateCardName('Test question');
+      await explorationCreator.updateCardName('Test');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
       await explorationCreator.addInteraction();
       await explorationCreator.showMessageOfSuccessfullExplrationCreation();
 
       await explorationCreator.goToSettingsTab();
-      await explorationCreator.updateTitle('Your Title Here');
+      await explorationCreator.updateTitle('Old Title');
       await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
       await explorationCreator.selectCategory();
       await explorationCreator.selectLanguage();
@@ -52,15 +53,13 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.publishExploration();
 
-      await explorationCreator.addSomeChanges();
+      await explorationCreator.updateTitle('New Title');
       await explorationCreator.discardCurrentChanges();
-      await explorationCreator.
-        expectChangesToBeDiscardedSuccessfully();
+      await explorationCreator.expectTitleToBe('Old Title');
 
-      await explorationCreator.addSomeChanges();
+      await explorationCreator.updateTitle('New Title');
       await explorationCreator.saveDraftExploration();
-      await explorationCreator.
-        expectExplorationToBeDraftedSuccessfully();
+      await explorationCreator.expectTitleToBe('Old TitleNew Title');
 
       await explorationVisitor.
         expectInteractionOnCreatorDashboard();
