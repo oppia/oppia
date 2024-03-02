@@ -131,8 +131,7 @@ run_tests.backend: ## Runs the backend tests
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-# Github Actions requires a non zero exit code to fail the action.
-	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)" || $(MAKE) stop && exit 1
+	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)"
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
