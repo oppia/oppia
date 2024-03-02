@@ -125,12 +125,14 @@ run_tests.third_party_size_check: ## Runs the third party size check
 	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server || $(MAKE) stop
 
 run_tests.backend: ## Runs the backend tests
+	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS) || $(MAKE) stop
+# Github Actions requires a non zero exit code to fail the action.
+	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)" || $(MAKE) stop && exit 1
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
