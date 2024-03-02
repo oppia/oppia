@@ -924,8 +924,9 @@ URLS = [
         r'%s' % feconf.FETCH_SKILLS_URL_PREFIX,
         skill_editor.FetchSkillsHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
-        skill_editor.SkillEditorPage),
+        r'%s/can_access_skill_editor/<skill_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SkillEditorPageAccessValidationHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),

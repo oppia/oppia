@@ -25,6 +25,7 @@ from core.domain import classroom_config_services
 from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import skill_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -477,4 +478,65 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX
             ), expected_status_int=404
         )
+        self.logout()
+
+
+class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestsBase):
+    """Checks the access to the skill editor page and its rendenring"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.admin_id = self.get_user_if_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
+
+    def test_access_skill_editor_page_without_logging_in(self) -> None:
+        self.get_json(
+            '%s/can_access_skill_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+
+    def test_access_skill_editor_page_with_guest_user(self) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/can_access_skill_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+        self.logout()
+
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_skill_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_access_skill_editor_page_with_curriculum_admin(
+            self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_json(
+            '%s/can_access_skill_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_skill_editor_page_fails(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()

@@ -57,6 +57,10 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'); // eslint-disable-line max-len
 
+  SKILL_EDITOR_ACCESS_VALIDATION_URL = (
+    '/access_validation_handler/can_access_skill_editor/<skill_id>'
+  );
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -122,6 +126,16 @@ export class AccessValidationBackendApiService {
     let url = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_GROUP_EDITOR_PAGE_ACCESS_VALIDATOR, {
         learner_group_id: learnerGroupId
+      });
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessToSkillEditorPage(skillId: string):
+  Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.SKILL_EDITOR_ACCESS_VALIDATION_URL, {
+        skill_id: skillId
       });
 
     return this.http.get<void>(url).toPromise();
