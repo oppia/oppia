@@ -44,3 +44,38 @@
   letter-spacing: 0em;
   text-align: left;
 }
+
+.player-footer-mid {
+  display: flex;
+  gap: 16px;
+}
+
+.lesson-progress-bar-container {
+  padding: 8px;
+  padding-right: 0;
+}
+
+.player-footer-save-button {
+  display: flex;
+  padding: 8px 12px;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 90px;
+  height: 44px;
+  background: #fff;
+  border: 1px solid #C55F45;
+  color: #C55F45;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0em;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.player-footer-save-button:disabled {
+  border: 1px solid #667085;
+  color: #667085;
+}
