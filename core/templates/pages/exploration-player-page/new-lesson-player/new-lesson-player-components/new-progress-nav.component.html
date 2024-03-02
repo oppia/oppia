@@ -1,0 +1,61 @@
+<div class="progress-nav-bar row space-between center">
+  <!-- Wrapping div on first button keeps the second button right-aligned
+    even when the first button is not present. -->
+  <div class="row-item row-item-previous-card">
+    <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
+    <div *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
+      <button mat-raised-button
+              aria-label="Previous Card"
+              (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
+              class="e2e-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
+        <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
+    <button mat-raised-button
+            (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
+            aria-label="Next Card"
+            class="oppia-next-button e2e-test-next-button oppia-nav-button">
+      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
+    </button>
+  </div>
+  <div *ngIf="!hasNext">
+    <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
+      <button mat-button
+              class="btn btn-secondary  oppia-skip-button e2e-test-skip-question-button"
+              *ngIf="skipButtonIsShown"
+              (click)="skipCurrentQuestion()">
+        I don't know
+      </button>
+      <!-- Special case for the 'Continue' interaction. -->
+      <button mat-button
+              *ngIf="interactionId === 'Continue'"
+              (click)="submit.emit()"
+              class="oppia-learner-confirm-button e2e-test-continue-button oppia-autofocus"
+              oppiaFocusOn="continue-btn">
+        {{ interactionCustomizationArgs.buttonText.value.unicode }}
+        <i class="fas fa-arrow-right oppia-arrow"></i>
+      </button>
+      <button mat-button
+              *ngIf="shouldGenericSubmitButtonBeShown()"
+              class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
+              (click)="submit.emit()"
+              [disabled]="displayedCard.showNoResponseError()">
+        {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+      </button>
+    </div>
+    <oppia-continue-button *ngIf="shouldContinueButtonBeShown()"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueButton.emit()"
+                           class="d-block continue-button">
+    </oppia-continue-button>
+    <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueToReviseButton.emit()"
+                           class="d-block continue-button">
+    </oppia-continue-button>
+  </div>
+</div>
