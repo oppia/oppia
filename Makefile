@@ -39,7 +39,7 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 
 build: ## Builds the all docker setup.
 	$(MAKE) install_node
-	./docker/pre_push_hook.sh --install
+	bash ./docker/pre_push_hook.sh --install
 	docker compose build
 
 run-devserver: ## Runs the dev-server
