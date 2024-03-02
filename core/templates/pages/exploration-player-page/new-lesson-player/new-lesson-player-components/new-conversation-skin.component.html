@@ -39,18 +39,18 @@
         </oppia-learner-answer-info-card>
       </div>
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
-        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [isLearnAgainButton]="isLearnAgainButton()"
-                            [displayedCard]="displayedCard"
-                            [submitButtonIsShown]="!answerIsBeingProcessed && !continueToReviseStateButtonIsVisible"
-                            [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
-                            (clickContinueButton)="showUpcomingCard()"
-                            (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                            (changeCard)="changeCard($event)"
-                            [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
-                            [skipButtonIsShown]="skipButtonIsShown"
-                            (skipQuestion)="skipCurrentQuestion()">
-        </oppia-progress-nav>
+        <oppia-new-progress-nav (submit)="submitAnswerFromProgressNav()"
+                                [isLearnAgainButton]="isLearnAgainButton()"
+                                [displayedCard]="displayedCard"
+                                [submitButtonIsShown]="!answerIsBeingProcessed && !continueToReviseStateButtonIsVisible"
+                                [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
+                                (clickContinueButton)="showUpcomingCard()"
+                                (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
+                                (changeCard)="changeCard($event)"
+                                [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
+                                [skipButtonIsShown]="skipButtonIsShown"
+                                (skipQuestion)="skipCurrentQuestion()">
+        </oppia-new-progress-nav>
       </div>
       <div *ngIf="isOnTerminalCard() && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
            class="conversation-skin-next-lesson-wrapper">
@@ -95,6 +95,17 @@
   <div class="conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
     <oppia-correctness-footer></oppia-correctness-footer>
   </div>
+  <oppia-new-lesson-player-footer (submit)="submitAnswerFromProgressNav()"
+                                  [displayedCard]="displayedCard"
+                                  [submitButtonIsShown]="!answerIsBeingProcessed && !continueToReviseStateButtonIsVisible"
+                                  [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
+                                  (clickContinueButton)="showUpcomingCard()"
+                                  (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
+                                  (changeCard)="changeCard($event)"
+                                  [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
+                                  [skipButtonIsShown]="skipButtonIsShown"
+                                  (skipQuestion)="skipCurrentQuestion()">
+  </oppia-new-lesson-player-footer>
 </div>
 
 <div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
