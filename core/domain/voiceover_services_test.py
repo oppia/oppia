@@ -278,11 +278,13 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
                 'exploration_id_to_content_ids': {
                     'exp_1': ['content_1', 'content_2', 'content_3']
                 },
-                'voiceovers': [
-                    self.voiceover1,
-                    self.voiceover2,
-                    self.voiceover3
-                ]
+                'exploration_id_to_voiceovers': {
+                    'exp_1': [
+                        self.voiceover1,
+                        self.voiceover2,
+                        self.voiceover3
+                    ]
+                }
             }
         }
 

@@ -247,7 +247,9 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
                 'exploration_id_to_content_ids': {
                     'exp_1': ['content_1', 'content_2', 'content_3']
                 },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
+                'exploration_id_to_voiceovers': {
+                    'exp_1': [voiceover1, voiceover2, voiceover3]
+                }
             }
         }
         user_id = 'user_id'
@@ -296,13 +298,16 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
         }
         user_id = 'user_id'
         voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
+            voiceover_models.VoiceoversAndContentsMappingType
+        ) = {
             'en': {
                 'language_accent_code': 'en-US',
                 'exploration_id_to_content_ids': {
                     'exp_1': ['content_1', 'content_2', 'content_3']
                 },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
+                'exploration_id_to_voiceovers': {
+                    'exp_1': [voiceover1, voiceover2, voiceover3]
+                }
             }
         }
 

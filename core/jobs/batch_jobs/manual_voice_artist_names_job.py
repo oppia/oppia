@@ -98,19 +98,19 @@ class GetVoiceArtistMetadataModelsFromDict(beam.DoFn): # type: ignore[misc]
             instances.
         """
 
-        vocie_artist_metadata_models = []
+        voice_artist_metadata_models = []
 
         with datastore_services.get_ndb_context():
             for voice_artist_id, metadata_mapping in (
                     voice_artist_id_to_metadata_mapping.items()):
-                vocie_artist_model = (
+                voice_artist_model = (
                     voiceover_services.
                     create_voice_artist_metadata_model_instance(
                         voice_artist_id, metadata_mapping)
                 )
-                vocie_artist_metadata_models.append(vocie_artist_model)
+                voice_artist_metadata_models.append(voice_artist_model)
 
-        return vocie_artist_metadata_models
+        return voice_artist_metadata_models
 
     def process(
         self,
@@ -270,34 +270,62 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
 
     @staticmethod
     def _add_voiceover(
-        voiceover_dicts: List[voiceover_models.VoiceoverDict],
-        voiceover_dict: voiceover_models.VoiceoverDict
+        exploration_id_to_voiceover_dicts: Dict[
+            str, List[voiceover_models.VoiceoverDict]],
+        voiceover_dict: voiceover_models.VoiceoverDict,
+        exploration_id: str
     ) -> List[voiceover_models.VoiceoverDict]:
         """Appends voiceovers to the existing list, ensuring that a maximum of
         five voiceovers with the longest duration are included.
 
         Args:
-            voiceover_dicts: list(VoiceoverDict). A list of sample voiceovers
-                for the given content in the given language.
+            exploration_id_to_voiceover_dicts: dict(str, list(VoiceoverDict)).
+                A dict with exploration IDs as keys and the list of sample
+                voiceovers as values for the given content in the
+                given language.
             voiceover_dict: VoiceoverDict. A voiceover dict, which may be added
                 to the voiceover dicts.
 
         Returns:
-            list(VoiceoverDict). A list of sample voiceovers for the given
-            content in the given language.
+            dict(str, list(VoiceoverDict)). A dict with exploration IDs as keys
+            and the list of sample voiceovers as values for the given content
+            in the given language.
         """
+        total_voiceovers = 0
+        exp_id_with_shortest_voiceover = ''
+        duration_of_shortest_voiceover = 3600
+        for exp_id, voiceovers in exploration_id_to_voiceover_dicts.items():
+            sorted(
+            voiceovers, key=lambda voiceover: voiceover['duration_secs'])
 
-        if len(voiceover_dicts) < MAX_SAMPLE_VOICEOVERS_IN_VOICE_ARTIST_MODEL:
-            voiceover_dicts.append(voiceover_dict)
-        elif (
-            voiceover_dicts[0]['duration_secs'] <
-            voiceover_dict['duration_secs']
-        ):
-            voiceover_dicts[0] = voiceover_dict
+            duration = voiceovers[0]['duration_secs']
+            if duration < duration_of_shortest_voiceover:
+                duration_of_shortest_voiceover = duration
+                exp_id_with_shortest_voiceover = exp_id
 
-        sorted(
-            voiceover_dicts, key=lambda voiceover: voiceover['duration_secs'])
-        return voiceover_dicts
+            total_voiceovers += len(voiceovers)
+
+        if total_voiceovers < MAX_SAMPLE_VOICEOVERS_IN_VOICE_ARTIST_MODEL:
+            if exploration_id not in exploration_id_to_voiceover_dicts:
+                exploration_id_to_voiceover_dicts[exploration_id] = []
+            exploration_id_to_voiceover_dicts[exploration_id].append(
+                voiceover_dict)
+        elif duration_of_shortest_voiceover > voiceover_dict['duration_secs']:
+
+            voiceovers = exploration_id_to_voiceover_dicts[
+                exp_id_with_shortest_voiceover]
+            voiceovers.remove(0) # check this
+
+            if len(voiceovers) == 0:
+                del exploration_id_to_voiceover_dicts[
+                    exp_id_with_shortest_voiceover]
+
+            if exploration_id not in exploration_id_to_voiceover_dicts:
+                exploration_id_to_voiceover_dicts[exploration_id] = []
+            exploration_id_to_voiceover_dicts[exploration_id].append(
+                voiceover_dict)
+
+        return exploration_id_to_voiceover_dicts
 
     @staticmethod
     def _get_voice_artist_metadata_info_from_exp_commit(
@@ -361,7 +389,7 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                             voiceovers_and_contents_mapping[lang_code] = {
                                 'language_accent_code': '',
                                 'exploration_id_to_content_ids': {},
-                                'voiceovers': []
+                                'exploration_id_to_voiceovers': {}
                             }
 
                         exploration_id_to_content_ids = (
@@ -380,17 +408,21 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         exploration_id_to_content_ids[
                             exploration_id].append(content_id)
 
-                        voiceovers = (
+                        exploration_id_to_voiceovers = (
                             voiceovers_and_contents_mapping[
-                                lang_code]['voiceovers']
+                                lang_code]['exploration_id_to_voiceovers']
                         )
-                        assert isinstance(voiceovers, list)
-                        voiceovers = (
+                        assert isinstance(exploration_id_to_voiceovers, dict)
+                        exploration_id_to_voiceovers = (
                             CreateVoiceArtistMetadataModelsFromExplorationsJob.
-                            _add_voiceover(voiceovers, voiceover_dict)
+                            _add_voiceover(
+                                exploration_id_to_voiceovers,
+                                voiceover_dict,
+                                exploration_id)
                         )
-                        voiceovers_and_contents_mapping[
-                            lang_code]['voiceovers'] = voiceovers
+                        voiceovers_and_contents_mapping[lang_code][
+                            'exploration_id_to_voiceovers'] = (
+                                exploration_id_to_voiceovers)
 
                 voice_artist_id_to_metadata_mapping[
                     voice_artist_id] = voiceovers_and_contents_mapping
@@ -427,7 +459,7 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
         return total_voiceovers
 
     @staticmethod
-    def check_exploration_is_curated(exp_id: str) -> bool:
+    def _check_exploration_is_curated(exp_id: str) -> bool:
         """The method verifies if the provided exploration ID has been
         curated or not.
 
@@ -450,7 +482,7 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
             | 'Get exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all())
             | 'Get curated exploration models' >> beam.Filter(
-                lambda model: self.check_exploration_is_curated(model.id))
+                lambda model: self._check_exploration_is_curated(model.id))
             | 'Get curated exploration model ids' >> beam.Map(
                 lambda exploration: exploration.id
             )

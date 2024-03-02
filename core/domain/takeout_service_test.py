@@ -1000,7 +1000,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'exploration_id_to_content_ids': {
                     'exp_1': ['content_1', 'content_2', 'content_3']
                 },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
+                'exploration_id_to_voiceovers': {
+                    'exp_1': [voiceover1, voiceover2, voiceover3]
+                }
             }
         }
         # Setup for VoiceArtistMetadataModel.
@@ -2150,8 +2152,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         'exploration_id_to_content_ids': {
                             'exp_1': ['content_1', 'content_2', 'content_3']
                         },
-                        'voiceovers': [
-                            {
+                        'exploration_id_to_voiceovers': {
+                            'exp_1': [{
                                 'filename': 'filename1.mp3',
                                 'file_size_bytes': 3000,
                                 'needs_update': False,
@@ -2168,8 +2170,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                                 'file_size_bytes': 3500,
                                 'needs_update': False,
                                 'duration_secs': 5.0,
-                            },
-                        ],
+                            }]
+                        }
                     }
                 }
             }
