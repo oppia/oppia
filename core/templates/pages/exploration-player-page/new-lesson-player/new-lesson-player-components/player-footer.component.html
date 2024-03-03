@@ -34,6 +34,13 @@
       Continue
       <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
     </button>
+    <!-- Special case for the 'Continue' interaction. -->
+    <button *ngIf="!hasNext && !shouldContinueButtonBeShown() && !helpCardHasContinueButton && interactionId === 'Continue'"
+            (click)="submit.emit()"
+            class="player-footer-continue-button">
+      Continue
+      <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
+    </button>
   </div>
 </div>
 
