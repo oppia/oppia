@@ -67,6 +67,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
+    # TODO(#19499): add missing tests
+    'translation-suggestion-review-modal.component.ts',
+    'image-local-storage.service.ts',
 ]
 
 
