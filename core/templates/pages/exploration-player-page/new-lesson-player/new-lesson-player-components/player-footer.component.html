@@ -20,7 +20,8 @@
            [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
       </div>
     </div>
-    <button class="player-footer-save-button" disabled="true">
+    <button *ngIf="(!userIsLoggedIn && checkpointCount>1)"
+            class="player-footer-save-button" [disabled]="checkpointStatusArray[0] === 'in-progress'">
       <mat-icon>save</mat-icon>
       Save
     </button>

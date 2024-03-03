@@ -46,6 +46,7 @@ import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -89,13 +90,14 @@ export class PlayerFooterComponent {
   explorationId!: string;
   newCardStateName!: string;
   currentCardIndex!: number;
-  checkpointCount!: number;
+  checkpointCount: number = 0;
   completedCheckpointsCount!: number;
-  checkpointStatusArray!: string[];
+  checkpointStatusArray: string[] = [];
   translatedCongratulatoryCheckpointMessage!: string | undefined;
   expStates: StateObjectsBackendDict;
   expEnded: boolean = false;
   expInfo: LearnerExplorationSummaryBackendDict;
+  userIsLoggedIn: boolean = false;
 
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
@@ -126,6 +128,7 @@ export class PlayerFooterComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private userService: UserService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -151,6 +154,10 @@ export class PlayerFooterComponent {
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
     this.explorationId = this.contextService.getExplorationId();
+
+    this.userService.getUserInfoAsync().then(userInfo => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -244,7 +251,6 @@ export class PlayerFooterComponent {
     ) {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
     }
-    console.log(this.checkpointStatusArray)
   }
 
   showProgressReminderModal(): void {
