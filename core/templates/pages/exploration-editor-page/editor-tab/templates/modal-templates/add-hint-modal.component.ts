@@ -26,6 +26,7 @@ import { Hint } from 'domain/exploration/hint-object.model';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface HintFormSchema {
   type: string;
@@ -57,7 +58,8 @@ export class AddHintModalComponent
     private contextService: ContextService,
     private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
-    private stateHintsService: StateHintsService
+    private stateHintsService: StateHintsService,
+    private htmlLengthService: HtmlLengthService,
   ) {
     super(ngbActiveModal);
   }
@@ -73,20 +75,10 @@ export class AddHintModalComponent
   }
 
   isHintLengthExceeded(tmpHint: string): boolean {
-    // The variable charCount stores the number of remaining characters after
-    // removing the html tags from tmpHint.
-    const domParser = new DOMParser();
-    let charCount = 0;
-    if (tmpHint.length) {
-      let dom = domParser.parseFromString(tmpHint, 'text/html');
-      if (dom.body.textContent) {
-        charCount = dom.body.textContent.replace(
-          ExplorationEditorPageConstants.NEW_LINE_REGEX, '').length;
-      }
-    }
-    // Note: charCount does not include the characters from Rich Text ELements.
     return Boolean(
-      charCount > ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
+      this.htmlLengthService.computeHtmlLength(
+        tmpHint, CALCULATION_TYPE_CHARACTER) >
+        ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 
   updateLocalHint($event: string): void {
