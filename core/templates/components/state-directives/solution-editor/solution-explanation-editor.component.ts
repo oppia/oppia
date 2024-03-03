@@ -24,6 +24,7 @@ import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface ExplanationFormSchema {
   type: string;
@@ -50,7 +51,8 @@ export class SolutionExplanationEditor
     private contextService: ContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private htmlLengthService: HtmlLengthService,
   ) {}
 
   updateExplanationHtml(newHtmlString: string): void {
@@ -74,9 +76,10 @@ export class SolutionExplanationEditor
     if (this.stateSolutionService.displayed === null) {
       throw new Error('Solution is undefined');
     }
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (
-      this.stateSolutionService.displayed.explanation.html.length > 100000);
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        this.stateSolutionService.displayed.explanation.html,
+        CALCULATION_TYPE_CHARACTER) > 3000);
   }
 
   saveThisExplanation(): void {
