@@ -36,7 +36,14 @@ import { ContentTranslationManagerService } from '../../services/content-transla
 
 import './player-footer.component.css';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { ContextService } from 'services/context.service';
 
+const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
+const CHECKPOINT_STATUS_COMPLETED = 'completed';
+const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
 
 @Component({
   selector: 'oppia-new-lesson-player-footer',
@@ -76,6 +83,13 @@ export class PlayerFooterComponent {
   explorationId!: string;
   newCardStateName!: string;
   currentCardIndex!: number;
+  checkpointCount!: number;
+  completedCheckpointsCount!: number;
+  checkpointStatusArray!: string[];
+  translatedCongratulatoryCheckpointMessage!: string | undefined;
+  expStates: StateObjectsBackendDict;
+  expEnded: boolean = false;
+
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
 
@@ -108,6 +122,10 @@ export class PlayerFooterComponent {
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
     private contentTranslationManagerService: ContentTranslationManagerService,
+    private explorationEngineService: ExplorationEngineService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private contextService: ContextService,
   ) {}
 
   ngOnChanges(): void {
@@ -119,6 +137,7 @@ export class PlayerFooterComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+    this.explorationId = this.contextService.getExplorationId();
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
@@ -141,10 +160,67 @@ export class PlayerFooterComponent {
         }
       )
     );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onActiveCardChanged.subscribe(
+        () => {
+          this.updateLessonProgressBar();
+        }
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardOpened.subscribe(
+        () => {
+          this.updateLessonProgressBar();
+        }
+      )
+    );
+    this.getCheckpointCount().then(() => {
+      this.updateLessonProgressBar();
+    });
   }
 
-  skipCurrentQuestion(): void {
-    this.skipQuestion.emit();
+  updateLessonProgressBar(): void {
+    if(!this.expEnded) {
+      const mostRecentlyReachedCheckpointIndex = (
+        this.getMostRecentlyReachedCheckpointIndex()
+      );
+      this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+      let displayedCardIndex = (
+        this.playerPositionService.getDisplayedCardIndex()
+      );
+      if (displayedCardIndex > 0) {
+        let state = this.explorationEngineService.getState();
+        let stateCard = this.explorationEngineService.getStateCardByName(
+          state.name);
+        if (stateCard.isTerminal()) {
+          this.completedCheckpointsCount += 1;
+          this.expEnded = true;
+        }
+      }
+    }
+    // This array is used to keep track of the status of each checkpoint,
+    // i.e. whether it is completed, in-progress, or yet-to-be-completed by the
+    // learner. This information is then used to display the progress bar
+    // in the lesson info card.
+    this.checkpointStatusArray = new Array(this.checkpointCount);
+    for (let i = 0; i < this.completedCheckpointsCount; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
+    }
+    // If not all checkpoints are completed, then the checkpoint immediately
+    // following the last completed checkpoint is labeled 'in-progress'.
+    if (this.checkpointCount > this.completedCheckpointsCount) {
+      this.checkpointStatusArray[this.completedCheckpointsCount] = (
+        CHECKPOINT_STATUS_IN_PROGRESS);
+    }
+    for (
+      let i = this.completedCheckpointsCount + 1;
+      i < this.checkpointCount;
+      i++
+    ) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
+    }
+    console.log(this.checkpointStatusArray)
   }
 
   ngOnDestroy(): void {
@@ -248,6 +324,62 @@ export class PlayerFooterComponent {
         this.clickContinueToReviseButton.emit();
       }
     }
+  }
+
+  getCompletedProgressBarWidth(): number {
+    if (this.completedCheckpointsCount === 0) {
+      return 0;
+    }
+    const spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
+    return (
+      ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
+      (spaceBetweenEachNode / 2));
+  }
+
+  getProgressPercentage(): string {
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      return '100';
+    }
+    if (this.completedCheckpointsCount === 0) {
+      return '0';
+    }
+    const progressPercentage = Math.floor(
+      (this.completedCheckpointsCount / this.checkpointCount) * 100
+    );
+    return progressPercentage.toString();
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  getMostRecentlyReachedCheckpointIndex(): number {
+    let checkpointIndex = 0;
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState = this.explorationEngineService.
+        getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointIndex++;
+      }
+    }
+    return checkpointIndex;
+  }
+
+  async getCheckpointCount(): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.expStates = response.exploration.states;
+          let count = 0;
+          for (let [, value] of Object.entries(this.expStates)) {
+            if (value.card_is_checkpoint) {
+              count++;
+            }
+          }
+          this.checkpointCount = count;
+        });
   }
 }
 

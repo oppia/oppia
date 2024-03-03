@@ -8,16 +8,18 @@
     </button>
   </div>
   <div class="player-footer-mid">
-    <span class="lesson-progress-bar-container">
-      <svg width="448" height="24" viewBox="0 0 448 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13 12L436 12" stroke="#C0C0C0" stroke-width="2"/>
-        <path d="M19.0032 12C19.0032 16.9704 14.9732 21 10.0016 21C5.03001 21 1 16.9704 1 12C1 7.02959 5.03001 3 10.0016 3C14.9732 3 19.0032 7.02959 19.0032 12Z" fill="#FCFCFD" stroke="#00645C" stroke-width="2"/>
-        <circle cx="222.003" cy="12" r="5.25" fill="#FCFCFD" stroke="#C0C0C0" stroke-width="1.5"/>
-        <circle cx="222.001" cy="12" r="5.5" fill="#FCFCFD" stroke="#C0C0C0"/>
-        <circle cx="436" cy="12" r="5.25" fill="#FCFCFD" stroke="#C0C0C0" stroke-width="1.5"/>
-        <circle cx="436" cy="12" r="5.5" fill="#FCFCFD" stroke="#C0C0C0"/>
-      </svg>                
-    </span>
+    <div class="progress-bar-container"
+         [ngClass]="{'d-none': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1}">
+      <div class="lesson-progress-bar">
+        <div tabindex="0" class="completed-progress-bar"
+             [style.width.%]="getCompletedProgressBarWidth()"
+             [attr.aria-label]="getProgressPercentage() + ' percent completed'">
+        </div>
+      </div>
+      <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
+           [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+      </div>
+    </div>
     <button class="player-footer-save-button" disabled="true">
       <mat-icon>save</mat-icon>
       Save

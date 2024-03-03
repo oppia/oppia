@@ -14,6 +14,10 @@
   position: relative;
 }
 
+.player-footer-left {
+  width: 44px;
+}
+
 .player-footer-previous-button {
   background: #fcfcfd;
   border: 1px solid #0d48a1;
@@ -23,14 +27,18 @@
   height: 44px;
   margin: 0 auto;
   padding: 10px 0px;
-  width: 44px;
+  width: 100%;
+}
+
+.player-footer-right {
+  width: 113px;
 }
 
 .player-footer-continue-button {
   display: flex;
   padding: 10px 4px 10px 8px;
   gap: 4px;
-  width: 113px;
+  width: 100%;
   height: 44px;
   background: #0d48a1;
   border: 1px solid #0d48a1;
@@ -53,6 +61,70 @@
 .lesson-progress-bar-container {
   padding: 8px;
   padding-right: 0;
+}
+
+.progress-bar-container {
+  align-items: center;
+  display: flex;
+  position: relative;
+  width: 448px;
+}
+
+.multiple-checkpoints-bar {
+  justify-content: space-between;
+}
+
+.lesson-progress-bar {
+  background-color: #bbb;
+  border-radius: 5px;
+  display: flex;
+  height: 5px;
+  justify-content: flex-start;
+  margin-left: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.completed-progress-bar {
+  background-color: #00645c;
+  border-radius: 5px;
+  height: 100%;
+  max-width: 100%;
+  transition: width 0.6s ease-in-out;
+}
+
+.completed-checkpoint-node {
+  background-color: #00645c;
+  border-radius: 50%;
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  width: 18px;
+  z-index: 0;
+}
+
+.in-progress-checkpoint-node {
+  align-items: flex-start;
+  background-color: #fff;
+  border: 2px solid #00645c;
+  border-radius: 50%;
+  display: flex;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+  z-index: 0;
+}
+
+.incomplete-checkpoint-node {
+  align-items: flex-end;
+  background-color: #fff;
+  border: 1px solid #c0c0c0;
+  border-radius: 50%;
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  width: 18px;
+  z-index: 0;
 }
 
 .player-footer-save-button {
