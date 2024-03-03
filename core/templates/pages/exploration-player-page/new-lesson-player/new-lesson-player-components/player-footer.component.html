@@ -24,14 +24,14 @@
             class="player-footer-save-button" [disabled]="checkpointStatusArray[0] === 'in-progress'"
             (click)="saveLoggedOutProgress()">
       <mat-icon>save</mat-icon>
-      Save
+      {{ 'I18N_PLAYER_SAVE_BUTTON' | translate }}
     </button>
   </div>
   <div class="player-footer-right">
     <button *ngIf="hasNext || shouldContinueButtonBeShown() || showContinueToReviseButton"
             class="player-footer-continue-button"
             (click)="handleNewContinueButtonClick()">
-      Continue
+      {{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate }}
       <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
     </button>
     <div *ngIf="!hasNext && submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton">
