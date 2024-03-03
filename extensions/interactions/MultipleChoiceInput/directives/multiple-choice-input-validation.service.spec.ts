@@ -145,12 +145,12 @@ describe('MultipleChoiceInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        currentState,
         // This throws "Argument of type '{}'. We need to suppress this error
         // because is not assignable to parameter of type
         // 'MultipleChoiceInputCustomizationArgs'." We are purposely assigning
         // the wrong type of customization args in order to test validations.
         // @ts-expect-error
-        currentState,
         {},
         goodAnswerGroups,
         goodDefaultOutcome

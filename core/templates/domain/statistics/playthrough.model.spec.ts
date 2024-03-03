@@ -241,12 +241,12 @@ describe('Playthrough Model Class', () => {
       actions: [],
     };
 
-    // This throws "Type 'string' is not assignable to type
-    // '"CyclicStateTransitions"'.". We need to suppress this error because
-    // 'playthroughDict' has an invalid value of 'issue_type' property. We need
-    // to do that in order to test validations.
-    // @ts-expect-error
     expect(() =>
+      // This throws "Type 'string' is not assignable to type
+      // '"CyclicStateTransitions"'.". We need to suppress this error because
+      // 'playthroughDict' has an invalid value of 'issue_type' property. We need
+      // to do that in order to test validations.
+      // @ts-expect-error
       Playthrough.createFromBackendDict(playthroughDict)
     ).toThrowError(
       'Backend dict does not match any known issue type: ' +

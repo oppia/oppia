@@ -45,18 +45,23 @@ describe('RandomSelector component', function () {
       // the value of the property is null.
       // @ts-ignore
       list_of_values: null,
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations. This happens because
+      // the value of the property is null.
+      // @ts-ignore
       value: null,
     };
   });
 
   it('should initialise component', () => {
     component.customizationArgs = {
+      list_of_values: ['test'],
       // This throws "Argument of type 'null' is not assignable to
       // parameter of type 'AnswerGroup[]'." We need to suppress this error
       // because of the need to test validations. This happens because
       // the value of the property is null.
       // @ts-ignore
-      list_of_values: ['test'],
       value: null,
     };
 

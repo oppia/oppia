@@ -20,9 +20,9 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-// eslint-disable-next-line oppia/disallow-httpclient
 import {
   HTTP_INTERCEPTORS,
+  // eslint-disable-next-line oppia/disallow-httpclient
   HttpClient,
   HttpHandler,
   HttpRequest,

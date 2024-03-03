@@ -210,11 +210,11 @@ describe('Pencil Code Editor Validation Service', () => {
       });
       expect(
         pcevs.getAllWarnings(
+          statename,
           // This throws "Type '1'. We need to suppress this error because is not
           // assignable to type 'string'." Here we are assigning the wrong type
           // of value to "customizationArguments" in order to test validations.
           // @ts-expect-error
-          statename,
           customizationArgs,
           [answergroup2],
           testOutcome2

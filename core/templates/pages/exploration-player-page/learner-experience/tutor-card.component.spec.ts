@@ -131,6 +131,11 @@ describe('Tutor card component', () => {
       null
     ),
     [],
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'RecordedVoiceovers'." We need to suppress this error because of
+    // the need to test validations. This throws an error only in the
+    // frontend tests and not in the frontend.
+    // @ts-ignore
     null,
     '',
     null

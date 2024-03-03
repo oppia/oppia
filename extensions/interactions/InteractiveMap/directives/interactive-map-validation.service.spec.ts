@@ -117,13 +117,13 @@ describe('InteractiveMapValidationService', () => {
   it('should expect latitude and longitude customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        currentState,
         // This throws "Argument of type '{}'. We need to suppress this error
         // because ..  oppia/comment-style is not assignable to
         // parameter of type 'InteractiveMapCustomizationArgs'." We are
         // purposely assigning the wrong type of customization args in
         // order to test validations.
         // @ts-expect-error
-        currentState,
         {},
         goodAnswerGroups,
         goodDefaultOutcome

@@ -296,54 +296,66 @@ describe('URL Interpolation Service', () => {
   });
 
   it('should throw an error for non-string parameters', () => {
-    // This throws "Type 'number' is not assignable to type 'string'
-    // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters. The test is still valid because
-    // the error is thrown by the function.
-    // @ts-ignore
     expect(
+      // This throws "No overload matches this call".
+      // We need to suppress this error because we need to test wrong call.
+      // @ts-ignore
       uis.interpolateUrl.bind(uis, '/test_url/<page>', {
+        // This throws "Type 'number' is not assignable to type 'string'
+        // ." We need to suppress this error because of the need to test
+        // validations on invalid parameters. The test is still valid because
+        // the error is thrown by the function.
+        // @ts-ignore
         page: 0,
       })
     ).toThrowError(
       'Every parameter passed into interpolateUrl must have string values, ' +
         'but received: {page: 0}'
     );
-    // This throws "Type '{}' is not assignable to type 'string'
-    // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters. The test is still valid because
-    // the error is thrown by the function.
-    // @ts-ignore
     expect(
+      // This throws "No overload matches this call".
+      // We need to suppress this error because we need to test wrong call.
+      // @ts-ignore
       uis.interpolateUrl.bind(uis, '/test_url/<page>', {
+        // This throws "Type '{}' is not assignable to type 'string'
+        // ." We need to suppress this error because of the need to test
+        // validations on invalid parameters. The test is still valid because
+        // the error is thrown by the function.
+        // @ts-ignore
         page: {},
       })
     ).toThrowError(
       'Every parameter passed into interpolateUrl must have string values, ' +
         'but received: {page: {}}'
     );
-    // This throws "Type '[]' is not assignable to type 'string'
-    // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters. The test is still valid because
-    // the error is thrown by the function.
-    // @ts-ignore
     expect(
+      // This throws "No overload matches this call".
+      // We need to suppress this error because we need to test wrong call.
+      // @ts-ignore
       uis.interpolateUrl.bind(uis, '/test_url/<page>', {
+        // This throws "Type '[]' is not assignable to type 'string'
+        // ." We need to suppress this error because of the need to test
+        // validations on invalid parameters. The test is still valid because
+        // the error is thrown by the function.
+        // @ts-ignore
         page: [],
       })
     ).toThrowError(
       'Every parameter passed into interpolateUrl must have string values, ' +
         'but received: {page: []}'
     );
-    // This throws "Type 'RegExp' is not assignable to type 'string'
-    // ." We need to suppress this error because of the need to test
-    // validations on invalid parameters. The test is still valid because
-    // the error is thrown by the function. We need to suppress this error
-    // because of the need to test validations on invalid parameters. The
-    // test is still valid because the error is thrown by the function.
-    // @ts-ignore
     expect(
+      // This throws "No overload matches this call".
+      // We need to suppress this error because we need to test wrong call.
+      // @ts-ignore
       uis.interpolateUrl.bind(uis, '/test_url/<page>', {
+        // This throws "Type 'RegExp' is not assignable to type 'string'
+        // ." We need to suppress this error because of the need to test
+        // validations on invalid parameters. The test is still valid because
+        // the error is thrown by the function. We need to suppress this error
+        // because of the need to test validations on invalid parameters. The
+        // test is still valid because the error is thrown by the function.
+        // @ts-ignore
         page: /abc/,
       })
     ).toThrowError(

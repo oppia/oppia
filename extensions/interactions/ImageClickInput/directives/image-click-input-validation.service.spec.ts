@@ -128,13 +128,13 @@ describe('ImageClickInputValidationService', () => {
     goodAnswerGroups[0].rules = [];
     expect(() => {
       validatorService.getAllWarnings(
+        currentState,
         // This throws "Argument of type '{}'. We need to suppress this error
         // because ..  oppia/comment-style is not assignable to parameter of
         // type 'ImageClickInputCustomizationArgs'." We are purposely
         // assigning the wrong type of customization args in order to test
         // validations.
         // @ts-expect-error
-        currentState,
         {},
         goodAnswerGroups,
         goodDefaultOutcome

@@ -251,7 +251,17 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         // thrown because the source and target are null.
         // @ts-ignore
         source: null,
+        // This throws "Type 'null' is not assignable to parameter of
+        // type 'NodeData'." We need to suppress this error
+        // because of the need to test validations. This error is
+        // thrown because the source and target are null.
+        // @ts-ignore
         target: null,
+        // This throws "Type 'null' is not assignable to parameter of
+        // type 'NodeData'." We need to suppress this error
+        // because of the need to test validations. This error is
+        // thrown because the source and target are null.
+        // @ts-ignore
         d: null,
         style: '',
         connectsDestIfStuck: false,

@@ -100,12 +100,12 @@ describe('ContinueValidationService', () => {
 
     expect(() => {
       validatorService.getAllWarnings(
+        currentState,
         // This throws "Argument of type '{}'. We need to suppress this error
         // because is not assignable to parameter of type
         // 'ContinueCustomizationArgs'." We are purposely assigning the wrong
         // type of customization args in order to test validations.
         // @ts-expect-error
-        currentState,
         {},
         [],
         goodDefaultOutcome
@@ -143,12 +143,12 @@ describe('ContinueValidationService', () => {
 
     expect(() => {
       validatorService.getAllWarnings(
+        currentState,
         // This throws "Argument of type '{}'. We need to suppress this error
         // because is not assignable to parameter of type
         // 'ContinueCustomizationArgs'." We are purposely assigning the wrong
         // type of customization args in order to test validations.
         // @ts-expect-error
-        currentState,
         {},
         [],
         goodDefaultOutcome
@@ -176,14 +176,14 @@ describe('ContinueValidationService', () => {
 
   it('should expect a non-confusing and non-null default outcome', () => {
     var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      [],
       // This throws "Type 'null' is not assignable to type 'Outcome'
       // ." We need to suppress this error because of the need to test
       // validations if the outcome is not defined. We are purposely
       // assigning the wrong type of outcome in order to test validations.
       // @ts-ignore
-      currentState,
-      customizationArguments,
-      [],
       null
     );
     expect(warnings).toEqual([

@@ -125,14 +125,18 @@ describe('State card object factory', () => {
       audioTranslationLanguageService
     );
     _sampleCard2 = StateCard.createNewCard(
+      'State 2',
+      '<p>Content</p>',
+      '',
       // This throws "Type null is not assignable to type
       // 'Interaction'." We need to suppress this error
       // because of the need to test validations.
       // @ts-ignore
-      'State 2',
-      '<p>Content</p>',
-      '',
       null,
+      // This throws "Type null is not assignable to type
+      // 'Interaction'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       null,
       'content',
       audioTranslationLanguageService

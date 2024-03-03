@@ -128,13 +128,13 @@ describe('Schema Based List Editor Component', () => {
       ' without entering any text',
     () => {
       component.localValue = [
+        'item1',
         // This throws "Type 'undefined' is not assignable to type
         // 'SchemaDefaultValue'." We need to suppress this error
         // because of the need to test validations. This error
         // is thrown because the type of validators is
         // OppiaValidator[] but we are assigning an object to it.
         // @ts-ignore
-        'item1',
         undefined,
       ];
 

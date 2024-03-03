@@ -454,11 +454,11 @@ describe('Change List Service when changes are mergable', () => {
       'an state with invalid property',
     () => {
       changeListService.editStateProperty(
+        'stateName',
         // This throws "Argument of type 'prop1' is not assignable to parameter
         // of type 'StatePropertyNames'.". We need to suppress this error because
         // we want to test passing wrong values.
         // @ts-expect-error
-        'stateName',
         'prop1',
         'oldValue',
         'newValue'

@@ -332,31 +332,33 @@ describe('Question Suggestion Editor Modal Component', () => {
   });
 
   it('should update the question', () => {
-    spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
+    spyOn(
+      contributionAndReviewService,
+      'updateQuestionSuggestionAsync'
+    ).and.callFake(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'string'." We need to suppress this error
       // because of the need to test validations. This rule will be removed
       // when the codeowners file is updated.
       // @ts-ignore
-      .and.callFake(
-        (
-          suggestionId,
-          skillDifficulty,
-          questionStateData,
-          nextContentIdIndex,
-          imagesData,
-          successCallback,
-          errorCallback
-        ) => {
-          // This throws "Argument of type 'null' is not assignable to parameter
-          // of type 'string'." We need to suppress
-          // this error because of the need to test validations. This rule will be
-          // removed when the codeowners file is updated.
-          // @ts-ignore
-          successCallback(null);
-          return null;
-        }
-      );
+      (
+        suggestionId,
+        skillDifficulty,
+        questionStateData,
+        nextContentIdIndex,
+        imagesData,
+        successCallback,
+        errorCallback
+      ) => {
+        // This throws "Argument of type 'null' is not assignable to parameter
+        // of type 'string'." We need to suppress
+        // this error because of the need to test validations. This rule will be
+        // removed when the codeowners file is updated.
+        // @ts-ignore
+        successCallback(null);
+        return null;
+      }
+    );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     component.question = question;
     component.skillDifficulty = skillDifficulty;
@@ -370,31 +372,33 @@ describe('Question Suggestion Editor Modal Component', () => {
   });
 
   it('should fail to update the question when no changes are made', () => {
-    spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
+    spyOn(
+      contributionAndReviewService,
+      'updateQuestionSuggestionAsync'
+    ).and.callFake(
       // This throws "Argument of type 'null' is not assignable to parameter
       // of type 'string'." We need to suppress this error
       // because of the need to test validations. This rule will be removed
       // when the codeowners file is updated.
       // @ts-ignore
-      .and.callFake(
-        (
-          suggestionId,
-          skillDifficulty,
-          questionStateData,
-          nextContentIdIndex,
-          imagesData,
-          successCallback,
-          errorCallback
-        ) => {
-          // This throws "Argument of type 'null' is not assignable to parameter
-          // of type 'string'." We need to suppress
-          // this error because of the need to test validations. This rule will
-          // be removed when the codeowners file is updated.
-          // @ts-ignore
-          successCallback(null);
-          return null;
-        }
-      );
+      (
+        suggestionId,
+        skillDifficulty,
+        questionStateData,
+        nextContentIdIndex,
+        imagesData,
+        successCallback,
+        errorCallback
+      ) => {
+        // This throws "Argument of type 'null' is not assignable to parameter
+        // of type 'string'." We need to suppress
+        // this error because of the need to test validations. This rule will
+        // be removed when the codeowners file is updated.
+        // @ts-ignore
+        successCallback(null);
+        return null;
+      }
+    );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
     spyOn(alertsService, 'addInfoMessage');
 

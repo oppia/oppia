@@ -494,6 +494,7 @@ describe('TopNavigationBarComponent', () => {
   it("should hide navbar if it's height more than 60px", fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
     spyOn(document, 'querySelector')
+      .withArgs('div.collapse.navbar-collapse')
       // This throws "Type '{ clientWidth: number; }' is missing the following
       // properties from type 'Element': assignedSlot, attributes, classList,
       // className, and 122 more.". We need to suppress this error because
@@ -501,7 +502,6 @@ describe('TopNavigationBarComponent', () => {
       // (clientWidth). We need only one 'clientWidth' for
       // testing purposes.
       // @ts-expect-error
-      .withArgs('div.collapse.navbar-collapse')
       .and.returnValue({
         clientHeight: 61,
       });

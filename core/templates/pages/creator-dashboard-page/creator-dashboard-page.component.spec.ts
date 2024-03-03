@@ -542,7 +542,10 @@ describe('Creator Dashboard Page Component', () => {
     };
 
     beforeEach(waitForAsync(() => {
-      spyOn(creatorDashboardBackendApiService, 'fetchDashboardDataAsync')
+      spyOn(
+        creatorDashboardBackendApiService,
+        'fetchDashboardDataAsync'
+      ).and.returnValue(
         // This throws "Type object is not assignable to type
         // 'CreatorDashboardData'." We need to suppress this error
         // because of the need to test validations. This throws an
@@ -550,50 +553,49 @@ describe('Creator Dashboard Page Component', () => {
         // suppress this error because the case where the returned
         // data is an empty object is also important to test.
         // @ts-ignore
-        .and.returnValue(
-          Promise.resolve({
-            dashboardStats: CreatorDashboardStats.createFromBackendDict(
-              dashboardData.dashboard_stats
-            ),
-            // Because lastWeekStats may be null.
-            lastWeekStats: dashboardData.last_week_stats
-              ? CreatorDashboardStats.createFromBackendDict(
-                  // This throws "Argument of type 'null' is not assignable to
-                  // parameter of type 'object'." We need to suppress this error
-                  // because of the need to test validations.
-                  // @ts-ignore
-                  dashboardData.last_week_stats
-                )
-              : null,
-            displayPreference: dashboardData.display_preference,
-            subscribersList: dashboardData.subscribers_list.map(subscriber =>
-              ProfileSummary.createFromSubscriberBackendDict(subscriber)
-            ),
-            explorationsList: dashboardData.explorations_list.map(expSummary =>
-              CreatorExplorationSummary.createFromBackendDict(expSummary)
-            ),
-            collectionsList: dashboardData.collections_list.map(
-              // This throws "Type object is not assignable to type
-              // 'CreatorDashboardData'." We need to suppress this error
-              // because of the need to test validations. This throws an
-              // error only in the case of strict checks and we need to
-              // suppress this error because the case where the returned
-              // data is an empty object is also important to test.
-              // @ts-ignore
-              (collectionSummary: CollectionSummary) =>
-                CollectionSummary.createFromBackendDict(
-                  // This throws "Type object is not assignable to type
-                  // 'CreatorDashboardData'." We need to suppress this error
-                  // because of the need to test validations. This throws an
-                  // error only in the case of strict checks and we need to
-                  // suppress this error because the case where the returned
-                  // data is an empty object is also important to test.
-                  // @ts-ignore
-                  collectionSummary as CollectionSummaryBackendDict
-                )
-            ),
-          } as CreatorDashboardData)
-        );
+        Promise.resolve({
+          dashboardStats: CreatorDashboardStats.createFromBackendDict(
+            dashboardData.dashboard_stats
+          ),
+          // Because lastWeekStats may be null.
+          lastWeekStats: dashboardData.last_week_stats
+            ? CreatorDashboardStats.createFromBackendDict(
+                // This throws "Argument of type 'null' is not assignable to
+                // parameter of type 'object'." We need to suppress this error
+                // because of the need to test validations.
+                // @ts-ignore
+                dashboardData.last_week_stats
+              )
+            : null,
+          displayPreference: dashboardData.display_preference,
+          subscribersList: dashboardData.subscribers_list.map(subscriber =>
+            ProfileSummary.createFromSubscriberBackendDict(subscriber)
+          ),
+          explorationsList: dashboardData.explorations_list.map(expSummary =>
+            CreatorExplorationSummary.createFromBackendDict(expSummary)
+          ),
+          collectionsList: dashboardData.collections_list.map(
+            // This throws "Type object is not assignable to type
+            // 'CreatorDashboardData'." We need to suppress this error
+            // because of the need to test validations. This throws an
+            // error only in the case of strict checks and we need to
+            // suppress this error because the case where the returned
+            // data is an empty object is also important to test.
+            // @ts-ignore
+            (collectionSummary: CollectionSummary) =>
+              CollectionSummary.createFromBackendDict(
+                // This throws "Type object is not assignable to type
+                // 'CreatorDashboardData'." We need to suppress this error
+                // because of the need to test validations. This throws an
+                // error only in the case of strict checks and we need to
+                // suppress this error because the case where the returned
+                // data is an empty object is also important to test.
+                // @ts-ignore
+                collectionSummary as CollectionSummaryBackendDict
+              )
+          ),
+        } as CreatorDashboardData)
+      );
 
       component.ngOnInit();
     }));

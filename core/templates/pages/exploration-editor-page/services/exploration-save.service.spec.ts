@@ -413,11 +413,11 @@ describe(
         explorationLanguageCodeService.savedMemento = 'afk';
         explorationTagsService.savedMemento = 'invalid';
 
-        // This throws "Argument of type 'null' is not assignable.". We need
-        // to suppress this error because of strict type checking. This is
-        // because the function is called with null as an argument.
-        // @ts-ignore
         explorationSaveService
+          // This throws "Argument of type 'null' is not assignable.". We need
+          // to suppress this error because of strict type checking. This is
+          // because the function is called with null as an argument.
+          // @ts-ignore
           .showPublishExplorationModal(null, null)
           .catch(failHandler);
         tick();
