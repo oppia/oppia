@@ -189,7 +189,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
   async createTopic({
     name, urlFragment, webTitleFragment, description, thumbnail, metaContent,
-    assignedSkills, subtopics, diagnosticTestSkills, isPublished }) {
+    assignedSkills, subtopics, diagnosticTestSkills, isPublished
+  }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
     await this.page.waitForSelector(
@@ -199,8 +200,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-topics-tab');
 
     await this.clickOn('.e2e-test-create-topic-button', { visible: true });
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-create-new-topic-modal',
+    await this.withinModal({
+      selector: 'oppia-create-new-topic-modal',
       whenOpened: async(_this) => {
         await _this.type('.e2e-test-new-topic-name-field', name);
         await _this.type(
@@ -211,8 +212,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
           '.e2e-test-new-topic-description-field', description);
 
         await _this.clickOn('.e2e-test-photo-button');
-        await _this.withinContainerAboveCurrentContent({
-          containerSelector: 'edit-thumbnail-modal',
+        await _this.withinModal({
+          selector: 'edit-thumbnail-modal',
           whenOpened: async(_this) => {
             await _this.uploadFile(thumbnail);
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
@@ -233,8 +234,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-save-topic-button');
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-topic-editor-save-modal',
+    await this.withinModal({
+      selector: 'oppia-topic-editor-save-modal',
       whenOpened: async(_this) => {
         _this.type('.e2e-test-commit-message-input', 'Init');
         _this.clickOn('.e2e-test-close-save-modal-button');
@@ -251,20 +252,17 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.clickOn('.e2e-test-skills-tab', { visible: true });
     await this.page.waitForSelector('oppia-topics-list', { hidden: true });
 
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-skills-list',
+    await this.page.waitForSelector('oppia-skills-list', { visible: true });
+    await this.clickOn('.e2e-test-assign-skill-to-topic-button');
+    await this.withinModal({
+      selector: 'oppia-assign-skill-to-topic-modal',
       whenOpened: async(_this) => {
-        await _this.clickOn('.e2e-test-assign-skill-to-topic-button');
-        await _this.withinContainerAboveCurrentContent({
-          containerSelector: 'oppia-assign-skill-to-topic-modal',
-          whenOpened: async(_this) => {
-            await _this.clickOn('.e2e-test-topics-list-item');
-            await _this.clickOn('.e2e-test-confirm-move-button');
-          }
-        });
-        await _this.clickOn('.e2e-test-topics-tab');
+        await _this.clickOn('.e2e-test-topics-list-item');
+        await _this.clickOn('.e2e-test-confirm-move-button');
       }
     });
+    await this.clickOn('.e2e-test-topics-tab');
+    await this.page.waitForSelector('oppia-skills-list', { hidden: true });
 
     await this.page.waitForSelector('oppia-topics-list', { visible: true });
     await Promise.all([
@@ -274,8 +272,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
     // Add subtopics.
     await this.clickOn('.e2e-test-add-subtopic-button', { visible: true });
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-create-new-subtopic-modal',
+    await this.withinModal({
+      selector: 'oppia-create-new-subtopic-modal',
       whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-new-subtopic-title-field', subtopics[0].title);
@@ -284,21 +282,14 @@ module.exports = class e2eSuperAdmin extends baseUser {
           subtopics[0].urlFragment);
 
         await _this.clickOn('.e2e-test-show-schema-editor');
-        await _this.withinContainerAboveCurrentContent({
-          containerSelector: '.e2e-test-create-subtopic-page-content ' +
-            '.e2e-test-rte',
-          whenOpened: async(_this) => {
-            await _this.page.type(
-              '.e2e-test-create-subtopic-page-content .e2e-test-rte',
-              subtopics[0].description);
-          },
-          afterClosing: async() => {}
-        });
+        await _this.type(
+          '.e2e-test-create-subtopic-page-content .e2e-test-rte',
+          subtopics[0].description, { visible: true });
 
         await _this.clickOn(
           '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
-        await _this.withinContainerAboveCurrentContent({
-          containerSelector: 'edit-thumbnail-modal',
+        await _this.withinModal({
+          selector: 'edit-thumbnail-modal',
           whenOpened: async(_this) => {
             await _this.uploadFile(subtopics[0].thumbnail);
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
@@ -306,21 +297,24 @@ module.exports = class e2eSuperAdmin extends baseUser {
         });
 
         await _this.clickOn(
-          '.e2e-test-confirm-subtopic-creation-button:enabled');
-      }
+          '.e2e-test-confirm-subtopic-creation-button:enabled',
+          { visible: true });
+        await _this.page.waitForNetworkIdle({ idleTime: 2000 });
+      },
+      afterClosing: async() => {}
     });
 
     await this.clickOn('.e2e-test-back-to-topic-editor', { visible: true });
 
     await this.clickOn('.e2e-test-skill-item-edit-btn', { visible: true });
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: '.e2e-test-options-for-uncategorized-skill',
-      whenOpened: async(_this) => {
-        await _this.clickOn('.e2e-test-assign-skill-to-subtopic');
-      }
-    });
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-change-subtopic-assignment-modal',
+    await this.page.waitForSelector(
+      '.e2e-test-options-for-uncategorized-skill', { visible: true });
+    await this.clickOn('.e2e-test-assign-skill-to-subtopic');
+    await this.page.waitForSelector(
+      '.e2e-test-options-for-uncategorized-skill', { hidden: true });
+
+    await this.withinModal({
+      selector: 'oppia-change-subtopic-assignment-modal',
       whenOpened: async(_this) => {
         await _this.clickOn('#mat-radio-2');
         await _this.clickOn('.e2e-test-skill-assign-subtopic-confirm');
@@ -328,8 +322,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-topic-editor-save-modal',
+    await this.withinModal({
+      selector: 'oppia-topic-editor-save-modal',
       whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-commit-message-input', 'Create subtopic');
@@ -344,15 +338,18 @@ module.exports = class e2eSuperAdmin extends baseUser {
     // page statement and the saving topic changes statements just
     // before the reload page statement.
     await this.reloadPage();
+    await this.page.waitForNetworkIdle({ idleTime: 2000 });
     await this.clickOn(
       '.e2e-test-add-diagnostic-test-skill', { visible: true });
+    await this.clickOn(
+      '.e2e-test-diagnostic-test-skill-selector', { visible: true });
     await this.select(
       '.e2e-test-diagnostic-test-skill-selector',
-      diagnosticTestSkills[0].description, { visible: true });
+      diagnosticTestSkills[0].description);
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-topic-editor-save-modal',
+    await this.withinModal({
+      selector: 'oppia-topic-editor-save-modal',
       whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-commit-message-input',
@@ -374,20 +371,11 @@ module.exports = class e2eSuperAdmin extends baseUser {
 
   async getTopicIdBy({ name }) {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
-    await this.clickOn('.e2e-test-topics-tab');
+    await this.clickOn('.e2e-test-topics-tab', { visible: true });
 
-    const topicListIndex = await this.page.evaluate(async(name) => {
-      const topicNames = document.getElementsByClassName(
-        'e2e-test-topic-name');
-      for (let i = 0; i < topicNames.length; i++) {
-        if (topicNames[i] === name) {
-          return i + 1;
-        }
-      }
-    }, name);
     await Promise.all([
       this.page.waitForNavigation({ waitUntil: 'networkidle0' }),
-      this.clickOn(`.e2e-test-topic-name:nth-child(${topicListIndex})`)
+      this.clickOn('.e2e-test-topic-name')
     ]);
 
     const topicEditorUrl = await this.page.url();
@@ -407,8 +395,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
     await this.clickOn('.e2e-test-create-skill-button', { visible: true });
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'oppia-create-new-skill-modal',
+    await this.withinModal({
+      selector: 'oppia-create-new-skill-modal',
       whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-new-skill-description-field', description);
@@ -425,8 +413,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
     if (misconception) {
       await this.clickOn(
         '.e2e-test-add-misconception-modal-button', { visible: true });
-      await this.withinContainerAboveCurrentContent({
-        containerSelector: '.e2e-test-add-misconception-modal',
+      await this.withinModal({
+        selector: '.e2e-test-add-misconception-modal',
         whenOpened: async(_this) => {
           await _this.type(
             '.e2e-test-misconception-name-field', misconception.name);
@@ -476,23 +464,28 @@ module.exports = class e2eSuperAdmin extends baseUser {
           '.e2e-test-rubric-explanation-list > ' +
           `:nth-child(${i + 1}) .oppia-click-to-start-editing` :
           `.e2e-test-add-explanation-button-${difficulty}`);
-        await this.withinContainerAboveCurrentContent({
-          containerSelector: '.e2e-test-rubric-explanation-text .e2e-test-rte',
-          whenOpened: async(_this, rteEditor) => {
-            // Triple-click to highlight the text. Then, the first letter typed
-            // will clear the previous text.
-            await _this.page.click(rteEditor, { clickCount: 3 });
-            await _this.page.type(rteEditor, rubricNotes[i]);
-            await _this.clickOn('.e2e-test-save-rubric-explanation-button');
-          }
-        });
+
+        // Triple-click to highlight the text. Then, the first letter typed
+        // will clear the previous text.
+        await this.page.waitForSelector(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          { visible: true });
+        await this.page.click(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          { clickCount: 3 });
+        await this.page.type(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte', rubricNotes[i]);
+        await this.clickOn('.e2e-test-save-rubric-explanation-button');
+        await this.page.waitForSelector(
+          '.e2e-test-rubric-explanation-text .e2e-test-rte',
+          { hidden: true });
       }
     }
 
     // Save skill changes.
     await this.clickOn('.e2e-test-save-or-publish-skill:enabled');
-    await this.withinContainerAboveCurrentContent({
-      containerSelector: 'skill-editor-save-modal',
+    await this.withinModal({
+      selector: 'skill-editor-save-modal',
       whenOpened: async(_this) => {
         await _this.type('.e2e-test-commit-message-input', 'test');
         await _this.clickOn('.e2e-test-close-save-modal-button');
@@ -509,98 +502,99 @@ module.exports = class e2eSuperAdmin extends baseUser {
     ]);
     for (let i = 0; i < questionCount; i++) {
       await this.clickOn('.e2e-test-create-question-button');
-      await this.withinContainerAboveCurrentContent({
-        containerSelector: '.e2e-test-create-question-progress',
+      await this.page.waitForSelector(
+        '.e2e-test-create-question-progress', { visible: true });
+
+      await this.clickOn('.e2e-test-skill-difficulty-medium');
+      await this.clickOn('.e2e-test-edit-content');
+
+      await this.type(
+        '.e2e-test-state-content-editor .e2e-test-rte',
+        'Question created by Skill Owner', { visible: true });
+      await this.clickOn('.e2e-test-save-state-content');
+      await this.page.waitForSelector(
+        '.e2e-test-state-content-editor .e2e-test-rte',
+        { hidden: true });
+
+      await this.clickOn('.e2e-test-open-add-interaction-modal');
+      await this.withinModal({
+        selector: 'oppia-customize-interaction',
         whenOpened: async(_this) => {
-          await _this.clickOn('.e2e-test-skill-difficulty-medium');
-
-          await _this.clickOn('.e2e-test-edit-content');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: '.e2e-test-state-content-editor .e2e-test-rte',
-            whenOpened: async(_this, questionTextEditor) => {
-              await _this.page.type(
-                questionTextEditor, 'Question created by Skill Owner');
-              await _this.clickOn('.e2e-test-save-state-content');
-            }
-          });
-
-          await _this.clickOn('.e2e-test-open-add-interaction-modal');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: 'oppia-customize-interaction',
-            whenOpened: async(_this) => {
-              await _this.clickOn(
-                '.e2e-test-interaction-tile-TextInput button');
-              await _this.clickOn('.e2e-test-save-interaction');
-            }
-          });
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: 'oppia-add-answer-group-modal-component',
-            whenOpened: async(_this) => {
-              await _this.clickOn('.e2e-test-add-list-entry');
-              await _this.type(
-                '.e2e-test-schema-based-list-editor-table-data input', 't',
-                { visible: true });
-              await _this.clickOn('.e2e-test-open-feedback-editor');
-              await _this.type(
-                '.e2e-test-add-response-details .e2e-test-rte', 'Correct!',
-                { visible: true });
-              await _this.clickOn('.e2e-test-editor-correctness-toggle');
-              await _this.clickOn('.e2e-test-add-new-response');
-            }
-          });
-
-          await _this.clickOn('.e2e-test-default-response-tab');
-          await _this.page.waitForSelector(
-            '.e2e-test-response-body-default', { visible: true });
           await _this.clickOn(
-            '.e2e-test-response-body-default ' +
-            '.e2e-test-open-outcome-feedback-editor');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: '.e2e-test-response-body-default ' +
-              '.e2e-test-rte',
-            whenOpened: async(_this, responseEditor) => {
-              _this.page.type(responseEditor, 'Incorrect!');
-              _this.clickOn('.e2e-test-save-outcome-feedback');
-            }
-          });
-
-          await _this.clickOn('.e2e-test-misconception-0-0-options');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector:
-              '.e2e-test-mark-non-applicable-misconception-0-0',
-            whenOpened: async(_this, misconceptionOptions) => {
-              _this.page.click(misconceptionOptions);
-            }
-          });
-
-          await _this.clickOn('.e2e-test-oppia-add-hint-button');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: 'oppia-add-hint-modal',
-            whenOpened: async(_this) => {
-              await _this.type(
-                '.e2e-test-hint-text .e2e-test-rte', 'hint text');
-              await _this.clickOn('.e2e-test-save-hint');
-            }
-          });
-
-          await _this.clickOn('.e2e-test-oppia-add-solution-button');
-          await _this.withinContainerAboveCurrentContent({
-            containerSelector: 'oppia-add-or-update-solution-modal',
-            whenOpened: async(_this) => {
-              await _this.type(
-                'oppia-add-or-update-solution-modal .e2e-test-description-box',
-                't');
-              await _this.clickOn('.e2e-test-submit-answer-button');
-              await _this.type(
-                '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation',
-                { visible: true });
-              await _this.clickOn('.e2e-test-submit-solution-button');
-            }
-          });
-
-          await _this.clickOn('.e2e-test-save-question-button:enabled');
+            '.e2e-test-interaction-tile-TextInput button');
+          await _this.clickOn('.e2e-test-save-interaction');
         }
       });
+      await this.withinModal({
+        selector: 'oppia-add-answer-group-modal-component',
+        whenOpened: async(_this) => {
+          await _this.clickOn('.e2e-test-add-list-entry');
+          await _this.type(
+            '.e2e-test-schema-based-list-editor-table-data input', 't',
+            { visible: true });
+          await _this.clickOn('.e2e-test-open-feedback-editor');
+          await _this.type(
+            '.e2e-test-add-response-details .e2e-test-rte', 'Correct!',
+            { visible: true });
+          await _this.clickOn('.e2e-test-editor-correctness-toggle');
+          await _this.clickOn('.e2e-test-add-new-response');
+        }
+      });
+
+      await this.clickOn('.e2e-test-default-response-tab');
+      await this.page.waitForSelector(
+        '.e2e-test-response-body-default', { visible: true });
+      await this.clickOn(
+        '.e2e-test-response-body-default ' +
+        '.e2e-test-open-outcome-feedback-editor');
+
+      await this.page.waitForSelector(
+        '.e2e-test-response-body-default .e2e-test-rte',
+        { visible: true });
+      await this.page.type(
+        '.e2e-test-response-body-default .e2e-test-rte',
+        'Incorrect!');
+      await this.clickOn('.e2e-test-save-outcome-feedback');
+      await this.page.waitForSelector(
+        '.e2e-test-response-body-default .e2e-test-rte',
+        { hidden: true });
+
+      await this.clickOn('.e2e-test-misconception-0-0-options');
+      await this.clickOn(
+        '.e2e-test-mark-non-applicable-misconception-0-0',
+        { visible: true }),
+      await this.page.waitForSelector(
+        '.e2e-test-mark-non-applicable-misconception-0-0',
+        { hidden: true });
+
+      await this.clickOn('.e2e-test-oppia-add-hint-button');
+      await this.withinModal({
+        selector: 'oppia-add-hint-modal',
+        whenOpened: async(_this) => {
+          await _this.type(
+            '.e2e-test-hint-text .e2e-test-rte', 'hint text');
+          await _this.clickOn('.e2e-test-save-hint');
+        }
+      });
+
+      await this.clickOn('.e2e-test-oppia-add-solution-button');
+      await this.withinModal({
+        selector: 'oppia-add-or-update-solution-modal',
+        whenOpened: async(_this) => {
+          await _this.type(
+            'oppia-add-or-update-solution-modal .e2e-test-description-box',
+            't');
+          await _this.clickOn('.e2e-test-submit-answer-button');
+          await _this.type(
+            '.e2e-test-explanation-textarea .e2e-test-rte', 'Explanation',
+            { visible: true });
+          await _this.clickOn('.e2e-test-submit-solution-button');
+        }
+      });
+
+      await this.clickOn('.e2e-test-save-question-button:enabled');
+      await this.page.waitForSelector(
+        '.e2e-test-create-question-progress', { hidden: true });
     }
   }
 };

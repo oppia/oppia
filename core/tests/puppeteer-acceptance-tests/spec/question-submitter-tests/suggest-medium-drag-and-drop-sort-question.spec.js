@@ -85,7 +85,7 @@ describe('Practice Question Submitter', function() {
       diagnosticTestSkills: [skill],
       isPublished: true
     });
-    const topicId = await superAdmin.getTopicId();
+    const topicId = await superAdmin.getTopicIdBy({ name: topicName });
 
     await superAdmin.editClassroom({ topicIds: [topicId] });
 

@@ -214,8 +214,8 @@ module.exports = class baseUser {
     this._setupDebugTools();
   }
 
-  async withinContainerAboveCurrentContent({
-    containerSelector,
+  async withinModal({
+    selector,
     beforeOpened = async(_this, container) => {
       await _this.page.waitForSelector(
         container, { visible: true });
@@ -226,9 +226,9 @@ module.exports = class baseUser {
         container, { hidden: true });
     }
   }) {
-    await beforeOpened(this, containerSelector);
-    await whenOpened(this, containerSelector);
-    await afterClosing(this, containerSelector);
+    await beforeOpened(this, selector);
+    await whenOpened(this, selector);
+    await afterClosing(this, selector);
   }
 
   /**
