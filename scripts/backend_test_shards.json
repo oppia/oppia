@@ -1,7 +1,7 @@
 {
     "1": [
         "core.jobs.transforms.job_result_transforms_test",
-        "scripts.linters.pre_commit_linter_test",
+        "scripts.linters.run_lint_checks_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
@@ -119,7 +119,7 @@
         "core.domain.fs_services_test",
         "core.domain.recommendations_services_test",
         "core.platform.search.elastic_search_services_test",
-        "scripts.typescript_checks_test",
+        "scripts.run_typescript_checks_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
         "core.platform.translate.cloud_translate_emulator_test",
@@ -325,6 +325,7 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
+        "core.jobs.batch_jobs.manual_voice_artist_names_job_test",
         "core.jobs.io.cache_io_test",
         "scripts.populate_sample_contributor_data_test",
         "core.platform.secrets.cloud_secrets_services_test",

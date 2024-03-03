@@ -50,7 +50,7 @@ VoiceoversAndContentsMappingType = Dict[
         str, Union[
             str,
             Dict[str, List[str]],
-            List[VoiceoverDict]
+            Dict[str, List[VoiceoverDict]]
         ]
     ]
 ]
@@ -233,9 +233,11 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     # (strings) to lists of content IDs (strings), denoting the content IDs
     # for which voiceovers are provided in a given exploration by the
     # voice artist.
-    # - 'voiceovers': A list of sample voiceovers, where each voiceover is
+    # - 'exploration_id_to_voiceovers': A dict with exploration IDs as keys
+    # and the list of voiceovers as values, where each voiceover is
     # represented as a dictionary (VoiceoverDict). This field specifically
-    # contains the five sample voiceovers with the longest duration.
+    # contains all of the voiceovers contributed by the user in the given
+    # exploration.
     voiceovers_and_contents_mapping = (
         datastore_services.JsonProperty(required=True))
 
@@ -300,10 +302,11 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
                 exploration IDs (strings) to lists of content IDs (strings),
                 denoting the content IDs for which voiceovers are provided in a
                 given exploration by the voice artist.
-                (c). 'voiceovers': A list of sample voiceovers, where each
-                voiceover is represented as a dictionary (VoiceoverDict).
-                This field specifically contains the five sample voiceovers
-                with the longest duration.
+                (c). 'exploration_id_to_voiceovers': A dict with exploration
+                IDs as keys and the list of sample voiceovers as values, where
+                each voiceover is represented as a dictionary (VoiceoverDict).
+                This field specifically contains all of the voiceovers
+                contributed by the user in the given exploration.
 
         Returns:
             VoiceArtistMetadataModel. The newly created

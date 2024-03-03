@@ -57,7 +57,7 @@
       <div class="navbar-header e2e-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
            href="/community-library"
-           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
             <source type="image/webp" [srcset]="logoWebpImageSrc">
             <source type="image/png" [srcset]="logoPngImageSrc">
@@ -118,7 +118,7 @@
                   </li>
                   <li>
                     <a href="/preferences"
-                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -126,7 +126,7 @@
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
                     <a [href]="logoutUrl"
-                       [smartRouterLink]="logoutUrl"
+                       [routerLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

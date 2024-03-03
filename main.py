@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_create_learner_group_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CreateLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.EditLearnerGroupPageAccessValidationHandler
@@ -304,9 +310,6 @@ URLS = [
         r'/contributionrightsdatahandler',
         contributor_dashboard_admin.ContributionRightsDataHandler),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
-        contributor_dashboard_admin.ContributorDashboardAdminPage),
-    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>' % (
             feconf.CONTRIBUTOR_DASHBOARD_ADMIN_STATS_URL_PREFIX),
         contributor_dashboard_admin.ContributorDashboardAdminStatsHandler),
@@ -316,6 +319,9 @@ URLS = [
     get_redirect_route(
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
+    get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
+        contributor_dashboard.ContributorDashboardPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
@@ -1030,8 +1036,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -1110,9 +1114,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
-    get_redirect_route(
-        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
-        learner_group.CreateLearnerGroupPage),
     get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),
