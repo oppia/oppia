@@ -151,3 +151,170 @@
   border: 1px solid #667085;
   color: #667085;
 }
+
+.oppia-lesson-info-card .save-progress-btn-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.oppia-lesson-info-card .save-progress-btn {
+  background-color: #00645c;
+  border-radius: 7px;
+  color: #fff;
+  cursor: pointer;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  height: 40px;
+  margin: 5px 0;
+  width: 170px;
+}
+
+.progress-bar-label-text {
+  color: #00645c;
+  font-size: 0.9em;
+  margin-bottom: 15px;
+}
+
+.save-progress-menu-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 5;
+}
+
+.save-progress-menu {
+  background-color: #fff;
+  border-radius: 10px;
+  height: auto;
+  left: 50%;
+  max-width: 600px;
+  position: absolute;
+  top: 8vh;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 6;
+}
+
+.save-menu-main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.save-menu-progress-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.save-menu-sign-in-container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.save-progress-menu h3 {
+  color: #00645c;
+  font-family: capriola, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin: 20px;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.save-progress-menu .sign-in-box {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: 30%;
+  justify-content: center;
+  width: 100%;
+}
+
+.save-progress-menu .sign-in-box p {
+  font-size: 18px;
+  margin: 10px 20px;
+}
+
+p.sign-in-text {
+  font-size: 16px !important;
+}
+
+.save-progress-menu .sign-in-box .sign-in-text a {
+  color: #00645c;
+  text-decoration: underline;
+}
+
+.save-progress-menu .sign-in-box .create-account-btn {
+  background-color: #00645c;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  height: 44px;
+  margin-top: 0;
+  width: 200px;
+}
+
+.save-progress-menu .separator {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 10%;
+  justify-content: space-evenly;
+  margin: 15px 0;
+  width: 100%;
+}
+
+.save-progress-menu .separator .bars {
+  background-color: #b7b7b7;
+  height: 2px;
+  padding: auto;
+  width: 30%;
+}
+
+.save-progress-menu .uid-box {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 40%;
+  width: 100%;
+}
+
+.save-progress-menu .uid-box .oppia-tooltip-container {
+  width: 100%;
+}
+
+.save-progress-menu .uid-box .guide-text {
+  margin: 0;
+  padding: 10px 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.save-progress-menu .uid-box .copy-text {
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.save-progress-menu .save-progress-close-button {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}

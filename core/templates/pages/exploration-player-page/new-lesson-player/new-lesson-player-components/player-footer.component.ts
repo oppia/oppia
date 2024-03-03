@@ -47,6 +47,7 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
+import { LocalStorageService } from 'services/local-storage.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -98,6 +99,11 @@ export class PlayerFooterComponent {
   expEnded: boolean = false;
   expInfo: LearnerExplorationSummaryBackendDict;
   userIsLoggedIn: boolean = false;
+  // Unique progress tracking ID is null until the first state of the
+  // exploration is loaded.
+  loggedOutProgressUniqueUrlId!: string | null;
+  loggedOutProgressUniqueUrl!: string;
+  saveProgressMenuIsShown: boolean = false;
 
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
@@ -142,6 +148,7 @@ export class PlayerFooterComponent {
     private ngbModal: NgbModal,
     private loggerService: LoggerService,
     private windowRef: WindowRef,
+    private localStorageService: LocalStorageService,
   ) {}
 
   ngOnChanges(): void {
@@ -205,9 +212,18 @@ export class PlayerFooterComponent {
         }
       })
     );
+  
     this.getCheckpointCount().then(() => {
       this.updateLessonProgressBar();
     });
+
+    this.loggedOutProgressUniqueUrlId = (
+      this.explorationPlayerStateService.getUniqueProgressUrlId());
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl = (
+        this.urlService.getOrigin() +
+        '/progress/' + this.loggedOutProgressUniqueUrlId);
+    }
   }
 
   updateLessonProgressBar(): void {
@@ -479,6 +495,46 @@ export class PlayerFooterComponent {
           }
           this.checkpointCount = count;
         });
+  }
+
+  async saveLoggedOutProgress(): Promise<void> {
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.explorationPlayerStateService
+        .setUniqueProgressUrlId()
+        .then(() => {
+          this.loggedOutProgressUniqueUrlId = (
+            this.explorationPlayerStateService.getUniqueProgressUrlId());
+          this.loggedOutProgressUniqueUrl = (
+            this.urlService.getOrigin() +
+            '/progress/' + this.loggedOutProgressUniqueUrlId);
+        });
+    }
+    this.saveProgressMenuIsShown = true;
+    const completedNodes = document.querySelectorAll<HTMLElement>(
+      '.save-menu-progress-container .progress-bar-container .completed-checkpoint-node');
+    const lastCompletedNode = Array.from(completedNodes).pop();
+    if (lastCompletedNode) {
+      lastCompletedNode.style.color = '#c55f45';
+    }
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        let urlId = this.loggedOutProgressUniqueUrlId;
+        if (urlId === null) {
+          throw new Error(
+            'User should not be able to login if ' +
+            'loggedOutProgressUniqueUrlId is not null.');
+        }
+        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+          urlId);
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      });
+  }
+
+  closeSaveProgressMenu(): void {
+    this.saveProgressMenuIsShown = false;
   }
 }
 

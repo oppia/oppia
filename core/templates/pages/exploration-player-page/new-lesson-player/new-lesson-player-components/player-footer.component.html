@@ -21,7 +21,8 @@
       </div>
     </div>
     <button *ngIf="(!userIsLoggedIn && checkpointCount>1)"
-            class="player-footer-save-button" [disabled]="checkpointStatusArray[0] === 'in-progress'">
+            class="player-footer-save-button" [disabled]="checkpointStatusArray[0] === 'in-progress'"
+            (click)="saveLoggedOutProgress()">
       <mat-icon>save</mat-icon>
       Save
     </button>
@@ -32,6 +33,53 @@
             (click)="handleNewContinueButtonClick()">
       Continue
       <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+
+<div  *ngIf="saveProgressMenuIsShown && !userIsLoggedIn"
+      class="save-progress-menu-backdrop">
+</div>
+<div class="save-progress-menu"
+     *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
+  <div class="save-menu-main-container">
+    <div class="sign-in-box">
+      <div class="save-menu-progress-container">
+        <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_NEW_1' | translate }}</p>
+        <div class="progress-bar-container"
+            [ngClass]="{'d-none': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1}">
+            <div class="lesson-progress-bar">
+              <div tabindex="0" class="completed-progress-bar"
+                  [style.width.%]="getCompletedProgressBarWidth()"
+                  [attr.aria-label]="getProgressPercentage() + ' percent completed'">
+              </div>
+            </div>
+            <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
+                [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+            </div>
+        </div>
+      </div>
+      <div class="save-menu-sign-in-container">
+        <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_NEW_2' | translate }}</p>
+        <button type="button"
+                class="btn btn-secondary create-account-btn"
+                (click)="onLoginButtonClicked()">
+              {{ 'I18N_CREATE_ACCOUNT' | translate }}
+        </button>
+        <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
+      </div>
+    </div>
+    <div class="uid-box">
+      <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_NEW_3' | translate }}</p>
+      <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
+          class="oppia-tooltip-container">
+        <oppia-new-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-new-copy-url>
+      </div>
+    </div>
+    <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+      <i class="material-icons md-24">&#xE5CD;</i>
+      <span class="oppia-icon-accessibility-label">Close</span>
     </button>
   </div>
 </div>
