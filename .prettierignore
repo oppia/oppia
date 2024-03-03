@@ -17,9 +17,10 @@ local_compiled_js_for_test/*
 *.html
 *.yml
 *.yaml
+*.css
+*.json
 # this file is parsed by assets/constants.py, so disable formatting for now.
 assets/constants.ts
-*.css
 # this file is parsed by js_ts_linter, so disable formatting for now.
 core/templates/services/angular-services.index.ts
 # this file is parsed by js_ts_linter, so disable formatting for now.
