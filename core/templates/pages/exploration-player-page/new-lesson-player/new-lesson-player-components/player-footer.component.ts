@@ -18,7 +18,7 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
@@ -33,6 +33,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { ContentTranslationManagerService } from '../../services/content-translation-manager.service';
+import { ProgressReminderModalComponent } from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
 
 import './player-footer.component.css';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
@@ -40,6 +41,11 @@ import { ExplorationEngineService } from 'pages/exploration-player-page/services
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ContextService } from 'services/context.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -89,6 +95,7 @@ export class PlayerFooterComponent {
   translatedCongratulatoryCheckpointMessage!: string | undefined;
   expStates: StateObjectsBackendDict;
   expEnded: boolean = false;
+  expInfo: LearnerExplorationSummaryBackendDict;
 
   @Output() submit: EventEmitter<void> = (
     new EventEmitter());
@@ -126,6 +133,12 @@ export class PlayerFooterComponent {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private contextService: ContextService,
+    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService,
+    private ngbModal: NgbModal,
+    private loggerService: LoggerService,
+    private windowRef: WindowRef,
   ) {}
 
   ngOnChanges(): void {
@@ -174,6 +187,17 @@ export class PlayerFooterComponent {
         }
       )
     );
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
+        if (this.checkpointCount) {
+          this.showProgressReminderModal();
+        } else {
+          this.getCheckpointCount().then(() => {
+            this.showProgressReminderModal();
+          });
+        }
+      })
+    );
     this.getCheckpointCount().then(() => {
       this.updateLessonProgressBar();
     });
@@ -221,6 +245,75 @@ export class PlayerFooterComponent {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
     }
     console.log(this.checkpointStatusArray)
+  }
+
+  showProgressReminderModal(): void {
+    const mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
+    );
+
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    if (this.completedCheckpointsCount === 0) {
+      this.explorationPlayerStateService.onShowProgressModal.emit();
+      return;
+    }
+
+    if (this.expInfo) {
+      this.openProgressReminderModal();
+    } else {
+      let stringifiedExpIds = JSON.stringify(
+        [this.explorationId]);
+      let includePrivateExplorations = JSON.stringify(true);
+
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openProgressReminderModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
+  openProgressReminderModal(): void {
+    let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
+      windowClass: 'oppia-progress-reminder-modal'
+    });
+    this.explorationPlayerStateService.onShowProgressModal.emit();
+
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
+      }
+    }
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    modalRef.componentInstance.completedCheckpointsCount = (
+      this.completedCheckpointsCount);
+    modalRef.componentInstance.explorationTitle = this.expInfo.title;
+
+    modalRef.result.then(() => {
+      // This callback is used for when the learner chooses to restart
+      // the exploration.
+      this.editableExplorationBackendApiService.resetExplorationProgressAsync(
+        this.explorationId).then(() => {
+        this.windowRef.nativeWindow.location.reload();
+      });
+    }, () => {
+      // This callback is used for when the learner chooses to resume
+      // the exploration.
+    });
   }
 
   ngOnDestroy(): void {
