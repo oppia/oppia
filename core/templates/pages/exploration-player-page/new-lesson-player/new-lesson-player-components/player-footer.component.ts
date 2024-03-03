@@ -94,9 +94,9 @@ export class PlayerFooterComponent {
   completedCheckpointsCount!: number;
   checkpointStatusArray: string[] = [];
   translatedCongratulatoryCheckpointMessage!: string | undefined;
-  expStates: StateObjectsBackendDict;
+  expStates!: StateObjectsBackendDict;
   expEnded: boolean = false;
-  expInfo: LearnerExplorationSummaryBackendDict;
+  expInfo!: LearnerExplorationSummaryBackendDict;
   userIsLoggedIn: boolean = false;
   // Unique progress tracking ID is null until the first state of the
   // exploration is loaded.

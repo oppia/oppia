@@ -79,8 +79,6 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { AudioTranslationLanguageService } from '../../services/audio-translation-language.service';
 import { ConceptCardManagerService } from '../../services/concept-card-manager.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
