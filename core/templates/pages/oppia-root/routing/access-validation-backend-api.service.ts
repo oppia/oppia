@@ -107,7 +107,7 @@ export class AccessValidationBackendApiService {
 
   validateAccessToCollectionPlayerPage(collectionId: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
-      this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR, {
+      this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE, {
         collection_id: collectionId
       });
 
