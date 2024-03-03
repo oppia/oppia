@@ -87,7 +87,7 @@ describe('Practice Question Submitter', function() {
     });
     const topicId = await superAdmin.getTopicIdBy({ name: topicName });
 
-    await superAdmin.editClassroom({ topicIds: [topicId] });
+    await superAdmin.editClassroom({ topicId });
 
     questionSubmitter = (
       await userFactory.createNewQuestionSubmitter('questionsubmitter'));

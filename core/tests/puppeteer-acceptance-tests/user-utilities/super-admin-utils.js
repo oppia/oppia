@@ -177,14 +177,25 @@ module.exports = class e2eSuperAdmin extends baseUser {
     });
   }
 
-  async editClassroom({ topicIds }) {
+  async editClassroom({ topicId }) {
     await this.goto('http://localhost:8181/admin#/config');
 
-    for (const topicId of topicIds) {
-      await this.clickOn('.e2e-test-add-list-entry');
-      await this.type('.e2e-test-topic-id-field', topicId);
+    await this.clickOn('.e2e-test-add-list-entry');
+    for (let i = 0; i < topicId.length; i++) {
+      await this.type(
+      '.e2e-test-schema-based-dict-editor ' +
+        '.e2e-test-schema-based-list-editor-table-data ' +
+        'input[type="text"]',
+      topicId[i], { visible: true });
     }
+
+    await this.page.waitForTimeout(5000);
+    await this.page.on('dialog', async(dialog) => {
+      await dialog.accept();
+    });
     await this.clickOn('.e2e-test-save-all-configs');
+    await this.page.waitForSelector(
+      '.e2e-test-status-message', { visible: true });
   }
 
   async createTopic({
@@ -208,8 +219,6 @@ module.exports = class e2eSuperAdmin extends baseUser {
           '.e2e-test-new-topic-url-fragment-field', urlFragment);
         await _this.type(
           '.e2e-test-new-page-title-fragm-field', webTitleFragment);
-        await _this.type(
-          '.e2e-test-new-topic-description-field', description);
 
         await _this.clickOn('.e2e-test-photo-button');
         await _this.withinModal({
@@ -219,6 +228,8 @@ module.exports = class e2eSuperAdmin extends baseUser {
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
           }
         });
+        await _this.type(
+          '.e2e-test-new-topic-description-field', description);
 
         await _this.clickOn('.e2e-test-confirm-topic-creation-button:enabled');
       },
@@ -277,10 +288,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
       whenOpened: async(_this) => {
         await _this.type(
           '.e2e-test-new-subtopic-title-field', subtopics[0].title);
-        await _this.type(
-          '.e2e-test-new-subtopic-url-fragment-field',
-          subtopics[0].urlFragment);
-
+        
         await _this.clickOn('.e2e-test-show-schema-editor');
         await _this.type(
           '.e2e-test-create-subtopic-page-content .e2e-test-rte',
@@ -295,6 +303,9 @@ module.exports = class e2eSuperAdmin extends baseUser {
             await _this.clickOn('.e2e-test-photo-upload-submit:enabled');
           }
         });
+        await _this.type(
+          '.e2e-test-new-subtopic-url-fragment-field',
+          subtopics[0].urlFragment);
 
         await _this.clickOn(
           '.e2e-test-confirm-subtopic-creation-button:enabled',
@@ -338,14 +349,22 @@ module.exports = class e2eSuperAdmin extends baseUser {
     // page statement and the saving topic changes statements just
     // before the reload page statement.
     await this.reloadPage();
-    await this.page.waitForNetworkIdle({ idleTime: 2000 });
     await this.clickOn(
       '.e2e-test-add-diagnostic-test-skill', { visible: true });
-    await this.clickOn(
-      '.e2e-test-diagnostic-test-skill-selector', { visible: true });
     await this.select(
       '.e2e-test-diagnostic-test-skill-selector',
-      diagnosticTestSkills[0].description);
+      await this.page.$eval(
+        '.e2e-test-diagnostic-test-skill-selector',
+        (dropdown, skillDescription) => {
+          for (const option of dropdown.options) {
+            if (option.text == skillDescription) {
+              return option.value;
+            }
+          }
+          return '';
+        },
+        diagnosticTestSkills[0].description),
+      { visible: true });
 
     await this.clickOn('.e2e-test-save-topic-button:enabled');
     await this.withinModal({
