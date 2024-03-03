@@ -41,6 +41,13 @@
       Continue
       <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
     </button>
+    <button mat-button
+            *ngIf="shouldGenericSubmitButtonBeShown()"
+            class="player-footer-continue-button"
+            (click)="submit.emit()"
+            [disabled]="displayedCard.showNoResponseError()">
+      {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+    </button>
   </div>
 </div>
 
