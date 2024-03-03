@@ -510,12 +510,6 @@ export class PlayerFooterComponent {
         });
     }
     this.saveProgressMenuIsShown = true;
-    const completedNodes = document.querySelectorAll<HTMLElement>(
-      '.save-menu-progress-container .progress-bar-container .completed-checkpoint-node');
-    const lastCompletedNode = Array.from(completedNodes).pop();
-    if (lastCompletedNode) {
-      lastCompletedNode.style.color = '#c55f45';
-    }
   }
 
   onLoginButtonClicked(): void {
