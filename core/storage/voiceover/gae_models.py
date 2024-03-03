@@ -234,9 +234,10 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     # for which voiceovers are provided in a given exploration by the
     # voice artist.
     # - 'exploration_id_to_voiceovers': A dict with exploration IDs as keys
-    # and the list of sample voiceovers as values, where each voiceover is
+    # and the list of voiceovers as values, where each voiceover is
     # represented as a dictionary (VoiceoverDict). This field specifically
-    # contains the five sample voiceovers in total with the longest duration.
+    # contains all of the voiceovers contributed by the user in the given
+    # exploration.
     voiceovers_and_contents_mapping = (
         datastore_services.JsonProperty(required=True))
 
@@ -304,8 +305,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
                 (c). 'exploration_id_to_voiceovers': A dict with exploration
                 IDs as keys and the list of sample voiceovers as values, where
                 each voiceover is represented as a dictionary (VoiceoverDict).
-                This field specifically contains the five sample voiceovers in
-                total with the longest duration.
+                This field specifically contains all of the voiceovers
+                contributed by the user in the given exploration.
 
         Returns:
             VoiceArtistMetadataModel. The newly created

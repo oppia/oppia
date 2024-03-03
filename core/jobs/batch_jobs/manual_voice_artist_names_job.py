@@ -269,65 +269,6 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
         return voiceover_mapping_diff, voice_artist_id_to_metadata_mapping
 
     @staticmethod
-    def _add_voiceover(
-        exploration_id_to_voiceover_dicts: Dict[
-            str, List[voiceover_models.VoiceoverDict]],
-        voiceover_dict: voiceover_models.VoiceoverDict,
-        exploration_id: str
-    ) -> List[voiceover_models.VoiceoverDict]:
-        """Appends voiceovers to the existing list, ensuring that a maximum of
-        five voiceovers with the longest duration are included.
-
-        Args:
-            exploration_id_to_voiceover_dicts: dict(str, list(VoiceoverDict)).
-                A dict with exploration IDs as keys and the list of sample
-                voiceovers as values for the given content in the
-                given language.
-            voiceover_dict: VoiceoverDict. A voiceover dict, which may be added
-                to the voiceover dicts.
-
-        Returns:
-            dict(str, list(VoiceoverDict)). A dict with exploration IDs as keys
-            and the list of sample voiceovers as values for the given content
-            in the given language.
-        """
-        total_voiceovers = 0
-        exp_id_with_shortest_voiceover = ''
-        duration_of_shortest_voiceover = 3600
-        for exp_id, voiceovers in exploration_id_to_voiceover_dicts.items():
-            sorted(
-            voiceovers, key=lambda voiceover: voiceover['duration_secs'])
-
-            duration = voiceovers[0]['duration_secs']
-            if duration < duration_of_shortest_voiceover:
-                duration_of_shortest_voiceover = duration
-                exp_id_with_shortest_voiceover = exp_id
-
-            total_voiceovers += len(voiceovers)
-
-        if total_voiceovers < MAX_SAMPLE_VOICEOVERS_IN_VOICE_ARTIST_MODEL:
-            if exploration_id not in exploration_id_to_voiceover_dicts:
-                exploration_id_to_voiceover_dicts[exploration_id] = []
-            exploration_id_to_voiceover_dicts[exploration_id].append(
-                voiceover_dict)
-        elif duration_of_shortest_voiceover > voiceover_dict['duration_secs']:
-
-            voiceovers = exploration_id_to_voiceover_dicts[
-                exp_id_with_shortest_voiceover]
-            voiceovers.remove(0) # check this
-
-            if len(voiceovers) == 0:
-                del exploration_id_to_voiceover_dicts[
-                    exp_id_with_shortest_voiceover]
-
-            if exploration_id not in exploration_id_to_voiceover_dicts:
-                exploration_id_to_voiceover_dicts[exploration_id] = []
-            exploration_id_to_voiceover_dicts[exploration_id].append(
-                voiceover_dict)
-
-        return exploration_id_to_voiceover_dicts
-
-    @staticmethod
     def _get_voice_artist_metadata_info_from_exp_commit(
         exp_commit_log_model: exp_models.ExplorationCommitLogEntryModel,
         voice_artist_id_to_metadata_mapping: Dict[
@@ -413,13 +354,12 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                                 lang_code]['exploration_id_to_voiceovers']
                         )
                         assert isinstance(exploration_id_to_voiceovers, dict)
-                        exploration_id_to_voiceovers = (
-                            CreateVoiceArtistMetadataModelsFromExplorationsJob.
-                            _add_voiceover(
-                                exploration_id_to_voiceovers,
-                                voiceover_dict,
-                                exploration_id)
-                        )
+
+                        if exploration_id not in exploration_id_to_voiceovers:
+                            exploration_id_to_voiceovers[exploration_id] = []
+                        exploration_id_to_voiceovers[exploration_id].append(
+                            voiceover_dict)
+
                         voiceovers_and_contents_mapping[lang_code][
                             'exploration_id_to_voiceovers'] = (
                                 exploration_id_to_voiceovers)

@@ -59,6 +59,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
     CURATED_EXPLORATION_ID_1 = 'explrotion_id_1'
     CURATED_EXPLORATION_ID_2 = 'exploration_id_2'
     NON_CURATED_EXPLORATION_ID_3 = 'exploration_id_3'
+    CURATED_EXPLORATION_ID_4 = 'exploration_id_4'
 
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
@@ -292,6 +293,39 @@ class VoiceArtistMetadataModelsTestsBaseClass(
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict = {
+            'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_2,
+            change_list, 'Translation commits')
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
                 'content_0': {
                     'en': {
                         'filename': 'filename4.mp3',
@@ -300,14 +334,28 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                         'duration_secs': 20
                     }
                 },
-                'ca_placeholder_2': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
                 'default_outcome_1': {}
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
                 'content_0': {},
-                'ca_placeholder_2': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
                 'default_outcome_1': {}
             }
         }
@@ -333,7 +381,14 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                         'duration_secs': 42.43
                     },
                 },
-                'ca_placeholder_2': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
                 'default_outcome_1': {}
             }
         }
@@ -347,7 +402,14 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                         'duration_secs': 20
                     }
                 },
-                'ca_placeholder_2': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
                 'default_outcome_1': {}
             }
         }
@@ -375,13 +437,20 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 },
                 'ca_placeholder_2': {
                     'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
+                'default_outcome_1': {
+                    'en': {
                         'filename': 'filename6.mp3',
                         'file_size_bytes': 1000,
                         'needs_update': False,
                         'duration_secs': 25
                     },
-                },
-                'default_outcome_1': {}
+                }
             }
         }
         old_voiceover_dict = {
@@ -394,7 +463,14 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                         'duration_secs': 42.43
                     },
                 },
-                'ca_placeholder_2': {},
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename9.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 20
+                    }
+                },
                 'default_outcome_1': {}
             }
         }
@@ -448,6 +524,252 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'new_value': self.CURATED_EXPLORATION_ID_2
             })], 'Changes.')
 
+        exploration_4 = self.save_new_valid_exploration(
+            self.CURATED_EXPLORATION_ID_4,
+            self.owner_id,
+            title='title4',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration_4.id)
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_4,
+            change_list, 'Translation commits')
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename10.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 60
+                    }
+                },
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': {
+                            'filename': 'filename7.mp3',
+                            'file_size_bytes': 3000,
+                            'needs_update': False,
+                            'duration_secs': 42.43
+                        }
+                    },
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_4,
+            change_list, 'Translation commits')
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename10.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 60
+                    }
+                },
+                'default_outcome_1': {
+                    'en': {
+                        'filename': 'filename11.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 2
+                    }
+                }
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': {
+                            'filename': 'filename7.mp3',
+                            'file_size_bytes': 3000,
+                            'needs_update': False,
+                            'duration_secs': 42.43
+                        }
+                    },
+                    'ca_placeholder_2': {
+                        'en': {
+                            'filename': 'filename10.mp3',
+                            'file_size_bytes': 3000,
+                            'needs_update': False,
+                            'duration_secs': 60
+                        }
+                    },
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_4,
+            change_list, 'Translation commits')
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename12.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 59
+                    }
+                },
+                'default_outcome_1': {
+                    'en': {
+                        'filename': 'filename11.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 2
+                    }
+                }
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                    'en': {
+                        'filename': 'filename7.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'ca_placeholder_2': {
+                    'en': {
+                        'filename': 'filename10.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 60
+                    }
+                },
+                'default_outcome_1': {
+                    'en': {
+                        'filename': 'filename11.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 2
+                    }
+                }
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_2, self.CURATED_EXPLORATION_ID_4,
+            change_list, 'Translation commits')
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_2, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_2',
+                'title': 'Node2',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_2',
+                'old_value': None,
+                'new_value': self.CURATED_EXPLORATION_ID_4
+            })], 'Changes.')
+
+    def _create_non_curated_exploration(self) -> None:
+        """The method generates a non curated exploration."""
+        exploration_3 = self.save_new_valid_exploration(
+            self.NON_CURATED_EXPLORATION_ID_3,
+            self.owner_id,
+            title='title1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration_3.id)
+
 
 class AuditVoiceArtistNamesFromExplorationJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
@@ -462,16 +784,17 @@ class AuditVoiceArtistNamesFromExplorationJobTests(
 
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
+        self._create_non_curated_exploration()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='Voice artist with ID %s contributed 1 voiceovers.' %
                 self.editor_id_4, stderr=''),
             job_run_result.JobRunResult(
-                stdout='Voice artist with ID %s contributed 3 voiceovers.' %
+                stdout='Voice artist with ID %s contributed 7 voiceovers.' %
                 self.editor_id_1, stderr=''),
             job_run_result.JobRunResult(
-                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                stdout='Voice artist with ID %s contributed 2 voiceovers.' %
                 self.editor_id_2, stderr='')
         ])
 
@@ -496,16 +819,17 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
 
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
+        self._create_non_curated_exploration()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='Voice artist with ID %s contributed 1 voiceovers.' %
                 self.editor_id_4, stderr=''),
             job_run_result.JobRunResult(
-                stdout='Voice artist with ID %s contributed 3 voiceovers.' %
+                stdout='Voice artist with ID %s contributed 7 voiceovers.' %
                 self.editor_id_1, stderr=''),
             job_run_result.JobRunResult(
-                stdout='Voice artist with ID %s contributed 1 voiceovers.' %
+                stdout='Voice artist with ID %s contributed 2 voiceovers.' %
                 self.editor_id_2, stderr='')
         ])
 
