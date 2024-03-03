@@ -177,6 +177,9 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                 voice_artist_id_to_metadata_mapping_iterable.items()):
             language_mapping = voiceovers_and_contents_mapping.get(
                 language_code, {})
+            # Here we use cast because we are narrowing down the type from
+            # Union[str, Dict[str, List[str]], Dict[str, List[VoiceoverDict]]
+            # to Dict[str, List[str]].
             exploration_mapping = cast(
                 Dict[str, List[str]],
                 language_mapping.get('exploration_id_to_content_ids', {}))
@@ -330,15 +333,22 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         lang_code_to_voiceover_dict.items()):
 
                         if lang_code not in voiceovers_and_contents_mapping:
+                            empty_exploration_id_to_content_ids: Dict[
+                                str, List[str]] = {}
+                            empty_exploration_id_to_voiceovers: Dict[str, List[
+                                voiceover_models.VoiceoverDict]] = {}
+
                             voiceovers_and_contents_mapping[lang_code] = {
                                 'language_accent_code': '',
-                                'exploration_id_to_content_ids': cast(
-                                    Dict[str, List[str]], {}),
-                                'exploration_id_to_voiceovers': cast(
-                                    Dict[str, List[
-                                        voiceover_models.VoiceoverDict]], {})
+                                'exploration_id_to_content_ids': (
+                                    empty_exploration_id_to_content_ids),
+                                'exploration_id_to_voiceovers': (
+                                    empty_exploration_id_to_voiceovers)
                             }
 
+                        # Here we use cast because we are narrowing down the
+                        # type from Union[str, Dict[str, List[str]], Dict[
+                        # str, List[VoiceoverDict]] to Dict[str, List[str]].
                         exploration_id_to_content_ids = cast(
                             Dict[str, List[str]],
                             voiceovers_and_contents_mapping[lang_code][
@@ -350,6 +360,10 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         exploration_id_to_content_ids[
                             exploration_id].append(content_id)
 
+                        # Here we use cast because we are narrowing down the
+                        # type from Union[str, Dict[str, List[str]], Dict[
+                        # str, List[VoiceoverDict]] to Dict[str, List[
+                        # VoiceoverDict]].
                         exploration_id_to_voiceovers = cast(
                             Dict[str, List[voiceover_models.VoiceoverDict]],
                             voiceovers_and_contents_mapping[lang_code][
