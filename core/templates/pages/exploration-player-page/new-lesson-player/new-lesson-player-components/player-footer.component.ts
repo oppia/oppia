@@ -86,7 +86,6 @@ export class PlayerFooterComponent {
   interactionCustomizationArgs!: InteractionCustomizationArgs | null;
   interactionId!: string | null;
   helpCardHasContinueButton!: boolean;
-  isIframed!: boolean;
   lastDisplayedCard!: StateCard;
   explorationId!: string;
   newCardStateName!: string;
@@ -159,7 +158,6 @@ export class PlayerFooterComponent {
   }
 
   ngOnInit(): void {
-    this.isIframed = this.urlService.isIframed();
     this.explorationId = this.contextService.getExplorationId();
 
     this.userService.getUserInfoAsync().then(userInfo => {

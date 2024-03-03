@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from '../../services/audio-translation-language.service';
 
-describe('Progress nav component', () => {
+describe('New progress nav component', () => {
   let fixture: ComponentFixture<NewProgressNavComponent>;
   let componentInstance: NewProgressNavComponent;
 

@@ -34,20 +34,22 @@
       Continue
       <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
     </button>
-    <!-- Special case for the 'Continue' interaction. -->
-    <button *ngIf="!hasNext && !shouldContinueButtonBeShown() && !helpCardHasContinueButton && interactionId === 'Continue'"
-            (click)="submit.emit()"
-            class="player-footer-continue-button">
-      Continue
-      <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
-    </button>
-    <button mat-button
-            *ngIf="shouldGenericSubmitButtonBeShown()"
-            class="player-footer-continue-button"
-            (click)="submit.emit()"
-            [disabled]="displayedCard.showNoResponseError()">
-      {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
-    </button>
+    <div *ngIf="!hasNext && submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton">
+      <!-- Special case for the 'Continue' interaction. -->
+      <button *ngIf="interactionId === 'Continue'"
+              (click)="submit.emit()"
+              class="player-footer-continue-button">
+        Continue
+        <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
+      </button>
+      <button mat-button
+              *ngIf="shouldGenericSubmitButtonBeShown()"
+              class="player-footer-continue-button"
+              (click)="submit.emit()"
+              [disabled]="displayedCard.showNoResponseError()">
+        {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+      </button>
+    </div>
   </div>
 </div>
 
