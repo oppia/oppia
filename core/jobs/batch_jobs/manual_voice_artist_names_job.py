@@ -184,8 +184,6 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                 Dict[str, List[str]],
                 language_mapping.get('exploration_id_to_content_ids', {}))
 
-            assert isinstance(exploration_mapping, dict)
-
             if exploration_id in exploration_mapping:
                 content_ids: List[str] = exploration_mapping.get(
                     exploration_id, [])
@@ -235,7 +233,7 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
 
         Returns:
             *. A 2-tuple consisting of:
-            - A dictionary representing the delta between the old and new
+            - A dictionary representing the difference between the old and new
             values of the recorded voiceover.
             - Another dictionary representing the updated metadata mapping for
             the voice artist.
@@ -354,12 +352,6 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                             voiceovers_and_contents_mapping[lang_code][
                                 'exploration_id_to_content_ids'])
 
-                        if exploration_id not in exploration_id_to_content_ids:
-                            exploration_id_to_content_ids[exploration_id] = []
-
-                        exploration_id_to_content_ids[
-                            exploration_id].append(content_id)
-
                         # Here we use cast because we are narrowing down the
                         # type from Union[str, Dict[str, List[str]], Dict[
                         # str, List[VoiceoverDict]] to Dict[str, List[
@@ -369,17 +361,27 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                             voiceovers_and_contents_mapping[lang_code][
                                 'exploration_id_to_voiceovers'])
 
+                        if exploration_id not in exploration_id_to_content_ids:
+                            exploration_id_to_content_ids[exploration_id] = []
+
                         if exploration_id not in exploration_id_to_voiceovers:
                             exploration_id_to_voiceovers[exploration_id] = []
+
+                        exploration_id_to_content_ids[exploration_id].append(
+                            content_id)
                         exploration_id_to_voiceovers[exploration_id].append(
                             voiceover_dict)
 
                         voiceovers_and_contents_mapping[lang_code][
+                            'exploration_id_to_content_ids'] = (
+                                exploration_id_to_content_ids)
+                        voiceovers_and_contents_mapping[lang_code][
                             'exploration_id_to_voiceovers'] = (
                                 exploration_id_to_voiceovers)
 
-                voice_artist_id_to_metadata_mapping[
-                    voice_artist_id] = voiceovers_and_contents_mapping
+
+                voice_artist_id_to_metadata_mapping[voice_artist_id] = (
+                    voiceovers_and_contents_mapping)
 
         return voice_artist_id_to_metadata_mapping
 
