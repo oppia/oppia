@@ -29,7 +29,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -177,13 +177,16 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                 voice_artist_id_to_metadata_mapping_iterable.items()):
             language_mapping = voiceovers_and_contents_mapping.get(
                 language_code, {})
-            exploration_mapping = language_mapping.get(
-                'exploration_id_to_content_ids', {})
+            exploration_mapping = cast(
+                Dict[str, List[str]],
+                language_mapping.get('exploration_id_to_content_ids', {}))
 
             assert isinstance(exploration_mapping, dict)
 
             if exploration_id in exploration_mapping:
-                content_ids = exploration_mapping.get(exploration_id, [])
+                content_ids: List[str] = exploration_mapping.get(
+                    exploration_id, [])
+
                 if content_id in content_ids:
                     content_ids.remove(content_id)
 
@@ -329,31 +332,28 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         if lang_code not in voiceovers_and_contents_mapping:
                             voiceovers_and_contents_mapping[lang_code] = {
                                 'language_accent_code': '',
-                                'exploration_id_to_content_ids': {},
-                                'exploration_id_to_voiceovers': {}
+                                'exploration_id_to_content_ids': cast(
+                                    Dict[str, List[str]], {}),
+                                'exploration_id_to_voiceovers': cast(
+                                    Dict[str, List[
+                                        voiceover_models.VoiceoverDict]], {})
                             }
 
-                        exploration_id_to_content_ids = (
+                        exploration_id_to_content_ids = cast(
+                            Dict[str, List[str]],
                             voiceovers_and_contents_mapping[lang_code][
                                 'exploration_id_to_content_ids'])
-
-                        assert isinstance(exploration_id_to_content_ids, dict)
 
                         if exploration_id not in exploration_id_to_content_ids:
                             exploration_id_to_content_ids[exploration_id] = []
 
-                        assert isinstance(
-                            exploration_id_to_content_ids[exploration_id],
-                            list
-                        )
                         exploration_id_to_content_ids[
                             exploration_id].append(content_id)
 
-                        exploration_id_to_voiceovers = (
-                            voiceovers_and_contents_mapping[
-                                lang_code]['exploration_id_to_voiceovers']
-                        )
-                        assert isinstance(exploration_id_to_voiceovers, dict)
+                        exploration_id_to_voiceovers = cast(
+                            Dict[str, List[voiceover_models.VoiceoverDict]],
+                            voiceovers_and_contents_mapping[lang_code][
+                                'exploration_id_to_voiceovers'])
 
                         if exploration_id not in exploration_id_to_voiceovers:
                             exploration_id_to_voiceovers[exploration_id] = []

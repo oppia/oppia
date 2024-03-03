@@ -547,8 +547,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'default_outcome_1': {}
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+        old_voiceover_dict = {
                 'voiceovers_mapping': {
                     'content_0': {},
                     'ca_placeholder_2': {},
@@ -588,8 +587,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'default_outcome_1': {}
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+        old_voiceover_dict = {
                 'voiceovers_mapping': {
                     'content_0': {
                         'en': {
@@ -643,8 +641,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 }
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+        old_voiceover_dict = {
                 'voiceovers_mapping': {
                     'content_0': {
                         'en': {
@@ -705,8 +702,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 }
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+        old_voiceover_dict = {
                 'voiceovers_mapping': {
                     'content_0': {
                     'en': {

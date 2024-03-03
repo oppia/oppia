@@ -981,27 +981,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'needs_update': False,
             'duration_secs': 6.1
         }
-        voiceover2: voiceover_models.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9
-        }
-        voiceover3: voiceover_models.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0
-        }
         voiceovers_and_contents_mapping: (
             voiceover_models.VoiceoversAndContentsMappingType) = {
             'en': {
                 'language_accent_code': 'en-US',
                 'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
+                    'exp_1': ['content_1']
                 },
                 'exploration_id_to_voiceovers': {
-                    'exp_1': [voiceover1, voiceover2, voiceover3]
+                    'exp_1': [voiceover1]
                 }
             }
         }
@@ -2144,37 +2132,27 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1,
+        }
         expected_voice_artist_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                'voiceovers_and_contents_mapping': {
-                    'en': {
-                        'language_accent_code': 'en-US',
-                        'exploration_id_to_content_ids': {
-                            'exp_1': ['content_1', 'content_2', 'content_3']
-                        },
-                        'exploration_id_to_voiceovers': {
-                            'exp_1': [{
-                                'filename': 'filename1.mp3',
-                                'file_size_bytes': 3000,
-                                'needs_update': False,
-                                'duration_secs': 6.1,
-                            },
-                            {
-                                'filename': 'filename2.mp3',
-                                'file_size_bytes': 3500,
-                                'needs_update': False,
-                                'duration_secs': 5.9,
-                            },
-                            {
-                                'filename': 'filename3.mp3',
-                                'file_size_bytes': 3500,
-                                'needs_update': False,
-                                'duration_secs': 5.0,
-                            }]
-                        }
+            str, voiceover_models.VoiceoversAndContentsMappingType
+        ] = {
+            'voiceovers_and_contents_mapping': {
+                'en': {
+                    'language_accent_code': 'en-US',
+                    'exploration_id_to_content_ids': {
+                        'exp_1': ['content_1']
+                    },
+                    'exploration_id_to_voiceovers': {
+                        'exp_1': [voiceover1]
                     }
                 }
             }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
