@@ -932,12 +932,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        config_models.ConfigPropertySnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-            commit_cmds=self.COMMIT_CMDS
-        ).put()
-
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,

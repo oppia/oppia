@@ -87,15 +87,6 @@ describe('Admin Page component ', () => {
     expect(result).toBe(true);
   });
 
-  it('should check whether the admin config tab is open', () => {
-    // Setting admin config tab to be open.
-    spyOn(adminRouterService, 'isConfigTabOpen').and.returnValue(true);
-
-    let result = component.isConfigTabOpen();
-
-    expect(result).toBe(true);
-  });
-
   it('should check whether the admin platform params tab is open', () => {
     // Setting admin platform params tab to be open.
     spyOn(adminRouterService, 'isPlatformParamsTabOpen').and.returnValue(true);

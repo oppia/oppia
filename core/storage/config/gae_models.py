@@ -33,63 +33,6 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ConfigPropertySnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a config property snapshot."""
-
-    pass
-
-
-class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content for a config property snapshot."""
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-
-class ConfigPropertyModel(base_models.VersionedModel):
-    """A class that represents a named configuration property.
-
-    The id is the name of the property.
-    """
-
-    SNAPSHOT_METADATA_CLASS = ConfigPropertySnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
-
-    # The property value.
-    value = datastore_services.JsonProperty(indexed=False)
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """ConfigPropertyModel is not related to users."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain user data."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with VersionedModel.commit().
-    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
-    def commit( # type: ignore[override]
-        self,
-        committer_id: str,
-        commit_cmds: base_models.AllowedCommitCmdsListType
-    ) -> None:
-        super().commit(committer_id, '', commit_cmds)
-
-
 class PlatformParameterSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a platform parameter snapshot."""
