@@ -210,7 +210,7 @@ export class PlayerFooterComponent {
         }
       })
     );
-  
+
     this.getCheckpointCount().then(() => {
       this.updateLessonProgressBar();
     });
@@ -225,7 +225,7 @@ export class PlayerFooterComponent {
   }
 
   updateLessonProgressBar(): void {
-    if(!this.expEnded) {
+    if (!this.expEnded) {
       const mostRecentlyReachedCheckpointIndex = (
         this.getMostRecentlyReachedCheckpointIndex()
       );
@@ -433,7 +433,8 @@ export class PlayerFooterComponent {
     } else if (!this.hasNext) {
       if (this.shouldContinueButtonBeShown()) {
         this.clickContinueButton.emit();
-      } else if (!this.shouldContinueButtonBeShown() && this.showContinueToReviseButton) {
+      } else if (!this.shouldContinueButtonBeShown() &&
+      this.showContinueToReviseButton) {
         this.clickContinueToReviseButton.emit();
       }
     }

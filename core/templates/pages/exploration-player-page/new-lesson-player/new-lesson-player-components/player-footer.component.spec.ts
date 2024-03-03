@@ -285,19 +285,23 @@ describe('New player footer component', () => {
     spyOn(componentInstance, 'validateIndexAndChangeCard');
     spyOn(componentInstance.clickContinueButton, 'emit');
     spyOn(componentInstance.clickContinueToReviseButton, 'emit');
-  
+
     componentInstance.handleNewContinueButtonClick();
-    expect(componentInstance.validateIndexAndChangeCard).toHaveBeenCalledWith(componentInstance.displayedCardIndex + 1);
-    
+    expect(componentInstance.validateIndexAndChangeCard).
+      toHaveBeenCalledWith(componentInstance.displayedCardIndex + 1);
+
     componentInstance.hasNext = false;
-    spyOn(componentInstance, 'shouldContinueButtonBeShown').and.returnValue(true);  
+    spyOn(componentInstance, 'shouldContinueButtonBeShown')
+      .and.returnValue(true);
     componentInstance.handleNewContinueButtonClick();
     expect(componentInstance.clickContinueButton.emit).toHaveBeenCalled();
 
     componentInstance.showContinueToReviseButton = true;
-    spyOn(componentInstance, 'shouldContinueButtonBeShown').and.returnValue(false);
+    spyOn(componentInstance, 'shouldContinueButtonBeShown')
+      .and.returnValue(false);
     componentInstance.handleNewContinueButtonClick();
-    expect(componentInstance.clickContinueToReviseButton.emit).toHaveBeenCalled();
+    expect(componentInstance.clickContinueToReviseButton.emit)
+      .toHaveBeenCalled();
   });
 
   it('should change card', () => {
@@ -436,19 +440,22 @@ describe('New player footer component', () => {
     componentInstance.getCheckpointCount();
     tick();
 
-    expect(componentInstance.expStates).toEqual(sampleDataResults.exploration.states);
+    expect(componentInstance.expStates).
+      toEqual(sampleDataResults.exploration.states);
     expect(componentInstance.checkpointCount).toEqual(1);
   }));
 
   it('should generate checkpoint status array upon initialization', () => {
     componentInstance.checkpointCount = 3;
-    spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(2);
+    spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex')
+      .and.returnValue(2);
     componentInstance.updateLessonProgressBar();
     expect(componentInstance.checkpointStatusArray).toEqual(
       ['completed', 'in-progress', 'incomplete']);
 
     componentInstance.checkpointCount = 1;
-    spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(1);
+    spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex')
+      .and.returnValue(1);
     componentInstance.updateLessonProgressBar();
     expect(componentInstance.checkpointStatusArray).toEqual(
       ['in-progress']);
@@ -476,8 +483,9 @@ describe('New player footer component', () => {
   });
 
   it('should check if progress reminder modal can be shown and show it', () => {
-    const recentlyReachedCheckpointSpy = spyOn(
-      componentInstance, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(1);
+    const recentlyReachedCheckpointSpy =
+      spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex')
+        .and.returnValue(1);
     spyOn(componentInstance, 'openProgressReminderModal');
     componentInstance.showProgressReminderModal();
     expect(componentInstance.openProgressReminderModal).not.toHaveBeenCalled();

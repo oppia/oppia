@@ -26,7 +26,7 @@
   color: #0d48a1;
   height: 44px;
   margin: 0 auto;
-  padding: 10px 0px;
+  padding: 10px 0;
   width: 100%;
 }
 
@@ -46,7 +46,7 @@
   font-weight: 700;
   gap: 4px;
   height: 44px;
-  letter-spacing: 0em;
+  letter-spacing: 0;
   line-height: 22px;
   padding: 10px 4px 10px 8px;
   text-align: left;
@@ -134,23 +134,23 @@
 }
 
 .player-footer-save-button {
-  display: flex;
-  padding: 8px 12px;
-  gap: 8px;
-  justify-content: center;
   align-items: center;
-  width: 90px;
-  height: 44px;
   background: #fff;
-  border: 1px solid #C55F45;
-  color: #C55F45;
+  border: 1px solid #c55f45;
+  border-radius: 4px;
+  color: #c55f45;
+  display: flex;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-weight: 700;
+  gap: 8px;
+  height: 44px;
+  justify-content: center;
+  letter-spacing: 0;
   line-height: 19px;
-  letter-spacing: 0em;
+  padding: 8px 12px;
   text-align: left;
-  border-radius: 4px;
+  width: 90px;
 }
 
 .player-footer-save-button:disabled {

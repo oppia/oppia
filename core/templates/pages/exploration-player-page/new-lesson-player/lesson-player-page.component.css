@@ -10,15 +10,15 @@
 }
 
 .oppia-new-player-content::before {
-  content: "";
   background-image: url('/assets/images/background/lessonPlayer.png');
   background-repeat: repeat;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
+  bottom: 0;
+  content: "";
+  left: 0;
   opacity: 0.2;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .oppia-new-player-content {
