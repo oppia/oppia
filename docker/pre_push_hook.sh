@@ -32,11 +32,11 @@ DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
 # Location of git hooks directory
 HOOKS_DIR=".git/hooks"
 
-# Path for pre-push hook file
+# Path for symbolic links to hook files
 PRE_PUSH_SYMLINK="$HOOKS_DIR/pre-push"
 PYTHON_PRE_PUSH_SYMLINK="$HOOKS_DIR/pre-push-python"
 
-# Path for pre-push hook file
+# Path for hook files
 PRE_PUSH_FILE="docker/pre_push_hook.sh"
 PYTHON_PRE_PUSH_FILE="scripts/pre_push_hook.py"
 
