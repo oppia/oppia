@@ -46,7 +46,6 @@ describe('Contributor dashboard Admin page', () => {
     ContributorDashboardAdminBackendApiService);
   let ngbModal: NgbModal;
   let $window: WindowRef;
-
   class MockNgbModalRef {
     componentInstance!: {};
   }
