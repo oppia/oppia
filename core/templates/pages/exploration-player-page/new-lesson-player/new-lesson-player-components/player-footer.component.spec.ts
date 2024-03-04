@@ -43,6 +43,8 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UserService } from 'services/user.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 const sampleExpInfo = {
   category: 'dummy_category',
@@ -117,6 +119,7 @@ describe('New player footer component', () => {
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
   let localStorageService: LocalStorageService;
+  let contextService: ContextService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', {} as Interaction, [],
@@ -126,6 +129,7 @@ describe('New player footer component', () => {
     {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -148,7 +152,11 @@ describe('New player footer component', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
-        }
+        },
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -162,6 +170,7 @@ describe('New player footer component', () => {
       LearnerViewInfoBackendApiService);
     loggerService = TestBed.inject(LoggerService);
     userService = TestBed.inject(UserService);
+    contextService = TestBed.inject(ContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     playerPositionService = TestBed.inject(PlayerPositionService);
@@ -190,6 +199,7 @@ describe('New player footer component', () => {
       new EventEmitter<HelpCardEventResponse>());
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
+    spyOn(contextService, 'getExplorationId').and.returnValue('dummy_id');
     spyOn(componentInstance.submit, 'emit');
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
@@ -243,6 +253,7 @@ describe('New player footer component', () => {
     spyOn(componentInstance, 'updateDisplayedCardInfo');
     spyOnProperty(contentTranslationManagerService, 'onStateCardContentUpdate')
       .and.returnValue(mockOnStateCardContentUpdate);
+    spyOn(contextService, 'getExplorationId').and.returnValue('dummy_id');
 
     componentInstance.ngOnInit();
     tick();
@@ -292,13 +303,11 @@ describe('New player footer component', () => {
 
     componentInstance.hasNext = false;
     spyOn(componentInstance, 'shouldContinueButtonBeShown')
-      .and.returnValue(true);
+      .and.returnValues(true, false);
     componentInstance.handleNewContinueButtonClick();
     expect(componentInstance.clickContinueButton.emit).toHaveBeenCalled();
 
     componentInstance.showContinueToReviseButton = true;
-    spyOn(componentInstance, 'shouldContinueButtonBeShown')
-      .and.returnValue(false);
     componentInstance.handleNewContinueButtonClick();
     expect(componentInstance.clickContinueToReviseButton.emit)
       .toHaveBeenCalled();
@@ -446,16 +455,15 @@ describe('New player footer component', () => {
   }));
 
   it('should generate checkpoint status array upon initialization', () => {
-    componentInstance.checkpointCount = 3;
     spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex')
-      .and.returnValue(2);
+      .and.returnValues(2, 1);
+
+    componentInstance.checkpointCount = 3;
     componentInstance.updateLessonProgressBar();
     expect(componentInstance.checkpointStatusArray).toEqual(
       ['completed', 'in-progress', 'incomplete']);
 
     componentInstance.checkpointCount = 1;
-    spyOn(componentInstance, 'getMostRecentlyReachedCheckpointIndex')
-      .and.returnValue(1);
     componentInstance.updateLessonProgressBar();
     expect(componentInstance.checkpointStatusArray).toEqual(
       ['in-progress']);
@@ -533,6 +541,7 @@ describe('New player footer component', () => {
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
     spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
       .and.returnValue('abcdef');
+    spyOn(contextService, 'getExplorationId').and.returnValue('dummy_id');
 
     componentInstance.ngOnInit();
 
