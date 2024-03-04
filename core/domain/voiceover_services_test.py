@@ -25,6 +25,7 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.domain import state_domain
+from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
@@ -336,3 +337,68 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             voice_artist_metadata_model.voiceovers_and_contents_mapping,
             self.voiceovers_and_contents_mapping)
+
+    def test_should_get_voice_artist_id_to_voiceover_filename(self) -> None:
+        expected_exp_id_to_filenames = {
+            'exp_1': ['filename3.mp3', 'filename2.mp3', 'filename1.mp3']
+        }
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+
+        self.assertDictEqual(
+            voiceover_services.get_voiceover_filenames(
+                self.voice_artist_id, 'en'),
+            expected_exp_id_to_filenames
+        )
+
+    def test_get_voice_artist_id_to_username(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        voice_artist_id = user_settings.user_id
+        user_services.set_username(voice_artist_id, username)
+
+        expected_voice_artist_id_to_username = {
+            voice_artist_id: username
+        }
+
+        voiceover_services.update_voice_artist_metadata(
+            voice_artist_id, self.voiceovers_and_contents_mapping)
+
+        self.assertDictEqual(
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
+            expected_voice_artist_id_to_username
+        )
+
+    def test_update_voice_artist_language_mapping(self) -> None:
+        language_code = 'en'
+        initial_language_accent_code = 'en-US'
+        final_language_accent_code = 'en-IN'
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.voiceovers_and_contents_mapping[
+                language_code]['language_accent_code'],
+            initial_language_accent_code
+        )
+
+        voiceover_services.update_voice_artist_language_mapping(
+            self.voice_artist_id, language_code, final_language_accent_code)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.voiceovers_and_contents_mapping[
+                language_code]['language_accent_code'],
+            final_language_accent_code
+        )

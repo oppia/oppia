@@ -33,7 +33,6 @@ class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_access_voiceover_admin_page
     def get(self) -> None:
         """Renders the voiceover admin page."""
-        print('Nikhil')
         self.render_template('voiceover-admin-page.mainpage.html')
 
 
@@ -125,71 +124,55 @@ class VoiceoverLanguageCodesMappingHandler(
         self.render_json(self.values)
 
 
+class PutVoiceArtistMetadataHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of VoiceArtistMetadataHandler's normalized_payload
+    dictionary.
+    """
+
+    voice_artist_id: str
+    language_code: str
+    language_accent_code: str
+
+
 class VoiceArtistMetadataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[
+        PutVoiceArtistMetadataHandlerNormalizedPayloadDict,
+        Dict[str, str]
+    ]
 ):
     """Handler class to manage voice artist data for the voiceover admin page.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'voice_artist_id_to_language_mapping': {
+            'voice_artist_id': {
                 'schema': {
-                    'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
-                    'values': {
-                        'schema': {
-                            'type': 'variable_keys_dict',
-                            'keys': {
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            },
-                            'values': {
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            }
-                        }
-                    }
+                    'type': 'basestring'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_accent_code': {
+                'schema': {
+                    'type': 'basestring'
                 }
             }
-        }}
+        }
+    }
 
+    @acl_decorators.can_access_voiceover_admin_page
     def get(self) -> None:
         """Retrieves voice artist data for the voiceover admin page."""
         voice_artist_id_to_language_mapping = (
             voiceover_services.get_all_voice_artist_language_accent_mapping())
         voice_artist_id_to_voice_artist_name = (
             voiceover_services.get_voice_artist_ids_to_voice_artist_names())
-
-
-        voice_artist_id_to_language_mapping = {
-            'voice_artist1': {
-                'en': '',
-                'hi': ''
-            },
-            'voice_artist2': {
-                'en': ''
-            },
-            'voice_artist3': {
-                'ar': ''
-            }
-        }
-        voice_artist_id_to_voice_artist_name = {
-            'voice_artist1': 'Voice Artist 1',
-            'voice_artist2': 'Voice Artist 2',
-            'voice_artist3': 'Voice Artist 3'
-        }
-        print(voice_artist_id_to_language_mapping)
-        print(voice_artist_id_to_voice_artist_name)
 
         self.values.update({
             'voice_artist_id_to_language_mapping':
@@ -199,25 +182,28 @@ class VoiceArtistMetadataHandler(
         })
         self.render_json(self.values)
 
+    @acl_decorators.can_access_voiceover_admin_page
     def put(self) -> None:
         """Updates voice artist data from the voiceover admin page."""
         assert self.normalized_payload is not None
-        voice_artist_id_to_language_mapping = (
-            self.normalized_payload['voice_artist_id_to_language_mapping'])
-        voiceover_services.update_voice_artists_language_mapping(
-            voice_artist_id_to_language_mapping)
+        voice_artist_id = self.normalized_payload['voice_artist_id']
+        language_code = self.normalized_payload['language_code']
+        language_accent_code = self.normalized_payload['language_accent_code']
 
+        voiceover_services.update_voice_artist_language_mapping(
+            voice_artist_id, language_code, language_accent_code)
         self.render_json(self.values)
 
 
 class GetSampleVoiceoversForGivenVoiceArtist(
-     base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler class to get sample contributed voiceovers of a voice artist in
     a given language.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'voice_artist_id': {
             'schema': {
                 'type': 'basestring'
@@ -231,21 +217,14 @@ class GetSampleVoiceoversForGivenVoiceArtist(
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    def get(self, voice_artist_id, language_code):
-        # voiceovers = (
-        #     voiceover_services.
-        #     get_sample_voiceovers_for_voice_artist_in_the_given_language(
-        #         voice_artist_id=voice_artist_id,
-        #         language_code=language_code
-        #     )
-        # )
-        exploration_id_to_filenames = {
-            'egtG9qUavylo': ['content_3-hi-2znwu1q9ni.mp3'],
-            'Jb1KbCvVatzs': ['content_0-hi-ko55h7pa05.mp3']
-        }
-
-        print('Inside handler')
-        print(exploration_id_to_filenames)
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self, voice_artist_id: str, language_code: str) -> None:
+        exploration_id_to_filenames = (
+            voiceover_services.get_voiceover_filenames(
+                voice_artist_id=voice_artist_id,
+                language_code=language_code
+            )
+        )
 
         self.values.update({
             'exploration_id_to_filenames': exploration_id_to_filenames,
