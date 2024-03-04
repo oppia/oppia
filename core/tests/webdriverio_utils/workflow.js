@@ -186,8 +186,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -209,16 +208,12 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
-  }
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
 
 var createAndPublishExplorationWithAdditionalCheckpoints = async function(
-    title, category, objective, language, welcomeModalIsShown,
-    correctnessFeedbackIsEnabled) {
+    title, category, objective, language, welcomeModalIsShown) {
   await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -255,9 +250,6 @@ var createAndPublishExplorationWithAdditionalCheckpoints = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
-  }
-  if (!correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.disableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -329,6 +321,15 @@ var getExplorationVoiceArtists = async function(isEmpty = false) {
 
 var getExplorationPlaytesters = async function(isEmpty = false) {
   return await _getExplorationRoles('viewer', isEmpty);
+};
+
+var createTopic = async function(
+    topicName, topicUrlFragment, description, shouldCloseTopicEditor) {
+  var topicsAndSkillsDashboardPage = (
+    new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.createTopic(
+    topicName, topicUrlFragment, description, shouldCloseTopicEditor);
 };
 
 var createSkillAndAssignTopic = async function(
@@ -416,6 +417,29 @@ var createQuestion = async function() {
   await skillEditorPage.saveQuestion();
 };
 
+// Sets the question interaction to NumericInput after deleting the
+// existing interaction.
+var changeQuestionInteraction = async function() {
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await explorationEditorMainTab.deleteInteraction();
+  await explorationEditorMainTab.setInteraction('NumericInput');
+  await explorationEditorMainTab.addResponse(
+    'NumericInput', await forms.toRichText('Correct Answer'), null, false,
+    'IsGreaterThan', 2);
+  await (
+    await explorationEditorMainTab.getResponseEditor(0)
+  ).markAsCorrect();
+  await (
+    await explorationEditorMainTab.getResponseEditor('default')
+  ).setFeedback(await forms.toRichText('Try again'));
+  await explorationEditorMainTab.addHint('Hint 1');
+  await explorationEditorMainTab.addSolution('NumericInput', {
+    correctAnswer: 4,
+    explanation: 'It is correct'
+  });
+};
+
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;
 exports.uploadImage = uploadImage;
@@ -444,5 +468,7 @@ exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
+exports.createTopic = createTopic;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;
+exports.changeQuestionInteraction = changeQuestionInteraction;

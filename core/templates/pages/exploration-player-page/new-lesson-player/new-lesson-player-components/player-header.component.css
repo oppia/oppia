@@ -1,0 +1,32 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-lesson-player-header {
+  align-items: center;
+  background-color: #094142;
+  color: #fff;
+  display: flex;
+  height: 48px;
+  justify-content: space-between;
+  padding-left: 15px;
+}
+
+.player-header-right {
+  display: none;
+  padding: 12px;
+}
+
+.header-menu-button {
+  background: none;
+  border: none;
+  color: #fff;
+}
+
+@media screen and (max-width: 574px) {
+  .player-header-right {
+    display: block;
+  }
+}

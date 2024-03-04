@@ -1,0 +1,198 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-lesson-player-sidebar {
+  display: flex;
+  height: 100%;
+}
+
+.lesson-player-sidebar-top {
+  display: flex;
+  flex-direction: column;
+}
+
+.lesson-player-sidebar-chevron {
+  width: 24px;
+}
+
+.player-sidebar-toggle {
+  background: none;
+  border: none;
+  color: #00645c;
+  font-size: 12px;
+  font-weight: 500;
+  height: 48px;
+  letter-spacing: 0;
+  line-height: 15px;
+}
+
+.player-sidebar-toggle div {
+  align-items: center;
+  display: flex;
+}
+
+.player-sidebar-toggle.expanded {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.oppia-exploration-description {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+  padding: 20px;
+}
+
+.player-sidebar-rating {
+  align-items: center;
+  display: flex;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  gap: 8px;
+  letter-spacing: -0.02em;
+  line-height: 20px;
+  padding: 8px 20px 8px 20px;
+}
+
+.player-rating-text {
+  align-self: flex-end;
+  height: 20px;
+}
+
+.player-desktop-sidebar-menu {
+  background-color: #f2f4f7;
+  box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 80px;
+  z-index: 1;
+}
+
+.player-desktop-sidebar-menu.expanded {
+  width: 240px;
+}
+
+.player-sidebar-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.player-sidebar-button {
+  background-color: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 10px 0 #00000026;
+  font-size: 16px;
+  font-weight: 400;
+  height: 45px;
+  letter-spacing: 0;
+  line-height: 20px;
+  padding: 10px;
+  width: 45px;
+}
+
+.player-sidebar-button i {
+  color: #0d48a1;
+}
+
+.player-sidebar-button div {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.player-desktop-sidebar-menu.expanded .player-sidebar-button {
+  width: 200px;
+}
+
+.player-mobile-menu-container {
+  display: none;
+}
+
+.player-mobile-menu-overlay {
+  background-color: #0009;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  width: 100vh;
+  z-index: 30;
+}
+
+.player-mobile-menu {
+  background-color: #fff;
+  border-radius: 28px 28px 0 0;
+  bottom: 0;
+  display: none;
+  height: 232px;
+  position: fixed;
+  width: 100%;
+  z-index: 40;
+}
+
+.player-mobile-menu-close {
+  align-self: flex-end;
+  height: 48px;
+  padding: 12px;
+  vertical-align: sub;
+  width: 48px;
+}
+
+.player-mobile-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px 12px 12px;
+}
+
+.player-mobile-menu-options button {
+  align-items: center;
+  background: none;
+  border: none;
+  color: #333;
+  display: flex;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 12px;
+  height: 40px;
+  line-height: 23px;
+  padding: 8px;
+}
+
+.rating-star-block {
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+}
+
+.rating-star-block svg {
+  height: 24px;
+  width: 24px;
+}
+
+@media screen and (max-width: 574px) {
+  .player-desktop-sidebar-menu {
+    display: none;
+  }
+
+  .player-mobile-menu-container {
+    display: block;
+  }
+
+  .player-mobile-menu {
+    display: flex;
+    flex-direction: column;
+  }
+}

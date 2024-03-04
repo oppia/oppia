@@ -22,19 +22,25 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from './switch-content-language-refresh-required-modal.component';
+import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    SharedComponentsModule
   ],
   declarations: [
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    LessonInformationCardModalComponent
   ],
   entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    LessonInformationCardModalComponent
   ],
   exports: [
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    LessonInformationCardModalComponent
   ],
 })
 

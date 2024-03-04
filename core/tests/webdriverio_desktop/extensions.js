@@ -43,9 +43,13 @@ describe('rich-text components', function() {
   });
 
   it('should display correctly', async function() {
-    await users.createAndLoginUser(
+    await users.createAndLoginCurriculumAdminUser(
       'user@richTextComponents.com', 'userRichTextComponent');
 
+    await workflow.createTopic(
+      'topic 1', 'topic-one', 'topic 1 description', false);
+    await workflow.createSkillAndAssignTopic(
+      'skill 1', 'description 1', 'topic 1');
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
@@ -66,6 +70,11 @@ describe('rich-text components', function() {
         title: 'title 1',
         content: await forms.toRichText('contents 2')
       }]);
+      // Test highlighting on Skillreview component.
+      await richTextEditor.appendPlainText('highlight');
+      await general.expectNoTextToBeSelected();
+      await richTextEditor.highlightText('highlight');
+      await richTextEditor.addRteComponent('Skillreview', null, 'skill 1');
     });
 
     await explorationEditorPage.navigateToPreviewTab();
@@ -86,6 +95,8 @@ describe('rich-text components', function() {
           title: 'title 1',
           content: await forms.toRichText('contents 2')
         }]);
+        await richTextChecker.readRteComponent(
+          'Skillreview', 'highlight', await forms.toRichText('description 1'));
       });
 
     await explorationEditorPage.discardChanges();

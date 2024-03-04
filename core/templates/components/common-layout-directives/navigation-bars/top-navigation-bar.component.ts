@@ -128,7 +128,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
-    'create', 'explore', 'collection', 'collection_editor',
+    'create', 'explore', 'lesson', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
 

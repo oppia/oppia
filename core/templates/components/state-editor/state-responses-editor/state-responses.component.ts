@@ -63,7 +63,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   activeAnswerGroupIndex!: number;
   // State name is null if their is no state selected or have no active state.
   // This is the case when the user is creating a new state.
-  stateName!: string | null;
   @Output() onResponsesInitialized = new EventEmitter<void>();
   @Output() onSaveInteractionAnswerGroups = (
     new EventEmitter<AnswerGroup[] | AnswerGroup>());
@@ -143,24 +142,27 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.stateSolicitAnswerDetailsService.saveDisplayedValue();
   }
 
+  getActiveStateName(): string | null {
+    return this.stateEditorService.getActiveStateName();
+  }
+
   isSelfLoopWithNoFeedback(outcome: Outcome): boolean | void {
-    if (outcome && typeof outcome === 'object' && this.stateName &&
+    let currentStateName = this.getActiveStateName();
+    if (outcome && typeof outcome === 'object' && currentStateName &&
       outcome.constructor.name === 'Outcome') {
-      return outcome.isConfusing(this.stateName);
+      return outcome.isConfusing(currentStateName);
     }
   }
 
   isSelfLoopThatIsMarkedCorrect(outcome: Outcome): boolean {
-    if (!outcome ||
-        !this.stateEditorService.getCorrectnessFeedbackEnabled()) {
+    if (!outcome) {
       return false;
+    } else {
+      const currentStateName = this.getActiveStateName();
+      return (
+        (outcome.dest === currentStateName) &&
+        outcome.labelledAsCorrect);
     }
-
-    let currentStateName = this.stateName;
-
-    return (
-      (outcome.dest === currentStateName) &&
-      outcome.labelledAsCorrect);
   }
 
   changeActiveAnswerGroupIndex(newIndex: number): void {
@@ -479,7 +481,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   isOutcomeLooping(outcome: Outcome): boolean {
-    let activeStateName = this.stateName;
+    let activeStateName = this.getActiveStateName();
     return outcome && (outcome.dest === activeStateName);
   }
 
@@ -573,7 +575,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     this.responseCardIsShown = true;
-    this.stateName = this.stateEditorService.getActiveStateName();
     this.enableSolicitAnswerDetailsFeature = (
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
     this.misconceptionsBySkill = {};
