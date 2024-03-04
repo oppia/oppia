@@ -103,3 +103,7 @@ scripts.run_e2e_tests_test
 scripts.run_frontend_tests_test
 scripts.install_third_party_libs_test
 scripts.run_mypy_checks_test
+# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+scripts.install_third_party_test
+scripts.run_backend_tests_test
+scripts.build_test

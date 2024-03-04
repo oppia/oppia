@@ -498,6 +498,7 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
+        # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
         if not feconf.OPPIA_IS_DOCKERIZED:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))

@@ -37,6 +37,7 @@ from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
 )
 
+# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
 if not feconf.OPPIA_IS_DOCKERIZED:
     from scripts import install_python_dev_dependencies
     from scripts import install_third_party_libs

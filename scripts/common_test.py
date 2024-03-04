@@ -1351,22 +1351,23 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
-        with constants_path_swap, feconf_path_swap:
-            common.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                print(constants_file.read())
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "",\n'
-                    '  "SHORT_COMMIT_HASH": ""\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with constants_path_swap, feconf_path_swap:
+                common.set_constants_to_default()
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    print(constants_file.read())
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "",\n'
+                        '  "SHORT_COMMIT_HASH": ""\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
 

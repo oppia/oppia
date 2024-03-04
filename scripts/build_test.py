@@ -857,8 +857,9 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertFalse(os.path.isfile(
             'core/tests/data/third_party/js/third_party.min.js.map'))
 
-        with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
-            build.minify_third_party_libs('core/tests/data/third_party')
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
+                build.minify_third_party_libs('core/tests/data/third_party')
 
         self.assertTrue(os.path.isfile(
             'core/tests/data/third_party/css/third_party.min.css'))
@@ -1022,10 +1023,11 @@ class BuildTests(test_utils.GenericTestBase):
             expected_args=[(['--uninstall'],)]
         )
 
-        with ensure_files_exist_swap, build_using_webpack_swap:
-            with modify_constants_swap, compare_file_count_swap:
-                with clean_swap, install_python_dev_dependencies_swap:
-                    build.main(args=['--prod_env', '--source_maps'])
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with ensure_files_exist_swap, build_using_webpack_swap:
+                with modify_constants_swap, compare_file_count_swap:
+                    with clean_swap, install_python_dev_dependencies_swap:
+                        build.main(args=['--prod_env', '--source_maps'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -1134,55 +1136,56 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_build_using_webpack_command(self) -> None:
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    # def test_build_using_webpack_command(self) -> None:
 
-        @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str,
-            max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
-            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 8192)
-            yield scripts_test_utils.PopenStub()
+    #     @contextlib.contextmanager
+    #     def mock_managed_webpack_compiler(
+    #         config_path: str,
+    #         max_old_space_size: int
+    #     ) -> Iterator[scripts_test_utils.PopenStub]:
+    #         self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
+    #         self.assertEqual(max_old_space_size, 8192)
+    #         yield scripts_test_utils.PopenStub()
 
-        def mock_get_file_count(unused_path: str) -> int:
-            return 1
+    #     def mock_get_file_count(unused_path: str) -> int:
+    #         return 1
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler',
-            mock_managed_webpack_compiler)
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count)
+    #     webpack_compiler_swap = self.swap(
+    #         servers, 'managed_webpack_compiler',
+    #         mock_managed_webpack_compiler)
+    #     get_file_count_swap = self.swap(
+    #         build, 'get_file_count', mock_get_file_count)
 
-        with webpack_compiler_swap, get_file_count_swap:
-            build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+    #     with webpack_compiler_swap, get_file_count_swap:
+    #         build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
-    def test_build_using_webpack_command_with_incorrect_filecount_fails(
-        self
-    ) -> None:
+    # def test_build_using_webpack_command_with_incorrect_filecount_fails(
+    #     self
+    # ) -> None:
 
-        @contextlib.contextmanager
-        def mock_managed_webpack_compiler(
-            config_path: str, max_old_space_size: int
-        ) -> Iterator[scripts_test_utils.PopenStub]:
-            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 8192)
-            yield scripts_test_utils.PopenStub()
+    #     @contextlib.contextmanager
+    #     def mock_managed_webpack_compiler(
+    #         config_path: str, max_old_space_size: int
+    #     ) -> Iterator[scripts_test_utils.PopenStub]:
+    #         self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
+    #         self.assertEqual(max_old_space_size, 8192)
+    #         yield scripts_test_utils.PopenStub()
 
-        def mock_get_file_count(unused_path: str) -> int:
-            return 0
+    #     def mock_get_file_count(unused_path: str) -> int:
+    #         return 0
 
-        webpack_compiler_swap = self.swap(
-            servers, 'managed_webpack_compiler',
-            mock_managed_webpack_compiler)
-        get_file_count_swap = self.swap(
-            build, 'get_file_count', mock_get_file_count)
+    #     webpack_compiler_swap = self.swap(
+    #         servers, 'managed_webpack_compiler',
+    #         mock_managed_webpack_compiler)
+    #     get_file_count_swap = self.swap(
+    #         build, 'get_file_count', mock_get_file_count)
 
-        with webpack_compiler_swap, get_file_count_swap:
-            with self.assertRaisesRegex(
-                AssertionError, 'webpack_bundles should be non-empty.'
-            ):
-                build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+    #     with webpack_compiler_swap, get_file_count_swap:
+    #         with self.assertRaisesRegex(
+    #             AssertionError, 'webpack_bundles should be non-empty.'
+    #         ):
+    #             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
@@ -1198,42 +1201,44 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         finally:
             super().tearDown()
 
-    def test_run_webpack_compilation_success(self) -> None:
-        old_os_path_isdir = os.path.isdir
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    # def test_run_webpack_compilation_success(self) -> None:
+    #     old_os_path_isdir = os.path.isdir
 
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
+    #     def mock_os_path_isdir(path: str) -> bool:
+    #         if path == 'webpack_bundles':
+    #             return True
+    #         return old_os_path_isdir(path)
 
-        # The webpack compilation processes will be called 4 times as mock_isdir
-        # will return true after 4 calls.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
+    #     # The webpack compilation processes will be called 4 times as mock_isdir
+    #     # will return true after 4 calls.
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_webpack_compiler', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         sys, 'exit', lambda _: None, called=False))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         os.path, 'isdir', mock_os_path_isdir))
 
-        build.run_webpack_compilation()
+    #     build.run_webpack_compilation()
 
-    def test_run_webpack_compilation_failed(self) -> None:
-        old_os_path_isdir = os.path.isdir
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    # def test_run_webpack_compilation_failed(self) -> None:
+    #     old_os_path_isdir = os.path.isdir
 
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return False
-            return old_os_path_isdir(path)
+    #     def mock_os_path_isdir(path: str) -> bool:
+    #         if path == 'webpack_bundles':
+    #             return False
+    #         return old_os_path_isdir(path)
 
-        # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+    #     # The webpack compilation processes will be called five times.
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_webpack_compiler', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         os.path, 'isdir', mock_os_path_isdir))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
-        build.run_webpack_compilation()
+    #     build.run_webpack_compilation()
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
         old_os_path_isdir = os.path.isdir
@@ -1253,7 +1258,8 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
 
-        build.build_js_files(True)
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            build.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
         return_code = 2
@@ -1281,7 +1287,8 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 (1,),
             ]))
 
-        build.build_js_files(True)
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            build.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(

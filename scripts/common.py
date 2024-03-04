@@ -922,6 +922,7 @@ def modify_constants(
         return
 
     if prod_env or version_info_must_be_set is False:
+        print('gp201-1')
         branch_name_variable = (
             '"BRANCH_NAME": "%s"'
             % (
@@ -938,6 +939,8 @@ def modify_constants(
             branch_name_variable,
             expected_number_of_replacements=1
         )
+
+        print(branch_name_variable)
 
         short_commit_hash_variable = (
             '"SHORT_COMMIT_HASH": "%s"'
