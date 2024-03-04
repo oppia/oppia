@@ -37,11 +37,9 @@ from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
 )
 
-# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import install_python_dev_dependencies
-    from scripts import install_third_party_libs
-    from scripts import servers
+from scripts import install_python_dev_dependencies
+from scripts import install_third_party_libs
+from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -200,6 +198,11 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
     Args:
         source_maps: bool. Whether to compile with source maps.
     """
+
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
+
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
@@ -695,6 +698,11 @@ def build_using_ng() -> None:
     generates an ahead of time compiled bundle. This bundle can be found in the
     dist/oppia-angular-prod folder.
     """
+
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
+
     print('Building using angular cli')
     managed_ng_build_process = servers.managed_ng_build(
         use_prod_env=True, watch_mode=False)
@@ -713,6 +721,10 @@ def build_using_webpack(config_path: str) -> None:
     Args:
         config_path: str. Webpack config to be used for building.
     """
+
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
 
     print('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
@@ -1401,6 +1413,10 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
+
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    if feconf.OPPIA_IS_DOCKERIZED:
+        return
 
     # We first remove this dev dependencies because they should not be needed
     # for the package build and we need to verify that they are actually not
