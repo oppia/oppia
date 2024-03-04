@@ -6712,7 +6712,7 @@ export default {
       ]
     },
     "CONTRIBUTOR_DASHBOARD_ADMIN": {
-      "ROUTE": "contributor-dashboard-admin",
+      "ROUTE": "contributor-admin-dashboard",
       "TITLE": "Contributor Dashboard Admin",
       "META": [
         {
