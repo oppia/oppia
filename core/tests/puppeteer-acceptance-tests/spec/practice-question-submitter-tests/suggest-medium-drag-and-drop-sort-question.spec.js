@@ -42,7 +42,6 @@ describe('Practice Question Submitter', function() {
 
   let questionSubmitter = null;
   const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
-  const ROLE_QUESTION_ADMIN = 'question admin';
   const DIFFICULTY_MEDIUM = 'Medium';
   const DIFFICULTY_HARD = 'Hard';
   const RESPONSE_EQUAL_TO_ORDERING = 'is equal to ordering';
@@ -87,7 +86,7 @@ describe('Practice Question Submitter', function() {
 
     const topicId = await superAdmin.getTopicIdBy({ name: topicName });
     await superAdmin.editClassroom({ topicId });
- 
+
     questionSubmitter = (
       await userFactory.createNewQuestionSubmitter('questionsubmitter'));
   }, DEFAULT_SPEC_TIMEOUT);
