@@ -328,3 +328,50 @@ p.sign-in-text {
   right: 10px;
   top: 10px;
 }
+
+@media screen and (max-width: 971px) {
+  .player-footer-mid {
+    width: 45%;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 574px) {
+  .oppia-lesson-player-footer {
+    height: 48px;
+    padding: 4px;
+  }
+
+  .player-footer-left {
+    width: 40px;
+  }
+
+  .player-footer-previous-button {
+    height: 40px;
+  }
+
+  .player-footer-save-button {
+    font-size: 13px;
+    height: 40px;
+    line-height: 15.2px;
+  }
+
+  .player-footer-save-button .mat-icon {
+    display: none;
+    height: 40px;
+    width: 45px;
+  }
+
+  .player-footer-right {
+    width: 93px;
+  }
+
+  .player-footer-continue-button {
+    font-size: 13px;
+    height: 40px;
+    line-height: 15.6px;
+  }
+}

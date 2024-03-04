@@ -191,3 +191,9 @@ oppia-conversation-skin .oppia-button-icon {
     opacity: 0.8;
   }
 }
+
+@media screen and (max-width: 574px) {
+  .conversation-skin-cards-container {
+    height: calc(100vh - 192px);
+  }
+}

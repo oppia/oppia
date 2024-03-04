@@ -75,7 +75,7 @@
   justify-content: space-between;
   position: relative;
   width: 80px;
-  z-index: 1;
+  z-index: 17;
 }
 
 .player-desktop-sidebar-menu.expanded {
