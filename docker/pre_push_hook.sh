@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2024 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -93,9 +93,9 @@ done
 
 # Check if dev-server is running and is healthy
 $(docker ps -a --format '{{json .}}' | grep $DEV_CONTAINER | jq .Status | grep -q healthy)
-was_container_running_before_hook=$?
+is_container_running=$?
 
-if [ "$was_container_running_before_hook" != "0" ]; then
+if [ "$is_container_running" != "0" ]; then
     # Start containers and run pre-push hook
     make start-devserver # We don't need to use run-offline as internet would be available when pushing commit
 fi
@@ -106,12 +106,12 @@ echo "Running $CMD"
 
 $CMD
 
-# Save exit code from the docker command
+# Save exit code from the docker command, so we can later use it to exit this pre-push hook at end.
 exitcode=$?
 echo "Python script exited with code $exitcode"
 
-# Shut down containers if they were not running before running hook
-if [ "$was_container_running_before_hook" != "0" ]; then
+# Shut down containers if they were not running before pre-push hook execution.
+if [ "$is_container_running" != "0" ]; then
     make stop
 fi
 
