@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/pre_commit_linter.py."""
+"""Unit tests for scripts/run_lint_checks.py."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ import sys
 from core.tests import test_utils
 from typing import List, Optional
 
-from . import pre_commit_linter
+from . import run_lint_checks
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
@@ -63,7 +63,7 @@ def all_checks_passed(linter_stdout: List[str]) -> bool:
 
     Args:
         linter_stdout: list(str). List of output messages from
-            pre_commit_linter.
+            run_lint_checks.
 
     Returns:
         bool. Whether all checks have passed or not.
@@ -72,7 +72,7 @@ def all_checks_passed(linter_stdout: List[str]) -> bool:
 
 
 class PreCommitLinterTests(test_utils.LinterTestBase):
-    """Tests for methods in pre_commit_linter module."""
+    """Tests for methods in run_lint_checks module."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -91,12 +91,12 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             return []
 
         all_filepath_swap = self.swap(
-            pre_commit_linter, '_get_all_filepaths', mock_get_all_filepaths)
+            run_lint_checks, '_get_all_filepaths', mock_get_all_filepaths)
 
         with self.print_swap, self.sys_swap:
             with self.install_swap:
                 with all_filepath_swap:
-                    pre_commit_linter.main()
+                    run_lint_checks.main()
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout)
 
@@ -105,13 +105,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             return []
 
         get_changed_filepaths_swap = self.swap(
-            pre_commit_linter, '_get_changed_filepaths',
+            run_lint_checks, '_get_changed_filepaths',
             mock_get_changed_filepaths)
 
         with self.print_swap, self.sys_swap:
             with self.install_swap:
                 with get_changed_filepaths_swap:
-                    pre_commit_linter.main()
+                    run_lint_checks.main()
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout)
 
@@ -132,10 +132,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             return []
 
         shards_swap = self.swap(
-            pre_commit_linter, 'SHARDS', mock_shards)
+            run_lint_checks, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
-            pre_commit_linter, '_get_filepaths_from_path',
+            run_lint_checks, '_get_filepaths_from_path',
             mock_get_filepaths_from_path, expected_args=[
                 (prefix,)
                 for prefix in mock_shards['1']
@@ -144,7 +144,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
-                    pre_commit_linter.main(args=['--shard', '1'])
+                    run_lint_checks.main(args=['--shard', '1'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_invalid_shards(self) -> None:
@@ -165,10 +165,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         }
 
         shards_swap = self.swap(
-            pre_commit_linter, 'SHARDS', mock_shards)
+            run_lint_checks, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
-            pre_commit_linter, '_get_filepaths_from_path',
+            run_lint_checks, '_get_filepaths_from_path',
             mock_get_filepaths_from_path,
             expected_args=[
                 (prefix,)
@@ -183,7 +183,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 with self.assertRaisesRegex(
                     RuntimeError, 'mock_file in multiple shards'
                 ):
-                    pre_commit_linter.main(args=['--shard', '1'])
+                    run_lint_checks.main(args=['--shard', '1'])
 
     def test_main_with_other_shard(self) -> None:
         def mock_get_filepaths_from_path(
@@ -207,7 +207,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         }
 
         shards_swap = self.swap(
-            pre_commit_linter, 'SHARDS', mock_shards)
+            run_lint_checks, 'SHARDS', mock_shards)
 
         filenames_from_path_expected_args = [(os.getcwd(),)] + [
             (prefix,)
@@ -215,21 +215,21 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         ]
 
         get_filenames_from_path_swap = self.swap_with_checks(
-            pre_commit_linter, '_get_filepaths_from_path',
+            run_lint_checks, '_get_filepaths_from_path',
             mock_get_filepaths_from_path,
             expected_args=filenames_from_path_expected_args)
 
         with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
-                    pre_commit_linter.main(
-                        args=['--shard', pre_commit_linter.OTHER_SHARD_NAME])
+                    run_lint_checks.main(
+                        args=['--shard', run_lint_checks.OTHER_SHARD_NAME])
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self) -> None:
         with self.print_swap, self.sys_swap:
             with self.install_swap:
-                pre_commit_linter.main(args=['--files=%s' % PYLINTRC_FILEPATH])
+                run_lint_checks.main(args=['--files=%s' % PYLINTRC_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_error_message(self) -> None:
@@ -238,14 +238,14 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         with self.print_swap, self.sys_swap:
             with self.install_swap, all_errors_swap:
-                pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
+                run_lint_checks.main(args=['--path=%s' % VALID_PY_FILEPATH])
         self.assert_same_list_elements(
             ['This is an error.'], self.linter_stdout)
 
     def test_main_with_path_arg(self) -> None:
         with self.print_swap, self.sys_swap:
             with self.install_swap:
-                pre_commit_linter.main(
+                run_lint_checks.main(
                     args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assert_same_list_elements([
@@ -254,13 +254,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_main_with_invalid_filepath_with_path_arg(self) -> None:
         with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
-            pre_commit_linter.main(args=['--path=invalid_file.py'])
+            run_lint_checks.main(args=['--path=invalid_file.py'])
         self.assert_same_list_elements(
             ['Could not locate file or directory'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_file_arg(self) -> None:
         with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
-            pre_commit_linter.main(args=['--files=invalid_file.py'])
+            run_lint_checks.main(args=['--files=invalid_file.py'])
         self.assert_same_list_elements(
             ['The following file(s) do not exist'], self.linter_stdout)
 
@@ -272,19 +272,19 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             return [VALID_PY_FILEPATH]
 
         get_all_files_swap = self.swap(
-            pre_commit_linter, '_get_all_files_in_directory',
+            run_lint_checks, '_get_all_files_in_directory',
             mock_get_all_files_in_directory)
 
         with self.print_swap, self.sys_swap:
             with self.install_swap:
                 with get_all_files_swap:
-                    pre_commit_linter.main(args=['--path=scripts/linters/'])
+                    run_lint_checks.main(args=['--path=scripts/linters/'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg(self) -> None:
         with self.print_swap, self.sys_swap:
             with self.install_swap:
-                pre_commit_linter.main(
+                run_lint_checks.main(
                     args=['--path=%s' % VALID_TS_FILEPATH,
                           '--only-check-file-extensions=ts'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
@@ -293,7 +293,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self
     ) -> None:
         with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
-            pre_commit_linter.main(
+            run_lint_checks.main(
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
         self.assert_same_list_elements([
@@ -305,13 +305,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_get_all_files_in_directory(self) -> None:
         with self.print_swap, self.sys_swap:
             with self.install_swap:
-                pre_commit_linter.main(
+                run_lint_checks.main(
                     args=['--path=scripts/linters/',
                           '--only-check-file-extensions=ts'])
 
     def test_html_file(self) -> None:
         with self.print_swap, self.sys_swap, self.install_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
+            run_lint_checks.main(args=['--path=%s' % VALID_HTML_FILEPATH])
         self.assert_same_list_elements(
             ['All Linter Checks Passed.'], self.linter_stdout)
 
@@ -323,4 +323,4 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         with self.print_swap, self.sys_swap:
             with self.install_swap, subprocess_swap:
-                pre_commit_linter.main()
+                run_lint_checks.main()
