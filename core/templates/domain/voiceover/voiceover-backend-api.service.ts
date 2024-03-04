@@ -44,7 +44,7 @@ interface ExplorationIdToFilenamesBackendDict {
 
 export interface ExplorationIdToFilenames {
   [explorationId: string]: string[];
-};
+}
 
 export interface LanguageAccentToDescription {
   [languageAccentCode: string]: string;
@@ -148,29 +148,30 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async updateVoiceArtistToLanguageMappingAsync(
-      voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
+  async updateVoiceArtistToLanguageAccentAsync(
+      voiceArtistId: string, languageCode: string, languageAccentCode: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
-        VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL,
-        {voice_artist_id_to_language_mapping: voiceArtistIdToLanguageMapping}
+        VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL, {
+          voice_artist_id: voiceArtistId,
+          language_code: languageCode,
+          language_accent_code: languageAccentCode
+        }
       ).toPromise().then(
         response => {
           resolve(response);
         }, errorResponse => {
           reject(errorResponse?.error);
         }
-      )
+      );
     });
   }
 
-  async fetchVoiceoversForVoiceArtistAsync(
+  async fetchFilenamesForVoiceArtistAsync(
       voiceArtistId: string, languageCode: string
   ): Promise<ExplorationIdToFilenames> {
     return new Promise((resolve, reject) => {
-      console.log('In side fetch voiceovers');
-      console.log(voiceArtistId, languageCode);
       this.http.get<ExplorationIdToFilenamesBackendDict>(
         this.urlInterpolationService.interpolateUrl(
           VoiceoverDomainConstants.GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE,
@@ -183,8 +184,8 @@ export class VoiceoverBackendApiService {
         resolve(response.exploration_id_to_filenames);
       }, errorResponse => {
         reject(errorResponse?.error);
-      })
-    })
+      });
+    });
   }
 }
 

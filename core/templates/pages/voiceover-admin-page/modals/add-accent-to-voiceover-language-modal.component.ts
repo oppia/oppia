@@ -21,8 +21,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {
   VoiceoverBackendApiService, LanguageAccentToDescription,
-  LanguageCodesMapping, LanguageAccentMasterList,
-  VoiceArtistIdToLanguageMapping, VoiceArtistIdToVoiceArtistName,
   ExplorationIdToFilenames
 } from 'domain/voiceover/voiceover-backend-api.service';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -38,11 +36,11 @@ export class AddAccentToVoiceoverLanguageModalComponent
   languageAccentCode: string = '';
   voiceArtistId: string = '';
   voiceArtistName: string = '';
-  languageAccentCodes = {};
+  languageAccentCodes: LanguageAccentToDescription = {};
   updateButtonIsDisabled: boolean = true;
   explorationIdsToFilenames: ExplorationIdToFilenames = {};
-  pageIsInitialized = false;
-  currentFilename = '';
+  pageIsInitialized: boolean = false;
+  currentFilename: string = '';
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -54,12 +52,10 @@ export class AddAccentToVoiceoverLanguageModalComponent
   }
 
   ngOnInit(): void {
-    console.log(this.voiceArtistId);
-    this.voiceoverBackendApiService.fetchVoiceoversForVoiceArtistAsync(
+    this.voiceoverBackendApiService.fetchFilenamesForVoiceArtistAsync(
       this.voiceArtistId, this.languageCode
     ).then(explorationIdToFilenames => {
       this.explorationIdsToFilenames = explorationIdToFilenames;
-      console.log(this.explorationIdsToFilenames);
       this.pageIsInitialized = true;
     });
   }
@@ -72,7 +68,7 @@ export class AddAccentToVoiceoverLanguageModalComponent
     this.ngbActiveModal.close();
   }
 
-  addLanguageAccentCodeSupport(languageAccentCode) {
+  addLanguageAccentCodeSupport(languageAccentCode: string): void {
     this.languageAccentCode = languageAccentCode;
     this.updateButtonIsDisabled = false;
   }
