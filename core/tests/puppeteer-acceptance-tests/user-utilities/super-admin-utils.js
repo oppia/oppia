@@ -106,6 +106,7 @@ module.exports = class e2eSuperAdmin extends baseUser {
     await this.goto('http://localhost:8181/admin#/config');
 
     await this.clickOn('.e2e-test-add-list-entry');
+    // TODO(#19668): Remove the for loop that types in the entire topic id.
     for (let i = 0; i < topicId.length; i++) {
       await this.type(
         '.e2e-test-schema-based-dict-editor ' +
