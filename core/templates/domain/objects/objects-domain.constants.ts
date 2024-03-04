@@ -272,5 +272,5 @@ export const ObjectsDomainConstants = {
     cents: 'Cent',
     Paisa: 'Paisa',
     paise: 'Paisa',
-  }
+  } as { [key: string]: string }
 } as const;
