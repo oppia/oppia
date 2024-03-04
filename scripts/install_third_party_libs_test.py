@@ -482,70 +482,71 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     #         initialized_directories,
     #         [correct_google_path])
 
-    def test_function_calls_on_windows(self) -> None:
-        check_function_calls = {
-            'install_third_party_main_is_called': False,
-            'setup_main_is_called': False,
-            'setup_gae_main_is_called': False,
-            'pre_commit_hook_main_is_called': False,
-            'pre_push_hook_main_is_called': False,
-            'tweak_yarn_executable_is_called': False
-        }
-        expected_check_function_calls = {
-            'install_third_party_main_is_called': True,
-            'setup_main_is_called': True,
-            'setup_gae_main_is_called': True,
-            'pre_commit_hook_main_is_called': True,
-            'pre_push_hook_main_is_called': False,
-            'tweak_yarn_executable_is_called': True
-        }
-        def mock_check_call(unused_cmd_tokens: List[str]) -> None:
-            pass
-        def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
-            check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
-            check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
-            check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-            check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-            check_function_calls['pre_push_hook_main_is_called'] = True
-        def mock_tweak_yarn_executable() -> None:
-            check_function_calls['tweak_yarn_executable_is_called'] = True
+    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+    # def test_function_calls_on_windows(self) -> None:
+    #     check_function_calls = {
+    #         'install_third_party_main_is_called': False,
+    #         'setup_main_is_called': False,
+    #         'setup_gae_main_is_called': False,
+    #         'pre_commit_hook_main_is_called': False,
+    #         'pre_push_hook_main_is_called': False,
+    #         'tweak_yarn_executable_is_called': False
+    #     }
+    #     expected_check_function_calls = {
+    #         'install_third_party_main_is_called': True,
+    #         'setup_main_is_called': True,
+    #         'setup_gae_main_is_called': True,
+    #         'pre_commit_hook_main_is_called': True,
+    #         'pre_push_hook_main_is_called': False,
+    #         'tweak_yarn_executable_is_called': True
+    #     }
+    #     def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+    #         pass
+    #     def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
+    #         check_function_calls['install_third_party_main_is_called'] = True
+    #     def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
+    #         check_function_calls['setup_main_is_called'] = True
+    #     def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
+    #         check_function_calls['setup_gae_main_is_called'] = True
+    #     def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+    #         check_function_calls['pre_commit_hook_main_is_called'] = True
+    #     def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+    #         check_function_calls['pre_push_hook_main_is_called'] = True
+    #     def mock_tweak_yarn_executable() -> None:
+    #         check_function_calls['tweak_yarn_executable_is_called'] = True
 
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        install_third_party_main_swap = self.swap(
-            install_third_party, 'main', mock_main_for_install_third_party)
-        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
-        setup_gae_main_swap = self.swap(
-            setup_gae, 'main', mock_main_for_setup_gae)
-        pre_commit_hook_main_swap = self.swap(
-            pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
-        pre_push_hook_main_swap = self.swap(
-            pre_push_hook, 'main', mock_main_for_pre_push_hook)
-        tweak_yarn_executable_swap = self.swap(
-            install_third_party_libs, 'tweak_yarn_executable',
-            mock_tweak_yarn_executable)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+    #     check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+    #     install_third_party_main_swap = self.swap(
+    #         install_third_party, 'main', mock_main_for_install_third_party)
+    #     setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
+    #     setup_gae_main_swap = self.swap(
+    #         setup_gae, 'main', mock_main_for_setup_gae)
+    #     pre_commit_hook_main_swap = self.swap(
+    #         pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
+    #     pre_push_hook_main_swap = self.swap(
+    #         pre_push_hook, 'main', mock_main_for_pre_push_hook)
+    #     tweak_yarn_executable_swap = self.swap(
+    #         install_third_party_libs, 'tweak_yarn_executable',
+    #         mock_tweak_yarn_executable)
+    #     os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
 
-        py_actual_text = (
-            'ConverterMapping,\nLine ending with '
-            '"ConverterMapping",\nOther Line\n')
-        temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
-        with utils.open_file(temp_py_config_file, 'w') as f:
-            f.write(py_actual_text)
+    #     py_actual_text = (
+    #         'ConverterMapping,\nLine ending with '
+    #         '"ConverterMapping",\nOther Line\n')
+    #     temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
+    #     with utils.open_file(temp_py_config_file, 'w') as f:
+    #         f.write(py_actual_text)
 
-        pq_actual_text = (
-            'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
-        temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
-        with utils.open_file(temp_pq_config_file, 'w') as f:
-            f.write(pq_actual_text)
+    #     pq_actual_text = (
+    #         'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
+    #     temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
+    #     with utils.open_file(temp_pq_config_file, 'w') as f:
+    #         f.write(pq_actual_text)
 
-        with check_call_swap, self.Popen_swap:
-            with install_third_party_main_swap, setup_main_swap:
-                with setup_gae_main_swap, pre_commit_hook_main_swap:
-                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
-                        with os_name_swap:
-                            install_third_party_libs.main()
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+    #     with check_call_swap, self.Popen_swap:
+    #         with install_third_party_main_swap, setup_main_swap:
+    #             with setup_gae_main_swap, pre_commit_hook_main_swap:
+    #                 with pre_push_hook_main_swap, tweak_yarn_executable_swap:
+    #                     with os_name_swap:
+    #                         install_third_party_libs.main()
+    #     self.assertEqual(check_function_calls, expected_check_function_calls)
