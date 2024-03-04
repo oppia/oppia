@@ -1356,7 +1356,6 @@ class CommonTests(test_utils.GenericTestBase):
                 common.set_constants_to_default()
                 with utils.open_file(
                     mock_constants_path, 'r') as constants_file:
-                    print(constants_file.read())
                     self.assertEqual(
                         constants_file.read(),
                         'export = {\n'

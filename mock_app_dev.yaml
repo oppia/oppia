@@ -1,6 +1,0 @@
-export = {
-  "DEV_MODE": true,
-  "EMULATOR_MODE": true,
-  "BRANCH_NAME": "test",
-  "SHORT_COMMIT_HASH": "test"
-};

@@ -922,7 +922,6 @@ def modify_constants(
         return
 
     if prod_env or version_info_must_be_set is False:
-        print('gp201-1')
         branch_name_variable = (
             '"BRANCH_NAME": "%s"'
             % (
