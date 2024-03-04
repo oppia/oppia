@@ -53,7 +53,7 @@ module.exports = class baseUser {
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 0, height: 0 });
+        await this.page.setViewport({ width: 1920, height: 1080 });
         this.page.on('dialog', async(dialog) => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
