@@ -215,11 +215,12 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page' +
     '.spec.js',
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
+    'practice-question-submitter-tests' +
+    '/suggest-medium-drag-and-drop-sort-question.spec.js',
+    'practice-question-submitter-tests/suggest-hard-fraction-input-question' +
+    '.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
-    'translation-admin-tests/remove-translation-rights.spec.js',
-    'question-submitter-tests/suggest-medium-' +
-    'drag-and-drop-sort-question.spec.js',
-    'question-submitter-tests/suggest-hard-fraction-input-question.spec.js'
+    'translation-admin-tests/remove-translation-rights.spec.js'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

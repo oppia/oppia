@@ -54,7 +54,6 @@ describe('Practice Question Submitter', function() {
   beforeAll(async function() {
     const superAdmin = await userFactory.createNewSuperAdmin('superadm');
     await superAdmin.assignRoleToUser('superadm', ROLE_CURRICULUM_ADMIN);
-    await superAdmin.assignRoleToUser('superadm', ROLE_QUESTION_ADMIN);
 
     const skill = {
       description: skillDescription,
@@ -85,10 +84,10 @@ describe('Practice Question Submitter', function() {
       diagnosticTestSkills: [skill],
       isPublished: true
     });
+
     const topicId = await superAdmin.getTopicIdBy({ name: topicName });
-
     await superAdmin.editClassroom({ topicId });
-
+ 
     questionSubmitter = (
       await userFactory.createNewQuestionSubmitter('questionsubmitter'));
   }, DEFAULT_SPEC_TIMEOUT);

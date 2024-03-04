@@ -24,10 +24,8 @@ let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 let e2eQuestionAdmin = require(
   '../user-utilities/question-admin-utils.js');
-let e2ePracticeQuestionSubmitter = require(
+let e2eQuestionSubmitter = require(
   '../user-utilities/question-submitter-utils.js');
-
-const testConstants = require('./test-constants.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -146,29 +144,6 @@ let createNewTranslationAdmin = async function(username, email) {
 };
 
 /**
- * The function creates a new question submitter user and returns the
- * instance of that user.
- * @param {string} username - The username of the question submitter.
- * @returns The question submitter instance created.
- */
-const createNewQuestionSubmitter = async function(username) {
-  if (superAdminInstance === null) {
-    superAdminInstance = await createNewSuperAdmin('superAdm');
-  }
-
-  const questionSubmitter = new e2ePracticeQuestionSubmitter();
-  await questionSubmitter.openBrowser();
-  await questionSubmitter.signUpNewUser(
-    username, 'questionsubmitter@example.com');
-
-  await superAdminInstance.assignContributionRightToUser(
-    username, testConstants.ContributorRights.SubmitQuestion);
-
-  activeUsers.push(questionSubmitter);
-  return questionSubmitter;
-};
-
-/**
  * Function to create a user with the question admin role.
  * @param {string} username - the username of the question admin.
  * @param {string} email - the email of the user.
@@ -192,6 +167,28 @@ let createNewQuestionAdmin = async function(username, email) {
 
   activeUsers.push(questionAdmin);
   return questionAdmin;
+};
+
+/**
+ * The function creates a new question submitter user and returns the
+ * instance of that user.
+ * @param {string} username - The username of the question submitter.
+ * @returns The question submitter instance created.
+ */
+let createNewQuestionSubmitter = async function(username) {
+  const questionAdmin = await createNewQuestionAdmin('questionAdm');
+
+  const questionSubmitter = new e2eQuestionSubmitter();
+  await questionSubmitter.openBrowser();
+  await questionSubmitter.signUpNewUser(
+    username, 'question_submitter@example.com');
+
+  await questionAdmin.navigateToContributorDashboardAdminPage();
+  await questionAdmin.addSubmitQuestionRights(username);
+  await questionAdmin.verifyUserCanSubmitQuestions(username);
+
+  activeUsers.push(questionSubmitter);
+  return questionSubmitter;
 };
 
 /**
