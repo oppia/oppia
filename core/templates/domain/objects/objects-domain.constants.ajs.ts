@@ -33,5 +33,8 @@ angular.module('oppia').constant(
   'CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
 
 angular.module('oppia').constant(
+  'unitMappings', ObjectsDomainConstants.UNITS_MAPPING);
+
+angular.module('oppia').constant(
   'RATIO_PARSING_ERROR_I18N_KEYS',
   ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS);

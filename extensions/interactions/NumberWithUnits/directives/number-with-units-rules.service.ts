@@ -46,13 +46,26 @@ export class NumberWithUnitsRulesService {
     // Returns true only if input is exactly equal to answer.
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    let valueIsEqual: boolean;
 
-    var answerNum = answerObject.toMathjsCompatibleString().split(' ')[0];
-    var inputNum = inputsObject.toMathjsCompatibleString().split(' ')[0];
+    if (answerObject.type !== inputsObject.type) {
+      return false;
+    }
+
+    if (answerObject.type === 'real') {
+      valueIsEqual = answerObject.real === inputsObject.real;
+    } else {
+      valueIsEqual = this.utilsService.isEquivalent(
+        answerObject.fraction, inputsObject.fraction
+      );
+    }
 
     return (
-      this.IsEquivalentTo(answer, inputs) &&
-      answerNum === inputNum
+      valueIsEqual &&
+      this.utilsService.isEquivalent(
+        answerObject.canonicalizeUnits(),
+        inputsObject.canonicalizeUnits()
+      )
     );
   }
 
@@ -71,6 +84,7 @@ export class NumberWithUnitsRulesService {
     }
     var answerString = answerObject.toMathjsCompatibleString();
     var inputsString = inputsObject.toMathjsCompatibleString();
+
     return unit(answerString).equals(unit(inputsString));
   }
 }

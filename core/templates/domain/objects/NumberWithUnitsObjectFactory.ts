@@ -124,6 +124,15 @@ export class NumberWithUnits {
       units: this.units
     };
   }
+
+  canonicalizeUnits = (): Unit[] => {
+    const updatedUnits = this.units.map(({ unit, exponent }: Unit) => ({
+      unit: ObjectsDomainConstants.UNITS_MAPPING[unit],
+      exponent: exponent,
+    }));
+
+    return updatedUnits;
+  };
 }
 
 @Injectable({
