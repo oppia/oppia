@@ -481,7 +481,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
-class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestsBase):
+class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     """Checks the access to the skill editor page and its rendenring"""
 
     def setUp(self) -> None:
