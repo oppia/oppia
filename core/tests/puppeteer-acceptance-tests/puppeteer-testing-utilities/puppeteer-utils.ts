@@ -30,8 +30,8 @@ const acceptedBrowserAlerts = [
 ];
 
 export default class BaseUser {
-  page: Page;
-  browserObject: Browser;
+  page!: Page;
+  browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
 
   /**

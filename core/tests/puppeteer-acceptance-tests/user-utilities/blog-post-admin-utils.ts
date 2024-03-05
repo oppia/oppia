@@ -414,8 +414,8 @@ export default class BlogPostAdmin extends BaseUser {
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).valueAsNumber);
-    if (tagLimit === limit) {
+      element => (element as HTMLInputElement).value);
+    if (parseInt(tagLimit) === limit) {
       throw new Error(`Maximum tag limit is already ${limit}!`);
     }
     showMessage(`Maximum tag limit is not ${limit}!`);
@@ -427,8 +427,8 @@ export default class BlogPostAdmin extends BaseUser {
   async expectMaximumTagLimitToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).valueAsNumber);
-    if (tagLimit !== limit) {
+      element => (element as HTMLInputElement).value);
+    if (parseInt(tagLimit) !== limit) {
       throw new Error(`Maximum tag limit is not ${limit}!`);
     }
     showMessage(`Maximum tag is currently ${limit}!`);

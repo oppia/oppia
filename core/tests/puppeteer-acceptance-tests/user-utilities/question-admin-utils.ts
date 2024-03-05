@@ -136,8 +136,9 @@ export default class QuestionAdmin extends BaseUser {
       element => (element as HTMLElement).innerText
     );
     const displayedUsers =
-      displayedUsersText.replace('Usernames:', '').trim();
-    return JSON.parse(displayedUsers);
+      displayedUsersText.replace('Usernames:', '').trim().replace(
+        '[', '').replace(']', '').split(',');
+    return displayedUsers;
   }
 
   /**
@@ -157,8 +158,9 @@ export default class QuestionAdmin extends BaseUser {
       element => (element as HTMLElement).innerText
     );
     const displayedUsers =
-      displayedUsersText.replace('Usernames:', '').trim();
-    return JSON.parse(displayedUsers);
+      displayedUsersText.replace('Usernames:', '').trim().replace(
+        '[', '').replace(']', '').split(',');
+    return displayedUsers;
   }
 
   /**
