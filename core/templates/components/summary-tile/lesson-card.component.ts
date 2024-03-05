@@ -82,6 +82,7 @@ export class LessonCardComponent implements OnInit{
     }
   }
 
+  //go back 1 - add test case 
   getProgress(arg: number) : string {
     return 'linear-gradient(' + (50 >= arg? (180 + (arg / 100 * 180)) : 270) + 'deg, #00645c ' + (50 >= arg ? arg : 50) + '%, transparent ' + (50 >= arg ? arg : 50) +'%),' +
     'linear-gradient(0deg, #00645c ' + (arg > 50 ? arg - 50 : 0) + '%, lightgray ' + (arg> 50 ? arg - 50 : 0) + '%)'

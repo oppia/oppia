@@ -2,13 +2,13 @@
   <div class="align-items-center d-flex justify-content-center lesson-card_img relative w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card_tags w-100">
-     <!--If tag length (learner groups && goal) === 0-->
+     <!--go back 2 - If tag length (learner groups && goal) === 0-->
     </div>
   </div>
   <div class="d-flex flex-column lesson-card_info justify-content-between">
     <div class="d-flex flex-column flex-grow justify-content-between"> 
       <!--nextIncompleteNodeTitle (story-summary), explorationTitle (exploration-summary), rename to chapter-->
-      <!--Find a way so the text are always aligned regardless of title length/line clamp-->
+      <!--go back 3 - Find a way so the text are always aligned regardless of title length/line clamp-->
       <p class="h-50 lesson-card_title mb-0"> {{ title }} </p>
       <div> 
         <!--topicName (story-summary)-->
@@ -25,6 +25,7 @@
           {{ progress }}% 
         </div>
       </div>
+      <!--go back 1 - i1qn, adjust for exploration lessons  = 0 -->
       <a class="align-items-center d-inline-flex justify-content-center lesson-card_button text-decoration-none" [href]="lessonUrl" target="_self">
         {{ progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume') }}
       </a>
