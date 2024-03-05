@@ -664,25 +664,6 @@ class FacilitatorDashboardPage(
         self.render_template('facilitator-dashboard-page.mainpage.html')
 
 
-class CreateLearnerGroupPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page for creating a new learner group."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_learner_groups
-    def get(self) -> None:
-        """Handles GET requests."""
-        if not learner_group_services.is_learner_group_feature_enabled(
-            self.user_id
-        ):
-            raise self.PageNotFoundException
-
-        self.render_template('create-learner-group-page.mainpage.html')
-
-
 class LearnerGroupSearchLearnerHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of LearnerGroupSearchLearnerHandler's
     normalized_request dictionary.

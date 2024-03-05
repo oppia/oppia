@@ -38,6 +38,8 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
 import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-learner-group-details-modal.component';
 import { toastrConfig } from 'pages/oppia-root/app.module';
 import { ToastrModule } from 'ngx-toastr';
+import { LearnerDashboardActivityBackendApiService } from
+  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 
 @NgModule({
   imports: [
@@ -85,5 +87,8 @@ import { ToastrModule } from 'ngx-toastr';
     ViewLearnerGroupInvitationModalComponent,
     ViewLearnerGroupDetailsModalComponent
   ],
+  providers: [
+    LearnerDashboardActivityBackendApiService
+  ]
 })
 export class LearnerDashboardPageModule {}

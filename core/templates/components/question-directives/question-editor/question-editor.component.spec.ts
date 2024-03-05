@@ -298,14 +298,20 @@ describe('Question Editor Component', () => {
       new SubtitledHtml('New content', 'New content'));
   });
 
-  it('should save interaction ID when interaction is saved', () => {
+  it('should save interaction data when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionId');
+    spyOn(stateEditorService, 'setInteractionCustomizationArgs');
 
-    component.saveInteractionId('TextInput');
+    let newInteractionData = {
+      interactionId: 'Text Input',
+      customizationArgs: 'Customization Args'
+    };
+    component.saveInteractionData(newInteractionData);
 
-    expect(stateEditorService.setInteractionId).toHaveBeenCalledWith(
-      'TextInput'
-    );
+    expect(stateEditorService.setInteractionId)
+      .toHaveBeenCalledWith(newInteractionData.interactionId);
+    expect(stateEditorService.setInteractionCustomizationArgs)
+      .toHaveBeenCalledWith(newInteractionData.customizationArgs);
   });
 
   it('should save interaction answer groups when interaction is saved', () => {
@@ -326,15 +332,6 @@ describe('Question Editor Component', () => {
 
     expect(stateEditorService.setInteractionDefaultOutcome)
       .toHaveBeenCalledWith({dest: 'New outcome'} as Outcome);
-  });
-
-  it('should save customization args when interaction is saved', () => {
-    spyOn(stateEditorService, 'setInteractionCustomizationArgs');
-
-    component.saveInteractionCustomizationArgs('Customization Args');
-
-    expect(stateEditorService.setInteractionCustomizationArgs)
-      .toHaveBeenCalledWith('Customization Args');
   });
 
   it('should set interaction solution when interaction is saved', () => {
