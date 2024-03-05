@@ -8,6 +8,7 @@
     "noImplicitReturns": true,
     "rootDir": "core/tests/puppeteer-acceptance-tests",
     "outDir": "core/tests/puppeteer-acceptance-tests/build",
+    "sourceMap": true,
     "typeRoots": [
       "node_modules/@types",
       "typings"

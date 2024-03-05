@@ -1089,7 +1089,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
-        self.assertIn(test_file_path, program_args)
+        self.assertIn(test_file_path + '.spec.js', program_args)
 
     def test_managed_acceptance_test_server_with_invalid_suite(self) -> None:
         suite_name = 'invalid_suite'
