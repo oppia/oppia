@@ -320,7 +320,7 @@ class ReviewableOpportunitiesHandler(
         if self.user_id:
             for opp in (
                 self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language)
+                    self.user_id, topic_name, language)
             ):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
