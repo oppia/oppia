@@ -708,9 +708,8 @@ def check_coverage(
                 not_covered_lines.append(output_lines[1])
                 is_first_line = False
             not_covered_lines.append(line)
-            if index + 1 < len(output_lines):
-                if ' 100%' not in output_lines[index + 1]:
-                    not_covered_lines.append(output_lines[1])
+            if index + 1 < len(output_lines) and ' 100%' not in output_lines[index + 1]:
+                not_covered_lines.append(output_lines[1])
 
     not_covered_lines_output = '\n'.join(not_covered_lines)
 
