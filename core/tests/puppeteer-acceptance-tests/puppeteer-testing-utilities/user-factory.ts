@@ -39,7 +39,9 @@ const ROLE_QUESTION_ADMIN = 'question admin';
  * The function creates a new super admin user and returns the instance
  * of that user.
  */
-export let createNewSuperAdmin = async function(username: string): Promise<SuperAdmin> {
+export let createNewSuperAdmin = async function(
+    username: string
+  ): Promise<SuperAdmin> {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -57,7 +59,9 @@ export let createNewSuperAdmin = async function(username: string): Promise<Super
  * The function creates a new blog admin user and returns the instance
  * of that user.
  */
-export let createNewBlogAdmin = async function(username): Promise<BlogAdmin> {
+export let createNewBlogAdmin = async function(
+    username: string
+): Promise<BlogAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -77,7 +81,9 @@ export let createNewBlogAdmin = async function(username): Promise<BlogAdmin> {
  * The function creates a new blog post editor user and returns the
  * instance of that user.
  */
-export let createNewBlogPostEditor = async function(username: string): Promise<BlogAdmin> {
+export let createNewBlogPostEditor = async function(
+    username: string
+  ): Promise<BlogAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -102,8 +108,8 @@ export let createNewBlogPostEditor = async function(username: string): Promise<B
  * The function creates a new guest user and returns the instance of that user.
  */
 export let createNewGuestUser = async function(
-  username: string,
-  email: string
+    username: string,
+    email: string
 ): Promise<GuestUser> {
   const guestUser = new GuestUser();
   await guestUser.openBrowser();
@@ -116,7 +122,9 @@ export let createNewGuestUser = async function(
 /**
  * Function to create a user with the translation admin role.
  */
-export let createNewTranslationAdmin = async function(username: string): Promise<TranslationAdmin> {
+export let createNewTranslationAdmin = async function(
+    username: string
+): Promise<TranslationAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -139,7 +147,9 @@ export let createNewTranslationAdmin = async function(username: string): Promise
 /**
  * Function to create a user with the question admin role.
  */
-export let createNewQuestionAdmin = async function(username: string): Promise<QuestionAdmin> {
+export let createNewQuestionAdmin = async function(
+    username: string
+): Promise<QuestionAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }

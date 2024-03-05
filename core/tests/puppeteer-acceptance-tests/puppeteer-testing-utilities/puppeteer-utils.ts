@@ -1,4 +1,4 @@
-// Copyright 202 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ const acceptedBrowserAlerts = [
 export default class BaseUser {
   page: Page;
   browserObject: Browser;
-  userHasAcceptedCookies: boolean;
+  userHasAcceptedCookies: boolean = false;
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -43,21 +43,22 @@ export default class BaseUser {
         headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
-    .then(async(browser) => {
-      this.browserObject = browser;
-      this.page = await browser.newPage();
-      await this.page.setViewport({ width: 0, height: 0 });
-      this.page.on('dialog', async(dialog) => {
-        const alertText = dialog.message();
-        if (acceptedBrowserAlerts.includes(alertText)) {
-          await dialog.accept();
-        } else {
-          throw new Error(`Unexpected alert: ${alertText}`);
-        }
+      .then(async(browser) => {
+        this.browserObject = browser;
+        this.page = await browser.newPage();
+        await this.page.setViewport({ width: 0, height: 0 });
+        this.page.on('dialog', async(dialog) => {
+          const alertText = dialog.message();
+          if (acceptedBrowserAlerts.includes(alertText)) {
+            await dialog.accept();
+          } else {
+            throw new Error(`Unexpected alert: ${alertText}`);
+          }
+        });
       });
-    });
     return this.page;
   }
+
   /**
    * Function to sign in the user with the given email to the Oppia website.
    */
@@ -156,4 +157,4 @@ export default class BaseUser {
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
   }
-};
+}

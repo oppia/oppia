@@ -50,9 +50,9 @@ let colored = function(color: string, str: string): string {
 };
 
 let printFailures = function(
-  result: jasmine.JasmineDoneInfo | jasmine.SpecResult | jasmine.SuiteResult
+    result: jasmine.JasmineDoneInfo | jasmine.SpecResult | jasmine.SuiteResult
 ): void {
-  for(let i = 0; i < result.failedExpectations.length; i++) {
+  for (let i = 0; i < result.failedExpectations.length; i++) {
     printNewline();
     print('Message:');
     printNewline();
@@ -60,7 +60,9 @@ let printFailures = function(
     printNewline();
     print('Stack:');
     printNewline();
-    print(!result.failedExpectations[i].stack ? '' : result.failedExpectations[i].stack);
+    print(
+      !result.failedExpectations[i].stack ? '' :
+      result.failedExpectations[i].stack);
   }
 };
 
@@ -78,15 +80,17 @@ let printSpecLog = function(result: jasmine.SpecResult): void {
   printNewline();
 };
 
-let printSuiteLog = function(result: jasmine.JasmineDoneInfo | jasmine.SuiteResult): void {
+let printSuiteLog = function(
+    result: jasmine.JasmineDoneInfo | jasmine.SuiteResult
+): void {
   printFailures(result);
 
   printNewline();
-}
+};
 
 let pendingSpecTrace = function(
-  result: jasmine.SpecResult,
-  pendingSpecNumber: number
+    result: jasmine.SpecResult,
+    pendingSpecNumber: number
 ): void {
   printNewline();
   print(pendingSpecNumber + '. ' + result.fullName);
@@ -102,15 +106,17 @@ let pendingSpecTrace = function(
 };
 
 let specFailureTrace = function(
-  result: jasmine.SpecResult,
-  failedSpecNumber: number
+    result: jasmine.SpecResult,
+    failedSpecNumber: number
 ): void {
   printNewline();
   print(failedSpecNumber + '. ' + result.fullName);
   printSpecLog(result);
 };
 
-let suiteFailureTrace = function(result: SuiteFailureResult | jasmine.SuiteResult): void {
+let suiteFailureTrace = function(
+    result: SuiteFailureResult | jasmine.SuiteResult
+): void {
   printNewline();
   print('Suite error: ' + result.fullName);
   printSuiteLog(result);
