@@ -64,7 +64,7 @@ var ContributorDashboardAdminPage = function() {
   var languageDropdown = $('.e2e-test-language-selector-dropdown');
 
   this.get = async function() {
-    await browser.url('/contributor-dashboard-admin');
+    await browser.url('/contributor-admin-dashboard');
     await waitFor.pageToFullyLoad();
   };
 
