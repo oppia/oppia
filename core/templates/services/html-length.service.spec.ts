@@ -585,6 +585,29 @@ describe('Html Length Service', () => {
     expect(result).toBe(65);
   });
 
+  it('should compute character count for empty string', () => {
+    const htmlString = '';
+    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+
+    expect(result).toBe(0);
+  });
+
+  it('should compute character count of text and normal string', () => {
+    const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
+      'Hello, how are you?' +
+      '<p>naghiue abghy gjuh &nbsp;</p>';
+    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+
+    /*
+      "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
+      And we have 2 paragraphs with 18 characters each.
+      "Hello, how are you?" is a normal string which will
+      counted as 0 characters.Therefore, the total character
+      count is 18 (paragraph) * 2 + 0  = 36 characters.
+    */
+    expect(result).toBe(36);
+  });
+
   describe('getLengthForNonTextNodes', () => {
     it('should throw an error when unable to determine ' +
       'length for non-text node', () => {

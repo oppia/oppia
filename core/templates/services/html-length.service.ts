@@ -75,11 +75,6 @@ export class HtmlLengthService {
   computeHtmlLength(
       htmlString: string,
       calculationType: CalculationType): number {
-    if (!htmlString) {
-      this.loggerService.error('Empty string was passed to compute length');
-      return 0;
-    }
-
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
 
