@@ -25,6 +25,7 @@ export const AboutPageConstants = {
   CREDITS_CONSTANTS: [
     'Aadya Mishra',
     'Aakanksha Bhende',
+    'Aakash Jakhmola',
     'Aaron Zuspan',
     'Aashish Gaba',
     'Aashish Khubchandani',
@@ -412,6 +413,7 @@ export const AboutPageConstants = {
     'Nikhil Nair',
     'Nikhil Prakash',
     'Nikhil Sangwan',
+    'Nikita Vorobev',
     'Nikki Hess',
     'Nils Johansson',
     'Nimalen Sivapalan',
