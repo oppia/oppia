@@ -30,6 +30,7 @@ from scripts import servers
 
 from typing import ContextManager, List, Optional, Tuple
 
+
 class PopenErrorReturn:
     """Popen return object."""
 
@@ -105,7 +106,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
         ) -> PopenErrorReturn:
             return PopenErrorReturn()
- 
+
         popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
         with popen_error_swap:

@@ -18,7 +18,7 @@
       "jasmine",
       "puppeteer",
       "puppeteer-acceptance-tests"
-    ],
+    ]
   },
   "include": [
     "core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities",
