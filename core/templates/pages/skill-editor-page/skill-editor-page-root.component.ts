@@ -27,6 +27,7 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 export class SkillEditorPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.TITLE;
+    
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.META as
     unknown as Readonly<MetaTagData>[];
