@@ -2936,7 +2936,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(story_exp_ids, exp_ids)
 
-    def test_get_published_story_exploration_ids_when_exp_ids_not_found( # pylint: disable=line-too-long
+    def test_get_published_story_exploration_ids_when_mapping_not_precomputed(
         self
     ) -> None:
         topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
