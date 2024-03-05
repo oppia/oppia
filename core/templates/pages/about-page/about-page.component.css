@@ -288,8 +288,8 @@
 }
 @media (orientation: landscape) and (max-width: 868px) {
   .oppia-about-page-section-one .oppia-about-title {
-    padding-top: 5vh;
     font-size: 25px;
+    padding-top: 5vh;
   }
 }
 @media (orientation: landscape) and (max-width: 862px) {
@@ -324,8 +324,8 @@
     padding-bottom: 5vh;
   }
   .oppia-about-page-section-one .oppia-about-title {
-    padding-top: 5vh;
     font-size: 25px;
+    padding-top: 5vh;
   }
   .oppia-about-page-section-six .oppia-about-book-image img {
     max-height: 50vh;
@@ -338,7 +338,7 @@
 }
 @media (orientation: landscape) and (max-width: 815px) {
   .about-page .oppia-about-button {
-      padding: 3px;
+    padding: 3px;
   }
 }
 @media (orientation: landscape) and (max-width: 740px) {
@@ -544,11 +544,11 @@
   }
 }
 @media (max-width: 698px) {
-  .about-page .oppia-about-button {
+  .oppia-about-button .about-page {
     padding: 1px;
   }
   .oppia-about-page-section-one .oppia-about-title {
-    font-size:20px;
+    font-size: 20px;
     padding-top: 3vh;
   }
 }
