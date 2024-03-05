@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { VoiceoverRemovalConfirmModalComponent } from
   './modals/language-accent-removal-confirm-modal.component';
@@ -244,7 +243,3 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageAccentDropdownIsShown = false;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVoiceoverAdminPage', downgradeComponent(
-    {component: VoiceoverAdminPageComponent}));

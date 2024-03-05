@@ -452,6 +452,7 @@ import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashb
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
+import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -939,5 +940,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['HtmlLengthService', HtmlLengthService],
   ['ContributorDashboardAdminStatsBackendApiService',
     ContributorDashboardAdminStatsBackendApiService],
-  ['InsertScriptService', InsertScriptService]
+  ['InsertScriptService', InsertScriptService],
+  ['VoiceoverAdminAuthGuard', VoiceoverAdminAuthGuard],
 ];

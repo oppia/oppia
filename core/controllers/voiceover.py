@@ -24,18 +24,6 @@ from core.domain import voiceover_services
 from typing import Dict, TypedDict
 
 
-class VoiceoverAdminPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Renders the voiceover admin page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_voiceover_admin_page
-    def get(self) -> None:
-        """Renders the voiceover admin page."""
-        self.render_template('voiceover-admin-page.mainpage.html')
-
-
 class VoiceoverAdminDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
