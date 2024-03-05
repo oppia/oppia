@@ -3638,7 +3638,7 @@ version: 1
         if len(change_list) > 0:
             topic_services.update_story_and_topic_summary(
                 feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
-                'Linked explorations to story ' + story_id, topic_id)
+                'Linked explorations to story %s' % story_id, topic_id)
 
     def create_story_for_translation_opportunity(
         self,
