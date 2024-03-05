@@ -298,6 +298,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/edit-group/edit-learner-group-page-auth.guard';
+import { CreateLearnerGroupPageAuthGuard } from '../pages/learner-group-pages/create-group/create-learner-group-page-auth.guard';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -450,6 +451,7 @@ import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard'
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -552,6 +554,7 @@ export const angularServices: [string, Type<{}>][] = [
     DragAndDropSortInputValidationService],
   ['EditabilityService', EditabilityService],
   ['EditLearnerGroupPageAuthGuard', EditLearnerGroupPageAuthGuard],
+  ['CreateLearnerGroupPageAuthGuard', CreateLearnerGroupPageAuthGuard],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',
     EditableExplorationBackendApiService],
@@ -699,6 +702,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
+  ['MobileMenuService', MobileMenuService],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['ModeratorAuthGuard', ModeratorAuthGuard],
   ['MultipleChoiceInputOrderedChoicesService',

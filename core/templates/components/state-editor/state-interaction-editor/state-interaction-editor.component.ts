@@ -37,7 +37,7 @@ import { StateSolutionService } from '../state-editor-properties-services/state-
 import { StateContentService } from '../state-editor-properties-services/state-content.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs, InteractionData } from 'interactions/customization-args-defs';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -63,10 +63,7 @@ export class StateInteractionEditorComponent
   @Output() markAllAudioAsNeedingUpdateModalIfRequired =
     new EventEmitter<string[]>();
 
-  @Output() onSaveInteractionCustomizationArgs =
-    new EventEmitter<InteractionCustomizationArgs>();
-
-  @Output() onSaveInteractionId = new EventEmitter<string>();
+  @Output() onSaveInteractionData = new EventEmitter<InteractionData>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolution = new EventEmitter<Solution>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
@@ -191,13 +188,14 @@ export class StateInteractionEditorComponent
         this.updateDefaultTerminalStateContentIfEmpty();
       }
       this.stateInteractionIdService.saveDisplayedValue();
-      this.onSaveInteractionId.emit(this.stateInteractionIdService.displayed);
     }
-
     this.stateCustomizationArgsService.saveDisplayedValue();
-    this.onSaveInteractionCustomizationArgs.emit(
-      this.stateCustomizationArgsService.displayed
-    );
+
+    let interactionData: InteractionData = {
+      interactionId: this.stateInteractionIdService.displayed,
+      customizationArgs: this.stateCustomizationArgsService.displayed
+    };
+    this.onSaveInteractionData.emit(interactionData);
 
     this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
@@ -258,12 +256,13 @@ export class StateInteractionEditorComponent
       this.interactionDetailsCacheService.removeDetails(
         this.stateInteractionIdService.savedMemento);
       this.stateInteractionIdService.saveDisplayedValue();
-      this.onSaveInteractionId.emit(this.stateInteractionIdService.displayed);
-
       this.stateCustomizationArgsService.saveDisplayedValue();
-      this.onSaveInteractionCustomizationArgs.emit(
-        this.stateCustomizationArgsService.displayed
-      );
+
+      let interactionData: InteractionData = {
+        interactionId: this.stateInteractionIdService.displayed,
+        customizationArgs: this.stateCustomizationArgsService.displayed
+      };
+      this.onSaveInteractionData.emit(interactionData);
 
       this.stateSolutionService.saveDisplayedValue();
       this.onSaveSolution.emit(this.stateSolutionService.displayed);

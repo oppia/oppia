@@ -33,14 +33,6 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard]
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .CONTRIBUTOR_DASHBOARD.ROUTE),
-    loadChildren: () => import(
-      'pages/contributor-dashboard-page/contributor-dashboard-page.module')
-      .then(m => m.ContributorDashboardPageModule)
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () => import('pages/moderator-page/moderator-page.module')
       .then(m => m.ModeratorPageModule),
@@ -92,6 +84,14 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/learner-group-pages/edit-group/edit-learner-group-page.module')
       .then(m => m.EditLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard]
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_CREATOR
+      .ROUTE,
+    loadChildren: () => import(
+      'pages/learner-group-pages/create-group/create-learner-group-page.module')
+      .then(m => m.CreateLearnerGroupPageModule),
     canActivate: [IsLoggedInGuard]
   },
   {

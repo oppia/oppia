@@ -118,11 +118,11 @@ describe('HintEditorComponent', () => {
 
   it('should check if hint HTML length exceeds 500 characters', () => {
     component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(500), 'contentID'));
+      SubtitledHtml.createDefault(`<p>${'a'.repeat(500)}</p>`, 'contentID'));
     expect(component.isHintLengthExceeded()).toBe(false);
 
     component.hint = new Hint(
-      SubtitledHtml.createDefault('a'.repeat(501), 'contentID'));
+      SubtitledHtml.createDefault(`<p>${'a'.repeat(501)}</p>`, 'contentID'));
     expect(component.isHintLengthExceeded()).toBe(true);
   });
 
