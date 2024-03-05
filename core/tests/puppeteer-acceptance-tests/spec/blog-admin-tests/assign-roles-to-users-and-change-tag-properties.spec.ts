@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
  * @fileoverview Acceptance Test for Blog Admin
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import * as userFactory from
+  '../../puppeteer-testing-utilities/user-factory';
+import SuperAdmin from '../../user-utilities/super-admin-utils';
+import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
+import testConstants from 
+  '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Blog Admin', function() {
   const ROLE_BLOG_ADMIN = 'blog admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-  let superAdmin = null;
-  let blogAdmin = null;
+  let superAdmin: SuperAdmin;
+  let blogAdmin: BlogPostAdmin;
 
   beforeAll(async function() {
     superAdmin = await userFactory.createNewSuperAdmin('superAdm');
@@ -60,9 +62,9 @@ describe('Blog Admin', function() {
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-      await blogAdmin.expectMaximumTagLimitNotToBe('5');
-      await blogAdmin.setMaximumTagLimitTo('5');
-      await blogAdmin.expectMaximumTagLimitToBe('5');
+      await blogAdmin.expectMaximumTagLimitNotToBe(5);
+      await blogAdmin.setMaximumTagLimitTo(5);
+      await blogAdmin.expectMaximumTagLimitToBe(5);
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     }, DEFAULT_SPEC_TIMEOUT);

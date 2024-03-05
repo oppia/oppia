@@ -17,15 +17,16 @@
  * can open links by clicking all buttons in about foundation page
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import * as userFactory from
+  '../../puppeteer-testing-utilities/user-factory';
+import LoggedInUsers from '../../user-utilities/logged-in-users-utils';
+import testConstants from 
+  '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User in About Foundation page', function() {
-  let testUser = null;
+  let testUser: LoggedInUsers;
 
   beforeAll(async function() {
     testUser = await userFactory.createNewGuestUser(

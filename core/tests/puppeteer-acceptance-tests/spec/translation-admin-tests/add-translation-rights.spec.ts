@@ -17,15 +17,16 @@
  * rights to users.
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
+import * as userFactory from 
+  '../../puppeteer-testing-utilities/user-factory';
+import TranslationAdmin from '../../user-utilities/translation-admin-utils';
 const testConstants = require(
   '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Translation Admin', function() {
-  let translationAdmin = null;
+  let translationAdmin: TranslationAdmin;
 
   beforeAll(async function() {
     translationAdmin =

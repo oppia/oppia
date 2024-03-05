@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 202 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-const puppeteer = require('puppeteer');
-const testConstants = require('./test-constants.js');
+import puppeteer, { Page, Browser } from 'puppeteer';
+import testConstants from './test-constants';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -29,49 +29,39 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?'
 ];
 
-module.exports = class baseUser {
-  constructor() {
-    this.page;
-    this.browserObject;
-    this.userHasAcceptedCookies = false;
-  }
+export default class BaseUser {
+  page: Page;
+  browserObject: Browser;
+  userHasAcceptedCookies: boolean;
 
   /**
    * This is a function that opens a new browser instance for the user.
-   * @returns {Promise<puppeteer.Page>} - Returns a promise that resolves
-   * to a Page object controlled by Puppeteer.
    */
-  async openBrowser() {
+  async openBrowser(): Promise<Page> {
     await puppeteer
       .launch({
-        /** TODO(#17761): Right now some acceptance tests are failing on
-         * headless mode. As per the expected behavior we need to make sure
-         * every test passes on both modes. */
         headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
-      .then(async(browser) => {
-        this.browserObject = browser;
-        this.page = await browser.newPage();
-        await this.page.setViewport({ width: 0, height: 0 });
-        this.page.on('dialog', async(dialog) => {
-          const alertText = dialog.message();
-          if (acceptedBrowserAlerts.includes(alertText)) {
-            await dialog.accept();
-          } else {
-            throw new Error(`Unexpected alert: ${alertText}`);
-          }
-        });
+    .then(async(browser) => {
+      this.browserObject = browser;
+      this.page = await browser.newPage();
+      await this.page.setViewport({ width: 0, height: 0 });
+      this.page.on('dialog', async(dialog) => {
+        const alertText = dialog.message();
+        if (acceptedBrowserAlerts.includes(alertText)) {
+          await dialog.accept();
+        } else {
+          throw new Error(`Unexpected alert: ${alertText}`);
+        }
       });
-
+    });
     return this.page;
   }
-
   /**
    * Function to sign in the user with the given email to the Oppia website.
-   * @param {string} email - The email of the user.
    */
-  async signInWithEmail(email) {
+  async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
     if (!this.userHasAcceptedCookies) {
       await this.clickOn('OK');
@@ -85,10 +75,8 @@ module.exports = class baseUser {
 
   /**
    * This function signs up a new user with the given username and email.
-   * @param {string} userName - The username of the user.
-   * @param {string} signInEmail - The email of the user.
    */
-  async signUpNewUser(userName, signInEmail) {
+  async signUpNewUser(userName: string, signInEmail: string): Promise<void> {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
@@ -101,16 +89,14 @@ module.exports = class baseUser {
   /**
    * Function to reload the current page.
    */
-  async reloadPage() {
+  async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
   }
 
   /**
    * The function clicks the element using the text on the button.
-   * @param {string} selector - The text on the button or the CSS selector of
-   * the element to be clicked
    */
-  async clickOn(selector) {
+  async clickOn(selector: string): Promise<void> {
     try {
       /** Normalize-space is used to remove the extra spaces in the text.
        * Check the documentation for the normalize-space function here :
@@ -126,46 +112,40 @@ module.exports = class baseUser {
 
   /**
    * This function types the text in the input field using its CSS selector.
-   * @param {string} selector - The CSS selector of the input field.
-   * @param {string} text - The text to be typed in the input field.
    */
-  async type(selector, text) {
+  async type(selector: string, text: string): Promise<void> {
     await this.page.waitForSelector(selector);
     await this.page.type(selector, text);
   }
 
   /**
    * This selects a value in a dropdown.
-   * @param {string} selector - The CSS selector of the input field.
-   * @param {string} option - The option to be selected.
    */
-  async select(selector, option) {
+  async select(selector: string, option: string): Promise<void> {
     await this.page.waitForSelector(selector);
     await this.page.select(selector, option);
   }
 
   /**
    * This function navigates to the given URL.
-   * @param {string} url - The URL to which the page has to be navigated.
    */
-  async goto(url) {
+  async goto(url: string): Promise<void> {
     await this.page.goto(url, {waitUntil: 'networkidle0'});
   }
 
   /**
    * This function uploads a file using the given file path.
-   * @param {string} filePath - The path of the file to be uploaded.
    */
-  async uploadFile(filePath) {
+  async uploadFile(filePath: string): Promise<void> {
     const inputUploadHandle = await this.page.$('input[type=file]');
     let fileToUpload = filePath;
-    inputUploadHandle.uploadFile(fileToUpload);
+    inputUploadHandle?.uploadFile(fileToUpload);
   }
 
   /**
    * This function logs out the current user.
    */
-  async logout() {
+  async logout(): Promise<void> {
     await this.goto(testConstants.URLs.Logout);
     await this.page.waitForSelector(testConstants.Dashboard.MainDashboard);
   }
@@ -173,7 +153,7 @@ module.exports = class baseUser {
   /**
    * This function closes the current Puppeteer browser instance.
    */
-  async closeBrowser() {
+  async closeBrowser(): Promise<void> {
     await this.browserObject.close();
   }
 };

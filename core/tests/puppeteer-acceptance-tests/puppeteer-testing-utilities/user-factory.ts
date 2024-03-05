@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
-let e2eGuestUser = require('../user-utilities/logged-in-users-utils.js');
-let e2eBlogAdmin = e2eBlogPostEditor = require(
-  '../user-utilities/blog-post-admin-utils.js');
-let e2eTranslationAdmin = require(
-  '../user-utilities/translation-admin-utils.js');
-let e2eQuestionAdmin = require(
-  '../user-utilities/question-admin-utils.js');
+import SuperAdmin from '../user-utilities/super-admin-utils';
+import GuestUser from '../user-utilities/logged-in-users-utils';
+import BlogAdmin from '../user-utilities/blog-post-admin-utils';
+import TranslationAdmin from '../user-utilities/translation-admin-utils';
+import QuestionAdmin from '../user-utilities/question-admin-utils';
+
+type User =
+  SuperAdmin | GuestUser | BlogAdmin | TranslationAdmin | QuestionAdmin;
 
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance = null;
-let activeUsers = [];
+let superAdminInstance: SuperAdmin | null = null;
+let activeUsers: User[] = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 const ROLE_TRANSLATION_ADMIN = 'translation admin';
@@ -38,15 +38,13 @@ const ROLE_QUESTION_ADMIN = 'question admin';
 /**
  * The function creates a new super admin user and returns the instance
  * of that user.
- * @param {string} username - The username of the super admin.
- * @returns The super admin instance created.
  */
-let createNewSuperAdmin = async function(username) {
+export let createNewSuperAdmin = async function(username: string): Promise<SuperAdmin> {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
 
-  const superAdmin = new e2eSuperAdmin();
+  const superAdmin = new SuperAdmin();
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUser(username, 'testadmin@example.com');
 
@@ -58,15 +56,13 @@ let createNewSuperAdmin = async function(username) {
 /**
  * The function creates a new blog admin user and returns the instance
  * of that user.
- * @param {string} username - The username of the blog admin.
- * @returns The blog admin instance created.
  */
-let createNewBlogAdmin = async function(username) {
+export let createNewBlogAdmin = async function(username): Promise<BlogAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
 
-  const blogAdmin = new e2eBlogAdmin();
+  const blogAdmin = new BlogAdmin();
   await blogAdmin.openBrowser();
   await blogAdmin.signUpNewUser(username, 'blog_admin@example.com');
 
@@ -80,13 +76,15 @@ let createNewBlogAdmin = async function(username) {
 /**
  * The function creates a new blog post editor user and returns the
  * instance of that user.
- * @param {string} username - The username of the blog post editor.
- * @returns The blog post editor instance created.
  */
-let createNewBlogPostEditor = async function(username) {
+export let createNewBlogPostEditor = async function(username: string): Promise<BlogAdmin> {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
   const blogAdmin = await createNewBlogAdmin('blogAdm');
 
-  const blogPostEditor = new e2eBlogPostEditor();
+  const blogPostEditor = new BlogAdmin();
   await blogPostEditor.openBrowser();
   await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
@@ -102,12 +100,12 @@ let createNewBlogPostEditor = async function(username) {
 
 /**
  * The function creates a new guest user and returns the instance of that user.
- * @param {string} username - The username of the guest user.
- * @param {string} email - The email of the guest user.
- * @returns The guest user instance created.
  */
-let createNewGuestUser = async function(username, email) {
-  const guestUser = new e2eGuestUser();
+export let createNewGuestUser = async function(
+  username: string,
+  email: string
+): Promise<GuestUser> {
+  const guestUser = new GuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
 
@@ -117,16 +115,13 @@ let createNewGuestUser = async function(username, email) {
 
 /**
  * Function to create a user with the translation admin role.
- * @param {string} username - the username of the translation admin.
- * @param {string} email - the email of the user.
- * @returns the instance of the translation admin.
  */
-let createNewTranslationAdmin = async function(username, email) {
+export let createNewTranslationAdmin = async function(username: string): Promise<TranslationAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
 
-  const translationAdmin = new e2eTranslationAdmin();
+  const translationAdmin = new TranslationAdmin();
   await translationAdmin.openBrowser();
   await translationAdmin.signUpNewUser(
     username,
@@ -143,16 +138,13 @@ let createNewTranslationAdmin = async function(username, email) {
 
 /**
  * Function to create a user with the question admin role.
- * @param {string} username - the username of the question admin.
- * @param {string} email - the email of the user.
- * @returns the instance of the question admin.
  */
-let createNewQuestionAdmin = async function(username, email) {
+export let createNewQuestionAdmin = async function(username: string): Promise<QuestionAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
 
-  const questionAdmin = new e2eQuestionAdmin();
+  const questionAdmin = new QuestionAdmin();
   await questionAdmin.openBrowser();
   await questionAdmin.signUpNewUser(
     username,
@@ -170,7 +162,7 @@ let createNewQuestionAdmin = async function(username, email) {
 /**
  * The function closes all the browsers opened by different users.
  */
-let closeAllBrowsers = async function() {
+export let closeAllBrowsers = async function(): Promise<void> {
   for (let i = 0; i < activeUsers.length; i++) {
     await activeUsers[i].closeBrowser();
   }
@@ -178,22 +170,10 @@ let closeAllBrowsers = async function() {
 
 /**
  * Function to close the browser opened by the specified user
- * @param {baseUser} user - the user object of the user who's browser
  * should be closed.
  */
-let closeBrowserForUser = async function(user) {
+export let closeBrowserForUser = async function(user: User): Promise<void> {
   const index = activeUsers.indexOf(user);
   activeUsers.splice(index, 1);
   await user.closeBrowser();
-};
-
-module.exports = {
-  createNewSuperAdmin,
-  createNewBlogAdmin,
-  createNewBlogPostEditor,
-  createNewGuestUser,
-  createNewTranslationAdmin,
-  createNewQuestionAdmin,
-  closeAllBrowsers,
-  closeBrowserForUser
 };

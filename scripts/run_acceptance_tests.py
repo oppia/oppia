@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
+import shutil
 import subprocess
 import sys
 
@@ -62,6 +63,29 @@ _PARSER.add_argument(
     action='store_true')
 
 
+def compile_test_ts_files() -> None:
+    """Compiles the test typescript files into a build directory."""
+    cmd = (
+        './node_modules/typescript/bin/tsc -p %s' %
+        './tsconfig.puppeteer-acceptance-tests.json')
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+    _, encoded_stderr = proc.communicate()
+    stderr = encoded_stderr.decode('utf-8')
+
+    if stderr:
+        raise Exception(stderr)
+
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    build_dir_path = os.path.join(puppeteer_acceptance_tests_dir_path, 'build')
+
+    shutil.copytree(
+        os.path.join(puppeteer_acceptance_tests_dir_path, 'images'),
+        os.path.join(build_dir_path, 'images'))
+
+
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
@@ -74,6 +98,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
+        compile_test_ts_files()
         if args.skip_build:
             common.modify_constants(prod_env=args.prod_env)
         else:

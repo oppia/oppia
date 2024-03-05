@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
  * @fileoverview Acceptance Test for Blog Post Editor
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import * as userFactory from
+  '../../puppeteer-testing-utilities/user-factory';
+import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
+import testConstants from
+'../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
 describe('Blog Editor', function() {
-  let blogPostEditor = null;
+  let blogPostEditor: BlogPostAdmin;
 
   beforeAll(async function() {
     blogPostEditor = await userFactory.createNewBlogPostEditor(

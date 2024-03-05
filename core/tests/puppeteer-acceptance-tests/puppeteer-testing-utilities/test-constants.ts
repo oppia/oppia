@@ -16,9 +16,9 @@
  * @fileoverview Constants that can be re-used in the accpetance tests.
  */
 
-const path = require('path');
+import path from 'path';
 
-let testConstants = {
+export default {
   URLs: {
     About: 'http://localhost:8181/about',
     AboutFoundation: 'http://localhost:8181/about-foundation',
@@ -58,5 +58,3 @@ let testConstants = {
   },
   DEFAULT_SPEC_TIMEOUT: 300000
 };
-
-module.exports = testConstants;
