@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import os
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -193,20 +194,21 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_2, self.user_id_admin)
         updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', False):
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
 
-            topic_summary = topic_services.compute_summary_of_topic(
-                updated_topic)
+        self.assertEqual(
+            topic_summary.total_published_node_count, len(story_exp_ids))
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: story_exp_ids,
+                self.story_id_2: no_exp_ids
+            })
 
-            self.assertEqual(
-                topic_summary.total_published_node_count, len(story_exp_ids))
-            self.assertDictEqual(
-                topic_summary.published_story_exploration_mapping, {
-                    self.story_id_1: story_exp_ids,
-                    self.story_id_2: no_exp_ids
-                })
-
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_compute_summary_when_serial_chapter_launch_enabled(
         self
     ) -> None:
@@ -221,21 +223,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             story_2_published_chapter_exp_ids)
         updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', True):
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
 
-            topic_summary = topic_services.compute_summary_of_topic(
-                updated_topic)
-
-            self.assertEqual(
-                topic_summary.total_published_node_count,
-                len(story_1_published_chapter_exp_ids) +
-                len(story_2_published_chapter_exp_ids))
-            self.assertDictEqual(
-                topic_summary.published_story_exploration_mapping, {
-                    self.story_id_1: story_1_published_chapter_exp_ids,
-                    self.story_id_2: story_2_published_chapter_exp_ids
-                })
+        self.assertEqual(
+            topic_summary.total_published_node_count,
+            len(story_1_published_chapter_exp_ids) +
+            len(story_2_published_chapter_exp_ids))
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: story_1_published_chapter_exp_ids,
+                self.story_id_2: story_2_published_chapter_exp_ids
+            })
 
     def test_compute_summary_does_not_map_unpublished_stories(
         self
@@ -442,6 +441,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.story_id_1: linked_exp_ids
             })
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_generate_topic_summary_when_unpublishing_story_chapter(
         self
     ) -> None:
@@ -451,22 +454,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         story = story_fetchers.get_story_by_id(self.story_id_1)
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ):
-            topic_services.update_story_and_topic_summary(
-                self.user_id_admin, self.story_id_1,
-                [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': story.story_contents.nodes[0].id,
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
-                })], 'Publish story chapter.', self.TOPIC_ID)
 
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ), self.swap_with_checks(
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+
+        with self.swap_with_checks(
             topic_services, 'generate_topic_summary',
             topic_services.generate_topic_summary,
             expected_args=[(self.TOPIC_ID,)]
@@ -490,6 +489,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.story_id_1: []
             })
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_generate_topic_summary_when_deleting_published_story_chapter(
         self
     ) -> None:
@@ -499,22 +502,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         story = story_fetchers.get_story_by_id(self.story_id_1)
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ):
-            topic_services.update_story_and_topic_summary(
-                self.user_id_admin, self.story_id_1,
-                [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': story.story_contents.nodes[0].id,
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
-                })], 'Publish story chapter.', self.TOPIC_ID)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
 
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ), self.swap_with_checks(
+        with self.swap_with_checks(
             topic_services, 'generate_topic_summary',
             topic_services.generate_topic_summary,
             expected_args=[(self.TOPIC_ID,)]
@@ -535,6 +533,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.story_id_1: []
             })
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_generate_topic_summary_when_changing_exp_id_linked_to_published_story_chapter( # pylint: disable=line-too-long
         self
     ) -> None:
@@ -545,17 +547,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         story = story_fetchers.get_story_by_id(self.story_id_1)
-        with self.swap_to_always_return(
-            feature_flag_services, 'is_feature_flag_enabled', True
-        ):
-            topic_services.update_story_and_topic_summary(
-                self.user_id_admin, self.story_id_1,
-                [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': story.story_contents.nodes[0].id,
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             })], 'Publish story chapter.', self.TOPIC_ID)
         self.save_new_valid_exploration(
             exp_id_2, self.user_id_admin, end_state_name='end')
@@ -2869,9 +2868,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, topic_exp_ids)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', False):
-            topic_services.generate_topic_summary(self.TOPIC_ID)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
 
         story_exp_ids = (
             topic_services.get_all_published_story_exploration_ids(
@@ -2879,6 +2876,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_get_published_story_exploration_ids_from_published_chapters_when_serial_chapter_feature_enabled( # pylint: disable=line-too-long
         self
     ) -> None:
@@ -2887,9 +2888,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self._publish_story_chapters_with_explorations(
             self.TOPIC_ID, self.story_id_1, topic_exp_ids,
             chapter_exp_ids=topic_published_chapters_exp_ids)
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', True):
-            topic_services.generate_topic_summary(self.TOPIC_ID)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
 
         story_exp_ids = (
             topic_services.get_all_published_story_exploration_ids(
@@ -2898,6 +2897,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             story_exp_ids, topic_published_chapters_exp_ids)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_get_published_story_exploration_ids_in_all_topics_when_topic_id_not_given( # pylint: disable=line-too-long
         self
     ) -> None:
@@ -2919,23 +2922,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self._publish_story_chapters_with_explorations(
             topic_id_2, story_id_4, exp_ids[3:])
 
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', False):
-            topic_services.generate_topic_summary(self.TOPIC_ID)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids())
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids())
 
-            self.assertItemsEqual(story_exp_ids, exp_ids)
+        self.assertItemsEqual(story_exp_ids, exp_ids)
 
-        with self.swap_to_always_return(
-                feature_flag_services, 'is_feature_flag_enabled', True):
-            topic_services.generate_topic_summary(self.TOPIC_ID)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            story_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids())
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids())
 
-            self.assertItemsEqual(story_exp_ids, exp_ids)
+        self.assertItemsEqual(story_exp_ids, exp_ids)
 
     def test_get_published_story_exploration_ids_when_exp_ids_not_found( # pylint: disable=line-too-long
         self
@@ -2959,7 +2958,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_services.get_all_published_story_exploration_ids(
                     self.TOPIC_ID))
 
-            self.assertItemsEqual(story_exp_ids, topic_exp_ids)
+        self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
