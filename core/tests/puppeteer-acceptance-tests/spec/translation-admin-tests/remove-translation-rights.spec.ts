@@ -17,10 +17,10 @@
  * rights from users.
  */
 
-import * as userFactory from 
+import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
 import TranslationAdmin from '../../user-utilities/translation-admin-utils';
-import testConstants from 
+import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;

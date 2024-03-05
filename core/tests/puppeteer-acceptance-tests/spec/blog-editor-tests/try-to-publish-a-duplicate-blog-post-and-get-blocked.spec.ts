@@ -20,7 +20,7 @@ import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
 import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
 import testConstants from
-'../../puppeteer-testing-utilities/test-constants';
+  '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const duplicateBlogPostWarning = ' Blog Post with the' +

@@ -41,7 +41,7 @@ const ROLE_QUESTION_ADMIN = 'question admin';
  */
 export let createNewSuperAdmin = async function(
     username: string
-  ): Promise<SuperAdmin> {
+): Promise<SuperAdmin> {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -83,7 +83,7 @@ export let createNewBlogAdmin = async function(
  */
 export let createNewBlogPostEditor = async function(
     username: string
-  ): Promise<BlogAdmin> {
+): Promise<BlogAdmin> {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }

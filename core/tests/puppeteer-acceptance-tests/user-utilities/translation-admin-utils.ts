@@ -16,13 +16,13 @@
  * @fileoverview Translation admin users utility file.
  */
 
-import BaseUser from 
+import BaseUser from
   '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from 
+import testConstants from
   '../puppeteer-testing-utilities/test-constants';
 const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
-import { showMessage } from 
+import { showMessage } from
   '../puppeteer-testing-utilities/show-message-utils';
 
 const translationRightValue = 'translation';
@@ -78,8 +78,8 @@ export default class TranslationAdmin extends BaseUser {
    */
 
   async addTranslationLanguageReviewRights(
-    username: string,
-    languageCode: string
+      username: string,
+      languageCode: string
   ): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
@@ -95,8 +95,8 @@ export default class TranslationAdmin extends BaseUser {
    * Function for removing a translation right from a user.
    */
   async removeTranslationLanguageReviewRights(
-    username: string,
-    languageCode: string
+      username: string,
+      languageCode: string
   ): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
@@ -123,7 +123,7 @@ export default class TranslationAdmin extends BaseUser {
    * Function to display translation rights by language.
    */
   async viewContributorTranslationRightsByLanguageCode(
-    languageCode: string
+      languageCode: string
   ): Promise<void> {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
@@ -179,4 +179,4 @@ export default class TranslationAdmin extends BaseUser {
         `${username} has translation rights for selected language!`);
     }
   }
-};
+}

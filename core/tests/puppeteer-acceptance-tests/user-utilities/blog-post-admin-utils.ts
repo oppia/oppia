@@ -16,7 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import BaseUser from 
+import BaseUser from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -67,7 +67,9 @@ export default class BlogPostAdmin extends BaseUser {
    * This function creates a blog post with given title.
    * to be created.
    */
-  async createDraftBlogPostWithTitle(draftBlogPostTitle: string): Promise<void> {
+  async createDraftBlogPostWithTitle(
+      draftBlogPostTitle: string
+  ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     /** Giving explicit timeout because we need to wait for small
      * transition to complete. We cannot wait for the next element to click
@@ -91,26 +93,29 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function deletes a draft blog post with given title.
    */
-  async deleteDraftBlogPostWithTitle(draftBlogPostTitle: string): Promise<void> {
-    const allDraftBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
+  async deleteDraftBlogPostWithTitle(
+      draftBlogPostTitle: string
+  ): Promise<void> {
+    const allDraftBlogPosts =
+      await this.page.$$('.blog-dashboard-tile-content');
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title', 
+        '.e2e-test-blog-post-title',
         element => (element as HTMLElement).innerText);
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
         await allDraftBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click());
-       /** Giving explicit timeout because we need to wait for small
-        * transition to complete. We cannot wait for the next element to click
-        * using its selector as it is instantly loaded in the DOM but cannot
-        * be clicked until the transition is completed.
-        */
+        /** Giving explicit timeout because we need to wait for small
+         * transition to complete. We cannot wait for the next element to click
+         * using its selector as it is instantly loaded in the DOM but cannot
+         * be clicked until the transition is completed.
+         */
         await this.page.waitForTimeout(100);
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector('div.modal-dialog');
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
-        showMessage('Draft blog post with given title deleted successfully!'); 
+        showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
     }
@@ -206,10 +211,11 @@ export default class BlogPostAdmin extends BaseUser {
       await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Published blog post with given title deleted successfully!');
     });
-    const allPublishedBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
+    const allPublishedBlogPosts =
+      await this.page.$$('.blog-dashboard-tile-content');
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title', 
+        '.e2e-test-blog-post-title',
         element => (element as HTMLElement).innerText);
       if (publishedBlogPostTitle === blogPostTitle) {
         await allPublishedBlogPosts[i].$eval(
@@ -223,13 +229,15 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function checks that the user is unable to publish a blog post.
    */
-  async expectUserUnableToPublishBlogPost(expectedWarningMessage: string): Promise<void> {
+  async expectUserUnableToPublishBlogPost(
+      expectedWarningMessage: string
+  ): Promise<void> {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
       el => el.textContent, toastMessageBox);
     const isPublishButtonDisabled = await this.page.$eval(
-      publishBlogPostButton, 
+      publishBlogPostButton,
       button => (button as HTMLButtonElement).disabled);
 
     if (!isPublishButtonDisabled) {
@@ -274,13 +282,16 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function checks a draft blog post to be created with the given title.
    */
-  async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle: string): Promise<void> {
+  async expectDraftBlogPostWithTitleToBePresent(
+      checkDraftBlogPostByTitle: string
+  ): Promise<void> {
     await this.goto(blogDashboardUrl);
-    const allDraftBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
+    const allDraftBlogPosts =
+      await this.page.$$('.blog-dashboard-tile-content');
     let count = 0;
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let draftBlogPostTitle = await allDraftBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title', 
+        '.e2e-test-blog-post-title',
         element => (element as HTMLElement).innerText);
       if (draftBlogPostTitle === checkDraftBlogPostByTitle) {
         count++;
@@ -302,14 +313,17 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function checks if the blog post with given title is published.
    */
-  async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle: string): Promise<void> {
+  async expectPublishedBlogPostWithTitleToBePresent(
+      blogPostTitle: string
+  ): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
-    const allPublishedBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
+    const allPublishedBlogPosts =
+      await this.page.$$('.blog-dashboard-tile-content');
     let count = 0;
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
-        '.e2e-test-blog-post-title', 
+        '.e2e-test-blog-post-title',
         element => (element as HTMLElement).innerText);
       if (publishedBlogPostTitle === blogPostTitle) {
         count++;
@@ -360,7 +374,10 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function assigns a user with a role from the blog admin page.
    */
-  async assignUserToRoleFromBlogAdminPage(username: string, role: string): Promise<void> {
+  async assignUserToRoleFromBlogAdminPage(
+      username: string,
+      role: string
+  ): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
@@ -379,7 +396,7 @@ export default class BlogPostAdmin extends BaseUser {
   /**
    * This function changes the blog tags limit.
    */
-  async setMaximumTagLimitTo(limit: number) {
+  async setMaximumTagLimitTo(limit: number): Promise<void> {
     // These steps are for deleting the existing value in the input field.
     const tagInputField = await this.page.$(maximumTagLimitInput);
     await tagInputField?.click({ clickCount: 3 });
@@ -396,7 +413,7 @@ export default class BlogPostAdmin extends BaseUser {
    */
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
-      maximumTagLimitInput, 
+      maximumTagLimitInput,
       element => (element as HTMLInputElement).valueAsNumber);
     if (tagLimit === limit) {
       throw new Error(`Maximum tag limit is already ${limit}!`);
@@ -409,11 +426,11 @@ export default class BlogPostAdmin extends BaseUser {
    */
   async expectMaximumTagLimitToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
-      maximumTagLimitInput, 
+      maximumTagLimitInput,
       element => (element as HTMLInputElement).valueAsNumber);
     if (tagLimit !== limit) {
       throw new Error(`Maximum tag limit is not ${limit}!`);
     }
     showMessage(`Maximum tag is currently ${limit}!`);
   }
-};
+}

@@ -125,11 +125,11 @@ export default class LoggedInUsers extends BaseUser {
    * Function to click a button and check if it opens the expected destination.
    */
   async clickButtonToNavigateToNewPage(
-    button: string,
-    buttonName: string,
-    expectedDestinationPageUrl: string,
-    expectedDestinationPageName: string
-  ) {
+      button: string,
+      buttonName: string,
+      expectedDestinationPageUrl: string,
+      expectedDestinationPageName: string
+  ): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn(button),
@@ -391,7 +391,8 @@ export default class LoggedInUsers extends BaseUser {
    * Function to click the Consider Becoming A Partner Today! link
    * in the About Foundation page and check if it opens the Partnerships page.
    */
-  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation(): Promise<void> {
+  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation():
+    Promise<void> {
     await this.page.waitForSelector(sectionSixPart1);
     const buttonText = await this.page.$eval(
       sectionSixPart1,
@@ -420,7 +421,8 @@ export default class LoggedInUsers extends BaseUser {
    * Function to click the Join our large volunteer community! link
    * in the About Foundation page and check if it opens the Volunteer page.
    */
-  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation(): Promise<void> {
+  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation():
+    Promise<void> {
     await this.page.waitForSelector(sectionSixPart2);
     const buttonText = await this.page.$eval(
       sectionSixPart2,
@@ -615,4 +617,4 @@ export default class LoggedInUsers extends BaseUser {
         'and if the Donate page is shown.');
     }
   }
-};
+}

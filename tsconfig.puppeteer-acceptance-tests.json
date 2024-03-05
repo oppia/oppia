@@ -10,7 +10,7 @@
     "outDir": "core/tests/puppeteer-acceptance-tests/build",
     "typeRoots": [
       "node_modules/@types",
-      "core/tests"
+      "typings"
     ],
     "types": [
       "node",

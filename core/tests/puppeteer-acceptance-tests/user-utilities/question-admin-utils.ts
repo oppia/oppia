@@ -16,7 +16,7 @@
  * @fileoverview Question admin users utility file.
  */
 
-import BaseUser from 
+import BaseUser from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -164,7 +164,10 @@ export default class QuestionAdmin extends BaseUser {
   /**
    * Function to return the contribution rights status for the user.
    */
-  async getContributionStatusForUser(username: string, contribution: string): Promise<string> {
+  async getContributionStatusForUser(
+      username: string,
+      contribution: string
+  ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
@@ -183,9 +186,8 @@ export default class QuestionAdmin extends BaseUser {
    * Function to check if the user has the right to review questions
    */
   async verifyUserCanReviewQuestions(username: string): Promise<void> {
-    const questionReviewStatusForUser = await
-      this.getContributionStatusForUser(
-        username, viewContributorReviewQuestionsResult);
+    const questionReviewStatusForUser = await this.getContributionStatusForUser(
+      username, viewContributorReviewQuestionsResult);
 
     if (questionReviewStatusForUser === 'Not-allowed') {
       throw new Error(
@@ -200,9 +202,8 @@ export default class QuestionAdmin extends BaseUser {
    * Function to check if the user has the right to submit questions
    */
   async verifyUserCanSubmitQuestions(username: string): Promise<void> {
-    const questionSubmitStatusForUser = await
-      this.getContributionStatusForUser(
-        username, viewContributorSubmitQuestionResult);
+    const questionSubmitStatusForUser = await this.getContributionStatusForUser(
+      username, viewContributorSubmitQuestionResult);
 
     if (questionSubmitStatusForUser === 'Not-allowed') {
       throw new Error(
@@ -217,9 +218,8 @@ export default class QuestionAdmin extends BaseUser {
    * Function to check if the user doesn't have the right to review questions
    */
   async verifyUserCannotReviewQuestions(username: string): Promise<void> {
-    const questionReviewStatusForUser = await
-      this.getContributionStatusForUser(
-        username, viewContributorReviewQuestionsResult);
+    const questionReviewStatusForUser = await this.getContributionStatusForUser(
+      username, viewContributorReviewQuestionsResult);
 
     if (questionReviewStatusForUser === 'Allowed') {
       throw new Error(
@@ -234,9 +234,8 @@ export default class QuestionAdmin extends BaseUser {
    * Function to check if the user doesn't have the right to submit questions
    */
   async verifyUserCannotSubmitQuestions(username: string): Promise<void> {
-    const questionSubmitStatusForUser = await
-      this.getContributionStatusForUser(
-        username, viewContributorSubmitQuestionResult);
+    const questionSubmitStatusForUser = await this.getContributionStatusForUser(
+      username, viewContributorSubmitQuestionResult);
 
     if (questionSubmitStatusForUser === 'Allowed') {
       throw new Error(
@@ -294,4 +293,4 @@ export default class QuestionAdmin extends BaseUser {
         `${username} has the right to submit questions!`);
     }
   }
-};
+}

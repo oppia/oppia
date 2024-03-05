@@ -20,7 +20,7 @@ import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
 import SuperAdmin from '../../user-utilities/super-admin-utils';
 import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
-import testConstants from 
+import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
