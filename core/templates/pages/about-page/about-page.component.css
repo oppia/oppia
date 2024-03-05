@@ -544,7 +544,7 @@
   }
 }
 @media (max-width: 698px) {
-  .oppia-about-button .about-page {
+  .about-page .oppia-about-button {
     padding: 1px;
   }
   .oppia-about-page-section-one .oppia-about-title {
