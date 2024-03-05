@@ -358,7 +358,7 @@ class ReviewableOpportunitiesHandler(
         #    explorations in published stories (see step 1).
         # 3. Fetch all exploration opportunity summaries for the resulting set
         #    of explorations.
-        # 4. Moved any pinned summaries to the top.
+        # 4. Move any pinned summaries to the top.
 
         pinned_opportunity_summary = None
         if topic_name is None:
