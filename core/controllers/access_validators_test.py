@@ -20,6 +20,7 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
+from core.domain import caching_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import config_services
@@ -35,8 +36,10 @@ from typing import Final
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
+    from mypy_imports import skill_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
     feconf.ACCESS_VALIDATION_HANDLER_PREFIX
@@ -490,7 +493,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-        self.admin_id = self.get_user_if_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -537,6 +540,13 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
 
     def test_skill_editor_page_fails(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        self.get_json(self.url, expected_status_int=404)
+        skill_model = skill_models.SkillModel.get(self.skill_id)
+        skill_model.delete(self.admin_id, 'Delete skill model.')
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id])
+        self.get_json(
+            '%s/can_access_skill_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=404
+        )
         self.logout()
