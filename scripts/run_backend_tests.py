@@ -603,7 +603,43 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
+        print('')
+        print(
+            '+-------------------------------------------------------------'
+            '--------------------------------------------------------------'
+            '-------+'
+            )
+        print(
+            '|----------------------------------------- '
+            'SUMMARY OF THE FILES WITH INCOMPLETE COVERAGE '
+            '------------------------------------------|'
+            )
+        print(
+            '+---------------------------------------------------------------'
+            '-------------------------------------------------------------'
+            '------+'
+            )
+        print('')
         print(report_stdout)
+        if coverage != 100:
+            print(
+                'WARNING: Backend test coverage is below 100%.'
+                ' The rightmost "Missing" column above '
+                'shows which lines are uncovered.'
+                )
+
+            print(
+                'Please add tests for scenarios that exercise '
+                'those lines of code so that there are no uncovered '
+                'lines in each file.'
+                )
+
+            print(
+                'For more information, please see the '
+                '[backend tests wiki page]'
+                '(https://github.com/oppia/oppia/wiki/'
+                'Backend-tests#coverage-reports ).'
+                )
 
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
@@ -659,6 +695,25 @@ def check_coverage(
     process = subprocess.run(
         cmd, capture_output=True, encoding='utf-8', env=env,
         check=False)
+
+    not_covered_lines = []
+    is_first_line = True
+    output_lines = process.stdout.split('\n')
+
+    for index, line in enumerate(output_lines):
+        if line and (' 100%' not in line and '-----' not in line
+         and 'Name' not in line):
+            if is_first_line and index > 0:
+                not_covered_lines.append(output_lines[0])
+                not_covered_lines.append(output_lines[1])
+                is_first_line = False
+            not_covered_lines.append(line)
+            if index + 1 < len(output_lines):
+                if ' 100%' not in output_lines[index + 1]:
+                    not_covered_lines.append(output_lines[1])
+
+    not_covered_lines_output = '\n'.join(not_covered_lines)
+
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the
         # --omit flag or .coveragerc.
@@ -676,6 +731,7 @@ def check_coverage(
             float(coverage_result.group('total')) if coverage_result else 0.0
         )
 
+    process.stdout = not_covered_lines_output
     return process.stdout, coverage
 
 
