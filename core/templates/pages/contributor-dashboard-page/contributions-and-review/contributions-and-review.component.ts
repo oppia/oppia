@@ -270,11 +270,13 @@ export class ContributionsAndReview
 
   getTranslationContentLength(contentHtml: string | string[]): number {
     if (typeof contentHtml === 'string') {
-      return this.htmlLengthService.computeHtmlLengthInWords(contentHtml);
+      return this.htmlLengthService.computeHtmlLength(
+        contentHtml, CALCULATION_TYPE_WORD);
     } else if (Array.isArray(contentHtml)) {
       let totalLength = 0;
       for (const str of contentHtml) {
-        totalLength += this.htmlLengthService.computeHtmlLengthInWords(str);
+        totalLength += this.htmlLengthService.computeHtmlLength(
+          str, CALCULATION_TYPE_WORD);
       }
       return totalLength;
     }
