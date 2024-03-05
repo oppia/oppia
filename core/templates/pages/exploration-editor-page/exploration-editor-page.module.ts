@@ -16,23 +16,13 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
 
 import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatMenuModule } from '@angular/material/menu';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
@@ -41,7 +31,6 @@ import { SaveValidationFailModalComponent } from './modal-templates/save-validat
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StateDiffModalComponent } from './modal-templates/state-diff-modal.component';
 import { PostPublishModalComponent } from './modal-templates/post-publish-modal.component';
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
@@ -63,8 +52,6 @@ import { PreviewSetParametersModalComponent } from './preview-tab/templates/prev
 import { CheckRevertExplorationModalComponent } from './history-tab/modal-templates/check-revert-exploration-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
 import { ExplorationMetadataDiffModalComponent } from './modal-templates/exploration-metadata-diff-modal.component';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { ExplorationTitleEditorComponent } from './exploration-title-editor/exploration-title-editor.component';
 import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
 import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
@@ -99,22 +86,30 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
 import { ValueGeneratorEditorComponent } from './param-changes-editor/value-generator-editor.component';
 import { ParamChangesEditorComponent } from './param-changes-editor/param-changes-editor.component';
 import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-page/exploration-player-viewer-common.module';
+import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
+import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
+import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
+import { ExplorationEditorPageRootComponent } from './exploration-editor-page.root.component';
+import { CommonModule } from '@angular/common';
+import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
+    RouterModule.forChild(
+      [{ path: '', component: ExplorationEditorPageRootComponent }]
+    ),
     InteractionExtensionsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatMenuModule,
     FormsModule,
     MatPaginatorModule,
-    RouterModule.forRoot([]),
     JoyrideModule.forRoot(),
     SharedComponentsModule,
     ExplorationPlayerViewerCommonModule,
@@ -185,7 +180,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
     ExplorationEditorPageComponent,
-    StateVersionHistoryComponent
+    StateVersionHistoryComponent,
+    ExplorationEditorPageRootComponent
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
@@ -252,60 +248,9 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     TranslationTabComponent,
     ExplorationEditorPageComponent,
     StateVersionHistoryComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
   ]
 })
-class ExplorationEditorPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+export class ExplorationEditorPageModule {
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
-import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-page/exploration-player-viewer-common.module';
-import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
-import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
-import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationEditorPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);

@@ -299,6 +299,15 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/blog-post-page/blog-post-page.module')
       .then(m => m.BlogPostPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/exploration-editor-page/exploration-editor-page.module')
+      .then(m => m.ExplorationEditorPageModule)
   }
 ];
 
@@ -309,7 +318,7 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
     path: AppConstants.STEWARDS_LANDING_PAGE.ROUTES[i],
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module').then(
-      m => m.VolunteerPageModule)
+        m => m.VolunteerPageModule)
   });
 }
 
@@ -333,7 +342,7 @@ routes.push(
       .ERROR.ROUTE}/:status_code`,
     loadChildren: () => import(
       'pages/error-pages/error-page.module').then(
-      m => m.ErrorPageModule)
+        m => m.ErrorPageModule)
   },
   // '**' wildcard route must be kept at the end,as it can override all other
   // routes.
@@ -342,7 +351,7 @@ routes.push(
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-page.module').then(
-      m => m.ErrorPageModule)
+        m => m.ErrorPageModule)
   }
 );
 
@@ -360,4 +369,4 @@ routes.push(
     }
   ]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
