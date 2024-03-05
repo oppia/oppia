@@ -30,7 +30,7 @@ let testConstants = {
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
-    ContributorDashboardAdmin: 'http://localhost:8181/contributor-dashboard-admin/',
+    ContributorDashboardAdmin: 'http://localhost:8181/contributor-admin-dashboard',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode: 'http://localhost:8181/creator-dashboard?mode=create',
     Donate: 'http://localhost:8181/donate',
