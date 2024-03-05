@@ -288,37 +288,36 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(
             check_mock_function_calls['recursive_chmod_is_called'])
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_buf_is_not_reinstalled(self) -> None:
-    #     check_mock_functions_are_not_called = {
-    #         'url_retrieve_is_not_called': True,
-    #         'recursive_chmod_is_not_called': True,
-    #     }
+    def test_buf_is_not_reinstalled(self) -> None:
+        check_mock_functions_are_not_called = {
+            'url_retrieve_is_not_called': True,
+            'recursive_chmod_is_not_called': True,
+        }
 
-    #     def mock_url_retrieve(url: str, filename: str) -> None: # pylint: disable=unused-argument
-    #         check_mock_functions_are_not_called[
-    #             'url_retrieve_is_not_called'] = False
-    #     def mock_recursive_chmod(unused_fname: str, mode: str) -> None: # pylint: disable=unused-argument
-    #         check_mock_functions_are_not_called[
-    #             'recursive_chmod_is_not_called'] = False
-    #     def mock_exists(unused_fname: str) -> bool:
-    #         return True
+        def mock_url_retrieve(url: str, filename: str) -> None: # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'url_retrieve_is_not_called'] = False
+        def mock_recursive_chmod(unused_fname: str, mode: str) -> None: # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'] = False
+        def mock_exists(unused_fname: str) -> bool:
+            return True
 
-    #     url_retrieve_swap = self.swap(
-    #         common, 'url_retrieve', mock_url_retrieve)
-    #     recursive_chmod_swap = self.swap(
-    #         common, 'recursive_chmod', mock_recursive_chmod)
-    #     exists_swap = self.swap(os.path, 'exists', mock_exists)
+        url_retrieve_swap = self.swap(
+            common, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-    #     with url_retrieve_swap, recursive_chmod_swap:
-    #         with self.dir_exists_swap, exists_swap:
-    #             install_third_party_libs.install_buf_and_protoc()
+        with url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, exists_swap:
+                install_third_party_libs.install_buf_and_protoc()
 
-    #     self.assertTrue(
-    #         check_mock_functions_are_not_called['url_retrieve_is_not_called'])
-    #     self.assertTrue(
-    #         check_mock_functions_are_not_called[
-    #             'recursive_chmod_is_not_called'])
+        self.assertTrue(
+            check_mock_functions_are_not_called['url_retrieve_is_not_called'])
+        self.assertTrue(
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'])
 
     def test_installing_protoc_raises_exception_if_fails_to_extract(
         self
@@ -381,172 +380,169 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 
-    # TODO(#18260): Remove this when we permanently move to the
-    # Dockerized Setup.
-    # def test_function_calls(self) -> None:
-    #     check_function_calls = {
-    #         'install_third_party_main_is_called': False,
-    #         'setup_main_is_called': False,
-    #         'setup_gae_main_is_called': False,
-    #         'pre_commit_hook_main_is_called': False,
-    #         'pre_push_hook_main_is_called': False,
-    #         'tweak_yarn_executable_is_called': False
-    #     }
-    #     expected_check_function_calls = {
-    #         'install_third_party_main_is_called': True,
-    #         'setup_main_is_called': True,
-    #         'setup_gae_main_is_called': True,
-    #         'pre_commit_hook_main_is_called': True,
-    #         'pre_push_hook_main_is_called': True,
-    #         'tweak_yarn_executable_is_called': False
-    #     }
-    #     def mock_check_call(unused_cmd_tokens: List[str]) -> None:
-    #         pass
-    #     def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['install_third_party_main_is_called'] = True
-    #     def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['setup_main_is_called'] = True
-    #     def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['setup_gae_main_is_called'] = True
-    #     def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['pre_commit_hook_main_is_called'] = True
-    #     def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['pre_push_hook_main_is_called'] = True
-    #     def mock_tweak_yarn_executable() -> None:
-    #         check_function_calls['tweak_yarn_executable_is_called'] = True
+    def test_function_calls(self) -> None:
+        check_function_calls = {
+            'install_third_party_main_is_called': False,
+            'setup_main_is_called': False,
+            'setup_gae_main_is_called': False,
+            'pre_commit_hook_main_is_called': False,
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': False
+        }
+        expected_check_function_calls = {
+            'install_third_party_main_is_called': True,
+            'setup_main_is_called': True,
+            'setup_gae_main_is_called': True,
+            'pre_commit_hook_main_is_called': True,
+            'pre_push_hook_main_is_called': True,
+            'tweak_yarn_executable_is_called': False
+        }
+        def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+            pass
+        def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['install_third_party_main_is_called'] = True
+        def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['setup_main_is_called'] = True
+        def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['setup_gae_main_is_called'] = True
+        def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['pre_commit_hook_main_is_called'] = True
+        def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['pre_push_hook_main_is_called'] = True
+        def mock_tweak_yarn_executable() -> None:
+            check_function_calls['tweak_yarn_executable_is_called'] = True
 
-    #     correct_google_path = os.path.join(
-    #         common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-    #     def mock_isdir(path: str) -> bool:
-    #         directories_that_do_not_exist = {
-    #             os.path.join(correct_google_path, 'appengine'),
-    #             os.path.join(correct_google_path, 'net'),
-    #             os.path.join(correct_google_path, 'pyglib'),
-    #             correct_google_path
-    #         }
-    #         if path in directories_that_do_not_exist:
-    #             return False
-    #         return True
-    #     initialized_directories = []
-    #     def mock_mkdir(path: str) -> None:
-    #         initialized_directories.append(path)
+        correct_google_path = os.path.join(
+            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        def mock_isdir(path: str) -> bool:
+            directories_that_do_not_exist = {
+                os.path.join(correct_google_path, 'appengine'),
+                os.path.join(correct_google_path, 'net'),
+                os.path.join(correct_google_path, 'pyglib'),
+                correct_google_path
+            }
+            if path in directories_that_do_not_exist:
+                return False
+            return True
+        initialized_directories = []
+        def mock_mkdir(path: str) -> None:
+            initialized_directories.append(path)
 
-    #     copied_src_dst_tuples = []
-    #     def mock_copytree(src: str, dst: str) -> None:
-    #         copied_src_dst_tuples.append((src, dst))
+        copied_src_dst_tuples = []
+        def mock_copytree(src: str, dst: str) -> None:
+            copied_src_dst_tuples.append((src, dst))
 
-    #     correct_copied_src_dst_tuples = [
-    #         (
-    #             os.path.join(
-    #                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
-    #             os.path.join(correct_google_path, 'appengine')),
-    #         (
-    #             os.path.join(
-    #                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-    #             os.path.join(correct_google_path, 'net')),
-    #         (
-    #             os.path.join(
-    #                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
-    #             os.path.join(correct_google_path, 'pyglib'))
-    #     ]
+        correct_copied_src_dst_tuples = [
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                os.path.join(correct_google_path, 'appengine')),
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+                os.path.join(correct_google_path, 'net')),
+            (
+                os.path.join(
+                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                os.path.join(correct_google_path, 'pyglib'))
+        ]
 
-    #     swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
-    #     swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
-    #     swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
-    #     check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-    #     install_third_party_main_swap = self.swap(
-    #         install_third_party, 'main', mock_main_for_install_third_party)
-    #     setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
-    #     setup_gae_main_swap = self.swap(
-    #         setup_gae, 'main', mock_main_for_setup_gae)
-    #     pre_commit_hook_main_swap = self.swap(
-    #         pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
-    #     pre_push_hook_main_swap = self.swap(
-    #         pre_push_hook, 'main', mock_main_for_pre_push_hook)
-    #     tweak_yarn_executable_swap = self.swap(
-    #         install_third_party_libs, 'tweak_yarn_executable',
-    #         mock_tweak_yarn_executable)
+        swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
+        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
+        swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        install_third_party_main_swap = self.swap(
+            install_third_party, 'main', mock_main_for_install_third_party)
+        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
+        setup_gae_main_swap = self.swap(
+            setup_gae, 'main', mock_main_for_setup_gae)
+        pre_commit_hook_main_swap = self.swap(
+            pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
+        pre_push_hook_main_swap = self.swap(
+            pre_push_hook, 'main', mock_main_for_pre_push_hook)
+        tweak_yarn_executable_swap = self.swap(
+            install_third_party_libs, 'tweak_yarn_executable',
+            mock_tweak_yarn_executable)
 
-    #     with check_call_swap, self.Popen_swap:
-    #         with install_third_party_main_swap, setup_main_swap:
-    #             with setup_gae_main_swap, pre_commit_hook_main_swap:
-    #                 with pre_push_hook_main_swap, tweak_yarn_executable_swap:
-    #                     with swap_isdir, swap_mkdir, swap_copytree:
-    #                         install_third_party_libs.main()
-    #     self.assertEqual(check_function_calls, expected_check_function_calls)
+        with check_call_swap, self.Popen_swap:
+            with install_third_party_main_swap, setup_main_swap:
+                with setup_gae_main_swap, pre_commit_hook_main_swap:
+                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
+                        with swap_isdir, swap_mkdir, swap_copytree:
+                            install_third_party_libs.main()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    #     self.assertEqual(
-    #         copied_src_dst_tuples, correct_copied_src_dst_tuples)
+        self.assertEqual(
+            copied_src_dst_tuples, correct_copied_src_dst_tuples)
 
-    #     self.assertEqual(
-    #         initialized_directories,
-    #         [correct_google_path])
+        self.assertEqual(
+            initialized_directories,
+            [correct_google_path])
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_function_calls_on_windows(self) -> None:
-    #     check_function_calls = {
-    #         'install_third_party_main_is_called': False,
-    #         'setup_main_is_called': False,
-    #         'setup_gae_main_is_called': False,
-    #         'pre_commit_hook_main_is_called': False,
-    #         'pre_push_hook_main_is_called': False,
-    #         'tweak_yarn_executable_is_called': False
-    #     }
-    #     expected_check_function_calls = {
-    #         'install_third_party_main_is_called': True,
-    #         'setup_main_is_called': True,
-    #         'setup_gae_main_is_called': True,
-    #         'pre_commit_hook_main_is_called': True,
-    #         'pre_push_hook_main_is_called': False,
-    #         'tweak_yarn_executable_is_called': True
-    #     }
-    #     def mock_check_call(unused_cmd_tokens: List[str]) -> None:
-    #         pass
-    #     def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['install_third_party_main_is_called'] = True
-    #     def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['setup_main_is_called'] = True
-    #     def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['setup_gae_main_is_called'] = True
-    #     def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['pre_commit_hook_main_is_called'] = True
-    #     def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
-    #         check_function_calls['pre_push_hook_main_is_called'] = True
-    #     def mock_tweak_yarn_executable() -> None:
-    #         check_function_calls['tweak_yarn_executable_is_called'] = True
+    def test_function_calls_on_windows(self) -> None:
+        check_function_calls = {
+            'install_third_party_main_is_called': False,
+            'setup_main_is_called': False,
+            'setup_gae_main_is_called': False,
+            'pre_commit_hook_main_is_called': False,
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': False
+        }
+        expected_check_function_calls = {
+            'install_third_party_main_is_called': True,
+            'setup_main_is_called': True,
+            'setup_gae_main_is_called': True,
+            'pre_commit_hook_main_is_called': True,
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': True
+        }
+        def mock_check_call(unused_cmd_tokens: List[str]) -> None:
+            pass
+        def mock_main_for_install_third_party(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['install_third_party_main_is_called'] = True
+        def mock_main_for_setup(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['setup_main_is_called'] = True
+        def mock_main_for_setup_gae(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['setup_gae_main_is_called'] = True
+        def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['pre_commit_hook_main_is_called'] = True
+        def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+            check_function_calls['pre_push_hook_main_is_called'] = True
+        def mock_tweak_yarn_executable() -> None:
+            check_function_calls['tweak_yarn_executable_is_called'] = True
 
-    #     check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-    #     install_third_party_main_swap = self.swap(
-    #         install_third_party, 'main', mock_main_for_install_third_party)
-    #     setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
-    #     setup_gae_main_swap = self.swap(
-    #         setup_gae, 'main', mock_main_for_setup_gae)
-    #     pre_commit_hook_main_swap = self.swap(
-    #         pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
-    #     pre_push_hook_main_swap = self.swap(
-    #         pre_push_hook, 'main', mock_main_for_pre_push_hook)
-    #     tweak_yarn_executable_swap = self.swap(
-    #         install_third_party_libs, 'tweak_yarn_executable',
-    #         mock_tweak_yarn_executable)
-    #     os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        install_third_party_main_swap = self.swap(
+            install_third_party, 'main', mock_main_for_install_third_party)
+        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
+        setup_gae_main_swap = self.swap(
+            setup_gae, 'main', mock_main_for_setup_gae)
+        pre_commit_hook_main_swap = self.swap(
+            pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
+        pre_push_hook_main_swap = self.swap(
+            pre_push_hook, 'main', mock_main_for_pre_push_hook)
+        tweak_yarn_executable_swap = self.swap(
+            install_third_party_libs, 'tweak_yarn_executable',
+            mock_tweak_yarn_executable)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
 
-    #     py_actual_text = (
-    #         'ConverterMapping,\nLine ending with '
-    #         '"ConverterMapping",\nOther Line\n')
-    #     temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
-    #     with utils.open_file(temp_py_config_file, 'w') as f:
-    #         f.write(py_actual_text)
+        py_actual_text = (
+            'ConverterMapping,\nLine ending with '
+            '"ConverterMapping",\nOther Line\n')
+        temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
+        with utils.open_file(temp_py_config_file, 'w') as f:
+            f.write(py_actual_text)
 
-    #     pq_actual_text = (
-    #         'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
-    #     temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
-    #     with utils.open_file(temp_pq_config_file, 'w') as f:
-    #         f.write(pq_actual_text)
+        pq_actual_text = (
+            'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
+        temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
+        with utils.open_file(temp_pq_config_file, 'w') as f:
+            f.write(pq_actual_text)
 
-    #     with check_call_swap, self.Popen_swap:
-    #         with install_third_party_main_swap, setup_main_swap:
-    #             with setup_gae_main_swap, pre_commit_hook_main_swap:
-    #                 with pre_push_hook_main_swap, tweak_yarn_executable_swap:
-    #                     with os_name_swap:
-    #                         install_third_party_libs.main()
-    #     self.assertEqual(check_function_calls, expected_check_function_calls)
+        with check_call_swap, self.Popen_swap:
+            with install_third_party_main_swap, setup_main_swap:
+                with setup_gae_main_swap, pre_commit_hook_main_swap:
+                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
+                        with os_name_swap:
+                            install_third_party_libs.main()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
