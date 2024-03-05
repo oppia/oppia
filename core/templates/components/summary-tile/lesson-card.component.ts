@@ -55,6 +55,7 @@ export class LessonCardComponent implements OnInit{
       let topicFragment = this.story.getTopicUrlFragment();
 
       //check if undefined needs to be tested 
+      let temp = `/explore/${currentStory.getExplorationId()}`
       this.lessonUrl = ((classFragment === undefined || topicFragment === undefined ) ?
         '#'
       :
@@ -63,9 +64,9 @@ export class LessonCardComponent implements OnInit{
           classroom_url_fragment: classFragment,
           story_url_fragment: this.story.getUrlFragment(),
           node_id: currentStory.getId()
-        }).map(([key, value]) => this.urlService.addField('', key, value)).join('')
+        }).map(([key, value]) => `${key}=${value}`).join('&')
       );
-
+        console.log(this.lessonUrl)
       //Must be a better way to do this (remove getNodeTitles())
       this.title =`Chapter ${completedStories + 1}: ${this.story.getNodeTitles()[completedStories]}`;
       this.progress = Math.floor(completedStories / this.story.getNodeTitles().length * 100);

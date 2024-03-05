@@ -104,8 +104,8 @@
         <!--tbd 2 - handling how exploratitons & topics are sorted by the most recent, add gap-4, temporarily mr-4 -->
         <!--tbd 3 - explorations are only retrieved when clicking on community lessons, can't calculate total number of cards for widht -->
         <ng-template #continueTiles>
-          <div class="d-flex mt-4"> 
-            <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
+          <div class="d-flex mt-4 subsection-container"> 
+            <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
               <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
                 <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [featureFlag]="featureFlag" [displayArea]="'homeTab'"
                   [topicName]="topicSummaryTile.name">
