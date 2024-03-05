@@ -72,6 +72,15 @@
 .oppia-follow-github-icon {
   color: #000;
 }
+.oppia-footer-social .oppia-footer-social-icons .oppia-linkedin-follow {
+  background: #0077b5;
+  border-radius: 8px;
+  margin-right: 6px;
+  padding: 10px 10px;
+}
+.oppia-follow-linkedin-icon {
+  color: #fff;
+}
 .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
   border-radius: 5px;
   bottom: -7px;
@@ -85,6 +94,7 @@
   position: relative;
 }
 
+.oppia-footer-social .oppia-linkedin-follow:hover,
 .oppia-footer-social .oppia-youtube-follow:hover,
 .oppia-footer-social .oppia-facebook-follow:hover,
 .oppia-footer-social .oppia-twitter-follow:hover,
