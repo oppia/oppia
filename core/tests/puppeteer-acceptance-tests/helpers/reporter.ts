@@ -108,19 +108,6 @@ let specFailureTrace = function(
   printNewline();
   print(failedSpecNumber + '. ' + result.fullName);
   printSpecLog(result);
-
-  /*
-  if (result.trace) {
-    printNewline();
-    print('Trace:');
-    printNewline();
-
-    for (const entry of result.trace) {
-      print(`${entry.timestamp}ms: ${entry.message}`);
-      printNewline();
-    }
-  }
-  */
 };
 
 let suiteFailureTrace = function(result: SuiteFailureResult | jasmine.SuiteResult): void {
