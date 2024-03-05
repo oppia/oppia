@@ -68,6 +68,8 @@ export class HomeTabComponent {
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
+    console.log(this.untrackedTopics)
+    console.log(this.partiallyLearntTopicsList)
     /**
      * tbd 1- Replace
      * const mappedGoals = allGoals.reduce((acc, curr) => ({...acc,[curr.id] : curr}), {})
