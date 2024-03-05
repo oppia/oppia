@@ -65,6 +65,13 @@ _PARSER.add_argument(
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    build_dir_path = os.path.join(puppeteer_acceptance_tests_dir_path, 'build')
+
+    if os.path.exists(build_dir_path):
+        shutil.rmtree(build_dir_path)
+
     cmd = (
         './node_modules/typescript/bin/tsc -p %s' %
         './tsconfig.puppeteer-acceptance-tests.json')
@@ -76,10 +83,6 @@ def compile_test_ts_files() -> None:
 
     if stderr:
         raise Exception(stderr)
-
-    puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
-    build_dir_path = os.path.join(puppeteer_acceptance_tests_dir_path, 'build')
 
     shutil.copytree(
         os.path.join(puppeteer_acceptance_tests_dir_path, 'images'),

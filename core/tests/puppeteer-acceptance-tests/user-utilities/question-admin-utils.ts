@@ -131,10 +131,12 @@ export default class QuestionAdmin extends BaseUser {
     await this.page.waitForNetworkIdle();
 
     await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
+    const displayedUsersText = await this.page.$eval(
       viewRoleUserResult,
       element => (element as HTMLElement).innerText
     );
+    const displayedUsers =
+      displayedUsersText.replace('Usernames:', '').trim();
     return JSON.parse(displayedUsers);
   }
 
@@ -150,10 +152,12 @@ export default class QuestionAdmin extends BaseUser {
     await this.page.waitForNetworkIdle();
 
     await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
+    const displayedUsersText = await this.page.$eval(
       viewRoleUserResult,
       element => (element as HTMLElement).innerText
     );
+    const displayedUsers =
+      displayedUsersText.replace('Usernames:', '').trim();
     return JSON.parse(displayedUsers);
   }
 

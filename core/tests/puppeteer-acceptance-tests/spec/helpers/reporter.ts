@@ -45,7 +45,7 @@ let printNewline = function(): void {
   print('\n');
 };
 
-let colored = function(color: string, str: string): string {
+let colored = function(color: keyof typeof ansi, str: string): string {
   return (ansi[color] + str + ansi.none);
 };
 
