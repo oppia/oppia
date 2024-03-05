@@ -68,6 +68,12 @@ export class HomeTabComponent {
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
+    /**
+     * tbd 1- Replace
+     * const mappedGoals = allGoals.reduce((acc, curr) => ({...acc,[curr.id] : curr}), {})
+     * const uniqueGoals = new Set(allGoals.map(goal => goal.id)).forEach(id => mappedGoals[id])
+     * tbd 2 - do I need currentGoals here?, just partiallyLearntTopicsList?
+     */
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
@@ -79,6 +85,7 @@ export class HomeTabComponent {
         this.continueWhereYouLeftOffList.push(allGoals[index]);
       }
     }
+    /***/
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
@@ -121,6 +128,7 @@ export class HomeTabComponent {
     return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
   }
 
+  /* redesign - remove */
   getWidth(length: number): number {
     /**
      * If there are 3 or more topics for each untrackedTopic, the total
@@ -137,16 +145,15 @@ export class HomeTabComponent {
      */
     return (length + 1) * 164;
   }
-
+  /* redesign - remove */
   changeActiveSection(): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
     );
   }
 
-  /**Testing */
+  /* redesign - testing */
   getImageUrl(arg): string {
-    return this.urlInterpolationService.getStaticImageUrl(
-      arg);
+    return this.urlInterpolationService.getStaticImageUrl(arg);
   }
 }
