@@ -55,7 +55,7 @@ import { SkillEditorPageRootComponent } from './skill-editor-page-root.component
     RouterModule.forChild([
       {
         path: '',
-        component: SkillEditorPageComponent,
+        component: SkillEditorPageRootComponent,
         canActivate: [SkillEditorAccessGuard]
       }
     ]),
