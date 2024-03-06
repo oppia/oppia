@@ -44,7 +44,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.showMessageOfSuccessfullExplrationCreation();
 
       await explorationCreator.goToSettingsTab();
-      await explorationCreator.updateTitle('Old Title');
+      await explorationCreator.addTitle('Old Title');
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectCategory();
       await explorationCreator.selectLanguage();
@@ -53,11 +53,11 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.publishExploration();
 
-      await explorationCreator.updateTitle('New Title');
+      await explorationCreator.addTitle('New Title');
       await explorationCreator.discardCurrentChanges();
       await explorationCreator.expectTitleToBe('Old Title');
 
-      await explorationCreator.updateTitle('New Title');
+      await explorationCreator.addTitle('New Title');
       await explorationCreator.saveDraftExploration();
       await explorationCreator.expectTitleToBe('Old TitleNew Title');
 

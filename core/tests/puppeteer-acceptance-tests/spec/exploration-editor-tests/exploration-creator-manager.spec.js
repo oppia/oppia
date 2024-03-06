@@ -69,7 +69,7 @@ describe('Exploration Creator', function() {
 
       await explorationCreator.goToSettingsTab();
 
-      await explorationCreator.updateTitle('Your Title Here');
+      await explorationCreator.addTitle('Your Title Here');
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
       await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');

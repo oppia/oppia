@@ -135,7 +135,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in updating Title.
    * @param {string} Title
    */
-  async updateTitle(Title) {
+  async addTitle(Title) {
     await this.clickOn(addTitleBar);
     await this.type(addTitle, Title);
   }
