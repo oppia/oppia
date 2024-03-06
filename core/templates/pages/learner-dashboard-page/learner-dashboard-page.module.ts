@@ -22,6 +22,7 @@ import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 
 import {LessonCardModule} from 'components/summary-tile/lesson-card.module';
+import {CardDisplayComponent} from './nav/card-display.component';
 import {LearnerStorySummaryTileComponent} from 'components/summary-tile/learner-story-summary-tile.component';
 import {LearnerTopicGoalsSummaryTileComponent} from 'components/summary-tile/learner-topic-goals-summary-tile.component';
 import {ProgressTabComponent} from './progress-tab.component';
@@ -55,6 +56,8 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ]),
   ],
   declarations: [
+    CardDisplayComponent,
+    LessonCardModule,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
     LearnerStorySummaryTileComponent,
@@ -72,6 +75,8 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
     ViewLearnerGroupDetailsModalComponent,
   ],
   entryComponents: [
+    CardDisplayComponent,
+    LessonCardModule,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,

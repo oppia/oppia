@@ -95,13 +95,8 @@
           ) | translate
         }}
       </p>
-      <div class="w-100">
-        <ng-container *ngIf="continueWhereYouLeftOffList.length === 0">
-          <p class="oppia-learner-dash-section-heading mb-0">
-            {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
-          </p>
-        </ng-container>
-        <div class="d-flex mt-4 subsection-container" *ngIf="continueWhereYouLeftOffList.length !== 0">
+      <div class="d-flex w-100" [ngClass]="(continueWhereYouLeftOffList.length + incompleteExplorationsList.length > 5 ? 'flex-wrap' : 'justify-content-between')"> 
+        <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [heading]="'Lessons in progress'" [numCards]="continueWhereYouLeftOffList.length" [tabType]="'home'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
@@ -113,6 +108,12 @@
             <lesson-card [story]="lesson"></lesson-card>
           </ng-container>
         </div>
+        </card-display>
+        <card-display [heading]="'Recommended for you'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
+            <lesson-card [story]="lesson"></lesson-card>
+          </ng-container>
+        </card-display>
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
