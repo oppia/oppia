@@ -45,7 +45,7 @@ export class CollectionPlayerAuthGuard implements CanActivate {
       state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      const collectionId = route.params.collection_id;
+      const collectionId = route.paramMap.get('collection_id') || '';
       this.accessValidationBackendApiService
         .validateAccessToCollectionPlayerPage(collectionId)
         .then(() => {
