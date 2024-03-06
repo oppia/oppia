@@ -23,6 +23,8 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const continueInteractionSelector = '.e2e-test-interaction-tile-Continue';
+const explorationCompletedMessage = 'div.toast-message';
+
 
 
 describe('Exploration Admin', function() {
@@ -33,19 +35,22 @@ describe('Exploration Admin', function() {
       'explorationAdm', 'exploration_creator@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to load, complete and restart an exploration',
+  it(`should be able to load, complete and restart an exploration preview.`,
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
       await explorationAdmin.createExploration(
-        'Test-revision', continueInteractionSelector);
-      await explorationAdmin.LoadExplorationWithQuestions();
+        'Exploration begins', continueInteractionSelector);
+      await explorationAdmin.LoadExplorationWithQuestions(2);
 
       await explorationAdmin.navigateToPreviewTab();
-      await explorationAdmin.expectTheExplorationToLoadInPreviewTab();
+      await explorationAdmin.expectTheExplorationToLoadInPreviewTab(
+        'Exploration begins');
       await explorationAdmin.completeTheExplorationInPreviewTab();
 
-      await explorationAdmin.expectTheExplorationToComplete();
-      await explorationAdmin.expectTheExplorationToRestart();
+      await explorationAdmin.expectTheExplorationToComplete(
+        explorationCompletedMessage);
+      await explorationAdmin.expectTheExplorationToRestart(
+        'Exploration begins');
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

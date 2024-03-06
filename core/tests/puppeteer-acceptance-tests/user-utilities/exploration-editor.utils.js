@@ -71,6 +71,10 @@ const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const closeMetadataModal = '.e2e-test-close-history-metadata-modal';
 const closeStateModal = '.e2e-test-close-history-state-modal';
+const oppiaResponseSelector = '.oppia-click-to-start-editing';
+const firstVersionOptionsButton = '#dropdownMenuButton-0';
+const secondVersionOptionsButton = '#dropdownMenuButton-1';
+
 
 // Preview tab elements.
 const testContinueButton = '.e2e-test-continue-button';
@@ -79,7 +83,6 @@ const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.e2e-preview-restart-button';
 const explorationConversationContent = '.e2e-test-conversation-content';
-const toastMessage = 'div.toast-message';
 
 // Settings tab elements.
 const explorationTitleInput = '.e2e-test-exploration-title-input';
@@ -105,7 +108,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.clickOn(stateEditSelector);
     await this.page.waitForSelector(
       explorationTextInput, { visible: true });
-    await this.type(explorationTextInput, `${text} 1`);
+    await this.type(explorationTextInput, `${text}`);
     await this.clickOn(saveContentButton);
 
     await this.page.waitForSelector(addInteractionButton);
@@ -179,13 +182,13 @@ module.exports = class explorationAdmin extends baseUser {
     let revisions = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async(el) => el.textContent);
+        revisionVersionNoSelector, async (el) => el.textContent);
       let notes = await element.$eval(
-        revisionNoteSelector, async(el) => el.textContent);
+        revisionNoteSelector, async (el) => el.textContent);
       let user = await element.$eval(
-        revisionUsernameSelector, async(el) => el.textContent);
+        revisionUsernameSelector, async (el) => el.textContent);
       let date = await element.$eval(
-        revisionDateSelector, async(el) => el.textContent);
+        revisionDateSelector, async (el) => el.textContent);
       revisions.push({ versionNo, notes, user, date });
     }
     return revisions;
@@ -202,13 +205,13 @@ module.exports = class explorationAdmin extends baseUser {
       throw new Error('No revisions found');
     }
     let versionNo = await element.$eval(
-      revisionVersionNoSelector, async(el) => el.textContent);
+      revisionVersionNoSelector, async (el) => el.textContent);
     let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
+      revisionNoteSelector, async (el) => el.textContent);
     let user = await element.$eval(
-      revisionUsernameSelector, async(el) => el.textContent);
+      revisionUsernameSelector, async (el) => el.textContent);
     let date = await element.$eval(
-      revisionDateSelector, async(el) => el.textContent);
+      revisionDateSelector, async (el) => el.textContent);
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
@@ -317,12 +320,12 @@ module.exports = class explorationAdmin extends baseUser {
   * */
   async downloadAndRevertRevision() {
     await this.page.waitForTimeout(1000);
-    await this.clickOn('#dropdownMenuButton-0');
+    await this.clickOn(firstVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
     await this.page.waitForTimeout(1000);
-    await this.clickOn('#dropdownMenuButton-1');
+    await this.clickOn(secondVersionDropdown);
     await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
     await this.page.click(confirmRevertVersionButton);
@@ -336,7 +339,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(versionsList);
     let element = await this.page.$(versionsList);
     let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
+      revisionNoteSelector, async (el) => el.textContent);
     showMessage(notes);
     await this.page.waitForTimeout(500);
     if (notes === ' Reverted exploration to version 14 ') {
@@ -352,7 +355,7 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async createNewCard(cardName) {
     await this.clickOn(openOutcomeDestButton);
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(500);
     await this.page.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput);
     await this.page.type(addStateInput, cardName);
@@ -403,8 +406,8 @@ module.exports = class explorationAdmin extends baseUser {
   async addResponsesToTheInteraction(response) {
     await this.page.waitForSelector(floatFormInput);
     await this.type(floatFormInput, response);
-    await this.page.waitForSelector('.oppia-click-to-start-editing');
-    await this.clickOn('.oppia-click-to-start-editing');
+    await this.page.waitForSelector(oppiaResponseSelector);
+    await this.clickOn(oppiaResponseSelector);
     await this.page.waitForSelector(explorationTextInput, { visible: true });
     await this.type(explorationTextInput, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -415,23 +418,19 @@ module.exports = class explorationAdmin extends baseUser {
   * Function for creating an exploration containing questions
   * @param {string} text - text of the exploration.
   */
-  async LoadExplorationWithQuestions() {
+  async LoadExplorationWithQuestions(numQuestions) {
     await this.clickOn('.oppia-response-header');
 
-    await this.createNewCard('Negative Numbers');
-    await this.goToNextCard(1);
-    await this.loadCardWithQuestion(
-      'mention a negaitve number greater than -100', numericInputSelector);
-    await this.addResponsesToTheInteraction('-99');
-
-    await this.createNewCard('Negative Number');
-    await this.goToNextCard(2);
-    await this.loadCardWithQuestion(
-      'mention a negative number greater than -5', numericInputSelector);
-    await this.addResponsesToTheInteraction('-4');
+    for (let i = 0; i < numQuestions; i++) {
+      await this.createNewCard(`Question ${i + 1}`);
+      await this.goToNextCard(i + 1);
+      await this.loadCardWithQuestion(
+        `mention a negative number greater than ${-100 - i}`, numericInputSelector);
+      await this.addResponsesToTheInteraction(`${-99 - i}`);
+    }
 
     await this.createNewCard('end');
-    await this.goToNextCard(3);
+    await this.goToNextCard(numQuestions + 1);
     await this.loadCardWithQuestion(
       'Exploration ends here', endInteractionSelector);
     await this.goToNextCard(0);
@@ -452,15 +451,15 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to verify if the exploration tab is loading correctly in
   * the preview tab or not.
   */
-  async expectTheExplorationToLoadInPreviewTab() {
+  async expectTheExplorationToLoadInPreviewTab(text) {
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
-    const text = await this.page.evaluate(
+    const introMessage = await this.page.evaluate(
       element => element.textContent, element);
-    if (text === 'Test-revision 1') {
-      showMessage('exploration is loading well in preview tab');
+    if (introMessage === text) {
+      showMessage('Exploration is loading correctly in preview tab');
     } else {
-      throw new Error('exploration is not loading in preview tab');
+      throw new Error('Exploration is not loading in preview tab');
     }
   }
 
@@ -475,22 +474,21 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(nextCardButton);
     await this.clickOn(nextCardButton);
     await this.page.waitForSelector(testFloatFormInput);
-    await this.type('.e2e-test-float-form-input', '-3');
+    await this.type(testFloatFormInput, '-3');
     await this.clickOn(submitAnswerButton);
     await this.page.waitForSelector(nextCardButton);
     await this.clickOn(nextCardButton);
-    showMessage('Exploration has completed Successfully');
   }
 
   /**
   * Function to verify if the exploration is completed in the preview tab.
   */
-  async expectTheExplorationToComplete() {
-    const element = await this.page.waitForSelector(toastMessage);
+  async expectTheExplorationToComplete(message) {
+    const element = await this.page.waitForSelector(message);
     if (element) {
-      showMessage('Journey completed successfully');
+      showMessage('Exploration has completed successfully');
     } else {
-      throw new Error('Journey did not complete successfully');
+      throw new Error('Exploration did not complete successfully');
     }
   }
 
@@ -498,18 +496,18 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to verify if the exploration is restarting after
   * getting completed or not.
   */
-  async expectTheExplorationToRestart() {
+  async expectTheExplorationToRestart(text) {
     await this.page.waitForTimeout(2000);
     await this.clickOn(explorationRestartButton);
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
-    const text = await this.page.evaluate(
+    const introMessage = await this.page.evaluate(
       element => element.textContent, element);
-    if (text === 'Test-revision 1') {
-      showMessage('exploration has restarted successfully');
+    if (introMessage === text) {
+      showMessage('Exploration has restarted successfully');
     } else {
-      throw new Error('exploration has not restarted successfully');
+      throw new Error('Exploration has not restarted successfully');
     }
   }
 };
