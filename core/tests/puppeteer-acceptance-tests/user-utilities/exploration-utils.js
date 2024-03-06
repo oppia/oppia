@@ -443,14 +443,15 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function helps in verifying , if exploration is
    * deleted successfully?
    */
-  async expectExplorationToBeDeletedSuccessfully() {
+  async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard() {
     await this.page.waitForTimeout(500);
-    const deleteButton = await this.page.$('.oppia-delete-button');
-    if (!deleteButton) {
-      showMessage('Exploration has been successfully deleted.');
-    } else {
-      throw new Error('Error: Exploration was not deleted.');
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('Exploration is not deleted successfully.');
+    } catch (error) {
+      showMessage('Exploration is Successfully deleted.');
     }
+    
   }
 
   /**

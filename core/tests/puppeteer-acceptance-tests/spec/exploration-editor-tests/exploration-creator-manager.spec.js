@@ -28,6 +28,7 @@ describe('Exploration Creator', function() {
   let guestUser2 = null;
   let guestUser3 = null;
   let explorationCreator = null;
+  let explorationVisitor = null;
   let superAdmin = null;
 
   beforeAll(async function() {
@@ -106,7 +107,8 @@ describe('Exploration Creator', function() {
       await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
-      await explorationCreator.expectExplorationToBeDeletedSuccessfully();
+      await explorationVisitor.
+      expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
