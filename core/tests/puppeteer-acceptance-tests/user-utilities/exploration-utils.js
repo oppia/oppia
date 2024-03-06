@@ -258,12 +258,16 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding tags.
-   * @param {string} TagName
+   * @param {Array} TagNames
    */
-  async addTags(TagName) {
-    await this.page.waitForTimeout(500);
+  async addTags(TagNames) {
     await this.clickOn(addTags);
-    await this.type(addTags, TagName);
+    await this.type(addTags, TagNames[0]);
+    await this.clickOn('.secondary-info-text');
+    await this.type(addTags, TagNames[1]);
+    await this.clickOn('.secondary-info-text');
+    await this.type(addTags, TagNames[2]);
+
   }
 
   async updateSettingsSuccessfully() {
@@ -288,7 +292,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
   async previewSummary() {
     await this.page.waitForSelector(
       '.e2e-test-open-preview-summary-modal:not([disabled])');
-    await this.clickOn('.e2e-test-open-preview-summary-modal');
     await this.clickOn(previewSummaryButton);
     await this.clickOn(dismissPreviewButton);
     await this.expectPreviewSummaryToBeVisible();

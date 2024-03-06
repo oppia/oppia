@@ -48,7 +48,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectCategory();
       await explorationCreator.selectLanguage();
-      await explorationCreator.addTags('Your Tag Here');
+      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
       await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.publishExploration();

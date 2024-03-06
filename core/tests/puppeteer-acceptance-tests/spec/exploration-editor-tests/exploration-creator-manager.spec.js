@@ -72,8 +72,8 @@ describe('Exploration Creator', function() {
       await explorationCreator.addTitle('Your Title Here');
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
-      await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
-      await explorationCreator.expectGoalToEqual('NeedSuccessInLifeAndMoney');
+      await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
+      await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
 
       await explorationCreator.selectCategory();
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
@@ -81,7 +81,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.selectLanguage();
       await explorationCreator.expectSelectedLanguageToBe('English');
 
-      await explorationCreator.addTags('Your Tag Here');
+      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
 
       await explorationCreator.updateSettingsSuccessfully();
 
