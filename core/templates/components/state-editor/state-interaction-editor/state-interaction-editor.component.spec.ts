@@ -378,12 +378,14 @@ describe('State Interaction component', () => {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
+    spyOn(component.onSaveInteractionData, 'emit').and.stub();
 
     component.openInteractionCustomizerModal();
     tick();
 
     expect(stateEditorService.onHandleCustomArgsUpdate.emit).toHaveBeenCalled();
     expect(stateContentService.saveDisplayedValue).toHaveBeenCalled();
+    expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
   }));
 
   it('should through error when state is undefined', () => {
