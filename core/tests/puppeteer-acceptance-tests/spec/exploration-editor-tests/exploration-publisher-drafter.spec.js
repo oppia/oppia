@@ -33,7 +33,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       'explorationVisitor', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should perform exploration management actions',
+  it('should draft, discard and publish the changes',
     async function() {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
