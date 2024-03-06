@@ -18,22 +18,21 @@
 
 import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
-import SuperAdmin from '../../user-utilities/super-admin-utils';
-import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
+import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
+import { IBlogAdmin } from '../../user-utilities/blog-post-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Blog Admin', function() {
   const ROLE_BLOG_ADMIN = 'blog admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-  let superAdmin: SuperAdmin;
-  let blogAdmin: BlogPostAdmin;
+  let superAdmin: ISuperAdmin & IBlogAdmin;
 
   beforeAll(async function() {
-    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-    blogAdmin = await userFactory.createNewBlogAdmin('blogAdm');
+    const user = await userFactory.createNewSuperAdmin('superAdm');
+    superAdmin = await userFactory.assignRoleToUser(user, 'blog admin');
   }, DEFAULT_SPEC_TIMEOUT);
 
   /** TODO(#17162): This test should be done without the need of super admin, as
@@ -42,29 +41,29 @@ describe('Blog Admin', function() {
   */
   it('should assign roles to users and change tag properties',
     async function() {
-      const guestUsr1 = await userFactory.createNewGuestUser(
+      const guestUsr1 = await userFactory.createNewUser(
         'guestUsr1', 'guest_user1@example.com');
-      const guestUsr2 = await userFactory.createNewGuestUser(
+      const guestUsr2 = await userFactory.createNewUser(
         'guestUsr2', 'guest_user2@example.com');
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
-      await blogAdmin.assignUserToRoleFromBlogAdminPage(
+      await superAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr1', 'BLOG_ADMIN');
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLE_BLOG_POST_EDITOR);
-      await blogAdmin.assignUserToRoleFromBlogAdminPage(
+      await superAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr2', 'BLOG_POST_EDITOR');
       await superAdmin.expectUserToHaveRole('guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-      await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
+      await superAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-      await blogAdmin.expectMaximumTagLimitNotToBe(5);
-      await blogAdmin.setMaximumTagLimitTo(5);
-      await blogAdmin.expectMaximumTagLimitToBe(5);
+      await superAdmin.expectMaximumTagLimitNotToBe(5);
+      await superAdmin.setMaximumTagLimitTo(5);
+      await superAdmin.expectMaximumTagLimitToBe(5);
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     }, DEFAULT_SPEC_TIMEOUT);

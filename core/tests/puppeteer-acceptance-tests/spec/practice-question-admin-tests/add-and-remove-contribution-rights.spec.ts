@@ -19,23 +19,25 @@
 
 import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
-import QuestionAdmin from '../../user-utilities/question-admin-utils';
+import { IQuestionAdmin } from '../../user-utilities/question-admin-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Question Admin', function() {
-  let questionAdmin: QuestionAdmin;
+  let questionAdmin: IQuestionAdmin;
 
   beforeAll(async function() {
-    questionAdmin =
-      await userFactory.createNewQuestionAdmin('questionAdm');
+    const user = await userFactory.createNewUser(
+      'questionAdm', 'question_admin@example.com');
+    questionAdmin = await userFactory.assignRoleToUser(
+      user, 'question admin');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide rights to review and submit questions to user.',
     async function() {
-      let Tester = await userFactory.createNewGuestUser(
+      let Tester = await userFactory.createNewUser(
         'Tester', 'admin.tester@example.com');
       await userFactory.closeBrowserForUser(Tester);
 

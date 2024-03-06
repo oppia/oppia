@@ -19,17 +19,17 @@
 
 import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
-import LoggedInUsers from '../../user-utilities/logged-in-users-utils';
+import { ILoggedInUser } from '../../user-utilities/logged-in-users-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User', function() {
-  let testUser: LoggedInUsers;
+  let testUser: ILoggedInUser;
 
   beforeAll(async function() {
-    testUser = await userFactory.createNewGuestUser(
+    testUser = await userFactory.createNewUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 

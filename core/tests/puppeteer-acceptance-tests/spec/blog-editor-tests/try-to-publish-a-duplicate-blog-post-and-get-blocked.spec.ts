@@ -18,20 +18,22 @@
 
 import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
-import BlogPostAdmin from '../../user-utilities/blog-post-admin-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
+import { IBlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
 describe('Blog Editor', function() {
-  let blogPostEditor: BlogPostAdmin;
+  let blogPostEditor: IBlogPostEditor;
 
   beforeAll(async function() {
-    blogPostEditor = await userFactory.createNewBlogPostEditor(
-      'blogPostEditor');
+    const user = await userFactory.createNewUser(
+      'blogPostEditor', 'blog_post_editor@example.com');
+    blogPostEditor =
+      await userFactory.assignRoleToUser(user, 'blog post editor');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should check blog editor unable to publish duplicate blog post',

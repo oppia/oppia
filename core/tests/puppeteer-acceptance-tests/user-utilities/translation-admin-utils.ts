@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Translation admin users utility file.
+ * @fileoverview Translation admin role utility file.
  */
 
-import BaseUser from
+import { IBaseUser, BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -65,7 +65,21 @@ const removeContributonRightsLanguageSelect =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-export default class TranslationAdmin extends BaseUser {
+export interface ITranslationAdmin extends IBaseUser {
+  navigateToContributorDashboardAdminPage: () => Promise<void>;
+  addTranslationLanguageReviewRights: (
+    username: string, languageCode: string) => Promise<void>;
+  removeTranslationLanguageReviewRights: (
+    username: string, languageCode: string) => Promise<void>;
+  viewContributionRightsForUser: (username: string) => Promise<void>;
+  viewContributorTranslationRightsByLanguageCode: (
+    languageCode: string) => Promise<void>;
+  expectDisplayedLanguagesToContain: (language: string) => Promise<void>;
+  expectUserToBeDisplayed: (username: string) => Promise<void>;
+  expectUserToNotBeDisplayed: (username: string) => Promise<void>;
+}
+
+class TranslationAdmin extends BaseUser implements ITranslationAdmin {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -180,3 +194,6 @@ export default class TranslationAdmin extends BaseUser {
     }
   }
 }
+
+export let TranslationAdminFactory =
+  (): ITranslationAdmin => new TranslationAdmin();

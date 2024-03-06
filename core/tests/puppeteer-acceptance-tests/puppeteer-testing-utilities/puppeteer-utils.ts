@@ -29,10 +29,38 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?'
 ];
 
-export default class BaseUser {
+interface IUserProps {
+  page: Page;
+  browserObject: Browser;
+  userHasAcceptedCookies: boolean;
+  username: string;
+  email: string;
+}
+
+export interface IBaseUser extends IUserProps {
+  openBrowser: () => Promise<Page>;
+  signInWithEmail: (email: string) => Promise<void>;
+  signUpNewUser: (userName: string, signInEmail: string) => Promise<void>;
+  reloadPage: () => Promise<void>;
+  clickOn: (selector: string) => Promise<void>;
+  type: (selector: string, text: string) => Promise<void>;
+  select: (selector: string, option: string) => Promise<void>;
+  goto: (url: string) => Promise<void>;
+  uploadFile: (filePath: string) => Promise<void>;
+  logout: () => Promise<void>;
+  closeBrowser: () => Promise<void>;
+}
+
+export type IBaseUserFactory = () => IBaseUser;
+
+export class BaseUser implements IBaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
+  email: string = '';
+  username: string = '';
+
+  constructor() {}
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -103,6 +131,9 @@ export default class BaseUser {
       'button.e2e-test-register-user:not([disabled])');
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+
+    this.username = userName;
+    this.email = signInEmail;
   }
 
   /**
@@ -176,3 +207,5 @@ export default class BaseUser {
     await this.browserObject.close();
   }
 }
+
+export const BaseUserFactory: IBaseUserFactory = () => (new BaseUser());

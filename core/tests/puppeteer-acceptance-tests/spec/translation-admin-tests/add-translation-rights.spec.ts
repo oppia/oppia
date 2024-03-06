@@ -19,22 +19,24 @@
 
 import * as userFactory from
   '../../puppeteer-testing-utilities/user-factory';
-import TranslationAdmin from '../../user-utilities/translation-admin-utils';
+import { ITranslationAdmin } from '../../user-utilities/translation-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Translation Admin', function() {
-  let translationAdmin: TranslationAdmin;
+  let translationAdmin: ITranslationAdmin;
 
   beforeAll(async function() {
-    translationAdmin =
-      await userFactory.createNewTranslationAdmin('translationAdm');
+    const user = await userFactory.createNewUser(
+      'translationAdm', 'translation_admin@example.com');
+    translationAdmin = await userFactory.assignRoleToUser(
+      user, 'translation admin');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide translation rights to user.',
     async function() {
-      let translatorSpanish = await userFactory.createNewGuestUser(
+      let translatorSpanish = await userFactory.createNewUser(
         'translatorSpanish', 'translatorSpanish@example.com');
       await userFactory.closeBrowserForUser(translatorSpanish);
       await translationAdmin.navigateToContributorDashboardAdminPage();
