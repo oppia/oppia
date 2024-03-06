@@ -382,6 +382,7 @@ import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-p
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
+import { CollectionPlayerAuthGuard } from 'pages/collection-player-page/collection-player-auth.guard';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -510,6 +511,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionEditorRoutingService', CollectionEditorRoutingService],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionPlayerBackendApiService', CollectionPlayerBackendApiService],
+  ['CollectionPlayerAuthGuard', CollectionPlayerAuthGuard],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
