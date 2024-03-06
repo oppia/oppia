@@ -38,10 +38,28 @@ export default class BaseUser {
    * This is a function that opens a new browser instance for the user.
    */
   async openBrowser(): Promise<Page> {
+    const args: string[] = [
+      '--start-fullscreen',
+      '--use-fake-ui-for-media-stream'
+    ];
+
+    const headless = (
+      process.env.HEADLESS ?
+      process.env.HEADLESS === 'true' :
+      testConstants.DEFAULT_IS_HEADLESS);
+    /**
+     * Here we are disabling the site isolation trials because it is causing
+     * tests to fail while running in non headless mode (see
+     * https://github.com/puppeteer/puppeteer/issues/7050).
+     */
+    if (!headless) {
+      args.push('--disable-site-isolation-trials');
+    }
+
     await puppeteer
       .launch({
-        headless: false,
-        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
+        headless,
+        args
       })
       .then(async(browser) => {
         this.browserObject = browser;
