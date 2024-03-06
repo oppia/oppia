@@ -504,7 +504,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
 
     def test_access_skill_editor_page_without_logging_in(self) -> None:
         self.get_json(
-            '%s/can_access_skill_editor_page/%s' % (
+            '%s/can_access_skill_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
             ), expected_status_int=401
         )
@@ -513,7 +513,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_json(
-            '%s/can_access_skill_editor_page/%s' % (
+            '%s/can_access_skill_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
             ), expected_status_int=401
         )
@@ -521,7 +521,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s/can_access_skill_editor_page/%s' % (
+            '%s/can_access_skill_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
             ), expected_status_int=401
         )
@@ -531,8 +531,8 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
             self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_json(
-            '%s/can_access_skill_editor_page/%s' % (
+        self.get_html_response(
+            '%s/can_access_skill_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
             ), expected_status_int=200
         )
@@ -545,7 +545,7 @@ class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id])
         self.get_json(
-            '%s/can_access_skill_editor_page/%s' % (
+            '%s/can_access_skill_editor/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
             ), expected_status_int=404
         )
