@@ -352,7 +352,7 @@ module.exports = class explorationAdmin extends baseUser {
   */
   async createNewCard(cardName) {
     await this.clickOn(openOutcomeDestButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
     await this.page.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput);
     await this.page.type(addStateInput, cardName);
