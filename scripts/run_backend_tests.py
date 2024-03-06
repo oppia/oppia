@@ -531,6 +531,22 @@ def main(args: Optional[List[str]] = None) -> None:
                 raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
+            # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
+            if feconf.OPPIA_IS_DOCKERIZED:
+                # The following tests are excluded from running in the Docker
+                # since they will be removed after the Dockerized setup is
+                # permanently moved to.
+                docker_exclude_tests = [
+                    'scripts.install_third_party_libs_test'
+                    'scripts.install_third_party_test',
+                    'scripts.install_python_dev_dependencies_test',
+                    'scripts.install_python_prod_dependencies_test',
+                    'scripts.setup_gae_test',
+                    'scripts.setup_test']
+                # remove docker_exclude_tests from all_test_targets
+                all_test_targets = [
+                    test for test in all_test_targets
+                    if test not in docker_exclude_tests]
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(
