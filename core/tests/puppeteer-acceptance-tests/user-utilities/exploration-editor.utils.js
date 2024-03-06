@@ -325,7 +325,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
     await this.page.waitForTimeout(1000);
-    await this.clickOn(secondVersionDropdown);
+    await this.clickOn(secondVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
     await this.page.click(confirmRevertVersionButton);
@@ -335,6 +335,7 @@ module.exports = class explorationAdmin extends baseUser {
   * Function verifies if a revsion is reverting and downloading or not.
   */
   async expectSuccessfulReversionOfRevision() {
+    // This page takes 3-5 seconds to reload to reflect the reverted revision.
     await this.page.waitForTimeout(5000);
     await this.page.waitForSelector(versionsList);
     let element = await this.page.$(versionsList);
