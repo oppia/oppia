@@ -502,33 +502,17 @@ module.exports = class e2eExplorationCreator extends baseUser {
     }
   }
 
-  // /**
-  //  * This function helps in doing some changes in exploration.
-  //  */
-  // async addSomeChanges() {
-  //   await this.clickOn(settingsTab);
-  //   await this.clickOn(addTitleBar);
-  //   titleBeforeChanges = await this.page.evaluate(() => {
-  //     return document.querySelector(
-  //       '.e2e-test-exploration-title-input').innerText;
-  //   });
-  //   await this.type(addTitle, 'Your Title Here please');
-  // }
-
   /**
    * This function is discarding the current changes.
    */
   async discardCurrentChanges() {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(500);
     await this.clickOn(discardDraftButton);
-    await this.page.waitForTimeout(1000);
-    try {
-      await this.clickOn(discardConfirmButton);
-    } catch(e) {
-      console.log ("confirm discard is not working");
-    }
+    await this.clickOn(discardConfirmButton);
+
+    await this.page.waitForNavigation({ waitUntil: 'networkidle2' });
   }
 
   /**
@@ -536,14 +520,12 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *@param {string} titleBeforeChanges
   */
   async expectTitleToBe(titleBeforeChanges) {
-    await this.page.waitForTimeout(10000); //Need to add 10seconds.
+    await this.page.waitForTimeout(400); 
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
       input =>input.value, titleInput);
-    
-    console.log("Rahat(titlebeforechanges)->" + titleBeforeChanges);
-    console.log("Rahat(titleafterchanges)->" + titleAfterChanges);
+  
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
     } else {

@@ -45,7 +45,7 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.goToSettingsTab();
       await explorationCreator.updateTitle('Old Title');
-      await explorationCreator.updateGoal('NeedSuccessInLifeAndMoney');
+      await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectCategory();
       await explorationCreator.selectLanguage();
       await explorationCreator.addTags('Your Tag Here');
