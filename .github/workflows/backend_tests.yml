@@ -65,6 +65,9 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
+      - name: Install coverage
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install coverage
       - name: Initialze Containers
         run: |
           sudo make build
