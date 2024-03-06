@@ -29,7 +29,7 @@ import { UserExplorationPermissionsService } from '../services/user-exploration-
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { RouterService } from '../services/router.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionData } from 'interactions/customization-args-defs';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -38,7 +38,6 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
 import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { ExplorationCorrectnessFeedbackService } from '../services/exploration-correctness-feedback.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorRefreshService } from '../services/state-editor-refresh.service';
 import { LoaderService } from 'services/loader.service';
@@ -93,8 +92,6 @@ export class ExplorationEditorTabComponent
       public stateCardIsCheckpointService: StateCardIsCheckpointService,
       private explorationInitStateNameService: ExplorationInitStateNameService,
       private explorationWarningsService: ExplorationWarningsService,
-      private explorationCorrectnessFeedbackService:
-        ExplorationCorrectnessFeedbackService,
       private focusManagerService: FocusManagerService,
       private stateEditorRefreshService: StateEditorRefreshService,
       private loaderService: LoaderService,
@@ -204,11 +201,18 @@ export class ExplorationEditorTabComponent
       this.tutorialInProgress = false;
     }
 
-    saveInteractionId(displayedValue: string): void {
+    saveInteractionData(displayedValue: InteractionData): void {
       this.explorationStatesService.saveInteractionId(
         this.stateEditorService.getActiveStateName(),
-        cloneDeep(displayedValue));
-      this.stateEditorService.setInteractionId(cloneDeep(displayedValue));
+        cloneDeep(displayedValue.interactionId));
+      this.stateEditorService.setInteractionId(
+        cloneDeep(displayedValue.interactionId));
+
+      this.explorationStatesService.saveInteractionCustomizationArgs(
+        this.stateEditorService.getActiveStateName(),
+        cloneDeep(displayedValue.customizationArgs));
+      this.stateEditorService.setInteractionCustomizationArgs(
+        cloneDeep(displayedValue.customizationArgs));
     }
 
     saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
@@ -229,16 +233,6 @@ export class ExplorationEditorTabComponent
       this.stateEditorService.setInteractionDefaultOutcome(
         cloneDeep(newOutcome));
       this.recomputeGraph();
-    }
-
-    saveInteractionCustomizationArgs(
-        displayedValue: InteractionCustomizationArgs): void {
-      this.explorationStatesService.saveInteractionCustomizationArgs(
-        this.stateEditorService.getActiveStateName(),
-        cloneDeep(displayedValue));
-
-      this.stateEditorService.setInteractionCustomizationArgs(
-        cloneDeep(displayedValue));
     }
 
     saveNextContentIdIndex(): void {
@@ -331,8 +325,6 @@ export class ExplorationEditorTabComponent
       this.stateName = this.stateEditorService.getActiveStateName();
       this.stateEditorService.setStateNames(
         this.explorationStatesService.getStateNames());
-      this.stateEditorService.setCorrectnessFeedbackEnabled(
-       this.explorationCorrectnessFeedbackService.isEnabled() as boolean);
       this.stateEditorService.setInQuestionMode(false);
 
       let stateData = this.explorationStatesService.getState(this.stateName);

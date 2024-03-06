@@ -318,7 +318,6 @@ describe('State Responses Component', () => {
     expect(component.responseCardIsShown).toBe(false);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(false);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    expect(component.stateName).toBeUndefined();
     expect(component.misconceptionsBySkill).toBeUndefined();
     expect(component.inapplicableSkillMisconceptionIds).toBeUndefined();
 
@@ -327,7 +326,7 @@ describe('State Responses Component', () => {
     expect(component.responseCardIsShown).toBe(true);
     expect(component.enableSolicitAnswerDetailsFeature).toBe(true);
     expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    expect(component.stateName).toBe('Hola');
+    expect(component.getActiveStateName()).toBe('Hola');
     expect(component.misconceptionsBySkill).toEqual({});
     expect(component.inapplicableSkillMisconceptionIds).toEqual(['id1']);
 
@@ -647,7 +646,8 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome has no feedback with self loop', () => {
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
     let outcome1 = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
     let outcome2 = outcomeObjectFactory.createNew(
@@ -657,9 +657,15 @@ describe('State Responses Component', () => {
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
+  it('should reject self-loop with undefined outcome', () => {
+    // This throws "TS2322". We need to suppress this error because
+    // the isSelfLoopThatIsMarkedCorrect function accepts an argument
+    // of type Outcome.
+    // @ts-ignore
+    expect(component.isSelfLoopThatIsMarkedCorrect(undefined)).toBe(false);
+  });
+
   it('should check if outcome marked as correct has self loop', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
@@ -672,19 +678,16 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValues(
+      'State Name', 'Hola');
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
-
-    component.stateName = 'Hola';
 
     expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop and return' +
-    ' false if correctness feedback is not enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      false);
+    ' true if correctness feedback is enabled', () => {
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
@@ -697,9 +700,10 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
   });
 
   it('should show state name input if user is creating new state', () => {
@@ -744,8 +748,6 @@ describe('State Responses Component', () => {
 
   it('should get outcome tooltip text', () => {
     // When outcome has self loop and is labelled correct.
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
-      true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
@@ -758,7 +760,8 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'State Name');
 
     expect(component.getOutcomeTooltip(outcome)).toBe(
       'Self-loops should not be labelled as correct.');
@@ -1209,7 +1212,7 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome is looping', () => {
-    component.stateName = 'Hola';
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
     expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(
       'Hola', '', '', []))).toBe(true);
     expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(

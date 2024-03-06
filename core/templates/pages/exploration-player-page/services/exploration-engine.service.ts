@@ -114,7 +114,8 @@ export class ExplorationEngineService {
         pathnameArray[i] === 'explore' ||
         pathnameArray[i] === 'create' ||
         pathnameArray[i] === 'skill_editor' ||
-        pathnameArray[i] === 'embed'
+        pathnameArray[i] === 'embed' ||
+        pathnameArray[i] === 'lesson'
       ) {
         explorationContext = true;
         break;
@@ -501,6 +502,8 @@ export class ExplorationEngineService {
         oldStateName,
         this.learnerParamsService.getAllParams(),
         answer,
+        this._explorationId,
+        answerIsCorrect,
         classificationResult.answerGroupIndex,
         classificationResult.ruleIndex,
         classificationResult.classificationCategorization,

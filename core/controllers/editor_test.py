@@ -750,7 +750,7 @@ solicit_answer_details: false
                 })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
-        self.maxDiff = 0
+        self.maxDiff = None
         download_url = (
             '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
@@ -2506,7 +2506,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         platform_parameter_registry.Registry.update_platform_parameter(
             (
-                platform_parameter_list.ParamNames.
+                platform_parameter_list.ParamName.
                 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
             ),
             self.admin_id,
