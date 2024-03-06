@@ -537,7 +537,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 # since they will be removed after the Dockerized setup is
                 # permanently moved to.
                 docker_exclude_tests = [
-                    'scripts.install_third_party_libs_test'
+                    'scripts.install_third_party_libs_test',
                     'scripts.install_third_party_test',
                     'scripts.install_python_dev_dependencies_test',
                     'scripts.install_python_prod_dependencies_test',
