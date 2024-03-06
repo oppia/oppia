@@ -49,6 +49,10 @@ describe('Topics and skills dashboard functionality', function() {
     await users.createAndLoginCurriculumAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
+
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('math', 'math');
   });
 
   beforeEach(async function() {
@@ -66,7 +70,6 @@ describe('Topics and skills dashboard functionality', function() {
     var topicId = url.split('/')[4].slice(0, -1);
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
@@ -135,10 +138,6 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_BETA, 'beta-tasd', 'Beta description', true);
 
-    await browser.url('/classroom-admin/');
-    await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.createNewClassroomConfig('math', 'math');
-
     await topicsAndSkillsDashboardPage.get();
     let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(
@@ -177,7 +176,6 @@ describe('Topics and skills dashboard functionality', function() {
     var topicId = url.split('/')[4].slice(0, -1);
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
@@ -203,7 +201,6 @@ describe('Topics and skills dashboard functionality', function() {
     var topicId = url.split('/')[4].slice(0, -1);
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
     await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
