@@ -267,7 +267,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.type(addTags, TagNames[1]);
     await this.clickOn('.secondary-info-text');
     await this.type(addTags, TagNames[2]);
-
   }
 
   async updateSettingsSuccessfully() {
@@ -436,7 +435,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
     } catch (error) {
       showMessage('Exploration is Successfully deleted.');
     }
-    
   }
 
   /**
@@ -509,12 +507,12 @@ module.exports = class e2eExplorationCreator extends baseUser {
   *@param {string} titleBeforeChanges
   */
   async expectTitleToBe(titleBeforeChanges) {
-    await this.page.waitForTimeout(400); 
+    await this.page.waitForTimeout(400);
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
       input =>input.value, titleInput);
-  
+
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
     } else {
