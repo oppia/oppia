@@ -234,7 +234,7 @@ export default class BlogPostAdmin extends BaseUser {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
-      el => el.textContent, toastMessageBox);
+      (element: HTMLDivElement) => element.textContent, toastMessageBox);
     const isPublishButtonDisabled = await this.page.$eval(
       publishBlogPostButton,
       button => (button as HTMLButtonElement).disabled);
@@ -257,14 +257,12 @@ export default class BlogPostAdmin extends BaseUser {
    * This function checks the number of the blog posts in the blog dashboard.
    */
   async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
-    await this.page.evaluate(async(number) => {
-      const allBlogPosts = document.getElementsByClassName(
-        'blog-dashboard-tile-content');
-      if (allBlogPosts.length !== number) {
-        throw new Error(
-          `Number of blog posts is not equal to ${number}`);
-      }
-    }, number);
+    const allBlogPosts = await this.page.$$(
+      '.blog-dashboard-tile-content');
+    if (allBlogPosts.length !== number) {
+      throw new Error(
+        `Number of blog posts is not equal to ${number}`);
+    }
 
     showMessage(`Number of blog posts is equal to ${number}`);
   }
@@ -317,8 +315,8 @@ export default class BlogPostAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
-    const allPublishedBlogPosts =
-      await this.page.$$('.blog-dashboard-tile-content');
+    const allPublishedBlogPosts = await this.page.$$(
+      '.blog-dashboard-tile-content');
     let count = 0;
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
