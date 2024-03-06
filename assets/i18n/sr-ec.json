@@ -85,6 +85,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER": "Тренутно:",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "Предложено:",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Предлог",
+	"I18N_LESSON_PLAYER_FEEDBACK_BUTTON": "Повратне информације",
 	"I18N_LICENSE_PAGE_LICENSE_HEADING": "Лиценца",
 	"I18N_LICENSE_PAGE_PARAGRAPH_1": "Сав садржај у истраживањима Опије је лиценциран под лиценцом <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">CC-BY-SA 4.0</a> са изјавом о одрицању одговорности за потребе доприноса (прецизније, Секције 3(a)(1) и 3(a)(2)). Ако употребљавате садржај са овог сајта другде, подстичемо Вас да ставите везу до релевантне странице истраживања, али ово није неопходно.",
 	"I18N_LICENSE_PAGE_PARAGRAPH_2": "Софтвер који покреће Опију је отвореног кода, а његов <a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">код</a> објављен је под лиценцом <a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a>.",
