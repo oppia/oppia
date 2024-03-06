@@ -396,21 +396,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   * This function verifies the selection of a voice artist.
-   * @param {string} expectedUsername The username of the expected voice artist.
-   */
-  async expectVoiceArtistToBeAdded(expectedUsername) {
-    const voiceArtistInput = await this.page.$(addVoiceArtistUserName);
-    const voiceArtistUsername = await this.page.evaluate(
-      input => input.value, voiceArtistInput);
-    if (voiceArtistUsername === expectedUsername) {
-      showMessage('Voice artist guestUsr3 has been successfully added.');
-    } else {
-      throw new Error('Voice artist guestUsr3  was not added.');
-    }
-  }
-
-  /**
    * This function helps to choose notification type.
    */
   async optInToEmailNotifications() {
