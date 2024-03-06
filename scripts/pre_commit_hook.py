@@ -35,6 +35,7 @@ import shutil
 import subprocess
 import sys
 
+from core import feconf
 from typing import Final, List, Optional, Tuple
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
@@ -47,6 +48,7 @@ from core import utils  # isort:skip # pylint: disable=wrong-import-position
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
 RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
+    '.', 'assets', 'release_constants_docker.json') if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
     '.', 'assets', 'release_constants.json')
 KEYS_UPDATED_IN_FECONF: Final = [
     b'ADMIN_EMAIL_ADDRESS',
