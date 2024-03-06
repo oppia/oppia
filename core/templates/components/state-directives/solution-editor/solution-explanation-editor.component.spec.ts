@@ -31,7 +31,7 @@ class MockStateSolutionService {
       _html: 'Hello world',
       contentId: 'contentId',
       get html(): string {
-        return 'Hello world';
+        return '<p>Hello world</p>';
       }
     }
   };
@@ -41,7 +41,7 @@ class MockStateSolutionService {
       _html: 'Hello world 2',
       contentId: 'xyz',
       get html(): string {
-        return 'Hello world 2';
+        return '<p>Hello world 2</p>';
       }
     }
   };

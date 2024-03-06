@@ -188,7 +188,7 @@ describe('Add Or Update Solution Modal Component', () => {
     });
 
     it('should not show solution explanation length validation error', () => {
-      let solutionExplanation = 'Explanation html';
+      let solutionExplanation = '<p>Explanation html</p>';
 
       expect(component.isSolutionExplanationLengthExceeded(
         solutionExplanation)).toBeFalse();
@@ -215,7 +215,7 @@ describe('Add Or Update Solution Modal Component', () => {
     });
 
     it('should show solution explanation length validation error', () => {
-      let solutionExplanation = 'Solution explanation'.repeat(180);
+      let solutionExplanation = '<p>Solution explanation</p>'.repeat(180);
 
       expect(component.isSolutionExplanationLengthExceeded(
         solutionExplanation)).toBeTrue();

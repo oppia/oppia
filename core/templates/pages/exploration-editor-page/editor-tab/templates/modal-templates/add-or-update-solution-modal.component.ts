@@ -30,6 +30,7 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -89,7 +90,8 @@ export class AddOrUpdateSolutionModalComponent
     private solutionObjectFactory: SolutionObjectFactory,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private htmlLengthService: HtmlLengthService,
   ) {
     super(ngbActiveModal);
   }
@@ -108,8 +110,9 @@ export class AddOrUpdateSolutionModalComponent
 
   isSolutionExplanationLengthExceeded(
       solExplanation: string): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return Boolean(solExplanation.length > 3000);
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        solExplanation, CALCULATION_TYPE_CHARACTER) > 3000);
   }
 
   onAnswerChange(): void {
