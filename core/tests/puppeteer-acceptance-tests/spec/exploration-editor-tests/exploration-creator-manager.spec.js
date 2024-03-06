@@ -65,7 +65,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
-      await explorationCreator.addInteraction();
+      await explorationCreator.addEndInteraction();
       await explorationCreator.showMessageOfSuccessfullExplrationCreation();
 
       await explorationCreator.goToSettingsTab();

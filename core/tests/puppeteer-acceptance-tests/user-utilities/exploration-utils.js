@@ -114,7 +114,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in adding interaction.
    */
-  async addInteraction() {
+  async addEndInteraction() {
     await this.clickOn(interactionAddbutton);
     await this.clickOn(endExplorationTab);
     await this.clickOn(saveInteractionButton);
