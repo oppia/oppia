@@ -18,6 +18,10 @@
       "jasmine",
       "puppeteer",
       "puppeteer-acceptance-tests"
+    ],
+    "lib": [
+      "ES2017",
+      "DOM"
     ]
   },
   "include": [

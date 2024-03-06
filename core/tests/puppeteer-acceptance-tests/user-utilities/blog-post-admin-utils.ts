@@ -199,18 +199,6 @@ export default class BlogPostAdmin extends BaseUser {
    */
   async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
     await this.clickOn('PUBLISHED');
-    await this.page.exposeFunction('deletePublishedBlogPost', async() => {
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-      await this.page.waitForTimeout(100);
-      await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-      await this.page.waitForSelector('button.e2e-test-confirm-button');
-      await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
-      showMessage('Published blog post with given title deleted successfully!');
-    });
     const allPublishedBlogPosts =
       await this.page.$$('.blog-dashboard-tile-content');
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
@@ -221,6 +209,17 @@ export default class BlogPostAdmin extends BaseUser {
         await allPublishedBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click());
+        /** Giving explicit timeout because we need to wait for small
+         * transition to complete. We cannot wait for the next element to click
+         * using its selector as it is instantly loaded in the DOM but cannot
+         * be clicked until the transition is completed.
+         */
+        await this.page.waitForTimeout(100);
+        await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+        await this.page.waitForSelector('button.e2e-test-confirm-button');
+        await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+        showMessage(
+          'Published blog post with given title deleted successfully!');
         return;
       }
     }
