@@ -19,6 +19,8 @@
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
 
+sourceMapSupport.install();
+
 interface SuiteFailureResult extends jasmine.JasmineDoneInfo {
   fullName: string;
 }
@@ -258,6 +260,5 @@ const Reporter: jasmine.CustomReporter = {
   }
 };
 
-sourceMapSupport().install();
 jasmine.getEnv().clearReporters();
 jasmine.getEnv().addReporter(Reporter);
