@@ -17,6 +17,7 @@
  */
 
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -38,7 +39,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { HtmlLengthService } from 'services/html-length.service';
+import { CALCULATION_TYPE_WORD, HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
@@ -258,8 +259,9 @@ export class ContributionsAndReview
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
-            this.htmlLengthService.computeHtmlLengthInWords(
-              suggestion.change_cmd.content_html)) : undefined
+            this.htmlLengthService.computeHtmlLength(
+              suggestion.change_cmd.content_html,
+              CALCULATION_TYPE_WORD)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -789,3 +791,8 @@ export class ContributionsAndReview
     $(document).off('click', this.closeDropdownWhenClickedOutside);
   }
 }
+
+angular.module('oppia').directive('oppiaContributionsAndReview',
+  downgradeComponent({
+    component: ContributionsAndReview
+  }) as angular.IDirectiveFactory);

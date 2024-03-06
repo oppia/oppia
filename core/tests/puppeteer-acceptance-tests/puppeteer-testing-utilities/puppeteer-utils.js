@@ -53,7 +53,7 @@ module.exports = class baseUser {
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 0, height: 0 });
+        await this.page.setViewport({ width: 1920, height: 1080 });
         this.page.on('dialog', async(dialog) => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -72,7 +72,7 @@ module.exports = class baseUser {
    * @param {string} email - The email of the user.
    */
   async signInWithEmail(email) {
-    await this.goto(testConstants.URLs.home);
+    await this.goto(testConstants.URLs.Home);
     if (!this.userHasAcceptedCookies) {
       await this.clickOn('OK');
       this.userHasAcceptedCookies = true;
@@ -166,7 +166,7 @@ module.exports = class baseUser {
    * This function logs out the current user.
    */
   async logout() {
-    await this.goto(testConstants.URLs.logout);
+    await this.goto(testConstants.URLs.Logout);
     await this.page.waitForSelector(testConstants.Dashboard.MainDashboard);
   }
 

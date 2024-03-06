@@ -33,7 +33,7 @@ from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from scripts.linters import pre_commit_linter
+    from scripts.linters import run_lint_checks
 
 
 class BadPatternRegexpDict(TypedDict):
@@ -384,7 +384,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
     """
 
     def __init__(
-        self, files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+        self, files_to_lint: List[str], file_cache: run_lint_checks.FileCache
     ) -> None:
         """Constructs a GeneralPurposeLinter object.
 
@@ -645,7 +645,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
 
 
 def get_linters(
-    files_to_lint: List[str], file_cache: pre_commit_linter.FileCache
+    files_to_lint: List[str], file_cache: run_lint_checks.FileCache
 ) -> Tuple[GeneralPurposeLinter, None]:
     """Creates GeneralPurposeLinter object and returns it.
 
