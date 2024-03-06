@@ -23,6 +23,7 @@ import { Injectable } from '@angular/core';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
+import { AppConstants } from 'app.constants';
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
@@ -158,6 +159,44 @@ export class ContributorDashboardAdminBackendApiService {
         reject(errorResponse.error.error);
       });
     });
+  }
+
+  async updateQuestionRightsAsync(
+      username: string,
+      isQuestionSubmitter: boolean,
+      isQuestionReviewer: boolean,
+      canSubmitQuestions: boolean,
+      canReviewQuestions: boolean): Promise<void> {
+    if (isQuestionSubmitter !== canSubmitQuestions) {
+      if (isQuestionSubmitter) {
+        await this.addContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+          username,
+          null
+        );
+      } else {
+        await this.removeContributionReviewerAsync(
+          username,
+          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+          null
+        );
+      }
+    }
+    if (isQuestionReviewer !== canReviewQuestions) {
+      if (isQuestionReviewer) {
+        await this.addContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          username,
+          null
+        );
+      } else {
+        await this.removeContributionReviewerAsync(
+          username,
+          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          null
+        );
+      }
+    }
   }
 }
 

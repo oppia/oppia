@@ -297,48 +297,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     });
   }
 
-  async updateContributions(
-      username: string,
-      isQuestionSubmitter: boolean,
-      isQuestionReviewer: boolean,
-      canSubmitQuestions: boolean,
-      canReviewQuestions: boolean): Promise<void> {
-    if (isQuestionSubmitter !== canSubmitQuestions) {
-      if (isQuestionSubmitter) {
-        await this.contributorDashboardAdminBackendApiService
-          .addContributionReviewerAsync(
-            AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-            username,
-            null
-          );
-      } else {
-        await this.contributorDashboardAdminBackendApiService
-          .removeContributionReviewerAsync(
-            username,
-            AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-            null
-          );
-      }
-    }
-    if (isQuestionReviewer !== canReviewQuestions) {
-      if (isQuestionReviewer) {
-        await this.contributorDashboardAdminBackendApiService
-          .addContributionReviewerAsync(
-            AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-            username,
-            null
-          );
-      } else {
-        await this.contributorDashboardAdminBackendApiService
-          .removeContributionReviewerAsync(
-            username,
-            AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-            null
-          );
-      }
-    }
-  }
-
   openCdAdminQuestionRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username).then(response => {
@@ -350,12 +308,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           isQuestionReviewer: response.can_review_questions
         };
         modelRef.result.then(results => {
-          this.updateContributions(
-            username,
-            results.isQuestionSubmitter,
-            results.isQuestionReviewer,
-            response.can_submit_questions,
-            response.can_review_questions);
+          this.contributorDashboardAdminBackendApiService.
+            updateQuestionRightsAsync(
+              username,
+              results.isQuestionSubmitter,
+              results.isQuestionReviewer,
+              response.can_submit_questions,
+              response.can_review_questions);
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

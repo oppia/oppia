@@ -364,40 +364,13 @@ export class ContributorAdminStatsTable implements OnInit {
           isQuestionReviewer: response.can_review_questions
         };
         modelRef.result.then(results => {
-          if (results.isQuestionSubmitter !== response.can_submit_questions) {
-            if (results.isQuestionSubmitter) {
-              this.contributorDashboardAdminBackendApiService
-                .addContributionReviewerAsync(
-                  constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                  username,
-                  null
-                );
-            } else {
-              this.contributorDashboardAdminBackendApiService
-                .removeContributionReviewerAsync(
-                  username,
-                  constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                  null
-                );
-            }
-          }
-          if (results.isQuestionReviewer !== response.can_review_questions) {
-            if (results.isQuestionReviewer) {
-              this.contributorDashboardAdminBackendApiService
-                .addContributionReviewerAsync(
-                  constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                  username,
-                  null
-                );
-            } else {
-              this.contributorDashboardAdminBackendApiService
-                .removeContributionReviewerAsync(
-                  username,
-                  constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                  null
-                );
-            }
-          }
+          this.contributorDashboardAdminBackendApiService.
+            updateQuestionRightsAsync(
+              username,
+              results.isQuestionSubmitter,
+              results.isQuestionReviewer,
+              response.can_submit_questions,
+              response.can_review_questions);
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
