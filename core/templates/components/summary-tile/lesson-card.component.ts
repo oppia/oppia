@@ -3,6 +3,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { UrlService } from 'services/contextual/url.service';
@@ -14,7 +15,7 @@ import { UrlService } from 'services/contextual/url.service';
 
 
 export class LessonCardComponent implements OnInit{
-  @Input() story: StorySummary | LearnerExplorationSummary;
+  @Input() story: StorySummary | LearnerExplorationSummary | CollectionSummary;
   @Input() topic: string;
 
   desc!: string;
@@ -70,6 +71,8 @@ export class LessonCardComponent implements OnInit{
       //Must be a better way to do this (remove getNodeTitles())
       this.title =`Chapter ${completedStories + 1}: ${this.story.getNodeTitles()[completedStories]}`;
       this.progress = Math.floor(completedStories / this.story.getNodeTitles().length * 100);
+
+    } else if (this.story instanceof CollectionSummary) {
 
     } else {
       this.desc = this.story.objective;

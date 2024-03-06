@@ -16,9 +16,10 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import {AppConstants} from 'app.constants';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import { AppConstants } from 'app.constants';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -39,6 +40,7 @@ export class HomeTabComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
+  @Input() incompleteCollectionsList!: CollectionSummary[];
   @Input() currentGoals!: LearnerTopicSummary[];
   @Input() goalTopics!: LearnerTopicSummary[];
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
