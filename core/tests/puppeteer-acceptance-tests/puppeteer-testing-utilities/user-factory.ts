@@ -94,7 +94,7 @@ export let assignRolesToUser = async function<
     switch (role) {
       case 'blog post editor':
         await superAdminInstance.assignUserToRoleFromBlogAdminPage(
-          user.username, role);
+          user.username, 'BLOG_POST_EDITOR');
         break;
       default:
         await superAdminInstance.assignRoleToUser(user.username, role);
