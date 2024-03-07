@@ -56,6 +56,19 @@ oppia-conversation-skin .supplemental-card-parent-container {
   width: 100%;
 }
 
+.conversation-skin-cards-container::before {
+  background-image: url('/assets/images/background/lessonPlayer.png');
+  background-repeat: repeat;
+  bottom: 0;
+  content: "";
+  left: 0;
+  opacity: 0.2;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
 .conversation-skin-help-card-content {
   padding: 12px;
 }
