@@ -206,4 +206,4 @@ export class BaseUser implements IBaseUser {
   }
 }
 
-export const BaseUserFactory = () => new BaseUser();
+export const BaseUserFactory = (): IBaseUser => new BaseUser();
