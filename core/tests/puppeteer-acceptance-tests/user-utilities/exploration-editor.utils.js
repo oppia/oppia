@@ -444,7 +444,7 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to navigate the preview tab.
   */
   async navigateToPreviewTab() {
-    await this.page.waitForSelector(navigateToPreviewTabButton);
+    await this.page.waitForTimeout(300);
     await this.clickOn(navigateToPreviewTabButton);
     await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
   }
