@@ -138,7 +138,7 @@ run_tests.backend: ## Runs the backend tests
 	$(MAKE) stop
 
 run_tests.check_overall_backend_test_coverage: ## Runs the check for overall backend test coverage
-	docker compose up dev-server -d --no-deps
+	$(MAKE) start-devserver
 	$(SHELL_PREFIX) dev-server python -m scripts.check_overall_backend_test_coverage
 	$(MAKE) stop
 
