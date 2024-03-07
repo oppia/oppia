@@ -57,18 +57,6 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
   selector: 'oppia-new-lesson-player-footer',
   templateUrl: './player-footer.component.html',
   styleUrls: ['./player-footer.component.css'],
-  animations: [
-    trigger('fadeInOut', [
-      transition('void => *', []),
-      transition('* <=> *', [
-        style({ opacity: 0 }),
-        animate('1s ease', keyframes([
-          style({ opacity: 0 }),
-          style({ opacity: 1 })
-        ]))
-      ])
-    ])
-  ]
 })
 export class PlayerFooterComponent {
   // These properties are initialized using Angular lifecycle hooks
