@@ -146,8 +146,9 @@ export let createNewSuperAdmin = async function(
   const superAdmin = await composeUserWithRole(user, SuperAdminFactory());
   await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
   await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
+  superAdminInstance = composeUserWithRole(superAdmin, BlogAdminFactory());
 
-  return composeUserWithRole(superAdmin, BlogAdminFactory());
+  return superAdminInstance;
 };
 
 /**
