@@ -18,11 +18,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import collection_services
-from core.domain import rights_manager
-from core.domain import user_services
 from core.tests import test_utils
 
-from typing import Final
 
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the collection viewer controller using a sample collection."""

@@ -77,6 +77,7 @@ class ClassroomAccessValidationHandler(
         if not classroom:
             raise self.PageNotFoundException
 
+
 class CollectionPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -96,8 +97,9 @@ class CollectionPageAccessValidationHandler(
 
     @acl_decorators.can_play_collection
     def get(self, _: str) -> None:
-       """Handles GET requests."""
-       pass
+        """Handles GET requests."""
+        pass
+
 
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]

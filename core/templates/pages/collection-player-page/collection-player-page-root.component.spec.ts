@@ -17,7 +17,7 @@
  */
 
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
@@ -29,19 +29,15 @@ describe('CollectionPlayerPageRootComponent', () => {
   let component: CollectionPlayerPageRootComponent;
   let fixture: ComponentFixture<CollectionPlayerPageRootComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       declarations: [CollectionPlayerPageRootComponent],
       providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(CollectionPlayerPageRootComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

@@ -91,7 +91,6 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
 
 class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
-
     """Test for collection page access validation."""
 
     COLLECTION_ID: Final = 'cid'
@@ -103,14 +102,9 @@ class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
-
-
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-
-
         self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
-
 
     def test_unpublished_collections_are_invisible_to_logged_out_users(
         self
@@ -119,7 +113,6 @@ class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             '%s/can_access_collection_player_page/%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
             expected_status_int=404)
-
 
     def test_unpublished_collections_are_invisible_to_unconnected_users(
         self
@@ -131,23 +124,17 @@ class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         expected_status_int=404)
         self.logout()
 
-
     def test_unpublished_collections_are_invisible_to_other_editors(
         self
     ) -> None:
         self.signup(self.OTHER_EDITOR_EMAIL, 'othereditorusername')
-
-
         self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
-
-
         self.login(self.OTHER_EDITOR_EMAIL)
         self.get_json(
         '%s/can_access_collection_player_page/%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
         expected_status_int=404)
         self.logout()
-
 
     def test_unpublished_collections_are_visible_to_their_editors(
         self
@@ -158,7 +145,6 @@ class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
         self.logout()
 
-
     def test_unpublished_collections_are_visible_to_admins(self) -> None:
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -168,29 +154,23 @@ class CollectionPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
         self.logout()
 
-
     def test_published_collections_are_visible_to_logged_out_users(
         self
     ) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
-
         self.get_html_response(
             '%s/can_access_collection_player_page/%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
-
 
     def test_published_collections_are_visible_to_logged_in_users(
         self
     ) -> None:
         rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
-
-
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/can_access_collection_player_page/%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
-
 
     def test_invalid_collection_error(self) -> None:
         self.login(self.EDITOR_EMAIL)
