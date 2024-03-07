@@ -182,7 +182,7 @@ module.exports = class explorationAdmin extends baseUser {
     let revisions = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async (el)=> el.textContent);
+        revisionVersionNoSelector, async(el)=> el.textContent);
       let notes = await element.$eval(
         revisionNoteSelector, async(el) => el.textContent);
       let user = await element.$eval(
@@ -427,7 +427,7 @@ module.exports = class explorationAdmin extends baseUser {
       await this.goToNextCard(i + 1);
       await this.loadCardWithQuestion(
         `mention a negative number greater than ${-100 - i}`,
-         numericInputSelector);
+        numericInputSelector);
       await this.addResponsesToTheInteraction(`${-99 - i}`);
     }
 
