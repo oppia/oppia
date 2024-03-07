@@ -143,7 +143,7 @@ export let createNewSuperAdmin = async function(
   // Here we manually intialize the super admin instance since it needs
   // to be temporarily created to assign "super admin" roles.
   const user = await createNewUser(username, 'testadmin@example.com');
-  const superAdmin = await composeUserWithRole(user, SuperAdminFactory());
+  const superAdmin = composeUserWithRole(user, SuperAdminFactory());
   await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
   await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
   superAdminInstance = composeUserWithRole(superAdmin, BlogAdminFactory());
