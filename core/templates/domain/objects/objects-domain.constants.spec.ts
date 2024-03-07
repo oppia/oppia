@@ -37,7 +37,7 @@ describe('ObjectsDomainConstants', () => {
     'torr', 'bar', 'mmHg', 'mmH2O', 'cmH2O', 'A', 'ampere', 'V', 'volt', 'C',
     'coulomb', 'ohm', 'F', 'farad', 'Wb', 'weber', 'T', 'tesla', 'H', 'henry',
     'S', 'siemens', 'b', 'bit', 'B', 'byte', '$', 'dollar', 'dollars', 'Dollar',
-    'Dollars', ' ₹', 'Rs', 'Rupee', 'Rupees', 'rupee', 'rupees', 'Cent',
+    'Dollars', '₹', 'Rs', 'Rupee', 'Rupees', 'rupee', 'rupees', 'Cent',
     'Cents', 'cent', 'cents', 'Paisa', 'paise', 'cwt', 'newton', 'rad', 'USD'
   ];
 
