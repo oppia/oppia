@@ -52,6 +52,12 @@ export default {
   SignInDetails: {
     inputField: 'input.e2e-test-sign-in-email-input',
   },
+  roles: {
+    TRANSLATION_ADMIN: 'translation admin',
+    BLOG_ADMIN: 'blog admin',
+    BLOG_POST_EDITOR: 'blog post editor',
+    QUESTION_ADMIN: 'question admin' 
+  } as const,
   images: {
     blogPostThumbnailImage: path.resolve(
       __dirname, '../images/blog-post-thumbnail.svg')

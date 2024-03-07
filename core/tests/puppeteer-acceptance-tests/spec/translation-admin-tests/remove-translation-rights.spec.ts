@@ -24,13 +24,14 @@ import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.roles;
 
 describe('Translation Admin', function() {
   let translationAdmin: ITranslationAdmin;
 
   beforeAll(async function() {
     translationAdmin = await userFactory.createNewUser(
-      'translationAdm', 'translation_admin@example.com', ['translation admin']);
+      'translationAdm', 'translation_admin@example.com', [ROLES.TRANSLATION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to remove translation rights from user.',

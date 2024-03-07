@@ -24,13 +24,14 @@ import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.roles;
 
 describe('Question Admin', function() {
   let questionAdmin: IQuestionAdmin;
 
   beforeAll(async function() {
     questionAdmin = await userFactory.createNewUser(
-      'questionAdm', 'question_admin@example.com', ['question admin']);
+      'questionAdm', 'question_admin@example.com', [ROLES.QUESTION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide rights to review and submit questions to user.',

@@ -23,6 +23,7 @@ import testConstants from
 import { IBlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.roles;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
@@ -31,7 +32,7 @@ describe('Blog Editor', function() {
 
   beforeAll(async function() {
     blogPostEditor = await userFactory.createNewUser(
-      'blogPostEditor', 'blog_post_editor@example.com', ['blog post editor']);
+      'blogPostEditor', 'blog_post_editor@example.com', [ROLES.BLOG_POST_EDITOR]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should check blog editor unable to publish duplicate blog post',

@@ -23,6 +23,9 @@ import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-
 import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
 import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
+import testConstants from './test-constants';
+
+const ROLES = testConstants.roles;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -94,7 +97,7 @@ export let assignRolesToUser = async function<
     }
 
     switch (role) {
-      case 'blog post editor':
+      case ROLES.BLOG_POST_EDITOR:
         await superAdminInstance.assignUserToRoleFromBlogAdminPage(
           user.username, 'BLOG_POST_EDITOR');
         break;
@@ -141,8 +144,8 @@ export let createNewSuperAdmin = async function(
   // to be temporarily created to assign "super admin" roles.
   const user = await createNewUser(username, 'testadmin@example.com');
   const superAdmin = await composeUserWithRole(user, SuperAdminFactory());
-  await superAdmin.assignRoleToUser(username, 'blog admin');
-  await superAdmin.expectUserToHaveRole(username, 'blog admin');
+  await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+  await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
 
   return composeUserWithRole(superAdmin, BlogAdminFactory());
 };

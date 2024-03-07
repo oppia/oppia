@@ -24,14 +24,16 @@ import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
 import { IBlogAdmin } from '../../user-utilities/blog-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.roles;
 
 describe('Blog Admin', function() {
-  const ROLE_BLOG_ADMIN = 'blog admin';
-  const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-  let superAdmin: ISuperAdmin & IBlogAdmin;
+  let superAdmin: ISuperAdmin;
+  let blogAdmin: IBlogAdmin;
 
   beforeAll(async function() {
     superAdmin = await userFactory.createNewSuperAdmin('superAdm');
+    blogAdmin = await userFactory.createNewUser(
+      'blogAdm', 'blog_admin@example.com', [ROLES.BLOG_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   /** TODO(#17162): This test should be done without the need of super admin, as
@@ -45,24 +47,24 @@ describe('Blog Admin', function() {
       const guestUsr2 = await userFactory.createNewUser(
         'guestUsr2', 'guest_user2@example.com');
 
-      await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
-      await superAdmin.assignUserToRoleFromBlogAdminPage(
+      await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
+      await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr1', 'BLOG_ADMIN');
-      await superAdmin.expectUserToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
+      await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
 
       await superAdmin.expectUserNotToHaveRole(
-        'guestUsr2', ROLE_BLOG_POST_EDITOR);
-      await superAdmin.assignUserToRoleFromBlogAdminPage(
+        'guestUsr2', ROLES.BLOG_POST_EDITOR);
+      await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr2', 'BLOG_POST_EDITOR');
-      await superAdmin.expectUserToHaveRole('guestUsr2', ROLE_BLOG_POST_EDITOR);
+      await superAdmin.expectUserToHaveRole('guestUsr2', ROLES.BLOG_POST_EDITOR);
 
-      await superAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
+      await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(
-        'guestUsr2', ROLE_BLOG_POST_EDITOR);
+        'guestUsr2', ROLES.BLOG_POST_EDITOR);
 
-      await superAdmin.expectMaximumTagLimitNotToBe(5);
-      await superAdmin.setMaximumTagLimitTo(5);
-      await superAdmin.expectMaximumTagLimitToBe(5);
+      await blogAdmin.expectMaximumTagLimitNotToBe(5);
+      await blogAdmin.setMaximumTagLimitTo(5);
+      await blogAdmin.expectMaximumTagLimitToBe(5);
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     }, DEFAULT_SPEC_TIMEOUT);
