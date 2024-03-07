@@ -69,7 +69,7 @@ export const ObjectsDomainConstants = {
   },
 
   // Used for converting units to their canonical forms.
-  // Keys represent unit name, and values are their normalized forms.
+  // Keys represent unit name, and values are their canonical forms.
   // Example: 'm' and 'meter' both map to 'm' (meters)
   UNIT_TO_NORMALIZED_UNIT_MAPPING: {
     // Length.
