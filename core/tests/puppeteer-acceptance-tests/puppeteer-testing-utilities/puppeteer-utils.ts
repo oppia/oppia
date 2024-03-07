@@ -51,8 +51,6 @@ export interface IBaseUser extends IUserProps {
   closeBrowser: () => Promise<void>;
 }
 
-export type IBaseUserFactory = () => IBaseUser;
-
 export class BaseUser implements IBaseUser {
   page!: Page;
   browserObject!: Browser;
@@ -208,4 +206,4 @@ export class BaseUser implements IBaseUser {
   }
 }
 
-export const BaseUserFactory: IBaseUserFactory = () => (new BaseUser());
+export const BaseUserFactory = () => new BaseUser();

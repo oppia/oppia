@@ -78,7 +78,6 @@ let composeUserWithRole = function<
   return user as TUser & TRole;
 };
 
-
 /**
  * This function assigns roles to a user and returns the instance of that user.
  */
