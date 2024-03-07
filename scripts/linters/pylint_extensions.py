@@ -2935,7 +2935,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
 
     def visit_binop(self, node: astroid.BinOp) -> None:
          """
-         Visits a binary operation node in the AST and checks if it's a string
+         Visits a binary operation node in the AST then checks if it's a string
          concatenation operation.
 
          Args:
@@ -2943,22 +2943,11 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
          """
 
          if isinstance(node, astroid.BinOp) and node.op == '+':
-            self._is_string_concatenation(node)
-
-    def _is_string_concatenation(self, node: astroid.BinOp):
-            """
-            Determines if the given binary operation node represents string concatenation.
-
-            Args:
-                node: The binary operation node to check.
-            """
-
             left_inferred = next(node.left.infer())
             right_inferred = next(node.right.infer())
 
             if isinstance(left_inferred.value, str) and isinstance(right_inferred.value, str):
                 self.add_message('prefer-string-interpolation', node=node)
-
 
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
