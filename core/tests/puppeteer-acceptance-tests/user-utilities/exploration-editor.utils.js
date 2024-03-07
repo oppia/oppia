@@ -182,13 +182,13 @@ module.exports = class explorationAdmin extends baseUser {
     let revisions = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async (el) => el.textContent);
+        revisionVersionNoSelector, async (el)=> el.textContent);
       let notes = await element.$eval(
-        revisionNoteSelector, async (el) => el.textContent);
+        revisionNoteSelector, async(el) => el.textContent);
       let user = await element.$eval(
-        revisionUsernameSelector, async (el) => el.textContent);
+        revisionUsernameSelector, async(el) => el.textContent);
       let date = await element.$eval(
-        revisionDateSelector, async (el) => el.textContent);
+        revisionDateSelector, async(el) => el.textContent);
       revisions.push({ versionNo, notes, user, date });
     }
     return revisions;
@@ -205,13 +205,13 @@ module.exports = class explorationAdmin extends baseUser {
       throw new Error('No revisions found');
     }
     let versionNo = await element.$eval(
-      revisionVersionNoSelector, async (el) => el.textContent);
+      revisionVersionNoSelector, async(el) => el.textContent);
     let notes = await element.$eval(
-      revisionNoteSelector, async (el) => el.textContent);
+      revisionNoteSelector, async(el) => el.textContent);
     let user = await element.$eval(
-      revisionUsernameSelector, async (el) => el.textContent);
+      revisionUsernameSelector, async(el) => el.textContent);
     let date = await element.$eval(
-      revisionDateSelector, async (el) => el.textContent);
+      revisionDateSelector, async(el) => el.textContent);
     if (!versionNo || !user || !date || typeof notes === 'undefined') {
       throw new Error('The latest revision is missing one or more properties');
     }
@@ -340,7 +340,7 @@ module.exports = class explorationAdmin extends baseUser {
     await this.page.waitForSelector(versionsList);
     let element = await this.page.$(versionsList);
     let notes = await element.$eval(
-      revisionNoteSelector, async (el) => el.textContent);
+      revisionNoteSelector, async(el) => el.textContent);
     showMessage(notes);
     await this.page.waitForTimeout(500);
     if (notes === ' Reverted exploration to version 14 ') {
@@ -426,7 +426,8 @@ module.exports = class explorationAdmin extends baseUser {
       await this.createNewCard(`Question ${i + 1}`);
       await this.goToNextCard(i + 1);
       await this.loadCardWithQuestion(
-        `mention a negative number greater than ${-100 - i}`, numericInputSelector);
+        `mention a negative number greater than ${-100 - i}`,
+         numericInputSelector);
       await this.addResponsesToTheInteraction(`${-99 - i}`);
     }
 
