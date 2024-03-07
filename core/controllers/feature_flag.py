@@ -16,8 +16,8 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feature_flag_services
@@ -62,6 +62,6 @@ class FeatureFlagDummyHandler(
         self.render_json({
             'msg': 'ok',
             'is_enabled': feature_flag_services.is_feature_flag_enabled(
-                self.user_id, platform_feature_list.FeatureNames.
+                self.user_id, feature_flag_list.FeatureNames.
                 DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
         })

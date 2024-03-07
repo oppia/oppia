@@ -109,16 +109,16 @@ describe('Add Hint Modal Component', () => {
   });
 
   it('should check if hint length is not valid', () => {
-    let hint1 = '<p>This is a hint </p>';
+    let hint1 = '<p>This is a hint.</p>';
     let hint2 = hint1.repeat(35);
 
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
   it('should update hint', () => {
-    component.tmpHint = 'hint';
+    component.tmpHint = '<p>hint</p>';
 
-    let hint = 'new hint';
+    let hint = '<p>new hint</p>';
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);

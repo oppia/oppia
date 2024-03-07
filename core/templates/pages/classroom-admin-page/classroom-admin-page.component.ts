@@ -18,7 +18,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
@@ -542,7 +541,3 @@ export class ClassroomAdminPageComponent implements OnInit {
     return this.topicNameToPrerequisiteTopicNames[topicName].length;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaClassroomAdminPage', downgradeComponent(
-    {component: ClassroomAdminPageComponent}));

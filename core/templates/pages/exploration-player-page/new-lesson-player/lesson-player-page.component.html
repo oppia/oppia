@@ -1,0 +1,15 @@
+<div class="lesson-player-page-container">
+  <oppia-player-header></oppia-player-header>
+  <div *ngIf="isLoadingExploration" class="loader-container">
+    <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
+  </div>
+  <div class="oppia-new-player-content">
+    <oppia-player-sidebar></oppia-player-sidebar>
+    <div class="oppia-new-player-main-content">
+      <oppia-new-audio-bar></oppia-new-audio-bar>
+      <oppia-new-lesson-player-footer></oppia-new-lesson-player-footer>
+    </div>
+  </div>
+  <attribution-guide></attribution-guide>
+  <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
+</div>
