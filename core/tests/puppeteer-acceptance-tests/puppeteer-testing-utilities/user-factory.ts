@@ -37,10 +37,10 @@ let activeUsers: IBaseUser[] = [];
  * Mapping of user roles to their respective function class.
  */
 const USER_ROLE_MAPPING = {
-  'translation admin': TranslationAdminFactory,
-  'blog admin': BlogAdminFactory,
-  'blog post editor': BlogPostEditorFactory,
-  'question admin': QuestionAdminFactory
+  [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
+  [ROLES.BLOG_ADMIN]: BlogAdminFactory,
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
+  [ROLES.QUESTION_ADMIN]: QuestionAdminFactory
 } as const;
 
 /**
