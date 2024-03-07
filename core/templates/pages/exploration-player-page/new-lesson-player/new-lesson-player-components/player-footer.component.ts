@@ -31,7 +31,6 @@ import { ExplorationPlayerStateService } from '../../services/exploration-player
 import { PlayerTranscriptService } from '../../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { ContentTranslationManagerService } from '../../services/content-translation-manager.service';
 import { ProgressReminderModalComponent } from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
 
