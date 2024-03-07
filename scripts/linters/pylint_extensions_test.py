@@ -4770,3 +4770,56 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
                 node)
+class PreventStringConcatenationCheckerTests(unittest.TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.PreventStringConcatenationChecker)
+        self.checker_test_object.setup_method()
+
+    def test_two_strings_concatenation(self) -> None:
+        node = astroid.extract_node(
+            """
+            a = 'a' + 'b' #@
+            """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id = 'prefer-string-interpolation',
+                node=expression_node,
+            ),
+            ignore_position=True,
+        ):
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_concatenation_of_variables(self) -> None:
+        node = astroid.extract_node(
+            """
+            var1 = 'Super'
+            var2 = 'man'
+            hero = var1 + var2 #@
+            """)
+
+        expression_node = node.value
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='prefer-string-interpolation',
+                node=expression_node,
+            ),
+            ignore_position=True,
+        ):
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_addition(self) -> None:
+        node = astroid.extract_node(
+            """
+            total = 5 + 5 #@
+            """)
+
+        expression_node = node.value
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
