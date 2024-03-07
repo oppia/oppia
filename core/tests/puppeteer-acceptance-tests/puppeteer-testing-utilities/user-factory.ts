@@ -30,10 +30,6 @@ import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils'
 let superAdminInstance: ISuperAdmin & IBlogAdmin | null = null;
 let activeUsers: IBaseUser[] = [];
 
-type UnionToIntersection<U> =
-  (U extends IBaseUser ? (k: U) => void : never) extends
-    ((k: infer I) => void) ? I : never;
-
 /**
  * Mapping of user roles to their respective function class.
  */
@@ -44,8 +40,15 @@ const USER_ROLE_MAPPING = {
   'question admin': QuestionAdminFactory
 };
 
+type UnionToIntersection<U> =
+  (U extends IBaseUser ? (k: U) => void : never) extends
+    ((k: infer I) => void) ? I : never;
+
+type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
+  UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
+
 /**
- * This function does creates a composition of the user and the role
+ * This function creates a composition of the user and the role
  * through object prototypes and returns the instance of that user.
  */
 export let composeUserRole = function<
@@ -75,6 +78,7 @@ export let composeUserRole = function<
   return user as TUser & TRole;
 };
 
+
 /**
  * This function assigns a role to a user and returns the instance of that user.
  */
@@ -84,8 +88,7 @@ export let assignRolesToUser = async function<
 >(
     user: TUser,
     roles: TRole[]
-): Promise<TUser & UnionToIntersection<
-    ReturnType<typeof USER_ROLE_MAPPING[TRole]>>> {
+): Promise<TUser & MultipleRoleIntersection<typeof roles>> {
   for (const role of roles) {
     if (superAdminInstance === null) {
       superAdminInstance = await createNewSuperAdmin('superAdm');
@@ -106,22 +109,22 @@ export let assignRolesToUser = async function<
     composeUserRole(user, USER_ROLE_MAPPING[role]());
   }
 
-  return user as TUser & UnionToIntersection<
-    ReturnType<typeof USER_ROLE_MAPPING[TRole]>>;
+  return user as TUser & MultipleRoleIntersection<typeof roles>;
 };
 
 /**
  * This function creates a new user and returns the instance of that user.
  */
 export let createNewUser = async function(
-    username: string, email: string
-): Promise<ILoggedInUser> {
-  const user = BaseUserFactory();
+    username: string, email: string,
+    roles: (keyof typeof USER_ROLE_MAPPING)[] = []
+): Promise<ILoggedInUser & MultipleRoleIntersection<typeof roles>> {
+  const user = composeUserRole(BaseUserFactory(), LoggedInUserFactory());
   await user.openBrowser();
   await user.signUpNewUser(username, email);
   activeUsers.push(user);
 
-  return composeUserRole(user, LoggedInUserFactory());
+  return await assignRolesToUser(user, roles);
 };
 
 /**

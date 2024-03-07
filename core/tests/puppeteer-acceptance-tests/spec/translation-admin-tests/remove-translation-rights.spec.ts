@@ -29,10 +29,8 @@ describe('Translation Admin', function() {
   let translationAdmin: ITranslationAdmin;
 
   beforeAll(async function() {
-    const user = await userFactory.createNewUser(
-      'translationAdm', 'translation_admin@example.com');
-    translationAdmin = await userFactory.assignRolesToUser(
-      user, ['translation admin']);
+    translationAdmin = await userFactory.createNewUser(
+      'translationAdm', 'translation_admin@example.com', ['translation admin']);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to remove translation rights from user.',

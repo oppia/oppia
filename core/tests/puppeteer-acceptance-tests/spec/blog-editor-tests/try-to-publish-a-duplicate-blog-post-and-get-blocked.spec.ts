@@ -30,10 +30,8 @@ describe('Blog Editor', function() {
   let blogPostEditor: IBlogPostEditor;
 
   beforeAll(async function() {
-    const user = await userFactory.createNewUser(
-      'blogPostEditor', 'blog_post_editor@example.com');
-    blogPostEditor =
-      await userFactory.assignRolesToUser(user, ['blog post editor']);
+    blogPostEditor = await userFactory.createNewUser(
+      'blogPostEditor', 'blog_post_editor@example.com', ['blog post editor']);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should check blog editor unable to publish duplicate blog post',
