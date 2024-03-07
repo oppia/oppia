@@ -38,6 +38,12 @@ describe('voice artist language mapping model', () => {
       },
       voiceArtist2: {
         hi: 'hi-IN'
+      },
+      voiceArtist3: {
+        en: 'en-IN'
+      },
+      voiceArtist4: {
+        ar: 'Arabic (Egypt)'
       }
     };
 
@@ -45,6 +51,6 @@ describe('voice artist language mapping model', () => {
       VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
         voiceArtistIdToLanguageMapping));
 
-    expect(voiceArtistLanguageMappingList.length).toEqual(2);
+    expect(voiceArtistLanguageMappingList.length).toEqual(4);
   });
 });

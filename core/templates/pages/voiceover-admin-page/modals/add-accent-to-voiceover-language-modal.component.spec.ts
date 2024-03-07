@@ -32,6 +32,7 @@ describe('Add accent to voiceover', () => {
   let componentInstance: AddAccentToVoiceoverLanguageModalComponent;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let closeSpy: jasmine.Spy;
+  let dismissSpy: jasmine.Spy;
   let ngbActiveModal: NgbActiveModal;
   let audioPlayerService: AudioPlayerService;
 
@@ -60,6 +61,7 @@ describe('Add accent to voiceover', () => {
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     audioPlayerService = TestBed.inject(AudioPlayerService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
   });
@@ -83,7 +85,7 @@ describe('Add accent to voiceover', () => {
 
   it('should be able to close modal', () => {
     componentInstance.cancel();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 
   it('should be able to update language accent code', () => {
