@@ -38,7 +38,7 @@ const USER_ROLE_MAPPING = {
   'blog admin': BlogAdminFactory,
   'blog post editor': BlogPostEditorFactory,
   'question admin': QuestionAdminFactory
-};
+} as const;
 
 /**
  * These types are used to create a union of all the roles and then
@@ -140,15 +140,15 @@ export let createNewSuperAdmin = async function(
   // Here we manually intialize the super admin instance since it needs
   // to be temporarily created to assign "super admin" roles.
   const user = await createNewUser(username, 'testadmin@example.com');
-  const tempSuperAdmin = await composeUserWithRole(user, SuperAdminFactory());
-  await tempSuperAdmin.assignRoleToUser(username, 'blog admin');
-  await tempSuperAdmin.expectUserToHaveRole(username, 'blog admin');
+  const superAdmin = await composeUserWithRole(user, SuperAdminFactory());
+  await superAdmin.assignRoleToUser(username, 'blog admin');
+  await superAdmin.expectUserToHaveRole(username, 'blog admin');
 
-  return composeUserWithRole(tempSuperAdmin, BlogAdminFactory());
+  return composeUserWithRole(superAdmin, BlogAdminFactory());
 };
 
 /**
- * The function closes all the browsers opened by different users.
+ * This function closes all the browsers opened by different users.
  */
 export let closeAllBrowsers = async function(): Promise<void> {
   for (let i = 0; i < activeUsers.length; i++) {
@@ -157,8 +157,7 @@ export let closeAllBrowsers = async function(): Promise<void> {
 };
 
 /**
- * Function to close the browser opened by the specified user
- * should be closed.
+ * This function closes the browser for the provided user.
  */
 export let closeBrowserForUser = async function(
     user: IBaseUser

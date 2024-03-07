@@ -63,9 +63,7 @@ let printFailures = function(
     printNewline();
     print('Stack:');
     printNewline();
-    print(
-      !result.failedExpectations[i].stack ? '' :
-      result.failedExpectations[i].stack);
+    print(result.failedExpectations[i].stack ?? '');
   }
 };
 

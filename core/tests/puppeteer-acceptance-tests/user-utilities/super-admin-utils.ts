@@ -59,7 +59,7 @@ class SuperAdmin extends BaseUser implements ISuperAdmin {
   }
 
   /**
-   * The function excepts the user to have the given role.
+   * The function expects the user to have the given role.
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
@@ -81,7 +81,7 @@ class SuperAdmin extends BaseUser implements ISuperAdmin {
   }
 
   /**
-   * The function excepts the user to not have the given role.
+   * The function expects the user to not have the given role.
    */
   async expectUserNotToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();

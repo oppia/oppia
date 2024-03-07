@@ -29,7 +29,7 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?'
 ];
 
-interface IUserProps {
+interface IUserProperties {
   page: Page;
   browserObject: Browser;
   userHasAcceptedCookies: boolean;
@@ -37,7 +37,7 @@ interface IUserProps {
   email: string;
 }
 
-export interface IBaseUser extends IUserProps {
+export interface IBaseUser extends IUserProperties {
   openBrowser: () => Promise<Page>;
   signInWithEmail: (email: string) => Promise<void>;
   signUpNewUser: (userName: string, signInEmail: string) => Promise<void>;
@@ -84,6 +84,9 @@ export class BaseUser implements IBaseUser {
 
     await puppeteer
       .launch({
+        /** TODO(#17761): Right now some acceptance tests are failing on
+         * headless mode. As per the expected behavior we need to make sure
+         * every test passes on both modes. */
         headless,
         args
       })
@@ -121,17 +124,17 @@ export class BaseUser implements IBaseUser {
   /**
    * This function signs up a new user with the given username and email.
    */
-  async signUpNewUser(userName: string, signInEmail: string): Promise<void> {
-    await this.signInWithEmail(signInEmail);
-    await this.type('input.e2e-test-username-input', userName);
+  async signUpNewUser(username: string, email: string): Promise<void> {
+    await this.signInWithEmail(email);
+    await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])');
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
-    this.username = userName;
-    this.email = signInEmail;
+    this.username = username;
+    this.email = email;
   }
 
   /**
@@ -186,8 +189,11 @@ export class BaseUser implements IBaseUser {
    */
   async uploadFile(filePath: string): Promise<void> {
     const inputUploadHandle = await this.page.$('input[type=file]');
+    if (inputUploadHandle === null) {
+      throw new Error('No file input found');
+    }
     let fileToUpload = filePath;
-    inputUploadHandle?.uploadFile(fileToUpload);
+    inputUploadHandle.uploadFile(fileToUpload);
   }
 
   /**
