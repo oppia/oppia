@@ -84,7 +84,7 @@
   </ng-container>
 
   <!--REDESIGN-->
-  <div *ngIf="featureFlag" class="gap-y-4"> 
+  <div *ngIf="featureFlag"> 
     <p class="greeting-heading mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="section-container" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="section-heading">
@@ -95,7 +95,7 @@
           ) | translate  
         }}
       </p>
-      <div class="empty-continue-where-you-left-off-section overflow-scroll">
+      <div [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles"> 
           <p class="section-heading mb-0">
             {{'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate}}
@@ -116,16 +116,12 @@
       </div>
     </div>
     <div class="section-container e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
-      <p class="section-heading">
-        {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }}
-      </p>
+      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="suggested-for-you-section">
         <ng-container *ngFor="let item of untrackedTopics | keyvalue">
           <p *ngIf="item.value.length !== 0" class="subsection-heading"> Basic {{item.key}} </p>
           <hr width="100%" color="#00645c" class="mt-2" size="2">
-          <div class="topic-summary-tile-section-1 d-flex gap-4 mt-4 w-100"
-            [ngStyle]="windowIsNarrow && {'width': getWidth(item.value.length) + 'px'}">
-            <!--Need to allow overflow-x-scroll-->
+          <div class="topic-summary-tile-section-1 d-flex gap-4 mt-4 w-100">
             <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile-1 flex-shrink-0">
               <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
               </oppia-learner-topic-summary-tile>

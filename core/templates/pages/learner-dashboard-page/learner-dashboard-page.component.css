@@ -329,9 +329,9 @@ oppia-learner-dashboard-page .learner-groups-icon {
   padding: 0 16px;
 }
 
-.learner-dashboard-content {
+/*.learner-dashboard-content {
   height: 92vh;
-}
+}*/
 
 .sidebar {
   background-color: #00645c;
@@ -376,6 +376,7 @@ oppia-learner-dashboard-page .learner-groups-icon {
 }
 
 .sidebar-position {
+  height: 92vh;
   max-height: 750px;
 }
 
