@@ -2919,7 +2919,13 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
-class PreventStringConcatenationChecker(checkers.BaseChecker):
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[misc]
     """Checks for string concactenation and encourage string interpolation."""
 
     __implements__ = interfaces.IAstroidChecker
