@@ -4771,6 +4771,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(
                 node)
 
+
 class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
@@ -4789,7 +4790,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id = 'prefer-string-interpolation',
+                msg_id='prefer-string-interpolation',
                 node=expression_node,
             ),
             ignore_position=True,
