@@ -212,7 +212,7 @@ module.exports = class explorationAdmin extends baseUser {
       selector3, async(el) => el.textContent);
     let property4 = await element.$eval(
       selector4, async(el) => el.textContent);
-    if (!property1 || typeof property2 === 'undefined' || 
+    if (!property1 || typeof property2 === 'undefined' ||
       !property3 || !property4) {
       throw new Error('The latest revision is missing one or more properties');
     }
