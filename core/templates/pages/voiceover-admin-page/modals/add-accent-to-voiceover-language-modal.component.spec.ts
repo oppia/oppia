@@ -82,7 +82,7 @@ describe('Add accent to voiceover', () => {
   }));
 
   it('should be able to close modal', () => {
-    componentInstance.close();
+    componentInstance.cancel();
     expect(closeSpy).toHaveBeenCalled();
   });
 

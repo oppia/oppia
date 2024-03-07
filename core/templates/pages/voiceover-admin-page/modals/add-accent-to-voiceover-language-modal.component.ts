@@ -61,11 +61,13 @@ export class AddAccentToVoiceoverLanguageModalComponent
   }
 
   update(): void {
+    this.pauseAudio();
     this.ngbActiveModal.close(this.languageAccentCode);
   }
 
-  close(): void {
-    this.ngbActiveModal.close();
+  cancel(): void {
+    this.pauseAudio();
+    this.ngbActiveModal.dismiss();
   }
 
   addLanguageAccentCodeSupport(languageAccentCode: string): void {

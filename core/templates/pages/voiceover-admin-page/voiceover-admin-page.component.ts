@@ -65,6 +65,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
     'languageAccentCode', 'languageAccentCodeModify'
   ];
 
+  voiceArtistsDataCount: number = 0;
+
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
       response => {
@@ -87,6 +89,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
           VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
             this.voiceArtistIdToLanguageMapping)
         );
+        this.voiceArtistsDataCount = (
+          this.voiceArtistIdToLanguageMappingList.length);
         this.voiceArtistIdToVoiceArtistName = (
           response.voiceArtistIdToVoiceArtistName);
       }
@@ -115,6 +119,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
         VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
           this.voiceArtistIdToLanguageMapping)
       );
+      this.voiceoverBackendApiService.updateVoiceArtistToLanguageAccentAsync(
+        voiceArtistId, languageCode, languageAccentCode);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is

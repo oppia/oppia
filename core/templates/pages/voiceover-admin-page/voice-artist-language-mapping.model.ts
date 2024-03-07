@@ -56,6 +56,19 @@ export class VoiceArtistLanguageMapping {
       voiceArtistID, languageCode, languageAccentCode);
   }
 
+  static sortBasedOnLanguageCode(
+      metaDataMapping1: VoiceArtistLanguageMapping,
+      metadataMapping2: VoiceArtistLanguageMapping
+  ): number {
+    if (metaDataMapping1._languageCode < metadataMapping2._languageCode) {
+      return -1;
+    }
+    if (metaDataMapping1._languageCode > metadataMapping2._languageCode) {
+      return 1;
+    }
+    return 0;
+  }
+
   static createVoiceArtistLanguageMappingList(
       voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
   ): VoiceArtistLanguageMapping[] {
@@ -71,6 +84,6 @@ export class VoiceArtistLanguageMapping {
             voiceArtistId, languageCode, languageAccentCode));
       }
     }
-    return voiceArtistLanguageMappingList;
+    return voiceArtistLanguageMappingList.sort(this.sortBasedOnLanguageCode);
   }
 }
