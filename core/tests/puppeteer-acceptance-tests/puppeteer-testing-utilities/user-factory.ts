@@ -40,6 +40,11 @@ const USER_ROLE_MAPPING = {
   'question admin': QuestionAdminFactory
 };
 
+/**
+ * These types are used to create a union of all the roles and then
+ * create an intersection of all the roles. This is used to create a
+ * composition of the user and the role for type inference.
+ */
 type UnionToIntersection<U> =
   (U extends IBaseUser ? (k: U) => void : never) extends
     ((k: infer I) => void) ? I : never;
@@ -51,7 +56,7 @@ type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
  * This function creates a composition of the user and the role
  * through object prototypes and returns the instance of that user.
  */
-export let composeUserRole = function<
+let composeUserWithRole = function<
   TUser extends IBaseUser,
   TRole extends IBaseUser
 >(
@@ -61,11 +66,6 @@ export let composeUserRole = function<
   const userPrototype = Object.getPrototypeOf(user);
   const rolePrototype = Object.getPrototypeOf(role);
 
-  /**
-   * Here we merge the two classes by altering their prototypes. It is fine to
-   * cast the return so we can use the typescript functionalities of
-   * both classes.
-   */
   Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
     Object.defineProperty(
       userPrototype,
@@ -80,7 +80,7 @@ export let composeUserRole = function<
 
 
 /**
- * This function assigns a role to a user and returns the instance of that user.
+ * This function assigns roles to a user and returns the instance of that user.
  */
 export let assignRolesToUser = async function<
   TUser extends IBaseUser,
@@ -106,7 +106,7 @@ export let assignRolesToUser = async function<
 
     await superAdminInstance.expectUserToHaveRole(user.username, role);
 
-    composeUserRole(user, USER_ROLE_MAPPING[role]());
+    composeUserWithRole(user, USER_ROLE_MAPPING[role]());
   }
 
   return user as TUser & MultipleRoleIntersection<typeof roles>;
@@ -119,7 +119,7 @@ export let createNewUser = async function(
     username: string, email: string,
     roles: (keyof typeof USER_ROLE_MAPPING)[] = []
 ): Promise<ILoggedInUser & MultipleRoleIntersection<typeof roles>> {
-  const user = composeUserRole(BaseUserFactory(), LoggedInUserFactory());
+  const user = composeUserWithRole(BaseUserFactory(), LoggedInUserFactory());
   await user.openBrowser();
   await user.signUpNewUser(username, email);
   activeUsers.push(user);
@@ -141,11 +141,11 @@ export let createNewSuperAdmin = async function(
   // Here we manually intialize the super admin instance since it needs
   // to be temporarily created to assign "super admin" roles.
   const user = await createNewUser(username, 'testadmin@example.com');
-  const tempSuperAdmin = await composeUserRole(user, SuperAdminFactory());
+  const tempSuperAdmin = await composeUserWithRole(user, SuperAdminFactory());
   await tempSuperAdmin.assignRoleToUser(username, 'blog admin');
   await tempSuperAdmin.expectUserToHaveRole(username, 'blog admin');
 
-  return composeUserRole(tempSuperAdmin, BlogAdminFactory());
+  return composeUserWithRole(tempSuperAdmin, BlogAdminFactory());
 };
 
 /**
