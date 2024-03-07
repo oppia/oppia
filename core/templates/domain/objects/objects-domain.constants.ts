@@ -68,7 +68,7 @@ export const ObjectsDomainConstants = {
     EMPTY_STRING: 'I18N_INTERACTIONS_RATIO_EMPTY_STRING',
   },
 
-  // Used for converting units to normalized forms.
+  // Used for converting units to their canonical forms.
   // Keys represent unit name, and values are their normalized forms.
   // Example: 'm' and 'meter' both map to 'm' (meters)
   UNIT_TO_NORMALIZED_UNIT_MAPPING: {
