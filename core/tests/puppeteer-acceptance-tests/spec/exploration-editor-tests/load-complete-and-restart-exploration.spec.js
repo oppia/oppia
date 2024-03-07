@@ -35,7 +35,7 @@ describe('Exploration Admin', function() {
       'explorationAdm', 'exploration_creator@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to load, complete and restart an exploration',
+  it('should be able to load, complete and restart an exploration preview',
     async function() {
       await explorationAdmin.navigateToCreatorDashboard();
       await explorationAdmin.createExploration(

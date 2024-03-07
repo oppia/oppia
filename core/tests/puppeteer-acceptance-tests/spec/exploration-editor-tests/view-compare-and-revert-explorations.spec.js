@@ -23,6 +23,10 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
+const versionNumber = '.e2e-history-table-index';
+const notes = '.e2e-test-history-table-message';
+const userName = '.e2e-test-history-table-profile';
+const date = '.e2e-test-history-tab-commit-date';
 
 describe('Exploration Admin', function() {
   let explorationAdmin = null;
@@ -41,9 +45,10 @@ describe('Exploration Admin', function() {
         'Test-revision', 13);
 
       await explorationAdmin.navigateToHistoryTab();
-      await explorationAdmin.expectRevisionsToHaveVersionNoNotesUsernameDate();
+      await explorationAdmin.expectRevisionsToHave(
+        versionNumber, notes, userName, date);
       await explorationAdmin.expectRevisionsToBeOrderedByDate();
-      await explorationAdmin.filterRevisionsByUsername();
+      await explorationAdmin.filterRevisionsByUsername('explorationAdm');
       await explorationAdmin.ExpectPaginatorToChangeItemsPerPage(15);
 
       await explorationAdmin.compareDifferentRevisions();

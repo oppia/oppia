@@ -198,28 +198,29 @@ module.exports = class explorationAdmin extends baseUser {
   * Function to confirm the existence of the Version number, Notes, Username,
   * and Date for a given revision.
   */
-  async expectRevisionsToHaveVersionNoNotesUsernameDate() {
+  async expectRevisionsToHave(selector1, selector2, selector3, selector4) {
     await this.page.waitForTimeout(500);
     let element = await this.page.$(versionsList);
     if (!element) {
       throw new Error('No revisions found');
     }
-    let versionNo = await element.$eval(
-      revisionVersionNoSelector, async(el) => el.textContent);
-    let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
-    let user = await element.$eval(
-      revisionUsernameSelector, async(el) => el.textContent);
-    let date = await element.$eval(
-      revisionDateSelector, async(el) => el.textContent);
-    if (!versionNo || !user || !date || typeof notes === 'undefined') {
+    let property1 = await element.$eval(
+      selector1, async(el) => el.textContent);
+    let property2 = await element.$eval(
+      selector2, async(el) => el.textContent);
+    let property3 = await element.$eval(
+      selector3, async(el) => el.textContent);
+    let property4 = await element.$eval(
+      selector4, async(el) => el.textContent);
+    if (!property1 || typeof property2 === 'undefined' || !property3 || !property4) {
       throw new Error('The latest revision is missing one or more properties');
     }
     showMessage('The versions are not missing any properties');
   }
+  
 
   /**
-  * Function to verify whether the revisions are sorted by dates and if the
+  * Function to verify whether the revisions are sorted by dates or not.
   */
   async expectRevisionsToBeOrderedByDate() {
     let revisions = await this.getRevisionsList(versionsList);
@@ -235,8 +236,8 @@ module.exports = class explorationAdmin extends baseUser {
   /**
   * Function to filter revisions by username.
   */
-  async filterRevisionsByUsername() {
-    await this.type(userNameEdit, 'explorationAdm');
+  async filterRevisionsByUsername(userName) {
+    await this.type(userNameEdit, userName);
     await this.type(userNameEdit, '\u000d');
   }
 
