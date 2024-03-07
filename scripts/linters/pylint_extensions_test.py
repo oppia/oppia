@@ -4770,6 +4770,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
                 node)
+
 class PreventStringConcatenationCheckerTests(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
