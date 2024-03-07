@@ -78,10 +78,10 @@ describe('Exploration Creator', function() {
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
 
-      await explorationCreator.selectCategory();
+      await explorationCreator.selectAlgebraAsACategory();
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
 
-      await explorationCreator.selectLanguage();
+      await explorationCreator.selectEnglishAsLanguage();
       await explorationCreator.expectSelectedLanguageToBe('English');
 
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);

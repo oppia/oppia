@@ -198,7 +198,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in selecting a category from dropdawn.
    */
-  async selectCategory() {
+  async selectAlgebraAsACategory() {
     await this.clickOn(cateogryDropDawn);
     await this.clickOn(addCateogry);
   }
@@ -228,7 +228,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in selecting language from dropdawn.
    */
-  async selectLanguage() {
+  async selectEnglishAsLanguage() {
     await this.clickOn(languageUpdateBar);
     await this.page.waitForTimeout(500);
     await this.clickOn(addLanguage);

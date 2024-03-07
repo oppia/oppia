@@ -46,8 +46,8 @@ describe('Exploration Publisher, Saver and Drafter', function() {
       await explorationCreator.goToSettingsTab();
       await explorationCreator.addTitle('Old Title');
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
-      await explorationCreator.selectCategory();
-      await explorationCreator.selectLanguage();
+      await explorationCreator.selectAlgebraAsACategory();
+      await explorationCreator.selectEnglishAsLanguage();
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
       await explorationCreator.updateSettingsSuccessfully();
 
