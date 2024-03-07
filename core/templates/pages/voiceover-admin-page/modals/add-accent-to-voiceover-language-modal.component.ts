@@ -74,9 +74,10 @@ export class AddAccentToVoiceoverLanguageModalComponent
   }
 
   playAudio(filename: string, explorationId: string): void {
+    this.pauseAudio();
+
     this.currentFilename = filename;
     this.contextService.explorationId = explorationId;
-    this.audioPlayerService.stop();
 
     this.audioPlayerService.loadAsync(filename).then(() => {
       this.audioPlayerService.play();

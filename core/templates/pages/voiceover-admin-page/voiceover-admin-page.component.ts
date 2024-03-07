@@ -59,8 +59,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
   voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
   voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
-  languageAccentMasterList;
-  columnsToDisplay = ['voiceArtist', 'languageCode', 'languageAccentCode', 'languageAccentCodeModify'];
+  languageAccentMasterList: LanguageAccentMasterList;
+  columnsToDisplay: string[] = [
+    'voiceArtist', 'languageCode',
+    'languageAccentCode', 'languageAccentCodeModify'
+  ];
 
   ngOnInit(): void {
     this.voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
@@ -92,7 +95,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   addLanguageAccentForVoiceArtist(
       voiceArtistId: string, languageCode: string
-  ) {
+  ): void {
     let languageAccentCodes = this.languageAccentMasterList[languageCode];
     let modalRef: NgbModalRef = this.ngbModal.
       open(AddAccentToVoiceoverLanguageModalComponent, {
@@ -103,12 +106,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
     modalRef.componentInstance.voiceArtistId = voiceArtistId;
     modalRef.componentInstance.voiceArtistName = (
       this.voiceArtistIdToVoiceArtistName[voiceArtistId]);
-    modalRef.componentInstance.languageAccentCodes = languageAccentCodes
+    modalRef.componentInstance.languageAccentCodes = languageAccentCodes;
 
     modalRef.result.then((languageAccentCode) => {
-      console.log(languageAccentCode);
-
-      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode] = languageAccentCode;
+      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode] = (
+        languageAccentCode);
       this.voiceArtistIdToLanguageMappingList = (
         VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
           this.voiceArtistIdToLanguageMapping)

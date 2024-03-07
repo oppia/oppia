@@ -18,31 +18,46 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { VoiceoverRemovalConfirmModalComponent } from './language-accent-removal-confirm-modal.component';
+import { AddAccentToVoiceoverLanguageModalComponent } from './add-accent-to-voiceover-language-modal.component';
+import { AudioPlayerService } from 'services/audio-player.service';
+import { MatTableModule } from '@angular/material/table';
+import { MaterialModule } from 'modules/material.module';
+import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
-describe('Language Accent Removal Confirmation Modal', () => {
-  let fixture: ComponentFixture<VoiceoverRemovalConfirmModalComponent>;
-  let componentInstance: VoiceoverRemovalConfirmModalComponent;
+describe('Add accent to voiceover', () => {
+  let fixture: ComponentFixture<AddAccentToVoiceoverLanguageModalComponent>;
+  let componentInstance: AddAccentToVoiceoverLanguageModalComponent;
   let closeSpy: jasmine.Spy;
   let ngbActiveModal: NgbActiveModal;
+  let audioPlayerService: AudioPlayerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MatTableModule,
+        MaterialModule,
+        FormsModule,
+        HttpClientTestingModule
+      ],
       declarations: [
-        VoiceoverRemovalConfirmModalComponent
+        AddAccentToVoiceoverLanguageModalComponent
       ],
       providers: [
+        AudioPlayerService,
         NgbActiveModal,
       ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VoiceoverRemovalConfirmModalComponent);
+    fixture = TestBed.createComponent(
+      AddAccentToVoiceoverLanguageModalComponent);
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    audioPlayerService = TestBed.inject(AudioPlayerService);
   });
 
   it('should create', () => {
@@ -52,5 +67,29 @@ describe('Language Accent Removal Confirmation Modal', () => {
   it('should be able to close modal', () => {
     componentInstance.close();
     expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('should be able to update language accent code', () => {
+    let languageAccentCode = 'en-US';
+    componentInstance.languageAccentCode = languageAccentCode;
+    componentInstance.update();
+    expect(closeSpy).toHaveBeenCalledWith(languageAccentCode);
+  });
+
+  it('should be able to add language accent code', () => {
+    componentInstance.languageAccentCode = 'en-US';
+    let updatedLanguageAccentCode = 'en-IN';
+
+    componentInstance.addLanguageAccentCodeSupport(updatedLanguageAccentCode);
+
+    expect(componentInstance.languageAccentCode).toEqual(
+      updatedLanguageAccentCode);
+  });
+
+  it('should be able to play audio', () => {
+    spyOn(audioPlayerService, 'loadAsync').and.returnValue(Promise.resolve());
+    componentInstance.playAudio('filename', 'explorationID');
+
+    expect(audioPlayerService.loadAsync).toHaveBeenCalled();
   });
 });
