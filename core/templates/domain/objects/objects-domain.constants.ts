@@ -260,6 +260,7 @@ export const ObjectsDomainConstants = {
 
     // Currency.
     $: 'dollar',
+    USD: 'dollar',
     dollar: 'dollar',
     dollars: 'dollar',
     Dollar: 'dollar',
