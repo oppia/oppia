@@ -39,7 +39,7 @@
       <button *ngIf="interactionId === 'Continue'"
               (click)="submit.emit()"
               class="player-footer-continue-button">
-        Continue
+        {{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate }}
         <i class="fa fa-lg fa-arrow-right" aria-hidden="true"></i>
       </button>
       <button mat-button

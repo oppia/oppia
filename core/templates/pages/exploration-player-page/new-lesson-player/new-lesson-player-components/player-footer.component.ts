@@ -120,11 +120,6 @@ export class PlayerFooterComponent {
   directiveSubscriptions = new Subscription();
   transcriptLength: number = 0;
   interactionIsInline: boolean = true;
-  CONTINUE_BUTTON_FOCUS_LABEL: string = (
-    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
-
-  SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE: string[] = [
-    'ItemSelectionInput', 'MultipleChoiceInput'];
 
   constructor(
     private explorationPlayerStateService: ExplorationPlayerStateService,
