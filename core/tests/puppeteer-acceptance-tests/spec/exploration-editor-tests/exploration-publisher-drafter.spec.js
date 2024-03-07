@@ -59,6 +59,10 @@ describe('Exploration Publisher, Saver and Drafter', function() {
 
       await explorationCreator.addTitle('New Title');
       await explorationCreator.saveDraftExploration();
+      /**
+       * We are expecting title to be 'Old TitleNew Title' because we are adding.
+       * In old title without deleting.
+       */
       await explorationCreator.expectTitleToBe('Old TitleNew Title');
 
       await explorationVisitor.
