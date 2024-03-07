@@ -16,7 +16,7 @@
  * @fileoverview Tests for language accent removal confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, waitForAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddAccentToVoiceoverLanguageModalComponent } from './add-accent-to-voiceover-language-modal.component';
 import { AudioPlayerService } from 'services/audio-player.service';
@@ -24,11 +24,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { VoiceoverBackendApiService } from 'domain/voiceover/voiceover-backend-api.service';
 
 
 describe('Add accent to voiceover', () => {
   let fixture: ComponentFixture<AddAccentToVoiceoverLanguageModalComponent>;
   let componentInstance: AddAccentToVoiceoverLanguageModalComponent;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let closeSpy: jasmine.Spy;
   let ngbActiveModal: NgbActiveModal;
   let audioPlayerService: AudioPlayerService;
@@ -45,6 +47,7 @@ describe('Add accent to voiceover', () => {
         AddAccentToVoiceoverLanguageModalComponent
       ],
       providers: [
+        VoiceoverBackendApiService,
         AudioPlayerService,
         NgbActiveModal,
       ]
@@ -58,11 +61,25 @@ describe('Add accent to voiceover', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     audioPlayerService = TestBed.inject(AudioPlayerService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
   });
 
-  it('should create', () => {
-    expect(componentInstance).toBeDefined();
-  });
+  it('should initialize component', fakeAsync(() => {
+    let explorationIdToFilenames = {
+      expId: ['filename1.mp3', 'filename2.mp3']
+    };
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchFilenamesForVoiceArtistAsync'
+    ).and.returnValue(Promise.resolve(explorationIdToFilenames));
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(
+      voiceoverBackendApiService.fetchFilenamesForVoiceArtistAsync
+    ).toHaveBeenCalled();
+  }));
 
   it('should be able to close modal', () => {
     componentInstance.close();
