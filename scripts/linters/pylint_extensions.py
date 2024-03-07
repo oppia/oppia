@@ -2918,6 +2918,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
             if name == 'Text':
                 self.add_message('disallowed-text-import', node=node)
 
+
 class PreventStringConcatenationChecker(checkers.BaseChecker):
     """Checks for string concactenation and encourage string interpolation."""
 
@@ -2926,7 +2927,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
     name = 'prefer-string-interpolation'
     priority = -1
     msgs = {
-        'C0042':(
+        'C0042': (
             'Please use string interpolation over string concatenation',
             'prefer-string-interpolation',
             'Used when string concatenation is detected.',
@@ -2934,20 +2935,20 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
     }
 
     def visit_binop(self, node: astroid.BinOp) -> None:
-         """
-         Visits a binary operation node in the AST then checks if it's a string
-         concatenation operation.
+        """Visits a binary operation node in the AST
+        then checks if it's a string concatenation operation.
 
-         Args:
-            node: astroid.BinOp The binary operation node to check.
-         """
+        Args: node: astroid.BinOp The binary operation node to check.
+        """
 
-         if isinstance(node, astroid.BinOp) and node.op == '+':
+        if isinstance(node, astroid.BinOp) and node.op == '+':
             left_inferred = next(node.left.infer())
             right_inferred = next(node.right.infer())
 
-            if isinstance(left_inferred.value, str) and isinstance(right_inferred.value, str):
+            if (isinstance(left_inferred.value, str) and
+                isinstance(right_inferred.value, str)):
                 self.add_message('prefer-string-interpolation', node=node)
+
 
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
