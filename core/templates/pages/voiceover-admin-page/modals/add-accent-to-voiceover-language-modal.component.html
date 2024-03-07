@@ -7,22 +7,22 @@
   <p><strong>Sample Voiceovers:</strong></p>
   <div *ngIf="pageIsInitialized">
     <ol>
-        <li *ngFor="let element of explorationIdsToFilenames | keyvalue">
-          <div *ngFor="let filename of element.value">
-            <button mat-button
-                    class="btn btn-secondary audio-button"
-                    (click)="playAudio(filename, element.key)"
-                    *ngIf="currentFilename !== filename">
-              <mat-icon>play_arrow</mat-icon>
-            </button>
-            <button mat-button
-                    class="btn btn-secondary audio-button"
-                    (click)="pauseAudio()"
-                    *ngIf="currentFilename === filename">
-              <mat-icon>pause</mat-icon>
-            </button>
-          </div>
-        </li>
+      <li *ngFor="let element of explorationIdsToFilenames | keyvalue">
+        <div *ngFor="let filename of element.value">
+          <button mat-button
+                  class="btn btn-secondary audio-button"
+                  (click)="playAudio(filename, element.key)"
+                  *ngIf="currentFilename !== filename">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+          <button mat-button
+                  class="btn btn-secondary audio-button"
+                  (click)="pauseAudio()"
+                  *ngIf="currentFilename === filename">
+            <mat-icon>pause</mat-icon>
+          </button>
+        </div>
+      </li>
     </ol>
   </div>
   <div *ngIf="!pageIsInitialized">
