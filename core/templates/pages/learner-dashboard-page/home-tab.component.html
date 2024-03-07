@@ -95,6 +95,7 @@
           ) | translate
         }}
       </p>
+      <!--go back 3 - title should stay in place when scrolling for small screens -->
       <div [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
           <p class="oppia-learner-dash-section_heading mb-0">
@@ -103,20 +104,18 @@
         </ng-container>
         <!--tbd 2 - handling how exploratitons & topics are sorted by the most recent, add gap-4, temporarily mr-4 -->
         <!--tbd 3 - explorations are only retrieved when clicking on community lessons, can't calculate total number of cards for widht -->
-        <ng-template #continueTiles>
-          <div class="d-flex mt-4 subsection-container"> 
-            <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
-              <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
-                <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [featureFlag]="featureFlag" [displayArea]="'homeTab'"
-                  [topicName]="topicSummaryTile.name">
-                </oppia-learner-story-summary-tile>
-              </ng-container>
+        <div class="d-flex mt-4 subsection-container" *ngIf="continueWhereYouLeftOffList.length === 0"> 
+          <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
+            <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
+              <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [featureFlag]="featureFlag" [displayArea]="'homeTab'"
+                [topicName]="topicSummaryTile.name">
+              </oppia-learner-story-summary-tile>
             </ng-container>
-            <ng-container *ngFor="let lesson of incompleteExplorationsList">
-              <lesson-card [story]="lesson" [topic]="'Community Lesson'"></lesson-card>
-            </ng-container>
-          </div>
-        </ng-template>
+          </ng-container>
+          <ng-container *ngFor="let lesson of incompleteExplorationsList">
+            <lesson-card [story]="lesson" [topic]="'Community Lesson'"></lesson-card>
+          </ng-container>
+        </div>
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
