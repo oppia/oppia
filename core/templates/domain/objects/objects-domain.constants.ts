@@ -68,7 +68,10 @@ export const ObjectsDomainConstants = {
     EMPTY_STRING: 'I18N_INTERACTIONS_RATIO_EMPTY_STRING',
   },
 
-  UNITS_MAPPING: {
+  // Used for converting units to normalized forms.
+  // Keys represent unit name, and values are their normalized forms.
+  // Example: 'm' and 'meter' both map to 'm' (meters)
+  UNIT_TO_NORMALIZED_UNIT_MAPPING: {
     // Length.
     m: 'm',
     meter: 'm',
@@ -256,11 +259,12 @@ export const ObjectsDomainConstants = {
     'byte': 'B',
 
     // Currency.
-    $: '$',
+    $: 'dollar',
     dollar: 'dollar',
     dollars: 'dollar',
     Dollar: 'dollar',
     Dollars: 'dollar',
+    '₹': 'Rs',
     Rs: 'Rs',
     Rupee: 'Rs',
     Rupees: 'Rs',

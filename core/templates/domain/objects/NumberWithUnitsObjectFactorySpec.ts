@@ -304,5 +304,23 @@ describe('NumberWithUnitsObjectFactory', () => {
       )).toMathjsCompatibleString())
         .toThrowError('Number with type fraction cannot have a real part.');
     });
+
+    it('should convert units to their canonical form', () => {
+      expect(new NumberWithUnits('real', 1, new Fraction(
+        false, 0, 0, 1), new Units(
+        [{unit: 'newton', exponent: 1}, {unit: 'meter', exponent: -1},
+          {unit: 'celsius', exponent: -2}]))
+        .getCanonicalRepresentationOfUnits()).toEqual(new Units(
+        [{unit: 'N', exponent: 1}, {unit: 'm', exponent: -1},
+          {unit: 'degC', exponent: -2}]).units);
+
+      expect(new NumberWithUnits('real', 1, new Fraction(
+        false, 0, 0, 1), new Units(
+        [{unit: 'rupee', exponent: 1}, {unit: 'dollars', exponent: -1},
+          {unit: '$', exponent: -2}]))
+        .getCanonicalRepresentationOfUnits()).toEqual(new Units(
+        [{unit: 'Rs', exponent: 1}, {unit: 'dollar', exponent: -1},
+          {unit: 'dollar', exponent: -2}]).units);
+    });
   });
 });

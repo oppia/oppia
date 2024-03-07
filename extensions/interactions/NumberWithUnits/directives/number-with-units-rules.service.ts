@@ -46,25 +46,25 @@ export class NumberWithUnitsRulesService {
     // Returns true only if input is exactly equal to answer.
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
-    let valueIsEqual: boolean;
+    let numericalValuesAreEqual: boolean;
 
     if (answerObject.type !== inputsObject.type) {
       return false;
     }
 
     if (answerObject.type === 'real') {
-      valueIsEqual = answerObject.real === inputsObject.real;
+      numericalValuesAreEqual = answerObject.real === inputsObject.real;
     } else {
-      valueIsEqual = this.utilsService.isEquivalent(
+      numericalValuesAreEqual = this.utilsService.isEquivalent(
         answerObject.fraction, inputsObject.fraction
       );
     }
 
     return (
-      valueIsEqual &&
+      numericalValuesAreEqual &&
       this.utilsService.isEquivalent(
-        answerObject.canonicalizeUnits(),
-        inputsObject.canonicalizeUnits()
+        answerObject.getCanonicalRepresentationOfUnits(),
+        inputsObject.getCanonicalRepresentationOfUnits()
       )
     );
   }

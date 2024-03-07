@@ -100,6 +100,10 @@ describe('Number with Units rules service', () => {
     , REAL_RULE_INPUT)
     ).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
+      'fraction', 0, createFractionDict(false, 0, 2, 1),
+      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
+    REAL_RULE_INPUT)).toBe(false);
+    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
       'fraction', 0, createFractionDict(false, 0, 2, 3),
       [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
     FRACTION_RULE_INPUT)).toBe(true);
