@@ -56,7 +56,7 @@ export default {
     TRANSLATION_ADMIN: 'translation admin',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
-    QUESTION_ADMIN: 'question admin' 
+    QUESTION_ADMIN: 'question admin'
   } as const,
   images: {
     blogPostThumbnailImage: path.resolve(

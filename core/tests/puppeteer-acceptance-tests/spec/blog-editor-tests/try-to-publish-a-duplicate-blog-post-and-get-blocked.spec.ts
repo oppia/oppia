@@ -32,7 +32,8 @@ describe('Blog Editor', function() {
 
   beforeAll(async function() {
     blogPostEditor = await userFactory.createNewUser(
-      'blogPostEditor', 'blog_post_editor@example.com', [ROLES.BLOG_POST_EDITOR]);
+      'blogPostEditor', 'blog_post_editor@example.com',
+      [ROLES.BLOG_POST_EDITOR]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should check blog editor unable to publish duplicate blog post',

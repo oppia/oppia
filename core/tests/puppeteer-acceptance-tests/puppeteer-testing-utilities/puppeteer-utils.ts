@@ -190,7 +190,7 @@ export class BaseUser implements IBaseUser {
   async uploadFile(filePath: string): Promise<void> {
     const inputUploadHandle = await this.page.$('input[type=file]');
     if (inputUploadHandle === null) {
-      throw new Error('No file input found');
+      throw new Error('No file input found while attempting to upload a file.');
     }
     let fileToUpload = filePath;
     inputUploadHandle.uploadFile(fileToUpload);

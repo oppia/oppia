@@ -56,7 +56,8 @@ describe('Blog Admin', function() {
         'guestUsr2', ROLES.BLOG_POST_EDITOR);
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr2', 'BLOG_POST_EDITOR');
-      await superAdmin.expectUserToHaveRole('guestUsr2', ROLES.BLOG_POST_EDITOR);
+      await superAdmin.expectUserToHaveRole(
+        'guestUsr2', ROLES.BLOG_POST_EDITOR);
 
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(

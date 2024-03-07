@@ -30,7 +30,8 @@ describe('Translation Admin', function() {
 
   beforeAll(async function() {
     translationAdmin = await userFactory.createNewUser(
-      'translationAdm', 'translation_admin@example.com', [ROLES.TRANSLATION_ADMIN]);
+      'translationAdm', 'translation_admin@example.com',
+      [ROLES.TRANSLATION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide translation rights to user.',
