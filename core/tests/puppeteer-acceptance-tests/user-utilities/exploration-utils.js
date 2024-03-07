@@ -405,7 +405,7 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * Exception function to verify the choice of receiving feedback
    * and suggestion notifications via email
    */
-  async expectEmailNotificationsToBeActivated() {
+  async expectEmailNotificationToBeActivated() {
     const isChecked = await this.page.$eval(
       'input[id="feedback-switch"]', input => input.checked);
     if (isChecked) {
