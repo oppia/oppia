@@ -141,14 +141,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
   }
 
   /**
-   * This function is used to save the current input.
-   */
-  async extraClickToSaveCurrentInput() {
-    await this.page.waitForTimeout(500);
-    await this.clickOn('.e2e-test-settings-container');
-  }
-
-  /**
    * This function checks length of title bar at basic settings tab.
    * @param {Number} maxLength
    */
