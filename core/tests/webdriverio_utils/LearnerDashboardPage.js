@@ -108,15 +108,15 @@ var LearnerDashboardPage = function() {
   };
 
   this.removeExplorationSummaryTileFromPlaylist = async function(title) {
-    var removeTile = await $(`.e2e-test-exp-summary-tile-title=${title}`);
+    let removeTile = await $(`.e2e-test-exp-summary-tile-title=${title}`);
     await removeTile.moveTo();
 
-    var removeFromPlayLaterListButton = $(
+    let removeFromPlayLaterListButton = $(
       '.e2e-test-remove-from-playlist-btn');
     await removeFromPlayLaterListButton.waitForDisplayed();
     await action.click(
       'Remove from playlist button', removeFromPlayLaterListButton, false);
-    var confirmDeleteInteractionButton = $(
+    let confirmDeleteInteractionButton = $(
       '.e2e-test-confirm-delete-interaction');
     await confirmDeleteInteractionButton.waitForDisplayed();
     await action.click(
