@@ -1,8 +1,8 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && !isShowRedesignedLearnerDashboardActive && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
-     class="position-relative" [ngClass]="{'learner-container' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
+     class="position-relative" [ngClass]="{'learner-dash-container' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
   <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center learner-dashboard-content': isShowRedesignedLearnerDashboardActive()}">
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!windowIsNarrow && !isShowRedesignedLearnerDashboardActive()">
       <mat-card class="oppia-learner-dashboard-main-menu">
@@ -40,10 +40,10 @@
       </mat-card>
     </div>
     <!--REDESIGN-->
-    <nav class="align-items-center d-flex flex-md-column justify-content-center sidebar-position" role="navigation" *ngIf="isShowRedesignedLearnerDashboardActive()">
-      <ol class="sidebar w-100">
-        <li class="sidebar-pic">
-          <!--if want frame, div w/ "border border-2 border-white mb-5 rounded-circle sidebar-pic-frame" style-->
+    <nav class="align-items-center d-flex flex-md-column justify-content-center learner-dash-sidebar_position" role="navigation" *ngIf="isShowRedesignedLearnerDashboardActive()">
+      <ol class="learner-dash-sidebar w-100">
+        <li class="learner-dash-sidebar_pic">
+          <!--if want frame, div w/ "border border-2 border-white mb-5 rounded-circle learner-dash-sidebar_pic-frame" style-->
           <picture>
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl" >
             <source type="image/png" [srcset]="profilePicturePngDataUrl" >
@@ -51,12 +51,10 @@
           </picture>
         </li>
         <li>
-          <!--replace svg icons with font-awesome icons-->
-          <button class="align-items-center d-inline-flex e2e-test-home-section rounded sidebar-btn text-left w-100" tabindex="0"
-                  [ngClass]="{'sidebar-btn-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
+          <button class="align-items-center d-inline-flex e2e-test-home-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
-            <span class="fa fa-house" [ngClass]="{'mb-2' : windowIsNarrow}"></span>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 21.0078V9.00781L12 3.00781L20 9.00781V21.0078H14V14.0078H10V21.0078H4Z" fill="#205D86"/>
             </svg>
@@ -64,8 +62,8 @@
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded sidebar-btn text-left w-100" tabindex="0"
-                  [ngClass]="{'sidebar-btn-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
@@ -77,11 +75,11 @@
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-progress-section rounded sidebar-btn text-left w-100" tabindex="0"
-                  [ngClass]="{'sidebar-btn-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+          <button class="align-items-center d-inline-flex e2e-test-progress-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" class="progress-icon" xmlns="http://www.w3.org/2000/svg">
+            <svg width="24" height="22" viewBox="0 0 22 22" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.0714 0L11.368 2.13478L13.4149 3.42104C9.75838 8.01071 4.46905 10.8378 0 11.9139L1.26604 14.2126C6.28762 12.5811 11.604 9.63831 15.0284 4.43925L16.5877 5.4189L17.0714 0ZM17.3693 4.50096L17.1836 6.61453L15.1986 5.3649C15.129 5.46904 15.0555 5.56932 14.9819 5.67345V18H18V4.50096H17.3693ZM11.5421 9.43775C11.0507 9.86201 10.5439 10.2631 10.0292 10.6411V18H13.0473V9.43775H11.5421ZM6.7558 12.6775C6.19862 12.9706 5.64144 13.2406 5.07653 13.4952V18H8.09458V12.6775H6.7558ZM0.123818 14.3745V18H3.14187V14.3745H2.9221C2.34867 14.5867 1.77562 14.7834 1.20606 14.9646L0.932889 15.0495L0.561436 14.3745H0.123818Z" fill="white"/>
             </svg>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
@@ -128,7 +126,7 @@
       </mat-card>
     </div>
     <!--Change all tab width to 100-->
-    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'dashboard-content ml-md-4 px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
+    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'learner-dash-tab ml-md-4 px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
       <div class="d-flex"
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
         <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
