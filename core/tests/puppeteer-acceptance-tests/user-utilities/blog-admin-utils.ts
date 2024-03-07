@@ -40,7 +40,7 @@ export interface IBlogAdmin extends IBaseUser {
   expectMaximumTagLimitToBe: (limit: number) => Promise<void>;
 }
 
-class BlogPostAdmin extends BaseUser implements IBlogAdmin {
+class BlogAdmin extends BaseUser implements IBlogAdmin {
   /**
    * This function assigns a user with a role from the blog admin page.
    */
@@ -105,4 +105,4 @@ class BlogPostAdmin extends BaseUser implements IBlogAdmin {
   }
 }
 
-export let BlogPostAdminFactory = (): IBlogAdmin => new BlogPostAdmin();
+export let BlogAdminFactory = (): IBlogAdmin => new BlogAdmin();

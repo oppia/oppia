@@ -20,49 +20,43 @@ import { SuperAdminFactory, ISuperAdmin } from '../user-utilities/super-admin-ut
 import { BaseUserFactory, IBaseUser } from './puppeteer-utils';
 import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
 import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-users-utils';
-import { BlogPostAdminFactory } from '../user-utilities/blog-post-admin-utils';
+import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
 import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
 
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: ISuperAdmin | null = null;
+let superAdminInstance: ISuperAdmin & IBlogAdmin | null = null;
 let activeUsers: IBaseUser[] = [];
+
+type UnionToIntersection<U> =
+  (U extends IBaseUser ? (k: U) => void : never) extends
+    ((k: infer I) => void) ? I : never;
 
 /**
  * Mapping of user roles to their respective function class.
  */
 const USER_ROLE_MAPPING = {
-  'super admin': SuperAdminFactory,
-  'logged in user': LoggedInUserFactory,
   'translation admin': TranslationAdminFactory,
-  'blog admin': BlogPostAdminFactory,
+  'blog admin': BlogAdminFactory,
   'blog post editor': BlogPostEditorFactory,
   'question admin': QuestionAdminFactory
 };
 
 /**
- * This function assigns a role to a user and returns the instance of that user.
+ * This function does creates a composition of the user and the role
+ * through object prototypes and returns the instance of that user.
  */
-export let assignRoleToUser = async function<
+export let composeUserRole = function<
   TUser extends IBaseUser,
-  TRole extends keyof typeof USER_ROLE_MAPPING
+  TRole extends IBaseUser
 >(
     user: TUser,
     role: TRole
-): Promise<TUser & ReturnType<typeof USER_ROLE_MAPPING[TRole]>> {
-  if (role !== 'super admin' && role !== 'logged in user') {
-    if (superAdminInstance === null) {
-      superAdminInstance = await createNewSuperAdmin('superAdm');
-    }
-
-    await superAdminInstance.assignRoleToUser(user.username, role);
-    await superAdminInstance.expectUserToHaveRole(user.username, role);
-  }
-
+): TUser & TRole {
   const userPrototype = Object.getPrototypeOf(user);
-  const rolePrototype = Object.getPrototypeOf(USER_ROLE_MAPPING[role]());
+  const rolePrototype = Object.getPrototypeOf(role);
 
   /**
    * Here we merge the two classes by altering their prototypes. It is fine to
@@ -78,7 +72,42 @@ export let assignRoleToUser = async function<
     );
   });
 
-  return user as TUser & ReturnType<typeof USER_ROLE_MAPPING[TRole]>;
+  return user as TUser & TRole;
+};
+
+/**
+ * This function assigns a role to a user and returns the instance of that user.
+ */
+export let assignRolesToUser = async function<
+  TUser extends IBaseUser,
+  TRole extends keyof typeof USER_ROLE_MAPPING
+>(
+    user: TUser,
+    roles: TRole[]
+): Promise<TUser & UnionToIntersection<
+    ReturnType<typeof USER_ROLE_MAPPING[TRole]>>> {
+  for (const role of roles) {
+    if (superAdminInstance === null) {
+      superAdminInstance = await createNewSuperAdmin('superAdm');
+    }
+
+    switch (role) {
+      case 'blog post editor':
+        await superAdminInstance.assignUserToRoleFromBlogAdminPage(
+          user.username, role);
+        break;
+      default:
+        await superAdminInstance.assignRoleToUser(user.username, role);
+        break;
+    }
+
+    await superAdminInstance.expectUserToHaveRole(user.username, role);
+
+    composeUserRole(user, USER_ROLE_MAPPING[role]());
+  }
+
+  return user as TUser & UnionToIntersection<
+    ReturnType<typeof USER_ROLE_MAPPING[TRole]>>;
 };
 
 /**
@@ -92,8 +121,7 @@ export let createNewUser = async function(
   await user.signUpNewUser(username, email);
   activeUsers.push(user);
 
-  const loggedInUser = await assignRoleToUser(user, 'logged in user');
-  return loggedInUser;
+  return composeUserRole(user, LoggedInUserFactory());
 };
 
 /**
@@ -102,16 +130,19 @@ export let createNewUser = async function(
  */
 export let createNewSuperAdmin = async function(
     username: string
-): Promise<ISuperAdmin> {
+): Promise<ISuperAdmin & IBlogAdmin> {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
 
+  // Here we manually intialize the super admin instance since it needs
+  // to be temporarily created to assign "super admin" roles.
   const user = await createNewUser(username, 'testadmin@example.com');
-  const superAdmin = await assignRoleToUser(user, 'super admin');
-  superAdminInstance = superAdmin;
+  const tempSuperAdmin = await composeUserRole(user, SuperAdminFactory());
+  await tempSuperAdmin.assignRoleToUser(username, 'blog admin');
+  await tempSuperAdmin.expectUserToHaveRole(username, 'blog admin');
 
-  return superAdmin;
+  return composeUserRole(tempSuperAdmin, BlogAdminFactory());
 };
 
 /**

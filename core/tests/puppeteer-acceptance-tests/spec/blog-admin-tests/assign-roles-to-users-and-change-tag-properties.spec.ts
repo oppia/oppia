@@ -21,7 +21,7 @@ import * as userFactory from
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
-import { IBlogAdmin } from '../../user-utilities/blog-post-admin-utils';
+import { IBlogAdmin } from '../../user-utilities/blog-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
@@ -31,8 +31,7 @@ describe('Blog Admin', function() {
   let superAdmin: ISuperAdmin & IBlogAdmin;
 
   beforeAll(async function() {
-    const user = await userFactory.createNewSuperAdmin('superAdm');
-    superAdmin = await userFactory.assignRoleToUser(user, 'blog admin');
+    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   /** TODO(#17162): This test should be done without the need of super admin, as

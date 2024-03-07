@@ -31,8 +31,8 @@ describe('Question Admin', function() {
   beforeAll(async function() {
     const user = await userFactory.createNewUser(
       'questionAdm', 'question_admin@example.com');
-    questionAdmin = await userFactory.assignRoleToUser(
-      user, 'question admin');
+    questionAdmin = await userFactory.assignRolesToUser(
+      user, ['question admin']);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide rights to review and submit questions to user.',
