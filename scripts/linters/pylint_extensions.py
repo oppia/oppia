@@ -2926,7 +2926,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker):
     name = 'prefer-string-interpolation'
     priority = -1
     msgs = {
-        'C0040':(
+        'C0042':(
             'Please use string interpolation over string concatenation',
             'prefer-string-interpolation',
             'Used when string concatenation is detected.',
