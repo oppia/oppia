@@ -16,7 +16,7 @@
  * @fileoverview Tests for Voice Artist Language Mapping model.
  */
 
-import { VoiceArtistLanguageMapping } from './voice-artist-language-mappinng.model';
+import { VoiceArtistLanguageMapping } from './voice-artist-language-mapping.model';
 
 describe('voice artist language mapping model', () => {
   it('should get language accent mapping field values', () => {

@@ -20,7 +20,7 @@
 import { VoiceArtistIdToLanguageMapping } from 'domain/voiceover/voiceover-backend-api.service';
 
 
-export class VoiceArtistLanguageMapping{
+export class VoiceArtistLanguageMapping {
   _voiceArtistId: string;
   _languageCode: string;
   _languageAccentCode: string;
@@ -53,7 +53,7 @@ export class VoiceArtistLanguageMapping{
       languageAccentCode: string
   ): VoiceArtistLanguageMapping {
     return new VoiceArtistLanguageMapping(
-      voiceArtistID, languageCode, languageAccentCode)
+      voiceArtistID, languageCode, languageAccentCode);
   }
 
   static createVoiceArtistLanguageMappingList(

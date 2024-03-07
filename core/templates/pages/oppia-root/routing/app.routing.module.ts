@@ -334,8 +334,9 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.ROUTE,
-    loadChildren: () => import('pages/voiceover-admin-page/voiceover-admin-page.module')
-      .then(m => m.VoiceoverAdminPageModule),
+    loadChildren: () => import(
+      'pages/voiceover-admin-page/voiceover-admin-page.module').then(
+      m => m.VoiceoverAdminPageModule),
     canActivate: [IsLoggedInGuard]
   },
 ];

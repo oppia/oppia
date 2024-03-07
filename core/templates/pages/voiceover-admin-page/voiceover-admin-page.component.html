@@ -70,7 +70,7 @@
   <h3>Label manual voiceovers</h3>
 
   <div class="table-container">
-    <table mat-table [dataSource]="voiceArtistIdToLanguageMappingList" class="demo-table">
+    <table mat-table [dataSource]="voiceArtistIdToLanguageMappingList" class="voice-artist-table">
       <ng-container matColumnDef="voiceArtist">
         <th mat-header-cell *matHeaderCellDef class="table-header"> Voice Artist </th>
         <td mat-cell *matCellDef="let element"> {{voiceArtistIdToVoiceArtistName[element.getVoiceArtistID()]}} </td>
@@ -127,16 +127,16 @@
     color: #000;
     font-size: initial;
   }
-  .demo-table {
+  .voice-artist-table {
     width: 100%;
   }
   .mat-header-cell {
-    text-align: center;
     justify-content: center;
+    text-align: center;
   }
   .mat-cell {
-    text-align: center;
     justify-content: center;
+    text-align: center;
   }
   .mat-mdc-row .mat-mdc-cell {
     border-bottom: 1px solid transparent;

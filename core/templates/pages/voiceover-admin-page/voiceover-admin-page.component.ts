@@ -27,7 +27,7 @@ import {
   LanguageCodesMapping, LanguageAccentMasterList,
   VoiceArtistIdToLanguageMapping, VoiceArtistIdToVoiceArtistName
 } from 'domain/voiceover/voiceover-backend-api.service';
-import { VoiceArtistLanguageMapping } from './voice-artist-language-mappinng.model';
+import { VoiceArtistLanguageMapping } from './voice-artist-language-mapping.model';
 
 
 interface LanguageAccentCodeToLanguageCode {
@@ -59,7 +59,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
   voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
-  languageAccentMasterList: LanguageAccentMasterList;
+  languageAccentMasterList!: LanguageAccentMasterList;
   columnsToDisplay: string[] = [
     'voiceArtist', 'languageCode',
     'languageAccentCode', 'languageAccentCodeModify'
