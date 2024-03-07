@@ -306,8 +306,8 @@ describe('Access validation backend api service', () => {
       expect(req.request.method).toEqual('GET');
       req.flush({});
 
-      flushMicrotasks();
-      expect(successSpy).toHaveBeenCalled();
-      expect(failSpy).not.toHaveBeenCalled();
-    }));
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
 });
