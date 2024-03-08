@@ -219,7 +219,7 @@ def _get_augmented_skill_summaries_in_batches(
         for skill_id in topic.get_all_skill_ids():
             assigned_skill_ids[skill_id]['topic_names'].append(topic.name)
             assigned_skill_ids[skill_id]['classroom_names'].append(
-                topic_classroom_dict[topic.id])
+                topic_classroom_dict.get(topic.id, ''))
 
     augmented_skill_summaries = []
     for skill_summary in skill_summaries:
