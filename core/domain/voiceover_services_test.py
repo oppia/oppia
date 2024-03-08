@@ -412,7 +412,6 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
             }
         }
 
-
         voiceover_services.update_voice_artist_metadata(
             self.voice_artist_id, voiceovers_and_contents_mapping)
 
