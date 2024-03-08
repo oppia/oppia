@@ -50,7 +50,7 @@ type UnionToIntersection<U> =
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
   UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
 
-type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> = 
+type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
   TRoles extends never[] ? [] : TRoles | [];
 
 /**
@@ -124,7 +124,7 @@ export class UserFactory {
    * This function creates a new user and returns the instance of that user.
    */
   static createNewUser = async function<
-    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[]
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[]
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
