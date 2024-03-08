@@ -48,7 +48,7 @@ describe('ObjectsDomainConstants', () => {
     expect(keys.sort()).toEqual(validUnits.sort());
   });
 
-  it('should check that every value in UNIT_TO ' +
+  it('should check that every value in UNIT_TO_' +
   'NORMALIZED_UNIT_MAPPING is a valid unit', () => {
     const unitValues = Object.values(
       ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
