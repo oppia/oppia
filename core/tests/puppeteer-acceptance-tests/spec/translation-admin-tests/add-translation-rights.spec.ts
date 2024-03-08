@@ -23,7 +23,7 @@ import { ITranslationAdmin } from '../../user-utilities/translation-admin-utils'
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-const ROLES = testConstants.roles;
+const ROLES = testConstants.Roles;
 
 describe('Translation Admin', function() {
   let translationAdmin: ITranslationAdmin;

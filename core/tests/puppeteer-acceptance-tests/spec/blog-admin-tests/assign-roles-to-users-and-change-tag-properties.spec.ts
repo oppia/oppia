@@ -23,7 +23,8 @@ import testConstants from
 import { IBlogAdmin } from '../../user-utilities/blog-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-const ROLES = testConstants.roles;
+const ROLES = testConstants.Roles;
+const BLOG_RIGHTS = testConstants.BlogRights;
 
 describe('Blog Admin', function() {
   let superAdmin: IFullSuperAdmin;
@@ -48,13 +49,13 @@ describe('Blog Admin', function() {
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
-        'guestUsr1', 'BLOG_ADMIN');
+        'guestUsr1', BLOG_RIGHTS.BLOG_ADMIN);
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
 
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLES.BLOG_POST_EDITOR);
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
-        'guestUsr2', 'BLOG_POST_EDITOR');
+        'guestUsr2', BLOG_RIGHTS.BLOG_POST_EDITOR);
       await superAdmin.expectUserToHaveRole(
         'guestUsr2', ROLES.BLOG_POST_EDITOR);
 

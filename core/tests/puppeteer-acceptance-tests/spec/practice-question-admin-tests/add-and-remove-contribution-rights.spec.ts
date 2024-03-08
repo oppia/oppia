@@ -24,7 +24,7 @@ import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-const ROLES = testConstants.roles;
+const ROLES = testConstants.Roles;
 
 describe('Question Admin', function() {
   let questionAdmin: IQuestionAdmin;

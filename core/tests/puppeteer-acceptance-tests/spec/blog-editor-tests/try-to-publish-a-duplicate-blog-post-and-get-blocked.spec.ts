@@ -23,7 +23,7 @@ import testConstants from
 import { IBlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-const ROLES = testConstants.roles;
+const ROLES = testConstants.Roles;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 

@@ -25,10 +25,12 @@ import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
 import testConstants from './test-constants';
 
-const ROLES = testConstants.roles;
+const ROLES = testConstants.Roles;
+const BLOG_RIGHTS = testConstants.BlogRights;
 
 // This user is a full super admin with all roles.
-export type IFullSuperAdmin = ISuperAdmin & MultipleRoleIntersection<[keyof typeof USER_ROLE_MAPPING]>;
+export type IFullSuperAdmin =
+  ISuperAdmin & MultipleRoleIntersection<[keyof typeof USER_ROLE_MAPPING]>;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -83,10 +85,11 @@ export class UserFactory {
     });
 
     return user as TUser & TRole;
-  }
+  };
 
   /**
-   * This function assigns roles to a user and returns the instance of that user.
+   * This function assigns roles to a user and returns the instance of
+   * that user.
    */
   static assignRolesToUser = async function<
     TUser extends IBaseUser,
@@ -103,7 +106,7 @@ export class UserFactory {
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
-            user.username, 'BLOG_POST_EDITOR');
+            user.username, BLOG_RIGHTS.BLOG_POST_EDITOR);
           break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
@@ -116,7 +119,7 @@ export class UserFactory {
     }
 
     return user as TUser & MultipleRoleIntersection<typeof roles>;
-  }
+  };
 
   /**
    * This function creates a new user and returns the instance of that user.
@@ -125,13 +128,14 @@ export class UserFactory {
       username: string, email: string,
       roles: (keyof typeof USER_ROLE_MAPPING)[] = []
   ): Promise<ILoggedInUser & MultipleRoleIntersection<typeof roles>> {
-    const user = UserFactory.composeUserWithRole(BaseUserFactory(), LoggedInUserFactory());
+    const user = UserFactory.composeUserWithRole(
+      BaseUserFactory(), LoggedInUserFactory());
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
     return await UserFactory.assignRolesToUser(user, roles);
-  }
+  };
 
   /**
    * The function creates a new super admin user and returns the instance
@@ -148,16 +152,19 @@ export class UserFactory {
      * Here we are creating a new user to be the super admin and
      * assigning all the roles to that user.
      */
-    const user = await UserFactory.createNewUser(username, 'testadmin@example.com');
-    superAdminInstance = UserFactory.composeUserWithRole(user, SuperAdminFactory());
-    await UserFactory.assignRolesToUser(superAdminInstance, [ROLES.BLOG_ADMIN]);
+    const user = await UserFactory.createNewUser(
+      username, 'testadmin@example.com');
+    superAdminInstance = UserFactory.composeUserWithRole(
+      user, SuperAdminFactory());
+    await UserFactory.assignRolesToUser(
+      superAdminInstance, [ROLES.BLOG_ADMIN]);
     const roles = Object.keys(USER_ROLE_MAPPING).filter(
       role => role !== ROLES.BLOG_ADMIN);
     await UserFactory.assignRolesToUser(
       superAdminInstance, roles as (keyof typeof USER_ROLE_MAPPING)[]);
 
     return superAdminInstance;
-  }
+  };
 
   /**
    * This function closes all the browsers opened by different users.
@@ -166,16 +173,16 @@ export class UserFactory {
     for (let i = 0; i < activeUsers.length; i++) {
       await activeUsers[i].closeBrowser();
     }
-  }
+  };
 
   /**
    * This function closes the browser for the provided user.
    */
   static closeBrowserForUser = async function(
-      user
+      user: IBaseUser
   ): Promise<void> {
     const index = activeUsers.indexOf(user);
     activeUsers.splice(index, 1);
     await user.closeBrowser();
-  }
+  };
 }
