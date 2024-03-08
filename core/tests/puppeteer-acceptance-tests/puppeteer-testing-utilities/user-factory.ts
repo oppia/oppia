@@ -28,16 +28,6 @@ import testConstants from './test-constants';
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
 
-// This user is a full super admin with all roles.
-export type IFullSuperAdmin =
-  ISuperAdmin & MultipleRoleIntersection<[keyof typeof USER_ROLE_MAPPING]>;
-
-/**
- * Global user instances that are created and can be reused again.
- */
-let superAdminInstance: IFullSuperAdmin | null = null;
-let activeUsers: IBaseUser[] = [];
-
 /**
  * Mapping of user roles to their respective function class.
  */
@@ -59,6 +49,16 @@ type UnionToIntersection<U> =
 
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
   UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
+
+// This user is a full super admin with all roles.
+export type IFullSuperAdmin =
+  ISuperAdmin & MultipleRoleIntersection<[keyof typeof USER_ROLE_MAPPING]>;
+
+/**
+ * Global user instances that are created and can be reused again.
+ */
+let superAdminInstance: IFullSuperAdmin | null = null;
+let activeUsers: IBaseUser[] = [];
 
 export class UserFactory {
   /**

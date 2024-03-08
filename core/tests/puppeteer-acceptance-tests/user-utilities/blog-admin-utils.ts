@@ -23,6 +23,8 @@ import testConstants from
 import { showMessage } from
   '../puppeteer-testing-utilities/show-message-utils';
 
+const BLOG_RIGHTS = testConstants.BlogRights;
+
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
 const maximumTagLimitInput = 'input#float-input';
@@ -32,7 +34,7 @@ const LABEL_FOR_SAVE_BUTTON = 'Save';
 
 export interface IBlogAdmin extends IBaseUser {
   assignUserToRoleFromBlogAdminPage: (
-    username: string, role: string) => Promise<void>;
+    username: string, role: keyof typeof BLOG_RIGHTS) => Promise<void>;
   removeBlogEditorRoleFromUsername: (
     username: string) => Promise<void>;
   setMaximumTagLimitTo: (limit: number) => Promise<void>;
@@ -46,7 +48,7 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
    */
   async assignUserToRoleFromBlogAdminPage(
       username: string,
-      role: string
+      role: keyof typeof BLOG_RIGHTS
   ): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
