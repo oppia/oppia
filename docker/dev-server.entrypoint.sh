@@ -14,7 +14,7 @@
 # limitations under the License.
 
 build_cmd="python -m scripts.build"
-dev_appserver_cmd="/google-cloud-sdk/bin/dev_appserver.py \
+dev_appserver_cmd="/app/vm_deps/google-cloud-sdk/bin/dev_appserver.py \
 --runtime=python38 \
 --host=0.0.0.0 \
 --port=8181 \
