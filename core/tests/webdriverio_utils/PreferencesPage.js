@@ -124,7 +124,18 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = async function(language) {
     await action.click('system language selector', languageSelector);
+    var dropdownSelectorString = '#mat-select-0-panel';
     var dropdownOption = $(`.mat-option-text=${language}`);
+
+    await browser.execute((selector, language)=>{
+      var element = document.querySelector(`${selector}`);
+      if (language === 'English') {
+        element.scrollTop = 0;
+      } else if (language === 'Español') {
+        element.scrollTop = 100;
+      }
+    }, dropdownSelectorString, language);
+
     await dropdownOption.waitForDisplayed({ timeout: 5000 });
     await dropdownOption.waitForClickable({ timeout: 5000 });
     await action.click('clickable', dropdownOption);
