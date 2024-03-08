@@ -351,6 +351,56 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
             expected_exp_id_to_filenames
         )
 
+    def test_should_get_voice_artist_id_to_language_mapping(self) -> None:
+        expected_voice_artist_to_language_mapping = {
+            'voice_artist_id': {
+                'en': 'en-US'
+            }
+        }
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+
+        retrieved_voice_artist_to_language_mapping = (
+            voiceover_services.get_all_voice_artist_language_accent_mapping()
+        )
+
+        self.assertDictEqual(
+            retrieved_voice_artist_to_language_mapping,
+            expected_voice_artist_to_language_mapping
+        )
+
+    def test_should_get_at_max_five_filenames(self) -> None:
+        voiceover4: voiceover_models.VoiceoverDict = {
+            'filename': 'filename4.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover5: voiceover_models.VoiceoverDict = {
+            'filename': 'filename5.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover6: voiceover_models.VoiceoverDict = {
+            'filename': 'filename6.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+
+        self.voiceovers_and_contents_mapping['en'][
+            'exploration_id_to_voiceovers']['exp_1'].extend(
+                [voiceover4, voiceover5, voiceover6])
+
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+
+        exp_id_to_filenames = voiceover_services.get_voiceover_filenames(
+                self.voice_artist_id, 'en')
+
+        self.assertEqual(len(exp_id_to_filenames['exp_1']), 5)
+
     def test_get_voice_artist_id_to_username(self) -> None:
         auth_id = 'someUser'
         username = 'username'
