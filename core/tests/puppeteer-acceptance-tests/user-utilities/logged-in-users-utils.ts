@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  * @fileoverview Logged-in users utility file.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
+import { IBaseUser, BaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from
+  '../puppeteer-testing-utilities/test-constants';
+import { showMessage } from
+  '../puppeteer-testing-utilities/show-message-utils';
 
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
@@ -89,32 +89,65 @@ const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
 
-module.exports = class LoggedInUsers extends baseUser {
+export interface ILoggedInUser extends IBaseUser {
+  navigateToHome: () => Promise<void>;
+  navigateToAboutPage: () => Promise<void>;
+  navigateToAboutFoundationPage: () => Promise<void>;
+  navigateToThanksForDonatingPage: () => Promise<void>;
+  clickAboutButtonInAboutMenuOnNavbar: () => Promise<void>;
+  clickBrowseOurLessonsButtonInAboutPage: () => Promise<void>;
+  clickAccessAndroidAppButtonInAboutPage: () => Promise<void>;
+  clickVisitClassroomButtonInAboutPage: () => Promise<void>;
+  clickBrowseLibraryButtonInAboutPage: () => Promise<void>;
+  clickCreateLessonsButtonInAboutPage: () => Promise<void>;
+  clickExploreLessonsButtonInAboutPage: () => Promise<void>;
+  clickAboutFoundationButtonInAboutMenuOnNavbar: () => Promise<void>;
+  click61MillionChildrenLinkInAboutFoundation: () => Promise<void>;
+  clickEvenThoseWhoAreInSchoolLinkInAboutFoundation: () => Promise<void>;
+  clickSourceUnescoLinkInAboutFoundation: () => Promise<void>;
+  click420MillionLinkInAboutFoundation: () => Promise<void>;
+  clickLearnMoreAboutOppiaButtonInAboutFoundation: () => Promise<void>;
+  clickBecomeAVolunteerButtonInAboutFoundation: () => Promise<void>;
+  clickConsiderBecomingAPartnerTodayLinkInAboutFoundation: () => Promise<void>;
+  clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation: () => Promise<void>;
+  clickDonationsLinkInAboutFoundation: () => Promise<void>;
+  clickBlogButtonInAboutMenuOnNavbar: () => Promise<void>;
+  clickPartnershipsButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
+  clickVolunteerButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
+  clickDonateButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
+  clickContactUsButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
+  clickDonateButtonOnNavbar: () => Promise<void>;
+  clickWatchAVideoButtonInThanksForDonatingPage: () => Promise<void>;
+  clickReadOurBlogButtonInThanksForDonatingPage: () => Promise<void>;
+  clickDismissButtonInThanksForDonatingPage: () => Promise<void>;
+}
+
+class LoggedInUser extends BaseUser implements ILoggedInUser {
   /**
    * Function to navigate to the home page.
    */
-  async navigateToHome() {
+  async navigateToHome(): Promise<void> {
     await this.goto(homeUrl);
   }
 
   /**
    * Function to navigate to the about page.
    */
-  async navigateToAboutPage() {
+  async navigateToAboutPage(): Promise<void> {
     await this.goto(aboutUrl);
   }
 
   /**
    * Function to navigate to the about foundation page.
    */
-  async navigateToAboutFoundationPage() {
+  async navigateToAboutFoundationPage(): Promise<void> {
     await this.goto(aboutFoundationUrl);
   }
 
   /**
    * Function to navigate to the Thanks for Donating page.
    */
-  async navigateToThanksForDonatingPage() {
+  async navigateToThanksForDonatingPage(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
       this.page.goto(thanksForDonatingUrl),
@@ -123,15 +156,13 @@ module.exports = class LoggedInUsers extends baseUser {
 
   /**
    * Function to click a button and check if it opens the expected destination.
-   * @param {string} button - the CSS selector of the button element
-   * @param {string} buttonName - the name of the button
-   * @param {string} expectedDestinationPageUrl - the expected page that
-   *   the button should navigate to
-   * @param {string} expectedDestinationPageName - the name of the expected page
    */
   async clickButtonToNavigateToNewPage(
-      button, buttonName, expectedDestinationPageUrl,
-      expectedDestinationPageName) {
+      button: string,
+      buttonName: string,
+      expectedDestinationPageUrl: string,
+      expectedDestinationPageName: string
+  ): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn(button),
@@ -151,7 +182,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the About button in the About Menu on navbar
    * and check if it opens the About page.
    */
-  async clickAboutButtonInAboutMenuOnNavbar() {
+  async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarAboutTab);
     await this.clickButtonToNavigateToNewPage(
       navbarAboutTabAboutButton,
@@ -162,7 +193,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickBrowseOurLessonsButtonInAboutPage() {
+  async clickBrowseOurLessonsButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       browseOurLessonsButton,
       'Browse Our Lessons button', mathClassroomUrl, 'Math Classroom');
@@ -172,7 +203,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Access Android App button in the About page
    * and check if it opens the Android page.
    */
-  async clickAccessAndroidAppButtonInAboutPage() {
+  async clickAccessAndroidAppButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       accessAndroidAppButton,
       'Access the Android App button', androidUrl, 'Android');
@@ -182,7 +213,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Visit Classroom button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickVisitClassroomButtonInAboutPage() {
+  async clickVisitClassroomButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       visitClassroomButton,
       'Visit Classroom button', mathClassroomUrl, 'Math Classroom');
@@ -192,7 +223,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Browse Library button in the About page
    * and check if it opens the Community Library page.
    */
-  async clickBrowseLibraryButtonInAboutPage() {
+  async clickBrowseLibraryButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       browseLibraryButton,
       'Browse Library button', communityLibraryUrl, 'Community Library');
@@ -202,7 +233,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Creator Dashboard page in Create Mode.
    */
-  async clickCreateLessonsButtonInAboutPage() {
+  async clickCreateLessonsButtonInAboutPage(): Promise<void> {
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error (
@@ -230,7 +261,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Browse Our Lessons button in the About page
    * and check if it opens the Math Classroom page.
    */
-  async clickExploreLessonsButtonInAboutPage() {
+  async clickExploreLessonsButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButton,
       'Explore Lessons button', mathClassroomUrl, 'Math Classroom');
@@ -240,13 +271,13 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the The Oppia Foundation button in the About Menu
    * on navbar and check if it opens The About Foundation page.
    */
-  async clickAboutFoundationButtonInAboutMenuOnNavbar() {
+  async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarAboutTab);
     await this.clickOn(navbarAboutTabAboutFoundationButton);
     await this.page.waitForSelector(aboutFoundationClass);
     const displayedH1 = await this.page.$eval(
       aboutFoundationClass,
-      element => element.innerText
+      (element) => (element as HTMLElement).innerText
     );
     if ((this.page.url() !== aboutFoundationUrl) &&
       (displayedH1 !== 'THE OPPIA FOUNDATION')) {
@@ -264,7 +295,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the 61 million children link
    * in the About Foundation page and check if it opens the right page.
    */
-  async click61MillionChildrenLinkInAboutFoundation() {
+  async click61MillionChildrenLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(millionsOfContentId);
     const buttonText = await this.page.$eval(
       millionsOfContentId,
@@ -292,7 +323,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the even those who are in school link
    * in the About Foundation page and check if it opens the right page.
    */
-  async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation() {
+  async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(millionsOfContentId);
     const buttonText = await this.page.$eval(
       millionsOfContentId,
@@ -320,7 +351,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Source: UNESCO link in the About Foundation page
    * and check if it opens the right page.
    */
-  async clickSourceUnescoLinkInAboutFoundation() {
+  async clickSourceUnescoLinkInAboutFoundation(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       sourceUnescoButton,
       'Source: UNESCO link', sourceUnescoUrl, 'right');
@@ -330,7 +361,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the 420 million link
    * in the About Foundation page and check if it opens the right page.
    */
-  async click420MillionLinkInAboutFoundation() {
+  async click420MillionLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(weCannotContentId);
     const buttonText = await this.page.$eval(
       weCannotContentId,
@@ -357,7 +388,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Learn More About Oppia button
    * in the About Foundation page and check if it opens the About page.
    */
-  async clickLearnMoreAboutOppiaButtonInAboutFoundation() {
+  async clickLearnMoreAboutOppiaButtonInAboutFoundation(): Promise<void> {
     await this.clickOn(learnMoreAboutOppiaButton);
     const newTab = await this.browserObject.waitForTarget(
       target => target.url() === aboutUrl
@@ -375,7 +406,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Become A Volunteer button
    * in the About Foundation page and check if it opens the Volunteer page.
    */
-  async clickBecomeAVolunteerButtonInAboutFoundation() {
+  async clickBecomeAVolunteerButtonInAboutFoundation(): Promise<void> {
     await this.clickOn(becomeAVolunteerButton);
     const newTab = await this.browserObject.waitForTarget(
       target => target.url() === volunteerUrl
@@ -393,7 +424,8 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Consider Becoming A Partner Today! link
    * in the About Foundation page and check if it opens the Partnerships page.
    */
-  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation() {
+  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation():
+    Promise<void> {
     await this.page.waitForSelector(sectionSixPart1);
     const buttonText = await this.page.$eval(
       sectionSixPart1,
@@ -422,7 +454,8 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Join our large volunteer community! link
    * in the About Foundation page and check if it opens the Volunteer page.
    */
-  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation() {
+  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation():
+    Promise<void> {
     await this.page.waitForSelector(sectionSixPart2);
     const buttonText = await this.page.$eval(
       sectionSixPart2,
@@ -451,7 +484,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the donations link
    * in the About Foundation page and check if it opens the Donate page.
    */
-  async clickDonationsLinkInAboutFoundation() {
+  async clickDonationsLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(sectionSixPart3);
     const buttonText = await this.page.$eval(
       sectionSixPart3,
@@ -478,7 +511,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Blog button in the About Menu on navbar
    * and check if it opens the Blog page.
    */
-  async clickBlogButtonInAboutMenuOnNavbar() {
+  async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarAboutTab);
     await this.clickButtonToNavigateToNewPage(
       navbarAboutTabBlogButton,
@@ -489,7 +522,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the School and Organizations button in the
    * Get Involved Menu on navbar and check if it opens the Partnerships page.
    */
-  async clickPartnershipsButtonInGetInvolvedMenuOnNavbar() {
+  async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarGetInvolvedTab);
     await this.clickButtonToNavigateToNewPage(
       navbarGetInvolvedTabSchoolAndOrganizationsButton,
@@ -501,7 +534,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Volunteer button in the Get Involved Menu
    * on navbar and check if it opens the Volunteer page.
    */
-  async clickVolunteerButtonInGetInvolvedMenuOnNavbar() {
+  async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarGetInvolvedTab);
     await this.clickButtonToNavigateToNewPage(
       navbarGetInvolvedTabVolunteerButton,
@@ -513,7 +546,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Donate button in the Get Involved Menu
    * on navbar and check if it opens the Donate page.
    */
-  async clickDonateButtonInGetInvolvedMenuOnNavbar() {
+  async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarGetInvolvedTab);
     await this.clickButtonToNavigateToNewPage(
       navbarGetInvolvedTabDonateButton,
@@ -524,7 +557,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Contact Us button in the Get Involved Menu
    * on navbar and check if it opens the Partnerships page.
    */
-  async clickContactUsButtonInGetInvolvedMenuOnNavbar() {
+  async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     await this.clickOn(navbarGetInvolvedTab);
     await this.clickButtonToNavigateToNewPage(
       navbarGetInvolvedTabContactUsButton,
@@ -536,7 +569,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Donate button on navbar
    * and check if it opens the Donate page.
    */
-  async clickDonateButtonOnNavbar() {
+  async clickDonateButtonOnNavbar(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
   }
@@ -545,11 +578,11 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Watch A Video button
    * in the Thanks for Donating page and check if it opens the right page.
    */
-  async clickWatchAVideoButtonInThanksForDonatingPage() {
+  async clickWatchAVideoButtonInThanksForDonatingPage(): Promise<void> {
     await this.page.waitForSelector(watchAVideoButton);
     const buttonText = await this.page.$eval(
       watchAVideoButton,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
     if (buttonText !== 'Watch a video') {
       throw new Error (
@@ -572,11 +605,11 @@ module.exports = class LoggedInUsers extends baseUser {
    * Function to click the Read Our Blog button
    * in the Thanks for Donating page and check if it opens the Blog page.
    */
-  async clickReadOurBlogButtonInThanksForDonatingPage() {
+  async clickReadOurBlogButtonInThanksForDonatingPage(): Promise<void> {
     await this.page.waitForSelector(readOurBlogButton);
     const buttonText = await this.page.$eval(
       readOurBlogButton,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
     if (buttonText !== 'Read our blog') {
       throw new Error (
@@ -600,7 +633,7 @@ module.exports = class LoggedInUsers extends baseUser {
    * and check if the Thanks for Donating popup disappears
    * and if the Donate page is shown
    */
-  async clickDismissButtonInThanksForDonatingPage() {
+  async clickDismissButtonInThanksForDonatingPage(): Promise<void> {
     await this.clickOn(dismissButton);
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
@@ -617,4 +650,6 @@ module.exports = class LoggedInUsers extends baseUser {
         'and if the Donate page is shown.');
     }
   }
-};
+}
+
+export let LoggedInUserFactory = (): ILoggedInUser => new LoggedInUser();
