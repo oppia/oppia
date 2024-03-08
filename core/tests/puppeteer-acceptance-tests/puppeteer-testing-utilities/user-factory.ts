@@ -124,7 +124,7 @@ export class UserFactory {
    * This function creates a new user and returns the instance of that user.
    */
   static createNewUser = async function<
-    TRoles extends (keyof typeof USER_ROLE_MAPPING)[]
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[]
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
