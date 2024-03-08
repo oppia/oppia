@@ -35,10 +35,12 @@ Otherwise, please delete this section.
 
 <!--
 Add videos/screenshots of the user-facing interface to demonstrate that the changes
-made in this PR work correctly. If this PR is for a developer-facing feature,
-provide the videos/screenshots of developer-facing interface. Please also include
-videos/screenshots of the developer tools browser console, so that we can be
-sure that there are no console errors.
+made in this PR work correctly. (For changes involving responsiveness or adjustment
+of UI elements, this should be a video that gradually resizes the viewport from wide
+to narrow and back again.) If this PR is for a developer-facing feature, provide
+the videos/screenshots of developer-facing interface. Please also include
+videos/screenshots of the developer tools browser console, so that we can be sure
+that there are no console errors.
 
 When you make updates to the PR, please update these videos/screenshots as well.
 You can drop videos/screenshots from previous versions of the PR.
