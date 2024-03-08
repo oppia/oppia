@@ -29,7 +29,7 @@ def main() -> None:
     env = os.environ.copy()
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
-        '--omit="%s*","third_party/*","/usr/share/*"'
+        '--omit="%s*","third_party/*","/usr/share/*"', "vm_deps/*"
         % common.OPPIA_TOOLS_DIR, '--show-missing']
     process = subprocess.run(
         cmd, capture_output=True, encoding='utf-8', env=env,
