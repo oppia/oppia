@@ -50,6 +50,9 @@ type UnionToIntersection<U> =
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
   UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
 
+type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> = 
+  TRoles extends never[] ? [] : TRoles | [];
+
 /**
  * Global user instances that are created and can be reused again.
  */
@@ -89,11 +92,11 @@ export class UserFactory {
    */
   static assignRolesToUser = async function<
     TUser extends IBaseUser,
-    TRole extends keyof typeof USER_ROLE_MAPPING
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[]
   >(
       user: TUser,
-      roles: TRole[]
-  ): Promise<TUser & MultipleRoleIntersection<typeof roles>> {
+      roles: TRoles
+  ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
         superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
@@ -120,11 +123,13 @@ export class UserFactory {
   /**
    * This function creates a new user and returns the instance of that user.
    */
-  static createNewUser = async function(
+  static createNewUser = async function<
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[]
+  >(
       username: string, email: string,
-      roles: (keyof typeof USER_ROLE_MAPPING)[] = []
-  ): Promise<ILoggedInUser & MultipleRoleIntersection<typeof roles>> {
-    const user = UserFactory.composeUserWithRole(
+      roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
+  ): Promise<ILoggedInUser & MultipleRoleIntersection<TRoles>> {
+    let user = UserFactory.composeUserWithRole(
       BaseUserFactory(), LoggedInUserFactory());
     await user.openBrowser();
     await user.signUpNewUser(username, email);
@@ -138,25 +143,20 @@ export class UserFactory {
    * of that user.
    */
   static createNewSuperAdmin = async function(
-      username: string,
-      roles: (keyof typeof USER_ROLE_MAPPING)[] = []
+      username: string
   ): Promise<ISuperAdmin & IBlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
 
-    /**
-     * Here we are creating a new user to be the super admin and
-     * assigning all the roles to that user.
-     */
     const user = await UserFactory.createNewUser(
       username, 'testadmin@example.com');
-    superAdminInstance = UserFactory.composeUserWithRole(
+    const superAdmin = UserFactory.composeUserWithRole(
       user, SuperAdminFactory());
-    await UserFactory.assignRolesToUser(
-      superAdminInstance, [ROLES.BLOG_ADMIN]);
-    await UserFactory.assignRolesToUser(
-      superAdminInstance, roles);
+    await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+    await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
+    superAdminInstance = UserFactory.composeUserWithRole(
+      superAdmin, BlogAdminFactory());
 
     return superAdminInstance;
   };
