@@ -18,7 +18,6 @@
  */
 
 var action = require('./action.js');
-var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
@@ -46,7 +45,6 @@ var AdminPage = function() {
   };
   var roleSelector = $('.e2e-test-new-role-selector');
   var roleValueOption = $('.e2e-test-role-value');
-  var saveAllConfigs = $('.e2e-test-save-all-configs');
 
   var statusMessage = $('.e2e-test-status-message');
   var userRoleItemsSelector = function() {

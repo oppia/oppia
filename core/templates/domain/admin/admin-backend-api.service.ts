@@ -32,7 +32,6 @@ import {
 } from 'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Schema } from 'services/schema-default-value.service';
 
 
 export interface UserRolesBackendResponse {

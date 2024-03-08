@@ -25,7 +25,6 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform-parameter/platform-parameter-filter.model';
 import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { Schema } from 'services/schema-default-value.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
