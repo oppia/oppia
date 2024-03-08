@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
  * @fileoverview Custom jasmine reporter for acceptance tests
  */
 
-const util = require('util');
+import util from 'util';
+import sourceMapSupport from 'source-map-support';
 
-let suiteCount,
-  specCount,
-  executedSpecCount,
-  failureCount,
-  failedSpecs = [],
-  pendingSpecs = [],
-  failedSuites = [],
+sourceMapSupport.install();
+
+interface SuiteFailureResult extends jasmine.JasmineDoneInfo {
+  fullName: string;
+}
+
+let suiteCount: number,
+  specCount: number,
+  executedSpecCount: number,
+  failureCount: number,
+  failedSpecs: jasmine.SpecResult[] = [],
+  pendingSpecs: jasmine.SpecResult[] = [],
+  failedSuites: jasmine.SuiteResult[] = [],
   ansi = {
     green: '\x1B[32;40m',
     red: '\x1B[31;40m',
@@ -33,30 +40,35 @@ let suiteCount,
     none: '\x1B[0m'
   };
 
-let print = function() {
-  process.stdout.write(util.format.apply(this, arguments));
+let print = function(message: string): void {
+  process.stdout.write(util.format(message));
 };
 
-let printNewline = function() {
+let printNewline = function(): void {
   print('\n');
 };
 
-let colored = function(color, str) {
+let colored = function(color: keyof typeof ansi, str: string): string {
   return (ansi[color] + str + ansi.none);
 };
 
-let printLog = function(result) {
+let printFailures = function(
+    result: jasmine.JasmineDoneInfo | jasmine.SpecResult | jasmine.SuiteResult
+): void {
   for (let i = 0; i < result.failedExpectations.length; i++) {
-    const failedExpectation = result.failedExpectations[i];
     printNewline();
     print('Message:');
     printNewline();
-    print(colored('red', failedExpectation.message));
+    print(colored('red', result.failedExpectations[i].message));
     printNewline();
     print('Stack:');
     printNewline();
-    print(!failedExpectation.stack ? '' : failedExpectation.stack);
+    print(result.failedExpectations[i].stack ?? '');
   }
+};
+
+let printSpecLog = function(result: jasmine.SpecResult): void {
+  printFailures(result);
 
   if (result.failedExpectations.length === 0 &&
     result.passedExpectations.length === 0) {
@@ -69,7 +81,18 @@ let printLog = function(result) {
   printNewline();
 };
 
-let pendingSpecTrace = function(result, pendingSpecNumber) {
+let printSuiteLog = function(
+    result: jasmine.JasmineDoneInfo | jasmine.SuiteResult
+): void {
+  printFailures(result);
+
+  printNewline();
+};
+
+let pendingSpecTrace = function(
+    result: jasmine.SpecResult,
+    pendingSpecNumber: number
+): void {
   printNewline();
   print(pendingSpecNumber + '. ' + result.fullName);
   printNewline();
@@ -83,31 +106,25 @@ let pendingSpecTrace = function(result, pendingSpecNumber) {
   printNewline();
 };
 
-let specFailureTrace = function(result, failedSpecNumber) {
+let specFailureTrace = function(
+    result: jasmine.SpecResult,
+    failedSpecNumber: number
+): void {
   printNewline();
   print(failedSpecNumber + '. ' + result.fullName);
-  printLog(result);
-
-  if (result.trace) {
-    printNewline();
-    print('Trace:');
-    printNewline();
-
-    for (const entry of result.trace) {
-      print(`${entry.timestamp}ms: ${entry.message}`);
-      printNewline();
-    }
-  }
+  printSpecLog(result);
 };
 
-let suiteFailureTrace = function(result) {
+let suiteFailureTrace = function(
+    result: SuiteFailureResult | jasmine.SuiteResult
+): void {
   printNewline();
   print('Suite error: ' + result.fullName);
-  printLog(result);
+  printSuiteLog(result);
 };
 
-const Reporter = {
-  jasmineStarted: function(suiteInfo) {
+const Reporter: jasmine.CustomReporter = {
+  jasmineStarted: function(suiteInfo: jasmine.JasmineStartedInfo): void {
     suiteCount = 0;
     specCount = 0;
     executedSpecCount = 0;
@@ -117,7 +134,7 @@ const Reporter = {
     printNewline();
   },
 
-  suiteStarted: function(result) {
+  suiteStarted: function(result: jasmine.SuiteResult): void {
     suiteCount++;
     const heading = '. Suite started: ';
     const length = suiteCount.toString().length + heading.length +
@@ -135,15 +152,15 @@ const Reporter = {
     printNewline();
   },
 
-  specStarted: function(result) {
+  specStarted: function(result: jasmine.SpecResult): void {
     printNewline();
     print('Spec started : ' + result.fullName);
     printNewline();
   },
 
-  specDone: function(result) {
+  specDone: function(result: jasmine.SpecResult) {
     specCount++;
-    const seconds = result ? result.duration / 1000 : 0;
+    const seconds = result?.duration ? result.duration / 1000 : 0;
 
     switch (result.status) {
       case 'pending':
@@ -176,14 +193,14 @@ const Reporter = {
     printNewline();
   },
 
-  suiteDone: function(result) {
+  suiteDone: function(result: jasmine.SuiteResult): void {
     if (result.failedExpectations && result.failedExpectations.length > 0) {
       failureCount++;
       failedSuites.push(result);
     }
   },
 
-  jasmineDone: function(result) {
+  jasmineDone: function(result: jasmine.JasmineDoneInfo): void {
     printNewline();
     printNewline();
     if (failedSpecs.length > 0) {
@@ -205,7 +222,7 @@ const Reporter = {
     if (pendingSpecs.length > 0) {
       print('Pending:');
     }
-    for (i = 0; i < pendingSpecs.length; i++) {
+    for (let i = 0; i < pendingSpecs.length; i++) {
       pendingSpecTrace(pendingSpecs[i], i + 1);
     }
 
