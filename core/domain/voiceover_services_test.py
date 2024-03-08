@@ -389,12 +389,32 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
             'duration_secs': 5.0
         }
 
-        self.voiceovers_and_contents_mapping['en'][
-            'exploration_id_to_voiceovers']['exp_1'].extend(
-                [voiceover4, voiceover5, voiceover6])
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': [
+                        'content_1', 'content_2', 'content_3',
+                        'content_4', 'content_5', 'content_6'
+                    ]
+                },
+                'exploration_id_to_voiceovers': {
+                    'exp_1': [
+                        self.voiceover1,
+                        self.voiceover2,
+                        self.voiceover3,
+                        voiceover4,
+                        voiceover5,
+                        voiceover6
+                    ]
+                }
+            }
+        }
+
 
         voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+            self.voice_artist_id, voiceovers_and_contents_mapping)
 
         exp_id_to_filenames = voiceover_services.get_voiceover_filenames(
                 self.voice_artist_id, 'en')

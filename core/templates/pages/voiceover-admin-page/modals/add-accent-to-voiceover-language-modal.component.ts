@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Close language accent removal confirmation modal.
+ * @fileoverview Add language accent modal.
  */
 
 import { Component } from '@angular/core';

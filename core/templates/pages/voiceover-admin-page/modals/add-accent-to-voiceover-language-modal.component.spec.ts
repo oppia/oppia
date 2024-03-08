@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for language accent removal confirmation modal.
+ * @fileoverview Tests for language accent add modal.
  */
 
 import { ComponentFixture, TestBed, fakeAsync, waitForAsync, tick } from '@angular/core/testing';

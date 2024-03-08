@@ -207,7 +207,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
     """The method returns a dict with voice artist IDs as keys and nested dicts
     as values. Each nested dict contains language codes as keys and language
-    accent values as values.
+    accent codes as values.
 
     Returns:
         dict(str, dict(str, str)). A dict representing voice artist IDs to
@@ -289,7 +289,7 @@ def get_voiceover_filenames(
     language_mapping = voiceovers_and_contents_mapping[language_code]
     voiceover_mapping = language_mapping.get('exploration_id_to_voiceovers')
     contributed_voiceovers: List[
-        voiceover_models.VoiceArtistMetadataModel] = []
+        voiceover_models.VoiceoverDict] = []
     for exp_id, voiceovers in voiceover_mapping.items():
         for voiceover in voiceovers:
             filename_to_exp_id[voiceover['filename']] = exp_id

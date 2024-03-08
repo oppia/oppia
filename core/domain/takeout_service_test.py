@@ -981,15 +981,27 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'needs_update': False,
             'duration_secs': 6.1
         }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
         voiceovers_and_contents_mapping: (
             voiceover_models.VoiceoversAndContentsMappingType) = {
             'en': {
                 'language_accent_code': 'en-US',
                 'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1']
+                    'exp_1': ['content_1', 'content_2', 'content_3']
                 },
                 'exploration_id_to_voiceovers': {
-                    'exp_1': [voiceover1]
+                    'exp_1': [voiceover1, voiceover2, voiceover3]
                 }
             }
         }
@@ -2138,6 +2150,18 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'needs_update': False,
             'duration_secs': 6.1,
         }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
         expected_voice_artist_data: Dict[
             str, voiceover_models.VoiceoversAndContentsMappingType
         ] = {
@@ -2145,10 +2169,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'en': {
                     'language_accent_code': 'en-US',
                     'exploration_id_to_content_ids': {
-                        'exp_1': ['content_1']
+                        'exp_1': ['content_1', 'content_2', 'content_3']
                     },
                     'exploration_id_to_voiceovers': {
-                        'exp_1': [voiceover1]
+                        'exp_1': [voiceover1, voiceover2, voiceover3]
                     }
                 }
             }

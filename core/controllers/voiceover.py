@@ -183,7 +183,7 @@ class VoiceArtistMetadataHandler(
         self.render_json(self.values)
 
 
-class GetSampleVoiceoversForGivenVoiceArtist(
+class GetSampleVoiceoversForGivenVoiceArtistHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler class to get sample contributed voiceovers of a voice artist in
