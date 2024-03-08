@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Translation admin users utility file.
+ * @fileoverview Translation admin role utility file.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+import { IBaseUser, BaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from
+  '../puppeteer-testing-utilities/test-constants';
 const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
+import { showMessage } from
+  '../puppeteer-testing-utilities/show-message-utils';
 
 const translationRightValue = 'translation';
 const usernameMethodValue = 'username';
@@ -65,21 +65,36 @@ const removeContributonRightsLanguageSelect =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-module.exports = class TranslationAdmin extends baseUser {
+export interface ITranslationAdmin extends IBaseUser {
+  navigateToContributorDashboardAdminPage: () => Promise<void>;
+  addTranslationLanguageReviewRights: (
+    username: string, languageCode: string) => Promise<void>;
+  removeTranslationLanguageReviewRights: (
+    username: string, languageCode: string) => Promise<void>;
+  viewContributionRightsForUser: (username: string) => Promise<void>;
+  viewContributorTranslationRightsByLanguageCode: (
+    languageCode: string) => Promise<void>;
+  expectDisplayedLanguagesToContain: (language: string) => Promise<void>;
+  expectUserToBeDisplayed: (username: string) => Promise<void>;
+  expectUserToNotBeDisplayed: (username: string) => Promise<void>;
+}
+
+class TranslationAdmin extends BaseUser implements ITranslationAdmin {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage() {
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
   }
 
   /**
    * Function for adding a translation right to a user.
-   * @param {string} username - the username of the user.
-   * @param {string} languageCode - the language code of the language to add.
    */
 
-  async addTranslationLanguageReviewRights(username, languageCode) {
+  async addTranslationLanguageReviewRights(
+      username: string,
+      languageCode: string
+  ): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
@@ -92,10 +107,11 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function for removing a translation right from a user.
-   * @param {string} username - the username of the user.
-   * @param {string} languageCode - the language code of the language to remove.
    */
-  async removeTranslationLanguageReviewRights(username, languageCode) {
+  async removeTranslationLanguageReviewRights(
+      username: string,
+      languageCode: string
+  ): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect, translationRightValue);
@@ -108,9 +124,8 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to display contribution rights by user.
-   * @param {string} username - the username of the user to view.
    */
-  async viewContributionRightsForUser(username) {
+  async viewContributionRightsForUser(username: string): Promise<void> {
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
@@ -120,9 +135,10 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to display translation rights by language.
-   * @param {string} languageCode - the language option as an option value.
    */
-  async viewContributorTranslationRightsByLanguageCode(languageCode) {
+  async viewContributorTranslationRightsByLanguageCode(
+      languageCode: string
+  ): Promise<void> {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
@@ -133,13 +149,12 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to check if the language is displayed as a translation right.
-   * @param {string} language - the language to match.
    */
-  async expectDisplayedLanguagesToContain(language) {
+  async expectDisplayedLanguagesToContain(language: string): Promise<void> {
     await this.page.waitForSelector(viewContributorLanguageResult);
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
-      element => element.innerText);
+      element => (element as HTMLElement).innerText);
     if (!displayedLanguage.includes(language)) {
       throw new Error(
         `Selected user does not have translation rights for ${language}!`);
@@ -151,33 +166,34 @@ module.exports = class TranslationAdmin extends baseUser {
 
   /**
    * Function to check if the user is displayed as a translator.
-   * @param {string} usenamer - the user expected to be displayed.
    */
-  async expectUserToBeDisplayed(username) {
+  async expectUserToBeDisplayed(username: string): Promise<void> {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${user} does not have translation rights for selected language!`);
+        `${username} does not have translation rights for selected language!`);
     }
   }
 
   /**
    * Function to check that there are no translators for the selected language.
-   * @param {string} usename - the user expected to not be displayed.
    */
-  async expectUserToNotBeDisplayed(username) {
+  async expectUserToNotBeDisplayed(username: string): Promise<void> {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${user} has translation rights for selected language!`);
+        `${username} has translation rights for selected language!`);
     }
   }
-};
+}
+
+export let TranslationAdminFactory =
+  (): ITranslationAdmin => new TranslationAdmin();

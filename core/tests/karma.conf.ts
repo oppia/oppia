@@ -62,7 +62,8 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      'extensions/classifiers/proto/*'
+      'extensions/classifiers/proto/*',
+      'core/tests/puppeteer-acceptance-tests/*'
     ],
     proxies: {
       // Karma serves files under the /base directory.

@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,26 +17,28 @@
  * rights to users.
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { UserFactory } from
+  '../../puppeteer-testing-utilities/user-factory';
+import { ITranslationAdmin } from '../../user-utilities/translation-admin-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
 describe('Translation Admin', function() {
-  let translationAdmin = null;
+  let translationAdmin: ITranslationAdmin;
 
   beforeAll(async function() {
-    translationAdmin =
-      await userFactory.createNewTranslationAdmin('translationAdm');
+    translationAdmin = await UserFactory.createNewUser(
+      'translationAdm', 'translation_admin@example.com',
+      [ROLES.TRANSLATION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide translation rights to user.',
     async function() {
-      let translatorSpanish = await userFactory.createNewGuestUser(
+      let translatorSpanish = await UserFactory.createNewUser(
         'translatorSpanish', 'translatorSpanish@example.com');
-      await userFactory.closeBrowserForUser(translatorSpanish);
+      await UserFactory.closeBrowserForUser(translatorSpanish);
       await translationAdmin.navigateToContributorDashboardAdminPage();
 
       await translationAdmin.addTranslationLanguageReviewRights(
@@ -50,6 +52,6 @@ describe('Translation Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

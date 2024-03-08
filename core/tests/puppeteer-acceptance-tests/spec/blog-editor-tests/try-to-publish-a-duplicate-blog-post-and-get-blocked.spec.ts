@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,21 +16,24 @@
  * @fileoverview Acceptance Test for Blog Post Editor
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { UserFactory } from
+  '../../puppeteer-testing-utilities/user-factory';
+import testConstants from
+  '../../puppeteer-testing-utilities/test-constants';
+import { IBlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
 describe('Blog Editor', function() {
-  let blogPostEditor = null;
+  let blogPostEditor: IBlogPostEditor;
 
   beforeAll(async function() {
-    blogPostEditor = await userFactory.createNewBlogPostEditor(
-      'blogPostEditor');
+    blogPostEditor = await UserFactory.createNewUser(
+      'blogPostEditor', 'blog_post_editor@example.com',
+      [ROLES.BLOG_POST_EDITOR]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should check blog editor unable to publish duplicate blog post',
@@ -52,6 +55,6 @@ describe('Blog Editor', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

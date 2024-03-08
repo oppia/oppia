@@ -206,18 +206,15 @@ CHROME_PATHS = [
 ]
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
-    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked' +
-    '.spec.js',
-    'logged-in-user-tests/click-all-buttons-on-navbar.spec.js',
-    'logged-in-user-tests/click-all-buttons-in-about-page.spec.js',
-    'logged-in-user-tests/click-all-buttons-in-about-foundation-page.spec.js',
-    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page' +
-    '.spec.js',
-    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
-    'translation-admin-tests/add-translation-rights.spec.js',
-    'translation-admin-tests/remove-translation-rights.spec.js'
-
+    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'logged-in-user-tests/click-all-buttons-on-navbar',
+    'logged-in-user-tests/click-all-buttons-in-about-page',
+    'logged-in-user-tests/click-all-buttons-in-about-foundation-page',
+    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page',
+    'practice-question-admin-tests/add-and-remove-contribution-rights',
+    'translation-admin-tests/add-translation-rights',
+    'translation-admin-tests/remove-translation-rights'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

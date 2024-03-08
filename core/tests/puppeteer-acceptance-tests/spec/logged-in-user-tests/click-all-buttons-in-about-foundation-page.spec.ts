@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,19 @@
  * can open links by clicking all buttons in about foundation page
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { UserFactory } from
+  '../../puppeteer-testing-utilities/user-factory';
+import { ILoggedInUser } from '../../user-utilities/logged-in-users-utils';
+import testConstants from
+  '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User in About Foundation page', function() {
-  let testUser = null;
+  let testUser: ILoggedInUser;
 
   beforeAll(async function() {
-    testUser = await userFactory.createNewGuestUser(
+    testUser = await UserFactory.createNewUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
@@ -84,6 +85,6 @@ describe('Logged-in User in About Foundation page', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
