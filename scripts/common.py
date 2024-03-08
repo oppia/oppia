@@ -215,6 +215,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page' +
     '.spec.js',
     'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
+    'topic-manager-tests/create-and-publish-topics-and-stories.spec.js',
     'translation-admin-tests/add-translation-rights.spec.js',
     'translation-admin-tests/remove-translation-rights.spec.js'
 

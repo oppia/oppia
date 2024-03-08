@@ -43,6 +43,7 @@ let testConstants = {
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     Partnerships: 'http://localhost:8181/partnerships',
+    TopicAndSkillsDashboard: 'http://localhost:8181/topics-and-skills-dashboard',
     Volunteer: 'http://localhost:8181/volunteer'
   },
   Dashboard: {

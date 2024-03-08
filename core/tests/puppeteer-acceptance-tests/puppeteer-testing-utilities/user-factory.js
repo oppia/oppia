@@ -24,6 +24,8 @@ let e2eTranslationAdmin = require(
   '../user-utilities/translation-admin-utils.js');
 let e2eQuestionAdmin = require(
   '../user-utilities/question-admin-utils.js');
+let e2eCurriculumAdmin = require(
+  '../user-utilities/curriculum-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -32,6 +34,7 @@ let superAdminInstance = null;
 let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
+const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
 const ROLE_TRANSLATION_ADMIN = 'translation admin';
 const ROLE_QUESTION_ADMIN = 'question admin';
 
@@ -98,6 +101,28 @@ let createNewBlogPostEditor = async function(username) {
 
   activeUsers.push(blogPostEditor);
   return blogPostEditor;
+};
+
+/**
+ * The function creates a new blog admin user and returns the instance
+ * of that user.
+ * @param {string} username - The username of the curriculum admin.
+ * @returns The curriculum admin instance created.
+ */
+let createNewCurriculumAdmin = async function(username) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
+  const curriculumAdmin = new e2eCurriculumAdmin();
+  await curriculumAdmin.openBrowser();
+  await curriculumAdmin.signUpNewUser(username, 'curriculum_admin@example.com');
+
+  await superAdminInstance.assignRoleToUser(username, ROLE_CURRICULUM_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(username, ROLE_CURRICULUM_ADMIN);
+
+  activeUsers.push(curriculumAdmin);
+  return curriculumAdmin;
 };
 
 /**
@@ -191,6 +216,7 @@ module.exports = {
   createNewSuperAdmin,
   createNewBlogAdmin,
   createNewBlogPostEditor,
+  createNewCurriculumAdmin,
   createNewGuestUser,
   createNewTranslationAdmin,
   createNewQuestionAdmin,
