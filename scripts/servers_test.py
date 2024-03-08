@@ -1100,7 +1100,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 servers.managed_acceptance_tests_server(
                     suite_name=suite_name,
                     stdout=subprocess.PIPE))
-            
+
     def test_managed_acceptance_test_server_mobile(
         self
     ) -> None:
@@ -1110,9 +1110,10 @@ class ManagedProcessTests(test_utils.TestBase):
         with self.exit_stack.enter_context(
             servers.managed_acceptance_tests_server(
                 suite_name=suite_name,
-                headless=True, 
+                headless=True,
                 stdout=subprocess.PIPE)):
             self.assertEqual(os.getenv('HEADLESS'), 'true')
+
 
 class GetChromedriverVersionTests(test_utils.TestBase):
 

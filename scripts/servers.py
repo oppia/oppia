@@ -746,6 +746,7 @@ def managed_acceptance_tests_server(
 
     Args:
         suite_name: str. The suite name whose tests should be run.
+        headless: bool. Whether to run the acceptance tests in headless mode.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
 
@@ -758,7 +759,7 @@ def managed_acceptance_tests_server(
     """
     if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
         raise Exception('Invalid suite name: %s' % suite_name)
-    
+
     if headless:
         os.environ['HEADLESS'] = 'true'
     else:
