@@ -110,15 +110,6 @@ describe('Contributor dashboard page', function() {
     await adminPage.get();
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     // Add topic to classroom to make it available for question contributions.
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await elem.setValue(TOPIC_ID);
-      });
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');

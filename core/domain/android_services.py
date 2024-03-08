@@ -24,8 +24,7 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_domain
-from core.domain import config_services
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
@@ -119,12 +118,16 @@ def initialize_android_test_data() -> str:
             translation_models.MachineTranslationModel.get_all().fetch())
 
         # Remove the topic from classroom pages if it's present.
-        classrooms_property = config_domain.CLASSROOM_PAGES_DATA
-        classrooms = classrooms_property.value
+        classrooms = classroom_config_services.get_all_classrooms()
         for classroom in classrooms:
-            classroom['topic_ids'].remove(topic.id)
-        config_services.set_property(
-            user_id, classrooms_property.name, classrooms)
+            topic_id_to_prerequisite_topic_ids = (
+                classroom.topic_id_to_prerequisite_topic_ids
+            )
+            del topic_id_to_prerequisite_topic_ids[topic.id]
+            classroom.topic_id_to_prerequisite_topic_ids = (
+                topic_id_to_prerequisite_topic_ids)
+            classroom_config_services.update_or_create_classroom_model(
+                classroom)
 
     # Generate new Structure id for topic, story, skill and question.
     topic_id = topic_fetchers.get_new_topic_id()
@@ -571,12 +574,10 @@ def initialize_android_test_data() -> str:
             )
 
     # Add the new topic to all available classrooms.
-    classrooms_property = config_domain.CLASSROOM_PAGES_DATA
-    classrooms = classrooms_property.value
+    classrooms = classroom_config_services.get_all_classrooms()
     for classroom in classrooms:
-        classroom['topic_ids'].append(topic_id)
-    config_services.set_property(user_id, classrooms_property.name, classrooms)
-
+        classroom.topic_id_to_prerequisite_topic_ids[topic_id] = []
+        classroom_config_services.update_or_create_classroom_model(classroom)
     return topic_id
 
 

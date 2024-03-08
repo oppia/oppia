@@ -74,7 +74,7 @@ class ClassroomDataHandler(
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+        topic_ids = classroom.get_topic_ids()
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []

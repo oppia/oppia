@@ -22,7 +22,6 @@ from core import feature_flag_list
 from core import feconf
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.platform import models
@@ -53,14 +52,6 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
             'name': 'math',

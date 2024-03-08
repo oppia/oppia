@@ -42,6 +42,8 @@ let CreatorDashboardPage = require(
   '../webdriverio_utils/CreatorDashboardPage.js'
 );
 let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+let DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
+
 
 describe('Contributor Admin Dashboard', function() {
   const TOPIC_NAMES = [
@@ -89,6 +91,7 @@ describe('Contributor Admin Dashboard', function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
 
     await users.createUser(TRANSLATION_COORDINATOR_EMAIL, 'translation');
     await users.createUser(QUESTION_COORDINATOR_EMAIL, 'question');
@@ -130,6 +133,13 @@ describe('Contributor Admin Dashboard', function() {
     // We have to remove the ending "#".
     const TOPIC_ID = TOPIC_ID_URL_PART.substring(
       0, TOPIC_ID_URL_PART.length - 1);
+
+    // Add topic to classroom to make it available for question contributions.
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
+
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
@@ -138,17 +148,6 @@ describe('Contributor Admin Dashboard', function() {
 
     await adminPage.get();
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
-    // Add topic to classroom to make it available for question contributions.
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await action.setValue(
-          'Topic Id', elem, TOPIC_ID, clickInputElement = false);
-      });
 
     // Creating an exploration with an image.
     await creatorDashboardPage.get();

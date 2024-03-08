@@ -160,8 +160,7 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     """
     classrooms = get_all_classrooms()
     for classroom in classrooms:
-        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
-        if topic_id in topic_ids:
+        if topic_id in classroom.get_topic_ids():
             return classroom.url_fragment
     return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
