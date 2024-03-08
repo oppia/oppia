@@ -106,3 +106,5 @@ scripts.run_mypy_checks_test
 # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
 scripts.run_backend_tests_test
 scripts.build_test
+scripts.setup_gae_test
+scripts.setup_test
