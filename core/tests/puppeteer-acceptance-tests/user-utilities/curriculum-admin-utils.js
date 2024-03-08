@@ -23,8 +23,15 @@ const testConstants = require(
 
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = 'input.e2e-test-float-form-input';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const saveContentButton = 'div.e2e-test-save-state-content';
+const saveChangesButton = 'button.e2e-test-save-changes'
+const saveDraftButton = 'button.e2e-test-save-draft-button';
+const publishExplorationButton = 'button.e2e-test-publish-exploration'
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const createSkillButton = 'button.e2e-test-create-skill-button';
@@ -32,11 +39,10 @@ const confirmSkillCreationButton = 'button.e2e-test-confirm-skill-creation-butto
 
 const createQuestionButton = 'div.e2e-test-create-question';
 const easyQuestionDifficultyOption = 'div.e2e-test-skill-difficulty-easy';
-const questionStateEditSelector = 'div.e2e-test-state-edit-content';
-const saveQuestionContentButton = 'div.e2e-test-save-state-content';
 
 const addInteractionButton = 'div.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton = 'div.e2e-test-interaction-tile-NumericInput';
+const interactionEndExplorationInputButton = 'div.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = 'div.e2e-test-save-interaction';
 const responseRuleDropdown = 'oppia-rule-type-selector.e2e-test-answer-description';
 const equalsRuleButtonText = 'is equal to ... ';
@@ -56,7 +62,23 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
+const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
+const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
+const explorationCategoryDropdown = 'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const explorationCategorySelectorChoice = 'mat-option.e2e-test-exploration-category-selector-choice';
+const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
+const explorationIdElement = 'span.oppia-unique-progress-id';
+
 module.exports = class e2eCurriculumAdmin extends baseUser {
+  /**
+   * Function for navigating to the topic and skills dashboard page.
+   */
+  async navigateToTopicAndSkillsDashboardPage() {
+    await this.goto(topicAndSkillsDashboardUrl);
+  }
+
   /**
    * Function for creating a skill in the topics and skills dashboard.
    */
@@ -72,14 +94,17 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.clickOn(confirmSkillCreationButton);
   }
 
+  /**
+   * Function for creating a question in the skill editor page.
+   */
   async createQuestion() {
     await this.clickOn(createQuestionButton);
     await this.clickOn(easyQuestionDifficultyOption);
-    await this.clickOn(questionStateEditSelector);
+    await this.clickOn(textStateEditSelector);
     await this.type(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(
       `${saveQuestionContentButton}:not([disabled])`);
-    await this.clickOn(saveQuestionContentButton);
+    await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
     await this.clickOn(interactionNumberInputButton);
@@ -111,10 +136,42 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
   }
 
   /**
-   * Function for navigating to the topic and skills dashboard page.
+   * Function for navigating to the contributor dashboard page.
    */
-  async navigateToTopicAndSkillsDashboardPage() {
-    await this.goto(topicAndSkillsDashboardUrl);
+  async navigateToCreatorDashboardPage() {
+    await this.goto(creatorDashboardUrl);
   }
 
+  async createExploration() {
+    await this.clickOn(createExplorationButton);
+    await this.page.waitForSelector(
+      `${dismissWelcomeModalSelector}:not([disabled])`);
+    await this.clickOn(dismissWelcomeModalSelector);
+    await this.clickOn(textStateEditSelector);
+    await this.type(richTextAreaField, 'Test Exploration');
+    await this.clickOn(saveContentButton);
+
+    await this.clickOn(addInteractionButton);
+    await this.clickOn(interactionEndExplorationInputButton);
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(
+      `${saveChangesButton}:not([disabled])`);
+    await this.clickOn(saveChangesButton);
+    await this.clickOn(saveDraftButton);
+
+    await this.page.waitForSelector(
+      `${publishExplorationButton}:not([disabled])`);
+    await this.clickOn(publishExplorationButton);
+    await this.type(explorationTitleInput, 'Test Exploration');
+    await this.type(explorationGoalInput, 'Test Exploration');
+    await this.clickOn(explorationCategoryDropdown);
+    await this.clickOn(explorationCategorySelectorChoice[0]);
+    await this.clickOn(saveExplorationChangesButton);
+    await this.clickOn(publishExplorationButton);
+    await this.page.waitForSelector(explorationIdElement);
+    const explorationIdUrl = await this.page.$eval(
+      explorationIdElement,
+      element => element.innerText);
+    return explorationIdUrl;
+  }
 };
