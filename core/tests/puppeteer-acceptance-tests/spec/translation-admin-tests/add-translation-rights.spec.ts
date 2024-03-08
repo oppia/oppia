@@ -17,7 +17,7 @@
  * rights to users.
  */
 
-import * as userFactory from
+import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import { ITranslationAdmin } from '../../user-utilities/translation-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
@@ -29,16 +29,16 @@ describe('Translation Admin', function() {
   let translationAdmin: ITranslationAdmin;
 
   beforeAll(async function() {
-    translationAdmin = await userFactory.createNewUser(
+    translationAdmin = await UserFactory.createNewUser(
       'translationAdm', 'translation_admin@example.com',
       [ROLES.TRANSLATION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide translation rights to user.',
     async function() {
-      let translatorSpanish = await userFactory.createNewUser(
+      let translatorSpanish = await UserFactory.createNewUser(
         'translatorSpanish', 'translatorSpanish@example.com');
-      await userFactory.closeBrowserForUser(translatorSpanish);
+      await UserFactory.closeBrowserForUser(translatorSpanish);
       await translationAdmin.navigateToContributorDashboardAdminPage();
 
       await translationAdmin.addTranslationLanguageReviewRights(
@@ -52,6 +52,6 @@ describe('Translation Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

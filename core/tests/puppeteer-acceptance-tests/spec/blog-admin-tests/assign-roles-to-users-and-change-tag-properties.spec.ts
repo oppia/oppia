@@ -16,23 +16,22 @@
  * @fileoverview Acceptance Test for Blog Admin
  */
 
-import * as userFactory from
+import { UserFactory, IFullSuperAdmin } from
   '../../puppeteer-testing-utilities/user-factory';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
-import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
 import { IBlogAdmin } from '../../user-utilities/blog-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.roles;
 
 describe('Blog Admin', function() {
-  let superAdmin: ISuperAdmin;
+  let superAdmin: IFullSuperAdmin;
   let blogAdmin: IBlogAdmin;
 
   beforeAll(async function() {
-    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-    blogAdmin = await userFactory.createNewUser(
+    superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    blogAdmin = await UserFactory.createNewUser(
       'blogAdm', 'blog_admin@example.com', [ROLES.BLOG_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
@@ -42,9 +41,9 @@ describe('Blog Admin', function() {
   */
   it('should assign roles to users and change tag properties',
     async function() {
-      const guestUsr1 = await userFactory.createNewUser(
+      const guestUsr1 = await UserFactory.createNewUser(
         'guestUsr1', 'guest_user1@example.com');
-      const guestUsr2 = await userFactory.createNewUser(
+      const guestUsr2 = await UserFactory.createNewUser(
         'guestUsr2', 'guest_user2@example.com');
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
@@ -71,6 +70,6 @@ describe('Blog Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

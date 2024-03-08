@@ -17,7 +17,7 @@
  * reviewing question rights to users.
  */
 
-import * as userFactory from
+import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import { IQuestionAdmin } from '../../user-utilities/question-admin-utils';
 import testConstants from
@@ -30,15 +30,15 @@ describe('Question Admin', function() {
   let questionAdmin: IQuestionAdmin;
 
   beforeAll(async function() {
-    questionAdmin = await userFactory.createNewUser(
+    questionAdmin = await UserFactory.createNewUser(
       'questionAdm', 'question_admin@example.com', [ROLES.QUESTION_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should be able to provide rights to review and submit questions to user.',
     async function() {
-      let Tester = await userFactory.createNewUser(
+      let Tester = await UserFactory.createNewUser(
         'Tester', 'admin.tester@example.com');
-      await userFactory.closeBrowserForUser(Tester);
+      await UserFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
@@ -64,6 +64,6 @@ describe('Question Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

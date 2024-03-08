@@ -62,6 +62,11 @@ _PARSER.add_argument(
     help='Build webpack with source maps.',
     action='store_true')
 
+_PARSER.add_argument(
+    '--headless',
+    help='Run the tests in headless mode.',
+    action='store_true')
+
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
@@ -132,6 +137,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name=args.suite,
+            headless=args.headless,
             stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')

@@ -17,7 +17,7 @@
  * can open links by clicking all buttons in about foundation page
  */
 
-import * as userFactory from
+import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import { ILoggedInUser } from '../../user-utilities/logged-in-users-utils';
 import testConstants from
@@ -29,7 +29,7 @@ describe('Logged-in User in About page', function() {
   let testUser: ILoggedInUser;
 
   beforeAll(async function() {
-    testUser = await userFactory.createNewUser(
+    testUser = await UserFactory.createNewUser(
       'testuser', 'testuser@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
@@ -69,6 +69,6 @@ describe('Logged-in User in About page', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

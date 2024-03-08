@@ -16,7 +16,7 @@
  * @fileoverview Acceptance Test for Blog Post Editor
  */
 
-import * as userFactory from
+import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
@@ -31,7 +31,7 @@ describe('Blog Editor', function() {
   let blogPostEditor: IBlogPostEditor;
 
   beforeAll(async function() {
-    blogPostEditor = await userFactory.createNewUser(
+    blogPostEditor = await UserFactory.createNewUser(
       'blogPostEditor', 'blog_post_editor@example.com',
       [ROLES.BLOG_POST_EDITOR]);
   }, DEFAULT_SPEC_TIMEOUT);
@@ -55,6 +55,6 @@ describe('Blog Editor', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

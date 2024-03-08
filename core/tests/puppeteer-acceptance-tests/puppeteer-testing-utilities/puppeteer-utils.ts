@@ -69,10 +69,7 @@ export class BaseUser implements IBaseUser {
       '--use-fake-ui-for-media-stream'
     ];
 
-    const headless = (
-      process.env.HEADLESS ?
-      process.env.HEADLESS === 'true' :
-      testConstants.DEFAULT_IS_HEADLESS);
+    const headless = process.env.HEADLESS === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
