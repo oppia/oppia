@@ -20,7 +20,7 @@ import { SuperAdminFactory, ISuperAdmin } from '../user-utilities/super-admin-ut
 import { BaseUserFactory, IBaseUser } from './puppeteer-utils';
 import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
 import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-users-utils';
-import { BlogAdminFactory } from '../user-utilities/blog-admin-utils';
+import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
 import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
 import testConstants from './test-constants';
@@ -50,14 +50,10 @@ type UnionToIntersection<U> =
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
   UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
 
-// This user is a full super admin with all roles.
-export type IFullSuperAdmin =
-  ISuperAdmin & MultipleRoleIntersection<[keyof typeof USER_ROLE_MAPPING]>;
-
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: IFullSuperAdmin | null = null;
+let superAdminInstance: ISuperAdmin & IBlogAdmin | null = null;
 let activeUsers: IBaseUser[] = [];
 
 export class UserFactory {
@@ -142,8 +138,9 @@ export class UserFactory {
    * of that user.
    */
   static createNewSuperAdmin = async function(
-      username: string
-  ): Promise<IFullSuperAdmin> {
+      username: string,
+      roles: (keyof typeof USER_ROLE_MAPPING)[] = []
+  ): Promise<ISuperAdmin & IBlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -158,10 +155,8 @@ export class UserFactory {
       user, SuperAdminFactory());
     await UserFactory.assignRolesToUser(
       superAdminInstance, [ROLES.BLOG_ADMIN]);
-    const roles = Object.keys(USER_ROLE_MAPPING).filter(
-      role => role !== ROLES.BLOG_ADMIN);
     await UserFactory.assignRolesToUser(
-      superAdminInstance, roles as (keyof typeof USER_ROLE_MAPPING)[]);
+      superAdminInstance, roles);
 
     return superAdminInstance;
   };

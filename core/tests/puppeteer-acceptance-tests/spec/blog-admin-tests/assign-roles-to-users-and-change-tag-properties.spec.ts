@@ -16,18 +16,19 @@
  * @fileoverview Acceptance Test for Blog Admin
  */
 
-import { UserFactory, IFullSuperAdmin } from
+import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 import { IBlogAdmin } from '../../user-utilities/blog-admin-utils';
+import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
 
 describe('Blog Admin', function() {
-  let superAdmin: IFullSuperAdmin;
+  let superAdmin: ISuperAdmin;
   let blogAdmin: IBlogAdmin;
 
   beforeAll(async function() {
