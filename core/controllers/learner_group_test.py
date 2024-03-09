@@ -856,30 +856,6 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
         self.logout()
 
 
-class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
-    """Checks the access and rendering of the create learner group page."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.login(self.NEW_USER_EMAIL)
-
-    def test_page_with_disabled_learner_groups_leads_to_404(self) -> None:
-        self.get_html_response(
-            feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
-        self.logout()
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
-    def test_page_with_enabled_learner_groups_loads_correctly(self) -> None:
-        response = self.get_html_response(
-            feconf.CREATE_LEARNER_GROUP_PAGE_URL)
-        response.mustcontain(
-            '<oppia-create-learner-group-page>'
-            '</oppia-create-learner-group-page>')
-        self.logout()
-
-
 class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the facilitator dashboard page."""
 

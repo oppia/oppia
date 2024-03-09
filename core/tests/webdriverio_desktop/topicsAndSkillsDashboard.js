@@ -19,6 +19,7 @@
 var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
 var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var ExplorationEditorPage = require(
@@ -27,6 +28,7 @@ var TopicsAndSkillsDashboardPage = require(
   '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 
 describe('Topics and skills dashboard functionality', function() {
@@ -43,9 +45,14 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     await users.createAndLoginCurriculumAdminUser(
       'creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDB');
+
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('math', 'math');
   });
 
   beforeEach(async function() {
@@ -57,7 +64,13 @@ describe('Topics and skills dashboard functionality', function() {
     let SKILL_NAME = 'skill1 TASD';
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAME, 'topic-tasd-one', 'Topic 1 description', true);
+      TOPIC_NAME, 'topic-tasd-one', 'Topic 1 description', false);
+
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
@@ -158,7 +171,14 @@ describe('Topics and skills dashboard functionality', function() {
     let SKILL_NAME = 'skill2 TASD';
     let TOPIC_NAME = 'Topic2 TASD';
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAME, 'topic-tasd-two', 'Topic 2 description', true);
+      TOPIC_NAME, 'topic-tasd-two', 'Topic 2 description', false);
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+
+    await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
         SKILL_NAME, 'Concept card explanation', true);
@@ -175,7 +195,15 @@ describe('Topics and skills dashboard functionality', function() {
     let SKILL_NAME = 'skill3 TASD';
     let TOPIC_NAME = 'Topic3 TASD';
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAME, 'topic-tasd-three', 'Topic 3 description', true);
+      TOPIC_NAME, 'topic-tasd-three', 'Topic 3 description', false);
+
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+
+    await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
         SKILL_NAME, 'Concept card explanation', true);

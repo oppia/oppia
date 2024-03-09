@@ -70,9 +70,9 @@ module.exports = {
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.import.ts',
-    contributor_dashboard_admin:
-      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-      'contributor-dashboard-admin-page.import.ts',
+    contributor_dashboard:
+      commonPrefix + '/pages/contributor-dashboard-page/' +
+      'contributor-dashboard-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
@@ -88,9 +88,6 @@ module.exports = {
     facilitator_dashboard:
       commonPrefix + '/pages/facilitator-dashboard-page/' +
       'facilitator-dashboard-page.import.ts',
-    learner_group_creator:
-      commonPrefix + '/pages/learner-group-pages/create-group/' +
-      'create-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root:
@@ -215,13 +212,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard_admin'],
-      filename: 'contributor-dashboard-admin-page.mainpage.html',
+      chunks: ['contributor_dashboard'],
+      filename: 'contributor-dashboard-page.mainpage.html',
       hybrid: true,
       meta: defaultMeta,
       template:
-        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-        'contributor-dashboard-admin-page.mainpage.html',
+        commonPrefix + '/pages/contributor-dashboard-page/' +
+        'contributor-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -412,17 +409,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/facilitator-dashboard-page/' +
         'facilitator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_group_creator'],
-      filename: 'create-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/create-group/' +
-        'create-learner-group-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

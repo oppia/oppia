@@ -30,6 +30,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StatsReportingService } from '../../services/stats-reporting.service';
 import { PlayerHeaderComponent } from './player-header.component';
+import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
 
 describe('Lesson player header component', () => {
   let fixture: ComponentFixture<PlayerHeaderComponent>;
@@ -44,6 +45,7 @@ describe('Lesson player header component', () => {
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let mobileMenuService: MobileMenuService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -62,7 +64,8 @@ describe('Lesson player header component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
-        ReadOnlyTopicObjectFactory
+        ReadOnlyTopicObjectFactory,
+        MobileMenuService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -82,6 +85,7 @@ describe('Lesson player header component', () => {
     readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.inject(
       TopicViewerBackendApiService);
+    mobileMenuService = TestBed.inject(MobileMenuService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       readOnlyTopicObjectFactory.createFromBackendDict({
@@ -105,7 +109,7 @@ describe('Lesson player header component', () => {
   });
 
   afterEach(() => {
-    componentInstance.ngOnDestory();
+    componentInstance.ngOnDestroy();
   });
 
   it('should initialize when component loads into view', fakeAsync(() => {
@@ -218,4 +222,10 @@ describe('Lesson player header component', () => {
       expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
     });
   }));
+
+  it('should toggle menu on mobile', () => {
+    spyOn(mobileMenuService, 'toggleMenuVisibility');
+    componentInstance.toggleMenu();
+    expect(mobileMenuService.toggleMenuVisibility).toHaveBeenCalled();
+  });
 });

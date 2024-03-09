@@ -23,7 +23,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -59,6 +59,20 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     """A dictionary representation of client side SkillOpportunity object."""
 
     topic_name: str
+
+
+class ContributorDashboardPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Page showing the contributor dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests and renders the contributor dashboard page."""
+        self.render_template('contributor-dashboard-page.mainpage.html')
 
 
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -182,9 +196,10 @@ class ContributionOpportunitiesHandler(
         """
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
-        classroom_topic_ids = []
-        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
-            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topic_ids: List[str] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+        for classroom in classrooms:
+            classroom_topic_ids.extend(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
