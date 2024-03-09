@@ -59,7 +59,8 @@ describe('Html Length Service', () => {
   it('should compute word count for empty string', () => {
     const htmlString = '';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     expect(result).toBe(0);
   });
@@ -69,7 +70,8 @@ describe('Html Length Service', () => {
       '<p>Earth Our home planet is the third planet' +
       ' from the sun.</p>');
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     expect(result).toBe(11);
   });
@@ -106,7 +108,7 @@ describe('Html Length Service', () => {
 
     for (const testCase of testCases) {
       const result = htmlLengthService
-        .computeHtmlLength(testCase.input, 'word');
+        .computeHtmlLength(testCase.input, 'word', 'htmlString');
       expect(result).toBe(testCase.expected);
     }
   });
@@ -120,7 +122,8 @@ describe('Html Length Service', () => {
       '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
       'svg&amp;quot;}\"></oppia-noninteractive-math></p>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     /*
       The paragraph "Hi this seems too good to be
@@ -141,7 +144,8 @@ describe('Html Length Service', () => {
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     /*
       "naghiue abghy gjuh &nbsp;" is a paragraph with 3 words.
@@ -167,7 +171,8 @@ describe('Html Length Service', () => {
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     /*
       "Hi this seems too good to be true but what to do man" is a paragraph
@@ -226,7 +231,8 @@ describe('Html Length Service', () => {
       '<p>&nbsp;</p>' +
       '<p>done!</p>');
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
     /*
       The 'collapsible' and 'tab' tags each add a count of 1000 words,
       totaling 2000 words. The phrases "Demo hint just to check" and "done!"
@@ -261,7 +267,8 @@ describe('Html Length Service', () => {
       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
         'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
     /*
       The 'collapsible' and 'tab' tags each add a count of 1000 words,
       totaling 2000 words. "Demo hint just to check" is a paragraph with
@@ -282,7 +289,8 @@ describe('Html Length Service', () => {
     'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
     'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     /*
       The 'skillreview' tag contains "Concept card" and the 'link' tag
@@ -300,7 +308,8 @@ describe('Html Length Service', () => {
                         '<li> This is the third item</li>' +
                         '</ol>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     expect(result).toBe(14);
   });
@@ -312,7 +321,8 @@ describe('Html Length Service', () => {
                         '<li> This is the third item</li>' +
                         '</ul>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'word', 'htmlString');
 
     expect(result).toBe(14);
   });
@@ -320,7 +330,8 @@ describe('Html Length Service', () => {
   it('should compute character count for empty string', () => {
     const htmlString = '';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     expect(result).toBe(0);
   });
@@ -332,7 +343,7 @@ describe('Html Length Service', () => {
         ' from the sun.</p>');
 
       const result = htmlLengthService
-        .computeHtmlLength(htmlString, 'character');
+        .computeHtmlLength(htmlString, 'character', 'htmlString');
 
       expect(result).toBe(55);
     });
@@ -369,7 +380,7 @@ describe('Html Length Service', () => {
 
     for (const testCase of testCases) {
       const result = htmlLengthService
-        .computeHtmlLength(testCase.input, 'character');
+        .computeHtmlLength(testCase.input, 'character', 'htmlString');
       expect(result).toBe(testCase.expected);
     }
   });
@@ -383,7 +394,8 @@ describe('Html Length Service', () => {
       '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
       'svg&amp;quot;}\"></oppia-noninteractive-math></p>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       The paragraph "Hi this seems too good to be true but what to do man"
@@ -403,7 +415,8 @@ describe('Html Length Service', () => {
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
@@ -429,7 +442,8 @@ describe('Html Length Service', () => {
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
     /*
       "Hi this seems too good to be true but what to do man" is a paragraph
       with 52 characters. The 'math' tag is counted as 1 character. "Svg file
@@ -461,7 +475,8 @@ describe('Html Length Service', () => {
       'heading-with-value="&amp;quot;Sample Header&amp;quot;"' +
       'ng-version="11.2.14"></oppia-noninteractive-collapsible>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       The 'collapsible' and 'tab' tags each add a count of 1000 characters,
@@ -484,7 +499,8 @@ describe('Html Length Service', () => {
       'text-with-value="&amp;quot;Oppia link&amp;quot;"' +
       'url-with-value="&amp;quot;https://www.oppia.org/&amp;quot;"></oppia-noninteractive-link></p>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       The 'skillreview' tag contains "Concept card" with 12 characters and
@@ -542,7 +558,8 @@ describe('Html Length Service', () => {
       '<p>&nbsp;</p>' +
       '<p>done!</p>');
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       The 'collapsible' and 'tab' tags each add a count of 1000 characters,
@@ -568,7 +585,8 @@ describe('Html Length Service', () => {
                         '<li> This is the third item</li>' +
                         '</ol>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     expect(result).toBe(65);
   });
@@ -580,23 +598,26 @@ describe('Html Length Service', () => {
                         '<li> This is the third item</li>' +
                       '</ul>';
 
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     expect(result).toBe(65);
   });
 
   it('should compute character count for empty string', () => {
     const htmlString = '';
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     expect(result).toBe(0);
   });
 
-  it('should compute character count of text and normal string', () => {
+  it('should compute character count of html string', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       'Hello, how are you?' +
       '<p>naghiue abghy gjuh &nbsp;</p>';
-    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'htmlString');
 
     /*
       "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
@@ -606,6 +627,36 @@ describe('Html Length Service', () => {
       count is 18 (paragraph) * 2 + 0  = 36 characters.
     */
     expect(result).toBe(36);
+  });
+
+  it('should compute character count of html string and normal string', () => {
+    const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
+      'Hello, how are you?' +
+      '<p>naghiue abghy gjuh &nbsp;</p>';
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'both');
+
+    /*
+      "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
+      And we have 2 paragraphs with 18 characters each.
+      "Hello, how are you?" is a normal string which has
+      19 characters.Therefore, the total character
+      count is 18 (paragraph) * 2 + 19  = 55 characters.
+    */
+    expect(result).toBe(55);
+  });
+
+  it('should compute character count of normal string', () => {
+    const htmlString = 'Hello, how are you?';
+    const result = htmlLengthService.computeHtmlLength(
+      htmlString, 'character', 'normalString');
+
+    /*
+      "Hello, how are you?" is a normal string which has
+      19 characters.Therefore, the total character
+      count is 19 characters.
+    */
+    expect(result).toBe(19);
   });
 
   describe('getLengthForNonTextNodes', () => {
