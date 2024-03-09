@@ -200,16 +200,16 @@ def load_feature_flags_from_storage(
 
 def is_feature_flag_enabled(
     feature_flag_name: str,
+    user_id: Optional[str],
     feature_flag: Optional[feature_flag_domain.FeatureFlag] = None,
-    user_id: Optional[str] = None,
 ) -> bool:
     """Returns True if feature is enabled for the given user else False.
 
     Args:
         feature_flag_name: str. The name of the feature flag that needs to
             be evaluated.
-        feature_flag: FeatureFlag|None. The feature flag domain model.
         user_id: str|None. The id of the user, if logged-out user then None.
+        feature_flag: FeatureFlag|None. The feature flag domain model.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.
