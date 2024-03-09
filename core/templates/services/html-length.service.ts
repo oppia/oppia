@@ -118,6 +118,14 @@ export class HtmlLengthService {
     dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
     let totalLength = 0;
+
+    Array.from(dom.body.childNodes).forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
+        totalLength += this.calculateTextLength(
+          node.nodeValue, calculationType);
+      }
+    });
+
     for (let tag of Array.from(dom.body.children)) {
     /**
       * Guarding against tag.textContent === null, which can

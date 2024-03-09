@@ -601,11 +601,23 @@ describe('Html Length Service', () => {
     /*
       "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
       And we have 2 paragraphs with 18 characters each.
-      "Hello, how are you?" is a normal string which will
-      counted as 0 characters.Therefore, the total character
-      count is 18 (paragraph) * 2 + 0  = 36 characters.
+      "Hello, how are you?" is a normal string which has
+      19 characters.Therefore, the total character
+      count is 18 (paragraph) * 2 + 19  = 55 characters.
     */
-    expect(result).toBe(36);
+    expect(result).toBe(55);
+  });
+
+  it('should compute character count of normal string', () => {
+    const htmlString = 'Hello, how are you?';
+    const result = htmlLengthService.computeHtmlLength(htmlString, 'character');
+
+    /*
+      "Hello, how are you?" is a normal with
+      19 characters.Therefore, the total character
+      count is 19 characters.
+    */
+    expect(result).toBe(19);
   });
 
   describe('getLengthForNonTextNodes', () => {
