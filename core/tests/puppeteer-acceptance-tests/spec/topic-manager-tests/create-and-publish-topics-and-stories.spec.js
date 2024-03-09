@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for topic manager
+ * @fileoverview Acceptance Test for curriculum admin
  */
 
 const userFactory = require(

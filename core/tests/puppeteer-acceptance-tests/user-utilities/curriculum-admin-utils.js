@@ -29,6 +29,10 @@ const saveChangesButton = 'button.e2e-test-save-changes'
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const publishExplorationButton = 'button.e2e-test-publish-exploration'
 
+const photoBoxButton = 'div.e2e-test-photo-button';
+const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
+const curriculumAdminThumbnailImage = testConstants.images.curriculumAdminThumbnailImage;
+
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
@@ -70,6 +74,30 @@ const explorationCategoryDropdown = 'mat-form-field.e2e-test-exploration-categor
 const explorationCategorySelectorChoice = 'mat-option.e2e-test-exploration-category-selector-choice';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationIdElement = 'span.oppia-unique-progress-id';
+
+const addTopicButton = 'div.e2e-test-create-topic-button';
+const topicNameField = 'input.e2e-test-new-topic-name-field';
+const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
+const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
+const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
+const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
+
+const addSubTopicButton = 'button.e2e-test-add-subtopic-button';
+const subTopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subTopicUrlFragmentField = 'input.e2e-test-new-subtopic-url-fragment-field';
+const subTopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const createSubTopicButton = 'button.e2e-test-confirm-subtopic-creation-button';
+
+const addStoryButton = 'button.e2e-test-create-story-button';
+const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
+const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
+const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
+
+const addChapterButton = 'button.e2e-test-add-chapter-button';
+const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 module.exports = class e2eCurriculumAdmin extends baseUser {
   /**
@@ -167,11 +195,29 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn(explorationCategorySelectorChoice[0]);
     await this.clickOn(saveExplorationChangesButton);
+    await this.page.waitForSelector(
+      `${publishExplorationButton}:not([disabled])`);
     await this.clickOn(publishExplorationButton);
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
       element => element.innerText);
     return explorationIdUrl;
+  }
+
+  async createTopic() {
+    await this.clickOn(addTopicButton);
+    await this.type(topicNameField, 'Test Topic 1');
+    await this.type(topicUrlFragmentField, 'test-topic-one');
+    await this.type(topicWebFragmentField, 'Test Topic 1');
+    await this.type(topicDescriptionField, 'This topic is to test curriculum admin utility.');
+    await this.clickOn(photoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(
+      `${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+    await this.page.waitForSelector(
+      `${createTopicButton}:not([disabled])`);
+    await this.clickOn(createTopicButton);
   }
 };

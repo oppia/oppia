@@ -104,7 +104,7 @@ let createNewBlogPostEditor = async function(username) {
 };
 
 /**
- * The function creates a new blog admin user and returns the instance
+ * The function creates a new curriculum admin user and returns the instance
  * of that user.
  * @param {string} username - The username of the curriculum admin.
  * @returns The curriculum admin instance created.
@@ -116,7 +116,7 @@ let createNewCurriculumAdmin = async function(username) {
 
   const curriculumAdmin = new e2eCurriculumAdmin();
   await curriculumAdmin.openBrowser();
-  await curriculumAdmin.signUpNewUser(username, 'curriculum_admin@example.com');
+  await curriculumAdmin.signUpNewUser(username, 'curriculumadmin@example.com');
 
   await superAdminInstance.assignRoleToUser(username, ROLE_CURRICULUM_ADMIN);
   await superAdminInstance.expectUserToHaveRole(username, ROLE_CURRICULUM_ADMIN);
