@@ -24,7 +24,7 @@ import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { CALCULATION_TYPE_CHARACTER, HtmlLengthService, STRING_TYPE_HTML } from 'services/html-length.service';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface ExplanationFormSchema {
   type: string;
@@ -79,7 +79,7 @@ export class SolutionExplanationEditor
     return Boolean(
       this.htmlLengthService.computeHtmlLength(
         this.stateSolutionService.displayed.explanation.html,
-        CALCULATION_TYPE_CHARACTER, STRING_TYPE_HTML) > 3000);
+        CALCULATION_TYPE_CHARACTER) > 3000);
   }
 
   saveThisExplanation(): void {
