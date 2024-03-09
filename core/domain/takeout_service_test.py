@@ -1246,7 +1246,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_rights_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1862,12 +1861,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_question_sm = {
-            self.GENERIC_MODEL_ID: {
-                'commit_type': self.COMMIT_TYPE,
-                'commit_message': self.COMMIT_MESSAGE,
-            }
-        }
-        expected_config_property_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
