@@ -228,10 +228,16 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
 
         Returns:
             *. A 2-tuple consisting of:
-            - A dictionary representing the difference between the old and new
-            values of the recorded voiceover.
-            - Another dictionary representing the updated metadata mapping for
-            the voice artist.
+            (a) dict(str, dict(str, VoiceoverDict)). A dictionary maps content
+            IDs as keys and nested dicts as values. Each nested dict contains
+            language codes as keys and voiceover dicts as values. The dictionary
+            representing the difference between the old and new values of the
+            recorded voiceover.
+            (b) dict(str, VoiceoversAndContentsMappingType). A dictionary
+            maps voice artist IDs as keys and nested dicts as values. Each
+            nested dict refers to the voiceovers_and_contents_mapping field
+            in the VoiceArtistMetadataModel. The dictionary representing the
+            updated metadata mapping for the voice artist.
         """
         voiceover_mapping_diff: Dict[
             str, Dict[str, voiceover_models.VoiceoverDict]] = {}
