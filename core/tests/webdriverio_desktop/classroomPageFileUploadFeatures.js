@@ -23,7 +23,6 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
 var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
@@ -33,14 +32,12 @@ var TopicsAndSkillsDashboardPage = require(
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
 describe('Classroom page functionality', function() {
-  var adminPage = null;
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var skillEditorPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -71,15 +68,6 @@ describe('Classroom page functionality', function() {
       var url = await browser.getUrl();
       var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
-      await adminPage.editConfigProperty(
-        'The details for each classroom page.',
-        'List',
-        async function(elem) {
-          elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(4, 'List');
-          elem = await elem.addItem('Unicode');
-          await elem.setValue(topicId);
-        });
 
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
