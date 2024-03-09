@@ -115,18 +115,13 @@ class GetVoiceArtistMetadataModelsFromDict(beam.DoFn): # type: ignore[misc]
     def process(
         self,
         voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType],
-        exp_commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
+            str, voiceover_models.VoiceoversAndContentsMappingType]
     ) -> Iterable[voiceover_models.VoiceArtistMetadataModel]:
-        self.total_commit_log_models = len(exp_commit_log_models)
-        self.processed_commit_log_models += 1
+        voice_artist_metadata_models = self._convert_to_models(
+            voice_artist_id_to_metadata_mapping)
 
-        if self.processed_commit_log_models == self.total_commit_log_models:
-            voice_artist_metadata_models = self._convert_to_models(
-                voice_artist_id_to_metadata_mapping)
-
-            for voice_artist_metadata_model in voice_artist_metadata_models:
-                yield voice_artist_metadata_model
+        for voice_artist_metadata_model in voice_artist_metadata_models:
+            yield voice_artist_metadata_model
 
 
 class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
@@ -379,7 +374,6 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                             'exploration_id_to_voiceovers'] = (
                                 exploration_id_to_voiceovers)
 
-
                 voice_artist_id_to_metadata_mapping[voice_artist_id] = (
                     voiceovers_and_contents_mapping)
 
@@ -433,6 +427,8 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
             )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        self.voice_artist_metadata_mapping = {}
+
         curated_exploration_model_ids = (
             self.pipeline
             | 'Get exploration models' >> ndb_io.GetModels(
@@ -457,8 +453,6 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
             )
         )
 
-        self.voice_artist_metadata_mapping = {}
-
         voice_artist_metadata_models = (
             exp_commit_log_models
             | 'Update voice artist metadata mapping dict' >> beam.Map(
@@ -468,9 +462,13 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         model, self.voice_artist_metadata_mapping)
                 )
             )
-            | 'Getting voice artist metadata models' >> beam.ParDo(
-                GetVoiceArtistMetadataModelsFromDict(),
-                exp_commit_log_models=beam.pvalue.AsList(exp_commit_log_models)
+            | 'Collect all updated voice artist metadata dicts' >> (
+                beam.combiners.ToList())
+            | 'Extract final updated voice artist metadata dict' >> beam.Map(
+                lambda elements: elements[-1] if elements else {}
+            )
+            | 'Get voice artist metadata models' >> beam.ParDo(
+                GetVoiceArtistMetadataModelsFromDict()
             )
         )
 
