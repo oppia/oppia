@@ -30,7 +30,7 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService, STRING_TYPE_HTML } from 'services/html-length.service';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -112,7 +112,7 @@ export class AddOrUpdateSolutionModalComponent
       solExplanation: string): boolean {
     return Boolean(
       this.htmlLengthService.computeHtmlLength(
-        solExplanation, CALCULATION_TYPE_CHARACTER) > 3000);
+        solExplanation, CALCULATION_TYPE_CHARACTER, STRING_TYPE_HTML) > 3000);
   }
 
   onAnswerChange(): void {
