@@ -26,7 +26,7 @@ import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { Hint } from 'domain/exploration/hint-object.model';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { CALCULATION_TYPE_CHARACTER, HtmlLengthService, STRING_TYPE_HTML } from 'services/html-length.service';
+import { CALCULATION_TYPE_CHARACTER, HtmlLengthService } from 'services/html-length.service';
 
 interface HintFormSchema {
   type: string;
@@ -76,9 +76,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   isHintLengthExceeded(): boolean {
     return Boolean(
       this.htmlLengthService.computeHtmlLength(
-        this.hint.hintContent._html,
-        CALCULATION_TYPE_CHARACTER,
-        STRING_TYPE_HTML) >
+        this.hint.hintContent._html, CALCULATION_TYPE_CHARACTER) >
         ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 

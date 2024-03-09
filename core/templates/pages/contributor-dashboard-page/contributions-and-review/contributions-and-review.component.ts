@@ -39,7 +39,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { CALCULATION_TYPE_WORD, HtmlLengthService, STRING_TYPE_HTML } from 'services/html-length.service';
+import { CALCULATION_TYPE_WORD, HtmlLengthService } from 'services/html-length.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
@@ -261,7 +261,7 @@ export class ContributionsAndReview
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
             this.htmlLengthService.computeHtmlLength(
               suggestion.change_cmd.content_html,
-              CALCULATION_TYPE_WORD, STRING_TYPE_HTML)) : undefined
+              CALCULATION_TYPE_WORD)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);

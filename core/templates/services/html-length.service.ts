@@ -18,19 +18,12 @@
 
 export const CALCULATION_TYPE_WORD = 'word';
 export const CALCULATION_TYPE_CHARACTER = 'character';
-export const STRING_TYPE_HTML = 'htmlString';
-export const STRING_TYPE_NORMAL = 'normalString';
-export const STRING_TYPE_NORMAL_AND_HTML = 'both';
 
 // eslint-disable-next-line max-len
 const CUSTOM_TAG_REGEX = /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs)[^>]*>/g;
 
 type CalculationType =
   typeof CALCULATION_TYPE_WORD | typeof CALCULATION_TYPE_CHARACTER;
-type StringType =
-  typeof STRING_TYPE_HTML |
-  typeof STRING_TYPE_NORMAL |
-  typeof STRING_TYPE_NORMAL_AND_HTML;
 
 import { Injectable, SecurityContext } from '@angular/core';
 import { LoggerService } from './contextual/logger.service';
@@ -76,15 +69,12 @@ export class HtmlLengthService {
     * @param {CalculationType} calculationType - The type
     *    of calculation to be performed. It can be either
     *    'word' or 'character'.
-    * @param {StringType} stringType - The type of string.
-    *    It can be either an HTML string, a normal string, or both.
     * @returns {number} The calculated length of the HTML
     *    string according to the specified 'calculationType'.
     */
   computeHtmlLength(
       htmlString: string,
-      calculationType: CalculationType,
-      stringType: StringType): number {
+      calculationType: CalculationType): number {
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
 
@@ -92,7 +82,7 @@ export class HtmlLengthService {
     const customTags = htmlString.match(CUSTOM_TAG_REGEX);
 
     let totalLength = this.calculateBaselineLength(
-      sanitizedHtml, calculationType, stringType);
+      sanitizedHtml, calculationType);
 
     if (customTags) {
       for (const customTag of customTags) {
@@ -117,36 +107,17 @@ export class HtmlLengthService {
     * @param {CalculationType} calculationType - The type
     *    of calculation to be performed. It can be either
     *    'word' or 'character'.
-    * @param {StringType} stringType - The type of string
     * @returns {number} The calculated length of the HTML
     *    string according to the specified 'calculationType'.
     */
 
   calculateBaselineLength(
-      sanitizedHtml: string,
-      calculationType: CalculationType,
-      stringType: StringType): number {
+      sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
     let dom: Document;
     dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
     let totalLength = 0;
-
-    if (stringType === STRING_TYPE_NORMAL) {
-      return this.calculateTextLength(
-        sanitizedHtml, calculationType);
-    }
-
-
-    if (stringType === STRING_TYPE_NORMAL_AND_HTML) {
-      Array.from(dom.body.childNodes).forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
-          totalLength += this.calculateTextLength(
-            node.nodeValue, calculationType);
-        }
-      });
-    }
-
     for (let tag of Array.from(dom.body.children)) {
     /**
       * Guarding against tag.textContent === null, which can
