@@ -117,9 +117,14 @@
   "include": [
     "core",
     "extensions",
-    "typings"
+    "typings",
+    "core/tests/puppeteer-acceptance-tests"
   ],
   "exclude": [
-    "core/tests"
+    "core/tests/build_sources",
+    "core/tests/data",
+    "core/tests/release_sources",
+    "core/tests/services_sources",
+    "core/tests/puppeteer-acceptance-tests/build"
   ]
 }
