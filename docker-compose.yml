@@ -16,6 +16,7 @@ services:
       - NODE_OPTIONS=--max_old_space_size=4096
       - prod_env=${prod_env:-false}
     entrypoint: bash /app/oppia/docker/angular-build.entrypoint.sh
+    user: node:node
 
   webpack-compiler:
     build:

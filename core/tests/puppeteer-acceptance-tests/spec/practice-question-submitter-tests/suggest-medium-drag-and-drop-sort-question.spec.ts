@@ -18,12 +18,15 @@
  * interaction.
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { UserFactory } from
+  '../../puppeteer-testing-utilities/user-factory';
+import { IQuestionSubmitter } from
+  '../../user-utilities/question-submitter-utils';
+import testConstants from
+  '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
 describe('Practice Question Submitter', function() {
   const topicName = 'Test Topic';
@@ -40,7 +43,7 @@ describe('Practice Question Submitter', function() {
   };
   const acceptedQuestionsPercentage = 30;
 
-  let questionSubmitter = null;
+  let questionSubmitter: IQuestionSubmitter;
   const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
   const DIFFICULTY_MEDIUM = 'Medium';
   const DIFFICULTY_HARD = 'Hard';
@@ -51,8 +54,8 @@ describe('Practice Question Submitter', function() {
   const SOLUTION_QUANTITY_ONLY_ONE = 'Only';
 
   beforeAll(async function() {
-    const superAdmin = await userFactory.createNewSuperAdmin('superadm');
-    await superAdmin.assignRoleToUser('superadm', ROLE_CURRICULUM_ADMIN);
+    const superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
+    await superAdmin.assignRoleToUser('superAdm', ROLE_CURRICULUM_ADMIN);
 
     const skill = {
       description: skillDescription,
@@ -87,8 +90,15 @@ describe('Practice Question Submitter', function() {
     const topicId = await superAdmin.getTopicIdBy({ name: topicName });
     await superAdmin.editClassroom({ topicId });
 
-    questionSubmitter = (
-      await userFactory.createNewQuestionSubmitter('questionsubmitter'));
+    questionSubmitter = await UserFactory.createNewUser(
+      'questionSubmitter', 'questionSubmitter@example.com');
+
+    const questionAdmin = await UserFactory.createNewUser(
+      'questionAdm', 'questionAdmin@example.com', [ROLES.QUESTION_ADMIN]);
+    questionAdmin.addSubmitQuestionRights('questionSubmitter');
+    questionAdmin.logout();
+
+    questionSubmitter.signInWithEmail('questionSubmitter@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should suggest questions by selecting the difficulty to a lesson' +
@@ -187,6 +197,6 @@ describe('Practice Question Submitter', function() {
   }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

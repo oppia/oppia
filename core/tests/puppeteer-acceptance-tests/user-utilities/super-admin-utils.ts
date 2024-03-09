@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  * @fileoverview Super Admin users utility file.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
+import { IBaseUser, BaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from
+  '../puppeteer-testing-utilities/test-constants';
+import { showMessage } from
+  '../puppeteer-testing-utilities/show-message-utils';
 
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
@@ -29,90 +29,146 @@ const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
 
-module.exports = class e2eSuperAdmin extends baseUser {
+export interface ISuperAdmin extends IBaseUser {
+  assignRoleToUser: (username: string, role: string) => Promise<void>;
+  expectUserToHaveRole: (username: string, role: string) => Promise<void>;
+  expectUserNotToHaveRole: (username: string, role: string) => Promise<void>;
+  editClassroom: (details: AdminPageClassroomDetails) => Promise<void>;
+  createTopic: (details: TopicDetails) => Promise<void>;
+  getTopicIdBy: (details: { name: string }) => Promise<void>;
+  createSkill: (details: SkillDetails) => Promise<void>;
+}
+
+export interface AdminPageClassroomDetails {
+  topicId?: string
+}
+
+export interface TopicDetails {
+  name: string;
+  urlFragment: string;
+  webTitleFragment: string;
+  description: string;
+  thumbnail: string;
+  metaContent: string;
+  assignedSkills?: SkillDetails[];
+  subtopics?: SubtopicDetails[];
+  diagnosticTestSkills?: SkillDetails[];
+  isPublished: boolean;
+}
+
+export interface SkillDetails {
+  description: string;
+  reviewMaterial: string;
+  misconception?: SkillMisconceptionDetails;
+  difficulties: {
+    Easy?: SkillDifficultyDetails,
+    Medium: SkillDifficultyDetails,
+    Hard?: SkillDifficultyDetails
+  };
+  questionCount?: number;
+}
+
+export interface SkillMisconceptionDetails {
+  name: string;
+  feedback: string;
+  mustBeTaggedToQuestion: boolean;
+}
+
+export interface SkillDifficultyDetails {
+  rubricNotes: string[];
+}
+
+export interface SubtopicDetails {
+  title: string;
+  urlFragment: string;
+  description: string;
+  thumbnail: string;
+  assignedSkills?: SkillDetails[];
+}
+
+class SuperAdmin extends BaseUser implements ISuperAdmin {
   /**
    * The function to assign a role to a user.
-   * @param {string} username - The username to which role would be assigned.
-   * @param {string} role - The role that would be assigned to the user.
    */
-  async assignRoleToUser(username, role) {
+  async assignRoleToUser(username: string, role: string): Promise<void> {
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.clickOn(addRoleButton);
     await this.clickOn(rolesSelectDropdown);
-    await this.page.evaluate(async(role) => {
-      const allRoles = document.getElementsByClassName('mat-option-text');
-      for (let i = 0; i < allRoles.length; i++) {
-        if (allRoles[i].innerText.toLowerCase() === role) {
-          allRoles[i].click({waitUntil: 'networkidle0'});
-          return;
-        }
+    const allRoles = await this.page.$$('.mat-option-text');
+    for (let i = 0; i < allRoles.length; i++) {
+      const roleText = await this.page.evaluate(
+        (role: HTMLElement) => role.innerText, allRoles[i]);
+      if (roleText.toLowerCase() === role) {
+        await allRoles[i].click();
+        await this.page.waitForNetworkIdle();
+        return;
       }
-      throw new Error(`Role ${role} does not exist.`);
-    }, role);
+    }
+    throw new Error(`Role ${role} does not exists.`);
   }
 
   /**
-   * The function excepts the user to have the given role.
-   * @param {string} username - The username to which role must be assigned.
-   * @param {string} role - The role which must be assigned to the user.
+   * The function expects the user to have the given role.
    */
-  async expectUserToHaveRole(username, role) {
+  async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
-    await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(
-        'oppia-user-role-description');
-      for (let i = 0; i < userRoles.length; i++) {
-        if (userRoles[i].innerText.toLowerCase() === role) {
-          return;
-        }
+    const userRoles = await this.page.$$('.oppia-user-role-description');
+    for (let i = 0; i < userRoles.length; i++) {
+      const roleText = await this.page.evaluate(
+        (role: HTMLElement) => role.innerText, userRoles[i]);
+      if (roleText.toLowerCase() === role) {
+        showMessage(`User ${username} has the ${role} role!`);
+        await this.goto(currentPageUrl);
+        return;
       }
-      throw new Error(`User does not have the ${role} role!`);
-    }, role);
-    showMessage(`User ${username} has the ${role} role!`);
-    await this.goto(currentPageUrl);
+    }
+    throw new Error(`User does not have the ${role} role!`);
   }
 
   /**
-   * The function excepts the user to not have the given role.
-   * @param {string} username - The user to which the role must not be assigned.
-   * @param {string} role - The role which must not be assigned to the user.
+   * The function expects the user to not have the given role.
    */
-  async expectUserNotToHaveRole(username, role) {
+  async expectUserNotToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(AdminPageRolesTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
-    await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(
-        'oppia-user-role-description');
-      for (let i = 0; i < userRoles.length; i++) {
-        if (userRoles[i].innerText.toLowerCase() === role) {
-          throw new Error(`User has the ${role} role!`);
-        }
+    const userRoles = await this.page.$$('.oppia-user-role-description');
+    for (let i = 0; i < userRoles.length; i++) {
+      const roleText = await this.page.evaluate(
+        (role: HTMLElement) => role.innerText, userRoles[i]);
+      if (roleText.toLowerCase() === role) {
+        throw new Error(`User has the ${role} role!`);
       }
-    }, role);
+    }
     showMessage(`User ${username} does not have the ${role} role!`);
     await this.goto(currentPageUrl);
   }
 
-  async editClassroom({ topicId }) {
+  /**
+   * The function edits the classroom on the admin page with the given
+   * details.
+   */
+  async editClassroom({ topicId }: AdminPageClassroomDetails): Promise<void> {
     await this.goto('http://localhost:8181/admin#/config');
 
-    await this.clickOn('.e2e-test-add-list-entry');
-    // TODO(#19668): Remove the for loop that types in the entire topic id.
-    for (let i = 0; i < topicId.length; i++) {
-      await this.type(
-        '.e2e-test-schema-based-dict-editor ' +
-        '.e2e-test-schema-based-list-editor-table-data ' +
-        'input[type="text"]',
-        topicId[i], { visible: true });
+    if (topicId) {
+      await this.clickOn('.e2e-test-add-list-entry');
+      // TODO(#19668): Remove the for loop that types in the entire topic id.
+      for (let i = 0; i < topicId.length; i++) {
+        await this.type(
+          '.e2e-test-schema-based-dict-editor ' +
+          '.e2e-test-schema-based-list-editor-table-data ' +
+          'input[type="text"]',
+          topicId[i], { visible: true });
+      }  
     }
 
     await this.page.on('dialog', async(dialog) => {
@@ -123,10 +179,17 @@ module.exports = class e2eSuperAdmin extends baseUser {
       '.e2e-test-status-message', { visible: true });
   }
 
+  /**
+   * The function creates a topic with the given details through the topic
+   * editor page.
+   *
+   * Ensure that the Curriculum Admin role is assigned to the super admin
+   * before calling this function.
+   */
   async createTopic({
     name, urlFragment, webTitleFragment, description, thumbnail, metaContent,
     assignedSkills, subtopics, diagnosticTestSkills, isPublished
-  }) {
+  }: TopicDetails): Promise<void> {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
     await this.page.waitForSelector(
@@ -313,7 +376,13 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }
   }
 
-  async getTopicIdBy({ name }) {
+  /**
+   * The function returns the id of the topic with the given details.
+   *
+   * Ensure that the Curriculum Admin role is assigned to the super admin
+   * before calling this function.
+   */
+  async getTopicIdBy({ name }: { name: string }): Promise<void> {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
     await this.clickOn('.e2e-test-topics-tab', { visible: true });
 
@@ -329,13 +398,20 @@ module.exports = class e2eSuperAdmin extends baseUser {
     return topicIdMatch.substring(1, topicIdMatch.length - 1);
   }
 
+  /**
+   * The function creates a skill with the given details through the skill
+   * editor page.
+   *
+   * Ensure that the Curriculum Admin role is assigned to the super admin
+   * before calling this function.
+   */
   async createSkill({
     description,
     reviewMaterial,
     misconception,
     difficulties,
     questionCount
-  }) {
+  }: SkillDetails): Promise<void> {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
 
     await this.clickOn('.e2e-test-create-skill-button', { visible: true });
@@ -541,4 +617,6 @@ module.exports = class e2eSuperAdmin extends baseUser {
         '.e2e-test-create-question-progress', { hidden: true });
     }
   }
-};
+}
+
+export let SuperAdminFactory = (): ISuperAdmin => new SuperAdmin();

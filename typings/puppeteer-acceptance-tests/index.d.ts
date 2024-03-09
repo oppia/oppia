@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Question submitter users utility file.
+ * @fileoverview Puppeteer acceptance test type definitions.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-
-module.exports = class e2ePracticeQuestionSubmitter extends baseUser {
-  async navigateToContributorDashboard() {
-    await this.goto('/contributor-dashboard');
-  }
-};
+type Uppercase<S extends string> = S;
+type Lowercase<S extends string> = S;
+type Capitalize<S extends string> = S;
+type Uncapitalize<S extends string> = S;

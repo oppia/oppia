@@ -110,6 +110,14 @@ class Classroom:
                 self.topic_id_to_prerequisite_topic_ids)
         }
 
+    def get_topic_ids(self) -> List[str]:
+        """Returns the list of topic IDs associated with the given classroom.
+
+        Returns:
+            list(str). The list of topic IDs.
+        """
+        return list(self.topic_id_to_prerequisite_topic_ids.keys())
+
     @classmethod
     def require_valid_name(cls, name: str) -> None:
         """Checks whether the name of the classroom is a valid one.

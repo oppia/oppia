@@ -13,13 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility function for logging the progress of the tests.
+ * @fileoverview Question submitter users utility file.
  */
 
-let showMessage = function(message) {
-  // We use console statements to log the progress or feedback of the tests.
-  // eslint-disable-next-line no-console
-  console.log('LOG: ' + message);
-};
+import { IBaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
 
-module.exports = { showMessage };
+export interface IQuestionSubmitter extends IBaseUser {
+  navigateToContributorDashboard: () => Promise<void>;
+}
+
+class QuestionSubmitter implements IQuestionSubmitter {
+  async navigateToContributorDashboard() {
+    await this.goto('/contributor-dashboard');
+  }
+}
+
+export let QuestionSubmitterFactory = (): IQuestionSubmitter => {
+  return new QuestionSubmitter();
+};

@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  * @fileoverview Constants that can be re-used in the accpetance tests.
  */
 
-const path = require('path');
+import path from 'path';
 
-let testConstants = {
+export default {
   URLs: {
     About: 'http://localhost:8181/about',
     AboutFoundation: 'http://localhost:8181/about-foundation',
@@ -30,7 +30,7 @@ let testConstants = {
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
-    ContributorDashboardAdmin: 'http://localhost:8181/contributor-dashboard-admin/',
+    ContributorDashboardAdmin: 'http://localhost:8181/contributor-admin-dashboard',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode: 'http://localhost:8181/creator-dashboard?mode=create',
     Donate: 'http://localhost:8181/donate',
@@ -52,6 +52,16 @@ let testConstants = {
   SignInDetails: {
     inputField: 'input.e2e-test-sign-in-email-input',
   },
+  Roles: {
+    TRANSLATION_ADMIN: 'translation admin',
+    BLOG_ADMIN: 'blog admin',
+    BLOG_POST_EDITOR: 'blog post editor',
+    QUESTION_ADMIN: 'question admin'
+  } as const,
+  BlogRights: {
+    BLOG_ADMIN: 'BLOG_ADMIN',
+    BLOG_POST_EDITOR: 'BLOG_POST_EDITOR'
+  } as const,
   images: {
     blogPostThumbnailImage: path.resolve(
       __dirname, '../images/blog-post-thumbnail.svg'),
@@ -63,7 +73,5 @@ let testConstants = {
     ReviewQuestion: 'REVIEW_QUESTION',
     SubmitQuestion: 'SUBMIT_QUESTION',
   },
-  DEFAULT_SPEC_TIMEOUT: 300000
+  DEFAULT_SPEC_TIMEOUT: 300000,
 };
-
-module.exports = testConstants;
