@@ -468,7 +468,7 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         model, self.voice_artist_metadata_mapping)
                 )
             )
-            | 'Collect all updated voice artist metadata dicts' >> (
+            | 'Collect all voice artist metadata dicts' >> (
                 beam.combiners.ToList())
             | 'Extract final updated voice artist metadata dict' >> beam.Map(
                 lambda elements: elements[-1] if elements else {}
