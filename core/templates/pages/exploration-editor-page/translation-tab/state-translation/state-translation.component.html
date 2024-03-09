@@ -188,11 +188,11 @@
               </span>
             </div>
             <div class="oppia-editor-card-section" *ngIf="caContent.content._unicode">
-              <span *ngIf="!caContent.content.unicode" class="oppia-placeholder" tabindex="0">
+              <span *ngIf="!caContent.content._unicode" class="oppia-placeholder" tabindex="0">
                 {{ getEmptyContentMessage() }}
               </span>
               <span>
-                <p tabindex="0">{{ caContent.content.unicode }}</p>
+                <p tabindex="0">{{ getRequiredUnicode(caContent.content) }}</p>
               </span>
             </div>
           </div>

@@ -144,6 +144,32 @@ export class StateTranslationComponent
     return translationContent.translation as string;
   }
 
+  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string {
+    if (this.translationTabActiveModeService.isTranslationModeActive()) {
+      return SubtitledUnicode.unicode;
+    }
+
+    let langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (
+      !this.entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+    ) {
+      return SubtitledUnicode.unicode;
+    }
+
+    let translationContent = (
+      this.entityTranslationsService
+        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
+          SubtitledUnicode.contentId
+        )
+    );
+    if (!translationContent) {
+      return SubtitledUnicode.unicode;
+    }
+
+    return translationContent.translation as string;
+  }
+
   getEmptyContentMessage(): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       return (
