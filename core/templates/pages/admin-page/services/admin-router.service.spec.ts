@@ -36,7 +36,7 @@ describe('Admin router service', () => {
     // Navigate away from the activities tab (relying on other tests to verify
     // this works correctly) in order to navigate back.
     expect(ars.isActivitiesTabOpen()).toBe(true);
-    ars.showTab('#/config');
+    ars.showTab('#/misc');
 
     expect(ars.isActivitiesTabOpen()).toBe(false);
     ars.showTab('#/activities');

@@ -1333,8 +1333,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -2229,8 +2227,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
