@@ -109,7 +109,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             sys.executable, '-m', 'coverage', 'combine']
         self.coverage_check_cmd = [
             sys.executable, '-m', 'coverage', 'report',
-            '--omit="%s*","third_party/*","/usr/share/*"'
+            '--omit="%s*","third_party/*","/usr/share/*","/app/vm_deps/*"'
             % common.OPPIA_TOOLS_DIR, '--show-missing']
         self.call_count = 0
 

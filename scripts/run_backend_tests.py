@@ -548,6 +548,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 all_test_targets = [
                     test for test in all_test_targets
                     if test not in docker_exclude_tests]
+                print(all_test_targets)
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(
@@ -665,7 +666,7 @@ def check_coverage(
 
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
-         '--omit="%s*","third_party/*","/usr/share/*"'
+         '--omit="%s*","third_party/*","/usr/share/*","/app/vm_deps/*"'
          % common.OPPIA_TOOLS_DIR, '--show-missing']
     if include:
         cmd.append('--include=%s' % ','.join(include))
