@@ -588,6 +588,9 @@ URLS = [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
+    get_redirect_route(
+        r'/voiceover_contribution_handler',
+        resources.VoiceoverContributionHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
     get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(

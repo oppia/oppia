@@ -22,6 +22,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { VoiceoverContributionBackendApiService } from 'services/voiceover-contribution-backend-api-service';
+
 
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
@@ -45,8 +47,10 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   activeTab!: string;
   memoryCacheProfile!: MemoryCacheProfile;
   promoBarConfigForm!: FormGroup;
+  voiceoverContributionForm!: FormGroup;
   memoryCacheDataFetched: boolean = false;
   submitButtonDisabled: boolean = false;
+  voiceoverContributionButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
@@ -56,7 +60,10 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     private formBuilder: FormBuilder,
     private platformFeatureService: PlatformFeatureService,
     private backendApiService: ReleaseCoordinatorBackendApiService,
-    private promoBarBackendApiService: PromoBarBackendApiService) {}
+    private promoBarBackendApiService: PromoBarBackendApiService,
+    private voiceoverContributionBackendApiService:
+      VoiceoverContributionBackendApiService
+  ) {}
 
   flushMemoryCache(): void {
     this.backendApiService.flushMemoryCacheAsync().then(() => {
@@ -93,15 +100,38 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
+  updateVoiceoverContributionParameter(): void {
+    this.statusMessage = (
+      'Updating voiceover contribution platform parameter...');
+    this.voiceoverContributionBackendApiService.
+      updateVoiceoverContributionDataAsync(
+        this.voiceoverContributionForm.controls.enabled.value).then(() => {
+        this.statusMessage = 'Success!';
+        this.voiceoverContributionForm.markAsPristine();
+      }, errorResponse => {
+        this.statusMessage = 'Server error: ' + errorResponse;
+      });
+  }
+
   ngOnInit(): void {
     this.statusMessage = '';
     this.submitButtonDisabled = true;
+    this.voiceoverContributionButtonDisabled = true;
     this.promoBarConfigForm = this.formBuilder.group({
       enabled: false,
       message: ''
     });
+
+    this.voiceoverContributionForm = this.formBuilder.group({
+      enabled: true
+    });
+
     this.promoBarConfigForm.valueChanges.subscribe(() => {
       this.submitButtonDisabled = false;
+    });
+
+    this.voiceoverContributionForm.valueChanges.subscribe(() => {
+      this.voiceoverContributionButtonDisabled = false;
     });
     this.memoryCacheDataFetched = false;
     this.activeTab = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
@@ -111,6 +141,15 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
         message: promoBar.promoBarMessage
       });
     });
+
+    this.voiceoverContributionBackendApiService.
+      getVoiceoverContributionDataAsync().then(
+        (voiceoverContributionEnabled) => {
+          this.voiceoverContributionForm.patchValue({
+            enabled: voiceoverContributionEnabled
+          });
+        }
+      );
   }
 }
 
