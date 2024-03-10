@@ -208,7 +208,7 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
     'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
-    'curriculum-admin-tests/create-and-publish-topics-and-stories.spec.js',
+    'curriculum-admin-tests/create-and-publish-topics-and-stories',
     'logged-in-user-tests/click-all-buttons-on-navbar',
     'logged-in-user-tests/click-all-buttons-in-about-page',
     'logged-in-user-tests/click-all-buttons-in-about-foundation-page',

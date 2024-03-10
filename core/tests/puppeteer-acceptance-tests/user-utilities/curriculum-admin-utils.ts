@@ -16,10 +16,12 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+import { IBaseUser, BaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from
+  '../puppeteer-testing-utilities/test-constants';
+import { showMessage } from
+  '../puppeteer-testing-utilities/show-message-utils';
 
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = 'input.e2e-test-float-form-input';
@@ -106,7 +108,21 @@ const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
-module.exports = class e2eCurriculumAdmin extends baseUser {
+
+export interface ICurriculumAdmin extends IBaseUser {
+  navigateToTopicAndSkillsDashboardPage: () => Promise<void>;
+  createSkill: (topicPageUrl: string) => Promise<void>;
+  createQuestion: () => Promise<void>;
+  navigateToCreatorDashboardPage: () => Promise<void>;
+  createExploration: () => Promise<string | null>;
+  createTopic: () => Promise<string>;
+  createSubTopic: (topicPageUrl: string) => Promise<void>;
+  createStory: (topicPageUrl: string) => Promise<void>;
+  createChapter: (explorationId: string) => Promise<void>;
+  publishStory: () => Promise<void>;
+}
+
+class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
   /**
    * Function for navigating to the topic and skills dashboard page.
    */
@@ -117,7 +133,7 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
   /**
    * Function for creating a skill in the topics and skills dashboard.
    */
-  async createSkill(topicPageUrl) {
+  async createSkill(topicPageUrl: string) {
     await this.goto(topicPageUrl);
     await this.clickOn(createSkillButton);
     await this.type(skillDescriptionField, 'Test Skill 3');
@@ -207,7 +223,7 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
-      element => element.innerText);
+      element => element.textContent);
     return explorationIdUrl;
   }
 
@@ -287,3 +303,5 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.clickOn(createChapterButton);
   }
 };
+
+export let CurriculumAdminFactory = (): ICurriculumAdmin => new CurriculumAdmin();

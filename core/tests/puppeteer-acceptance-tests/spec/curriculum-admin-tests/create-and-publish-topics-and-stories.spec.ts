@@ -16,29 +16,32 @@
  * @fileoverview Acceptance Test for curriculum admin
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { UserFactory } from
+  '../../puppeteer-testing-utilities/user-factory';
+import testConstants from
+  '../../puppeteer-testing-utilities/test-constants';
+import { ICurriculumAdmin } from '../../user-utilities/curriculum-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function() {
-  let curriculumAdmin = null;
-  let topicUrl = '';
-  let explorationUrl = '';
-  let explorationId = '';
+  let curriculumAdmin: ICurriculumAdmin;
+  let topicUrl: string | null;
+  let explorationUrl: string | null;
+  let explorationId: string | null;
 
   beforeAll(async function() {
-    curriculumAdmin =
-      await userFactory.createNewCurriculumAdmin('curriculumAdm');
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm', 'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]);
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should create skill.',
     async function() {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       explorationUrl = await curriculumAdmin.createExploration();
-      explorationId = 'https://localhost:8081/explore/235'.match(/explore\/(.*)/)[1];
+      explorationId = explorationUrl ? explorationUrl.match(/explore\/(.*)/)?.[1] ?? '' : '';
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       topicUrl = await curriculumAdmin.createTopic();
@@ -50,6 +53,6 @@ describe('Curriculum Admin', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
