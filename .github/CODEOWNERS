@@ -79,7 +79,7 @@
 # TS typing
 /typings/ @oppia/dev-workflow-reviewers
 /tsconfig*.json @oppia/dev-workflow-reviewers
-/scripts/typescript_checks*.py @oppia/dev-workflow-reviewers
+/scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
 
 
 # Answer classification team.
@@ -423,7 +423,6 @@
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
 /core/templates/components/concept-card/ @oppia/lace-frontend-reviewers
@@ -739,6 +738,11 @@
 /core/templates/pages/release-coordinator-page/features-tab/ @oppia/core-reviewers
 /core/templates/services/platform-feature*.ts @oppia/core-reviewers
 
+# Acceptance Tests.
+/core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
+/core/tests/puppeteer/ @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
+/scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 
 # Critical files.
 #
