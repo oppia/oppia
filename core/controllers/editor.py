@@ -193,26 +193,36 @@ class ExplorationHandler(
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request['apply_draft']
-
+        exploration_data = {}
         try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id, apply_draft=apply_draft,
-                version=version)
-            if self.user_id is not None:
+            if self.user_id is None:
+                exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+                exploration_rights = (
+                    rights_manager.get_exploration_rights(
+                        exploration_id).to_dict()
+                )
+                states = {}
+                for state_name in exploration.states:
+                    state_dict = exploration.states[state_name].to_dict()
+                    states[state_name] = state_dict
+                exploration_data = exp_domain.UserExplorationData(
+                    exploration, states, exploration_rights
+                ).to_dict()
+            else:
+                exploration_data = exp_services.get_user_exploration_data(
+                    self.user_id, exploration_id, apply_draft=apply_draft,
+                    version=version)
                 user_settings = user_services.get_user_settings(
                     self.user_id, strict=False
                 )
-                has_seen_editor_tutorial = False
-                has_seen_translation_tutorial = False
                 if user_settings is not None:
-                    if user_settings.last_started_state_editor_tutorial:
-                        has_seen_editor_tutorial = True
-                    if user_settings.last_started_state_translation_tutorial:
-                        has_seen_translation_tutorial = True
-                exploration_data['show_state_editor_tutorial_on_load'] = (
-                    not has_seen_editor_tutorial)
-                exploration_data['show_state_translation_tutorial_on_load'] = (
-                    not has_seen_translation_tutorial)
+                    if not user_settings.last_started_state_editor_tutorial:
+                        exploration_data[
+                            'show_state_editor_tutorial_on_load'] = True
+                    if not (
+                        user_settings.last_started_state_translation_tutorial):
+                        exploration_data[
+                            'show_state_translation_tutorial_on_load'] = True
             # Here we use MyPy ignore because here we are defining a new
             # 'exploration_is_linked_to_story' key on a well defined TypedDict
             # dictionary.

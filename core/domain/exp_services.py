@@ -2963,14 +2963,14 @@ def is_version_of_draft_valid(exp_id: str, version: int) -> bool:
 
 
 def get_user_exploration_data(
-    user_id: str | None,
+    user_id: str,
     exploration_id: str,
     apply_draft: bool = False,
     version: Optional[int] = None
 ) -> exp_domain.UserExplorationDataDict:
     """Returns a description of the given exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id) if user_id else None
+        user_id, exploration_id)
     is_valid_draft_version = (
         is_version_of_draft_valid(
             exploration_id, exp_user_data.draft_change_list_exp_version)
@@ -2979,7 +2979,7 @@ def get_user_exploration_data(
     if apply_draft:
         updated_exploration = (
             get_exp_with_draft_applied(exploration_id, user_id)
-        ) if user_id else None
+        )
         if updated_exploration is None:
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=version)
@@ -3000,19 +3000,18 @@ def get_user_exploration_data(
     draft_change_list_id = (
         exp_user_data.draft_change_list_id if exp_user_data else 0)
 
-    editor_dict = exp_domain.UserExplorationData(
-        exploration=exploration,
-        states=states,
-        rights=rights_manager.get_exploration_rights(exploration_id).to_dict()
+    exploration_email_preferences = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id
+        )
     ).to_dict()
 
-    if user_id is not None:
-        editor_dict['draft_changes'] = draft_changes
-        editor_dict['draft_change_list_id'] = draft_change_list_id
-        editor_dict['is_version_of_draft_valid'] = is_valid_draft_version
-        editor_dict['email_preferences'] = (
-        user_services.get_email_preferences_for_exploration(
-            user_id, exploration_id)).to_dict()
+    editor_dict = exp_domain.UserExplorationData(
+        exploration, states,
+        rights_manager.get_exploration_rights(exploration_id).to_dict(),
+        exploration_email_preferences, draft_change_list_id,
+        is_valid_draft_version, draft_changes
+    ).to_dict()
 
     return editor_dict
 

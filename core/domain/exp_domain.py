@@ -5822,7 +5822,7 @@ class UserExplorationDataDict(TypedDict):
 class UserExplorationData(translation_domain.BaseTranslatableObject):
     """Domain object for an User Exploration data."""
 
-    default_exp_email_pref: user_domain.UserExplorationPrefsDict = {
+    default_exploration_email_prefs: user_domain.UserExplorationPrefsDict = {
         'mute_feedback_notifications': False,
         'mute_suggestion_notifications': False
     }
@@ -5832,9 +5832,8 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         exploration: Exploration,
         states: Dict[str, state_domain.StateDict],
         rights: rights_domain.ActivityRightsDict,
-        exp_email_pref: Optional[user_domain.UserExplorationPrefsDict] = None,
-        show_state_editor_tutorial_on_load: bool = False,
-        show_state_translation_tutorial_on_load: bool = False,
+        exploration_email_preferences: Optional[
+            user_domain.UserExplorationPrefsDict] = None,
         draft_change_list_id: int = 0,
         is_valid_draft_version: Optional[bool] = False,
         draft_changes: Optional[Dict[str, str]] = None,
@@ -5847,12 +5846,8 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
                 the State object.
             rights: rights_domain.ActivityRightsDict. Dictionary
                 representation of activity rights.
-            exp_email_pref: Optional[user_domain.UserExplorationPrefsDict].
+            exploration_email_preferences: Optional[user_domain.UserExplorationPrefsDict]. # pylint: disable=line-too-long
                 Dictionary representing feedback and suggestion email settings.
-            show_state_editor_tutorial_on_load: bool. Whether to show the
-                tutorial when the exploration editor loads.
-            show_state_translation_tutorial_on_load: bool. Whether to show the
-                tutorial when the translation tab loads.
             draft_change_list_id: int. The id of draf change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
                 version is valid or not.
@@ -5860,18 +5855,17 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         """
         self.exploration = exploration
         self.draft_change_list_id = draft_change_list_id
-        self.show_state_editor_tutorial_on_load = (
-            show_state_editor_tutorial_on_load)
-        self.show_state_translation_tutorial_on_load = (
-            show_state_translation_tutorial_on_load)
+        self.show_state_editor_tutorial_on_load = False
+        self.show_state_translation_tutorial_on_load = False
         self.draft_changes = draft_changes
         self.states = states
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
-        if exp_email_pref is None:
-            self.exploration_email_preferences = self.default_exp_email_pref
+        if exploration_email_preferences is None:
+            self.exploration_email_preferences = (
+                self.default_exploration_email_prefs)
         else:
-            self.exploration_email_preferences = exp_email_pref
+            self.exploration_email_preferences = exploration_email_preferences
 
     def to_dict(self) -> UserExplorationDataDict:
         """Gets the dict representation of UserExplorationData
