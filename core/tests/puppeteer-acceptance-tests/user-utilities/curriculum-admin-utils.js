@@ -82,7 +82,7 @@ const explorationCategorySelectorChoice = 'mat-option.e2e-test-exploration-categ
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 
-const addTopicButton = 'div.e2e-test-create-topic-button';
+const addTopicButton = 'button.e2e-test-create-topic-button';
 const topicNameField = 'input.e2e-test-new-topic-name-field';
 const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
 const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
@@ -117,7 +117,8 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
   /**
    * Function for creating a skill in the topics and skills dashboard.
    */
-  async createSkill() {
+  async createSkill(topicPageUrl) {
+    await this.goto(topicPageUrl);
     await this.clickOn(createSkillButton);
     await this.type(skillDescriptionField, 'Test Skill 3');
     await this.clickOn(skillReviewMaterialHeader)
@@ -211,7 +212,6 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
   }
 
   async createTopic() {
-    await this.clickOn(topicsTab);
     await this.clickOn(addTopicButton);
     await this.type(topicNameField, 'Test Topic 1');
     await this.type(topicUrlFragmentField, 'test-topic-one');
@@ -225,11 +225,12 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.page.waitForSelector(
       `${createTopicButton}:not([disabled])`);
     await this.clickOn(createTopicButton);
-    await this.page.waitForSelector(addSubTopicButton);
+    await this.page.waitForSelector(addStoryButton);
     return window.location.href;
   }
 
-  async createSubTopic() {
+  async createSubTopic(topicPageUrl) {
+    await this.goto(topicPageUrl);
     await this.clickOn(addSubTopicButton);
     await this.type(subTopicTitleField, 'Test Subtopic 1');
     await this.type(subTopicUrlFragmentField, 'test-subtopic-one');
@@ -243,10 +244,10 @@ module.exports = class e2eCurriculumAdmin extends baseUser {
     await this.page.waitForSelector(
       `${createSubTopicButton}:not([disabled])`);
     await this.clickOn(createSubTopicButton);
-    window.history.back();
   }
 
-  async createStory() {
+  async createStory(topicPageUrl) {
+    await this.goto(topicPageUrl);
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, 'Test Story 1');
     await this.type(storyUrlFragmentField, 'test-story-one');

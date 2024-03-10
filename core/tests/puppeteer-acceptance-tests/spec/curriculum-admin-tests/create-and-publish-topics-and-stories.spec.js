@@ -25,6 +25,9 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Curriculum Admin', function() {
   let curriculumAdmin = null;
+  let topicUrl = '';
+  let explorationUrl = '';
+  let explorationId = '';
 
   beforeAll(async function() {
     curriculumAdmin =
@@ -33,8 +36,17 @@ describe('Curriculum Admin', function() {
 
   it('should create skill.',
     async function() {
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      explorationUrl = await curriculumAdmin.createExploration();
+      explorationId = 'https://localhost:8081/explore/235'.match(/explore\/(.*)/)[1];
+
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createSkill();
+      topicUrl = await curriculumAdmin.createTopic();
+      await curriculumAdmin.createSubTopic(topicUrl);
+      await curriculumAdmin.createSkill(topicUrl);
+      await curriculumAdmin.createStory(topicUrl);
+      await curriculumAdmin.createChapter(explorationId);
+      await curriculumAdmin.publishStory();
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
