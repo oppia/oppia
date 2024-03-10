@@ -1043,7 +1043,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.unpublish_story(
                 self.TOPIC_ID, 'story_10', self.user_id_admin)
 
-        # Throw error if exploration isn't published.
+        # Throw error if a story node doesn't have an exploration.
         self.save_new_story(
             'story_id_new',
             self.user_id,
