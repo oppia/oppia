@@ -96,24 +96,6 @@ export class ContributionOpportunitiesBackendApiService {
     '/pinned-opportunities'
   );
 
-  private _getExplorationOpportunityFromDict(
-      opportunityDict: ExplorationOpportunitySummaryBackendDict):
-      ExplorationOpportunitySummary {
-    return new ExplorationOpportunitySummary(
-      opportunityDict.id, opportunityDict.topic_name,
-      opportunityDict.story_title, opportunityDict.chapter_title,
-      opportunityDict.content_count, opportunityDict.translation_counts,
-      opportunityDict.translation_in_review_counts,
-      opportunityDict.language_code, opportunityDict.is_pinned);
-  }
-
-  private _getSkillOpportunityFromDict(
-      opportunityDict: SkillOpportunityBackendDict): SkillOpportunity {
-    return new SkillOpportunity(
-      opportunityDict.id, opportunityDict.skill_description,
-      opportunityDict.topic_name, opportunityDict.question_count);
-  }
-
   async fetchSkillOpportunitiesAsync(cursor: string):
   Promise<SkillContributionOpportunities> {
     const params = {
@@ -127,7 +109,7 @@ export class ContributionOpportunitiesBackendApiService {
         }
       ), { params }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
-        dict => this._getSkillOpportunityFromDict(dict));
+        dict => SkillOpportunity.createFromBackendDict(dict));
 
       return {
         opportunities: opportunities,
@@ -182,7 +164,7 @@ export class ContributionOpportunitiesBackendApiService {
         }
       ), { params }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
-        dict => this._getExplorationOpportunityFromDict(dict));
+        dict => ExplorationOpportunitySummary.createFromBackendDict(dict));
 
       return {
         opportunities: opportunities,
@@ -195,17 +177,14 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchReviewableTranslationOpportunitiesAsync(
-      topicName?: string,
+      topicName: string,
       languageCode?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (
-      topicName &&
-      topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL
-    ) {
+    if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
@@ -214,9 +193,10 @@ export class ContributionOpportunitiesBackendApiService {
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
         params
-      } as Object).toPromise().then(data => {
+      } as Object
+    ).toPromise().then(data => {
       const opportunities = data.opportunities.map(
-        dict => this._getExplorationOpportunityFromDict(dict));
+        dict => ExplorationOpportunitySummary.createFromBackendDict(dict));
       return {
         opportunities: opportunities
       };
@@ -245,10 +225,8 @@ export class ContributionOpportunitiesBackendApiService {
     try {
       const response = await this.http
         .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
-      // TODO(#15648): Re-enable "All Topics" after fetching latency is fixed.
-      // response.topic_names.unshift('All');
 
-      return response.topic_names;
+      return [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...response.topic_names];
     } catch {
       return [];
     }
