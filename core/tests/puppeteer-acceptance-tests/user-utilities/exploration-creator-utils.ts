@@ -479,7 +479,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    * deleted successfully?
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(
-    ): Promise<void> {
+  ): Promise<void> {
     await this.page.waitForTimeout(500);
     try {
       await this.page.goto(explorationUrlAfterPublished);
