@@ -127,14 +127,20 @@ var PreferencesPage = function() {
     var dropdownSelectorString = '#mat-select-0-panel';
     var dropdownOption = $(`.mat-option-text=${language}`);
 
-    await browser.execute((selector, language)=>{
+    await browser.execute((selector)=>{
       var element = document.querySelector(`${selector}`);
-      if (language === 'English') {
-        element.scrollTop = 0;
-      } else if (language === 'Español') {
-        element.scrollTop = 100;
+      element.scrollTop = 0;
+    }, dropdownSelectorString);
+
+    while (true) {
+      if (await dropdownOption.isDisplayedInViewport()) {
+        break;
       }
-    }, dropdownSelectorString, language);
+      await browser.execute((selector)=>{
+        var element = document.querySelector(`${selector}`);
+        element.scrollTop += 100;
+      }, dropdownSelectorString);
+    }
 
     await dropdownOption.waitForDisplayed({ timeout: 5000 });
     await dropdownOption.waitForClickable({ timeout: 5000 });
