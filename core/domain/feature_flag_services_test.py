@@ -49,6 +49,8 @@ FeatureStages = feature_flag_domain.FeatureStages
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
 
+    LOGGED_OUT_USER_ID = None
+
     def _swap_name_to_description_feature_stage_registry(
         self) -> contextlib._GeneratorContextManager[None]:
         """Returns swap iterator for the registry variable."""
@@ -486,7 +488,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_evaluate_dev_feature_flag_for_prod_server_returns_false(
         self) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
-            self._swap_feature_flags_list())
+                self._swap_feature_flags_list())
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry())
         with swap_all_feature_flags, self.swap(
@@ -554,7 +556,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._swap_name_to_description_feature_stage_registry())
         with swap_name_to_description_feature_stage_registry_dict:
             self.assertTrue(feature_services.is_feature_flag_enabled(
-                self.dev_feature_flag.name))
+                self.dev_feature_flag.name, user_id=self.LOGGED_OUT_USER_ID))
 
     def test_feature_flag_not_enabled_for_logged_out_user(self) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
@@ -565,7 +567,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name, False, 0, [])
                 self.assertFalse(feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name))
+                    self.dev_feature_flag.name,
+                    user_id=self.LOGGED_OUT_USER_ID))
 
     def _signup_multiple_users_and_return_ids(self) -> Tuple[str, str, str]:
         """Signup multiple users and returns user ids of them

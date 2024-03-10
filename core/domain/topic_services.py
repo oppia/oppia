@@ -1104,15 +1104,16 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    published_stories = story_fetchers.get_stories_by_ids(
-        published_canonical_story_ids + published_additional_story_ids,
-        strict=False)
+    published_stories: List[story_domain.Story] = [
+        story for story in story_fetchers.get_stories_by_ids(
+            published_canonical_story_ids + published_additional_story_ids,
+            strict=False)
+        if story is not None]
     topic_model_published_story_exploration_mapping: Dict[str, List[str]] = (
         _compute_story_exploration_mapping(published_stories))
 
     total_published_node_count = 0
     for story in published_stories:
-        assert story is not None
         if story.id in published_canonical_story_ids:
             total_published_node_count += (
                 story.story_contents.get_published_node_count()
@@ -1155,12 +1156,11 @@ def _compute_story_exploration_mapping(
         stories: list(Story). A list of stories to reference in the mapping.
 
     Returns:
-        dict(str,list(str)). A mapping whose keys are story ids and whose
+        dict(str, list(str)). A mapping whose keys are story ids and whose
         values are lists of exploration ids linked to the corresponding story.
     """
     mapping: Dict[str, List[str]] = {}
     for story in stories:
-        assert story is not None
         mapping[story.id] = (
             story.story_contents.get_linked_exp_ids_of_published_nodes()
             if feature_flag_services.is_feature_flag_enabled(
@@ -1856,8 +1856,10 @@ def get_all_published_story_exploration_ids(
                     topic.additional_story_references
                 if story_ref.story_is_published
             ]
-            published_stories = story_fetchers.get_stories_by_ids(
-                published_story_ids, strict=False)
+            published_stories: List[story_domain.Story] = [
+                story for story in story_fetchers.get_stories_by_ids(
+                    published_story_ids, strict=False)
+                if story is not None]
             mappings.append(_compute_story_exploration_mapping(
                 published_stories))
 
