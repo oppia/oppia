@@ -16,14 +16,14 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-import { SuperAdminFactory, ISuperAdmin } from '../user-utilities/super-admin-utils';
-import { BaseUserFactory, IBaseUser } from './puppeteer-utils';
-import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
-import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-users-utils';
 import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
-import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
-import { ExplorationCreatorFactory, IExplorationCreator } from '../user-utilities/exploration-utils';
+import { ExplorationCreatorFactory, IExplorationCreator } from '../user-utilities/exploration-creator-utils';
+import { ILoggedInUser, LoggedInUserFactory } from '../user-utilities/logged-in-users-utils';
+import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
+import { ISuperAdmin, SuperAdminFactory } from '../user-utilities/super-admin-utils';
+import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
+import { BaseUserFactory, IBaseUser } from './puppeteer-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -130,7 +130,8 @@ export class UserFactory {
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<ILoggedInUser & IExplorationCreator & MultipleRoleIntersection<TRoles>> {
+  ): Promise<ILoggedInUser & IExplorationCreator &
+     MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRole(
       UserFactory.composeUserWithRole(BaseUserFactory(), LoggedInUserFactory()),
       ExplorationCreatorFactory()

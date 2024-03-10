@@ -217,7 +217,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'translation-admin-tests/remove-translation-rights'
     'exploration-creator-tests/create-exploration-and-change-basic-settings',
     'exploration-creator-tests/savedraft-publish-and-discard-the-changes'
-    
+
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

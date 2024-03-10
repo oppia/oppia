@@ -18,12 +18,9 @@
 
 import { IBaseUser, BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
 import { showMessage } from
   '../puppeteer-testing-utilities/show-message-utils';
 import { error } from 'console';
-  
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
 const createNewExplorationButton =
@@ -91,7 +88,7 @@ export interface IExplorationCreator extends IBaseUser {
   addTitle:
     (Title: string) => Promise<void>;
   expectTitleToHaveMaxLength:
-    (maxLength: Number) => Promise<void>;
+    (maxLength: number) => Promise<void>;
   updateGoal:
     (Goal: string) => Promise<void>;
   expectGoalToEqual:
@@ -103,7 +100,7 @@ export interface IExplorationCreator extends IBaseUser {
   expectSelectedLanguageToBe:
     (expectedLanguage: string) => Promise<void>;
   addTags:
-    (TagNames: Array<string>) => Promise<void>;
+    (TagNames: string[]) => Promise<void>;
   updateSettingsSuccessfully: () => Promise<void>;
   expectTagsToBeAdded: () => Promise<void>;
   previewSummary: () => Promise<void>;
@@ -117,7 +114,7 @@ export interface IExplorationCreator extends IBaseUser {
     (user2: string) => Promise<void>;
   expectExplorationToBePublished: () => Promise<void>;
   addVoiceArtist:
-    (voiceArtists: Array<string>) => Promise<void>;
+    (voiceArtists: string[]) => Promise<void>;
   optInToEmailNotifications: () => Promise<void>;
   expectEmailNotificationToBeActivated:
     () => Promise<void>;
@@ -258,11 +255,10 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     if (!categoryDropdown) {
       throw new Error('Category dropdown not found.');
-    }//need to be verified(added,If TypeScript is giving you an error about categoryDropdown possibly being null, you can handle this situation by checking if categoryDropdown is null before proceeding to click on it. Here's how you can do it:)
+    }
     await categoryDropdown.click();
 
     const selectedCategory = await this.page.evaluate(() => {
-      //If TypeScript is giving you an error about innerText not existing on type Element, you can resolve this by explicitly casting the result of querySelector to an appropriate type that has innerText. In this case, you can cast it to HTMLElement. Here's the updated code:
       return (document.querySelector('#mat-option-69') as HTMLElement).innerText;
     });
     if (selectedCategory === expectedCategory) {
@@ -580,4 +576,5 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   }
 };
 
-export let ExplorationCreatorFactory = (): IExplorationCreator => new ExplorationCreator();
+export let ExplorationCreatorFactory = (): IExplorationCreator =>
+new ExplorationCreator();

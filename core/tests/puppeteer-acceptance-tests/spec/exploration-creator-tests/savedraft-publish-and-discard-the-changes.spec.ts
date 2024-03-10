@@ -18,18 +18,18 @@
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { IExplorationCreator } from '../../user-utilities/exploration-utils';
+import { IExplorationCreator } from '../../user-utilities/exploration-creator-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationCreator: IExplorationCreator;
-  // let explorationVisitor: IExplorationCreator;
+  let explorationVisitor: IExplorationCreator;
   beforeAll(async function() {
     explorationCreator = await UserFactory.createNewUser(
       'explorationAdmi', 'exploration_creator@example.com');
-    // explorationVisitor = await UserFactory.createNewUser(
-    //   'explorationVisitori', 'exploration_visitor@example.com');
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationVisitori', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should draft, discard and publish the changes',

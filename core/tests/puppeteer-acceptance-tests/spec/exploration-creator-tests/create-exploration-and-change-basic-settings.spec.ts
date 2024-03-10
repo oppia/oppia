@@ -18,11 +18,10 @@
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { IExplorationCreator } from '../../user-utilities/exploration-utils';
+import { IExplorationCreator } from '../../user-utilities/exploration-creator-utils';
 import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
-const ROLES = testConstants.Roles;
 
 describe('Exploration Creator', function() {
   let explorationCreator: IExplorationCreator;
@@ -33,7 +32,7 @@ describe('Exploration Creator', function() {
     explorationCreator = await UserFactory.createNewUser(
       'explorationAdm', 'exploration_creator@example.com');
     explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor', 'exploration_visitor@example.com'); 
+      'explorationVisitor', 'exploration_visitor@example.com');
     superAdmin = await UserFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 
@@ -48,8 +47,8 @@ describe('Exploration Creator', function() {
 
       await guestUser2.closeBrowser();
       await guestUser1.closeBrowser();
-      await guestUser3.closeBrowser();        
-        
+      await guestUser3.closeBrowser();
+
       await superAdmin.assignRoleToUser(
         'explorationAdm', 'voiceover admin');
       await superAdmin.expectUserToHaveRole(
