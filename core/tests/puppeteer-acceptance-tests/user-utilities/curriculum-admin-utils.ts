@@ -192,11 +192,15 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.goto(creatorDashboardUrl);
   }
 
+  /**
+   * Function for creating an exploration as a curriculum admin.
+   */
   async createExploration() {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`);
     await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
     await this.type(richTextAreaField, 'Test Exploration');
     await this.clickOn(saveContentButton);
@@ -227,6 +231,9 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     return explorationIdUrl;
   }
 
+  /**
+   * Function for creating a topic in the topics-and-skills dashboard.
+   */
   async createTopic() {
     await this.clickOn(addTopicButton);
     await this.type(topicNameField, 'Test Topic 1');
@@ -245,7 +252,10 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     return window.location.href;
   }
 
-  async createSubTopic(topicPageUrl) {
+  /**
+   * Function for creating a subtopic as a curriculum admin.
+   */
+  async createSubTopic(topicPageUrl: string) {
     await this.goto(topicPageUrl);
     await this.clickOn(addSubTopicButton);
     await this.type(subTopicTitleField, 'Test Subtopic 1');
@@ -262,7 +272,10 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(createSubTopicButton);
   }
 
-  async createStory(topicPageUrl) {
+  /**
+   * Function for creating a story for a certain topic.
+   */
+  async createStory(topicPageUrl: string) {
     await this.goto(topicPageUrl);
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, 'Test Story 1');
@@ -278,6 +291,9 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(createStoryButton);
   }
 
+  /**
+   * Function for publishing a story as a curriculum admin.
+   */
   async publishStory() {
     await this.clickOn(editorMainTabButton);
     await this.clickOn(saveStoryButton);
@@ -289,7 +305,10 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(publishStoryButton);
   }
 
-  async createChapter(explorationId) {
+  /**
+   * Function for creating a chapter for a certain story.
+   */
+  async createChapter(explorationId: string) {
     await this.clickOn(addChapterButton);
     await this.type(chapterTitleField, 'Test Story 1');
     await this.type(chapterExplorationIdField, explorationId);
