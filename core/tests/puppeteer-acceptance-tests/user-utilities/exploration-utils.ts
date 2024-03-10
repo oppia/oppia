@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,14 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview exploration management test file
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
+import { IBaseUser, BaseUser } from
+  '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from
+  '../puppeteer-testing-utilities/test-constants';
+import { showMessage } from
+  '../puppeteer-testing-utilities/show-message-utils';
+import { error } from 'console';
+  
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
 const createNewExplorationButton =
@@ -72,7 +77,63 @@ const addVoiceArtistUserName = '#newVoicAartistUsername';
 
 let explorationUrlAfterPublished = '';
 
-module.exports = class e2eExplorationCreator extends baseUser {
+export interface IExplorationCreator extends IBaseUser {
+  openCreatorDashboardPage: () => Promise<void>;
+  switchToEditorTab: () => Promise<void>;
+  updateCardName:
+    (cardName: string) => Promise<void>;
+  updateExplorationIntroText:
+    (Introtext: string) => Promise<void>;
+  addEndInteraction: () => Promise<void>;
+  showMessageOfSuccessfullExplrationCreation:
+    () => Promise<void>;
+  goToSettingsTab: () => Promise<void>;
+  addTitle:
+    (Title: string) => Promise<void>;
+  expectTitleToHaveMaxLength:
+    (maxLength: Number) => Promise<void>;
+  updateGoal:
+    (Goal: string) => Promise<void>;
+  expectGoalToEqual:
+    (expectedGoal: string) => Promise<void>;
+  selectAlgebraAsACategory: () => Promise<void>;
+  expectSelectedCategoryToBe:
+    (expectedCategory: string) => Promise<void>;
+  selectEnglishAsLanguage: () => Promise<void>;
+  expectSelectedLanguageToBe:
+    (expectedLanguage: string) => Promise<void>;
+  addTags:
+    (TagNames: Array<string>) => Promise<void>;
+  updateSettingsSuccessfully: () => Promise<void>;
+  expectTagsToBeAdded: () => Promise<void>;
+  previewSummary: () => Promise<void>;
+  expectPreviewSummaryToBeVisible: () => Promise<void>;
+  enableAutomaticTextToSpeech: () => Promise<void>;
+  expectAutomaticTextToSpeechToBeEnabled:
+    () => Promise<void>;
+  assignUserToCollaboratorRole:
+    (user1: string) => Promise<void>;
+  assignUserToPlaytesterRole:
+    (user2: string) => Promise<void>;
+  expectExplorationToBePublished: () => Promise<void>;
+  addVoiceArtist:
+    (voiceArtists: Array<string>) => Promise<void>;
+  optInToEmailNotifications: () => Promise<void>;
+  expectEmailNotificationToBeActivated:
+    () => Promise<void>;
+  deleteExploration: () => Promise<void>;
+  expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard:
+    () => Promise<void>;
+  saveDraftExploration: () => Promise<void>;
+  expectExplorationToBeDraftedSuccessfully: () => Promise<void>;
+  publishExploration: () => Promise<void>;
+  expectInteractionOnCreatorDashboard: () => Promise<void>;
+  discardCurrentChanges: () => Promise<void>;
+  expectTitleToBe:
+    (titleBeforeChanges: string) => Promise<void>;
+  }
+
+class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in reaching dashboard Url.
    */
@@ -90,7 +151,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in updating Card Name.
-   * @param {string} cardName
    */
   async updateCardName(cardName) {
     await this.page.waitForTimeout(500);
@@ -102,7 +162,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in updating exploration intro text.
-   * @param {string} Introtext
    */
   async updateExplorationIntroText(Introtext) {
     await this.page.waitForTimeout(600);
@@ -134,7 +193,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in updating Title.
-   * @param {string} Title
    */
   async addTitle(Title) {
     await this.clickOn(addTitleBar);
@@ -143,7 +201,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function checks length of title bar at basic settings tab.
-   * @param {Number} maxLength
    */
   async expectTitleToHaveMaxLength(maxLength) {
     const titleInput = await this.page.$(
@@ -165,7 +222,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding a goal.
-   * @param {string} Goal
    */
   async updateGoal(Goal) {
     await this.clickOn(addGoalBar);
@@ -174,7 +230,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function checks if the goal has been set in the exploration.
-   * @param {string} expectedGoal The Goal expected.
    */
   async expectGoalToEqual(expectedGoal) {
     const goalInput = await this.page.$(
@@ -198,16 +253,18 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function checks if a category has been selected for the exploration.
-   * @param {string} expectedCategory The Category expected.
    */
   async expectSelectedCategoryToBe(expectedCategory) {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
+    if (!categoryDropdown) {
+      throw new Error('Category dropdown not found.');
+    }//need to be verified(added,If TypeScript is giving you an error about categoryDropdown possibly being null, you can handle this situation by checking if categoryDropdown is null before proceeding to click on it. Here's how you can do it:)
     await categoryDropdown.click();
 
     const selectedCategory = await this.page.evaluate(() => {
-      return document.querySelector('#mat-option-69').innerText;
+      //If TypeScript is giving you an error about innerText not existing on type Element, you can resolve this by explicitly casting the result of querySelector to an appropriate type that has innerText. In this case, you can cast it to HTMLElement. Here's the updated code:
+      return (document.querySelector('#mat-option-69') as HTMLElement).innerText;
     });
-
     if (selectedCategory === expectedCategory) {
       showMessage(
         `The category ${selectedCategory}` +
@@ -229,16 +286,17 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    *  This function verifies that the selected language is displayed correctly.
-   * @param {string} expectedLanguage
    */
   async expectSelectedLanguageToBe(expectedLanguage) {
     const languageDropdown = await this.page.$('#mat-select-value-9');
+    if (!languageDropdown) {
+      throw new Error('Category dropdown not found.');
+    }
     await languageDropdown.click();
 
     const selectedLanguage = await this.page.evaluate(() => {
-      return document.querySelector('#mat-option-6').innerText;
+      return (document.querySelector('#mat-option-6') as HTMLElement).innerText;
     });
-
     if (selectedLanguage === expectedLanguage) {
       showMessage(
         `The language ${selectedLanguage}` +
@@ -246,12 +304,10 @@ module.exports = class e2eExplorationCreator extends baseUser {
     } else {
       throw new Error('Language is not correct.');
     }
-    await languageDropdown.click();
   }
 
   /**
    * This function helps in adding tags.
-   * @param {Array} TagNames
    */
   async addTags(TagNames) {
     await this.clickOn(addTags);
@@ -322,17 +378,17 @@ module.exports = class e2eExplorationCreator extends baseUser {
     if (isAutoTTSwitchOn) {
       showMessage('Automatic Text-to-Speech is enabled.');
     } else {
-      showMessage('Automatic Text-to-Speech is disabled.');
+      throw error('Automatic Text-to-Speech is disabled.');
     }
   }
 
   /**
    * This function helps in assigning role of collaborator to any guest user.
    */
-  async assignUserToCollaboratorRole() {
+  async assignUserToCollaboratorRole(user1) {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.type(addUserName, 'guestUsr1');
+    await this.type(addUserName, user1);
     await this.clickOn(addRoleBar);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRole);
@@ -341,10 +397,10 @@ module.exports = class e2eExplorationCreator extends baseUser {
   /**
    * This function helps in assigning role of Playtester to guest user.
    */
-  async assignUserToPlaytesterRole() {
+  async assignUserToPlaytesterRole(user2) {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.type(addUserName, 'guestUsr2');
+    await this.type(addUserName, user2);
     await this.clickOn(addRoleBar);
     await this.clickOn(playTesterRoleOption);
     await this.clickOn(saveRole);
@@ -368,7 +424,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
    * This function helps in adding voice artist.
-   * @param {Array} voiceArtists
    */
   async addVoiceArtist(voiceArtists) {
     await this.clickOn(voiceArtistEditButton);
@@ -399,8 +454,14 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * and suggestion notifications via email
    */
   async expectEmailNotificationToBeActivated() {
-    const isChecked = await this.page.$eval(
-      'input[id="feedback-switch"]', input => input.checked);
+    const input = await this.page.$('input[id="feedback-switch"]');
+
+    if (!input) {
+      throw new Error('Feedback switch input element not found.');
+    }
+    const isChecked = await input.evaluate(
+      (input) => (input as HTMLInputElement).checked);
+
     if (isChecked) {
       showMessage('suggestions notifications via email are enabled.');
     } else {
@@ -444,8 +505,15 @@ module.exports = class e2eExplorationCreator extends baseUser {
    * This function checks whether changes has been drafted or not.
    */
   async expectExplorationToBeDraftedSuccessfully() {
-    const isDraftButtonDisabled = await this.page.$eval(
-      '#tutorialSaveButton', button => button.disabled);
+    const button = await this.page.$('#tutorialSaveButton');
+
+    if (!button) {
+      throw new Error('Save button not found.');
+    }
+
+    const isDraftButtonDisabled = await button.evaluate(
+      (button) => (button as HTMLButtonElement).disabled);
+
     if (isDraftButtonDisabled) {
       showMessage('Changes have been successfully drafted.');
     } else {
@@ -460,7 +528,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
     await this.saveDraftExploration();
     await this.page.waitForTimeout(500);
     await this.clickOn(publishButton);
-    await this.page.waitForTimeout(500);
     await this.clickOn(publishConfirmButton);
     await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
@@ -497,7 +564,6 @@ module.exports = class e2eExplorationCreator extends baseUser {
 
   /**
   *This function checks whether changes has discarded successfully or not.
-  *@param {string} titleBeforeChanges
   */
   async expectTitleToBe(titleBeforeChanges) {
     await this.page.waitForTimeout(400);
@@ -513,3 +579,5 @@ module.exports = class e2eExplorationCreator extends baseUser {
     }
   }
 };
+
+export let ExplorationCreatorFactory = (): IExplorationCreator => new ExplorationCreator();

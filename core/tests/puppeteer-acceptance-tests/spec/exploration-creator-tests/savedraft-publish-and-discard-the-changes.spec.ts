@@ -16,21 +16,20 @@
  * @fileoverview Acceptance Test for Exploration Creator and Exploration Manager
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
+import { IExplorationCreator } from '../../user-utilities/exploration-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function() {
-  let explorationCreator = null;
-  let explorationVisitor = null;
+  let explorationCreator: IExplorationCreator;
+  // let explorationVisitor: IExplorationCreator;
   beforeAll(async function() {
-    explorationCreator = await userFactory.createNewExplorationCreator(
-      'explorationAdm', 'exploration_creator@example.com');
-    explorationVisitor = await userFactory.createNewExplorationCreator(
-      'explorationVisitor', 'exploration_visitor@example.com');
+    explorationCreator = await UserFactory.createNewUser(
+      'explorationAdmi', 'exploration_creator@example.com');
+    // explorationVisitor = await UserFactory.createNewUser(
+    //   'explorationVisitori', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should draft, discard and publish the changes',
@@ -70,6 +69,6 @@ describe('Exploration Publisher, Saver and Drafter', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

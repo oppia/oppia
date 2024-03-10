@@ -16,50 +16,50 @@
  * @fileoverview Acceptance Test for Exploration Creator and Exploration Manager
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
+import { IExplorationCreator } from '../../user-utilities/exploration-utils';
+import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
 describe('Exploration Creator', function() {
-  let guestUser1 = null;
-  let guestUser2 = null;
-  let guestUser3 = null;
-  let explorationCreator = null;
-  let explorationVisitor = null;
-  let superAdmin = null;
+  let explorationCreator: IExplorationCreator;
+  let explorationVisitor: IExplorationCreator;
+  let superAdmin: ISuperAdmin;
 
   beforeAll(async function() {
-    guestUser1 = await userFactory.createNewGuestUser(
-      'guestUsr1', 'guest_user1@example.com');
-    guestUser2 = await userFactory.createNewGuestUser(
-      'guestUsr2', 'guest_user2@example.com');
-    guestUser3 = await userFactory.createNewGuestUser(
-      'guestUsr3', 'guest_user3@example.com');
-    explorationCreator = await userFactory.createNewExplorationCreator(
+    explorationCreator = await UserFactory.createNewUser(
       'explorationAdm', 'exploration_creator@example.com');
-    explorationVisitor = await userFactory.createNewExplorationCreator(
-      'explorationVisitor', 'exploration_visitor@example.com');
-    superAdmin = await userFactory.createNewSuperAdmin('Leader');
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationVisitor', 'exploration_visitor@example.com'); 
+    superAdmin = await UserFactory.createNewSuperAdmin('Leader');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should create an exploration and modify it via the Settings tab',
     async function() {
-      await superAdmin.assignRoleToUser(
-        'explorationAdm', 'voiceover admin');
-      await superAdmin.expectUserToHaveRole(
-        'explorationAdm', 'voiceover admin');
+      const guestUser1 = await UserFactory.createNewUser(
+        'guestUsr1', 'guest_user1@example.com',);
+      const guestUser2 = await UserFactory.createNewUser(
+        'guestUsr2', 'guest_user2@example.com');
+      const guestUser3 = await UserFactory.createNewUser(
+        'guestUsr3', 'guest_user3@example.com');
 
-      await superAdmin.assignRoleToUser(
-        'explorationAdm', 'curriculum admin');
-      await superAdmin.expectUserToHaveRole(
-        'explorationAdm', 'curriculum admin');
-
-      await guestUser1.closeBrowser();
       await guestUser2.closeBrowser();
-      await guestUser3.closeBrowser();
+      await guestUser1.closeBrowser();
+      await guestUser3.closeBrowser();        
+        
+      await superAdmin.assignRoleToUser(
+        'explorationAdm', 'voiceover admin');
+      await superAdmin.expectUserToHaveRole(
+        'explorationAdm', 'voiceover admin');
+
+      await superAdmin.assignRoleToUser(
+        'explorationAdm', 'curriculum admin');
+      await superAdmin.expectUserToHaveRole(
+        'explorationAdm', 'curriculum admin');
+
       await superAdmin.closeBrowser();
 
       await explorationCreator.openCreatorDashboardPage();
@@ -112,6 +112,6 @@ describe('Exploration Creator', function() {
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
