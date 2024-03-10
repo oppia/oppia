@@ -259,7 +259,8 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
     await categoryDropdown.click();
 
     const selectedCategory = await this.page.evaluate(() => {
-      return (document.querySelector('#mat-option-69') as HTMLElement).innerText;
+      return (document.querySelector('#mat-option-69') as HTMLElement
+        ).innerText;
     });
     if (selectedCategory === expectedCategory) {
       showMessage(
@@ -574,7 +575,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
       throw new Error('Failed to discard changes.');
     }
   }
-};
+}
 
 export let ExplorationCreatorFactory = (): IExplorationCreator =>
-new ExplorationCreator();
+  new ExplorationCreator();
