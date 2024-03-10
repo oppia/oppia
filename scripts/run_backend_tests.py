@@ -459,6 +459,8 @@ def print_coverage_report(
     incomplete_coverage = 0
     coverage_exclusions = load_coverage_exclusion_list(
     COVERAGE_EXCLUSION_LIST_PATH)
+    print("Exclusiuon path: {}".format(COVERAGE_EXCLUSION_LIST_PATH))
+    print("Covered exlusions: ", coverage_exclusions)
     for task in tasks:
         if task.finished and not task.exception:
             coverage = task.task_results[0].get_report()[-2]
