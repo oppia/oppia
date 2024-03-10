@@ -41,7 +41,8 @@ describe('Curriculum Admin', function() {
     async function() {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       explorationUrl = await curriculumAdmin.createExploration();
-      explorationId = explorationUrl ? explorationUrl.match(/explore\/(.*)/)?.[1] ?? '' : '';
+      explorationId = explorationUrl ?
+        explorationUrl.match(/explore\/(.*)/)?.[1] ?? '' : '';
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       topicUrl = await curriculumAdmin.createTopic();

@@ -20,28 +20,25 @@ import { IBaseUser, BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
 
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = 'input.e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'div.e2e-test-save-state-content';
-const saveChangesButton = 'button.e2e-test-save-changes'
+const saveChangesButton = 'button.e2e-test-save-changes';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
-const publishExplorationButton = 'button.e2e-test-publish-exploration'
+const publishExplorationButton = 'button.e2e-test-publish-exploration';
 
 const photoBoxButton = 'div.e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const curriculumAdminThumbnailImage = testConstants.images.curriculumAdminThumbnailImage;
+const curriculumAdminThumbnailImage =
+  testConstants.images.curriculumAdminThumbnailImage;
 
 const editorMainTabButton = 'a.e2e-test-main-tab';
-const saveStoryButton = 'button.e2e-test-save-story-button'
+const saveStoryButton = 'button.e2e-test-save-story-button';
 const saveStoryMessageInput = 'textarea.e2e-test-commit-message-input';
 const confirmSaveStoryButton = 'button.e2e-test-close-save-modal-button';
 const publishStoryButton = 'button.e2e-test-publish-story-button';
-
-const topicsTab = 'a.e2e-test-topics-tab';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
@@ -49,17 +46,22 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const createSkillButton = 'button.e2e-test-create-skill-button';
-const confirmSkillCreationButton = 'button.e2e-test-confirm-skill-creation-button';
+const confirmSkillCreationButton =
+  'button.e2e-test-confirm-skill-creation-button';
 
 const createQuestionButton = 'div.e2e-test-create-question';
 const easyQuestionDifficultyOption = 'div.e2e-test-skill-difficulty-easy';
 const addInteractionButton = 'div.e2e-test-open-add-interaction-modal';
-const interactionNumberInputButton = 'div.e2e-test-interaction-tile-NumericInput';
-const interactionEndExplorationInputButton = 'div.e2e-test-interaction-tile-EndExploration';
+const interactionNumberInputButton =
+  'div.e2e-test-interaction-tile-NumericInput';
+const interactionEndExplorationInputButton =
+  'div.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = 'div.e2e-test-save-interaction';
-const responseRuleDropdown = 'oppia-rule-type-selector.e2e-test-answer-description';
+const responseRuleDropdown =
+  'oppia-rule-type-selector.e2e-test-answer-description';
 const equalsRuleButtonText = 'is equal to ... ';
-const answersInGroupAreCorrectToggle = 'input.e2e-test-editor-correctness-toggle';
+const answersInGroupAreCorrectToggle =
+  'input.e2e-test-editor-correctness-toggle';
 const saveResponseButton = 'div.e2e-test-add-new-response';
 
 const openOutcomeFeedBackEditor = 'div.e2e-test-add-new-response';
@@ -79,8 +81,10 @@ const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
-const explorationCategoryDropdown = 'mat-form-field.e2e-test-exploration-category-metadata-modal';
-const explorationCategorySelectorChoice = 'mat-option.e2e-test-exploration-category-selector-choice';
+const explorationCategoryDropdown =
+  'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const explorationCategorySelectorChoice =
+  'mat-option.e2e-test-exploration-category-selector-choice';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 
@@ -93,7 +97,8 @@ const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
 
 const addSubTopicButton = 'button.e2e-test-add-subtopic-button';
 const subTopicTitleField = 'input.e2e-test-new-subtopic-title-field';
-const subTopicUrlFragmentField = 'input.e2e-test-new-subtopic-url-fragment-field';
+const subTopicUrlFragmentField =
+  'input.e2e-test-new-subtopic-url-fragment-field';
 const subTopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubTopicButton = 'button.e2e-test-confirm-subtopic-creation-button';
 
@@ -137,7 +142,7 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.goto(topicPageUrl);
     await this.clickOn(createSkillButton);
     await this.type(skillDescriptionField, 'Test Skill 3');
-    await this.clickOn(skillReviewMaterialHeader)
+    await this.clickOn(skillReviewMaterialHeader);
     await this.type(richTextAreaField, 'This is a test skill with 3 questions');
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`);
@@ -239,7 +244,9 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(topicNameField, 'Test Topic 1');
     await this.type(topicUrlFragmentField, 'test-topic-one');
     await this.type(topicWebFragmentField, 'Test Topic 1');
-    await this.type(topicDescriptionField, 'This topic is to test curriculum admin utility.');
+    await this.type(
+      topicDescriptionField, 'This topic is to test curriculum admin utility.'
+    );
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(
@@ -260,8 +267,10 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(addSubTopicButton);
     await this.type(subTopicTitleField, 'Test Subtopic 1');
     await this.type(subTopicUrlFragmentField, 'test-subtopic-one');
-    await this.clickOn(subTopicDescriptionEditorToggle)
-    await this.type(richTextAreaField, 'This subtopic is to test curriculum admin utility.');
+    await this.clickOn(subTopicDescriptionEditorToggle);
+    await this.type(
+      richTextAreaField, 'This subtopic is to test curriculum admin utility.'
+    );
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(
@@ -280,7 +289,9 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, 'Test Story 1');
     await this.type(storyUrlFragmentField, 'test-story-one');
-    await this.type(storyDescriptionField, 'This story is to test curriculum admin utility.');
+    await this.type(
+      storyDescriptionField, 'This story is to test curriculum admin utility.'
+    );
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(
@@ -297,7 +308,9 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
   async publishStory() {
     await this.clickOn(editorMainTabButton);
     await this.clickOn(saveStoryButton);
-    await this.type(saveStoryMessageInput, 'Test publishing story as curriculum admin.');
+    await this.type(
+      saveStoryMessageInput, 'Test publishing story as curriculum admin.'
+    );
     await this.page.waitForSelector(
       `${confirmSaveStoryButton}:not([disabled])`);
     await this.clickOn(confirmSaveStoryButton);
@@ -321,6 +334,7 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
       `${createChapterButton}:not([disabled])`);
     await this.clickOn(createChapterButton);
   }
-};
+}
 
-export let CurriculumAdminFactory = (): ICurriculumAdmin => new CurriculumAdmin();
+export let CurriculumAdminFactory =
+  (): ICurriculumAdmin => new CurriculumAdmin();
