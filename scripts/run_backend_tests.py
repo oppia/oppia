@@ -693,7 +693,6 @@ def check_coverage(
         check=False)
 
     coverage_output_lines = process.stdout.split('\n')
-
     # The `process.stdout` is a string containing the coverage report,
     # structured as follows:
     # process_stdout_structure =
@@ -703,13 +702,7 @@ def check_coverage(
     # file2.py      20    0      4      0    90%   32, 34, 36, 38.
     # -------------------------------------------------
     # TOTAL        30    0      6      0   95%.
-
-    # The `coverage_output_lines` is a list of strings,
-    # where each string represents a line in the coverage report.
-
-    # List to store the coverage report of files with incomplete coverage.
     incomplete_coverage_lines: List[str] = []
-
     # Lines with incomplete coverage are appenede to incomplete_coverage_lines.
     for line_number, line in enumerate(coverage_output_lines):
 
@@ -718,23 +711,23 @@ def check_coverage(
 
         line_missing_full_coverage = line and (
             ' 100%' not in line and '-----' not in line and 'Name' not in line
-            )
+        )
         if line_missing_full_coverage:
             # If a line indicates incomplete coverage then Heading,
             # Followed by dashed line(----) is appended,
             # to incomplete_coverage_lines.
 
-            if not incomplete_coverage_lines and line_number > 0:
+            if len(incomplete_coverage_lines) == 0 and line_number:
                 incomplete_coverage_lines.extend(coverage_output_lines[:2])
 
             incomplete_coverage_lines.append(line)
 
             # The Subsequent lines will be separated by a dashed line(-----).
-            if line_number + 1 < len(coverage_output_lines):
-                if ' 100%' not in coverage_output_lines[line_number + 1]:
-                    incomplete_coverage_lines.append(coverage_output_lines[1])
+            if line_number + 1 < len(coverage_output_lines) and (
+                ' 100%' not in coverage_output_lines[line_number + 1]):
+                incomplete_coverage_lines.append(coverage_output_lines[1])
 
-    incomplete_coverage_output = '\n'.join(incomplete_coverage_lines)
+    uncovered_lines_output = '\n'.join(incomplete_coverage_lines)
 
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the
@@ -753,7 +746,7 @@ def check_coverage(
             float(coverage_result.group('total')) if coverage_result else 0.0
         )
 
-    process.stdout = incomplete_coverage_output
+    process.stdout = uncovered_lines_output
     return process.stdout, coverage
 
 
