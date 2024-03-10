@@ -209,7 +209,9 @@ def is_feature_flag_enabled(
         feature_flag_name: str. The name of the feature flag that needs to
             be evaluated.
         user_id: str|None. The id of the user, if logged-out user then None.
-        feature_flag: FeatureFlag|None. The feature flag domain model.
+        feature_flag: FeatureFlag|None. The feature flag domain object.
+            If None, then this function is responsible for fetching the
+            feature flag.
 
     Returns:
         bool. True if the feature is enabled for the given user else False.
