@@ -894,11 +894,32 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(returned_output, coverage_report_output)
         self.assertEqual(coverage, 86)
 
-    def test_coverage_is_calculated_correctly_for_a_single_file(self) -> None:
+    def test_coverage_is_calculated_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         data_file = '.coverage.hostname.12345.987654321'
         coverage_report_output = (
+            'Name                                                       '
+            '                    Stmts   Miss Branch BrPart  Cover   Missing\n'
+            '------------------------------------------------------------'
+            '--------------------------------------------------------------\n'
+            'core/constants.py                         '
+            '                         '
+            '               37      8      6      1    70%   108-112, 119-123\n'
+            '-------------------------------------------------------------'
+            '-------------------------------------------------------------\n'
+                        'core/constants2.py                         '
+            '                         '
+            '               37      8      6      1    100%               \n'
+            '-------------------------------------------------------------'
+            '-------------------------------------------------------------\n'
+            'TOTAL                                                         '
+            '                 53906  17509  16917   1191    62%\n'
+            '--------------------------------------------------------------'
+            '------------------------------------------------------------\n'
+        )
+
+        expected_coverage_report = (
             'Name                                                       '
             '                    Stmts   Miss Branch BrPart  Cover   Missing\n'
             '------------------------------------------------------------'
@@ -930,10 +951,96 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file)
 
-        expected_output = coverage_report_output.strip()
+        expected_output = expected_coverage_report.strip()
         returned_res = returned_output.strip()
         self.assertEqual(expected_output, returned_res)
         self.assertEqual(coverage, 62.0)
+
+    def test_coverage_calculated_correctly_all_files_not_covered(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        data_file = '.coverage.hostname.12345.987654321'
+
+        coverage_report_output = (
+            'Name                                                       '
+            '                    Stmts   Miss Branch BrPart  Cover   Missing\n'
+            '------------------------------------------------------------'
+            '--------------------------------------------------------------\n'
+            'core/constants.py                         '
+            '                         '
+            '               37      8      6      1    70%   108-112, 119-123\n'
+            '-------------------------------------------------------------'
+            '-------------------------------------------------------------\n'
+            'TOTAL                                                         '
+            '                 37    8      6       1       70%\n'
+            '--------------------------------------------------------------'
+            '------------------------------------------------------------\n'
+        )
+        process = MockProcessOutput()
+        process.stdout = coverage_report_output
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
+            if cmd == self.coverage_combine_cmd:
+                return MockProcessOutput()
+            elif cmd == self.coverage_check_cmd:
+                return process
+            else:
+                raise Exception(
+                    'Invalid command passed to subprocess.run() method')
+
+        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        with swap_subprocess_run:
+            returned_output, coverage = run_backend_tests.check_coverage(
+                False, data_file=data_file)
+
+        expected_output = coverage_report_output.strip()
+        returned_res = returned_output.strip()
+        self.assertEqual(expected_output, returned_res)
+        self.assertEqual(coverage, 70.0)
+
+    def test_coverage_is_calculated_correctly_all_files_covered(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        data_file = '.coverage.hostname.12345.987654321'
+        coverage_report_input = (
+            'Name                                                       '
+            '                    Stmts   Miss Branch BrPart  Cover   Missing\n'
+            '------------------------------------------------------------'
+            '--------------------------------------------------------------\n'
+            'core/constants.py                         '
+            '                         '
+            '               37      0      0      0    100%                  \n'
+            '-------------------------------------------------------------'
+            '-------------------------------------------------------------\n'
+            'TOTAL                                                         '
+            '                 37     0     0      0       100%\n'
+            '--------------------------------------------------------------'
+            '------------------------------------------------------------\n'
+        )
+
+        coverage_report_output = ''
+        process = MockProcessOutput()
+        process.stdout = coverage_report_input
+
+        def mock_subprocess_run(cmd: List[str], **_: str) -> MockProcessOutput:
+            if cmd == self.coverage_combine_cmd:
+                return MockProcessOutput()
+            elif cmd == self.coverage_check_cmd:
+                return process
+            else:
+                raise Exception(
+                    'Invalid command passed to subprocess.run() method')
+
+        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        with swap_subprocess_run:
+            returned_output, coverage = run_backend_tests.check_coverage(
+                False, data_file=data_file)
+
+        expected_output = coverage_report_output.strip()
+        returned_res = returned_output.strip()
+
+        self.assertEqual(expected_output, returned_res)
+        self.assertEqual(coverage, 100.0)
 
     def test_no_data_to_report_returns_full_coverage(self) -> None:
         with self.swap_install_third_party_libs:
