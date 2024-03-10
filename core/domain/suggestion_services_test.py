@@ -7260,6 +7260,38 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         self.assertIsNotNone(response)
 
+    def test_create_translation_contributor_certificate_for_rule_translation(
+        self
+    ) -> None:
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': ['text1', 'text2'],
+            'translation_html': ['translated text1', 'translated text2'],
+            'data_format': 'set_of_normalized_string'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
+            'reviewer_1', change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            self.username,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            'hi',
+            self.from_date,
+            self.to_date,
+        )
+
+        self.assertIsNotNone(response)
+
     def test_create_translation_contributor_certificate_for_english(
         self
     ) -> None:
