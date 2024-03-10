@@ -708,7 +708,7 @@ def check_coverage(
     # where each string represents a line in the coverage report.
 
     # List to store the coverage report of files with incomplete coverage.
-    incomplete_coverage_lines = []
+    incomplete_coverage_lines: List[str] = []
 
     # Lines with incomplete coverage are appenede to incomplete_coverage_lines.
     for line_number, line in enumerate(coverage_output_lines):
