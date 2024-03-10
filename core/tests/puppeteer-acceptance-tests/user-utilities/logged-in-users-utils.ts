@@ -335,11 +335,13 @@ class LoggedInUser extends BaseUser implements ILoggedInUser {
         'The Even Those Who Are In School button does not exist!');
     }
     try {
-      await this.openExternalPdfLink(externalPdfLinkSelector, evenThoseWhoAreInSchoolUrl);
-      showMessage('The Even Those Who Are In School link opens the right page.');
+      await this.openExternalPdfLink(
+        externalPdfLinkSelector, evenThoseWhoAreInSchoolUrl);
+      showMessage(
+        'The Even Those Who Are In School link opens the right page.');
     } catch (error) {
       throw new Error(error);
-    }    
+    }
   }
 
   /**

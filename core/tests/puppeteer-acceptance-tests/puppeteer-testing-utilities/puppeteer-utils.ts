@@ -195,12 +195,13 @@ export class BaseUser implements IBaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked to external PDFs or not.
-   * Use this particularly when interacting with buttons associated with external PDF links, 
-   * because Puppeteer in headless mode, does not natively support 
-   * opening of external PDFs.
+   * This function validates whether an anchor tag is correctly linked
+   * to external PDFs or not. Use this particularly when interacting with
+   * buttons associated with external PDF links, because Puppeteer in
+   * headless mode, does not natively support opening of external PDFs.
    */
-  async openExternalPdfLink(selector: string, expectedUrl: string): Promise<void> {
+  async openExternalPdfLink(
+    selector: string, expectedUrl: string): Promise<void> {
     await this.page.waitForSelector(selector);
     const href = await this.page.$eval(
       selector,
@@ -210,7 +211,8 @@ export class BaseUser implements IBaseUser {
       throw new Error(`The ${selector} is not an anchor tag!`);
     }
     if (href !== expectedUrl) {
-      throw new Error(`The ${selector} does not open the expected URL! Actual: ${href}, Expected: ${expectedUrl}`);
+      throw new Error(`The ${selector} does not open the expected URL!
+      Actual: ${href}, Expected: ${expectedUrl}`);
     }
   }
 
