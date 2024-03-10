@@ -1104,29 +1104,22 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    published_story_ids = (
-        published_canonical_story_ids + published_additional_story_ids)
-    stories = story_fetchers.get_stories_by_ids(
-        published_story_ids, strict=False)
-    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = {}
-    total_published_node_count = 0
-    for i, story in enumerate(stories):
-        assert story is not None
-        topic_model_published_story_exploration_mapping[
-            published_story_ids[i]
-        ] = (
-            story.story_contents.get_linked_exp_ids_of_published_nodes()
-            if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames
-                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
-            else story.story_contents.get_all_linked_exp_ids())
+    published_stories = story_fetchers.get_stories_by_ids(
+        published_canonical_story_ids + published_additional_story_ids,
+        strict=False)
+    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = (
+        _compute_story_exploration_mapping(published_stories))
 
+    total_published_node_count = 0
+    for story in published_stories:
+        assert story is not None
         if story.id in published_canonical_story_ids:
             total_published_node_count += (
                 story.story_contents.get_published_node_count()
                 if feature_flag_services.is_feature_flag_enabled(
                     feature_flag_list.FeatureNames
-                    .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value)
+                    .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                    user_id=None)
                 else len(story.story_contents.nodes))
     topic_model_published_node_count = total_published_node_count
 
@@ -1150,6 +1143,32 @@ def compute_summary_of_topic(
     )
 
     return topic_summary
+
+
+def _compute_story_exploration_mapping(
+    stories: List[story_domain.Story]
+) -> Dict[str, List[str]]:
+    """Returns a mapping from each story id to a list of its linked
+    exploration ids.
+
+    Args:
+        stories: list(Story). A list of stories to reference in the mapping.
+
+    Returns:
+        dict(str,list(str)). A mapping whose keys are story ids and whose
+        values are lists of exploration ids linked to the corresponding story.
+    """
+    mapping: Dict[str, List[str]] = {}
+    for story in stories:
+        assert story is not None
+        mapping[story.id] = (
+            story.story_contents.get_linked_exp_ids_of_published_nodes()
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                user_id=None)
+            else story.story_contents.get_all_linked_exp_ids())
+    return mapping
 
 
 def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
@@ -1814,32 +1833,36 @@ def get_all_published_story_exploration_ids(
         [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
         else topic_fetchers.get_all_topic_summaries())
 
-    # Keep all topic summaries with a mapping. For those without a mapping,
+    # Keep each summary's mapping. For those without a mapping,
     # record their ids, fetch their corresponding topics with them, and then
-    # use the topic to compute their summary. Add each new topic summary to
-    # the list of summaries that initially had a mapping.
-    topic_summaries_with_persisted_mapping = []
+    # use the topic to compute the mapping. Add each computed mapping to
+    # the list of persisted mappings.
+    mappings = []
     ids_of_summaries_without_persisted_mapping: List[str] = []
     for summary in fetched_topic_summaries:
         if summary.published_story_exploration_mapping is None:
             ids_of_summaries_without_persisted_mapping.append(summary.id)
         else:
-            topic_summaries_with_persisted_mapping.append(summary)
-    topic_summaries_with_recently_computed_mapping = []
+            mappings.append(
+                summary.published_story_exploration_mapping)
     if len(ids_of_summaries_without_persisted_mapping) > 0:
         topics = topic_fetchers.get_topics_by_ids(
             ids_of_summaries_without_persisted_mapping)
         for topic in topics:
             assert topic is not None
-            topic_summaries_with_recently_computed_mapping.append(
-                compute_summary_of_topic(topic))
-    topic_summaries = (
-        topic_summaries_with_persisted_mapping +
-        topic_summaries_with_recently_computed_mapping)
+            published_story_ids = [
+                story_ref.story_id for story_ref
+                in topic.canonical_story_references +
+                    topic.additional_story_references
+                if story_ref.story_is_published
+            ]
+            published_stories = story_fetchers.get_stories_by_ids(
+                published_story_ids, strict=False)
+            mappings.append(_compute_story_exploration_mapping(
+                published_stories))
 
     exp_ids = itertools.chain.from_iterable(
-        itertools.chain.from_iterable(
-            summary.published_story_exploration_mapping.values())
-        for summary in topic_summaries)
+        itertools.chain.from_iterable(mapping.values())
+        for mapping in mappings)
 
     return list(set(exp_ids))
