@@ -353,11 +353,15 @@ def load_coverage_exclusion_list(path: str) -> List[str]:
     Returns:
         list(str). Dotted names of excluded modules.
     """
+    print("Exclusion path: {}".format(path))
     exclusion_list = []
     with open(path, 'r', encoding='utf-8') as exclusion_file:
+        print("Exclusion file: {}".format(exclusion_file))
         for line in exclusion_file:
             line = line.strip()
+            print("Line: {}".format(line))
             if line and not line.startswith('#'):
+                print("Appending line: {}".format(line))
                 exclusion_list.append(line)
     return exclusion_list
 
