@@ -134,14 +134,14 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in reaching dashboard Url.
    */
-  async openCreatorDashboardPage() {
+  async openCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardUrl);
   }
 
   /**
    * This function helps in reaching editor section.
    */
-  async switchToEditorTab() {
+  async switchToEditorTab(): Promise<void> {
     await this.clickOn(createNewExplorationButton);
     await this.clickOn(takeMeToEditorButton);
   }
@@ -149,7 +149,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating Card Name.
    */
-  async updateCardName(cardName) {
+  async updateCardName(cardName): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.clickOn(addCardName);
     await this.type('.e2e-test-state-name-input', cardName);
@@ -160,7 +160,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating exploration intro text.
    */
-  async updateExplorationIntroText(Introtext) {
+  async updateExplorationIntroText(Introtext): Promise<void> {
     await this.page.waitForTimeout(600);
     await this.clickOn('.e2e-test-edit-content-pencil-button');
     await this.page.waitForSelector('.e2e-test-rte', { visible: true });
@@ -171,27 +171,27 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding interaction.
    */
-  async addEndInteraction() {
+  async addEndInteraction(): Promise<void> {
     await this.clickOn(interactionAddbutton);
     await this.clickOn(endExplorationTab);
     await this.clickOn(saveInteractionButton);
   }
 
-  async showMessageOfSuccessfullExplrationCreation() {
+  async showMessageOfSuccessfullExplrationCreation(): Promise<void> {
     showMessage('Successfully created a exploration!');
   }
 
   /**
    * This function helps in reaching setting tab successfully.
    */
-  async goToSettingsTab() {
+  async goToSettingsTab(): Promise<void> {
     await this.clickOn(settingsTab);
   }
 
   /**
    * This function helps in updating Title.
    */
-  async addTitle(Title) {
+  async addTitle(Title): Promise<void> {
     await this.clickOn(addTitleBar);
     await this.type(addTitle, Title);
   }
@@ -199,7 +199,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks length of title bar at basic settings tab.
    */
-  async expectTitleToHaveMaxLength(maxLength) {
+  async expectTitleToHaveMaxLength(maxLength): Promise<void> {
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const title = await this.page.evaluate(
@@ -220,7 +220,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding a goal.
    */
-  async updateGoal(Goal) {
+  async updateGoal(Goal): Promise<void> {
     await this.clickOn(addGoalBar);
     await this.type(addGoal, Goal);
   }
@@ -228,7 +228,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks if the goal has been set in the exploration.
    */
-  async expectGoalToEqual(expectedGoal) {
+  async expectGoalToEqual(expectedGoal): Promise<void> {
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input');
     const goal = await this.page.evaluate(
@@ -243,7 +243,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in selecting a category from dropdawn.
    */
-  async selectAlgebraAsACategory() {
+  async selectAlgebraAsACategory(): Promise<void> {
     await this.clickOn(cateogryDropDawn);
     await this.clickOn(addCateogry);
   }
@@ -251,7 +251,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks if a category has been selected for the exploration.
    */
-  async expectSelectedCategoryToBe(expectedCategory) {
+  async expectSelectedCategoryToBe(expectedCategory): Promise<void> {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     if (!categoryDropdown) {
       throw new Error('Category dropdown not found.');
@@ -275,7 +275,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in selecting language from dropdawn.
    */
-  async selectEnglishAsLanguage() {
+  async selectEnglishAsLanguage(): Promise<void> {
     await this.clickOn(languageUpdateBar);
     await this.page.waitForTimeout(500);
     await this.clickOn(addLanguage);
@@ -284,7 +284,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    *  This function verifies that the selected language is displayed correctly.
    */
-  async expectSelectedLanguageToBe(expectedLanguage) {
+  async expectSelectedLanguageToBe(expectedLanguage): Promise<void> {
     const languageDropdown = await this.page.$('#mat-select-value-9');
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
@@ -306,7 +306,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding tags.
    */
-  async addTags(TagNames) {
+  async addTags(TagNames): Promise<void> {
     await this.clickOn(addTags);
     await this.type(addTags, TagNames[0]);
     await this.clickOn('.secondary-info-text');
@@ -315,14 +315,14 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
     await this.type(addTags, TagNames[2]);
   }
 
-  async updateSettingsSuccessfully() {
+  async updateSettingsSuccessfully(): Promise<void> {
     showMessage('Successfully updated basic settings!');
   }
 
   /**
    * This function checks if tags are successfully added.
    */
-  async expectTagsToBeAdded() {
+  async expectTagsToBeAdded(): Promise<void> {
     const tags = await this.page.$$('#mat-chip-list-input-0');
     if (tags.length > 0) {
       showMessage(`${tags.length} tag's added successfully.`);
@@ -334,7 +334,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function allows you to preview the exploration.
    */
-  async previewSummary() {
+  async previewSummary(): Promise<void> {
     await this.page.waitForSelector(
       '.e2e-test-open-preview-summary-modal:not([disabled])');
     await this.clickOn(previewSummaryButton);
@@ -345,7 +345,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function verifies that the preview summary is visible.
    */
-  async expectPreviewSummaryToBeVisible() {
+  async expectPreviewSummaryToBeVisible(): Promise<void> {
     const previewSummary = await this.page.$(
       '.e2e-test-open-preview-summary-modal');
     if (previewSummary) {
@@ -358,7 +358,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating advanced settings
    */
-  async enableAutomaticTextToSpeech() {
+  async enableAutomaticTextToSpeech(): Promise<void> {
     await this.clickOn(textToSpeechToggle);
 
     showMessage('Successfully updated advanced settings!');
@@ -368,7 +368,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    * This function checks whether the Automatic Text-to-Speech
    * setting is enabled or disabled.
    */
-  async expectAutomaticTextToSpeechToBeEnabled() {
+  async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
     const autoTTSwitch = await this.page.$('#text-speech-switch');
     const isAutoTTSwitchOn = await this.page.evaluate(
       switchElement => switchElement.checked, autoTTSwitch);
@@ -382,7 +382,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in assigning role of collaborator to any guest user.
    */
-  async assignUserToCollaboratorRole(user1) {
+  async assignUserToCollaboratorRole(user1): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
     await this.type(addUserName, user1);
@@ -394,7 +394,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in assigning role of Playtester to guest user.
    */
-  async assignUserToPlaytesterRole(user2) {
+  async assignUserToPlaytesterRole(user2): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
     await this.type(addUserName, user2);
@@ -407,7 +407,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    *Exception function to verify the setting
    *of the exploration to Public/Private
    */
-  async expectExplorationToBePublished() {
+  async expectExplorationToBePublished(): Promise<void> {
     const publishButton = await this.page.$('.e2e-test-publish-exploration');
     if (publishButton) {
       showMessage(
@@ -422,7 +422,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding voice artist.
    */
-  async addVoiceArtist(voiceArtists) {
+  async addVoiceArtist(voiceArtists): Promise<void> {
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
     await this.type(addVoiceArtistUserName, voiceArtists[0]);
@@ -442,7 +442,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps to choose notification type.
    */
-  async optInToEmailNotifications() {
+  async optInToEmailNotifications(): Promise<void> {
     await this.clickOn(feedbackToggleOff);
   }
 
@@ -450,7 +450,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    * Exception function to verify the choice of receiving feedback
    * and suggestion notifications via email
    */
-  async expectEmailNotificationToBeActivated() {
+  async expectEmailNotificationToBeActivated(): Promise<void> {
     const input = await this.page.$('input[id="feedback-switch"]');
 
     if (!input) {
@@ -469,7 +469,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This funciton helps in deleting the exploration successfully.
    */
-  async deleteExploration() {
+  async deleteExploration(): Promise<void> {
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(deleteConfirmButton);
   }
@@ -478,7 +478,8 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    * This function helps in verifying , if exploration is
    * deleted successfully?
    */
-  async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard() {
+  async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(
+    ): Promise<void> {
     await this.page.waitForTimeout(500);
     try {
       await this.page.goto(explorationUrlAfterPublished);
@@ -491,7 +492,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in drafting the exploration.
    */
-  async saveDraftExploration() {
+  async saveDraftExploration(): Promise<void> {
     await this.clickOn(saveDraftButton);
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
@@ -501,7 +502,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks whether changes has been drafted or not.
    */
-  async expectExplorationToBeDraftedSuccessfully() {
+  async expectExplorationToBeDraftedSuccessfully(): Promise<void> {
     const button = await this.page.$('#tutorialSaveButton');
 
     if (!button) {
@@ -521,7 +522,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in publishing the exploration
    */
-  async publishExploration() {
+  async publishExploration(): Promise<void> {
     await this.saveDraftExploration();
     await this.page.waitForTimeout(500);
     await this.clickOn(publishButton);
@@ -537,7 +538,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   *This function checks whether the exploration
   *is published successfully or not.
   */
-  async expectInteractionOnCreatorDashboard() {
+  async expectInteractionOnCreatorDashboard(): Promise<void> {
     try {
       await this.page.goto(explorationUrlAfterPublished);
       showMessage('Exploration is available on creator dashboard.');
@@ -549,7 +550,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function is discarding the current changes.
    */
-  async discardCurrentChanges() {
+  async discardCurrentChanges(): Promise<void> {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
     await this.page.waitForTimeout(500);
@@ -562,7 +563,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
   *This function checks whether changes has discarded successfully or not.
   */
-  async expectTitleToBe(titleBeforeChanges) {
+  async expectTitleToBe(titleBeforeChanges): Promise<void> {
     await this.page.waitForTimeout(400);
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
