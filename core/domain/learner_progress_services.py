@@ -25,7 +25,6 @@ from core.constants import constants
 from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import learner_goals_services
@@ -1581,10 +1580,10 @@ def get_all_and_untracked_topic_ids_for_user(
         list(str). The ids of all the topics not tracked for the user.
     """
 
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
     all_topic_ids = []
-    for classroom in all_classrooms_dict:
-        for topic_id in classroom['topic_ids']:
+    for classroom in classrooms:
+        for topic_id in classroom.get_topic_ids():
             all_topic_ids.append(topic_id)
     tracked_topic_ids = (
         partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn)
