@@ -47,6 +47,7 @@ export interface IBaseUser extends IUserProperties {
   select: (selector: string, option: string) => Promise<void>;
   goto: (url: string) => Promise<void>;
   uploadFile: (filePath: string) => Promise<void>;
+  openExternalPdfLink: (selector: string, expectedUrl: string) => Promise<void>;
   logout: () => Promise<void>;
   closeBrowser: () => Promise<void>;
 }
@@ -191,6 +192,26 @@ export class BaseUser implements IBaseUser {
     }
     let fileToUpload = filePath;
     inputUploadHandle.uploadFile(fileToUpload);
+  }
+
+  /**
+   * This function validates whether an anchor tag is correctly linked to external PDFs or not.
+   * Use this particularly when interacting with buttons associated with external PDF links, 
+   * because Puppeteer in headless mode, does not natively support 
+   * opening of external PDFs.
+   */
+  async openExternalPdfLink(selector: string, expectedUrl: string): Promise<void> {
+    await this.page.waitForSelector(selector);
+    const href = await this.page.$eval(
+      selector,
+      element => element.getAttribute('href')
+    );
+    if (href === null) {
+      throw new Error(`The ${selector} is not an anchor tag!`);
+    }
+    if (href !== expectedUrl) {
+      throw new Error(`The ${selector} does not open the expected URL! Actual: ${href}, Expected: ${expectedUrl}`);
+    }
   }
 
   /**

@@ -88,6 +88,7 @@ const readOurBlogButton =
 const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
+const externalPdfLinkSelector = '.e2e-external-pdf-link';
 
 export interface ILoggedInUser extends IBaseUser {
   navigateToHome: () => Promise<void>;
@@ -333,18 +334,12 @@ class LoggedInUser extends BaseUser implements ILoggedInUser {
       throw new Error (
         'The Even Those Who Are In School button does not exist!');
     }
-    await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[1].click()
-    );
-    if (this.page.url() !== evenThoseWhoAreInSchoolUrl) {
-      throw new Error (
-        'The Even Those Who Are In School link does not open ' +
-        'the right page!');
-    } else {
-      showMessage(
-        'The Even Those Who Are In School link opens the right page.');
-    }
+    try {
+      await this.openExternalPdfLink(externalPdfLinkSelector, evenThoseWhoAreInSchoolUrl);
+      showMessage('The Even Those Who Are In School link opens the right page.');
+    } catch (error) {
+      throw new Error(error);
+    }    
   }
 
   /**
