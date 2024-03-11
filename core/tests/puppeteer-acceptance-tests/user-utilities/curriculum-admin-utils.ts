@@ -24,7 +24,7 @@ import testConstants from
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = 'input.e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const saveContentButton = 'div.e2e-test-save-state-content';
+const saveContentButton = 'button.e2e-test-save-state-content';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
@@ -42,6 +42,8 @@ const publishStoryButton = 'button.e2e-test-publish-story-button';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const topicsTab = 'a.e2e-test-topics-tab';
+const topic = 'a.e2e-test-topic-name';
 
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
@@ -51,12 +53,12 @@ const confirmSkillCreationButton =
 
 const createQuestionButton = 'div.e2e-test-create-question';
 const easyQuestionDifficultyOption = 'div.e2e-test-skill-difficulty-easy';
-const addInteractionButton = 'div.e2e-test-open-add-interaction-modal';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
 const interactionEndExplorationInputButton =
   'div.e2e-test-interaction-tile-EndExploration';
-const saveInteractionButton = 'div.e2e-test-save-interaction';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
 const equalsRuleButtonText = 'is equal to ... ';
@@ -83,9 +85,8 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
-const explorationCategorySelectorChoice =
-  'mat-option.e2e-test-exploration-category-selector-choice';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
+const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 
 const addTopicButton = 'button.e2e-test-create-topic-button';
@@ -116,13 +117,13 @@ const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
 export interface ICurriculumAdmin extends IBaseUser {
   navigateToTopicAndSkillsDashboardPage: () => Promise<void>;
-  createSkill: (topicPageUrl: string) => Promise<void>;
+  createSkill: () => Promise<void>;
   createQuestion: () => Promise<void>;
   navigateToCreatorDashboardPage: () => Promise<void>;
   createExploration: () => Promise<string | null>;
   createTopic: () => Promise<string>;
-  createSubTopic: (topicPageUrl: string) => Promise<void>;
-  createStory: (topicPageUrl: string) => Promise<void>;
+  createSubTopic: () => Promise<void>;
+  createStory: () => Promise<void>;
   createChapter: (explorationId: string) => Promise<void>;
   publishStory: () => Promise<void>;
 }
@@ -138,8 +139,8 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
   /**
    * Function for creating a skill in the topics and skills dashboard.
    */
-  async createSkill(topicPageUrl: string) {
-    await this.goto(topicPageUrl);
+  async createSkill() {
+    await this.openTopicEditor();
     await this.clickOn(createSkillButton);
     await this.type(skillDescriptionField, 'Test Skill 3');
     await this.clickOn(skillReviewMaterialHeader);
@@ -207,6 +208,7 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
+    await this.page.waitForTimeout(500);
     await this.type(richTextAreaField, 'Test Exploration');
     await this.clickOn(saveContentButton);
 
@@ -224,11 +226,12 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(explorationTitleInput, 'Test Exploration');
     await this.type(explorationGoalInput, 'Test Exploration');
     await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn(explorationCategorySelectorChoice[0]);
+    await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
     await this.page.waitForSelector(
       `${publishExplorationButton}:not([disabled])`);
     await this.clickOn(publishExplorationButton);
+    await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
@@ -252,26 +255,34 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.page.waitForSelector(
       `${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
+    await this.page.waitForTimeout(500);
     await this.page.waitForSelector(
       `${createTopicButton}:not([disabled])`);
     await this.clickOn(createTopicButton);
-    await this.page.waitForSelector(addStoryButton);
-    return window.location.href;
+    return this.page.url();
+  }
+
+  async openTopicEditor() {
+    await this.navigateToTopicAndSkillsDashboardPage()
+    await this.clickOn(topicsTab);
+    await this.clickOn(topic);
   }
 
   /**
    * Function for creating a subtopic as a curriculum admin.
    */
-  async createSubTopic(topicPageUrl: string) {
-    await this.goto(topicPageUrl);
+  async createSubTopic() {
+    await this.openTopicEditor();
     await this.clickOn(addSubTopicButton);
     await this.type(subTopicTitleField, 'Test Subtopic 1');
     await this.type(subTopicUrlFragmentField, 'test-subtopic-one');
     await this.clickOn(subTopicDescriptionEditorToggle);
+    await this.page.waitForTimeout(500);
     await this.type(
       richTextAreaField, 'This subtopic is to test curriculum admin utility.'
     );
     await this.clickOn(photoBoxButton);
+    await this.page.waitForTimeout(500);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(
       `${uploadPhotoButton}:not([disabled])`);
@@ -284,8 +295,8 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
   /**
    * Function for creating a story for a certain topic.
    */
-  async createStory(topicPageUrl: string) {
-    await this.goto(topicPageUrl);
+  async createStory() {
+    await this.openTopicEditor();
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, 'Test Story 1');
     await this.type(storyUrlFragmentField, 'test-story-one');

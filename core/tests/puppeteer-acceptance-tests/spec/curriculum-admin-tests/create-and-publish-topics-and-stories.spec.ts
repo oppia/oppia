@@ -46,9 +46,9 @@ describe('Curriculum Admin', function() {
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       topicUrl = await curriculumAdmin.createTopic();
-      await curriculumAdmin.createSubTopic(topicUrl);
-      await curriculumAdmin.createSkill(topicUrl);
-      await curriculumAdmin.createStory(topicUrl);
+      await curriculumAdmin.createSubTopic();
+      await curriculumAdmin.createSkill();
+      await curriculumAdmin.createStory();
       await curriculumAdmin.createChapter(explorationId);
       await curriculumAdmin.publishStory();
     }, DEFAULT_SPEC_TIMEOUT);
