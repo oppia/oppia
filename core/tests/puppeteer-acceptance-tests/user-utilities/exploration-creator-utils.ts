@@ -73,7 +73,7 @@ const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
 
 let explorationUrlAfterPublished = '';
-  export class ExplorationCreator extends BaseUser {
+export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in reaching dashboard Url.
    */
