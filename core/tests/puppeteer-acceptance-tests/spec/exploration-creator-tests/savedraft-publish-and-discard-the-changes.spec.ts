@@ -27,9 +27,9 @@ describe('Exploration Publisher, Saver and Drafter', function() {
   let explorationVisitor: ExplorationCreator;
   beforeAll(async function() {
     explorationCreator = await UserFactory.createNewUser(
-      'explorationAdmi', 'exploration_creator@example.com');
+      'explorationAdm', 'exploration_creator@example.com');
     explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitori', 'exploration_visitor@example.com');
+      'explorationVisitor', 'exploration_visitor@example.com');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should draft, discard and publish the changes',
