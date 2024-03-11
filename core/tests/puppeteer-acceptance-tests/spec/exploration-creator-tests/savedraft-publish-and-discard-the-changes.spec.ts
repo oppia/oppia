@@ -18,13 +18,13 @@
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { IExplorationCreator } from '../../user-utilities/exploration-creator-utils';
+import { ExplorationCreator } from '../../user-utilities/exploration-creator-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function() {
-  let explorationCreator: IExplorationCreator;
-  let explorationVisitor: IExplorationCreator;
+  let explorationCreator: ExplorationCreator;
+  let explorationVisitor: ExplorationCreator;
   beforeAll(async function() {
     explorationCreator = await UserFactory.createNewUser(
       'explorationAdmi', 'exploration_creator@example.com');

@@ -18,15 +18,15 @@
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { IExplorationCreator } from '../../user-utilities/exploration-creator-utils';
-import { ISuperAdmin } from '../../user-utilities/super-admin-utils';
+import { ExplorationCreator } from '../../user-utilities/exploration-creator-utils';
+import { SuperAdmin } from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Creator', function() {
-  let explorationCreator: IExplorationCreator;
-  let explorationVisitor: IExplorationCreator;
-  let superAdmin: ISuperAdmin;
+  let explorationCreator: ExplorationCreator;
+  let explorationVisitor: ExplorationCreator;
+  let superAdmin: SuperAdmin;
 
   beforeAll(async function() {
     explorationCreator = await UserFactory.createNewUser(

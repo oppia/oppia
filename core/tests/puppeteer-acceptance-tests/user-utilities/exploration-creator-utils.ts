@@ -16,7 +16,7 @@
  * @fileoverview exploration management test file
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import { showMessage } from
   '../puppeteer-testing-utilities/show-message-utils';
@@ -73,64 +73,7 @@ const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
 
 let explorationUrlAfterPublished = '';
-
-export interface IExplorationCreator extends IBaseUser {
-  openCreatorDashboardPage: () => Promise<void>;
-  switchToEditorTab: () => Promise<void>;
-  updateCardName:
-    (cardName: string) => Promise<void>;
-  updateExplorationIntroText:
-    (Introtext: string) => Promise<void>;
-  addEndInteraction: () => Promise<void>;
-  showMessageOfSuccessfullExplrationCreation:
-    () => Promise<void>;
-  goToSettingsTab: () => Promise<void>;
-  addTitle:
-    (Title: string) => Promise<void>;
-  expectTitleToHaveMaxLength:
-    (maxLength: number) => Promise<void>;
-  updateGoal:
-    (Goal: string) => Promise<void>;
-  expectGoalToEqual:
-    (expectedGoal: string) => Promise<void>;
-  selectAlgebraAsACategory: () => Promise<void>;
-  expectSelectedCategoryToBe:
-    (expectedCategory: string) => Promise<void>;
-  selectEnglishAsLanguage: () => Promise<void>;
-  expectSelectedLanguageToBe:
-    (expectedLanguage: string) => Promise<void>;
-  addTags:
-    (TagNames: string[]) => Promise<void>;
-  updateSettingsSuccessfully: () => Promise<void>;
-  expectTagsToBeAdded: () => Promise<void>;
-  previewSummary: () => Promise<void>;
-  expectPreviewSummaryToBeVisible: () => Promise<void>;
-  enableAutomaticTextToSpeech: () => Promise<void>;
-  expectAutomaticTextToSpeechToBeEnabled:
-    () => Promise<void>;
-  assignUserToCollaboratorRole:
-    (user1: string) => Promise<void>;
-  assignUserToPlaytesterRole:
-    (user2: string) => Promise<void>;
-  expectExplorationToBePublished: () => Promise<void>;
-  addVoiceArtist:
-    (voiceArtists: string[]) => Promise<void>;
-  optInToEmailNotifications: () => Promise<void>;
-  expectEmailNotificationToBeActivated:
-    () => Promise<void>;
-  deleteExploration: () => Promise<void>;
-  expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard:
-    () => Promise<void>;
-  saveDraftExploration: () => Promise<void>;
-  expectExplorationToBeDraftedSuccessfully: () => Promise<void>;
-  publishExploration: () => Promise<void>;
-  expectInteractionOnCreatorDashboard: () => Promise<void>;
-  discardCurrentChanges: () => Promise<void>;
-  expectTitleToBe:
-    (titleBeforeChanges: string) => Promise<void>;
-  }
-
-class ExplorationCreator extends BaseUser implements IExplorationCreator {
+  export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in reaching dashboard Url.
    */
@@ -579,4 +522,4 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
 }
 
 export let ExplorationCreatorFactory = (
-): IExplorationCreator =>new ExplorationCreator();
+): ExplorationCreator =>new ExplorationCreator();

@@ -16,7 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -32,17 +32,7 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
 const LABEL_FOR_SAVE_BUTTON = 'Save';
 
-export interface IBlogAdmin extends IBaseUser {
-  assignUserToRoleFromBlogAdminPage: (
-    username: string, role: keyof typeof BLOG_RIGHTS) => Promise<void>;
-  removeBlogEditorRoleFromUsername: (
-    username: string) => Promise<void>;
-  setMaximumTagLimitTo: (limit: number) => Promise<void>;
-  expectMaximumTagLimitNotToBe: (limit: number) => Promise<void>;
-  expectMaximumTagLimitToBe: (limit: number) => Promise<void>;
-}
-
-class BlogAdmin extends BaseUser implements IBlogAdmin {
+export class BlogAdmin extends BaseUser {
   /**
    * This function assigns a user with a role from the blog admin page.
    */
@@ -107,4 +97,4 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
   }
 }
 
-export let BlogAdminFactory = (): IBlogAdmin => new BlogAdmin();
+export let BlogAdminFactory = (): BlogAdmin => new BlogAdmin();

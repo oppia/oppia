@@ -16,7 +16,7 @@
  * @fileoverview Translation admin role utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -65,21 +65,7 @@ const removeContributonRightsLanguageSelect =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-export interface ITranslationAdmin extends IBaseUser {
-  navigateToContributorDashboardAdminPage: () => Promise<void>;
-  addTranslationLanguageReviewRights: (
-    username: string, languageCode: string) => Promise<void>;
-  removeTranslationLanguageReviewRights: (
-    username: string, languageCode: string) => Promise<void>;
-  viewContributionRightsForUser: (username: string) => Promise<void>;
-  viewContributorTranslationRightsByLanguageCode: (
-    languageCode: string) => Promise<void>;
-  expectDisplayedLanguagesToContain: (language: string) => Promise<void>;
-  expectUserToBeDisplayed: (username: string) => Promise<void>;
-  expectUserToNotBeDisplayed: (username: string) => Promise<void>;
-}
-
-class TranslationAdmin extends BaseUser implements ITranslationAdmin {
+export class TranslationAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -196,4 +182,4 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
 }
 
 export let TranslationAdminFactory =
-  (): ITranslationAdmin => new TranslationAdmin();
+  (): TranslationAdmin => new TranslationAdmin();
