@@ -279,6 +279,9 @@ export class ContributionsAndReview
           str, CALCULATION_TYPE_WORD);
       }
       return totalLength;
+    } else {
+      throw new Error(
+        'Invalid input: contentHtml must be a string or an array of strings.');
     }
   }
 
