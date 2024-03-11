@@ -120,7 +120,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(saveInteractionButton);
   }
 
-  async showMessageOfSuccessfullExplrationCreation(): Promise<void> {
+  async showMessageOfSuccessfulExplorationCreation(): Promise<void> {
     showMessage('Successfully created a exploration!');
   }
 

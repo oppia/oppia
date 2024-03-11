@@ -34,40 +34,39 @@ describe('Exploration Creator', function() {
     explorationVisitor = await UserFactory.createNewUser(
       'explorationVisitor', 'exploration_visitor@example.com');
     superAdmin = await UserFactory.createNewSuperAdmin('Leader');
+    const guestUser1 = await UserFactory.createNewUser(
+      'guestUsr1', 'guest_user1@example.com',);
+    const guestUser2 = await UserFactory.createNewUser(
+      'guestUsr2', 'guest_user2@example.com');
+    const guestUser3 = await UserFactory.createNewUser(
+      'guestUsr3', 'guest_user3@example.com');
+
+    await guestUser2.closeBrowser();
+    await guestUser1.closeBrowser();
+    await guestUser3.closeBrowser();
+
+    await superAdmin.assignRoleToUser(
+      'explorationAdm', 'voiceover admin');
+    await superAdmin.expectUserToHaveRole(
+      'explorationAdm', 'voiceover admin');
+
+    await superAdmin.assignRoleToUser(
+      'explorationAdm', 'curriculum admin');
+    await superAdmin.expectUserToHaveRole(
+      'explorationAdm', 'curriculum admin');
+
+    await superAdmin.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should create an exploration and modify it via the Settings tab',
     async function() {
-      const guestUser1 = await UserFactory.createNewUser(
-        'guestUsr1', 'guest_user1@example.com',);
-      const guestUser2 = await UserFactory.createNewUser(
-        'guestUsr2', 'guest_user2@example.com');
-      const guestUser3 = await UserFactory.createNewUser(
-        'guestUsr3', 'guest_user3@example.com');
-
-      await guestUser2.closeBrowser();
-      await guestUser1.closeBrowser();
-      await guestUser3.closeBrowser();
-
-      await superAdmin.assignRoleToUser(
-        'explorationAdm', 'voiceover admin');
-      await superAdmin.expectUserToHaveRole(
-        'explorationAdm', 'voiceover admin');
-
-      await superAdmin.assignRoleToUser(
-        'explorationAdm', 'curriculum admin');
-      await superAdmin.expectUserToHaveRole(
-        'explorationAdm', 'curriculum admin');
-
-      await superAdmin.closeBrowser();
-
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text');
       await explorationCreator.addEndInteraction();
-      await explorationCreator.showMessageOfSuccessfullExplrationCreation();
+      await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
       await explorationCreator.goToSettingsTab();
 

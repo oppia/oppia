@@ -135,8 +135,8 @@ export class UserFactory {
      MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(
       UserFactory.composeUserWithRoles(
-        BaseUserFactory(), [LoggedInUserFactory()]), 
-        [ExplorationCreatorFactory()]
+        BaseUserFactory(), [LoggedInUserFactory()]),
+      [ExplorationCreatorFactory()]
     );
     await user.openBrowser();
     await user.signUpNewUser(username, email);
