@@ -564,7 +564,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 include_load_tests=include_load_tests)
 
         # Prepare tasks.
-        max_concurrent_runs = 1
+        max_concurrent_runs = 25
         concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
         semaphore = threading.Semaphore(concurrent_count)
 
