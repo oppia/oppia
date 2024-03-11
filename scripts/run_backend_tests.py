@@ -550,7 +550,8 @@ def main(args: Optional[List[str]] = None) -> None:
                     'scripts.setup_gae_test',
                     'scripts.setup_test',
                     'scripts.script_import_test',
-                    'scripts.run_backend_tests_test']
+                    'scripts.run_backend_tests_test',
+                    'scripts.build_test']
                 # remove docker_exclude_tests from all_test_targets
                 all_test_targets = [
                     test for test in all_test_targets
