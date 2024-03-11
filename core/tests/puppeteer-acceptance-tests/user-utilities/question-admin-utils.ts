@@ -16,7 +16,7 @@
  * @fileoverview Question admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -63,27 +63,7 @@ const removeContributonRightsCategorySelector =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-export interface IQuestionAdmin extends IBaseUser {
-  navigateToContributorDashboardAdminPage: () => Promise<void>;
-  addReviewQuestionRights: (username: string) => Promise<void>;
-  addSubmitQuestionRights: (username: string) => Promise<void>;
-  removeReviewQuestionRights: (username: string) => Promise<void>;
-  removeSubmitQuestionRights: (username: string) => Promise<void>;
-  getDisplayedListOfQuestionReviewers: () => Promise<string[]>;
-  getDisplayedListOfQuestionSubmitters: () => Promise<string[]>;
-  getContributionStatusForUser: (
-    username: string, contribution: string) => Promise<string>;
-  verifyUserCanReviewQuestions: (username: string) => Promise<void>;
-  verifyUserCanSubmitQuestions: (username: string) => Promise<void>;
-  verifyUserCannotReviewQuestions: (username: string) => Promise<void>;
-  verifyUserCannotSubmitQuestions: (username: string) => Promise<void>;
-  verifyQuestionReviewersIncludeUser: (username: string) => Promise<void>;
-  verifyQuestionSubmittersIncludeUser: (username: string) => Promise<void>;
-  verifyQuestionReviewersExcludeUser: (username: string) => Promise<void>;
-  verifyQuestionSubmittersExcludeUser: (username: string) => Promise<void>;
-}
-
-class QuestionAdmin extends BaseUser implements IQuestionAdmin {
+export class QuestionAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -317,4 +297,4 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   }
 }
 
-export let QuestionAdminFactory = (): IQuestionAdmin => new QuestionAdmin();
+export let QuestionAdminFactory = (): QuestionAdmin => new QuestionAdmin();

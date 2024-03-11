@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -29,13 +29,7 @@ const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
 
-export interface ISuperAdmin extends IBaseUser {
-  assignRoleToUser: (username: string, role: string) => Promise<void>;
-  expectUserToHaveRole: (username: string, role: string) => Promise<void>;
-  expectUserNotToHaveRole: (username: string, role: string) => Promise<void>;
-}
-
-class SuperAdmin extends BaseUser implements ISuperAdmin {
+export class SuperAdmin extends BaseUser {
   /**
    * The function to assign a role to a user.
    */
@@ -102,4 +96,4 @@ class SuperAdmin extends BaseUser implements ISuperAdmin {
   }
 }
 
-export let SuperAdminFactory = (): ISuperAdmin => new SuperAdmin();
+export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();

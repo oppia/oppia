@@ -19,7 +19,7 @@
 
 import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
-import { ITranslationAdmin } from '../../user-utilities/translation-admin-utils';
+import { TranslationAdmin } from '../../user-utilities/translation-admin-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
@@ -27,7 +27,7 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 
 describe('Translation Admin', function() {
-  let translationAdmin: ITranslationAdmin;
+  let translationAdmin: TranslationAdmin;
 
   beforeAll(async function() {
     translationAdmin = await UserFactory.createNewUser(

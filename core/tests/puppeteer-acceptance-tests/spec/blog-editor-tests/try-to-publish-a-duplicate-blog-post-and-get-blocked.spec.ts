@@ -20,7 +20,7 @@ import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
-import { IBlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
+import { BlogPostEditor } from '../../user-utilities/blog-post-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
@@ -28,7 +28,7 @@ const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
 describe('Blog Editor', function() {
-  let blogPostEditor: IBlogPostEditor;
+  let blogPostEditor: BlogPostEditor;
 
   beforeAll(async function() {
     blogPostEditor = await UserFactory.createNewUser(

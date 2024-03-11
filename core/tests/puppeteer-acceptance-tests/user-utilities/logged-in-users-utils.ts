@@ -16,7 +16,7 @@
  * @fileoverview Logged-in users utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -89,40 +89,7 @@ const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
 
-export interface ILoggedInUser extends IBaseUser {
-  navigateToHome: () => Promise<void>;
-  navigateToAboutPage: () => Promise<void>;
-  navigateToAboutFoundationPage: () => Promise<void>;
-  navigateToThanksForDonatingPage: () => Promise<void>;
-  clickAboutButtonInAboutMenuOnNavbar: () => Promise<void>;
-  clickBrowseOurLessonsButtonInAboutPage: () => Promise<void>;
-  clickAccessAndroidAppButtonInAboutPage: () => Promise<void>;
-  clickVisitClassroomButtonInAboutPage: () => Promise<void>;
-  clickBrowseLibraryButtonInAboutPage: () => Promise<void>;
-  clickCreateLessonsButtonInAboutPage: () => Promise<void>;
-  clickExploreLessonsButtonInAboutPage: () => Promise<void>;
-  clickAboutFoundationButtonInAboutMenuOnNavbar: () => Promise<void>;
-  click61MillionChildrenLinkInAboutFoundation: () => Promise<void>;
-  clickEvenThoseWhoAreInSchoolLinkInAboutFoundation: () => Promise<void>;
-  clickSourceUnescoLinkInAboutFoundation: () => Promise<void>;
-  click420MillionLinkInAboutFoundation: () => Promise<void>;
-  clickLearnMoreAboutOppiaButtonInAboutFoundation: () => Promise<void>;
-  clickBecomeAVolunteerButtonInAboutFoundation: () => Promise<void>;
-  clickConsiderBecomingAPartnerTodayLinkInAboutFoundation: () => Promise<void>;
-  clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation: () => Promise<void>;
-  clickDonationsLinkInAboutFoundation: () => Promise<void>;
-  clickBlogButtonInAboutMenuOnNavbar: () => Promise<void>;
-  clickPartnershipsButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
-  clickVolunteerButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
-  clickDonateButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
-  clickContactUsButtonInGetInvolvedMenuOnNavbar: () => Promise<void>;
-  clickDonateButtonOnNavbar: () => Promise<void>;
-  clickWatchAVideoButtonInThanksForDonatingPage: () => Promise<void>;
-  clickReadOurBlogButtonInThanksForDonatingPage: () => Promise<void>;
-  clickDismissButtonInThanksForDonatingPage: () => Promise<void>;
-}
-
-class LoggedInUser extends BaseUser implements ILoggedInUser {
+export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
    */
@@ -652,4 +619,4 @@ class LoggedInUser extends BaseUser implements ILoggedInUser {
   }
 }
 
-export let LoggedInUserFactory = (): ILoggedInUser => new LoggedInUser();
+export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

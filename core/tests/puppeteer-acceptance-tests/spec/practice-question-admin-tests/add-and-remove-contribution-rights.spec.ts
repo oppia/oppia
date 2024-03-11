@@ -19,7 +19,7 @@
 
 import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
-import { IQuestionAdmin } from '../../user-utilities/question-admin-utils';
+import { QuestionAdmin } from '../../user-utilities/question-admin-utils';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
 
@@ -27,7 +27,7 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 
 describe('Question Admin', function() {
-  let questionAdmin: IQuestionAdmin;
+  let questionAdmin: QuestionAdmin;
 
   beforeAll(async function() {
     questionAdmin = await UserFactory.createNewUser(
