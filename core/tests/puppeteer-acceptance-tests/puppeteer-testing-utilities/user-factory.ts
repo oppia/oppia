@@ -16,11 +16,11 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-import { SuperAdminFactory, ISuperAdmin } from '../user-utilities/super-admin-utils';
-import { BaseUserFactory, IBaseUser } from './puppeteer-utils';
+import { SuperAdminFactory, SuperAdmin } from '../user-utilities/super-admin-utils';
+import { BaseUserFactory, BaseUser } from './puppeteer-utils';
 import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
-import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-users-utils';
-import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
+import { LoggedInUserFactory, LoggedInUser } from '../user-utilities/logged-in-users-utils';
+import { BlogAdminFactory, BlogAdmin } from '../user-utilities/blog-admin-utils';
 import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
 import testConstants from './test-constants';
@@ -44,7 +44,7 @@ const USER_ROLE_MAPPING = {
  * composition of the user and the role for type inference.
  */
 type UnionToIntersection<U> =
-  (U extends IBaseUser ? (k: U) => void : never) extends
+  (U extends BaseUser ? (k: U) => void : never) extends
     ((k: infer I) => void) ? I : never;
 
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
@@ -56,34 +56,36 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: ISuperAdmin & IBlogAdmin | null = null;
-let activeUsers: IBaseUser[] = [];
+let superAdminInstance: SuperAdmin & BlogAdmin | null = null;
+let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
   /**
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
    */
-  private static composeUserWithRole = function<
-    TUser extends IBaseUser,
-    TRole extends IBaseUser
+  private static composeUserWithRoles = function<
+    TUser extends BaseUser,
+    TRoles extends BaseUser[]
   >(
       user: TUser,
-      role: TRole
-  ): TUser & TRole {
-    const userPrototype = Object.getPrototypeOf(user);
-    const rolePrototype = Object.getPrototypeOf(role);
+      roles: TRoles
+  ): TUser & UnionToIntersection<TRoles[number]> {
+    for (const role of roles) {
+      const userPrototype = Object.getPrototypeOf(user);
+      const rolePrototype = Object.getPrototypeOf(role);
 
-    Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
-      Object.defineProperty(
-        userPrototype,
-        name,
-        Object.getOwnPropertyDescriptor(rolePrototype, name) ||
-          Object.create(null)
-      );
-    });
+      Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        Object.defineProperty(
+          userPrototype,
+          name,
+          Object.getOwnPropertyDescriptor(rolePrototype, name) ||
+            Object.create(null)
+        );
+      });
+    }
 
-    return user as TUser & TRole;
+    return user as TUser & UnionToIntersection<TRoles[number]>;
   };
 
   /**
@@ -91,7 +93,7 @@ export class UserFactory {
    * that user.
    */
   static assignRolesToUser = async function<
-    TUser extends IBaseUser,
+    TUser extends BaseUser,
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[]
   >(
       user: TUser,
@@ -114,7 +116,7 @@ export class UserFactory {
 
       await superAdminInstance.expectUserToHaveRole(user.username, role);
 
-      UserFactory.composeUserWithRole(user, USER_ROLE_MAPPING[role]());
+      UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
 
     return user as TUser & MultipleRoleIntersection<typeof roles>;
@@ -128,9 +130,9 @@ export class UserFactory {
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<ILoggedInUser & MultipleRoleIntersection<TRoles>> {
-    let user = UserFactory.composeUserWithRole(
-      BaseUserFactory(), LoggedInUserFactory());
+  ): Promise<LoggedInUser & MultipleRoleIntersection<TRoles>> {
+    let user = UserFactory.composeUserWithRoles(
+      BaseUserFactory(), [LoggedInUserFactory()]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
@@ -144,19 +146,19 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function(
       username: string
-  ): Promise<ISuperAdmin & IBlogAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
 
     const user = await UserFactory.createNewUser(
       username, 'testadmin@example.com');
-    const superAdmin = UserFactory.composeUserWithRole(
-      user, SuperAdminFactory());
+    const superAdmin = UserFactory.composeUserWithRoles(
+      user, [SuperAdminFactory()]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
-    superAdminInstance = UserFactory.composeUserWithRole(
-      superAdmin, BlogAdminFactory());
+    superAdminInstance = UserFactory.composeUserWithRoles(
+      superAdmin, [BlogAdminFactory()]);
 
     return superAdminInstance;
   };
@@ -174,7 +176,7 @@ export class UserFactory {
    * This function closes the browser for the provided user.
    */
   static closeBrowserForUser = async function(
-      user: IBaseUser
+      user: BaseUser
   ): Promise<void> {
     const index = activeUsers.indexOf(user);
     activeUsers.splice(index, 1);

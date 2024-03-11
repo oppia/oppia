@@ -16,7 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
+import { BaseUser } from
   '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from
   '../puppeteer-testing-utilities/test-constants';
@@ -41,32 +41,7 @@ const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
-export interface IBlogPostEditor extends IBaseUser {
-  addUserBioInBlogDashboard: () => Promise<void>;
-  navigateToBlogDashboardPage: () => Promise<void>;
-  createDraftBlogPostWithTitle:
-    (draftBlogPostTitle: string) => Promise<void>;
-  deleteDraftBlogPostWithTitle:
-    (draftBlogPostTitle: string) => Promise<void>;
-  expectPublishButtonToBeDisabled: () => Promise<void>;
-  publishNewBlogPostWithTitle:
-    (newBlogPostTitle: string) => Promise<void>;
-  createNewBlogPostWithTitle:
-    (newBlogPostTitle: string) => Promise<void>;
-  deletePublishedBlogPostWithTitle: (blogPostTitle: string) => Promise<void>;
-  expectUserUnableToPublishBlogPost:
-    (expectedWarningMessage: string) => Promise<void>;
-  expectNumberOfBlogPostsToBe: (number: number) => Promise<void>;
-  navigateToPublishTab: () => Promise<void>;
-  expectDraftBlogPostWithTitleToBePresent: (
-    checkDraftBlogPostByTitle: string) => Promise<void>;
-  expectPublishedBlogPostWithTitleToBePresent: (
-    blogPostTitle: string) => Promise<void>;
-  expectBlogDashboardAccessToBeUnauthorized: () => Promise<void>;
-  expectBlogDashboardAccessToBeAuthorized: () => Promise<void>;
-}
-
-class BlogPostEditor extends BaseUser implements IBlogPostEditor {
+export class BlogPostEditor extends BaseUser {
   /**
    * Function for adding blog post author bio in blog dashboard.
    */
@@ -390,4 +365,4 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
   }
 }
 
-export let BlogPostEditorFactory = (): IBlogPostEditor => new BlogPostEditor();
+export let BlogPostEditorFactory = (): BlogPostEditor => new BlogPostEditor();
