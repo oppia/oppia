@@ -371,6 +371,7 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
   it('should remove question reviewer rights given the username ' +
     'when calling updateQuestionRightsAsync', fakeAsync(() => {
     let username = 'validUser';
@@ -391,6 +392,7 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
   it('should add question submitter rights given the username ' +
     'when calling updateQuestionRightsAsync', fakeAsync(() => {
     let username = 'validUser';
@@ -408,6 +410,7 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
   it('should remove question submitter rights given the username ' +
     'when calling updateQuestionRightsAsync', fakeAsync(() => {
     let username = 'validUser';
@@ -429,6 +432,7 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
   it('should add question submitter and reviewer rights given the username ' +
   'when calling updateQuestionRightsAsync', fakeAsync(() => {
     let username = 'validUser';

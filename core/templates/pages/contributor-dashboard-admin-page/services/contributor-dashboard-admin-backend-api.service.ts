@@ -163,12 +163,13 @@ export class ContributorDashboardAdminBackendApiService {
 
   async updateQuestionRightsAsync(
       username: string,
-      isQuestionSubmitter: boolean,
-      isQuestionReviewer: boolean,
-      canSubmitQuestions: boolean,
-      canReviewQuestions: boolean): Promise<void> {
-    if (isQuestionSubmitter !== canSubmitQuestions) {
-      if (isQuestionSubmitter) {
+      userWasGrantedQuestionSubmissionRights: boolean,
+      userWasGrantedQuestionReviewRights: boolean,
+      userCanCurrentlySubmitQuestions: boolean,
+      userCanCurrentlyReviewQuestions: boolean): Promise<void> {
+    if (userWasGrantedQuestionSubmissionRights !==
+        userCanCurrentlySubmitQuestions) {
+      if (userWasGrantedQuestionSubmissionRights) {
         await this.addContributionReviewerAsync(
           AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
           username,
@@ -182,8 +183,9 @@ export class ContributorDashboardAdminBackendApiService {
         );
       }
     }
-    if (isQuestionReviewer !== canReviewQuestions) {
-      if (isQuestionReviewer) {
+    if (userWasGrantedQuestionReviewRights !==
+        userCanCurrentlyReviewQuestions) {
+      if (userWasGrantedQuestionReviewRights) {
         await this.addContributionReviewerAsync(
           AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
           username,

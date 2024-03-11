@@ -662,6 +662,7 @@ describe('Contributor stats component', () => {
           },
         ]);
       }));
+
     it('should return the translation reviewer stats attributes correctly',
       fakeAsync(() => {
         expect(component.getContributorAdminStatsTableAttributes(
@@ -684,6 +685,7 @@ describe('Contributor stats component', () => {
           },
         ]);
       }));
+
     it('should return the question submitter stats attributes correctly',
       fakeAsync(() => {
         expect(component.getContributorAdminStatsTableAttributes(
@@ -710,6 +712,7 @@ describe('Contributor stats component', () => {
           },
         ]);
       }));
+
     it('should return the question reviewer stats attributes correctly',
       fakeAsync(() => {
         expect(component.getContributorAdminStatsTableAttributes(
@@ -736,6 +739,7 @@ describe('Contributor stats component', () => {
           },
         ]);
       }));
+
     it('should return the last contributed type correctly',
       fakeAsync(() => {
         let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
@@ -751,6 +755,7 @@ describe('Contributor stats component', () => {
         expect(component.getLastContributedType(
           activeTab)).toEqual('Last Reviewed');
       }));
+
     it('should return the contribution count label correctly',
       fakeAsync(() => {
         let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
@@ -766,6 +771,7 @@ describe('Contributor stats component', () => {
         expect(component.getContributionCountLabel(
           activeTab)).toEqual('Questions Reviewed');
       }));
+
     it('should return the contribution count correctly',
       fakeAsync(() => {
         let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;

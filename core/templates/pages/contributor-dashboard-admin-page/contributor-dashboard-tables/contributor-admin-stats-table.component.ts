@@ -124,61 +124,82 @@ export class ContributorAdminStatsTable implements OnInit {
     return num === 1 ? word : word + 's';
   }
 
-  getCountDisplay(
+  getEditTextForAttribute(
+      editCount: number,
+      contributionSubType: string): string {
+    return ' (' + editCount + ' ' +
+           (
+           contributionSubType ===
+           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW ?
+           'edited' : 'without edits'
+           ) +
+           ')';
+  }
+
+  getTextForAttribute(
       count: number,
       wordCount: number = 0,
-      editDisplay: string = ''): string {
+      showEditText: boolean = false,
+      editCount: number = 0,
+      contributionSubType: string = ''): string {
     return count + this.pluralise(count, ' card') +
-           editDisplay +
          (
-          wordCount === 0 ?
-                       '' :
-                       ', ' + wordCount + this.pluralise(wordCount, ' word')
+          showEditText ?
+                  this.getEditTextForAttribute(editCount, contributionSubType) :
+                  ''
+         ) +
+         (
+          wordCount !== 0 ?
+                       ', ' + wordCount + this.pluralise(wordCount, ' word') :
+                       ''
          );
   }
 
-  getAcceptedSubmittedDisplay(
+  getTextForActiveTopicAttribute(topics: string[]): string {
+    return topics ? topics.join(', ') : 'No topics available';
+  }
+
+  getAcceptedSubmittedTextForAttribute(
       acceptedTranslationCount: number,
       acceptedTranslationsWithoutReviewerEditsCount: number,
       acceptedTranslationWordCount: number = 0): string {
-    return this.getCountDisplay(
+    return this.getTextForAttribute(
       acceptedTranslationCount,
       acceptedTranslationWordCount,
-      ' (' + acceptedTranslationsWithoutReviewerEditsCount +
-        ' without edits)');
+      true,
+      acceptedTranslationsWithoutReviewerEditsCount,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
   }
 
-  getAcceptedReviewedDisplay(
+  getAcceptedReviewedTextForAttribute(
       acceptedTranslationCount: number,
       acceptedTranslationsWithReviewerEditsCount: number,
       acceptedTranslationWordCount: number = 0): string {
-    return this.getCountDisplay(
+    return this.getTextForAttribute(
       acceptedTranslationCount,
       acceptedTranslationWordCount,
-      ' (' + acceptedTranslationsWithReviewerEditsCount + ' edited)');
-  }
-
-  getActiveTopicDisplay(topics: string[]): string {
-    return topics ? topics.join(', ') : 'No topics available';
+      true,
+      acceptedTranslationsWithReviewerEditsCount,
+      AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
   }
 
   getTranslationReviewerStatsTableAttributes(
       element: TranslationReviewerStats): void {
     this.contributorAdminStatsTableAttributes.push({
       key: 'Accepted Translations',
-      value: this.getAcceptedReviewedDisplay(
+      value: this.getAcceptedReviewedTextForAttribute(
         element.acceptedTranslationsCount,
         element.acceptedTranslationsWithReviewerEditsCount,
         element.acceptedTranslationWordCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Rejected Translations',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.rejectedTranslationsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Active Topics',
-      value: this.getActiveTopicDisplay(
+      value: this.getTextForActiveTopicAttribute(
         element.topicsWithTranslationReviews)
     });
   }
@@ -187,26 +208,26 @@ export class ContributorAdminStatsTable implements OnInit {
       element: TranslationSubmitterStats): void {
     this.contributorAdminStatsTableAttributes.push({
       key: 'Submitted Translations',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.submittedTranslationsCount,
         element.submittedTranslationWordCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Accepted Translations',
-      value: this.getAcceptedSubmittedDisplay(
+      value: this.getAcceptedSubmittedTextForAttribute(
         element.acceptedTranslationsCount,
         element.acceptedTranslationsWithoutReviewerEditsCount,
         element.acceptedTranslationWordCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Rejected Translations',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.rejectedTranslationsCount,
         element.rejectedTranslationWordCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Active Topics',
-      value: this.getActiveTopicDisplay(
+      value: this.getTextForActiveTopicAttribute(
         element.topicsWithTranslationSubmissions)
     });
   }
@@ -215,23 +236,23 @@ export class ContributorAdminStatsTable implements OnInit {
       element: QuestionSubmitterStats): void {
     this.contributorAdminStatsTableAttributes.push({
       key: 'Submitted Questions',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.submittedQuestionsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Accepted Questions',
-      value: this.getAcceptedSubmittedDisplay(
+      value: this.getAcceptedSubmittedTextForAttribute(
         element.acceptedQuestionsCount,
         element.acceptedQuestionsWithoutReviewerEditsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Rejected Questions',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.rejectedQuestionsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Active Topics',
-      value: this.getActiveTopicDisplay(
+      value: this.getTextForActiveTopicAttribute(
         element.topicsWithQuestionSubmissions)
     });
   }
@@ -244,18 +265,18 @@ export class ContributorAdminStatsTable implements OnInit {
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Accepted Questions',
-      value: this.getAcceptedReviewedDisplay(
+      value: this.getAcceptedReviewedTextForAttribute(
         element.acceptedQuestionsCount,
         element.acceptedQuestionsWithReviewerEditsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Rejected Questions',
-      value: this.getCountDisplay(
+      value: this.getTextForAttribute(
         element.rejectedQuestionsCount)
     });
     this.contributorAdminStatsTableAttributes.push({
       key: 'Active Topics',
-      value: this.getActiveTopicDisplay(
+      value: this.getTextForActiveTopicAttribute(
         element.topicsWithQuestionReviews)
     });
   }
@@ -413,7 +434,7 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  checkMobileView(): boolean {
+  isMobileView(): boolean {
     return (this.windowRef.nativeWindow.innerWidth < 800);
   }
 
@@ -473,7 +494,7 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 
   updateColumns(contributionSubType: string): void {
-    if (this.checkMobileView()) {
+    if (this.isMobileView()) {
       this.columnsToDisplay = ['contributorName'];
     } else {
       this.columnsToDisplay = ['chevron', 'contributorName'];
@@ -485,16 +506,16 @@ export class ContributorAdminStatsTable implements OnInit {
     this.columnsToDisplay.push(
       'contributionCount', 'lastContributedInDays', 'role');
 
-    if (this.checkMobileView()) {
+    if (this.isMobileView()) {
       this.columnsToDisplay.push('chevron');
     }
   }
 
   updateColumnsToDisplay(): void {
-    let contributionType: string =
-    this.getContributionType(this.inputs.activeTab);
-    let contributionSubType: string =
-    this.getContributionSubType(this.inputs.activeTab);
+    let contributionType: string = this.getContributionType(
+      this.inputs.activeTab);
+    let contributionSubType: string = this.getContributionSubType(
+      this.inputs.activeTab);
 
 
     this.ContributorDashboardAdminStatsBackendApiService
