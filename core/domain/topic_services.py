@@ -1120,7 +1120,7 @@ def compute_summary_of_topic(
                 if feature_flag_services.is_feature_flag_enabled(
                     feature_flag_list.FeatureNames
                     .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-                    user_id=None)
+                    None)
                 else len(story.story_contents.nodes))
     topic_model_published_node_count = total_published_node_count
 
@@ -1166,7 +1166,7 @@ def _compute_story_exploration_mapping(
             if feature_flag_services.is_feature_flag_enabled(
                 feature_flag_list.FeatureNames
                 .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-                user_id=None)
+                None)
             else story.story_contents.get_all_linked_exp_ids())
     return mapping
 

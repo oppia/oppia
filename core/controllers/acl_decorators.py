@@ -1245,7 +1245,7 @@ def can_access_contributor_dashboard_admin_page(
 
         new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            user_id=self.user_id)
+            self.user_id)
 
         if new_dashboard_enabled and (
             role_services

@@ -266,7 +266,7 @@ def evaluate_all_feature_flag_configs(
     feature_flags = get_all_feature_flags()
     for feature_flag in feature_flags:
         feature_flag_status = is_feature_flag_enabled(
-            feature_flag.name, user_id=user_id, feature_flag=feature_flag)
+            feature_flag.name, user_id, feature_flag=feature_flag)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(feature_flag_status, bool)
         result_dict[feature_flag.name] = feature_flag_status

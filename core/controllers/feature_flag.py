@@ -65,5 +65,5 @@ class FeatureFlagDummyHandler(
         self.render_json({
             'msg': 'ok',
             'is_enabled': feature_flag_services.is_feature_flag_enabled(
-                dummy_feature_flag_for_e2e_tests, user_id=self.user_id)
+                dummy_feature_flag_for_e2e_tests, self.user_id)
         })
