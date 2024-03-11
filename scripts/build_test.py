@@ -974,70 +974,69 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_build_with_prod_source_maps(self) -> None:
-    #     check_function_calls = {
-    #         'build_using_webpack_gets_called': False,
-    #         'ensure_files_exist_gets_called': False,
-    #         'modify_constants_gets_called': False,
-    #         'compare_file_count_gets_called': False,
-    #         'clean_gets_called': False,
-    #     }
-    #     expected_check_function_calls = {
-    #         'build_using_webpack_gets_called': True,
-    #         'ensure_files_exist_gets_called': True,
-    #         'modify_constants_gets_called': True,
-    #         'compare_file_count_gets_called': True,
-    #         'clean_gets_called': True,
-    #     }
+    def test_build_with_prod_source_maps(self) -> None:
+        check_function_calls = {
+            'build_using_webpack_gets_called': False,
+            'ensure_files_exist_gets_called': False,
+            'modify_constants_gets_called': False,
+            'compare_file_count_gets_called': False,
+            'clean_gets_called': False,
+        }
+        expected_check_function_calls = {
+            'build_using_webpack_gets_called': True,
+            'ensure_files_exist_gets_called': True,
+            'modify_constants_gets_called': True,
+            'compare_file_count_gets_called': True,
+            'clean_gets_called': True,
+        }
 
-    #     expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
+        expected_config_path = build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
 
-    #     def mock_build_using_webpack(config_path: str) -> None:
-    #         self.assertEqual(config_path, expected_config_path)
-    #         check_function_calls['build_using_webpack_gets_called'] = True
+        def mock_build_using_webpack(config_path: str) -> None:
+            self.assertEqual(config_path, expected_config_path)
+            check_function_calls['build_using_webpack_gets_called'] = True
 
-    #     def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-    #         check_function_calls['ensure_files_exist_gets_called'] = True
+        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
+            check_function_calls['ensure_files_exist_gets_called'] = True
 
-    #     def mock_modify_constants(
-    #         prod_env: bool,  # pylint: disable=unused-argument
-    #         emulator_mode: bool,  # pylint: disable=unused-argument
-    #         maintenance_mode: bool  # pylint: disable=unused-argument
-    #     ) -> None:
-    #         check_function_calls['modify_constants_gets_called'] = True
+        def mock_modify_constants(
+            prod_env: bool,  # pylint: disable=unused-argument
+            emulator_mode: bool,  # pylint: disable=unused-argument
+            maintenance_mode: bool  # pylint: disable=unused-argument
+        ) -> None:
+            check_function_calls['modify_constants_gets_called'] = True
 
-    #     def mock_compare_file_count(
-    #         unused_first_dir: str, unused_second_dir: str
-    #     ) -> None:
-    #         check_function_calls['compare_file_count_gets_called'] = True
+        def mock_compare_file_count(
+            unused_first_dir: str, unused_second_dir: str
+        ) -> None:
+            check_function_calls['compare_file_count_gets_called'] = True
 
-    #     def mock_clean() -> None:
-    #         check_function_calls['clean_gets_called'] = True
+        def mock_clean() -> None:
+            check_function_calls['clean_gets_called'] = True
 
-    #     ensure_files_exist_swap = self.swap(
-    #         build, '_ensure_files_exist', mock_ensure_files_exist)
-    #     build_using_webpack_swap = self.swap(
-    #         build, 'build_using_webpack', mock_build_using_webpack)
-    #     modify_constants_swap = self.swap(
-    #         common, 'modify_constants', mock_modify_constants)
-    #     compare_file_count_swap = self.swap(
-    #         build, '_compare_file_count', mock_compare_file_count)
-    #     clean_swap = self.swap(build, 'clean', mock_clean)
-    #     install_python_dev_dependencies_swap = self.swap_with_checks(
-    #         install_python_dev_dependencies,
-    #         'main',
-    #         lambda _: None,
-    #         expected_args=[(['--uninstall'],)]
-    #     )
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', mock_ensure_files_exist)
+        build_using_webpack_swap = self.swap(
+            build, 'build_using_webpack', mock_build_using_webpack)
+        modify_constants_swap = self.swap(
+            common, 'modify_constants', mock_modify_constants)
+        compare_file_count_swap = self.swap(
+            build, '_compare_file_count', mock_compare_file_count)
+        clean_swap = self.swap(build, 'clean', mock_clean)
+        install_python_dev_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'main',
+            lambda _: None,
+            expected_args=[(['--uninstall'],)]
+        )
 
-    #     with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-    #         with ensure_files_exist_swap, build_using_webpack_swap:
-    #             with modify_constants_swap, compare_file_count_swap:
-    #                 with clean_swap, install_python_dev_dependencies_swap:
-    #                     build.main(args=['--prod_env', '--source_maps'])
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with ensure_files_exist_swap, build_using_webpack_swap:
+                with modify_constants_swap, compare_file_count_swap:
+                    with clean_swap, install_python_dev_dependencies_swap:
+                        build.main(args=['--prod_env', '--source_maps'])
 
-    #     self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1210,44 +1209,43 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         finally:
             super().tearDown()
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_run_webpack_compilation_success(self) -> None:
-    #     old_os_path_isdir = os.path.isdir
+    def test_run_webpack_compilation_success(self) -> None:
+        old_os_path_isdir = os.path.isdir
 
-    #     def mock_os_path_isdir(path: str) -> bool:
-    #         if path == 'webpack_bundles':
-    #             return True
-    #         return old_os_path_isdir(path)
+        def mock_os_path_isdir(path: str) -> bool:
+            if path == 'webpack_bundles':
+                return True
+            return old_os_path_isdir(path)
 
-    #     # The webpack compilation processes will be called 4 times as mock_isdir
-    #     # will return true after 4 calls.
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_webpack_compiler', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         sys, 'exit', lambda _: None, called=False))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         os.path, 'isdir', mock_os_path_isdir))
+        # The webpack compilation processes will be called 4 times as mock_isdir
+        # will return true after 4 calls.
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
 
-    #     build.run_webpack_compilation()
+        build.run_webpack_compilation()
 
-    # def test_run_webpack_compilation_failed(self) -> None:
-    #     old_os_path_isdir = os.path.isdir
+    def test_run_webpack_compilation_failed(self) -> None:
+        old_os_path_isdir = os.path.isdir
 
-    #     def mock_os_path_isdir(path: str) -> bool:
-    #         if path == 'webpack_bundles':
-    #             return False
-    #         return old_os_path_isdir(path)
+        def mock_os_path_isdir(path: str) -> bool:
+            if path == 'webpack_bundles':
+                return False
+            return old_os_path_isdir(path)
 
-    #     # The webpack compilation processes will be called five times.
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_webpack_compiler', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         os.path, 'isdir', mock_os_path_isdir))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        # The webpack compilation processes will be called five times.
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
-    #     with self.oppia_is_dockerized_swap:
-    #         build.run_webpack_compilation()
+        with self.oppia_is_dockerized_swap:
+            build.run_webpack_compilation()
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
         old_os_path_isdir = os.path.isdir
@@ -1270,35 +1268,34 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
             build.build_js_files(True)
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-    #     return_code = 2
-    #     self.exit_stack.enter_context(self.swap_to_always_raise(
-    #         servers, 'managed_webpack_compiler',
-    #         error=subprocess.CalledProcessError(return_code, [])))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         build, 'main', lambda *_, **__: None,
-    #         expected_kwargs=[{'args': []}]))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         sys, 'exit', lambda _: None,
-    #         expected_args=[
-    #             # When the code under test runs, the first sys.exit call halts
-    #             # execution. However, when this test runs, sys.exit is mocked
-    #             # and so does not interrupt the execution flow. Therefore we
-    #             # call sys.exit with the error code from the webpack compilation
-    #             # process (2) 5 times (the maximum number of attempts allowed to
-    #             # compile webpack) and then exit with code 1 after giving up
-    #             # trying to compile webpack.
-    #             (return_code,),
-    #             (return_code,),
-    #             (return_code,),
-    #             (return_code,),
-    #             (return_code,),
-    #             (1,),
-    #         ]))
+    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
+        return_code = 2
+        self.exit_stack.enter_context(self.swap_to_always_raise(
+            servers, 'managed_webpack_compiler',
+            error=subprocess.CalledProcessError(return_code, [])))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None,
+            expected_args=[
+                # When the code under test runs, the first sys.exit call halts
+                # execution. However, when this test runs, sys.exit is mocked
+                # and so does not interrupt the execution flow. Therefore we
+                # call sys.exit with the error code from the webpack compilation
+                # process (2) 5 times (the maximum number of attempts allowed to
+                # compile webpack) and then exit with code 1 after giving up
+                # trying to compile webpack.
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (1,),
+            ]))
 
-    #     with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-    #         build.build_js_files(True)
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            build.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -1318,15 +1315,14 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
         build.build_js_files(False, source_maps=True)
 
-    # TODO (#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         common, 'run_cmd', lambda *_: None, called=False))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         build, 'main', lambda *_, **__: None,
-    #         expected_kwargs=[{'args': []}]))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         build, 'run_webpack_compilation', lambda **_: None,
-    #         expected_kwargs=[{'source_maps': True}]))
+    def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_cmd', lambda *_: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'run_webpack_compilation', lambda **_: None,
+            expected_kwargs=[{'source_maps': True}]))
 
-    #     build.build_js_files(True, source_maps=True)
+        build.build_js_files(True, source_maps=True)

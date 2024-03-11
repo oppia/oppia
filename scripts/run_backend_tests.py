@@ -353,15 +353,11 @@ def load_coverage_exclusion_list(path: str) -> List[str]:
     Returns:
         list(str). Dotted names of excluded modules.
     """
-    print("Exclusion path: {}".format(path))
     exclusion_list = []
     with open(path, 'r', encoding='utf-8') as exclusion_file:
-        print("Exclusion file: {}".format(exclusion_file))
         for line in exclusion_file:
             line = line.strip()
-            print("Line: {}".format(line))
             if line and not line.startswith('#'):
-                print("Appending line: {}".format(line))
                 exclusion_list.append(line)
     return exclusion_list
 
@@ -463,8 +459,6 @@ def print_coverage_report(
     incomplete_coverage = 0
     coverage_exclusions = load_coverage_exclusion_list(
     COVERAGE_EXCLUSION_LIST_PATH)
-    print("Exclusiuon path: {}".format(COVERAGE_EXCLUSION_LIST_PATH))
-    print("Covered exlusions: ", coverage_exclusions)
     for task in tasks:
         if task.finished and not task.exception:
             coverage = task.task_results[0].get_report()[-2]
@@ -550,13 +544,11 @@ def main(args: Optional[List[str]] = None) -> None:
                     'scripts.setup_gae_test',
                     'scripts.setup_test',
                     'scripts.script_import_test',
-                    'scripts.run_backend_tests_test',
                     'scripts.build_test']
                 # remove docker_exclude_tests from all_test_targets
                 all_test_targets = [
                     test for test in all_test_targets
                     if test not in docker_exclude_tests]
-                print(all_test_targets)
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(

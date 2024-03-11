@@ -939,8 +939,6 @@ def modify_constants(
             expected_number_of_replacements=1
         )
 
-        print(branch_name_variable)
-
         short_commit_hash_variable = (
             '"SHORT_COMMIT_HASH": "%s"'
             % (
