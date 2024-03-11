@@ -78,10 +78,10 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
-      - name: Deleting ubuntu files
+      - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          rm --recursive --force "$AGENT_TOOLSDIRECTORY" 
       - uses: ./.github/actions/install-chrome
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
@@ -133,10 +133,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Deleting ubuntu files
+      - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          rm --recursive --force "$AGENT_TOOLSDIRECTORY" 
       - uses: ./.github/actions/merge
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -183,10 +183,10 @@ jobs:
           with:
             python-version: '3.8.15'
             architecture: 'x64'
-        - name: Deleting ubuntu files
+        - name: Free disk space
           run: |
             sudo rm -rf /usr/share/dotnet
-            sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+            rm --recursive --force "$AGENT_TOOLSDIRECTORY" 
         - uses: ./.github/actions/merge
         - uses: ./.github/actions/install-chrome
         - name: Initializing Containers

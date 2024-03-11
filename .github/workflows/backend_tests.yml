@@ -30,10 +30,10 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - name: Deleting ubuntu files
+      - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          rm --recursive --force "$AGENT_TOOLSDIRECTORY" 
       - name: Initialze Containers
         run: |
           make build
