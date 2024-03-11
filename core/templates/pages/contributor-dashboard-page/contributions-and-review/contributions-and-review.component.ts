@@ -47,7 +47,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
-    content_html: string;
+    content_html: string | string[];
     translation_html: string | string[];
     question_dict: QuestionBackendDict;
     skill_difficulty: string[];
@@ -259,14 +259,30 @@ export class ContributionsAndReview
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
         translationWordCount: (
           this.isReviewTranslationsTab() && this.activeExplorationId) ? (
-            this.htmlLengthService.computeHtmlLength(
-              suggestion.change_cmd.content_html,
-              CALCULATION_TYPE_WORD)) : undefined
+            this.getTranslationContentLength(
+              suggestion.change_cmd.content_html)) : undefined
       };
 
       translationContributionsSummaryList.push(requiredData);
     });
     return translationContributionsSummaryList;
+  }
+
+  getTranslationContentLength(contentHtml: string | string[]): number {
+    if (typeof contentHtml === 'string') {
+      return this.htmlLengthService.computeHtmlLength(
+        contentHtml, CALCULATION_TYPE_WORD);
+    } else if (Array.isArray(contentHtml)) {
+      let totalLength = 0;
+      for (const str of contentHtml) {
+        totalLength += this.htmlLengthService.computeHtmlLength(
+          str, CALCULATION_TYPE_WORD);
+      }
+      return totalLength;
+    } else {
+      throw new Error(
+        'Invalid input: contentHtml must be a string or an array of strings.');
+    }
   }
 
   getTranslationSuggestionHeading(suggestion: Suggestion): string {

@@ -49,7 +49,7 @@ export class OpportunitiesListComponent {
   @Input() progressBarRequired: boolean = false;
 
   @Input() showOpportunityButton: boolean = true;
-  @Input() showPinUnpinButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = false;
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()

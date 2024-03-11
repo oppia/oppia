@@ -1764,6 +1764,51 @@ describe('Contributions and review component', () => {
               suggestion_type: 'translate_content',
               status: 'review',
               change_cmd: {
+                content_html: ['<p>This is test para</p>'],
+                translation_html: '<p>Traducáú &amp;</p>'
+              }
+            } as Suggestion,
+            details: {
+              skill_description: 'skill_description',
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title'
+            } as ContributionDetails
+          }
+        } as Record<string, SuggestionDetails>;
+
+        component.activeTabType = component.TAB_TYPE_REVIEWS;
+        component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
+        component.activeExplorationId = 'id';
+        tick();
+
+        expect(component.getTranslationContributionsSummary(
+          suggestionIdToSuggestions)).toEqual([{
+          id: 'id',
+          heading: 'Traducáú &',
+          subheading: 'topic_name / story_title / chapter_title',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review',
+          translationWordCount: 4
+        }]);
+      }));
+
+      it('should get in-review translation suggestions with' +
+       'correct translation word count', fakeAsync(() => {
+        spyOn(formatRtePreviewPipe, 'transform')
+          .and.returnValue('Traducáú &amp;');
+        spyOn(htmlEscaperService, 'escapedStrToUnescapedStr')
+          .and.returnValue('Traducáú &');
+        let suggestionIdToSuggestions = {
+          suggestion: {
+            suggestion: {
+              author_name: 'a',
+              target_id: '1',
+              suggestion_id: 'id',
+              suggestion_type: 'translate_content',
+              status: 'review',
+              change_cmd: {
                 content_html: '<p>This is test para</p>',
                 translation_html: '<p>Traducáú &amp;</p>'
               }
@@ -1792,6 +1837,72 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Review',
           translationWordCount: 4
         }]);
+
+        suggestionIdToSuggestions = {
+          suggestion: {
+            suggestion: {
+              author_name: 'a',
+              target_id: '1',
+              suggestion_id: 'id',
+              suggestion_type: 'translate_content',
+              status: 'review',
+              change_cmd: {
+                content_html: [
+                  '<p>This is test para</p>',
+                  '<p>This is test para 2</p>',
+                  '<p>Test para 3</p>'
+                ],
+                translation_html: '<p>Traducáú &amp;</p>'
+              }
+            } as Suggestion,
+            details: {
+              skill_description: 'skill_description',
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title'
+            } as ContributionDetails
+          }
+        } as Record<string, SuggestionDetails>;
+
+        expect(component.getTranslationContributionsSummary(
+          suggestionIdToSuggestions)).toEqual([{
+          id: 'id',
+          heading: 'Traducáú &',
+          subheading: 'topic_name / story_title / chapter_title',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review',
+          translationWordCount: 12
+        }]);
+
+        suggestionIdToSuggestions = {
+          suggestion: {
+            suggestion: {
+              author_name: 'a',
+              target_id: '1',
+              suggestion_id: 'id',
+              suggestion_type: 'translate_content',
+              status: 'review',
+              change_cmd: {
+                content_html: 1 as unknown,
+                translation_html: '<p>Traducáú &amp;</p>'
+              }
+            } as Suggestion,
+            details: {
+              skill_description: 'skill_description',
+              topic_name: 'topic_name',
+              story_title: 'story_title',
+              chapter_title: 'chapter_title'
+            } as ContributionDetails
+          }
+        } as Record<string, SuggestionDetails>;
+
+        expect(() => {
+          component.getTranslationContributionsSummary(
+            suggestionIdToSuggestions);
+        }).toThrowError(
+          'Invalid input: contentHtml must be a string or an array of ' +
+          'strings.');
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {

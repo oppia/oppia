@@ -60,7 +60,7 @@ export class OpportunitiesListItemComponent {
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
   @Input() showOpportunityButton: boolean = true;
-  @Input() showPinUnpinButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = false;
 
   labelText!: string;
   labelStyle!: { 'background-color': string };
