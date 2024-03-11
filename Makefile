@@ -39,7 +39,6 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 
 build: ## Builds the all docker setup.
 	$(MAKE) install_node
-	bash ./docker/pre_push_hook.sh --install
 	docker compose build
 
 run-devserver: ## Runs the dev-server
@@ -72,7 +71,10 @@ start-devserver: ## Starts the development server
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-init: build run-devserver ## Initializes the build and runs dev-server.
+init: install-hooks build run-devserver ## Initializes the build and runs dev-server.
+
+install-hooks:  ## Install required hooks
+	bash ./docker/pre_push_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
 	docker compose down --rmi all --volumes
