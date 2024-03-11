@@ -42,7 +42,7 @@ const addTitle = '.e2e-test-exploration-title-input';
 const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
 const categoryDropDawn = '.mat-select-arrow-wrapper';
-const addCateogry = '#mat-option-69';
+const addCategory = '#mat-option-69';
 const languageUpdateBar = '#mat-select-value-9';
 const addLanguage = '#mat-option-6';
 const addTags = '#mat-chip-list-input-0';
@@ -188,7 +188,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectAlgebraAsACategory(): Promise<void> {
     await this.clickOn(categoryDropDawn);
-    await this.clickOn(addCateogry);
+    await this.clickOn(addCategory);
   }
 
   /**
