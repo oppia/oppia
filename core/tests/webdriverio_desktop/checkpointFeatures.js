@@ -16,7 +16,6 @@
  * @fileoverview End-to-end tests for the checkpoint features.
  */
 
-var action = require('../webdriverio_utils/action.js');
 var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
@@ -109,16 +108,6 @@ describe('Checkpoints functionality', function() {
     var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
-    await adminPage.editConfigProperty(
-      'The details for each classroom page.',
-      'List',
-      async function(elem) {
-        elem = await elem.editItem(0, 'Dictionary');
-        elem = await elem.editEntry(4, 'List');
-        elem = await elem.addItem('Unicode');
-        await action.setValue(
-          'Topic ID', elem, topicId, false);
-      });
 
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
