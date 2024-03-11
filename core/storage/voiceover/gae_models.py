@@ -225,21 +225,12 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     Instances of this class are keyed by the user ID.
     """
 
-    # Dictionary mapping language codes to nested dictionaries. Each
-    # nested dictionary contains the following key-value pairs:
-    # - 'language_accent_code': A string indicating the accent code of
-    # the voice artist for voiceovers in the respective language.
-    # - 'exploration_id_to_content_ids': A mapping from exploration IDs
-    # (strings) to lists of content IDs (strings), denoting the content IDs
-    # for which voiceovers are provided in a given exploration by the
-    # voice artist.
-    # - 'exploration_id_to_voiceovers': A dict with exploration IDs as keys
-    # and the list of voiceovers as values, where each voiceover is
-    # represented as a dictionary (VoiceoverDict). This field specifically
-    # contains all of the voiceovers contributed by the user in the given
-    # exploration.
-    voiceovers_and_contents_mapping = (
-        datastore_services.JsonProperty(required=True))
+    # Dictionary mapping language codes to nested dictionaries.Each nested dict
+    # contains exploration IDs as keys and list of voiceovers as values.
+    language_code_to_voiceovers = datastore_services.JsonProperty(required=True)
+
+    # Dictionary mapping codes as keys and language acccent codes as values.
+    language_code_to_accent = datastore_services.JsonProperty(required=True)
 
     @classmethod
     def has_reference_to_user_id(cls, voice_artist_id: str) -> bool:
@@ -286,7 +277,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     def create(
         cls,
         voice_artist_id: str,
-        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType
+        language_code_to_voiceovers,
+        language_code_to_accent
     ) -> VoiceArtistMetadataModel:
         """Creates a new VoiceArtistMetadataModel instance.
 
@@ -323,7 +315,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
 
         entity = cls(
             id=voice_artist_id,
-            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
+            language_code_to_voiceovers=language_code_to_voiceovers,
+            language_code_to_accent=language_code_to_accent
         )
         entity.update_timestamps()
         entity.put()
@@ -351,3 +344,61 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
                     voice_artist_metadata_model.voiceovers_and_contents_mapping)
             }
         return user_data
+
+
+class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
+    """The model links the exploration's latest contents IDs and the voice
+    artist ID who contributed voiceovers in the given language code.
+    Instances of this class are keyed by the exploration ID.
+    """
+    content_id_to_voice_artists = datastore_services.JsonProperty(required=True)
+
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user to export."""
+        return dict(
+            super(
+                ExplorationVoiceArtistsLinkModel, cls
+            ).get_export_policy(), **{
+                'voiceovers_and_contents_mapping': (
+                    base_models.EXPORT_POLICY.EXPORTED)
+            }
+        )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """The model contains data corresponding to a user: user_id and their
+        provided voiceover data, but it isn't deleted because the voiceover
+        data is needed to classify voiceovers.
+        """
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model contain user ID of voice artist and their provided
+        voiceovers metadata.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def create(
+        cls,
+        exploration_id: str,
+        content_id_to_voice_artists,
+    ) -> VoiceArtistMetadataModel:
+
+        if cls.get(exploration_id, strict=False):
+            raise Exception(
+                'An exploration voice artist link model with a given '
+                'exploration ID already exists')
+
+        entity = cls(
+            id=exploration_id,
+            content_id_to_voice_artists=content_id_to_voice_artists
+        )
+        entity.update_timestamps()
+        entity.put()
+
+        return entity

@@ -231,8 +231,9 @@ def update_voice_artist_metadata(
 
 def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
-    voiceovers_and_contents_mapping: (
-        voiceover_models.VoiceoversAndContentsMappingType)
+    language_code_to_accent: (
+        voiceover_models.VoiceoversAndContentsMappingType),
+    language_code_to_voiceovers
 ) -> voiceover_models.VoiceArtistMetadataModel:
     """The method creates a VoiceArtistMetadataModel instance.
 
@@ -249,7 +250,23 @@ def create_voice_artist_metadata_model_instance(
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
-        voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+        language_code_to_accent=language_code_to_accent,
+        language_code_to_voiceovers=language_code_to_voiceovers)
     voice_artist_metadata_model.update_timestamps()
 
     return voice_artist_metadata_model
+
+
+def create_exploration_voice_artists_link_model_instance(
+    exploration_id,
+    content_id_to_voice_artists
+):
+    exploration_voice_artists_link_model = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel(
+            id=exploration_id,
+            content_id_to_voice_artists=content_id_to_voice_artists
+        )
+    )
+    exploration_voice_artists_link_model.update_timestamps()
+
+    return exploration_voice_artists_link_model

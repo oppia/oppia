@@ -19,17 +19,18 @@ exploration models."""
 
 from __future__ import annotations
 
-import copy
-
 from core.domain import opportunity_services
 from core.domain import voiceover_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
+from core.jobs.transforms import job_result_transforms
+from core.jobs.transforms import results_transforms
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, Iterable, List, Tuple, cast
+import result
+from typing import Dict, Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,9 +42,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 (voiceover_models, exp_models) = models.Registry.import_models([
     models.Names.VOICEOVER, models.Names.EXPLORATION])
-
-
-MAX_SAMPLE_VOICEOVERS_IN_VOICE_ARTIST_MODEL = 5
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -65,151 +63,19 @@ class FilterCommitLogModelByExplorationIds(beam.DoFn): # type: ignore[misc]
             yield exp_commit_log_model
 
 
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to
-# assume that PTransform class is of type Any. Thus to avoid MyPy's error
-# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
-# ignore here.
-class GetVoiceArtistMetadataModelsFromDict(beam.DoFn): # type: ignore[misc]
-    """DoFn to convert voice artist metadata dicts to their corresponding
-    model instances.
+class UpdateVoiceArtistMetadata(beam.DoFn): # type: ignore[misc]
+    """DoFn to update exploration voice artist link and voice artist metdata.
     """
+    exploration_id_to_voiceover_mapping = {}
+    voice_artist_id_to_voiceovers_data = {}
 
-    total_commit_log_models = 0
-    processed_commit_log_models = 0
-
-    @staticmethod
-    def _convert_to_models(
-        voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType]
-    ) -> List[voiceover_models.VoiceArtistMetadataModel]:
-        """The method converts the voice artist metadata dicts to their
-        corresponding model instances.
-
-        Args:
-            voice_artist_id_to_metadata_mapping:
-                dict(str, VoiceoversAndContentsMappingType). A dictionary
-                mapping voice artist IDs as keys and nested dicts as values.
-                Each nested dict refers to the voiceovers_and_contents_mapping
-                field in the VoiceArtistMetadataModel.
-
-        Returns:
-            list(VoiceArtistMetadataModel). A list of VoiceArtistMetadataModel
-            instances.
-        """
-
-        voice_artist_metadata_models = []
-
-        with datastore_services.get_ndb_context():
-            for voice_artist_id, metadata_mapping in (
-                    voice_artist_id_to_metadata_mapping.items()):
-                voice_artist_model = (
-                    voiceover_services.
-                    create_voice_artist_metadata_model_instance(
-                        voice_artist_id, metadata_mapping)
-                )
-                voice_artist_metadata_models.append(voice_artist_model)
-
-        return voice_artist_metadata_models
-
-    def process(
+    def get_voiceover_from_recorded_voiceover_diff(
         self,
-        voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType]
-    ) -> Iterable[voiceover_models.VoiceArtistMetadataModel]:
-        voice_artist_metadata_models = self._convert_to_models(
-            voice_artist_id_to_metadata_mapping)
-
-        for voice_artist_metadata_model in voice_artist_metadata_models:
-            yield voice_artist_metadata_model
-
-
-class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
-    """Jobs used for fetching and saving voice artist names from curated
-    exploration models.
-    """
-
-    DATASTORE_UPDATES_ALLOWED = True
-    voice_artist_metadata_mapping: Dict[
-        str, voiceover_models.VoiceoversAndContentsMappingType] = {}
-
-    @staticmethod
-    def _delete_voice_artist_model_for_old_commits(
-        language_code: str,
-        exploration_id: str,
-        content_id: str,
-        voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType]
-    ) -> Dict[str, voiceover_models.VoiceoversAndContentsMappingType]:
-        """Remove the content ID association from the metadata of the previous
-        voice artist when a new voiceover is recorded for the same content
-        by another voice artist, necessitating the deletion of the
-        previous record.
-
-        Args:
-            language_code: str. The language code in which the new voiceover
-                is added.
-            exploration_id: str. The exploration ID in which the new voiceover
-                is added.
-            content_id: str. The content ID in which the new voiceover is added.
-            voice_artist_id_to_metadata_mapping:
-                dict(str, VoiceoversAndContentsMappingType). A dictionary
-                mapping voice artist IDs as keys and nested dicts as values.
-                Each nested dict refers to the voiceovers_and_contents_mapping
-                field in the VoiceArtistMetadataModel.
-
-        Returns:
-            dict(str, VoiceoversAndContentsMappingType). A dictionary
-            mapping voice artist IDs as keys and nested dicts as values.
-            Each nested dict refers to the voiceovers_and_contents_mapping
-            field in the VoiceArtistMetadataModel.
-        """
-        voice_artist_id_to_metadata_mapping_iterable: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = (
-                copy.deepcopy(voice_artist_id_to_metadata_mapping))
-
-        for voice_artist_id, voiceovers_and_contents_mapping in (
-                voice_artist_id_to_metadata_mapping_iterable.items()):
-            language_mapping = voiceovers_and_contents_mapping.get(
-                language_code, {})
-            # Here we use cast because we are narrowing down the type from
-            # Union[str, Dict[str, List[str]], Dict[str, List[VoiceoverDict]]
-            # to Dict[str, List[str]].
-            exploration_mapping = cast(
-                Dict[str, List[str]],
-                language_mapping.get('exploration_id_to_content_ids', {}))
-
-            if exploration_id in exploration_mapping:
-                content_ids: List[str] = exploration_mapping.get(
-                    exploration_id, [])
-
-                if content_id in content_ids:
-                    content_ids.remove(content_id)
-
-                if not content_ids:
-                    del exploration_mapping[exploration_id]
-
-                if not exploration_mapping:
-                    del voiceovers_and_contents_mapping[language_code]
-
-            if not voiceovers_and_contents_mapping:
-                del voice_artist_id_to_metadata_mapping[voice_artist_id]
-
-        return voice_artist_id_to_metadata_mapping
-
-    @staticmethod
-    def _get_voiceover_from_recorded_voiceover_diff(
         new_voiceover_mapping: Dict[
             str, Dict[str, voiceover_models.VoiceoverDict]],
         old_voiceover_mapping: Dict[
-            str, Dict[str, voiceover_models.VoiceoverDict]],
-        voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType],
-        exploration_id: str
-    ) -> Tuple[
-        Dict[str, Dict[str, voiceover_models.VoiceoverDict]],
-        Dict[str, voiceover_models.VoiceoversAndContentsMappingType]
-    ]:
+            str, Dict[str, voiceover_models.VoiceoverDict]]
+    ) -> Dict[str, Dict[str, voiceover_models.VoiceoverDict]]:
         """The method calculates the difference between the old and new values
         of the recorded voiceover to isolate and retrieve only the updated
         voiceover values within a given commit.
@@ -219,25 +85,13 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                 representing new values of recorded voiceovers.
             old_voiceover_mapping: dict(str, dict(str, VoiceoverDict)). A dict
                 representing old values of recorded voiceovers.
-            voice_artist_id_to_metadata_mapping:
-                dict(str, VoiceoversAndContentsMappingType). A dictionary
-                mapping voice artist IDs as keys and nested dicts as values.
-                Each nested dict refers to the voiceovers_and_contents_mapping
-                field in the VoiceArtistMetadataModel.
-            exploration_id: str. The ID of the given exploration.
 
         Returns:
-            *. A 2-tuple consisting of:
-            (a) dict(str, dict(str, VoiceoverDict)). A dictionary maps content
+            dict(str, dict(str, VoiceoverDict)). A dictionary maps content
             IDs as keys and nested dicts as values. Each nested dict contains
             language codes as keys and voiceover dicts as values. The dictionary
             representing the difference between the old and new values of the
             recorded voiceover.
-            (b) dict(str, VoiceoversAndContentsMappingType). A dictionary
-            maps voice artist IDs as keys and nested dicts as values. Each
-            nested dict refers to the voiceovers_and_contents_mapping field
-            in the VoiceArtistMetadataModel. The dictionary representing the
-            updated metadata mapping for the voice artist.
         """
         voiceover_mapping_diff: Dict[
             str, Dict[str, voiceover_models.VoiceoverDict]] = {}
@@ -245,12 +99,14 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
         for content_id, lang_code_to_voiceover_dict in (
             new_voiceover_mapping.items()):
 
-            voiceover_mapping_diff[content_id] = {}
-
             for lang_code, voiceover_dict in (
                 lang_code_to_voiceover_dict.items()):
 
                 if lang_code not in old_voiceover_mapping[content_id]:
+
+                    if content_id not in voiceover_mapping_diff:
+                        voiceover_mapping_diff[content_id] = {}
+
                     voiceover_mapping_diff[content_id][lang_code] = (
                         voiceover_dict)
                 else:
@@ -260,159 +116,216 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                         content_id][lang_code]
 
                     if old_voiceover_dict != new_voiceover_dict:
+                        if content_id not in voiceover_mapping_diff:
+                            voiceover_mapping_diff[content_id] = {}
+
                         voiceover_mapping_diff[content_id][lang_code] = (
                             voiceover_dict)
-                        voice_artist_id_to_metadata_mapping = (
-                            CreateVoiceArtistMetadataModelsFromExplorationsJob.
-                            _delete_voice_artist_model_for_old_commits(
-                                lang_code,
-                                exploration_id,
-                                content_id,
-                                voice_artist_id_to_metadata_mapping)
-                        )
 
-        return voiceover_mapping_diff, voice_artist_id_to_metadata_mapping
+        return voiceover_mapping_diff
 
-    @staticmethod
-    def _get_voice_artist_metadata_info_from_exp_commit(
-        exp_commit_log_model: exp_models.ExplorationCommitLogEntryModel,
-        voice_artist_id_to_metadata_mapping: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType]
-    ) -> Dict[str, voiceover_models.VoiceoversAndContentsMappingType]:
-        """The method adds a new entry to the voice artist metadata dictionary
-        for a given user ID if the commit includes changes related to
-        voiceovers.
-
-        Args:
-            exp_commit_log_model: ExplorationCommitLogEntryModel. An instance
-                of ExplorationCommitLogEntryModel will be used to create a
-                new entry for voice artist metadata.
-            voice_artist_id_to_metadata_mapping:
-                dict(str, VoiceoversAndContentsMappingType). A dictionary
-                mapping voice artist IDs as keys and nested dicts as values.
-                Each nested dict refers to the voiceovers_and_contents_mapping
-                field in the VoiceArtistMetadataModel.
-
-        Returns:
-            dict(str, VoiceoversAndContentsMappingType). A dictionary
-            mapping voice artist IDs as keys and nested dicts as values.
-            Each nested dict refers to the voiceovers_and_contents_mapping
-            field in the VoiceArtistMetadataModel.
+    def update_voice_artist_data(
+        self,
+        voice_artist_id: str,
+        exploration_id: str,
+        language_code: str,
+        voiceover: voiceover_models.VoiceoverDict
+    ) -> None:
+        """The method updates the voice artist metadata information based on
+        the given data for a specific commit log model.
         """
 
-        exp_change_dicts = exp_commit_log_model.commit_cmds
+        if voice_artist_id not in self.voice_artist_id_to_voiceovers_data:
+            self.voice_artist_id_to_voiceovers_data[voice_artist_id] = {
+                'language_code_to_voiceovers': {},
+                'language_code_to_accent': {}
+            }
+
+        language_code_to_voiceovers = (
+            self.voice_artist_id_to_voiceovers_data[
+                voice_artist_id]['language_code_to_voiceovers'])
+        language_code_to_accent = (
+            self.voice_artist_id_to_voiceovers_data[
+                voice_artist_id]['language_code_to_accent'])
+
+        if language_code not in language_code_to_voiceovers:
+            language_code_to_voiceovers[language_code] = {}
+            # Assigning empty string, since accent will be filled manually
+            # using voiceover-admin page.
+            language_code_to_accent[language_code] = ''
+
+        if exploration_id not in language_code_to_voiceovers[language_code]:
+            language_code_to_voiceovers[language_code][exploration_id] = []
+
+        language_code_to_voiceovers[language_code][exploration_id].append(
+            voiceover)
+
+    def update_exp_id_to_voicever_mapping(
+        self, exp_commit_log_model
+    ):
+        """The method updates the exploration voice artist link information for
+        a specific commit log model.
+        """
+
         exploration_id = exp_commit_log_model.exploration_id
+        voice_artist_id = exp_commit_log_model.user_id
+        exp_change_dicts = exp_commit_log_model.commit_cmds
+
+        exploration_mapping = (
+            self.exploration_id_to_voiceover_mapping[exploration_id])
 
         for change_dict in exp_change_dicts:
             if (
-                change_dict['cmd'] == 'edit_state_property' and
-                change_dict['property_name'] == 'recorded_voiceovers'
+                change_dict.get('cmd') == 'edit_state_property' and
+                change_dict.get('property_name') == 'recorded_voiceovers'
             ):
-                voiceovers_mapping, voice_artist_id_to_metadata_mapping = (
-                    CreateVoiceArtistMetadataModelsFromExplorationsJob.
-                    _get_voiceover_from_recorded_voiceover_diff(
-                        change_dict['new_value']['voiceovers_mapping'],
-                        change_dict['old_value']['voiceovers_mapping'],
-                        voice_artist_id_to_metadata_mapping,
-                        exploration_id)
-                )
+                new_recorded_voiceovers = change_dict.get('new_value')
+                new_voiceovers_mapping = new_recorded_voiceovers.get(
+                    'voiceovers_mapping')
 
-                voice_artist_id = exp_commit_log_model.user_id
-                voiceovers_and_contents_mapping: (
-                    voiceover_models.VoiceoversAndContentsMappingType) = {}
+                old_recorded_voiceovers = change_dict.get('old_value')
+                old_voiceovers_mapping = old_recorded_voiceovers.get(
+                    'voiceovers_mapping')
 
-                if voice_artist_id in voice_artist_id_to_metadata_mapping:
-                    voiceovers_and_contents_mapping = copy.deepcopy(
-                        voice_artist_id_to_metadata_mapping[voice_artist_id])
+                # Getting the difference between old and new commit changes.
+                voiceovers_mapping = (
+                    self.get_voiceover_from_recorded_voiceover_diff(
+                        new_voiceovers_mapping, old_voiceovers_mapping))
 
                 for content_id, lang_code_to_voiceover_dict in (
                     voiceovers_mapping.items()):
 
+                    # If some old commit models contain voiceovers for
+                    # contents that are not part of the current version,
+                    # then we should skip the content.
+                    if content_id not in exploration_mapping:
+                        continue
+
                     for lang_code, voiceover_dict in (
                         lang_code_to_voiceover_dict.items()):
 
-                        if lang_code not in voiceovers_and_contents_mapping:
-                            empty_exploration_id_to_content_ids: Dict[
-                                str, List[str]] = {}
-                            empty_exploration_id_to_voiceovers: Dict[str, List[
-                                voiceover_models.VoiceoverDict]] = {}
+                        # Updating voice artist metadata information for the
+                        # given voice artist.
+                        self.update_voice_artist_data(
+                            voice_artist_id,
+                            exploration_id,
+                            lang_code,
+                            voiceover_dict
+                        )
 
-                            voiceovers_and_contents_mapping[lang_code] = {
-                                'language_accent_code': '',
-                                'exploration_id_to_content_ids': (
-                                    empty_exploration_id_to_content_ids),
-                                'exploration_id_to_voiceovers': (
-                                    empty_exploration_id_to_voiceovers)
-                            }
+                        # If some old commit models contain voiceovers for
+                        # contents in some languages that are not part of the
+                        # current version, then we should skip the language
+                        # code.
+                        if lang_code not in exploration_mapping.get(content_id):
+                            continue
 
-                        # Here we use cast because we are narrowing down the
-                        # type from Union[str, Dict[str, List[str]], Dict[
-                        # str, List[VoiceoverDict]] to Dict[str, List[str]].
-                        exploration_id_to_content_ids = cast(
-                            Dict[str, List[str]],
-                            voiceovers_and_contents_mapping[lang_code][
-                                'exploration_id_to_content_ids'])
+                        # If the exploration mapping already includes the voice
+                        # artist ID for the specified language code, we should
+                        # skip it, as we are iterating through commit log models
+                        # in reverse order, meaning that in earlier versions,
+                        # the voice artist ID would have already been added.
+                        if exploration_mapping[content_id][lang_code] != '':
+                            continue
 
-                        # Here we use cast because we are narrowing down the
-                        # type from Union[str, Dict[str, List[str]], Dict[
-                        # str, List[VoiceoverDict]] to Dict[str, List[
-                        # VoiceoverDict]].
-                        exploration_id_to_voiceovers = cast(
-                            Dict[str, List[voiceover_models.VoiceoverDict]],
-                            voiceovers_and_contents_mapping[lang_code][
-                                'exploration_id_to_voiceovers'])
+                        exploration_mapping[content_id][lang_code] = (
+                            voice_artist_id)
 
-                        if exploration_id not in exploration_id_to_content_ids:
-                            exploration_id_to_content_ids[exploration_id] = []
-
-                        if exploration_id not in exploration_id_to_voiceovers:
-                            exploration_id_to_voiceovers[exploration_id] = []
-
-                        exploration_id_to_content_ids[exploration_id].append(
-                            content_id)
-                        exploration_id_to_voiceovers[exploration_id].append(
-                            voiceover_dict)
-
-                        voiceovers_and_contents_mapping[lang_code][
-                            'exploration_id_to_content_ids'] = (
-                                exploration_id_to_content_ids)
-                        voiceovers_and_contents_mapping[lang_code][
-                            'exploration_id_to_voiceovers'] = (
-                                exploration_id_to_voiceovers)
-
-                voice_artist_id_to_metadata_mapping[voice_artist_id] = (
-                    voiceovers_and_contents_mapping)
-
-        return voice_artist_id_to_metadata_mapping
-
-    @staticmethod
-    def _calculate_number_of_voiceovers(
-        voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType)
-    ) -> int:
-        """The method calculates the number of voiceovers given by a specific
-        voice artist.
-
-        Args:
-            voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType.
-                A dict representing the metadata information for the given voice
-                artist.
+    def get_voice_artist_metadata_models(self):
+        """The method creates a list of voice artist metadata models.
 
         Returns:
-            int. The total number of voiceovers given by a voice artist.
+            list(VoiceArtistMetadataModel). A list of voice artist
+            metadata models.
         """
-        total_voiceovers = 0
-        for metadata_mapping in voiceovers_and_contents_mapping.values():
-            exploration_mapping = (
-                metadata_mapping['exploration_id_to_content_ids'])
-            assert isinstance(exploration_mapping, dict)
+        voice_artist_data_models = []
 
-            for content_ids in exploration_mapping.values():
-                assert isinstance(content_ids, list)
+        with datastore_services.get_ndb_context():
+            for voice_artist_id, voiceover_mapping in (
+                    self.voice_artist_id_to_voiceovers_data.items()):
 
-                total_voiceovers += len(content_ids)
+                language_code_to_voiceovers = (
+                    voiceover_mapping['language_code_to_voiceovers'])
+                language_code_to_accent = (
+                    voiceover_mapping['language_code_to_accent'])
 
-        return total_voiceovers
+                voice_artist_model = (
+                    voiceover_services.
+                    create_voice_artist_metadata_model_instance(
+                        voice_artist_id,
+                        language_code_to_accent,
+                        language_code_to_voiceovers
+                    )
+                )
+                voice_artist_data_models.append(voice_artist_model)
+
+        return voice_artist_data_models
+
+
+    def get_exploration_voice_artists_link_models(self):
+        """The method creates a list of exploration voice artist link models.
+
+        Returns:
+            list(ExplorationVoiceArtistsLinkModel). A list of exploration voice
+            artist link models.
+        """
+        exploration_voice_artists_link_models = []
+
+        with datastore_services.get_ndb_context():
+            for exploration_id, content_id_to_voice_artists in (
+                    self.exploration_id_to_voiceover_mapping.items()):
+
+                exploration_voice_artists_link_model = (
+                    voiceover_services.
+                    create_exploration_voice_artists_link_model_instance(
+                        exploration_id, content_id_to_voice_artists
+                    )
+                )
+                exploration_voice_artists_link_models.append(
+                    exploration_voice_artists_link_model
+                )
+        return exploration_voice_artists_link_models
+
+    def process(
+        self,
+        exploration_id_to_voiceover_mapping,
+        exp_commit_log_models
+    ) -> Iterable[exp_models.ExplorationCommitLogEntryModel]:
+
+        self.exploration_id_to_voiceover_mapping = (
+            exploration_id_to_voiceover_mapping)
+
+
+        # By sorting the commit log models in reverse order, we ensure that
+        # while iterating backwards, we exclusively update voice artists for
+        # the most recent voiceover. If we come across voice artists associated
+        # with an older version, we skip them as they have already been updated.
+        exp_commit_log_models.sort(key=lambda model: model.id, reverse=True)
+
+        for exp_commit_log_model in exp_commit_log_models:
+            self.update_exp_id_to_voicever_mapping(exp_commit_log_model)
+
+        exploration_voice_artists_link_models = (
+            self.get_exploration_voice_artists_link_models())
+        voice_artist_data_models = (
+            self.get_voice_artist_metadata_models())
+
+        models_to_put = []
+        models_to_put.extend(exploration_voice_artists_link_models)
+        models_to_put.extend(voice_artist_data_models)
+
+        for model in models_to_put:
+            yield model
+
+
+class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
+    """Jobs used for fetching and saving voice artist names from curated
+    exploration models.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = True
+    voice_artist_metadata_mapping = {}
+    exploration_id_to_voiceover_mapping = {}
 
     @staticmethod
     def _check_exploration_is_curated(exp_id: str) -> bool:
@@ -432,17 +345,63 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
                 is_exploration_available_for_contribution(exp_id)
             )
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        self.voice_artist_metadata_mapping = {}
 
-        curated_exploration_model_ids = (
+    def _get_exploration_id_to_voiceover_mapping(self, exploration):
+        """The function generates a dictionary for explorations containing the
+        most recent content ID and language code details, allowing for the
+        assignment of the respective voice artist IDs who contributed to the
+        voiceovers.
+        """
+        content_id_to_voiceovers_mapping = {}
+        for state in exploration.states.values():
+            voiceover_mapping = (
+                state['recorded_voiceovers']['voiceovers_mapping']
+            )
+            for content_id, lang_code_to_voiceovers in (
+                    voiceover_mapping.items()):
+
+                content_id_to_voiceovers_mapping[content_id] = {}
+
+                for lang_code in lang_code_to_voiceovers:
+
+                    # Empty strings will be assigned as the voice artist name is
+                    # currently unknown, but it will be updated during iteration
+                    # on commit log models.
+                    content_id_to_voiceovers_mapping[content_id][lang_code] = ''
+
+        self.exploration_id_to_voiceover_mapping[exploration.id] = (
+            content_id_to_voiceovers_mapping)
+
+        return self.exploration_id_to_voiceover_mapping
+
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+
+        curated_exploration_models = (
             self.pipeline
             | 'Get exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all())
             | 'Get curated exploration models' >> beam.Filter(
                 lambda model: self._check_exploration_is_curated(model.id))
+        )
+
+        curated_exploration_model_ids = (
+            curated_exploration_models
             | 'Get curated exploration model ids' >> beam.Map(
                 lambda exploration: exploration.id
+            )
+        )
+
+        exp_id_to_voiceover_mapping = (
+            curated_exploration_models
+            | 'Get exploration wise data' >> beam.Map(
+                lambda exploration: (
+                    self._get_exploration_id_to_voiceover_mapping(exploration))
+            )
+            | 'Collect all exploration mapping dicts' >> (
+                beam.combiners.ToList())
+            | 'Extract final exploration mapping dict' >> beam.Map(
+                lambda elements: elements[-1] if elements else {}
             )
         )
 
@@ -459,46 +418,37 @@ class CreateVoiceArtistMetadataModelsFromExplorationsJob(base_jobs.JobBase):
             )
         )
 
-        voice_artist_metadata_models = (
-            exp_commit_log_models
-            | 'Update voice artist metadata mapping dict' >> beam.Map(
+        models_to_put = (
+            exp_id_to_voiceover_mapping
+            | 'Update voice artist metadata mapping dict' >> beam.ParDo(
+                UpdateVoiceArtistMetadata(),
+                beam.pvalue.AsList(exp_commit_log_models)
+            )
+        )
+
+
+        updated_voice_artist_data_result = (
+            models_to_put
+            | 'Get the result for models' >> beam.Map(
                 lambda model: (
-                    CreateVoiceArtistMetadataModelsFromExplorationsJob.
-                    _get_voice_artist_metadata_info_from_exp_commit(
-                        model, self.voice_artist_metadata_mapping)
+                    job_run_result.JobRunResult.as_stdout(
+                        'Generated voice artist data for %s.' % model.id)
+                    if isinstance(
+                        model, voiceover_models.VoiceArtistMetadataModel)
+                    else job_run_result.JobRunResult.as_stdout(
+                        'Generated exploration voice artist link for %s.' %
+                        model.id)
                 )
-            )
-            | 'Collect all voice artist metadata dicts' >> (
-                beam.combiners.ToList())
-            | 'Extract final updated voice artist metadata dict' >> beam.Map(
-                lambda elements: elements[-1] if elements else {}
-            )
-            | 'Get voice artist metadata models' >> beam.ParDo(
-                GetVoiceArtistMetadataModelsFromDict()
             )
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
-            unused_voice_artist_metadata_put_results = (
-                voice_artist_metadata_models
-                | 'Put VoiceArtistMetadataModel models' >> ndb_io.PutModels()
+            unused_put_results = (
+                models_to_put
+                | 'Put models into datastore' >> ndb_io.PutModels()
             )
 
-        voice_artist_metadata_job_result = (
-            voice_artist_metadata_models
-            | 'Getting user IDs to number of provided voiceovers result' >> (
-                beam.Map(
-                    lambda model: job_run_result.JobRunResult.as_stdout(
-                        'Voice artist with ID %s contributed %s voiceovers.'
-                        % (model.id, str(self._calculate_number_of_voiceovers(
-                            model.voiceovers_and_contents_mapping)))
-                    )
-                )
-            )
-        )
-
-        return voice_artist_metadata_job_result
-
+        return updated_voice_artist_data_result
 
 class AuditVoiceArtistNamesFromExplorationJob(
     CreateVoiceArtistMetadataModelsFromExplorationsJob
