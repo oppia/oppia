@@ -505,7 +505,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     with contextlib.ExitStack() as stack:
         # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-        if not feconf.OPPIA_IS_DOCKERIZED:
+        if not feconf.OPPIA_IS_DOCKERIZED: # docker: no cover
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True))
             stack.enter_context(servers.managed_redis_server())
@@ -538,7 +538,7 @@ def main(args: Optional[List[str]] = None) -> None:
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
             # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-            if feconf.OPPIA_IS_DOCKERIZED:
+            if feconf.OPPIA_IS_DOCKERIZED: # docker: no cover
                 # The following tests are excluded from running in the Docker
                 # since they will be removed after the Dockerized setup is
                 # permanently moved to.
