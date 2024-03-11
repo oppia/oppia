@@ -41,7 +41,7 @@ const addTitleBar = '.e2e-test-exploration-title-input';
 const addTitle = '.e2e-test-exploration-title-input';
 const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
-const cateogryDropDawn = '.mat-select-arrow-wrapper';
+const categoryDropDawn = '.mat-select-arrow-wrapper';
 const addCateogry = '#mat-option-69';
 const languageUpdateBar = '#mat-select-value-9';
 const addLanguage = '#mat-option-6';
@@ -187,7 +187,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectAlgebraAsACategory(): Promise<void> {
-    await this.clickOn(cateogryDropDawn);
+    await this.clickOn(categoryDropDawn);
     await this.clickOn(addCateogry);
   }
 
