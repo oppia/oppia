@@ -149,7 +149,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating Card Name.
    */
-  async updateCardName(cardName): Promise<void> {
+  async updateCardName(cardName: string): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.clickOn(addCardName);
     await this.type('.e2e-test-state-name-input', cardName);
@@ -160,7 +160,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating exploration intro text.
    */
-  async updateExplorationIntroText(Introtext): Promise<void> {
+  async updateExplorationIntroText(Introtext: string): Promise<void> {
     await this.page.waitForTimeout(600);
     await this.clickOn('.e2e-test-edit-content-pencil-button');
     await this.page.waitForSelector('.e2e-test-rte', { visible: true });
@@ -191,7 +191,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in updating Title.
    */
-  async addTitle(Title): Promise<void> {
+  async addTitle(Title: string): Promise<void> {
     await this.clickOn(addTitleBar);
     await this.type(addTitle, Title);
   }
@@ -199,7 +199,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks length of title bar at basic settings tab.
    */
-  async expectTitleToHaveMaxLength(maxLength): Promise<void> {
+  async expectTitleToHaveMaxLength(maxLength: number): Promise<void> {
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const title = await this.page.evaluate(
@@ -220,7 +220,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding a goal.
    */
-  async updateGoal(Goal): Promise<void> {
+  async updateGoal(Goal: string): Promise<void> {
     await this.clickOn(addGoalBar);
     await this.type(addGoal, Goal);
   }
@@ -228,7 +228,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks if the goal has been set in the exploration.
    */
-  async expectGoalToEqual(expectedGoal): Promise<void> {
+  async expectGoalToEqual(expectedGoal: string): Promise<void> {
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input');
     const goal = await this.page.evaluate(
@@ -251,7 +251,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function checks if a category has been selected for the exploration.
    */
-  async expectSelectedCategoryToBe(expectedCategory): Promise<void> {
+  async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
     const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
     if (!categoryDropdown) {
       throw new Error('Category dropdown not found.');
@@ -284,7 +284,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    *  This function verifies that the selected language is displayed correctly.
    */
-  async expectSelectedLanguageToBe(expectedLanguage): Promise<void> {
+  async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
     const languageDropdown = await this.page.$('#mat-select-value-9');
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
@@ -306,7 +306,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding tags.
    */
-  async addTags(TagNames): Promise<void> {
+  async addTags(TagNames: string[]): Promise<void> {
     await this.clickOn(addTags);
     await this.type(addTags, TagNames[0]);
     await this.clickOn('.secondary-info-text');
@@ -382,7 +382,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in assigning role of collaborator to any guest user.
    */
-  async assignUserToCollaboratorRole(user1): Promise<void> {
+  async assignUserToCollaboratorRole(user1: string): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
     await this.type(addUserName, user1);
@@ -394,7 +394,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in assigning role of Playtester to guest user.
    */
-  async assignUserToPlaytesterRole(user2): Promise<void> {
+  async assignUserToPlaytesterRole(user2: string): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
     await this.type(addUserName, user2);
@@ -422,7 +422,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
    * This function helps in adding voice artist.
    */
-  async addVoiceArtist(voiceArtists): Promise<void> {
+  async addVoiceArtist(voiceArtists: string[]): Promise<void> {
     await this.clickOn(voiceArtistEditButton);
     await this.clickOn(addVoiceArtistUserName);
     await this.type(addVoiceArtistUserName, voiceArtists[0]);
@@ -563,7 +563,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   /**
   *This function checks whether changes has discarded successfully or not.
   */
-  async expectTitleToBe(titleBeforeChanges): Promise<void> {
+  async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
     await this.page.waitForTimeout(400);
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
@@ -578,5 +578,5 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
   }
 }
 
-export let ExplorationCreatorFactory = (): IExplorationCreator =>
-  new ExplorationCreator();
+export let ExplorationCreatorFactory = (
+): IExplorationCreator =>new ExplorationCreator();

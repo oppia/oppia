@@ -37,7 +37,6 @@ const USER_ROLE_MAPPING = {
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
-  [ROLES.EXPLORATION_CREATOR]: ExplorationCreatorFactory
 } as const;
 
 /**
