@@ -192,7 +192,7 @@ class DependencyBundleDict(TypedDict):
     fontsPath: str
 
 
-def run_webpack_compilation(source_maps: bool = False) -> None:
+def run_webpack_compilation(source_maps: bool = False) -> None: # docker: no cover
     """Runs webpack compilation.
 
     Args:
@@ -223,7 +223,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
         sys.exit(1)
 
 
-def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
+def build_js_files(dev_mode: bool, source_maps: bool = False) -> None: # docker: no cover
     """Build the javascript files.
 
     Args:
@@ -1411,7 +1411,7 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
     print('Build completed.')
 
 
-def generate_python_package() -> None:
+def generate_python_package() -> None: # docker: no cover
     """Generates Python package using setup.py."""
 
     # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
