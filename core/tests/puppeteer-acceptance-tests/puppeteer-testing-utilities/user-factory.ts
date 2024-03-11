@@ -64,7 +64,7 @@ export class UserFactory {
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
    */
-  private static composeUserWithRole = function<
+  private static composeUserWithRoles = function<
     TUser extends BaseUser,
     TRoles extends BaseUser[]
   >(
@@ -116,7 +116,7 @@ export class UserFactory {
 
       await superAdminInstance.expectUserToHaveRole(user.username, role);
 
-      UserFactory.composeUserWithRole(user, [USER_ROLE_MAPPING[role]()]);
+      UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
 
     return user as TUser & MultipleRoleIntersection<typeof roles>;
@@ -131,7 +131,7 @@ export class UserFactory {
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
   ): Promise<LoggedInUser & MultipleRoleIntersection<TRoles>> {
-    let user = UserFactory.composeUserWithRole(
+    let user = UserFactory.composeUserWithRoles(
       BaseUserFactory(), [LoggedInUserFactory()]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);
@@ -153,11 +153,11 @@ export class UserFactory {
 
     const user = await UserFactory.createNewUser(
       username, 'testadmin@example.com');
-    const superAdmin = UserFactory.composeUserWithRole(
+    const superAdmin = UserFactory.composeUserWithRoles(
       user, [SuperAdminFactory()]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
-    superAdminInstance = UserFactory.composeUserWithRole(
+    superAdminInstance = UserFactory.composeUserWithRoles(
       superAdmin, [BlogAdminFactory()]);
 
     return superAdminInstance;
