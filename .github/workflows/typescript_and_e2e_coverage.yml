@@ -31,7 +31,7 @@ jobs:
       - uses: ./.github/actions/install-chrome
       - name: Initialize Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
           make stop
       - name: Check that all e2e test files are captured in wdio.conf.js

@@ -31,7 +31,7 @@ jobs:
       - uses: ./.github/actions/merge
       - name: Initialze Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
           make stop
       - name: Third Party Size Check

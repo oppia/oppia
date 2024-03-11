@@ -87,7 +87,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Initializing Containers
         run: |
-          sudo make build
+          make build
           # This is required as E2E tests are run on the host machine and not in the docker container.
           sudo docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
@@ -143,7 +143,7 @@ jobs:
         uses: ./.github/actions/install-chrome
       - name: Initializing Containers
         run: |
-          sudo make build
+          make build
           sudo docker compose up angular-build -d
           # This is required as lighthouse tests are run on the host machine and not in the docker container.
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
@@ -191,7 +191,7 @@ jobs:
         - uses: ./.github/actions/install-chrome
         - name: Initializing Containers
           run: |
-            sudo make build
+            make build
             sudo docker compose up angular-build -d
             # This is required as lighthouse tests are run on the host machine and not in the docker container.
             sudo docker cp oppia-angular-build:/app/oppia/node_modules .

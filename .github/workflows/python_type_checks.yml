@@ -31,7 +31,7 @@ jobs:
       - uses: ./.github/actions/merge
       - name: Initialize Containers
         run: |
-          sudo make build
+          make build
           make stop
       - name: Run Mypy type checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

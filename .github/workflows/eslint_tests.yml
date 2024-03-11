@@ -31,7 +31,7 @@ jobs:
       - uses: ./.github/actions/merge
       - name: Initialize Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

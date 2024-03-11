@@ -62,7 +62,7 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Initialize Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
           make stop
       - name: Run frontend tests ${{ matrix.num_runs }}

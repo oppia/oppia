@@ -36,7 +36,7 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Initialze Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
           make stop
       - name: Run backend test shard
@@ -70,7 +70,7 @@ jobs:
         run: pip install coverage
       - name: Initialze Containers
         run: |
-          sudo make build
+          make build
           sudo make run-devserver
           make stop
       - name: Download coverage report for shard 1

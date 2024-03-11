@@ -31,7 +31,7 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Initializing Containers
         run: |
-          sudo make build
+          make build
           sudo docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
         shell: bash
