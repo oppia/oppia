@@ -488,7 +488,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_evaluate_dev_feature_flag_for_prod_server_returns_false(
         self) -> None:
         swap_all_feature_flags, swap_all_feature_names_set = (
-                self._swap_feature_flags_list())
+            self._swap_feature_flags_list())
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry())
         with swap_all_feature_flags, self.swap(
