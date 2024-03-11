@@ -32,8 +32,8 @@ const forButtonToBeEnabled =
 '.e2e-test-state-name-submit:not([disabled])';
 const introTitleSubmitButton = '.e2e-test-save-state-content';
 const interactionAddbutton = '.oppia-add-interaction-button';
-const endExplorationTab =
-'img[src="/extensions/interactions/EndExploration/static/EndExploration.png"]';
+const endIneractionTab =
+'.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab =
 '.nav-link[aria-label="Exploration Setting Button"]';
@@ -173,7 +173,7 @@ class ExplorationCreator extends BaseUser implements IExplorationCreator {
    */
   async addEndInteraction(): Promise<void> {
     await this.clickOn(interactionAddbutton);
-    await this.clickOn(endExplorationTab);
+    await this.clickOn(endIneractionTab);
     await this.clickOn(saveInteractionButton);
   }
 
