@@ -1104,10 +1104,11 @@ def compute_summary_of_topic(
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
-    published_stories: List[story_domain.Story] = [
-        story for story in story_fetchers.get_stories_by_ids(
-            published_canonical_story_ids + published_additional_story_ids,
-            strict=False)
+    published_stories_query_result = story_fetchers.get_stories_by_ids(
+        published_canonical_story_ids + published_additional_story_ids,
+        strict=False)
+    published_stories = [
+        story for story in published_stories_query_result
         if story is not None]
     topic_model_published_story_exploration_mapping: Dict[str, List[str]] = (
         _compute_story_exploration_mapping(published_stories))
@@ -1856,9 +1857,10 @@ def get_all_published_story_exploration_ids(
                     topic.additional_story_references
                 if story_ref.story_is_published
             ]
-            published_stories: List[story_domain.Story] = [
-                story for story in story_fetchers.get_stories_by_ids(
-                    published_story_ids, strict=False)
+            published_stories_query_result = story_fetchers.get_stories_by_ids(
+                published_story_ids, strict=False)
+            published_stories = [
+                story for story in published_stories_query_result
                 if story is not None]
             mappings.append(_compute_story_exploration_mapping(
                 published_stories))
