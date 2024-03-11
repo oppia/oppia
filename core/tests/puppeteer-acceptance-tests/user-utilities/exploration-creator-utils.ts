@@ -163,7 +163,7 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in adding a goal.
    */
-  async updateGoal(Goal: string): Promise<void> {
+  async updateGoal(goal: string): Promise<void> {
     await this.clickOn(addGoalBar);
     await this.type(addGoal, Goal);
   }
