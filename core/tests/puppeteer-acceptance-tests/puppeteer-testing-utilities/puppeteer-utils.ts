@@ -29,29 +29,7 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?'
 ];
 
-interface IUserProperties {
-  page: Page;
-  browserObject: Browser;
-  userHasAcceptedCookies: boolean;
-  username: string;
-  email: string;
-}
-
-export interface IBaseUser extends IUserProperties {
-  openBrowser: () => Promise<Page>;
-  signInWithEmail: (email: string) => Promise<void>;
-  signUpNewUser: (userName: string, signInEmail: string) => Promise<void>;
-  reloadPage: () => Promise<void>;
-  clickOn: (selector: string) => Promise<void>;
-  type: (selector: string, text: string) => Promise<void>;
-  select: (selector: string, option: string) => Promise<void>;
-  goto: (url: string) => Promise<void>;
-  uploadFile: (filePath: string) => Promise<void>;
-  logout: () => Promise<void>;
-  closeBrowser: () => Promise<void>;
-}
-
-export class BaseUser implements IBaseUser {
+export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
@@ -209,4 +187,4 @@ export class BaseUser implements IBaseUser {
   }
 }
 
-export const BaseUserFactory = (): IBaseUser => new BaseUser();
+export const BaseUserFactory = (): BaseUser => new BaseUser();
