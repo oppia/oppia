@@ -75,11 +75,6 @@ export class HtmlLengthService {
   computeHtmlLength(
       htmlString: string,
       calculationType: CalculationType): number {
-    if (!htmlString) {
-      this.loggerService.error('Empty string was passed to compute length');
-      return 0;
-    }
-
     const sanitizedHtml = this.sanitizer.sanitize(
       SecurityContext.HTML, htmlString) as string;
 
@@ -123,6 +118,14 @@ export class HtmlLengthService {
     dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
     let totalLength = 0;
+
+    Array.from(dom.body.childNodes).forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
+        totalLength += this.calculateTextLength(
+          node.nodeValue, calculationType);
+      }
+    });
+
     for (let tag of Array.from(dom.body.children)) {
     /**
       * Guarding against tag.textContent === null, which can
