@@ -39,7 +39,8 @@ export enum FeatureNames {
   IsImprovementsTabEnabled = 'is_improvements_tab_enabled',
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
-  NewLessonPlayer = 'new_lesson_player'
+  NewLessonPlayer = 'new_lesson_player',
+  ADDING_VOICEOVER_WITH_ACCENT = 'adding_voiceover_with_accent'
 }
 
 export interface FeatureStatusSummaryBackendDict {
