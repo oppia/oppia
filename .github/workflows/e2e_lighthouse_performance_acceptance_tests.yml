@@ -89,7 +89,7 @@ jobs:
         run: |
           make build
           # This is required as E2E tests are run on the host machine and not in the docker container.
-          sudo docker compose up angular-build -d
+          docker compose up angular-build -d
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run E2E Test ${{ matrix.suite.name }}
         uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
@@ -97,7 +97,7 @@ jobs:
           max_attempts: 2
           substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
           command: >
-            sudo xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite.name }} VIDEO_RECORDING_IS_ENABLED=1
+            xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.e2e suite=${{ matrix.suite.name }} VIDEO_RECORDING_IS_ENABLED=1
       - name: Get tree information
         if: ${{ failure() }}
         run: |
@@ -144,7 +144,7 @@ jobs:
       - name: Initializing Containers
         run: |
           make build
-          sudo docker compose up angular-build -d
+          docker compose up angular-build -d
           # This is required as lighthouse tests are run on the host machine and not in the docker container.
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run Lighthouse performance checks shard
@@ -192,7 +192,7 @@ jobs:
         - name: Initializing Containers
           run: |
             make build
-            sudo docker compose up angular-build -d
+            docker compose up angular-build -d
             # This is required as lighthouse tests are run on the host machine and not in the docker container.
             sudo docker cp oppia-angular-build:/app/oppia/node_modules .
         - name: Run Acceptance Test ${{ matrix.suite }}
