@@ -16,10 +16,9 @@
  * @fileoverview Tests for GetAbbreviatedText pipe for Oppia.
  */
 
-import { GetAbbreviatedTextPipe } from
-  'filters/string-utility-filters/get-abbreviated-text.pipe';
+import {GetAbbreviatedTextPipe} from 'filters/string-utility-filters/get-abbreviated-text.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let pipe: GetAbbreviatedTextPipe;
   beforeEach(() => {
     pipe = new GetAbbreviatedTextPipe();
@@ -30,25 +29,38 @@ describe('Testing filters', function() {
   });
 
   it('should not shorten the length of text', () => {
-    expect(pipe.transform('It will remain unchanged.', 50))
-      .toBe('It will remain unchanged.');
-    expect(pipe.transform(
-      'Itisjustaverylongsinglewordfortesting',
-      50)).toBe('Itisjustaverylongsinglewordfortesting');
+    expect(pipe.transform('It will remain unchanged.', 50)).toBe(
+      'It will remain unchanged.'
+    );
+    expect(pipe.transform('Itisjustaverylongsinglewordfortesting', 50)).toBe(
+      'Itisjustaverylongsinglewordfortesting'
+    );
   });
 
   it('should shorten the length of text', () => {
-    expect(pipe.transform(
-      'It has to convert to a substring as it exceeds the character limit.',
-      50)).toBe('It has to convert to a substring as it exceeds...');
-    expect(pipe.transform(
-      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
-      50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
-    expect(pipe.transform(
-      'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
-      50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
-    expect(pipe.transform(
-      'It is just a very long singlewordfortestinggetAbbreviatedText',
-      50)).toBe('It is just a very long...');
+    expect(
+      pipe.transform(
+        'It has to convert to a substring as it exceeds the character limit.',
+        50
+      )
+    ).toBe('It has to convert to a substring as it exceeds...');
+    expect(
+      pipe.transform(
+        'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
+        50
+      )
+    ).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
+    expect(
+      pipe.transform(
+        'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+        50
+      )
+    ).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
+    expect(
+      pipe.transform(
+        'It is just a very long singlewordfortestinggetAbbreviatedText',
+        50
+      )
+    ).toBe('It is just a very long...');
   });
 });

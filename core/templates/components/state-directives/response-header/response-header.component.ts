@@ -16,22 +16,22 @@
  * @fileoverview Component for the header of the response tiles.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { EditabilityService } from 'services/editability.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {EditabilityService} from 'services/editability.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { AppConstants } from 'app.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {AppConstants} from 'app.constants';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 interface DeleteValue {
   index: number;
   evt: Event;
 }
 @Component({
   selector: 'oppia-response-header',
-  templateUrl: './response-header.component.html'
+  templateUrl: './response-header.component.html',
 })
 export class ResponseHeaderComponent {
   @Output() delete = new EventEmitter<DeleteValue>();
@@ -52,7 +52,7 @@ export class ResponseHeaderComponent {
   constructor(
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    public editabilityService: EditabilityService,
+    public editabilityService: EditabilityService
   ) {}
 
   returnToState(): void {
@@ -69,8 +69,10 @@ export class ResponseHeaderComponent {
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return Boolean(interactionId) && INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].is_linear;
+    return (
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
+    );
   }
 
   isCorrect(): boolean {
@@ -80,7 +82,7 @@ export class ResponseHeaderComponent {
   isOutcomeLooping(): boolean {
     const outcome = this.outcome;
     const activeStateName = this.stateEditorService.getActiveStateName();
-    return outcome && (outcome.dest === activeStateName);
+    return outcome && outcome.dest === activeStateName;
   }
 
   isCreatingNewState(): boolean {
@@ -91,14 +93,16 @@ export class ResponseHeaderComponent {
   deleteResponse(evt: Event): void {
     const value: DeleteValue = {
       index: this.index,
-      evt: evt
+      evt: evt,
     };
 
     this.delete.emit(value);
   }
 }
 
-angular.module('oppia').directive('oppiaResponseHeader',
+angular.module('oppia').directive(
+  'oppiaResponseHeader',
   downgradeComponent({
-    component: ResponseHeaderComponent
-  }) as angular.IDirectiveFactory);
+    component: ResponseHeaderComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,13 +16,15 @@
  * @fileoverview Capitalize filter for Oppia.
  */
 
-angular.module('oppia').filter('capitalize', [function() {
-  return function(input: string) {
-    if (!input) {
-      return input;
-    }
+angular.module('oppia').filter('capitalize', [
+  function () {
+    return function (input: string) {
+      if (!input) {
+        return input;
+      }
 
-    var trimmedInput = input.trim();
-    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
-  };
-}]);
+      var trimmedInput = input.trim();
+      return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+    };
+  },
+]);

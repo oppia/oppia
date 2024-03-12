@@ -16,29 +16,33 @@
  * @fileoverview Unit tests for lesson information card modal component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { LessonInformationCardModalComponent } from './lesson-information-card-modal.component';
-import { LocalStorageService } from 'services/local-storage.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-
-
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
+import {
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
+import {UrlService} from 'services/contextual/url.service';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
+import {LocalStorageService} from 'services/local-storage.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -65,10 +69,12 @@ class MockCheckpointCelebrationUtilityService {
   private isOnCheckpointedState: boolean = false;
 
   getCheckpointMessage(
-      completedCheckpointCount: number, totalCheckpointCount: number
+    completedCheckpointCount: number,
+    totalCheckpointCount: number
   ): string {
     return (
-      'checkpoint ' + completedCheckpointCount + '/' + totalCheckpointCount);
+      'checkpoint ' + completedCheckpointCount + '/' + totalCheckpointCount
+    );
   }
 
   getIsOnCheckpointedState(): boolean {
@@ -84,23 +90,23 @@ class MockWindowRef {
       reload: () => {},
       toString: () => {
         return 'http://localhost:8181/?lang=es';
-      }
+      },
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
     gtag: () => {},
     history: {
-      pushState(data: object, title: string, url?: string | null) {}
+      pushState(data: object, title: string, url?: string | null) {},
     },
     document: {
       body: {
         style: {
           overflowY: 'auto',
-        }
-      }
-    }
+        },
+      },
+    },
   };
 }
 
@@ -116,8 +122,7 @@ describe('Lesson Information card modal component', () => {
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
-  let checkpointCelebrationUtilityService:
-    CheckpointCelebrationUtilityService;
+  let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -128,15 +133,13 @@ describe('Lesson Information card modal component', () => {
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [
         LessonInformationCardModalComponent,
         MockTranslatePipe,
         MockTruncteAndCapitalizePipe,
         MockSummarizeNonnegativeNumberPipe,
-        MockLimitToPipe
+        MockLimitToPipe,
       ],
       providers: [
         NgbActiveModal,
@@ -147,18 +150,18 @@ describe('Lesson Information card modal component', () => {
         UrlInterpolationService,
         {
           provide: CheckpointCelebrationUtilityService,
-          useClass: MockCheckpointCelebrationUtilityService
+          useClass: MockCheckpointCelebrationUtilityService,
         },
         {
           provide: WindowRef,
-          useValue: mockWindowRef
+          useValue: mockWindowRef,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -176,11 +179,11 @@ describe('Lesson Information card modal component', () => {
       created_on_msec: 2,
       human_readable_contributors_summary: {
         'contributer 1': {
-          num_commits: 2
+          num_commits: 2,
         },
         'contributer 2': {
-          num_commits: 2
-        }
+          num_commits: 2,
+        },
       },
       language_code: '',
       num_views: 100,
@@ -189,7 +192,7 @@ describe('Lesson Information card modal component', () => {
       tags: ['tag1', 'tag2'],
       thumbnail_bg_color: '#fff',
       thumbnail_icon_url: 'icon_url',
-      title: expTitle
+      title: expTitle,
     };
 
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -200,14 +203,20 @@ describe('Lesson Information card modal component', () => {
     userService = TestBed.inject(UserService);
     localStorageService = TestBed.inject(LocalStorageService);
     explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService);
+      ExplorationPlayerStateService
+    );
     checkpointCelebrationUtilityService = TestBed.inject(
-      CheckpointCelebrationUtilityService);
+      CheckpointCelebrationUtilityService
+    );
 
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(true, false);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, true);
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValues(true, false);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
+      false,
+      true
+    );
   });
 
   it('should initialize the component', () => {
@@ -227,40 +236,42 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.explorationIsPrivate).toBe(true);
     expect(componentInstance.explorationTags).toEqual({
       tagsToShow: ['tag1', 'tag2'],
-      tagsInTooltip: []
+      tagsInTooltip: [],
     });
     expect(componentInstance.infoCardBackgroundCss).toEqual({
-      'background-color': '#fff'
+      'background-color': '#fff',
     });
     expect(componentInstance.infoCardBackgroundImageUrl).toEqual('icon_url');
 
     expect(componentInstance.expTitleTranslationKey).toEqual(
-      'I18N_EXPLORATION_expId_TITLE');
+      'I18N_EXPLORATION_expId_TITLE'
+    );
     expect(componentInstance.expDescTranslationKey).toEqual(
-      'I18N_EXPLORATION_expId_DESCRIPTION');
+      'I18N_EXPLORATION_expId_DESCRIPTION'
+    );
 
     // Translation is only displayed if the language is not English
     // and it's hacky translation is available.
-    let hackyExpTitleTranslationIsDisplayed = (
-      componentInstance.isHackyExpTitleTranslationDisplayed());
+    let hackyExpTitleTranslationIsDisplayed =
+      componentInstance.isHackyExpTitleTranslationDisplayed();
     expect(hackyExpTitleTranslationIsDisplayed).toBe(true);
-    let hackyExpDescTranslationIsDisplayed = (
-      componentInstance.isHackyExpDescTranslationDisplayed());
+    let hackyExpDescTranslationIsDisplayed =
+      componentInstance.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
   });
 
-  it('should determine if exploration isn\'t private upon initialization',
-    () => {
-      componentInstance.expInfo.status = 'public';
+  it("should determine if exploration isn't private upon initialization", () => {
+    componentInstance.expInfo.status = 'public';
 
-      componentInstance.ngOnInit();
+    componentInstance.ngOnInit();
 
-      expect(componentInstance.explorationIsPrivate).toBe(false);
-    });
+    expect(componentInstance.explorationIsPrivate).toBe(false);
+  });
 
   it('should throw error if unique url id is null', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      Promise.resolve('https://oppia.org/login'));
+      Promise.resolve('https://oppia.org/login')
+    );
     componentInstance.loggedOutProgressUniqueUrlId = null;
     expect(() => {
       componentInstance.onLoginButtonClicked();
@@ -274,24 +285,29 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.ngOnInit();
 
-    expect(componentInstance.checkpointStatusArray).toEqual(
-      ['completed', 'in-progress', 'incomplete']);
+    expect(componentInstance.checkpointStatusArray).toEqual([
+      'completed',
+      'in-progress',
+      'incomplete',
+    ]);
 
     componentInstance.checkpointCount = 1;
     componentInstance.completedCheckpointsCount = 0;
 
     componentInstance.ngOnInit();
 
-    expect(componentInstance.checkpointStatusArray).toEqual(
-      ['in-progress']);
+    expect(componentInstance.checkpointStatusArray).toEqual(['in-progress']);
 
     componentInstance.checkpointCount = 3;
     componentInstance.completedCheckpointsCount = 3;
 
     componentInstance.ngOnInit();
 
-    expect(componentInstance.checkpointStatusArray).toEqual(
-      ['completed', 'completed', 'completed']);
+    expect(componentInstance.checkpointStatusArray).toEqual([
+      'completed',
+      'completed',
+      'completed',
+    ]);
   });
 
   it('should get completed progress-bar width', () => {
@@ -309,63 +325,89 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.getCompletedProgressBarWidth()).toEqual(75);
   });
 
-  it('should correctly set logged-out progress learner URL ' +
-    'when unique progress URL ID exists', fakeAsync (() => {
-    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
-      .and.returnValue(true);
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('');
-    spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
-      .and.returnValue('abcdef');
+  it(
+    'should correctly set logged-out progress learner URL ' +
+      'when unique progress URL ID exists',
+    fakeAsync(() => {
+      spyOn(
+        explorationPlayerStateService,
+        'isInStoryChapterMode'
+      ).and.returnValue(true);
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        ''
+      );
+      spyOn(
+        urlService,
+        'getClassroomUrlFragmentFromLearnerUrl'
+      ).and.returnValue('');
+      spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
+      spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        ''
+      );
+      spyOn(
+        explorationPlayerStateService,
+        'getUniqueProgressUrlId'
+      ).and.returnValue('abcdef');
 
-    componentInstance.ngOnInit();
+      componentInstance.ngOnInit();
 
-    expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
-      'https://oppia.org/progress/abcdef');
-  }));
+      expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
+        'https://oppia.org/progress/abcdef'
+      );
+    })
+  );
 
   it('should fetch checkpoint message if on checkpointed state', () => {
     const getIsOnCheckpointedState = spyOn(
-      checkpointCelebrationUtilityService, 'getIsOnCheckpointedState').and
-      .returnValue(false);
-    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage').and
-      .returnValue('checkpoint message');
+      checkpointCelebrationUtilityService,
+      'getIsOnCheckpointedState'
+    ).and.returnValue(false);
+    spyOn(
+      checkpointCelebrationUtilityService,
+      'getCheckpointMessage'
+    ).and.returnValue('checkpoint message');
 
     componentInstance.ngOnInit();
 
     expect(getIsOnCheckpointedState).toHaveBeenCalled();
-    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
-      .not.toHaveBeenCalled();
-    expect(componentInstance.translatedCongratulatoryCheckpointMessage)
-      .toBeUndefined();
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessage
+    ).not.toHaveBeenCalled();
+    expect(
+      componentInstance.translatedCongratulatoryCheckpointMessage
+    ).toBeUndefined();
 
     getIsOnCheckpointedState.and.returnValue(true);
 
     componentInstance.ngOnInit();
 
-    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
-      .toHaveBeenCalled();
-    expect(componentInstance.translatedCongratulatoryCheckpointMessage)
-      .toEqual('checkpoint message');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessage
+    ).toHaveBeenCalled();
+    expect(componentInstance.translatedCongratulatoryCheckpointMessage).toEqual(
+      'checkpoint message'
+    );
   });
 
   it('should get image url correctly', () => {
     let imageUrl = 'image_url';
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('interpolated_url');
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      'interpolated_url'
+    );
 
-    expect(componentInstance.getStaticImageUrl(imageUrl))
-      .toEqual('interpolated_url');
+    expect(componentInstance.getStaticImageUrl(imageUrl)).toEqual(
+      'interpolated_url'
+    );
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
-      imageUrl);
+      imageUrl
+    );
   });
 
   it('should determine if current language is RTL', () => {
     const isLanguageRTLSpy = spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
+      i18nLanguageCodeService,
+      'isCurrentLanguageRTL'
+    ).and.returnValue(true);
 
     expect(componentInstance.isLanguageRTL()).toBe(true);
 
@@ -377,63 +419,74 @@ describe('Lesson Information card modal component', () => {
   it('should get exploration tags summary', () => {
     let arrayOfTags = ['tag1', 'tag2'];
 
-    expect(componentInstance.getExplorationTagsSummary(['tag1', 'tag2']))
-      .toEqual({
-        tagsToShow: arrayOfTags,
-        tagsInTooltip: []
-      });
+    expect(
+      componentInstance.getExplorationTagsSummary(['tag1', 'tag2'])
+    ).toEqual({
+      tagsToShow: arrayOfTags,
+      tagsInTooltip: [],
+    });
 
     arrayOfTags = [
-      'this is a long tag.', 'this is also a long tag',
-      'this takes the tags length past 45 characters'];
+      'this is a long tag.',
+      'this is also a long tag',
+      'this takes the tags length past 45 characters',
+    ];
 
     expect(componentInstance.getExplorationTagsSummary(arrayOfTags)).toEqual({
       tagsToShow: [arrayOfTags[0], arrayOfTags[1]],
-      tagsInTooltip: [arrayOfTags[2]]
+      tagsInTooltip: [arrayOfTags[2]],
     });
   });
 
   it('should get updated string', () => {
     let dateTimeString = 'datetime_string';
-    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-      .and.returnValue(dateTimeString);
+    spyOn(
+      dateTimeFormatService,
+      'getLocaleAbbreviatedDatetimeString'
+    ).and.returnValue(dateTimeString);
 
     expect(componentInstance.getLastUpdatedString(12)).toEqual(dateTimeString);
   });
 
   it('should save logged-out learner progress correctly', fakeAsync(() => {
-    spyOn(explorationPlayerStateService, 'setUniqueProgressUrlId')
-      .and.returnValue(Promise.resolve());
-    spyOn(explorationPlayerStateService, 'getUniqueProgressUrlId')
-      .and.returnValue('abcdef');
+    spyOn(
+      explorationPlayerStateService,
+      'setUniqueProgressUrlId'
+    ).and.returnValue(Promise.resolve());
+    spyOn(
+      explorationPlayerStateService,
+      'getUniqueProgressUrlId'
+    ).and.returnValue('abcdef');
     spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
 
     componentInstance.saveLoggedOutProgress();
     tick(100);
 
     expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
-      'https://oppia.org/progress/abcdef');
+      'https://oppia.org/progress/abcdef'
+    );
     expect(componentInstance.loggedOutProgressUniqueUrlId).toEqual('abcdef');
   }));
 
-  it('should store unique progress URL ID when login button is clicked',
-    fakeAsync(() => {
-      spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-        Promise.resolve('https://oppia.org/login'));
-      spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
-      componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
+  it('should store unique progress URL ID when login button is clicked', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+      Promise.resolve('https://oppia.org/login')
+    );
+    spyOn(localStorageService, 'updateUniqueProgressIdOfLoggedOutLearner');
+    componentInstance.loggedOutProgressUniqueUrlId = 'abcdef';
 
-      expect(mockWindowRef.nativeWindow.location.href).toEqual('');
+    expect(mockWindowRef.nativeWindow.location.href).toEqual('');
 
-      componentInstance.onLoginButtonClicked();
-      tick(100);
+    componentInstance.onLoginButtonClicked();
+    tick(100);
 
-      expect(localStorageService.updateUniqueProgressIdOfLoggedOutLearner)
-        .toHaveBeenCalledWith('abcdef');
-      expect(mockWindowRef.nativeWindow.location.href).toEqual(
-        'https://oppia.org/login');
-    })
-  );
+    expect(
+      localStorageService.updateUniqueProgressIdOfLoggedOutLearner
+    ).toHaveBeenCalledWith('abcdef');
+    expect(mockWindowRef.nativeWindow.location.href).toEqual(
+      'https://oppia.org/login'
+    );
+  }));
 
   it('should correctly close save progress menu', () => {
     componentInstance.saveProgressMenuIsShown = true;

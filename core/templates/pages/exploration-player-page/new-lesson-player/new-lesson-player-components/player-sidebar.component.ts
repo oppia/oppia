@@ -16,15 +16,17 @@
  * @fileoverview Component for the new lesson player sidebar
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {MobileMenuService} from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
-import { ContextService } from 'services/context.service';
-import { I18nLanguageCodeService, TranslationKeyType } from
-  'services/i18n-language-code.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ContextService} from 'services/context.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-player-sidebar',
@@ -45,44 +47,48 @@ export class PlayerSidebarComponent implements OnInit {
     private mobileMenuService: MobileMenuService,
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
-    private urlService: UrlService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
-    this.mobileMenuService.getMenuVisibility().subscribe((visibility) => {
+    this.mobileMenuService.getMenuVisibility().subscribe(visibility => {
       this.mobileMenuVisible = visibility;
     });
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
     for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'explore' ||
-          pathnameArray[i] === 'create' ||
-          pathnameArray[i] === 'skill_editor' ||
-          pathnameArray[i] === 'embed' ||
-          pathnameArray[i] === 'lesson') {
+      if (
+        pathnameArray[i] === 'explore' ||
+        pathnameArray[i] === 'create' ||
+        pathnameArray[i] === 'skill_editor' ||
+        pathnameArray[i] === 'embed' ||
+        pathnameArray[i] === 'lesson'
+      ) {
         explorationContext = true;
         break;
       }
     }
 
-    this.explorationId = explorationContext ?
-      this.contextService.getExplorationId() : 'test_id';
+    this.explorationId = explorationContext
+      ? this.contextService.getExplorationId()
+      : 'test_id';
     this.expDescription = 'Loading...';
-    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-      this.explorationId,
-      this.urlService.getExplorationVersionFromUrl(),
-      this.urlService.getPidFromUrl())
-      .then((response) => {
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(
+        this.explorationId,
+        this.urlService.getExplorationVersionFromUrl(),
+        this.urlService.getPidFromUrl()
+      )
+      .then(response => {
         this.expDescription = response.exploration.objective;
       });
-    this.expDescTranslationKey = (
-      this.i18nLanguageCodeService.
-        getExplorationTranslationKey(
-          this.explorationId, TranslationKeyType.DESCRIPTION)
-    );
+    this.expDescTranslationKey =
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId,
+        TranslationKeyType.DESCRIPTION
+      );
   }
 
   toggleSidebar(): void {
@@ -98,7 +104,9 @@ export class PlayerSidebarComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaPlayerHeader',
+angular.module('oppia').directive(
+  'oppiaPlayerHeader',
   downgradeComponent({
-    component: PlayerSidebarComponent
-  }) as angular.IDirectiveFactory);
+    component: PlayerSidebarComponent,
+  }) as angular.IDirectiveFactory
+);

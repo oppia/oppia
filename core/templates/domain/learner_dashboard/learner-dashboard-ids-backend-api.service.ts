@@ -17,36 +17,44 @@
  * activities present in the learner dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   LearnerDashboardActivityIds,
-  LearnerDashboardActivityIdsDict
+  LearnerDashboardActivityIdsDict,
 } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 interface LearnerDashboardIdsBackendResponse {
-  'learner_dashboard_activity_ids': LearnerDashboardActivityIdsDict;
+  learner_dashboard_activity_ids: LearnerDashboardActivityIdsDict;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerDashboardIdsBackendApiService {
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   async _fetchLearnerDashboardIdsAsync(): Promise<LearnerDashboardActivityIds> {
     return new Promise((resolve, reject) => {
-      this.http.get<LearnerDashboardIdsBackendResponse>(
-        '/learnerdashboardidshandler/data').toPromise().then(response => {
-        resolve(
-          LearnerDashboardActivityIds
-            .createFromBackendDict(response.learner_dashboard_activity_ids));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<LearnerDashboardIdsBackendResponse>(
+          '/learnerdashboardidshandler/data'
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              LearnerDashboardActivityIds.createFromBackendDict(
+                response.learner_dashboard_activity_ids
+              )
+            );
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
@@ -55,6 +63,9 @@ export class LearnerDashboardIdsBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'LearnerDashboardIdsBackendApiService',
-  downgradeInjectable(LearnerDashboardIdsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'LearnerDashboardIdsBackendApiService',
+    downgradeInjectable(LearnerDashboardIdsBackendApiService)
+  );

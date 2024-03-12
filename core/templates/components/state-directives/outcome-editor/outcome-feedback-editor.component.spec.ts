@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for OutcomeFeedbackEditorComponent.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ContextService } from 'services/context.service';
-import { OutcomeFeedbackEditorComponent } from './outcome-feedback-editor.component';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ContextService} from 'services/context.service';
+import {OutcomeFeedbackEditorComponent} from './outcome-feedback-editor.component';
 
 describe('Outcome Feedback Editor Component', () => {
   let fixture: ComponentFixture<OutcomeFeedbackEditorComponent>;
@@ -31,14 +31,9 @@ describe('Outcome Feedback Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [],
-      declarations: [
-        OutcomeFeedbackEditorComponent
-      ],
-      providers: [
-        ChangeDetectorRef,
-        ContextService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [OutcomeFeedbackEditorComponent],
+      providers: [ChangeDetectorRef, ContextService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -57,16 +52,18 @@ describe('Outcome Feedback Editor Component', () => {
     expect(component.OUTCOME_FEEDBACK_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        hide_complex_extensions: false
-      }
+        hide_complex_extensions: false,
+      },
     });
   });
 
   it('should update html', () => {
-    const changeDetectorRef = fixture.debugElement.injector.get(
-      ChangeDetectorRef);
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
     const detectChangesSpy = spyOn(
-      changeDetectorRef.constructor.prototype, 'detectChanges');
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.outcome = new Outcome(
       'default',
       null,
@@ -74,11 +71,12 @@ describe('Outcome Feedback Editor Component', () => {
       false,
       [],
       null,
-      null,
+      null
     );
 
     expect(component.outcome.feedback.html).toBe(
-      '<p> Previous HTML string </p>');
+      '<p> Previous HTML string </p>'
+    );
 
     component.updateHtml('<p> New HTML string </p>');
 
@@ -86,26 +84,31 @@ describe('Outcome Feedback Editor Component', () => {
     expect(detectChangesSpy).toHaveBeenCalled();
   });
 
-  it('should not update html if the new and old html' +
-    ' strings are the same', () => {
-    const changeDetectorRef = fixture.debugElement.injector.get(
-      ChangeDetectorRef);
-    const detectChangesSpy = spyOn(
-      changeDetectorRef.constructor.prototype, 'detectChanges');
-    component.outcome = new Outcome(
-      'default',
-      null,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
+  it(
+    'should not update html if the new and old html' + ' strings are the same',
+    () => {
+      const changeDetectorRef =
+        fixture.debugElement.injector.get(ChangeDetectorRef);
+      const detectChangesSpy = spyOn(
+        changeDetectorRef.constructor.prototype,
+        'detectChanges'
+      );
+      component.outcome = new Outcome(
+        'default',
+        null,
+        new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+        false,
+        [],
+        null,
+        null
+      );
 
-    expect(component.outcome.feedback.html).toBe(
-      '<p> Previous HTML string </p>');
+      expect(component.outcome.feedback.html).toBe(
+        '<p> Previous HTML string </p>'
+      );
 
-    component.updateHtml('<p> Previous HTML string </p>');
-    expect(detectChangesSpy).not.toHaveBeenCalled();
-  });
+      component.updateHtml('<p> Previous HTML string </p>');
+      expect(detectChangesSpy).not.toHaveBeenCalled();
+    }
+  );
 });

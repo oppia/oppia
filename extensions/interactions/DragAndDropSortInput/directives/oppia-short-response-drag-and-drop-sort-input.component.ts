@@ -16,15 +16,15 @@
  * @fileoverview Component for the DragAndDropSortInput short response.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { DragAndDropAnswer } from 'interactions/answer-defs';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {DragAndDropAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-short-response-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-short-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -40,30 +40,34 @@ export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   ngOnInit(): void {
     // Obtain the contentIds of the options in the correct order.
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as DragAndDropAnswer;
+      this.answer
+    ) as DragAndDropAnswer;
     this.isAnswerLengthGreaterThanZero = _answer.length > 0;
-    const _choices = this.htmlEscaperService.escapedJsonToObj(
-      this.choices) as { _html: string; _contentId: string }[];
+    const _choices = this.htmlEscaperService.escapedJsonToObj(this.choices) as {
+      _html: string;
+      _contentId: string;
+    }[];
 
     const choicesContentIds = _choices.map(choice => choice._contentId);
 
     // Obtain the answer html (in the correct order) using the contentIds.
     this.responseList = _answer.map(optionListAtPosition => {
       return optionListAtPosition.map(
-        contentId => _choices[choicesContentIds.indexOf(contentId)]._html);
+        contentId => _choices[choicesContentIds.indexOf(contentId)]._html
+      );
     });
   }
 
   chooseItemType(index: number): string {
-    return (
-      index === 0 ?
-      'drag-and-drop-response-item' :
-      'drag-and-drop-response-subitem'
-    );
+    return index === 0
+      ? 'drag-and-drop-response-item'
+      : 'drag-and-drop-response-subitem';
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseDragAndDropSortInput', downgradeComponent({
-    component: ShortResponseDragAndDropSortInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseDragAndDropSortInput',
+  downgradeComponent({
+    component: ShortResponseDragAndDropSortInputComponent,
+  }) as angular.IDirectiveFactory
+);

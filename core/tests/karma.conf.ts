@@ -1,12 +1,11 @@
 var argv = require('yargs').positional('terminalEnabled', {
   type: 'boolean',
-  'default': false
+  default: false,
 }).argv;
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
-  generatedJs = (
-    'third_party/generated/js/third_party.min.js');
+  generatedJs = 'third_party/generated/js/third_party.min.js';
 }
 
 // Generate a random number between 0 and 999 to use as the seed for the
@@ -15,7 +14,7 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
@@ -45,32 +44,32 @@ module.exports = function(config) {
         pattern: 'assets/**',
         watched: false,
         served: true,
-        included: false
+        included: false,
       },
       {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
-        included: false
+        included: false,
       },
       'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
       'extensions/interactions/*.json',
-      'core/tests/data/*.json'
+      'core/tests/data/*.json',
     ],
     exclude: [
       'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       'extensions/classifiers/proto/*',
-      'core/tests/puppeteer-acceptance-tests/*'
+      'core/tests/puppeteer-acceptance-tests/*',
     ],
     proxies: {
       // Karma serves files under the /base directory.
       // We access files directly in our code, for example /folder/,
       // so we need to proxy the requests from /folder/ to /base/folder/.
       '/assets/': '/base/assets/',
-      '/extensions/': '/base/extensions/'
+      '/extensions/': '/base/extensions/',
     },
     preprocessors: {
       'core/templates/*.ts': ['webpack'],
@@ -86,7 +85,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/*.json': ['json_fixtures'],
-      'core/tests/data/*.json': ['json_fixtures']
+      'core/tests/data/*.json': ['json_fixtures'],
     },
     client: {
       jasmine: {
@@ -101,8 +100,8 @@ module.exports = function(config) {
       dir: '../karma_coverage_reports/',
       fixWebpackSourcePaths: true,
       'report-config': {
-        html: { outdir: 'html' }
-      }
+        html: {outdir: 'html'},
+      },
     },
     autoWatch: true,
     browsers: ['CI_Chrome'],
@@ -114,7 +113,7 @@ module.exports = function(config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: argv.terminalEnabled
+      terminal: argv.terminalEnabled,
     },
     // Continue running in the background after running tests.
     singleRun: true,
@@ -128,9 +127,9 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=4096'
-        ]
-      }
+          '--js-flags=--max-old-space-size=4096',
+        ],
+      },
     },
 
     plugins: [
@@ -140,7 +139,7 @@ module.exports = function(config) {
       'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
       'karma-coverage',
-      'karma-webpack'
+      'karma-webpack',
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
@@ -154,7 +153,7 @@ module.exports = function(config) {
       prependPrefix: '/',
     },
     jsonFixturesPreprocessor: {
-      variableName: '__fixtures__'
+      variableName: '__fixtures__',
     },
 
     webpack: {
@@ -174,8 +173,8 @@ module.exports = function(config) {
           // their full path: 'assets/{{filename}}'.
           'assets/constants': 'constants.ts',
           'assets/rich_text_components_definitions':
-            'rich_text_components_definitions.ts'
-        }
+            'rich_text_components_definitions.ts',
+        },
       },
       devtool: 'inline-cheap-source-map',
       module: {
@@ -188,19 +187,20 @@ module.exports = function(config) {
                 loader: 'ts-loader',
                 options: {
                   // Typescript checks do the type checking.
-                  transpileOnly: true
-                }
+                  transpileOnly: true,
+                },
               },
               {
                 loader: path.resolve(
-                  'angular-template-style-url-replacer.webpack-loader')
-              }
-            ]
+                  'angular-template-style-url-replacer.webpack-loader'
+                ),
+              },
+            ],
           },
           {
             test: /\.html$/,
             exclude: /(directive|component)\.html$/,
-            loader: 'underscore-template-loader'
+            loader: 'underscore-template-loader',
           },
           {
             test: /(directive|component)\.html$/,
@@ -215,8 +215,8 @@ module.exports = function(config) {
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
+              options: {esModules: true},
+            },
           },
           {
             test: /\.css$/,
@@ -224,19 +224,19 @@ module.exports = function(config) {
               {
                 loader: 'style-loader',
                 options: {
-                  esModule: false
-                }
+                  esModule: false,
+                },
               },
               {
                 loader: 'css-loader',
                 options: {
                   url: false,
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
   });
 };

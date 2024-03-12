@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the about foundation page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {AboutFoundationPageRootComponent} from './about-foundation-page-root.component';
 
 describe('About foundation Page Root', () => {
   let fixture: ComponentFixture<AboutFoundationPageRootComponent>;
@@ -31,14 +31,9 @@ describe('About foundation Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AboutFoundationPageRootComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        PageHeadService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [AboutFoundationPageRootComponent, MockTranslatePipe],
+      providers: [PageHeadService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -57,6 +52,7 @@ describe('About foundation Page Root', () => {
     component.ngOnInit();
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.META
+    );
   });
 });

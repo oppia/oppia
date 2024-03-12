@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for worked-example.model.
  */
 
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExample } from 'domain/skill/worked-example.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {
+  WorkedExampleBackendDict,
+  WorkedExample,
+} from 'domain/skill/worked-example.model';
 
 describe('Worked example object factory', () => {
   let workedExampleBackendDict: WorkedExampleBackendDict;
@@ -26,31 +29,37 @@ describe('Worked example object factory', () => {
     workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
-      }
+        content_id: 'worked_example_e_1',
+      },
     };
   });
 
   it('should create a new worked example from a backend dictionary', () => {
-    let workedExample = (
-      WorkedExample.createFromBackendDict(
-        workedExampleBackendDict));
+    let workedExample = WorkedExample.createFromBackendDict(
+      workedExampleBackendDict
+    );
     expect(workedExample.getQuestion()).toEqual(
       SubtitledHtml.createDefault(
-        'worked example question 1', 'worked_example_q_1'));
+        'worked example question 1',
+        'worked_example_q_1'
+      )
+    );
     expect(workedExample.getExplanation()).toEqual(
       SubtitledHtml.createDefault(
-        'worked example explanation 1', 'worked_example_e_1'));
+        'worked example explanation 1',
+        'worked_example_e_1'
+      )
+    );
   });
 
   it('should convert to a backend dictionary', () => {
-    let workedExample = (
-      WorkedExample.createFromBackendDict(
-        workedExampleBackendDict));
+    let workedExample = WorkedExample.createFromBackendDict(
+      workedExampleBackendDict
+    );
     expect(workedExample.toBackendDict()).toEqual(workedExampleBackendDict);
   });
 });

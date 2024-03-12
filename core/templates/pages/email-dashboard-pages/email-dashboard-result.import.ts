@@ -22,12 +22,12 @@ import 'zone.js';
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
-import { AppConstants } from 'app.constants';
-import { enableProdMode } from '@angular/core';
-import { LoggerService } from 'services/contextual/logger.service';
-import { EmailDashboardResultModule } from './email-dashboard-result.module';
+import {AppConstants} from 'app.constants';
+import {enableProdMode} from '@angular/core';
+import {LoggerService} from 'services/contextual/logger.service';
+import {EmailDashboardResultModule} from './email-dashboard-result.module';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
@@ -35,9 +35,9 @@ if (!AppConstants.DEV_MODE) {
 
 const loggerService = new LoggerService();
 
-platformBrowserDynamic().bootstrapModule(EmailDashboardResultModule).catch(
-  (err) => loggerService.error(err)
-);
+platformBrowserDynamic()
+  .bootstrapModule(EmailDashboardResultModule)
+  .catch(err => loggerService.error(err));
 
 // This prevents angular pages to cause side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files

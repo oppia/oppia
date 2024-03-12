@@ -16,10 +16,8 @@
  * @fileoverview unit tests for the Ratio Model
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Ratio } from
-  'domain/objects/ratio.model';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {Ratio} from 'domain/objects/ratio.model';
 
 describe('Ratio Model', () => {
   let errors: typeof ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS;
@@ -65,16 +63,17 @@ describe('Ratio Model', () => {
 
   describe('.fromRawInputString()', () => {
     it('should parse valid strings', () => {
-      expect(Ratio.fromRawInputString('1:2')).toEqual(
-        new Ratio([1, 2]));
-      expect(Ratio.fromRawInputString('2:3:5')).toEqual(
-        new Ratio([2, 3, 5]));
+      expect(Ratio.fromRawInputString('1:2')).toEqual(new Ratio([1, 2]));
+      expect(Ratio.fromRawInputString('2:3:5')).toEqual(new Ratio([2, 3, 5]));
       expect(Ratio.fromRawInputString('2:3:5:7:11')).toEqual(
-        new Ratio([2, 3, 5, 7, 11]));
+        new Ratio([2, 3, 5, 7, 11])
+      );
       expect(Ratio.fromRawInputString('2 : 3 : 5 : 7 : 11')).toEqual(
-        new Ratio([2, 3, 5, 7, 11]));
+        new Ratio([2, 3, 5, 7, 11])
+      );
       expect(Ratio.fromRawInputString('  2 :3:   5')).toEqual(
-        new Ratio([2, 3, 5]));
+        new Ratio([2, 3, 5])
+      );
     });
 
     it('should throw errors for invalid character', () => {
@@ -105,7 +104,7 @@ describe('Ratio Model', () => {
     });
 
     it('should throw errors for invalid Ratio', () => {
-    // Invalid ratio.
+      // Invalid ratio.
       expect(() => {
         Ratio.fromRawInputString('1:3/2');
       }).toThrowError(errors.NON_INTEGER_ELEMENTS);

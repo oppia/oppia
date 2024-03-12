@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for headroom directive
  */
 
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { HeadroomDirective } from './headroom.directive';
+import {Component} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {HeadroomDirective} from './headroom.directive';
 
 @Component({
   selector: 'mock-comp-a',
-  template: '  <span headroom></span>'
+  template: '  <span headroom></span>',
 })
 class MockCompA {}
 
@@ -33,14 +33,15 @@ describe('Headroom Directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MockCompA, HeadroomDirective]
+      declarations: [MockCompA, HeadroomDirective],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(MockCompA);
     const directiveEl = fixture.debugElement.query(
-      By.directive(HeadroomDirective));
+      By.directive(HeadroomDirective)
+    );
     expect(directiveEl).not.toBeNull();
 
     directiveInstance = directiveEl.injector.get(HeadroomDirective);

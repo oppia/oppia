@@ -23,9 +23,9 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('match-line-break', rule, {
-  valid: [{
-    code:
-    `angular.module('oppia').directive('oppiaRoot', [
+  valid: [
+    {
+      code: `angular.module('oppia').directive('oppiaRoot', [
     '$translate', function($translate) {
       return {
         template: require('./oppia-root.directive.html'),
@@ -39,9 +39,9 @@ ruleTester.run('match-line-break', rule, {
       };
     }
   ]);`,
-  }, {
-    code:
-    `angular.module('oppia').directive('oppiaRoot', 'testing', [
+    },
+    {
+      code: `angular.module('oppia').directive('oppiaRoot', 'testing', [
       '$translate', function($translate) {
         return {
           template: require('./oppia-root.directive.html'),
@@ -55,18 +55,18 @@ ruleTester.run('match-line-break', rule, {
         };
       }
     ]);`,
-  }, {
-    code:
-    `angular.module('oppia').directive('oppiaRoot', [
+    },
+    {
+      code: `angular.module('oppia').directive('oppiaRoot', [
     '$translate', function($translate) { 'test'
   }
   ]);`,
-  }],
+    },
+  ],
 
   invalid: [
     {
-      code:
-      `angular.module('oppia').directive('oppiaRoot', [
+      code: `angular.module('oppia').directive('oppiaRoot', [
       '$translate', function($translate) {
         return {
           template: require('./oppia-root.directive.html'),
@@ -81,12 +81,14 @@ ruleTester.run('match-line-break', rule, {
         };
       }
     ]);`,
-      errors: [{
-        message: (
-          'Please ensure that the line breaks pattern between the dependenci' +
-          'es mentioned as strings and the dependencies mentioned as function' +
-          ' parameters for the corresponding controller should exactly match.'),
-      }],
+      errors: [
+        {
+          message:
+            'Please ensure that the line breaks pattern between the dependenci' +
+            'es mentioned as strings and the dependencies mentioned as function' +
+            ' parameters for the corresponding controller should exactly match.',
+        },
+      ],
     },
-  ]
+  ],
 });

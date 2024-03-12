@@ -16,12 +16,11 @@
  * @fileoverview Unit test for the Interaction attributes extractor service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionAttributesExtractorService } from
-  'interactions/interaction-attributes-extractor.service';
-import { ContinueCustomizationArgs } from './customization-args-defs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {ContinueCustomizationArgs} from './customization-args-defs';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService;
@@ -29,25 +28,28 @@ describe('Interaction attributes extractor service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [InteractionAttributesExtractorService, HtmlEscaperService]
+      providers: [InteractionAttributesExtractorService, HtmlEscaperService],
     });
 
     iaes = TestBed.inject(InteractionAttributesExtractorService);
     hes = TestBed.inject(HtmlEscaperService);
   });
 
-  it('should properly extract migrated customization arguments values from' +
-    'attributes', () => {
-    const buttonTextWithValue = hes.objToEscapedJson({
-      content_id: 'ca_placeholder_0',
-      unicode_str: 'Enter Here'
-    });
-    const attributes = { buttonTextWithValue };
+  it(
+    'should properly extract migrated customization arguments values from' +
+      'attributes',
+    () => {
+      const buttonTextWithValue = hes.objToEscapedJson({
+        content_id: 'ca_placeholder_0',
+        unicode_str: 'Enter Here',
+      });
+      const attributes = {buttonTextWithValue};
 
-    const caValues = (
-      iaes.getValuesFromAttributes(
-        'Continue', attributes) as ContinueCustomizationArgs);
-    expect(caValues.buttonText.value.unicode).toEqual('Enter Here');
-  }
+      const caValues = iaes.getValuesFromAttributes(
+        'Continue',
+        attributes
+      ) as ContinueCustomizationArgs;
+      expect(caValues.buttonText.value.unicode).toEqual('Enter Here');
+    }
   );
 });
