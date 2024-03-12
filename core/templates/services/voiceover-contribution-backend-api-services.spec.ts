@@ -18,11 +18,9 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { VoiceoverContributionBackendApiService } from 'services/voiceover-contribution-backend-api-service';
-import { ServicesConstants } from './services.constants';
+import { VoiceoverContributionBackendApiService } from '../services/voiceover-contribution-backend-api-services';
 
 describe('Voiceover contribution backend api service', () => {
-  const initialValue = ServicesConstants.ENABLE_PROMO_BAR;
   let voiceoverContributionBackendApiService:
     VoiceoverContributionBackendApiService;
   let httpTestingController: HttpTestingController;
@@ -92,11 +90,10 @@ describe('Voiceover contribution backend api service', () => {
       let failHandler = jasmine.createSpy('fail');
       let voiceoverContributionEnabled = true;
 
-      (
-        voiceoverContributionBackendApiService.
+      voiceoverContributionBackendApiService.
         updateVoiceoverContributionDataAsync(
-          voiceoverContributionEnabled).then(successHandler, failHandler)
-      );
+          voiceoverContributionEnabled
+        ).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/voiceover_contribution_handler');
@@ -119,11 +116,9 @@ describe('Voiceover contribution backend api service', () => {
       let failHandler = jasmine.createSpy('fail');
       let voiceoverContributionEnabled = true;
 
-      (
-        voiceoverContributionBackendApiService.
+      voiceoverContributionBackendApiService.
         updateVoiceoverContributionDataAsync(
-          voiceoverContributionEnabled).then(successHandler, failHandler)
-      );
+          voiceoverContributionEnabled).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/voiceover_contribution_handler');

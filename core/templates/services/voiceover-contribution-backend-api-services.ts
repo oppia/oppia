@@ -47,11 +47,11 @@ export class VoiceoverContributionBackendApiService {
   }
 
   async updateVoiceoverContributionDataAsync(
-    voiceoverContributionEnabled: boolean): Promise<void> {
+      voiceoverContributionEnabled: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<VoiceoverContributionBackendDict>(
         ServicesConstants.VOICEOVER_CONTRIBUTION_IS_ENABLED_URL, {
-            voiceover_contribution_enabled: voiceoverContributionEnabled
+          voiceover_contribution_enabled: voiceoverContributionEnabled
         }
       ).toPromise().then(() => {
         resolve();
