@@ -19,9 +19,7 @@
 var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
-
 const {PuppeteerScreenRecorder} = require('puppeteer-screen-recorder');
-
 const fs = require('fs');
 
 const ADMIN_URL = 'http://localhost:8181/admin';
