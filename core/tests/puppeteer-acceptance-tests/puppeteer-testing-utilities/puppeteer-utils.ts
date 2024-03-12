@@ -138,6 +138,14 @@ export class BaseUser {
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
   }
+  
+  /**
+   * This function waits for an element to be clickable.
+   */
+  async waitForClickable(selector: string): Promise<void> {
+    const element = await this.page.waitForSelector(selector);
+    await this.page.waitForFunction(isElementClickable, {}, element);
+  }
 
   /**
    * The function clicks the element using the text on the button.
@@ -147,12 +155,13 @@ export class BaseUser {
       /** Normalize-space is used to remove the extra spaces in the text.
        * Check the documentation for the normalize-space function here :
        * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-      const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`
-      );
+      const textSelector = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
+      const [button] = await this.page.$x(textSelector);
+      await this.page.waitForClickable(textSelector);
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);
+      await this.page.waitForClickable(selector);
       await this.page.click(selector);
     }
   }
@@ -205,14 +214,6 @@ export class BaseUser {
    */
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
-  }
-
-  /**
-   * This function waits for an element to be clickable.
-   */
-  async waitForClickable(selector: string): Promise<void> {
-    const element = await this.page.waitForSelector(selector);
-    await this.page.waitForFunction(isElementClickable, {}, element);
   }
 
   get viewport(): Viewport {
