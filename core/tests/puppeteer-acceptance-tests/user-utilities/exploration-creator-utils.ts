@@ -165,7 +165,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async updateGoal(goal: string): Promise<void> {
     await this.clickOn(addGoalBar);
-    await this.type(addGoal, Goal);
+    await this.type(addGoal, goal);
   }
 
   /**
@@ -250,12 +250,11 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding tags.
    */
   async addTags(TagNames: string[]): Promise<void> {
-    await this.clickOn(addTags);
-    await this.type(addTags, TagNames[0]);
-    await this.clickOn('.secondary-info-text');
-    await this.type(addTags, TagNames[1]);
-    await this.clickOn('.secondary-info-text');
-    await this.type(addTags, TagNames[2]);
+    for(let i = 0; i < 2; i++){
+      await this.clickOn(addTags);
+      await this.type(addTags, TagNames[i]);
+      await this.clickOn('.secondary-info-text');
+    }
   }
 
   async updateSettingsSuccessfully(): Promise<void> {
@@ -268,7 +267,7 @@ export class ExplorationCreator extends BaseUser {
   async expectTagsToBeAdded(): Promise<void> {
     const tags = await this.page.$$('#mat-chip-list-input-0');
     if (tags.length > 0) {
-      showMessage(`${tags.length} tag's added successfully.`);
+      showMessage(`${tags.length} tags added successfully.`);
     } else {
       throw new Error('Tags are not added.');
     }
@@ -366,20 +365,13 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding voice artist.
    */
   async addVoiceArtist(voiceArtists: string[]): Promise<void> {
-    await this.clickOn(voiceArtistEditButton);
-    await this.clickOn(addVoiceArtistUserName);
-    await this.type(addVoiceArtistUserName, voiceArtists[0]);
-    await this.clickOn(voiceArtistSaveButton);
-
-    await this.clickOn(voiceArtistEditButton);
-    await this.clickOn(addVoiceArtistUserName);
-    await this.type(addVoiceArtistUserName, voiceArtists[1]);
-    await this.clickOn(voiceArtistSaveButton);
-
-    await this.clickOn(voiceArtistEditButton);
-    await this.clickOn(addVoiceArtistUserName);
-    await this.type(addVoiceArtistUserName, voiceArtists[2]);
-    await this.clickOn(voiceArtistSaveButton);
+    for(let i = 0; i < 2; i++){
+      await this.clickOn(voiceArtistEditButton);
+      await this.clickOn(addVoiceArtistUserName);
+      await this.type(addVoiceArtistUserName, voiceArtists[i]);
+      await this.clickOn(voiceArtistSaveButton);
+  
+    }
   }
 
   /**
@@ -418,8 +410,8 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in verifying , if exploration is
-   * deleted successfully?
+   * This function helps in verifying, if exploration is
+   * deleted successfully or not.
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(
   ): Promise<void> {
@@ -428,7 +420,7 @@ export class ExplorationCreator extends BaseUser {
       await this.page.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
     } catch (error) {
-      showMessage('Exploration is Successfully deleted.');
+      showMessage('Exploration is successfully deleted.');
     }
   }
 
@@ -478,8 +470,8 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-  *This function checks whether the exploration
-  *is published successfully or not.
+  * This function checks whether the exploration
+  * is published successfully or not.
   */
   async expectInteractionOnCreatorDashboard(): Promise<void> {
     try {
@@ -511,7 +503,7 @@ export class ExplorationCreator extends BaseUser {
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
-      input =>input.value, titleInput);
+      input => input.value, titleInput);
 
     if (titleBeforeChanges === titleAfterChanges) {
       showMessage('Changes have been discarded successfully.');
@@ -522,4 +514,4 @@ export class ExplorationCreator extends BaseUser {
 }
 
 export let ExplorationCreatorFactory = (
-): ExplorationCreator =>new ExplorationCreator();
+): ExplorationCreator => new ExplorationCreator();
