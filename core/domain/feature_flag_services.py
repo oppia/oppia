@@ -31,7 +31,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
 
-(config_models,) = models.Registry.import_models([models.Names.CONFIG])
+(config_models, user_models) = models.Registry.import_models(
+    [models.Names.CONFIG, models.Names.USER])
+
 
 ALL_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
     feature_flag_list.DEV_FEATURES_LIST +
@@ -236,7 +238,16 @@ def is_feature_flag_enabled(
 
     if feature_flag.feature_flag_config.force_enable_for_all_users:
         return True
+
     if user_id is not None:
+        user_group_models = [user_group_model.id for user_group_model in list(
+            user_models.UserGroupModel.query(
+                user_models.UserGroupModel.users == user_id
+            ).fetch())]
+        for user_group_id in feature_flag.feature_flag_config.user_group_ids:
+            if user_group_id in user_group_models:
+                return True
+
         salt = feature_flag_name.encode('utf-8')
         hashed_user_id = hashlib.sha256(
             user_id.encode('utf-8') + salt).hexdigest()
