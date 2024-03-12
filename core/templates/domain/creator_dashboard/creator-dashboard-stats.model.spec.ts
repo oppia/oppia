@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for CreatorDashboardStats.
  */
 
-import { CreatorDashboardStats } from
-  'domain/creator_dashboard/creator-dashboard-stats.model';
+import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 
 describe('Creator dashboard stats model', () => {
   it('should correctly convert backend dict to object', () => {
@@ -25,7 +24,7 @@ describe('Creator dashboard stats model', () => {
       average_ratings: 1,
       num_ratings: 2,
       total_open_feedback: 3,
-      total_plays: 4
+      total_plays: 4,
     };
 
     let dashboardStatsObject =

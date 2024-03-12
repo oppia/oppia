@@ -16,8 +16,7 @@
  * @fileoverview Tests for GuestCollectionProgressModel.
  */
 
-import { GuestCollectionProgress } from
-  'domain/collection/guest-collection-progress.model';
+import {GuestCollectionProgress} from 'domain/collection/guest-collection-progress.model';
 
 describe('Guest collection progress model', () => {
   var _collectionId0: string;
@@ -39,84 +38,121 @@ describe('Guest collection progress model', () => {
   describe('hasCompletionProgress', () => {
     it('should initially have no progress', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
-      expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(false);
+      expect(
+        guestCollectionProgress.hasCompletionProgress(_collectionId0)
+      ).toBe(false);
     });
 
     it('should have progress after recording an exploration', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
-      expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(true);
+        _collectionId0,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.hasCompletionProgress(_collectionId0)
+      ).toBe(true);
     });
 
     it('should have no progress for an unknown exploration', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0);
-      expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(false);
+        _collectionId1,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.hasCompletionProgress(_collectionId0)
+      ).toBe(false);
     });
   });
 
   describe('getCompletedExplorationIds', () => {
     it('should initially have no completed exploration IDs', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
-      expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([]);
+      expect(
+        guestCollectionProgress.getCompletedExplorationIds(_collectionId0)
+      ).toEqual([]);
     });
 
     it('should provide completed exploration ID', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
-      expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([_expId0]);
+        _collectionId0,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.getCompletedExplorationIds(_collectionId0)
+      ).toEqual([_expId0]);
     });
 
     it('should not provide completed exp ID for other collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0);
-      expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([]);
+        _collectionId1,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.getCompletedExplorationIds(_collectionId0)
+      ).toEqual([]);
     });
 
     it('should provide all completed exploration IDs in order', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId1);
+        _collectionId0,
+        _expId1
+      );
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0);
+        _collectionId1,
+        _expId0
+      );
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
-      expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([_expId1, _expId0]);
+        _collectionId0,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.getCompletedExplorationIds(_collectionId0)
+      ).toEqual([_expId1, _expId0]);
     });
   });
 
   describe('addCompletedExplorationId', () => {
     it('should successfully add exploration to empty collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
-      expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0)).toBe(true);
+      expect(
+        guestCollectionProgress.addCompletedExplorationId(
+          _collectionId0,
+          _expId0
+        )
+      ).toBe(true);
     });
 
     it('should fail to re-add exploration to collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
-      expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0)).toBe(false);
+        _collectionId0,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.addCompletedExplorationId(
+          _collectionId0,
+          _expId0
+        )
+      ).toBe(false);
     });
 
     it('should successfully add exploration to second collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
-      expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0)).toBe(true);
+        _collectionId0,
+        _expId0
+      );
+      expect(
+        guestCollectionProgress.addCompletedExplorationId(
+          _collectionId1,
+          _expId0
+        )
+      ).toBe(true);
     });
   });
 
@@ -128,42 +164,54 @@ describe('Guest collection progress model', () => {
     it('should convert progress for one collection to JSON', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
+        _collectionId0,
+        _expId0
+      );
 
       expect(guestCollectionProgress.toJson()).toEqual(
-        '{"collection_id0":["exploration_id0"]}');
+        '{"collection_id0":["exploration_id0"]}'
+      );
     });
 
     it('should convert progress for multiple collections to JSON', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId1);
+        _collectionId1,
+        _expId1
+      );
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId1);
+        _collectionId0,
+        _expId1
+      );
       guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0);
+        _collectionId1,
+        _expId0
+      );
 
       expect(guestCollectionProgress.toJson()).toEqual(
         '{"collection_id1":["exploration_id1","exploration_id0"],' +
-        '"collection_id0":["exploration_id1"]}');
+          '"collection_id0":["exploration_id1"]}'
+      );
     });
   });
 
   describe('createFromJson', () => {
     it('should create a new empty progress object from JSON', () => {
-      var guestCollectionProgress = (
-        GuestCollectionProgress.createFromJson('{}'));
+      var guestCollectionProgress =
+        GuestCollectionProgress.createFromJson('{}');
       expect(guestCollectionProgress).toEqual(_createEmptyProgressObject());
     });
 
     it('should create a progress object from some progress JSON', () => {
       var expectedCollectionProgress = _createEmptyProgressObject();
       expectedCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0);
+        _collectionId0,
+        _expId0
+      );
 
-      var guestCollectionProgress = (
-        GuestCollectionProgress.createFromJson(
-          '{"collection_id0": ["exploration_id0"]}'));
+      var guestCollectionProgress = GuestCollectionProgress.createFromJson(
+        '{"collection_id0": ["exploration_id0"]}'
+      );
 
       expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
     });
@@ -171,16 +219,22 @@ describe('Guest collection progress model', () => {
     it('should create a progress object for multiple collections', () => {
       var expectedCollectionProgress = _createEmptyProgressObject();
       expectedCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId1);
+        _collectionId1,
+        _expId1
+      );
       expectedCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId1);
+        _collectionId0,
+        _expId1
+      );
       expectedCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0);
+        _collectionId1,
+        _expId0
+      );
 
-      var guestCollectionProgress = (
-        GuestCollectionProgress.createFromJson(
-          '{"collection_id1": ["exploration_id1", "exploration_id0"], ' +
-          '"collection_id0": ["exploration_id1"]}'));
+      var guestCollectionProgress = GuestCollectionProgress.createFromJson(
+        '{"collection_id1": ["exploration_id1", "exploration_id0"], ' +
+          '"collection_id0": ["exploration_id1"]}'
+      );
 
       expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
     });

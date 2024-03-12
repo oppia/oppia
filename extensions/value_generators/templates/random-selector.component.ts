@@ -16,12 +16,12 @@
  * @fileoverview Component for random selector value generator.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'random-selector',
-  templateUrl: './RandomSelector.component.html'
+  templateUrl: './RandomSelector.component.html',
 })
 export class RandomSelectorComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks
@@ -38,11 +38,11 @@ export class RandomSelectorComponent implements OnInit {
   SCHEMA = {
     type: 'list',
     items: {
-      type: 'unicode'
+      type: 'unicode',
     },
     ui_config: {
-      add_element_text: 'Add New Choice'
-    }
+      add_element_text: 'Add New Choice',
+    },
   };
 
   getTemplateUrl(): string {
@@ -57,5 +57,8 @@ export class RandomSelectorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'randomSelector', downgradeComponent({
-    component: RandomSelectorComponent}));
+  'randomSelector',
+  downgradeComponent({
+    component: RandomSelectorComponent,
+  })
+);

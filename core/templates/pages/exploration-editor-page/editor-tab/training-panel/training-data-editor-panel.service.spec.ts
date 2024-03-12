@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AlertsService } from 'services/alerts.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TrainingDataEditorPanelService } from './training-data-editor-panel.service';
+import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {AlertsService} from 'services/alerts.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TrainingDataEditorPanelService} from './training-data-editor-panel.service';
 
 describe('Training Modal Service', () => {
   let trainingDataEditorPanelService: TrainingDataEditorPanelService;
@@ -36,32 +36,31 @@ describe('Training Modal Service', () => {
         TrainingDataEditorPanelService,
         AlertsService,
         ExternalSaveService,
-        NgbModal
-      ]
+        NgbModal,
+      ],
     });
 
     trainingDataEditorPanelService = TestBed.inject(
-      TrainingDataEditorPanelService);
+      TrainingDataEditorPanelService
+    );
     alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
     externalSaveService = TestBed.inject(ExternalSaveService);
   });
 
   it('should open NgbModal', () => {
-    spyOn(alertsService, 'clearWarnings')
-      .and.stub();
+    spyOn(alertsService, 'clearWarnings').and.stub();
     spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        result: Promise.resolve()
-      } as NgbModalRef);
+      return {
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
     spyOn(externalSaveService.onExternalSave, 'emit').and.stub();
 
     trainingDataEditorPanelService.openTrainingDataEditor();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
-    expect(
-      externalSaveService.onExternalSave.emit).toHaveBeenCalled();
+    expect(externalSaveService.onExternalSave.emit).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
   });
 });

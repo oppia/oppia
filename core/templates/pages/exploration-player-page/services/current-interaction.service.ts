@@ -19,46 +19,45 @@
  * answer submission process.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ContextService } from 'services/context.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { Observable, Subject } from 'rxjs';
-import { AlgebraicExpressionInputRulesService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
-import { CodeReplRulesService } from 'interactions/CodeRepl/directives/code-repl-rules.service';
-import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
-import { FractionInputRulesService } from 'interactions/FractionInput/directives/fraction-input-rules.service';
-import { ImageClickInputRulesService } from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import { InteractiveMapRulesService } from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
-import { MathEquationInputRulesService } from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
-import { NumericInputRulesService } from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
-import { GraphInputRulesService } from 'interactions/GraphInput/directives/graph-input-rules.service';
-import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
-import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { StateCard } from 'domain/state_card/state-card.model';
+import {ContextService} from 'services/context.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {Observable, Subject} from 'rxjs';
+import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
+import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
+import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';
+import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
+import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
+import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
+import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import {GraphInputRulesService} from 'interactions/GraphInput/directives/graph-input-rules.service';
+import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {StateCard} from 'domain/state_card/state-card.model';
 
 type SubmitAnswerFn = () => void;
 
-type InteractionRulesService = (
-  AlgebraicExpressionInputRulesService |
-  CodeReplRulesService |
-  ContinueRulesService |
-  FractionInputRulesService |
-  ImageClickInputRulesService |
-  InteractiveMapRulesService |
-  MathEquationInputRulesService |
-  NumericExpressionInputRulesService |
-  NumericInputRulesService |
-  PencilCodeEditorRulesService |
-  GraphInputRulesService |
-  SetInputRulesService |
-  TextInputRulesService
-);
+type InteractionRulesService =
+  | AlgebraicExpressionInputRulesService
+  | CodeReplRulesService
+  | ContinueRulesService
+  | FractionInputRulesService
+  | ImageClickInputRulesService
+  | InteractiveMapRulesService
+  | MathEquationInputRulesService
+  | NumericExpressionInputRulesService
+  | NumericInputRulesService
+  | PencilCodeEditorRulesService
+  | GraphInputRulesService
+  | SetInputRulesService
+  | TextInputRulesService;
 
 export type OnSubmitFn = (
   answer: InteractionAnswer,
@@ -70,13 +69,14 @@ export type ValidityCheckFn = () => boolean;
 export type PresubmitHookFn = () => void;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CurrentInteractionService {
   constructor(
     private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService) {}
+    private playerTranscriptService: PlayerTranscriptService
+  ) {}
 
   // The 'submitAnswerFn' function should grab the learner's answer and pass
   // it to onSubmit. The interaction can pass in 'null' for this property if
@@ -103,8 +103,8 @@ export class CurrentInteractionService {
   }
 
   registerCurrentInteraction(
-      submitAnswerFn: SubmitAnswerFn | null,
-      validityCheckFn: ValidityCheckFn | null
+    submitAnswerFn: SubmitAnswerFn | null,
+    validityCheckFn: ValidityCheckFn | null
   ): void {
     /**
      * Each interaction directive should call registerCurrentInteraction
@@ -139,11 +139,10 @@ export class CurrentInteractionService {
   }
 
   onSubmit(
-      answer: InteractionAnswer,
-      interactionRulesService: InteractionRulesService
+    answer: InteractionAnswer,
+    interactionRulesService: InteractionRulesService
   ): void {
-    for (
-      let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
+    for (let i = 0; i < CurrentInteractionService.presubmitHooks.length; i++) {
       CurrentInteractionService.presubmitHooks[i]();
     }
     CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
@@ -169,16 +168,23 @@ export class CurrentInteractionService {
     if (CurrentInteractionService.submitAnswerFn === null) {
       let index = this.playerPositionService.getDisplayedCardIndex();
       let displayedCard = this.playerTranscriptService.getCard(index);
-      let additionalInfo = (
+      let additionalInfo =
         '\nUndefined submit answer debug logs:' +
-        '\nInteraction ID: ' + displayedCard.getInteractionId() +
-        '\nExploration ID: ' + this.contextService.getExplorationId() +
-        '\nState Name: ' + displayedCard.getStateName() +
-        '\nContext: ' + this.contextService.getPageContext() +
-        '\nErrored at index: ' + index);
+        '\nInteraction ID: ' +
+        displayedCard.getInteractionId() +
+        '\nExploration ID: ' +
+        this.contextService.getExplorationId() +
+        '\nState Name: ' +
+        displayedCard.getStateName() +
+        '\nContext: ' +
+        this.contextService.getPageContext() +
+        '\nErrored at index: ' +
+        index;
       throw new Error(
         'The current interaction did not ' +
-        'register a _submitAnswerFn.' + additionalInfo);
+          'register a _submitAnswerFn.' +
+          additionalInfo
+      );
     } else {
       CurrentInteractionService.submitAnswerFn();
     }
@@ -213,5 +219,9 @@ export class CurrentInteractionService {
     return CurrentInteractionService.answerChangedSubject.asObservable();
   }
 }
-angular.module('oppia').factory('CurrentInteractionService',
-  downgradeInjectable(CurrentInteractionService));
+angular
+  .module('oppia')
+  .factory(
+    'CurrentInteractionService',
+    downgradeInjectable(CurrentInteractionService)
+  );

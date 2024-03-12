@@ -20,12 +20,14 @@
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
-var customizeInteraction = async function(elem, customLetters) {
-  await waitFor.presenceOf(elem.$(
-    '.e2e-test-custom-letters-div'),
-  'The custom letters div took too long to load.');
+var customizeInteraction = async function (elem, customLetters) {
+  await waitFor.presenceOf(
+    elem.$('.e2e-test-custom-letters-div'),
+    'The custom letters div took too long to load.'
+  );
   for (let letter of customLetters) {
     if (letter.match(/[a-z]/)) {
       await action.click('Math OSK Tab', elem.$('button=abc'));
@@ -36,54 +38,64 @@ var customizeInteraction = async function(elem, customLetters) {
   }
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
+var expectInteractionDetailsToMatch = async function (elem) {
   expect(
-    await elem.$(
-      '<oppia-interactive-math-equation-input>').isExisting()
+    await elem.$('<oppia-interactive-math-equation-input>').isExisting()
   ).toBe(true);
   // Testing editor's value in default state.
   expect(
-    await objects.MathEditor(elem.$(
-      '<oppia-interactive-math-equation-input>')).getValue()
+    await objects
+      .MathEditor(elem.$('<oppia-interactive-math-equation-input>'))
+      .getValue()
   ).toBe('\\color{grey}{\\text{\\small{Type an equation here.}}}');
 };
 
-var submitAnswer = async function(elem, answer) {
-  await objects.MathEditor(elem.$(
-    '<oppia-interactive-math-equation-input>')).setValue(answer);
+var submitAnswer = async function (elem, answer) {
+  await objects
+    .MathEditor(elem.$('<oppia-interactive-math-equation-input>'))
+    .setValue(answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 
 var answerObjectType = 'MathEquation';
 
-var testSuite = [{
-  interactionArguments: [['y', 'm', 'x', 'c', 'b']],
-  ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
-  correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
-}, {
-  interactionArguments: [['x', 'y']],
-  ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
-  correctAnswers: [
-    '(2*x+1)*(x-3)=0', '0=(2*x+1)*(x-3)', '2*x*x-6*x=3-x', '-2*x*x+5*x+3=0',
-    '(2*x+1)*(-x+3)=0']
-}, {
-  interactionArguments: [['y', 'm', 'x', 'c']],
-  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', 'y=0', 'y=m*x-c']
-}, {
-  interactionArguments: [['y', 'm', 'x', 'c']],
-  ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c', 'y=c+m*x'],
-  correctAnswers: ['y=m*x+c']
-}];
+var testSuite = [
+  {
+    interactionArguments: [['y', 'm', 'x', 'c', 'b']],
+    ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
+    correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0'],
+  },
+  {
+    interactionArguments: [['x', 'y']],
+    ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
+    correctAnswers: [
+      '(2*x+1)*(x-3)=0',
+      '0=(2*x+1)*(x-3)',
+      '2*x*x-6*x=3-x',
+      '-2*x*x+5*x+3=0',
+      '(2*x+1)*(-x+3)=0',
+    ],
+  },
+  {
+    interactionArguments: [['y', 'm', 'x', 'c']],
+    ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
+    correctAnswers: ['y=m*x+c', 'y=m*x^2+c', 'y=0', 'y=m*x-c'],
+  },
+  {
+    interactionArguments: [['y', 'm', 'x', 'c']],
+    ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c', 'y=c+m*x'],
+    correctAnswers: ['y=m*x+c'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

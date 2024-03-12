@@ -20,69 +20,75 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var TopicViewerPage = function() {
+var TopicViewerPage = function () {
   var messageOnCompletion = $('.e2e-test-practice-complete-message');
   var practiceTabLink = $('.e2e-test-practice-tab-link');
   var revisionTabLink = $('.e2e-test-revision-tab-link');
   var startPracticeButton = $('.e2e-test-practice-start-button');
   var storySummaryTitleListElement = $('.e2e-test-story-summary-title');
-  var storySummaryTitleListSelector = function() {
+  var storySummaryTitleListSelector = function () {
     return $$('.e2e-test-story-summary-title');
   };
   var topicDescription = $('.e2e-test-topic-description');
 
-  this.get = async function(classroomUrlFragment, topicName) {
+  this.get = async function (classroomUrlFragment, topicName) {
     await browser.url(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
     var topicLink = $(`.e2e-test-topic-name=${topicName}`);
     await waitFor.presenceOf(
-      topicLink, 'Topic ' +
-      topicName + ' card is not present on /' + classroomUrlFragment);
+      topicLink,
+      'Topic ' + topicName + ' card is not present on /' + classroomUrlFragment
+    );
     await action.click(topicName, topicLink);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectTopicInformationToBe = async function(description) {
+  this.expectTopicInformationToBe = async function (description) {
     await waitFor.visibilityOf(
-      topicDescription, 'Topic description takes too long to be visible.');
+      topicDescription,
+      'Topic description takes too long to be visible.'
+    );
     var text = await topicDescription.getText();
     expect(text).toEqual(description);
   };
 
-  this.expectStoryCountToBe = async function(count) {
+  this.expectStoryCountToBe = async function (count) {
     var storySummaryTitleList = await storySummaryTitleListSelector();
     if (count === 0) {
       expect(storySummaryTitleList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         storySummaryTitleListElement,
-        'Story summary tiles take too long to be visible.');
+        'Story summary tiles take too long to be visible.'
+      );
       var storySummaryTitleList = await storySummaryTitleListSelector();
       expect(storySummaryTitleList.length).toEqual(count);
     }
   };
 
-  this.moveToRevisionTab = async function() {
+  this.moveToRevisionTab = async function () {
     await action.click('Revision Tab', revisionTabLink);
   };
 
-  this.moveToPracticeTab = async function() {
+  this.moveToPracticeTab = async function () {
     await action.click('Practice Tab', practiceTabLink);
   };
 
-  this.selectSkillForPractice = async function(subtopicTitle) {
+  this.selectSkillForPractice = async function (subtopicTitle) {
     var skillCheckbox = $(`.e2e-test-skill-checkbox-title=${subtopicTitle}`);
     await action.click('Select skill to practice', skillCheckbox);
   };
 
-  this.startPractice = async function() {
+  this.startPractice = async function () {
     await action.click('Start practice', startPracticeButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectMessageAfterCompletion = async function(message) {
+  this.expectMessageAfterCompletion = async function (message) {
     await waitFor.visibilityOf(
-      messageOnCompletion, 'Completion message takes too long to be visible.');
+      messageOnCompletion,
+      'Completion message takes too long to be visible.'
+    );
     var text = await messageOnCompletion.getText();
     expect(text).toEqual(message);
   };

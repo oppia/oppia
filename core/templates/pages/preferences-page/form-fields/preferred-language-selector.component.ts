@@ -16,7 +16,7 @@
  * @fileoverview Component for the preferred language selector.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 interface Language {
   id: string;
@@ -26,7 +26,7 @@ interface Language {
 
 @Component({
   selector: 'oppia-preferred-language-selector',
-  templateUrl: './preferred-language-selector.component.html'
+  templateUrl: './preferred-language-selector.component.html',
 })
 export class PreferredSiteLanguageSelectorComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -35,8 +35,8 @@ export class PreferredSiteLanguageSelectorComponent {
   @Input() preferredLanguageCode!: string;
   @Input() choices!: Language[];
   @Input() entity!: string;
-  @Output() preferredLanguageCodeChange: EventEmitter<string> = (
-    new EventEmitter());
+  @Output() preferredLanguageCodeChange: EventEmitter<string> =
+    new EventEmitter();
 
   filteredChoices!: Language[];
 
@@ -46,7 +46,8 @@ export class PreferredSiteLanguageSelectorComponent {
 
   filterChoices(searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
-      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    );
   }
 
   updateLanguage(code: string): void {

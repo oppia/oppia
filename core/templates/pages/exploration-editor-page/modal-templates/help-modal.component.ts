@@ -16,10 +16,10 @@
  * @fileoverview Component for help modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-help-modal',
@@ -40,27 +40,25 @@ export class HelpModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.explorationId = (
-      this.contextService.getExplorationId());
+    this.explorationId = this.contextService.getExplorationId();
   }
 
   beginEditorTutorial(): void {
-    this.siteAnalyticsService
-      .registerOpenTutorialFromHelpCenterEvent(
-        this.explorationId);
+    this.siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
+      this.explorationId
+    );
     this.ngbActiveModal.close(this.EDITOR_TUTORIAL_MODE);
   }
 
   beginTranslationTutorial(): void {
-    this.siteAnalyticsService
-      .registerOpenTutorialFromHelpCenterEvent(
-        this.explorationId);
+    this.siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
+      this.explorationId
+    );
     this.ngbActiveModal.close(this.TRANSLATION_TUTORIAL_MODE);
   }
 
   goToHelpCenter(): void {
-    this.siteAnalyticsService.registerVisitHelpCenterEvent(
-      this.explorationId);
+    this.siteAnalyticsService.registerVisitHelpCenterEvent(this.explorationId);
     this.ngbActiveModal.dismiss('cancel');
   }
 }

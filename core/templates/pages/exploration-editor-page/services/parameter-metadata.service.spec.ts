@@ -16,53 +16,62 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
-import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {ParameterMetadataService} from 'pages/exploration-editor-page/services/parameter-metadata.service';
+import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockExplorationParamChangesService {
-  savedMemento = [{
-    customizationArgs: {
-      parse_with_jinja: false,
-      value: '5'
+  savedMemento = [
+    {
+      customizationArgs: {
+        parse_with_jinja: false,
+        value: '5',
+      },
+      generatorId: 'Copier',
+      name: 'ParamChange1',
     },
-    generatorId: 'Copier',
-    name: 'ParamChange1'
-  }, {
-    customizationArgs: {
-      parse_with_jinja: true,
-      value: '{{ParamChange2}}'
+    {
+      customizationArgs: {
+        parse_with_jinja: true,
+        value: '{{ParamChange2}}',
+      },
+      generatorId: 'Copier',
     },
-    generatorId: 'Copier',
-  }, {
-    customizationArgs: {
-      parse_with_jinja: true,
-      value: '5'
+    {
+      customizationArgs: {
+        parse_with_jinja: true,
+        value: '5',
+      },
+      generatorId: 'RandomSelector',
+      name: 'ParamChange3',
     },
-    generatorId: 'RandomSelector',
-    name: 'ParamChange3'
-  }];
+  ];
 }
 class MockGraphDataService {
   getGraphData() {
     return {
-      links: [{
-        source: 'Hola',
-        target: 'Hola'
-      }, {
-        source: 'State2',
-        target: 'State3'
-      }, {
-        source: 'State',
-        target: 'State'
-      }, {
-        source: 'State3',
-        target: 'State'
-      }]
+      links: [
+        {
+          source: 'Hola',
+          target: 'Hola',
+        },
+        {
+          source: 'State2',
+          target: 'State3',
+        },
+        {
+          source: 'State',
+          target: 'State',
+        },
+        {
+          source: 'State3',
+          target: 'State',
+        },
+      ],
     };
   }
 }
@@ -82,7 +91,7 @@ describe('Parameter Metadata Service', () => {
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: '{{HtmlValue}}'
+              html: '{{HtmlValue}}',
             },
             recorded_voiceovers: {
               voiceovers_mapping: {
@@ -97,42 +106,44 @@ describe('Parameter Metadata Service', () => {
                 placeholder: {
                   value: {
                     content_id: 'ca_placeholder_2',
-                    unicode_str: ''
-                  }
+                    unicode_str: '',
+                  },
                 },
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               solution: {
                 answer_is_exclusive: true,
                 correct_answer: '1',
                 explanation: {
                   content_id: 'solution_5',
-                  html: '<p>1</p>'
-                }
+                  html: '<p>1</p>',
+                },
               },
               id: 'TextInput',
-              answer_groups: [{
-                rule_specs: [],
-                training_data: [],
-                tagged_skill_misconception_id: null,
-                outcome: {
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                  missing_prerequisite_skill_id: null,
-                  dest: '',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '{{FeedbackValue}}'
+              answer_groups: [
+                {
+                  rule_specs: [],
+                  training_data: [],
+                  tagged_skill_misconception_id: null,
+                  outcome: {
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
+                    dest: '',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '{{FeedbackValue}}',
+                    },
                   },
                 },
-              }],
+              ],
               default_outcome: {
                 labelled_as_correct: true,
                 param_changes: [],
@@ -155,13 +166,13 @@ describe('Parameter Metadata Service', () => {
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: 'content'
+              html: 'content',
             },
             recorded_voiceovers: {
               voiceovers_mapping: {
                 content: {},
                 default_outcome: {},
-              }
+              },
             },
             param_changes: [],
             interaction: {
@@ -170,42 +181,44 @@ describe('Parameter Metadata Service', () => {
                 placeholder: {
                   value: {
                     content_id: 'ca_placeholder_2',
-                    unicode_str: ''
-                  }
+                    unicode_str: '',
+                  },
                 },
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               solution: {
                 answer_is_exclusive: true,
                 correct_answer: '1',
                 explanation: {
                   content_id: 'solution_5',
-                  html: '<p>1</p>'
-                }
+                  html: '<p>1</p>',
+                },
               },
               id: 'TextInput',
-              answer_groups: [{
-                rule_specs: [],
-                training_data: [],
-                tagged_skill_misconception_id: null,
-                outcome: {
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                  missing_prerequisite_skill_id: null,
-                  dest: '',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '{{StateFeedbackValue}}'
+              answer_groups: [
+                {
+                  rule_specs: [],
+                  training_data: [],
+                  tagged_skill_misconception_id: null,
+                  outcome: {
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
+                    dest: '',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '{{StateFeedbackValue}}',
+                    },
                   },
                 },
-              }],
+              ],
               default_outcome: {
                 labelled_as_correct: true,
                 param_changes: [],
@@ -215,10 +228,10 @@ describe('Parameter Metadata Service', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
-                  html: ''
+                  html: '',
                 },
               },
-              hints: []
+              hints: [],
             },
           },
           State2: {
@@ -228,13 +241,13 @@ describe('Parameter Metadata Service', () => {
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: 'content'
+              html: 'content',
             },
             recorded_voiceovers: {
               voiceovers_mapping: {
                 content: {},
                 default_outcome: {},
-              }
+              },
             },
             param_changes: [],
             interaction: {
@@ -243,42 +256,44 @@ describe('Parameter Metadata Service', () => {
                 placeholder: {
                   value: {
                     content_id: 'ca_placeholder_2',
-                    unicode_str: ''
-                  }
+                    unicode_str: '',
+                  },
                 },
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               solution: {
                 answer_is_exclusive: true,
                 correct_answer: '1',
                 explanation: {
                   content_id: 'solution_5',
-                  html: '<p>1</p>'
-                }
+                  html: '<p>1</p>',
+                },
               },
               id: 'TextInput',
-              answer_groups: [{
-                rule_specs: [],
-                training_data: [],
-                tagged_skill_misconception_id: null,
-                outcome: {
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                  missing_prerequisite_skill_id: null,
-                  dest: '',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: '',
-                    html: ''
-                  }
-                }
-              }],
+              answer_groups: [
+                {
+                  rule_specs: [],
+                  training_data: [],
+                  tagged_skill_misconception_id: null,
+                  outcome: {
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
+                    dest: '',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: '',
+                      html: '',
+                    },
+                  },
+                },
+              ],
               default_outcome: {
                 labelled_as_correct: true,
                 param_changes: [],
@@ -288,10 +303,10 @@ describe('Parameter Metadata Service', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
-                  html: ''
+                  html: '',
                 },
               },
-              hints: []
+              hints: [],
             },
           },
           State3: {
@@ -301,13 +316,13 @@ describe('Parameter Metadata Service', () => {
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: 'content'
+              html: 'content',
             },
             recorded_voiceovers: {
               voiceovers_mapping: {
                 content: {},
                 default_outcome: {},
-              }
+              },
             },
             param_changes: [],
             interaction: {
@@ -316,42 +331,44 @@ describe('Parameter Metadata Service', () => {
                 placeholder: {
                   value: {
                     content_id: 'ca_placeholder_2',
-                    unicode_str: ''
-                  }
+                    unicode_str: '',
+                  },
                 },
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               solution: {
                 answer_is_exclusive: true,
                 correct_answer: '1',
                 explanation: {
                   content_id: 'solution_5',
-                  html: '<p>1</p>'
-                }
+                  html: '<p>1</p>',
+                },
               },
               id: 'TextInput',
-              answer_groups: [{
-                rule_specs: [],
-                training_data: [],
-                tagged_skill_misconception_id: null,
-                outcome: {
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                  missing_prerequisite_skill_id: null,
-                  dest: '',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: '',
-                    html: ''
-                  }
-                }
-              }],
+              answer_groups: [
+                {
+                  rule_specs: [],
+                  training_data: [],
+                  tagged_skill_misconception_id: null,
+                  outcome: {
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
+                    dest: '',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: '',
+                      html: '',
+                    },
+                  },
+                },
+              ],
               default_outcome: {
                 labelled_as_correct: true,
                 param_changes: [],
@@ -361,12 +378,12 @@ describe('Parameter Metadata Service', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
-                  html: ''
+                  html: '',
                 },
               },
-              hints: []
-            }
-          }
+              hints: [],
+            },
+          },
         });
       }
     }
@@ -377,49 +394,56 @@ describe('Parameter Metadata Service', () => {
         ParameterMetadataService,
         {
           provide: ExplorationParamChangesService,
-          useClass: MockExplorationParamChangesService
+          useClass: MockExplorationParamChangesService,
         },
         {
           provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
+          useClass: MockExplorationStatesService,
         },
         {
           provide: GraphDataService,
-          useClass: MockGraphDataService
-        }
-      ]
+          useClass: MockGraphDataService,
+        },
+      ],
     });
 
     parameterMetadataService = TestBed.inject(ParameterMetadataService);
     statesObjectFactory = TestBed.inject(StatesObjectFactory);
   });
 
-
   it('should get unset parameters info', () => {
-    expect(parameterMetadataService.getUnsetParametersInfo(
-      ['Hola', 'State2']))
-      .toEqual([{
+    expect(
+      parameterMetadataService.getUnsetParametersInfo(['Hola', 'State2'])
+    ).toEqual([
+      {
         paramName: 'ParamChange2',
-        stateName: null
-      }, {
+        stateName: null,
+      },
+      {
         paramName: 'HtmlValue',
         stateName: 'Hola',
-      }, {
+      },
+      {
         paramName: 'FeedbackValue',
-        stateName: 'Hola'
-      }, {
+        stateName: 'Hola',
+      },
+      {
         paramName: 'StateFeedbackValue',
-        stateName: 'State'
-      }]);
+        stateName: 'State',
+      },
+    ]);
 
-    expect(parameterMetadataService.getUnsetParametersInfo(
-      ['State', 'State3']))
-      .toEqual([{
+    expect(
+      parameterMetadataService.getUnsetParametersInfo(['State', 'State3'])
+    ).toEqual([
+      {
         paramName: 'ParamChange2',
-        stateName: null
-      }, {
+        stateName: null,
+      },
+      {
         paramName: 'StateFeedbackValue',
-        stateName: 'State'
-      }]);
+        stateName: 'State',
+      },
+    ]);
   });
 });

@@ -17,58 +17,67 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UtilsService } from 'services/utils.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml, SubtitledHtmlBackendDict } from
-  'domain/exploration/subtitled-html.model';
-import { ExplorationChange } from './exploration-draft.model';
-import { InteractionBackendDict } from './InteractionObjectFactory';
-import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
-import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
-import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
-import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
-import { AppConstants } from 'app.constants';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'domain/exploration/subtitled-html.model';
+import {ExplorationChange} from './exploration-draft.model';
+import {InteractionBackendDict} from './InteractionObjectFactory';
+import {ParamChangeBackendDict} from './ParamChangeObjectFactory';
+import {ParamSpecBackendDict} from './ParamSpecObjectFactory';
+import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
+import {WrittenTranslationsBackendDict} from './WrittenTranslationsObjectFactory';
+import {AppConstants} from 'app.constants';
 
 interface LostChangeValues {
-  'outcome'?: Outcome;
-  'dest'?: string;
-  'feedback'?: SubtitledHtml;
-  'rules'?: Object;
-  'html'?: string;
+  outcome?: Outcome;
+  dest?: string;
+  feedback?: SubtitledHtml;
+  rules?: Object;
+  html?: string;
 }
 
-export type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
-  InteractionBackendDict | ParamChangeBackendDict[] |
-  RecordedVoiceOverBackendDict | WrittenTranslationsBackendDict |
-  ParamChangeBackendDict[] | ParamSpecBackendDict | boolean | number | string |
-  string[];
+export type LostChangeValue =
+  | LostChangeValues
+  | SubtitledHtmlBackendDict
+  | InteractionBackendDict
+  | ParamChangeBackendDict[]
+  | RecordedVoiceOverBackendDict
+  | WrittenTranslationsBackendDict
+  | ParamChangeBackendDict[]
+  | ParamSpecBackendDict
+  | boolean
+  | number
+  | string
+  | string[];
 
 // Properties are optional in 'LostChangeBackendDict' because all of them may
 // not be present in the dict and may change according to the cmd.
 export interface LostChangeBackendDict {
-  'cmd': string;
-  'new_state_name'?: string;
-  'old_state_name'?: string;
-  'state_name'?: string;
+  cmd: string;
+  new_state_name?: string;
+  old_state_name?: string;
+  state_name?: string;
   // 'new_value' here refers to the new value of an entity
   // added into an Exploration. Entity here refers to the
   // Interactions, Translations, Hints, Solutions etc. 'new_value'
   // will be 'null' when any of these entities are deleted.
-  'new_value'?: LostChangeValue | null;
+  new_value?: LostChangeValue | null;
   // 'old_value' here refers to the old value of an entity
   // present in an Exploration. Entity here refers to the
   // Interactions, Translations, Hints, Solutions etc. 'old_value'
   // will be 'null' when any of these entities are newly added.
-  'old_value'?: LostChangeValue | null;
-  'property_name'?: string;
-  'translation_html'?: string;
-  'content_id'?: string;
-  'language_code'?: string;
+  old_value?: LostChangeValue | null;
+  property_name?: string;
+  translation_html?: string;
+  content_id?: string;
+  language_code?: string;
 }
 
 // Properties are optional in 'LostChangeBackendDict' because all of them may
@@ -90,11 +99,18 @@ export class LostChange {
   utilsService: UtilsService;
 
   constructor(
-      utilsService: UtilsService, cmd: string, newStateName?: string,
-      oldStateName?: string, stateName?: string,
-      newValue?: LostChangeValue | null, oldValue?: LostChangeValue | null,
-      propertyName?: string, contentId?: string,
-      languageCode?: string, translationHTML?: string) {
+    utilsService: UtilsService,
+    cmd: string,
+    newStateName?: string,
+    oldStateName?: string,
+    stateName?: string,
+    newValue?: LostChangeValue | null,
+    oldValue?: LostChangeValue | null,
+    propertyName?: string,
+    contentId?: string,
+    languageCode?: string,
+    translationHTML?: string
+  ) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -112,9 +128,11 @@ export class LostChange {
   // object, then simply return that object. In case of an array, return
   // the last item.
   getStatePropertyValue(
-      statePropertyValue: string[] | Object): string | Object {
-    return Array.isArray(statePropertyValue) ?
-      statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
+    statePropertyValue: string[] | Object
+  ): string | Object {
+    return Array.isArray(statePropertyValue)
+      ? statePropertyValue[statePropertyValue.length - 1]
+      : statePropertyValue;
   }
 
   isEndingExploration(): boolean {
@@ -137,8 +155,10 @@ export class LostChange {
     let newValueOutcome = (this.newValue as LostChangeValues).outcome;
     let oldValueOutcome = (this.oldValue as LostChangeValues).outcome;
     if (
-      newValueOutcome && newValueOutcome?.feedback &&
-      oldValueOutcome && oldValueOutcome?.feedback
+      newValueOutcome &&
+      newValueOutcome?.feedback &&
+      oldValueOutcome &&
+      oldValueOutcome?.feedback
     ) {
       return newValueOutcome.feedback.html === oldValueOutcome.feedback.html;
     }
@@ -172,7 +192,8 @@ export class LostChange {
   isRulesEqual(): boolean {
     return isEqual(
       (this.newValue as LostChangeValues).rules,
-      (this.oldValue as LostChangeValues).rules);
+      (this.oldValue as LostChangeValues).rules
+    );
   }
 
   // Detects whether an object of the type 'answer_group' or
@@ -224,7 +245,7 @@ export class LostChange {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LostChangeObjectFactory {
   constructor(private utilsService: UtilsService) {
@@ -239,7 +260,8 @@ export class LostChangeObjectFactory {
    * @returns {LostChange} - The associated type, if any.
    */
   createNew(
-      lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
+    lostChangeDict: ExplorationChange | LostChangeBackendDict
+  ): LostChange {
     lostChangeDict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
       this.utilsService,
@@ -252,10 +274,14 @@ export class LostChangeObjectFactory {
       lostChangeDict.property_name,
       lostChangeDict.content_id,
       lostChangeDict.language_code,
-      lostChangeDict.translation_html,
+      lostChangeDict.translation_html
     );
   }
 }
 
-angular.module('oppia').factory(
-  'LostChangeObjectFactory', downgradeInjectable(LostChangeObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'LostChangeObjectFactory',
+    downgradeInjectable(LostChangeObjectFactory)
+  );

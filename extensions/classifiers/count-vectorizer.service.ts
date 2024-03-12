@@ -23,15 +23,15 @@
  * propagated here.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 interface Vocabulary {
   [char: string]: number;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CountVectorizerService {
   vectorize(tokens: string[] | null, vocabulary: Vocabulary): number[] {
@@ -45,7 +45,7 @@ export class CountVectorizerService {
       return vector;
     }
 
-    tokens.forEach(function(token) {
+    tokens.forEach(function (token) {
       if (vocabulary.hasOwnProperty(token)) {
         vector[vocabulary[token]] += 1;
       }
@@ -55,5 +55,9 @@ export class CountVectorizerService {
   }
 }
 
-angular.module('oppia').factory(
-  'CountVectorizerService', downgradeInjectable(CountVectorizerService));
+angular
+  .module('oppia')
+  .factory(
+    'CountVectorizerService',
+    downgradeInjectable(CountVectorizerService)
+  );

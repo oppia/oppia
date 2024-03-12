@@ -16,17 +16,18 @@
  * @fileoverview Unit test for the Translation topic service.
  */
 
-import { ContributionOpportunitiesService } from
+import {
+  ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities.service';
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LoggerService } from 'services/contextual/logger.service';
-import { TranslationTopicService } from
+} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {EventEmitter} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  TranslationTopicService,
   // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { fakeAsync, TestBed } from '@angular/core/testing';
-
+} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {fakeAsync, TestBed} from '@angular/core/testing';
 
 describe('Translation topic service', () => {
   let $flushPendingTasks: () => void;
@@ -36,28 +37,32 @@ describe('Translation topic service', () => {
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $flushPendingTasks = $injector.get('$flushPendingTasks');
-    $q = $injector.get('$q');
+  beforeEach(
+    angular.mock.inject(function ($injector) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
+      $q = $injector.get('$q');
 
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+      });
 
-    loggerService = TestBed.get(LoggerService);
-    translationTopicService = TestBed.get(TranslationTopicService);
-    contributionOpportunitiesService = TestBed.get(
-      ContributionOpportunitiesService);
-    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
-      .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
-  }));
+      loggerService = TestBed.get(LoggerService);
+      translationTopicService = TestBed.get(TranslationTopicService);
+      contributionOpportunitiesService = TestBed.get(
+        ContributionOpportunitiesService
+      );
+      spyOn(
+        contributionOpportunitiesService,
+        'getTranslatableTopicNamesAsync'
+      ).and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
+    })
+  );
 
   describe('Translation topic service', () => {
-    it('should correctly set and get topic names', fakeAsync(async() => {
+    it('should correctly set and get topic names', fakeAsync(async () => {
       translationTopicService.setActiveTopicName('Topic 1');
       $flushPendingTasks();
-      expect(translationTopicService.getActiveTopicName()).toBe(
-        'Topic 1');
+      expect(translationTopicService.getActiveTopicName()).toBe('Topic 1');
     }));
 
     it('should not allow invalid topic names to be set', () => {
@@ -65,8 +70,7 @@ describe('Translation topic service', () => {
 
       translationTopicService.setActiveTopicName('Topic 3');
       $flushPendingTasks();
-      expect(
-        translationTopicService.getActiveTopicName()).toBeUndefined();
+      expect(translationTopicService.getActiveTopicName()).toBeUndefined();
       expect(logErrorSpy).toHaveBeenCalledWith(
         'Invalid active topic name: Topic 3'
       );
@@ -78,14 +82,14 @@ describe('Translation topic service', () => {
       // @ts-ignore
       translationTopicService.setActiveTopicName(null);
       $flushPendingTasks();
-      expect(
-        translationTopicService.getActiveTopicName()).toBeUndefined();
+      expect(translationTopicService.getActiveTopicName()).toBeUndefined();
     });
 
     it('should emit the new topic name', () => {
       let newTopicEventEmitter = new EventEmitter();
       expect(translationTopicService.onActiveTopicChanged).toEqual(
-        newTopicEventEmitter);
+        newTopicEventEmitter
+      );
     });
   });
 });

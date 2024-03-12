@@ -16,27 +16,28 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from
-  'domain/question/QuestionObjectFactory';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  Question,
+  QuestionBackendDict,
+  QuestionObjectFactory,
+} from 'domain/question/QuestionObjectFactory';
+import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 interface PretestQuestionsBackendResponse {
-  'pretest_question_dicts': QuestionBackendDict[];
+  pretest_question_dicts: QuestionBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PretestQuestionBackendApiService {
   constructor(
@@ -46,52 +47,70 @@ export class PretestQuestionBackendApiService {
   ) {}
 
   _fetchPretestQuestions(
-      explorationId: string, storyUrlFragment: string,
-      successCallback: (value: Question[]) => void,
-      errorCallback: (reason: string) => void): void {
+    explorationId: string,
+    storyUrlFragment: string,
+    successCallback: (value: Question[]) => void,
+    errorCallback: (reason: string) => void
+  ): void {
     if (
       !storyUrlFragment ||
-      !storyUrlFragment.match(AppConstants.VALID_URL_FRAGMENT_REGEX)) {
+      !storyUrlFragment.match(AppConstants.VALID_URL_FRAGMENT_REGEX)
+    ) {
       successCallback([]);
       return;
     }
 
     var pretestDataUrl = this.urlInterpolationService.interpolateUrl(
-      QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
+      QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE,
+      {
         exploration_id: explorationId,
         story_url_fragment: storyUrlFragment,
-      });
+      }
+    );
 
-    this.http.get<PretestQuestionsBackendResponse>(
-      pretestDataUrl
-    ).toPromise().then(data => {
-      var pretestQuestionDicts = (
-        cloneDeep(data.pretest_question_dicts));
-      var pretestQuestionObjects = pretestQuestionDicts.map(
-        (pretestQuestionDict) => {
-          return this.questionObjectFactory.createFromBackendDict(
-            pretestQuestionDict);
-        });
-      if (successCallback) {
-        successCallback(pretestQuestionObjects);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+    this.http
+      .get<PretestQuestionsBackendResponse>(pretestDataUrl)
+      .toPromise()
+      .then(
+        data => {
+          var pretestQuestionDicts = cloneDeep(data.pretest_question_dicts);
+          var pretestQuestionObjects = pretestQuestionDicts.map(
+            pretestQuestionDict => {
+              return this.questionObjectFactory.createFromBackendDict(
+                pretestQuestionDict
+              );
+            }
+          );
+          if (successCallback) {
+            successCallback(pretestQuestionObjects);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
   async fetchPretestQuestionsAsync(
-      explorationId: string,
-      storyUrlFragment: string): Promise<Question[]> {
+    explorationId: string,
+    storyUrlFragment: string
+  ): Promise<Question[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(
-        explorationId, storyUrlFragment, resolve, reject);
+        explorationId,
+        storyUrlFragment,
+        resolve,
+        reject
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'PretestQuestionBackendApiService',
-  downgradeInjectable(PretestQuestionBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'PretestQuestionBackendApiService',
+    downgradeInjectable(PretestQuestionBackendApiService)
+  );

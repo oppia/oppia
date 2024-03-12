@@ -16,25 +16,34 @@
  * @fileoverview Unit tests for the blog home page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { BlogHomePageBackendApiService, BlogPostPageData } from 'domain/blog/blog-homepage-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {
+  BlogHomePageBackendApiService,
+  BlogPostPageData,
+} from 'domain/blog/blog-homepage-backend-api.service';
 
-import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { UrlService } from 'services/contextual/url.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
-import { PageTitleService } from 'services/page-title.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BlogPostPageRootComponent } from './blog-post-page-root.component';
-import { UserService } from 'services/user.service';
+import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
+import {PageTitleService} from 'services/page-title.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {BlogPostPageRootComponent} from './blog-post-page-root.component';
+import {UserService} from 'services/user.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -70,13 +79,8 @@ describe('Blog Post Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        BlogPostPageRootComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [BlogPostPageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         MetaTagCustomizationService,
@@ -86,10 +90,10 @@ describe('Blog Post Page Root', () => {
         BlogHomePageBackendApiService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -100,55 +104,36 @@ describe('Blog Post Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
     pageTitleService = TestBed.inject(PageTitleService);
     blogHomePageBackendApiService = TestBed.inject(
-      BlogHomePageBackendApiService);
+      BlogHomePageBackendApiService
+    );
     loaderService = TestBed.inject(LoaderService);
     urlService = TestBed.inject(UrlService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     translateService = TestBed.inject(TranslateService);
     sampleBlogPost = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
+      sampleBlogPostBackendDict
+    );
     userService = TestBed.inject(UserService);
-    spyOn(urlService, 'getBlogPostUrlFromUrl')
-      .and.returnValue('sample-post');
+    spyOn(urlService, 'getBlogPostUrlFromUrl').and.returnValue('sample-post');
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
-  it('should initialize and show page when access is valid and blog project' +
-  ' feature is enabled', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-      .and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'fetchBlogPostData');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(component.blogPostUrlFragment).toBe('sample-post');
-    expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-      .toHaveBeenCalled();
-    expect(component.fetchBlogPostData).toHaveBeenCalledWith('sample-post');
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
-  }));
-
-  it('should initialize and show error page when server respond with error',
+  it(
+    'should initialize and show page when access is valid and blog project' +
+      ' feature is enabled',
     fakeAsync(() => {
       spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-        Promise.resolve(false));
+        Promise.resolve(false)
+      );
       spyOn(
-        accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-        .and.returnValue(Promise.reject());
+        accessValidationBackendApiService,
+        'validateAccessToBlogPostPage'
+      ).and.returnValue(Promise.resolve());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
       spyOn(component, 'fetchBlogPostData');
@@ -156,20 +141,49 @@ describe('Blog Post Page Root', () => {
       component.ngOnInit();
       tick();
       tick();
-      tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.validateAccessToBlogPostPage)
-        .toHaveBeenCalledWith('sample-post');
-      expect(component.fetchBlogPostData).not.toHaveBeenCalled();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
+      expect(component.blogPostUrlFragment).toBe('sample-post');
+      expect(
+        accessValidationBackendApiService.validateAccessToBlogPostPage
+      ).toHaveBeenCalled();
+      expect(component.fetchBlogPostData).toHaveBeenCalledWith('sample-post');
+      expect(component.errorPageIsShown).toBeFalse();
+      expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should initialize and show error page when server respond with error', fakeAsync(() => {
+    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+      Promise.resolve(false)
+    );
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToBlogPostPage'
+    ).and.returnValue(Promise.reject());
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(component, 'fetchBlogPostData');
+
+    component.ngOnInit();
+    tick();
+    tick();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      accessValidationBackendApiService.validateAccessToBlogPostPage
+    ).toHaveBeenCalledWith('sample-post');
+    expect(component.fetchBlogPostData).not.toHaveBeenCalled();
+    expect(component.errorPageIsShown).toBeTrue();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-      .and.returnValue(Promise.resolve());
+      accessValidationBackendApiService,
+      'validateAccessToBlogPostPage'
+    ).and.returnValue(Promise.resolve());
     spyOn(component.directiveSubscriptions, 'add');
     spyOn(translateService.onLangChange, 'subscribe');
 
@@ -182,8 +196,9 @@ describe('Blog Post Page Root', () => {
 
   it('should update page title whenever the language changes', () => {
     spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogPostPage')
-      .and.returnValue(Promise.resolve());
+      accessValidationBackendApiService,
+      'validateAccessToBlogPostPage'
+    ).and.returnValue(Promise.resolve());
     component.ngOnInit();
     spyOn(component, 'setPageTitleAndMetaTags');
 
@@ -202,60 +217,68 @@ describe('Blog Post Page Root', () => {
 
     expect(translateService.instant).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.TITLE,
-      { blogPostTitle: 'sampleTitle' });
+      {blogPostTitle: 'sampleTitle'}
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       'I18N_BLOG_POST_PAGE_TITLE',
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.META
     );
     expect(pageTitleService.addMetaTag).toHaveBeenCalledWith({
       name: 'keywords',
-      content: 'news, pandas'
+      content: 'news, pandas',
     });
   });
 
-  it('should successfully load fetch blog post data from backend', fakeAsync(
-    () => {
-      let sampleBlogPostPageData: BlogPostPageData = {
-        authorUsername: 'test_username',
-        blogPostDict: sampleBlogPost,
-        summaryDicts: [],
-      };
-      spyOn(blogHomePageBackendApiService, 'fetchBlogPostPageDataAsync')
-        .and.returnValue(Promise.resolve(sampleBlogPostPageData));
-      spyOn(component, 'setPageTitleAndMetaTags');
-      spyOn(loaderService, 'hideLoadingScreen');
-
-      component.fetchBlogPostData('sample-post');
-
-      expect(blogHomePageBackendApiService.fetchBlogPostPageDataAsync)
-        .toHaveBeenCalledWith('sample-post');
-
-      tick();
-
-      expect(component.blogPost).toEqual(sampleBlogPost);
-      expect(component.blogPostPageData).toEqual(sampleBlogPostPageData);
-      expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }
-  ));
-
-  it('should use reject handler if fetching blog post data', fakeAsync(() => {
-    spyOn(alertsService, 'addWarning');
-    spyOn(blogHomePageBackendApiService, 'fetchBlogPostPageDataAsync')
-      .and.returnValue(Promise.reject({
-        error: {error: 'Backend error'},
-        status: 500
-      }));
+  it('should successfully load fetch blog post data from backend', fakeAsync(() => {
+    let sampleBlogPostPageData: BlogPostPageData = {
+      authorUsername: 'test_username',
+      blogPostDict: sampleBlogPost,
+      summaryDicts: [],
+    };
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogPostPageDataAsync'
+    ).and.returnValue(Promise.resolve(sampleBlogPostPageData));
+    spyOn(component, 'setPageTitleAndMetaTags');
+    spyOn(loaderService, 'hideLoadingScreen');
 
     component.fetchBlogPostData('sample-post');
 
-    expect(blogHomePageBackendApiService.fetchBlogPostPageDataAsync)
-      .toHaveBeenCalledWith('sample-post');
+    expect(
+      blogHomePageBackendApiService.fetchBlogPostPageDataAsync
+    ).toHaveBeenCalledWith('sample-post');
+
+    tick();
+
+    expect(component.blogPost).toEqual(sampleBlogPost);
+    expect(component.blogPostPageData).toEqual(sampleBlogPostPageData);
+    expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should use reject handler if fetching blog post data', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogPostPageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Backend error'},
+        status: 500,
+      })
+    );
+
+    component.fetchBlogPostData('sample-post');
+
+    expect(
+      blogHomePageBackendApiService.fetchBlogPostPageDataAsync
+    ).toHaveBeenCalledWith('sample-post');
 
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Unable to fetch blog post data.Error: Backend error');
+      'Unable to fetch blog post data.Error: Backend error'
+    );
   }));
 
   it('should unsubscribe on component destruction', () => {
