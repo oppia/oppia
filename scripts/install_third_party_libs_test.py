@@ -111,11 +111,10 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with self.check_call_swap:
                 install_third_party_libs.main()
 
-    # TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-    # def test_install_third_party_main(self) -> None:
-    #     with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-    #         with self.check_call_swap:
-    #             install_third_party_libs.main()
+    def test_install_third_party_main(self) -> None:
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with self.check_call_swap:
+                install_third_party_libs.main()
 
     def test_tweak_yarn_executable(self) -> None:
         check_function_calls = {
