@@ -16,23 +16,22 @@
  * @fileoverview Root Component for volunteer page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-volunteer-page-root',
-  templateUrl: './volunteer-page-root.component.html'
+  templateUrl: './volunteer-page-root.component.html',
 })
 export class VolunteerPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.META
+    );
   }
 }

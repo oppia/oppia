@@ -16,12 +16,20 @@
  * @fileoverview Tests that the email dashboard result backend api service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
-import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
-import { EmailData } from './email-dashboard-result.component';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {EmailDashboardBackendApiService} from 'domain/email-dashboard/email-dashboard-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {EmailDashboardResultBackendApiService} from './email-dashboard-result-backend-api.service';
+import {EmailData} from './email-dashboard-result.component';
 
 describe('Email dashboard result backend api service', () => {
   let edrbas: EmailDashboardResultBackendApiService;
@@ -31,13 +39,8 @@ describe('Email dashboard result backend api service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      providers: [
-        EmailDashboardBackendApiService,
-        UrlInterpolationService
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [EmailDashboardBackendApiService, UrlInterpolationService],
     }).compileComponents();
   }));
 
@@ -53,7 +56,7 @@ describe('Email dashboard result backend api service', () => {
       email_subject: '',
       email_body: '',
       email_intent: '',
-      max_recipients: 0
+      max_recipients: 0,
     };
     edrbas.submitEmailAsync(emailData, '').then(successSpy, failSpy);
 
@@ -82,7 +85,8 @@ describe('Email dashboard result backend api service', () => {
     edrbas.sendTestEmailAsync('', '', '').then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/emaildashboardtestbulkemailhandler/');
+      '/emaildashboardtestbulkemailhandler/'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 

@@ -16,23 +16,27 @@
  * @fileoverview Unit tests for Schema Based Editor Component
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule } from '@angular/forms';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
-import { SchemaBasedEditorComponent } from './schema-based-editor.component';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FormControl, FormsModule} from '@angular/forms';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {SchemaBasedEditorComponent} from './schema-based-editor.component';
 
-describe('Schema based editor component', function() {
+describe('Schema based editor component', function () {
   let component: SchemaBasedEditorComponent;
   let fixture: ComponentFixture<SchemaBasedEditorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedEditorComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -42,7 +46,7 @@ describe('Schema based editor component', function() {
 
     component.schema = {
       type: 'float',
-      choices: [12, 23]
+      choices: [12, 23],
     };
 
     fixture.detectChanges();
@@ -53,7 +57,7 @@ describe('Schema based editor component', function() {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: SchemaDefaultValue) {
+    let mockFunction = function (value: SchemaDefaultValue) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -77,11 +81,9 @@ describe('Schema based editor component', function() {
 
   it('should set form validity', fakeAsync(() => {
     let mockEmitter = new EventEmitter();
-    let form = jasmine.createSpyObj(
-      'form', ['$setValidity']);
+    let form = jasmine.createSpyObj('form', ['$setValidity']);
 
-    spyOnProperty(component.form, 'statusChanges')
-      .and.returnValue(mockEmitter);
+    spyOnProperty(component.form, 'statusChanges').and.returnValue(mockEmitter);
     spyOn(angular, 'element').and.returnValue(
       // This throws "Type '{ top: number; }' is not assignable to type
       // 'JQLite | Coordinates'". We need to suppress this error because
@@ -90,7 +92,7 @@ describe('Schema based editor component', function() {
       {
         controller: (formString: string) => {
           return form;
-        }
+        },
       }
     );
 

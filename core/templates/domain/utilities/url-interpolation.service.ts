@@ -17,14 +17,14 @@
  * necessary to have a fully-qualified URL.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UtilsService } from 'services/utils.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {UtilsService} from 'services/utils.service';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 import resourceHashes from 'utility/hashes';
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
@@ -34,13 +34,14 @@ export interface InterpolationValuesType {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UrlInterpolationService {
   constructor(
     private alertsService: AlertsService,
     private urlService: UrlService,
-    private utilsService: UtilsService) {}
+    private utilsService: UtilsService
+  ) {}
 
   get DEV_MODE(): boolean {
     return AppConstants.DEV_MODE;
@@ -59,7 +60,8 @@ export class UrlInterpolationService {
     // Ensure that resourcePath starts with a forward slash.
     if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
       this.alertsService.fatalWarning(
-        'Path must start with \'\/\': \'' + resourcePath + '\'.');
+        "Path must start with '/': '" + resourcePath + "'."
+      );
     }
   }
 
@@ -74,8 +76,11 @@ export class UrlInterpolationService {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
         return (
-          resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
-          resourcePath.slice(index));
+          resourcePath.slice(0, index) +
+          '.' +
+          hashes[resourcePath] +
+          resourcePath.slice(index)
+        );
       }
     }
     return resourcePath;
@@ -119,20 +124,24 @@ export class UrlInterpolationService {
    * @return {string} The URL interpolated with the interpolationValues object.
    */
   interpolateUrl(
-      urlTemplate: string,
-      interpolationValues: InterpolationValuesType): string {
+    urlTemplate: string,
+    interpolationValues: InterpolationValuesType
+  ): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
-        'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
+        "Invalid or empty URL template passed in: '" + urlTemplate + "'"
+      );
     }
 
     // http://stackoverflow.com/questions/4775722
-    if (!(interpolationValues instanceof Object) || (
-      Object.prototype.toString.call(
-        interpolationValues) === '[object Array]')) {
+    if (
+      !(interpolationValues instanceof Object) ||
+      Object.prototype.toString.call(interpolationValues) === '[object Array]'
+    ) {
       this.alertsService.fatalWarning(
         'Expected an object of interpolation values to be passed into ' +
-          'interpolateUrl.');
+          'interpolateUrl.'
+      );
     }
 
     // Valid pattern: <alphanum>
@@ -142,19 +151,27 @@ export class UrlInterpolationService {
     let EMPTY_VARIABLE_REGEX = /<>/;
     let INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
-    if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
-        urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
+    if (
+      urlTemplate.match(INVALID_VARIABLE_REGEX) ||
+      urlTemplate.match(EMPTY_VARIABLE_REGEX)
+    ) {
       this.alertsService.fatalWarning(
-        'Invalid URL template received: \'' + urlTemplate + '\'');
+        "Invalid URL template received: '" + urlTemplate + "'"
+      );
     }
 
     let nonStringParams = Object.entries(interpolationValues).filter(
-      ([key, val]) => !this.utilsService.isString(val));
+      ([key, val]) => !this.utilsService.isString(val)
+    );
     if (nonStringParams.length > 0) {
       this.alertsService.fatalWarning(
         'Every parameter passed into interpolateUrl must have string values, ' +
-        'but received: {' + nonStringParams.map(
-          ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
+          'but received: {' +
+          nonStringParams
+            .map(([key, val]) => key + ': ' + angular.toJson(val))
+            .join(', ') +
+          '}'
+      );
     }
 
     let escapedInterpolationValues: Record<string, string> = {};
@@ -171,12 +188,13 @@ export class UrlInterpolationService {
       let currentVarName = match[1];
       if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
         this.alertsService.fatalWarning(
-          'Expected variable \'' + currentVarName +
-          '\' when interpolating URL.');
+          "Expected variable '" + currentVarName + "' when interpolating URL."
+        );
       }
       filledUrl = filledUrl.replace(
         INTERPOLATION_VARIABLE_REGEX,
-        escapedInterpolationValues[currentVarName]);
+        escapedInterpolationValues[currentVarName]
+      );
       match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
     }
     return filledUrl;
@@ -241,13 +259,18 @@ export class UrlInterpolationService {
   getInteractionThumbnailImageUrl(interactionId: string): string {
     if (!interactionId) {
       this.alertsService.fatalWarning(
-        'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+        'Empty interactionId passed in getInteractionThumbnailImageUrl.'
+      );
     }
     return this.getExtensionResourceUrl(
-      '/interactions/' + interactionId + '/static/' + interactionId + '.png');
+      '/interactions/' + interactionId + '/static/' + interactionId + '.png'
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'UrlInterpolationService',
-  downgradeInjectable(UrlInterpolationService));
+angular
+  .module('oppia')
+  .factory(
+    'UrlInterpolationService',
+    downgradeInjectable(UrlInterpolationService)
+  );

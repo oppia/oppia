@@ -17,27 +17,33 @@
  */
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
-import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { ExplorationCreator } from '../../user-utilities/exploration-creator-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Publisher, Saver and Drafter', function() {
+describe('Exploration Publisher, Saver and Drafter', function () {
   let explorationCreator: ExplorationCreator;
   let explorationVisitor: ExplorationCreator;
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
-      'explorationAdm', 'exploration_creator@example.com');
+      'explorationAdm',
+      'exploration_creator@example.com'
+    );
     explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor', 'exploration_visitor@example.com');
+      'explorationVisitor',
+      'exploration_visitor@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should draft, discard and publish the changes',
-    async function() {
+  it(
+    'should draft, discard and publish the changes',
+    async function () {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
       await explorationCreator.updateExplorationIntroText(
-        'Exploration intro text');
+        'Exploration intro text'
+      );
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
       await explorationCreator.showMessageOfSuccessfulExplorationCreation();
@@ -64,11 +70,12 @@ describe('Exploration Publisher, Saver and Drafter', function() {
        */
       await explorationCreator.expectTitleToBe('Old TitleNew Title');
 
-      await explorationVisitor.
-        expectInteractionOnCreatorDashboard();
-    }, DEFAULT_SPEC_TIMEOUT);
+      await explorationVisitor.expectInteractionOnCreatorDashboard();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

@@ -16,28 +16,37 @@
  * @fileoverview Unit tests for progress nav component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
-import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { ProgressNavComponent } from './progress-nav.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
+import {
+  HelpCardEventResponse,
+  PlayerPositionService,
+} from '../services/player-position.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ProgressNavComponent} from './progress-nav.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -53,21 +62,30 @@ describe('Progress nav component', () => {
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
-    '', '', '', {} as Interaction, [],
-    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
+    '',
+    '',
+    '',
+    {} as Interaction,
+    [],
+    {} as RecordedVoiceovers,
+    '',
+    {} as AudioTranslationLanguageService
+  );
   let mockDisplayedCard2 = new StateCard(
-    'state', 'name', 'html', {} as Interaction, [],
-    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
+    'state',
+    'name',
+    'html',
+    {} as Interaction,
+    [],
+    {} as RecordedVoiceovers,
+    '',
+    {} as AudioTranslationLanguageService
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ProgressNavComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ProgressNavComponent, MockTranslatePipe],
       providers: [
         ExplorationEngineService,
         ExplorationPlayerStateService,
@@ -79,10 +97,10 @@ describe('Progress nav component', () => {
         SchemaFormSubmittedService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -92,17 +110,20 @@ describe('Progress nav component', () => {
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService);
+      ExplorationPlayerStateService
+    );
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
     contentTranslationManagerService = TestBed.inject(
-      ContentTranslationManagerService);
+      ContentTranslationManagerService
+    );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   afterEach(() => {
@@ -111,21 +132,24 @@ describe('Progress nav component', () => {
 
   it('should initialize', fakeAsync(() => {
     let isIframed = true;
-    let mockOnHelpCardAvailableEventEmitter = (
-      new EventEmitter<HelpCardEventResponse>());
+    let mockOnHelpCardAvailableEventEmitter =
+      new EventEmitter<HelpCardEventResponse>();
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(componentInstance.submit, 'emit');
-    spyOnProperty(playerPositionService, 'onHelpCardAvailable')
-      .and.returnValue(mockOnHelpCardAvailableEventEmitter);
+    spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
+      mockOnHelpCardAvailableEventEmitter
+    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOnProperty(schemaFormSubmittedService, 'onSubmittedSchemaBasedForm')
-      .and.returnValue(mockSchemaFormSubmittedEventEmitter);
+    spyOnProperty(
+      schemaFormSubmittedService,
+      'onSubmittedSchemaBasedForm'
+    ).and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
     componentInstance.ngOnInit();
     mockOnHelpCardAvailableEventEmitter.emit({
-      hasContinueButton: true
+      hasContinueButton: true,
     } as HelpCardEventResponse);
     mockSchemaFormSubmittedEventEmitter.emit();
     tick();
@@ -140,12 +164,15 @@ describe('Progress nav component', () => {
     let displayedCardIndex = 0;
 
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(
-      transcriptLength);
+      transcriptLength
+    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(
-      displayedCardIndex);
+      displayedCardIndex
+    );
     spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(explorationPlayerStateService, 'isInQuestionMode')
-      .and.returnValue(true);
+    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
+      true
+    );
     spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     componentInstance.displayedCard = mockDisplayedCard;
@@ -159,16 +186,20 @@ describe('Progress nav component', () => {
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeFalse();
     expect(componentInstance.interactionIsInline).toEqual(
-      mockDisplayedCard.isInteractionInline());
+      mockDisplayedCard.isInteractionInline()
+    );
     expect(componentInstance.interactionCustomizationArgs).toEqual(
-      mockDisplayedCard.getInteractionCustomizationArgs());
+      mockDisplayedCard.getInteractionCustomizationArgs()
+    );
   }));
 
   it('should respond to state card content updates', fakeAsync(() => {
     let mockOnStateCardContentUpdate = new EventEmitter<void>();
     spyOn(componentInstance, 'updateDisplayedCardInfo');
-    spyOnProperty(contentTranslationManagerService, 'onStateCardContentUpdate')
-      .and.returnValue(mockOnStateCardContentUpdate);
+    spyOnProperty(
+      contentTranslationManagerService,
+      'onStateCardContentUpdate'
+    ).and.returnValue(mockOnStateCardContentUpdate);
 
     componentInstance.ngOnInit();
     tick();
@@ -182,14 +213,17 @@ describe('Progress nav component', () => {
 
   it('should tell if window can show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
+    );
 
     expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
   });
 
   it('should tell if generic submit button should be shown', () => {
-    spyOn(componentInstance, 'doesInteractionHaveNavSubmitButton')
-      .and.returnValues(false, true);
+    spyOn(
+      componentInstance,
+      'doesInteractionHaveNavSubmitButton'
+    ).and.returnValues(false, true);
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(false);
 
     expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();

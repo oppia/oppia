@@ -16,14 +16,23 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-import { SuperAdminFactory, SuperAdmin } from '../user-utilities/super-admin-utils';
-import { BaseUserFactory, BaseUser } from './puppeteer-utils';
-import { TranslationAdminFactory } from '../user-utilities/translation-admin-utils';
-import { LoggedInUserFactory, LoggedInUser } from '../user-utilities/logged-in-users-utils';
-import { BlogAdminFactory, BlogAdmin } from '../user-utilities/blog-admin-utils';
-import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
-import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
-import { ExplorationCreatorFactory, ExplorationCreator } from '../user-utilities/exploration-creator-utils';
+import {
+  SuperAdminFactory,
+  SuperAdmin,
+} from '../user-utilities/super-admin-utils';
+import {BaseUserFactory, BaseUser} from './puppeteer-utils';
+import {TranslationAdminFactory} from '../user-utilities/translation-admin-utils';
+import {
+  LoggedInUserFactory,
+  LoggedInUser,
+} from '../user-utilities/logged-in-users-utils';
+import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
+import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
+import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
+import {
+  ExplorationCreatorFactory,
+  ExplorationCreator,
+} from '../user-utilities/exploration-creator-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -44,12 +53,14 @@ const USER_ROLE_MAPPING = {
  * create an intersection of all the roles. This is used to create a
  * composition of the user and the role for type inference.
  */
-type UnionToIntersection<U> =
-  (U extends BaseUser ? (k: U) => void : never) extends
-    ((k: infer I) => void) ? I : never;
+type UnionToIntersection<U> = (
+  U extends BaseUser ? (k: U) => void : never
+) extends (k: infer I) => void
+  ? I
+  : never;
 
 type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
-  UnionToIntersection<ReturnType<typeof USER_ROLE_MAPPING[T[number]]>>;
+  UnionToIntersection<ReturnType<(typeof USER_ROLE_MAPPING)[T[number]]>>;
 
 type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
   TRoles extends never[] ? [] : TRoles | [];
@@ -57,7 +68,7 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: SuperAdmin & BlogAdmin | null = null;
+let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -65,13 +76,10 @@ export class UserFactory {
    * This function creates a composition of the user and the role
    * through object prototypes and returns the instance of that user.
    */
-  private static composeUserWithRoles = function<
+  private static composeUserWithRoles = function <
     TUser extends BaseUser,
-    TRoles extends BaseUser[]
-  >(
-      user: TUser,
-      roles: TRoles
-  ): TUser & UnionToIntersection<TRoles[number]> {
+    TRoles extends BaseUser[],
+  >(user: TUser, roles: TRoles): TUser & UnionToIntersection<TRoles[number]> {
     for (const role of roles) {
       const userPrototype = Object.getPrototypeOf(user);
       const rolePrototype = Object.getPrototypeOf(role);
@@ -93,12 +101,12 @@ export class UserFactory {
    * This function assigns roles to a user and returns the instance of
    * that user.
    */
-  static assignRolesToUser = async function<
+  static assignRolesToUser = async function <
     TUser extends BaseUser,
-    TRoles extends (keyof typeof USER_ROLE_MAPPING)[]
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[],
   >(
-      user: TUser,
-      roles: TRoles
+    user: TUser,
+    roles: TRoles
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -108,7 +116,9 @@ export class UserFactory {
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
-            user.username, BLOG_RIGHTS.BLOG_POST_EDITOR);
+            user.username,
+            BLOG_RIGHTS.BLOG_POST_EDITOR
+          );
           break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
@@ -126,16 +136,19 @@ export class UserFactory {
   /**
    * This function creates a new user and returns the instance of that user.
    */
-  static createNewUser = async function<
-    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[]
+  static createNewUser = async function <
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(
-      username: string, email: string,
-      roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<LoggedInUser & ExplorationCreator &
-     MultipleRoleIntersection<TRoles>> {
+    username: string,
+    email: string,
+    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
+  ): Promise<
+    LoggedInUser & ExplorationCreator & MultipleRoleIntersection<TRoles>
+  > {
     let user = UserFactory.composeUserWithRoles(
-      UserFactory.composeUserWithRoles(
-        BaseUserFactory(), [LoggedInUserFactory()]),
+      UserFactory.composeUserWithRoles(BaseUserFactory(), [
+        LoggedInUserFactory(),
+      ]),
       [ExplorationCreatorFactory()]
     );
     await user.openBrowser();
@@ -149,21 +162,25 @@ export class UserFactory {
    * The function creates a new super admin user and returns the instance
    * of that user.
    */
-  static createNewSuperAdmin = async function(
-      username: string
+  static createNewSuperAdmin = async function (
+    username: string
   ): Promise<SuperAdmin & BlogAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
 
     const user = await UserFactory.createNewUser(
-      username, 'testadmin@example.com');
-    const superAdmin = UserFactory.composeUserWithRoles(
-      user, [SuperAdminFactory()]);
+      username,
+      'testadmin@example.com'
+    );
+    const superAdmin = UserFactory.composeUserWithRoles(user, [
+      SuperAdminFactory(),
+    ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
-    superAdminInstance = UserFactory.composeUserWithRoles(
-      superAdmin, [BlogAdminFactory()]);
+    superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
+      BlogAdminFactory(),
+    ]);
 
     return superAdminInstance;
   };
@@ -171,7 +188,7 @@ export class UserFactory {
   /**
    * This function closes all the browsers opened by different users.
    */
-  static closeAllBrowsers = async function(): Promise<void> {
+  static closeAllBrowsers = async function (): Promise<void> {
     for (let i = 0; i < activeUsers.length; i++) {
       await activeUsers[i].closeBrowser();
     }
@@ -180,9 +197,7 @@ export class UserFactory {
   /**
    * This function closes the browser for the provided user.
    */
-  static closeBrowserForUser = async function(
-      user: BaseUser
-  ): Promise<void> {
+  static closeBrowserForUser = async function (user: BaseUser): Promise<void> {
     const index = activeUsers.indexOf(user);
     activeUsers.splice(index, 1);
     await user.closeBrowser();

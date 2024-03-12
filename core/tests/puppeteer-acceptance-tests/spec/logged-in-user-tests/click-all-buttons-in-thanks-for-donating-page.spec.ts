@@ -17,43 +17,52 @@
  * can open links by clicking all buttons in thanks for donating page
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import { LoggedInUser } from '../../user-utilities/logged-in-users-utils';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Logged-in User in Thanks for Donating page', function() {
+describe('Logged-in User in Thanks for Donating page', function () {
   let testUser: LoggedInUser;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser', 'testuser@example.com');
+      'testuser',
+      'testuser@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await testUser.navigateToThanksForDonatingPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the right page with the Watch A Video button.',
-    async function() {
+  it(
+    'should open the right page with the Watch A Video button.',
+    async function () {
       await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the Blog page with the Read Our Blog button.',
-    async function() {
+  it(
+    'should open the Blog page with the Read Our Blog button.',
+    async function () {
       await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should close the thanks for donating popup and show the Donate Page ' +
-    'with the dismiss button.',
-  async function() {
-    await testUser.clickDismissButtonInThanksForDonatingPage();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should close the thanks for donating popup and show the Donate Page ' +
+      'with the dismiss button.',
+    async function () {
+      await testUser.clickDismissButtonInThanksForDonatingPage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

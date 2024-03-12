@@ -16,18 +16,22 @@
  * @fileoverview The custom handler to handle the missing translations.
  */
 
-import { MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
+import {
+  MissingTranslationHandler,
+  MissingTranslationHandlerParams,
+} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
 
 type DefaultTranslationsKey = keyof typeof AppConstants.DEFAULT_TRANSLATIONS;
 
-export class MissingTranslationCustomHandler implements
-  MissingTranslationHandler {
+export class MissingTranslationCustomHandler
+  implements MissingTranslationHandler
+{
   handle(params: MissingTranslationHandlerParams): string {
     if (params.key in AppConstants.DEFAULT_TRANSLATIONS) {
-      return (
-        AppConstants.DEFAULT_TRANSLATIONS[params.key as
-           DefaultTranslationsKey]);
+      return AppConstants.DEFAULT_TRANSLATIONS[
+        params.key as DefaultTranslationsKey
+      ];
     }
     return params.key;
   }

@@ -36,5 +36,5 @@ export const CollectionDomainConstants = {
   CMD_ADD_COLLECTION_SKILL: 'add_collection_skill',
   CMD_DELETE_COLLECTION_SKILL: 'delete_collection_skill',
   COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: 'prerequisite_skill_ids',
-  COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids'
+  COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids',
 } as const;

@@ -16,12 +16,9 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import { BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const BLOG_RIGHTS = testConstants.BlogRights;
 
@@ -37,8 +34,8 @@ export class BlogAdmin extends BaseUser {
    * This function assigns a user with a role from the blog admin page.
    */
   async assignUserToRoleFromBlogAdminPage(
-      username: string,
-      role: keyof typeof BLOG_RIGHTS
+    username: string,
+    role: keyof typeof BLOG_RIGHTS
   ): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
@@ -61,7 +58,7 @@ export class BlogAdmin extends BaseUser {
   async setMaximumTagLimitTo(limit: number): Promise<void> {
     // These steps are for deleting the existing value in the input field.
     const tagInputField = await this.page.$(maximumTagLimitInput);
-    await tagInputField?.click({ clickCount: 3 });
+    await tagInputField?.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit.toString());
@@ -76,7 +73,8 @@ export class BlogAdmin extends BaseUser {
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).value);
+      element => (element as HTMLInputElement).value
+    );
     if (parseInt(tagLimit) === limit) {
       throw new Error(`Maximum tag limit is already ${limit}!`);
     }
@@ -89,7 +87,8 @@ export class BlogAdmin extends BaseUser {
   async expectMaximumTagLimitToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).value);
+      element => (element as HTMLInputElement).value
+    );
     if (parseInt(tagLimit) !== limit) {
       throw new Error(`Maximum tag limit is not ${limit}!`);
     }

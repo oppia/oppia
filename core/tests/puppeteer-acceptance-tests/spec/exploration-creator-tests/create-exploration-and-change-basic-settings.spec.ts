@@ -17,54 +17,62 @@
  */
 
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
-import { UserFactory } from '../../puppeteer-testing-utilities/user-factory';
-import { ExplorationCreator } from '../../user-utilities/exploration-creator-utils';
-import { SuperAdmin } from '../../user-utilities/super-admin-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
+import {SuperAdmin} from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Creator', function() {
+describe('Exploration Creator', function () {
   let explorationCreator: ExplorationCreator;
   let explorationVisitor: ExplorationCreator;
   let superAdmin: SuperAdmin;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
-      'explorationAdm', 'exploration_creator@example.com');
+      'explorationAdm',
+      'exploration_creator@example.com'
+    );
     explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor', 'exploration_visitor@example.com');
+      'explorationVisitor',
+      'exploration_visitor@example.com'
+    );
     superAdmin = await UserFactory.createNewSuperAdmin('Leader');
     const guestUser1 = await UserFactory.createNewUser(
-      'guestUsr1', 'guest_user1@example.com',);
+      'guestUsr1',
+      'guest_user1@example.com'
+    );
     const guestUser2 = await UserFactory.createNewUser(
-      'guestUsr2', 'guest_user2@example.com');
+      'guestUsr2',
+      'guest_user2@example.com'
+    );
     const guestUser3 = await UserFactory.createNewUser(
-      'guestUsr3', 'guest_user3@example.com');
+      'guestUsr3',
+      'guest_user3@example.com'
+    );
 
     await guestUser2.closeBrowser();
     await guestUser1.closeBrowser();
     await guestUser3.closeBrowser();
 
-    await superAdmin.assignRoleToUser(
-      'explorationAdm', 'voiceover admin');
-    await superAdmin.expectUserToHaveRole(
-      'explorationAdm', 'voiceover admin');
+    await superAdmin.assignRoleToUser('explorationAdm', 'voiceover admin');
+    await superAdmin.expectUserToHaveRole('explorationAdm', 'voiceover admin');
 
-    await superAdmin.assignRoleToUser(
-      'explorationAdm', 'curriculum admin');
-    await superAdmin.expectUserToHaveRole(
-      'explorationAdm', 'curriculum admin');
+    await superAdmin.assignRoleToUser('explorationAdm', 'curriculum admin');
+    await superAdmin.expectUserToHaveRole('explorationAdm', 'curriculum admin');
 
     await superAdmin.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should create an exploration and modify it via the Settings tab',
-    async function() {
+  it(
+    'should create an exploration and modify it via the Settings tab',
+    async function () {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
       await explorationCreator.updateCardName('Test question');
       await explorationCreator.updateExplorationIntroText(
-        'Exploration intro text');
+        'Exploration intro text'
+      );
       await explorationCreator.addEndInteraction();
       await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
@@ -89,8 +97,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.previewSummary();
 
       await explorationCreator.enableAutomaticTextToSpeech();
-      await explorationCreator.
-        expectAutomaticTextToSpeechToBeEnabled();
+      await explorationCreator.expectAutomaticTextToSpeechToBeEnabled();
 
       await explorationCreator.assignUserToCollaboratorRole('guestUsr1');
       await explorationCreator.assignUserToPlaytesterRole('guestUsr2');
@@ -98,18 +105,22 @@ describe('Exploration Creator', function() {
       await explorationCreator.publishExploration();
       await explorationCreator.expectExplorationToBePublished();
 
-      await explorationCreator.addVoiceArtists(
-        ['guestUsr1', 'guestUsr2', 'guestUsr3']);
+      await explorationCreator.addVoiceArtists([
+        'guestUsr1',
+        'guestUsr2',
+        'guestUsr3',
+      ]);
 
       await explorationCreator.optInToEmailNotifications();
       await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
-      await explorationVisitor.
-        expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
-    }, DEFAULT_SPEC_TIMEOUT);
+      await explorationVisitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

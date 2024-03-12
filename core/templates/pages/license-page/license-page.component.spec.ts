@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the license page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { LicensePageComponent } from './license-page.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {LicensePageComponent} from './license-page.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
-@Pipe({ name: 'translate' })
+@Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
@@ -50,10 +50,10 @@ describe('License Page', () => {
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
+          useClass: MockI18nLanguageCodeService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -63,8 +63,7 @@ describe('License Page', () => {
     fixture.detectChanges();
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 });

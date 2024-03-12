@@ -16,10 +16,15 @@
  * @fileoverview Unit tests for Schema Based Bool Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {FormControl, FormsModule} from '@angular/forms';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SchemaBasedBoolEditorComponent} from './schema-based-bool-editor.component';
 
 describe('Schema Based Bool Editor Component', () => {
   let component: SchemaBasedBoolEditorComponent;
@@ -28,10 +33,8 @@ describe('Schema Based Bool Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedBoolEditorComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedBoolEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -41,7 +44,7 @@ describe('Schema Based Bool Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: boolean) {
+    let mockFunction = function (value: boolean) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -54,12 +57,12 @@ describe('Schema Based Bool Editor Component', () => {
   }));
 
   it('should return errors for invalid value type', () => {
-    expect(
-      component.validate(new FormControl(2))
-    ).toEqual({invalidType: 'number'});
-    expect(
-      component.validate(new FormControl('true'))
-    ).toEqual({invalidType: 'string'});
+    expect(component.validate(new FormControl(2))).toEqual({
+      invalidType: 'number',
+    });
+    expect(component.validate(new FormControl('true'))).toEqual({
+      invalidType: 'string',
+    });
     expect(component.validate(new FormControl(false))).toEqual(null);
   });
 
@@ -81,15 +84,13 @@ describe('Schema Based Bool Editor Component', () => {
     expect(component.localValue).toBeFalse();
   });
 
-  it(
-    'should not update value when local value is the same as the new value',
-    () => {
-      component.localValue = true;
+  it('should not update value when local value is the same as the new value', () => {
+    component.localValue = true;
 
-      expect(component.localValue).toBeTrue();
+    expect(component.localValue).toBeTrue();
 
-      component.updateValue(true);
+    component.updateValue(true);
 
-      expect(component.localValue).toBeTrue();
-    });
+    expect(component.localValue).toBeTrue();
+  });
 });
