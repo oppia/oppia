@@ -17,14 +17,13 @@
  * interaction in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = async function(elem, richTextInstructionsArray) {
+var customizeInteraction = async function (elem, richTextInstructionsArray) {
   await forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = await forms.ListEditor(elem).editItem(i, 'RichText');
@@ -35,16 +34,20 @@ var customizeInteraction = async function(elem, richTextInstructionsArray) {
 
 // These members of richTextInstructionsArray each describe how to check one of
 // the options.
-var expectInteractionDetailsToMatch = async function(
-    elem, richTextInstructionsArray) {
+var expectInteractionDetailsToMatch = async function (
+  elem,
+  richTextInstructionsArray
+) {
   var optionElements = await elem.$$(
-    '.e2e-test-multiple-choice-option-container');
+    '.e2e-test-multiple-choice-option-container'
+  );
   var optionsCount = optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var results = [];
   for (var i = 0; i < optionsCount; i++) {
-    results.push(await optionElements[i].$(
-      '.e2e-test-multiple-choice-option').getText());
+    results.push(
+      await optionElements[i].$('.e2e-test-multiple-choice-option').getText()
+    );
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];
   rteInstructionArrayCopy.sort();
@@ -54,33 +57,42 @@ var expectInteractionDetailsToMatch = async function(
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
-var submitAnswer = async function(elem, answer) {
-  var selectionInputItem = elem.$('oppia-interactive-multiple-choice-input')
+var submitAnswer = async function (elem, answer) {
+  var selectionInputItem = elem
+    .$('oppia-interactive-multiple-choice-input')
     .$(`button=${answer}`);
   await action.click('Selection Input Item', selectionInputItem);
 
-  var submitAnswerButton = $(
-    '.e2e-test-submit-answer-button');
+  var submitAnswerButton = $('.e2e-test-submit-answer-button');
   await action.click('Submit answer button', submitAnswerButton);
 };
 
 var answerObjectType = 'NonnegativeInt';
 
-var testSuite = [{
-  interactionArguments: [[async function(editor) {
-    await editor.appendBoldText('right');
-  }, async function(editor) {
-    await editor.appendItalicText('wrong1');
-  }, async function(editor) {
-    await editor.appendItalicText('wrong2');
-  }, async function(editor) {
-    await editor.appendItalicText('wrong3');
-  }]],
-  ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
-  wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
-  correctAnswers: ['right']
-}];
+var testSuite = [
+  {
+    interactionArguments: [
+      [
+        async function (editor) {
+          await editor.appendBoldText('right');
+        },
+        async function (editor) {
+          await editor.appendItalicText('wrong1');
+        },
+        async function (editor) {
+          await editor.appendItalicText('wrong2');
+        },
+        async function (editor) {
+          await editor.appendItalicText('wrong3');
+        },
+      ],
+    ],
+    ruleArguments: ['Equals', ['right']],
+    expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
+    wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
+    correctAnswers: ['right'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

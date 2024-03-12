@@ -16,31 +16,31 @@
  * @fileoverview Module for the exploration player page.
  */
 
-import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
-import { ExplorationPlayerViewerCommonModule } from './exploration-player-viewer-common.module';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { MatButtonModule } from '@angular/material/button';
-import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
-import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
-import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { MaterialModule } from 'modules/material.module';
-import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
-import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
-import { ExplorationPlayerPageRoutingModule } from './exploration-player-page-routing.module';
-import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
-import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
-import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
-import { FatigueDetectionService } from './services/fatigue-detection.service';
+import {NgModule} from '@angular/core';
+import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {CommonModule} from '@angular/common';
+import {ExplorationPlayerViewerCommonModule} from './exploration-player-viewer-common.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {MatButtonModule} from '@angular/material/button';
+import {LearnerLocalNavComponent} from './layout-directives/learner-local-nav.component';
+import {FlagExplorationModalComponent} from './modals/flag-exploration-modal.component';
+import {ExplorationSuccessfullyFlaggedModalComponent} from './modals/exploration-successfully-flagged-modal.component';
+import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.component';
+import {MaterialModule} from 'modules/material.module';
+import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
+import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
+import {ExplorationPlayerPageRoutingModule} from './exploration-player-page-routing.module';
+import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
+import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
+import {HintAndSolutionModalService} from './services/hint-and-solution-modal.service';
+import {FatigueDetectionService} from './services/fatigue-detection.service';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -76,13 +76,7 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
-  providers: [
-    HintAndSolutionModalService,
-    FatigueDetectionService,
-  ],
-  exports: [
-    LearnerLocalNavComponent,
-    LearnerViewInfoComponent,
-  ],
+  providers: [HintAndSolutionModalService, FatigueDetectionService],
+  exports: [LearnerLocalNavComponent, LearnerViewInfoComponent],
 })
 export class ExplorationPlayerPageModule {}

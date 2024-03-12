@@ -18,19 +18,29 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 
-angular.module('oppia').constant(
-  'TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
+angular
+  .module('oppia')
+  .constant('TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
 
-angular.module('oppia').constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL);
+angular
+  .module('oppia')
+  .constant(
+    'PRACTICE_SESSIONS_DATA_URL',
+    PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL
+  );
 
-angular.module('oppia').constant(
-  'TOPIC_VIEWER_PAGE', PracticeSessionPageConstants.TOPIC_VIEWER_PAGE);
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_VIEWER_PAGE',
+    PracticeSessionPageConstants.TOPIC_VIEWER_PAGE
+  );
 
-angular.module('oppia').constant(
-  'PRACTICE_SESSIONS_URL',
-  PracticeSessionPageConstants.PRACTICE_SESSIONS_URL);
+angular
+  .module('oppia')
+  .constant(
+    'PRACTICE_SESSIONS_URL',
+    PracticeSessionPageConstants.PRACTICE_SESSIONS_URL
+  );

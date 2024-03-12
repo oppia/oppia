@@ -16,23 +16,23 @@
  * @fileoverview Component for the navbar breadcrumb of the skill editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 @Component({
   selector: 'oppia-skill-editor-navbar-breadcrumb',
   templateUrl: './skill-editor-navbar-breadcrumb.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SkillEditorNavbarBreadcrumbComponent {
-  constructor(
-    private skillEditorStateService: SkillEditorStateService) {}
+  constructor(private skillEditorStateService: SkillEditorStateService) {}
 
   getTruncatedDescription(): string {
     const skill = this.skillEditorStateService.getSkill();
-    const skillDescription = (
-      skill ? skill.getDescription() : 'Skill description loading');
+    const skillDescription = skill
+      ? skill.getDescription()
+      : 'Skill description loading';
     let truncatedDescription = skillDescription.substr(0, 35);
     if (skillDescription.length > 35) {
       truncatedDescription += '...';
@@ -41,6 +41,9 @@ export class SkillEditorNavbarBreadcrumbComponent {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaSkillEditorNavbarBreadcrumb', downgradeComponent(
-    {component: SkillEditorNavbarBreadcrumbComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaSkillEditorNavbarBreadcrumb',
+    downgradeComponent({component: SkillEditorNavbarBreadcrumbComponent})
+  );

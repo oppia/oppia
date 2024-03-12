@@ -16,13 +16,21 @@
  * @fileoverview Unit tests for Schema Based Dict Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule } from '@angular/forms';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { IdGenerationService } from 'services/id-generation.service';
-import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
-import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FormControl, FormsModule} from '@angular/forms';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {IdGenerationService} from 'services/id-generation.service';
+import {SchemaBasedDictEditorComponent} from './schema-based-dict-editor.component';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
 describe('Schema Based Dict Editor Component', () => {
   let component: SchemaBasedDictEditorComponent;
@@ -32,14 +40,9 @@ describe('Schema Based Dict Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedDictEditorComponent
-      ],
-      providers: [
-        FocusManagerService,
-        IdGenerationService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedDictEditorComponent],
+      providers: [FocusManagerService, IdGenerationService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -50,7 +53,7 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: Record<string, SchemaDefaultValue>) {
+    let mockFunction = function (value: Record<string, SchemaDefaultValue>) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -67,34 +70,31 @@ describe('Schema Based Dict Editor Component', () => {
       {
         name: 'Name1',
         schema: {
-          type: 'int'
-        }
+          type: 'int',
+        },
       },
       {
         name: 'Name2',
         schema: {
-          type: 'int'
-        }
-      }
+          type: 'int',
+        },
+      },
     ];
-    spyOn(idGenerationService, 'generateNewId')
-      .and.returnValues('id1', 'id2');
+    spyOn(idGenerationService, 'generateNewId').and.returnValues('id1', 'id2');
 
     expect(component.fieldIds).toEqual({});
 
     component.ngOnInit();
 
-    expect(component.fieldIds).toEqual(
-      {
-        Name1: 'id1',
-        Name2: 'id2'
-      }
-    );
+    expect(component.fieldIds).toEqual({
+      Name1: 'id1',
+      Name2: 'id2',
+    });
   });
 
   it('should write value', () => {
     component.localValue = {
-      first: 'false'
+      first: 'false',
     };
 
     component.writeValue({first: 'true'});
@@ -103,7 +103,7 @@ describe('Schema Based Dict Editor Component', () => {
 
   it('should update value when local value change', () => {
     let localValue = {
-      first: 'true'
+      first: 'true',
     };
 
     component.localValue = localValue;
@@ -117,7 +117,7 @@ describe('Schema Based Dict Editor Component', () => {
 
   it('should not update value when local value not change', () => {
     let localValue = {
-      first: 'true'
+      first: 'true',
     };
 
     component.localValue = localValue;
@@ -135,14 +135,14 @@ describe('Schema Based Dict Editor Component', () => {
 
   it('should get schema', () => {
     const HTML_SCHEMA = {
-      type: 'html'
+      type: 'html',
     } as Schema;
 
     component.propertySchemas = [
       {
         name: 'id1',
-        schema: HTML_SCHEMA
-      }
+        schema: HTML_SCHEMA,
+      },
     ];
 
     expect(component.getSchema(0)).toBe(HTML_SCHEMA);
@@ -155,9 +155,11 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should get human readable property description', () => {
-    expect(component.getHumanReadablePropertyDescription({
-      description: 'This is the property description',
-      name: 'Property Name'
-    })).toBe('This is the property description');
+    expect(
+      component.getHumanReadablePropertyDescription({
+        description: 'This is the property description',
+        name: 'Property Name',
+      })
+    ).toBe('This is the property description');
   });
 });

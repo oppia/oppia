@@ -16,24 +16,19 @@
  * @fileoverview Routing module for error page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { Error404PageRootComponent } from './error-404-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {Error404PageRootComponent} from './error-404-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: Error404PageRootComponent
-  }
+    component: Error404PageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class Error404PageRoutingModule {}

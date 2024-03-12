@@ -19,15 +19,15 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var GetStartedPage = function() {
+var GetStartedPage = function () {
   var GET_STARTED_PAGE_URL = '/get-started';
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(GET_STARTED_PAGE_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getMetaTagContent = async function(name, type) {
+  this.getMetaTagContent = async function (name, type) {
     if (type === 'itemprop') {
       var tag = $(`meta[itemprop="${name}"]`);
     } else if (type === 'og') {
@@ -40,7 +40,10 @@ var GetStartedPage = function() {
 
     await waitFor.presenceOf(tag, 'Tag is taking too long to appear');
     var contentAtrribute = await action.getAttribute(
-      'Tag name', tag, 'content');
+      'Tag name',
+      tag,
+      'content'
+    );
     return contentAtrribute;
   };
 };

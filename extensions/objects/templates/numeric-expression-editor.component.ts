@@ -19,20 +19,20 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { AppConstants } from 'app.constants';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { FocusObj } from './math-equation-editor.component';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {AppConstants} from 'app.constants';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {FocusObj} from './math-equation-editor.component';
 
 @Component({
   selector: 'numeric-expression-editor',
-  templateUrl: './numeric-expression-editor.component.html'
+  templateUrl: './numeric-expression-editor.component.html',
 })
 export class NumericExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -58,7 +58,6 @@ export class NumericExpressionEditorComponent implements OnInit {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-
   ngOnInit(): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
@@ -71,11 +70,12 @@ export class NumericExpressionEditorComponent implements OnInit {
     this.guppyInitializationService.init(
       'guppy-div-creator',
       AppConstants.MATH_INTERACTION_PLACEHOLDERS.NumericExpressionInput,
-      this.value);
+      this.value
+    );
 
     Guppy.event('change', (focusObj: FocusObj) => {
-      const activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
+      const activeGuppyObject =
+        this.guppyInitializationService.findActiveGuppyObject();
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.currentValue = activeGuppyObject.guppyInstance.asciimath();
@@ -99,9 +99,11 @@ export class NumericExpressionEditorComponent implements OnInit {
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(
-      this.currentValue);
+      this.currentValue
+    );
     var answerIsValid = this.mathInteractionsService.validateNumericExpression(
-      this.currentValue);
+      this.currentValue
+    );
     if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.
@@ -111,19 +113,22 @@ export class NumericExpressionEditorComponent implements OnInit {
     }
     if (answerIsValid) {
       // Explicitly inserting '*' signs wherever necessary.
-      this.currentValue = (
+      this.currentValue =
         this.mathInteractionsService.insertMultiplicationSigns(
-          this.currentValue));
+          this.currentValue
+        );
       this.value = this.currentValue;
       this.valueChanged.emit(this.value);
     }
     if (!this.hasBeenTouched) {
       this.warningText = '';
     }
-    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      modalId: this.modalId,
-      value: !answerIsValid
-    }));
+    this.eventBusGroup.emit(
+      new ObjectFormValidityChangeEvent({
+        modalId: this.modalId,
+        value: !answerIsValid,
+      })
+    );
     return answerIsValid;
   }
 
@@ -134,6 +139,8 @@ export class NumericExpressionEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'numericExpressionEditor', downgradeComponent({
-    component: NumericExpressionEditorComponent
-  }) as angular.IDirectiveFactory);
+  'numericExpressionEditor',
+  downgradeComponent({
+    component: NumericExpressionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -17,11 +17,11 @@
  * refreshing state editor in exploration editor page
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateEditorRefreshService {
   private _refreshStateEditorEventEmitter = new EventEmitter<void>();
@@ -31,5 +31,9 @@ export class StateEditorRefreshService {
   }
 }
 
-angular.module('oppia').factory('StateEditorRefreshService',
-  downgradeInjectable(StateEditorRefreshService));
+angular
+  .module('oppia')
+  .factory(
+    'StateEditorRefreshService',
+    downgradeInjectable(StateEditorRefreshService)
+  );

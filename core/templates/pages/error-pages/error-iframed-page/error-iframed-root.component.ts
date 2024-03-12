@@ -16,10 +16,10 @@
  * @fileoverview Root component for error iframed page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-error-iframed-page-root',
-  templateUrl: './error-iframed-root.component.html'
+  templateUrl: './error-iframed-root.component.html',
 })
 export class ErrorIframedPageRootComponent {}

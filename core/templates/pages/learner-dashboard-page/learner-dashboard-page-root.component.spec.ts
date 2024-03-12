@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for learner dashboard page root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { LearnerDashboardPageRootComponent } from './learner-dashboard-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {LearnerDashboardPageRootComponent} from './learner-dashboard-page-root.component';
 
 describe('LearnerDashboardPageRootComponent', () => {
   let fixture: ComponentFixture<LearnerDashboardPageRootComponent>;
@@ -43,8 +43,10 @@ describe('LearnerDashboardPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.META
+    );
   });
 });

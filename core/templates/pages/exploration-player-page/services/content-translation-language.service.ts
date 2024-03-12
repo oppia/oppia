@@ -17,18 +17,17 @@
  * used for content translations.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ExplorationLanguageInfo } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {UrlService} from 'services/contextual/url.service';
 
-import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import {INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContentTranslationLanguageService {
   constructor(
@@ -43,9 +42,9 @@ export class ContentTranslationLanguageService {
   private languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
-      allContentLanguageCodesInExploration: string[],
-      preferredContentLanguageCodes: string[],
-      explorationLanguageCode: string
+    allContentLanguageCodesInExploration: string[],
+    preferredContentLanguageCodes: string[],
+    explorationLanguageCode: string
   ): void {
     this.currentContentLanguageCode = '';
     this.languageOptions = [];
@@ -59,10 +58,12 @@ export class ContentTranslationLanguageService {
     if (
       urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
       allContentLanguageCodesInExploration.includes(
-        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM])
+        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+      )
     ) {
-      this.setCurrentContentLanguageCode(urlParams[
-        INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]);
+      this.setCurrentContentLanguageCode(
+        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+      );
     }
 
     if (
@@ -77,43 +78,39 @@ export class ContentTranslationLanguageService {
       }
     }
 
-    if (
-      !this.currentContentLanguageCode &&
-      explorationLanguageCode !== null
-    ) {
+    if (!this.currentContentLanguageCode && explorationLanguageCode !== null) {
       this.currentContentLanguageCode = explorationLanguageCode;
     }
 
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
-    allContentLanguageCodesInExploration.forEach(
-      (languageCode: string) => {
-        // TODO(#12341): Change getContentanguageDescription to instead refer to
-        // the list of languages that we support written translations for. (Note
-        // that this is not the same as "getContentLanguageDescription", because
-        // the latter refers to the language that the exploration is written
-        // in.)
-        let languageDescription = (
-          this.languageUtilService.getContentLanguageDescription(
-            languageCode
-          )
-        );
-        if (!languageDescription) {
-          throw new Error('The exploration language code is invalid');
-        }
-        this.languageOptions.push({
-          value: languageCode,
-          displayed: languageDescription
-        });
+    allContentLanguageCodesInExploration.forEach((languageCode: string) => {
+      // TODO(#12341): Change getContentanguageDescription to instead refer to
+      // the list of languages that we support written translations for. (Note
+      // that this is not the same as "getContentLanguageDescription", because
+      // the latter refers to the language that the exploration is written
+      // in.)
+      let languageDescription =
+        this.languageUtilService.getContentLanguageDescription(languageCode);
+      if (!languageDescription) {
+        throw new Error('The exploration language code is invalid');
+      }
+      this.languageOptions.push({
+        value: languageCode,
+        displayed: languageDescription,
       });
+    });
   }
 
   init(
-      allContentLanguageCodesInExploration: string[],
-      preferredContentLanguageCodes: string[],
-      explorationLanguageCode: string): void {
+    allContentLanguageCodesInExploration: string[],
+    preferredContentLanguageCodes: string[],
+    explorationLanguageCode: string
+  ): void {
     this._init(
-      allContentLanguageCodesInExploration, preferredContentLanguageCodes,
-      explorationLanguageCode);
+      allContentLanguageCodesInExploration,
+      preferredContentLanguageCodes,
+      explorationLanguageCode
+    );
   }
 
   /**
@@ -143,6 +140,9 @@ export class ContentTranslationLanguageService {
   }
 }
 
-angular.module('oppia').factory(
-  'ContentTranslationLanguageService',
-  downgradeInjectable(ContentTranslationLanguageService));
+angular
+  .module('oppia')
+  .factory(
+    'ContentTranslationLanguageService',
+    downgradeInjectable(ContentTranslationLanguageService)
+  );

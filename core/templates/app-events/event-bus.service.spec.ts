@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for Event Bus Service and Event Bus Group.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { Subject, Subscription } from 'rxjs';
-import { EventBusGroup, EventBusService, Newable } from './event-bus.service';
-import { BaseEvent } from './app-events';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {Subject, Subscription} from 'rxjs';
+import {EventBusGroup, EventBusService, Newable} from './event-bus.service';
+import {BaseEvent} from './app-events';
 
 abstract class EventWithMessage<T> extends BaseEvent {
   public readonly message: T;
@@ -48,7 +48,7 @@ describe('Event Bus Group', () => {
     let value = '';
     eventbusGroup.on(
       CustomEvent as Newable<CustomEvent>,
-      event => value = event.message
+      event => (value = event.message)
     );
     eventbusGroup.emit(new CustomEvent('Event'));
     eventbusGroup.unsubscribe();
@@ -67,7 +67,7 @@ describe('Event Bus Group', () => {
       // undefined, complet...'.". We need to suppress this error because of
       // strict type checking.
       // @ts-ignore
-      (f) => {
+      f => {
         expect(() => f()).toThrowError('Error in event bus\nRandom Error');
         return new Subscription();
       }
@@ -79,31 +79,29 @@ describe('Event Bus Group', () => {
     eventbusGroup.unsubscribe();
   }));
 
-  it('should throw uncaught errors that are not Error type', waitForAsync(
-    () => {
-      spyOn(Subject.prototype, 'subscribe').and.callFake(
-        // This throws "This expression is not callable. Not all constituents
-        // of type 'PartialObserver<any> | ((value: any) => void) |
-        // ((value: any) => void)' are callable. Type 'NextObserver<any>'
-        // has no call signatures". We need to suppress this error because of
-        // strict type checking.
-        // @ts-ignore
-        (f) => {
-          // The eslint error is suppressed since we need to test if
-          // just a string was thrown.
-          // eslint-disable-next-line oppia/no-to-throw
-          expect(() => f()).toThrow('Random Error');
-          return new Subscription();
-        }
-      );
-      eventbusGroup.on(CustomEvent as Newable<CustomEvent>, _ => {
-        // The eslint error is suppressed since we need to throw just a string
-        // for testing purposes.
-        // eslint-disable-next-line no-throw-literal
-        throw 'Random Error';
-      });
-      eventbusGroup.emit(new CustomEvent('Event'));
-      eventbusGroup.unsubscribe();
-    }
-  ));
+  it('should throw uncaught errors that are not Error type', waitForAsync(() => {
+    spyOn(Subject.prototype, 'subscribe').and.callFake(
+      // This throws "This expression is not callable. Not all constituents
+      // of type 'PartialObserver<any> | ((value: any) => void) |
+      // ((value: any) => void)' are callable. Type 'NextObserver<any>'
+      // has no call signatures". We need to suppress this error because of
+      // strict type checking.
+      // @ts-ignore
+      f => {
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+        expect(() => f()).toThrow('Random Error');
+        return new Subscription();
+      }
+    );
+    eventbusGroup.on(CustomEvent as Newable<CustomEvent>, _ => {
+      // The eslint error is suppressed since we need to throw just a string
+      // for testing purposes.
+      // eslint-disable-next-line no-throw-literal
+      throw 'Random Error';
+    });
+    eventbusGroup.emit(new CustomEvent('Event'));
+    eventbusGroup.unsubscribe();
+  }));
 });

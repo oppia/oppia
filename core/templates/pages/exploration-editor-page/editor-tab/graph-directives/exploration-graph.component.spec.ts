@@ -16,19 +16,24 @@
  * @fileoverview Unit tests for explorationGraph.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NgbModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationGraphModalComponent } from '../templates/modal-templates/exploration-graph-modal.component';
-import { ExplorationGraphComponent } from './exploration-graph.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {NgbModule, NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationGraphModalComponent} from '../templates/modal-templates/exploration-graph-modal.component';
+import {ExplorationGraphComponent} from './exploration-graph.component';
 
 describe('Exploration Graph Component', () => {
   let component: ExplorationGraphComponent;
@@ -46,21 +51,15 @@ describe('Exploration Graph Component', () => {
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModule
-      ],
-      declarations: [
-        ExplorationGraphComponent,
-        ExplorationGraphModalComponent,
-      ],
+      imports: [HttpClientTestingModule, NgbModule],
+      declarations: [ExplorationGraphComponent, ExplorationGraphModalComponent],
       providers: [
         StateEditorService,
         RouterService,
@@ -71,10 +70,10 @@ describe('Exploration Graph Component', () => {
         AlertsService,
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     });
   });
 
@@ -95,25 +94,27 @@ describe('Exploration Graph Component', () => {
     component = fixture.componentInstance;
   });
 
-
-  it('should show graph when exploration states service is initialized',
-    () => {
-      expect(component.isGraphShown()).toBe(false);
-      explorationStatesService.init({}, false);
-      expect(component.isGraphShown()).toBe(true);
-    });
+  it('should show graph when exploration states service is initialized', () => {
+    expect(component.isGraphShown()).toBe(false);
+    explorationStatesService.init({}, false);
+    expect(component.isGraphShown()).toBe(true);
+  });
 
   it('should get name from the active state', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-      'Introduction');
+      'Introduction'
+    );
     expect(component.getActiveStateName()).toBe('Introduction');
   });
 
-  it('should get null graph data from graph data service when it is not' +
-    ' recomputed', () => {
-    expect(component.isGraphShown()).toBe(false);
-    expect(component.getGraphData()).toBeUndefined();
-  });
+  it(
+    'should get null graph data from graph data service when it is not' +
+      ' recomputed',
+    () => {
+      expect(component.isGraphShown()).toBe(false);
+      expect(component.getGraphData()).toBeUndefined();
+    }
+  );
 
   it('should evaluate if exploration graph is editable', () => {
     isEditableSpy.and.returnValue(true);
@@ -125,7 +126,6 @@ describe('Exploration Graph Component', () => {
     expect(component.isEditable()).toBe(false);
   });
 
-
   it('should delete state when closing state graph modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
@@ -133,8 +133,8 @@ describe('Exploration Graph Component', () => {
       },
       result: Promise.resolve({
         action: 'delete',
-        stateName: 'Introduction'
-      })
+        stateName: 'Introduction',
+      }),
     } as NgbModalRef);
     spyOn(explorationStatesService, 'deleteState');
 
@@ -142,55 +142,56 @@ describe('Exploration Graph Component', () => {
     tick();
 
     expect(explorationStatesService.deleteState).toHaveBeenCalledWith(
-      'Introduction');
+      'Introduction'
+    );
   }));
 
-  it('should navigate to main tab when closing state graph modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          isEditable: true,
-        },
-        result: Promise.resolve({
-          action: 'navigate',
-          stateName: 'Introduction'
-        })
-      } as NgbModalRef);
-      spyOn(routerService, 'navigateToMainTab');
+  it('should navigate to main tab when closing state graph modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isEditable: true,
+      },
+      result: Promise.resolve({
+        action: 'navigate',
+        stateName: 'Introduction',
+      }),
+    } as NgbModalRef);
+    spyOn(routerService, 'navigateToMainTab');
 
-      component.openStateGraphModal();
-      tick();
+    component.openStateGraphModal();
+    tick();
 
-      expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
-        'Introduction');
-    }));
+    expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
+      'Introduction'
+    );
+  }));
 
-  it('should handle invalid actions when state graph modal is opened',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          isEditable: true,
-        },
-        result: Promise.resolve({
-          action: 'add',
-          stateName: 'Introduction'
-        })
-      } as NgbModalRef);
-      spyOn(loggerService, 'error');
+  it('should handle invalid actions when state graph modal is opened', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isEditable: true,
+      },
+      result: Promise.resolve({
+        action: 'add',
+        stateName: 'Introduction',
+      }),
+    } as NgbModalRef);
+    spyOn(loggerService, 'error');
 
-      component.openStateGraphModal();
-      tick();
+    component.openStateGraphModal();
+    tick();
 
-      expect(loggerService.error).toHaveBeenCalledWith(
-        'Invalid closeDict action: add');
-    }));
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Invalid closeDict action: add'
+    );
+  }));
 
   it('should dismiss state graph modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
         isEditable: true,
       },
-      result: Promise.reject()
+      result: Promise.reject(),
     } as NgbModalRef);
     spyOn(alertsService, 'clearWarnings');
 
@@ -207,12 +208,18 @@ describe('Exploration Graph Component', () => {
   });
 
   it('should return checkpoint count warning', () => {
-    spyOn(explorationWarningsService, 'getCheckpointCountWarning').and
-      .returnValue('Only a maximum of 8 checkpoints are allowed per lesson.');
+    spyOn(
+      explorationWarningsService,
+      'getCheckpointCountWarning'
+    ).and.returnValue(
+      'Only a maximum of 8 checkpoints are allowed per lesson.'
+    );
 
     expect(component.showCheckpointCountWarningSign()).toEqual(
-      'Only a maximum of 8 checkpoints are allowed per lesson.');
+      'Only a maximum of 8 checkpoints are allowed per lesson.'
+    );
     expect(component.checkpointCountWarning).toEqual(
-      'Only a maximum of 8 checkpoints are allowed per lesson.');
+      'Only a maximum of 8 checkpoints are allowed per lesson.'
+    );
   });
 });
