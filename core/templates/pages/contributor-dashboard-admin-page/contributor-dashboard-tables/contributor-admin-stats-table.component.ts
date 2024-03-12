@@ -24,6 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ContributorDashboardAdminStatsBackendApiService } from '../services/contributor-dashboard-admin-stats-backend-api.service';
 import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
+import { ContributionAttribute, FormatContributionAttributesService } from '../services/format-contribution-attributes.service';
 import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
 import { AppConstants } from 'app.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -32,12 +33,6 @@ import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd
 import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
 import isEqual from 'lodash/isEqual';
-
-interface ContributorAdminStatsTableAttribute {
-  key: string;
-  value: string;
-}
-
 @Component({
   selector: 'contributor-admin-stats-table',
   templateUrl: './contributor-admin-stats-table.component.html',
@@ -101,8 +96,6 @@ export class ContributorAdminStatsTable implements OnInit {
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
   firstTimeFetchingData: boolean = true;
-  contributorAdminStatsTableAttributes:
-    ContributorAdminStatsTableAttribute[] = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -110,6 +103,8 @@ export class ContributorAdminStatsTable implements OnInit {
       ContributorDashboardAdminStatsBackendApiService,
     private contributorDashboardAdminBackendApiService:
       ContributorDashboardAdminBackendApiService,
+    private formatContributionAttributesService:
+      FormatContributionAttributesService,
     private modalService: NgbModal,
   ) {}
 
@@ -118,193 +113,6 @@ export class ContributorAdminStatsTable implements OnInit {
     if (this.inputs.filter) {
       this.updateColumnsToDisplay();
     }
-  }
-
-  pluralise(num: number, word: string): string {
-    return num === 1 ? word : word + 's';
-  }
-
-  getEditTextForAttribute(
-      editCount: number,
-      contributionSubType: string): string {
-    return ' (' + editCount + ' ' +
-           (
-           contributionSubType ===
-           AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW ?
-           'edited' : 'without edits'
-           ) +
-           ')';
-  }
-
-  getTextForAttribute(
-      count: number,
-      wordCount: number = 0,
-      showEditText: boolean = false,
-      editCount: number = 0,
-      contributionSubType: string = ''): string {
-    return count + this.pluralise(count, ' card') +
-         (
-          showEditText ?
-                  this.getEditTextForAttribute(editCount, contributionSubType) :
-                  ''
-         ) +
-         (
-          wordCount !== 0 ?
-                       ', ' + wordCount + this.pluralise(wordCount, ' word') :
-                       ''
-         );
-  }
-
-  getTextForActiveTopicAttribute(topics: string[]): string {
-    return topics ? topics.join(', ') : 'No topics available';
-  }
-
-  getAcceptedSubmittedTextForAttribute(
-      acceptedTranslationCount: number,
-      acceptedTranslationsWithoutReviewerEditsCount: number,
-      acceptedTranslationWordCount: number = 0): string {
-    return this.getTextForAttribute(
-      acceptedTranslationCount,
-      acceptedTranslationWordCount,
-      true,
-      acceptedTranslationsWithoutReviewerEditsCount,
-      AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION);
-  }
-
-  getAcceptedReviewedTextForAttribute(
-      acceptedTranslationCount: number,
-      acceptedTranslationsWithReviewerEditsCount: number,
-      acceptedTranslationWordCount: number = 0): string {
-    return this.getTextForAttribute(
-      acceptedTranslationCount,
-      acceptedTranslationWordCount,
-      true,
-      acceptedTranslationsWithReviewerEditsCount,
-      AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW);
-  }
-
-  getTranslationReviewerStatsTableAttributes(
-      element: TranslationReviewerStats): void {
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Accepted Translations',
-      value: this.getAcceptedReviewedTextForAttribute(
-        element.acceptedTranslationsCount,
-        element.acceptedTranslationsWithReviewerEditsCount,
-        element.acceptedTranslationWordCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Rejected Translations',
-      value: this.getTextForAttribute(
-        element.rejectedTranslationsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Active Topics',
-      value: this.getTextForActiveTopicAttribute(
-        element.topicsWithTranslationReviews)
-    });
-  }
-
-  getTranslationSubmitterStatsTableAttributes(
-      element: TranslationSubmitterStats): void {
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Submitted Translations',
-      value: this.getTextForAttribute(
-        element.submittedTranslationsCount,
-        element.submittedTranslationWordCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Accepted Translations',
-      value: this.getAcceptedSubmittedTextForAttribute(
-        element.acceptedTranslationsCount,
-        element.acceptedTranslationsWithoutReviewerEditsCount,
-        element.acceptedTranslationWordCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Rejected Translations',
-      value: this.getTextForAttribute(
-        element.rejectedTranslationsCount,
-        element.rejectedTranslationWordCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Active Topics',
-      value: this.getTextForActiveTopicAttribute(
-        element.topicsWithTranslationSubmissions)
-    });
-  }
-
-  getQuestionSubmitterStatsTableAttributes(
-      element: QuestionSubmitterStats): void {
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Submitted Questions',
-      value: this.getTextForAttribute(
-        element.submittedQuestionsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Accepted Questions',
-      value: this.getAcceptedSubmittedTextForAttribute(
-        element.acceptedQuestionsCount,
-        element.acceptedQuestionsWithoutReviewerEditsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Rejected Questions',
-      value: this.getTextForAttribute(
-        element.rejectedQuestionsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Active Topics',
-      value: this.getTextForActiveTopicAttribute(
-        element.topicsWithQuestionSubmissions)
-    });
-  }
-
-  getQuestionReviewerStatsTableAttributes(
-      element: QuestionReviewerStats): void {
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Reviewed Questions',
-      value: element.reviewedQuestionsCount.toString()
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Accepted Questions',
-      value: this.getAcceptedReviewedTextForAttribute(
-        element.acceptedQuestionsCount,
-        element.acceptedQuestionsWithReviewerEditsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Rejected Questions',
-      value: this.getTextForAttribute(
-        element.rejectedQuestionsCount)
-    });
-    this.contributorAdminStatsTableAttributes.push({
-      key: 'Active Topics',
-      value: this.getTextForActiveTopicAttribute(
-        element.topicsWithQuestionReviews)
-    });
-  }
-
-  getContributorAdminStatsTableAttributes(
-      element: TranslationSubmitterStats |
-               TranslationReviewerStats |
-               QuestionSubmitterStats |
-               QuestionReviewerStats):
-  ContributorAdminStatsTableAttribute[] {
-    this.contributorAdminStatsTableAttributes = [
-      {
-        key: 'Date Joined',
-        value: element.firstContributionDate
-      }
-    ];
-
-    if (element instanceof TranslationSubmitterStats) {
-      this.getTranslationSubmitterStatsTableAttributes(element);
-    } else if (element instanceof TranslationReviewerStats) {
-      this.getTranslationReviewerStatsTableAttributes(element);
-    } else if (element instanceof QuestionSubmitterStats) {
-      this.getQuestionSubmitterStatsTableAttributes(element);
-    } else if (element instanceof QuestionReviewerStats) {
-      this.getQuestionReviewerStatsTableAttributes(element);
-    }
-
-    return this.contributorAdminStatsTableAttributes;
   }
 
   getLastContributedType(activeTab: string): string {
@@ -372,6 +180,16 @@ export class ContributorAdminStatsTable implements OnInit {
     }
 
     return contributionCount;
+  }
+
+  getFormattedContributionAttributes(
+      element: TranslationSubmitterStats |
+             TranslationReviewerStats |
+             QuestionSubmitterStats |
+             QuestionReviewerStats):
+             ContributionAttribute[] {
+    return this.formatContributionAttributesService.
+      getContributionAttributes(element);
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {

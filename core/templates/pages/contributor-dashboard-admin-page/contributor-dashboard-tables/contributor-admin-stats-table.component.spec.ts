@@ -638,7 +638,7 @@ describe('Contributor stats component', () => {
   describe('when displaying the stats table', () => {
     it('should return the translation submitter stats attributes correctly',
       fakeAsync(() => {
-        expect(component.getContributorAdminStatsTableAttributes(
+        expect(component.getFormattedContributionAttributes(
           translationSubmitterStats)).toEqual([
           {
             key: 'Date Joined',
@@ -665,7 +665,7 @@ describe('Contributor stats component', () => {
 
     it('should return the translation reviewer stats attributes correctly',
       fakeAsync(() => {
-        expect(component.getContributorAdminStatsTableAttributes(
+        expect(component.getFormattedContributionAttributes(
           translationReviewerStats)).toEqual([
           {
             key: 'Date Joined',
@@ -688,7 +688,7 @@ describe('Contributor stats component', () => {
 
     it('should return the question submitter stats attributes correctly',
       fakeAsync(() => {
-        expect(component.getContributorAdminStatsTableAttributes(
+        expect(component.getFormattedContributionAttributes(
           questionSubmitterStats)).toEqual([
           {
             key: 'Date Joined',
@@ -715,7 +715,7 @@ describe('Contributor stats component', () => {
 
     it('should return the question reviewer stats attributes correctly',
       fakeAsync(() => {
-        expect(component.getContributorAdminStatsTableAttributes(
+        expect(component.getFormattedContributionAttributes(
           questionReviewerStats)).toEqual([
           {
             key: 'Date Joined',
