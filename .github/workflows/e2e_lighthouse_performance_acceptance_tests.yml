@@ -13,7 +13,6 @@ on:
 
 jobs:
   e2e_test:
-    needs: build
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
