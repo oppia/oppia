@@ -74,7 +74,37 @@
   color: #fff;
   font-size: 12px;
   height: 18px;
+  list-style-type: none;
+  position: relative;
   width: 18px;
+}
+
+.oppia-contributors-more-circle-expand {
+  background-color: rgba(26, 26, 26, 0.99);
+  border-radius: 5px;
+  left: 50%;
+  padding: 7px;
+  position: absolute;
+  top: -8px;
+  transform: translate(-50%, -100%);
+}
+
+.oppia-contributors-more-circle-expand::after {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid rgba(26, 26, 26, 0.95);
+  bottom: -8px;
+  content: "";
+  height: 0;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 0;
+}
+
+.oppia-contributors-more-circle-expand a {
+  color: #fff;
+  font-size: 10px;
 }
 
 .oppia-info-card-title {

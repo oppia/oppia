@@ -86,6 +86,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
   saveProgressMenuIsShown: boolean = false;
+  contributorsListIsShown: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

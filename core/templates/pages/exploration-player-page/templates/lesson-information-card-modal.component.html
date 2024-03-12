@@ -121,12 +121,17 @@
                 <profile-link-image [username]="name"></profile-link-image>
               </li>
             </div>
-            <li *ngIf="contributorNames.length > 2"
-                class="oppia-contributors-more-circle"
-                [ngbTooltip]="contributorNames.slice(2).join(', ')"
-                placement="top">
+            <div (mouseover)="contributorsListIsShown = true" (mouseleave)="contributorsListIsShown = false">
+              <li *ngIf="contributorNames.length > 2" class="oppia-contributors-more-circle">
                 +{{ contributorNames.length - 2 }}
-            </li>
+                <div *ngIf="contributorsListIsShown" class="oppia-contributors-more-circle-expand">
+                  <ng-container *ngFor="let name of contributorNames | slice:2; let isLast=last">
+                    <profile-link-text [username]="name"></profile-link-text>
+                    <span *ngIf="!isLast">, </span>
+                  </ng-container>
+                </div>
+              </li>
+            </div>
             <li *ngIf="contributorNames.length === 0"
                 [ngbTooltip]="'I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate"
                 placement="top">
