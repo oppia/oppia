@@ -16,7 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, { Page, Browser } from 'puppeteer';
+import puppeteer, { Page, Browser, Viewport } from 'puppeteer';
 import testConstants from './test-constants';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -206,7 +206,6 @@ export class BaseUser {
   /**
    * This function executes the given function while at a certain width
    * breakpoint or another function if the breakpoint is not met.
-   */
   async executeAtBreakpoint(
       breakpoint: number,
       callbacks: {
@@ -223,6 +222,15 @@ export class BaseUser {
     } else if (callbacks.otherwise) {
       await callbacks.otherwise();
     }
+  }
+  */
+
+  get viewport(): Viewport {
+    const viewport = this.page.viewport();
+    if (viewport === null) {
+      throw new Error('Viewport is not defined.');
+    }
+    return viewport;
   }
 }
 

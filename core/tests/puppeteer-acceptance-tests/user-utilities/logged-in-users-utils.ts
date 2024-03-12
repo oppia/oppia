@@ -188,20 +188,17 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the About page.
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickButtonToNavigateToNewPage(
-          mobileSidebarAboutButton,
-          'About Oppia button on mobile sidebar', aboutUrl, 'About');
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarAboutTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarAboutTabAboutButton,
-          'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarAboutButton,
+        'About Oppia button in the About Menu on mobile sidebar', aboutUrl, 'About');
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabAboutButton,
+        'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
+    }
   }
 
   /**
@@ -287,16 +284,13 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens The About Foundation page.
    */
   async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickOn(mobileSidebarAboutFoundationButton);
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarAboutTab);
-        await this.clickOn(navbarAboutTabAboutFoundationButton);
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickOn(mobileSidebarAboutFoundationButton);
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickOn(navbarAboutTabAboutFoundationButton);
+    }
     await this.page.waitForSelector(aboutFoundationClass);
     const displayedH1 = await this.page.$eval(
       aboutFoundationClass,
@@ -535,17 +529,12 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Blog page.
    */
   async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        // There is no Blog button in the mobile sidebar.
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarAboutTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarAboutTabBlogButton,
-          'Blog button in the About Menu on navbar', blogUrl, 'Blog');
-      }
-    });
+    if (this.viewport.width >= BREAKPOINTS.MOBILE) {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        'Blog button in the About Menu on navbar', blogUrl, 'Blog');
+    }
   }
 
   /**
@@ -553,23 +542,20 @@ export class LoggedInUser extends BaseUser {
    * Get Involved Menu on navbar and check if it opens the Partnerships page.
    */
   async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
-        await this.clickButtonToNavigateToNewPage(
-          mobileSidebarGetInvolvedMenuPartnershipsButton,
-          'School and Organizations in the Get Involved Menu on mobile sidebar',
-          partnershipsUrl, 'Partnerships');
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarGetInvolvedTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarGetInvolvedTabSchoolAndOrganizationsButton,
-          'School and Organizations in the Get Involved Menu on navbar',
-          partnershipsUrl, 'Partnerships');
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuPartnershipsButton,
+        'School and Organizations in the Get Involved Menu on mobile sidebar',
+        partnershipsUrl, 'Partnerships');
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabSchoolAndOrganizationsButton,
+        'School and Organizations in the Get Involved Menu on navbar',
+        partnershipsUrl, 'Partnerships');
+    }
   }
 
   /**
@@ -577,23 +563,20 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Volunteer page.
    */
   async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
-        await this.clickButtonToNavigateToNewPage(
-          mobileSidebarGetInvolvedMenuVolunteerButton,
-          'Volunteer in the Get Involved Menu on mobile sidebar',
-          volunteerUrl, 'Volunteer');
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarGetInvolvedTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarGetInvolvedTabVolunteerButton,
-          'Volunteer in the Get Involved Menu on navbar',
-          volunteerUrl, 'Volunteer');
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuVolunteerButton,
+        'Volunteer in the Get Involved Menu on mobile sidebar',
+        volunteerUrl, 'Volunteer');
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabVolunteerButton,
+        'Volunteer in the Get Involved Menu on navbar',
+        volunteerUrl, 'Volunteer');
+    }
   }
 
   /**
@@ -601,22 +584,19 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Donate page.
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
-        await this.clickButtonToNavigateToNewPage(
-          mobileSidevbarGetInvolvedMenuDonateButton,
-          'Donate in the Get Involved Menu on mobile sidebar',
-          donateUrl, 'Donate');
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarGetInvolvedTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarGetInvolvedTabDonateButton,
-          'Donate in the Get Involved Menu on navbar', donateUrl, 'Donate');
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidevbarGetInvolvedMenuDonateButton,
+        'Donate in the Get Involved Menu on mobile sidebar',
+        donateUrl, 'Donate');
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabDonateButton,
+        'Donate in the Get Involved Menu on navbar', donateUrl, 'Donate');
+    }
   }
 
   /**
@@ -624,23 +604,20 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Partnerships page.
    */
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        await this.clickOnMobileNavbarButton();
-        await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
-        await this.clickButtonToNavigateToNewPage(
-          mobileSidebarGetInvolvedMenuContactUsButton,
-          'Contact Us in the Get Involved Menu on mobile sidebar',
-          contactUrl, 'Contact');
-      },
-      otherwise: async() => {
-        await this.clickOn(navbarGetInvolvedTab);
-        await this.clickButtonToNavigateToNewPage(
-          navbarGetInvolvedTabContactUsButton,
-          'Contact Us in the Get Involved Menu on navbar',
-          contactUrl, 'Contact');
-      }
-    });
+    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+      await this.clickOnMobileNavbarButton();
+      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuContactUsButton,
+        'Contact Us in the Get Involved Menu on mobile sidebar',
+        contactUrl, 'Contact');
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabContactUsButton,
+        'Contact Us in the Get Involved Menu on navbar',
+        contactUrl, 'Contact');
+    }
   }
 
   /**
@@ -648,15 +625,10 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Donate page.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        // There is no Donate button in the mobile sidebar.
-      },
-      otherwise: async() => {
-        await this.clickButtonToNavigateToNewPage(
-          navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
-      }
-    });
+    if (this.viewport.width >= BREAKPOINTS.MOBILE) {
+      await this.clickButtonToNavigateToNewPage(
+        navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
+    }
   }
 
   /**
@@ -677,29 +649,22 @@ export class LoggedInUser extends BaseUser {
       this.page.waitForNavigation(),
       this.clickOn(watchAVideoButton),
     ]);
-    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
-      execute: async() => {
-        // Here we split the URL to remove the query parameters since Facebook
-        // adds a query parameter to the URL when the device is mobile.
-        const url = this.page.url().split('?')[0];
-        if (url !== mobileWatchAVideoUrl) {
-          throw new Error (
-            'The Watch A Video button does not open the right page!');
-        } else {
-          showMessage(
-            'The Watch A Video button opens the right page.');
-        }
-      },
-      otherwise: async() => {
-        if (this.page.url() !== watchAVideoUrl) {
-          throw new Error (
-            'The Watch A Video button does not open the right page!');
-        } else {
-          showMessage(
-            'The Watch A Video button opens the right page.');
-        }
-      }
-    });
+    const url = this.page.url().split('?')[0];
+    if (
+      this.viewport.width < BREAKPOINTS.MOBILE &&
+      url !== mobileWatchAVideoUrl
+    ) {
+      throw new Error (
+        'The Watch A Video button does not open the right page!');
+    } else if (
+      this.viewport.width >= BREAKPOINTS.MOBILE &&
+      url !== watchAVideoUrl
+    ) {
+      throw new Error (
+        'The Watch A Video button does not open the right page!');
+    }
+    showMessage(
+      'The Watch A Video button opens the right page.');
   }
 
   /**

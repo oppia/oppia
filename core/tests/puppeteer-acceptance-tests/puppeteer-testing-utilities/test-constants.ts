@@ -64,7 +64,7 @@ export default {
     BLOG_POST_EDITOR: 'BLOG_POST_EDITOR'
   } as const,
   Breakpoints: {
-    MOBILE: 480
+    MOBILE: 768
   },
   images: {
     blogPostThumbnailImage: path.resolve(
