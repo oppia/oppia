@@ -42,7 +42,6 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 run-devserver: ## Runs the dev-server
-# Explicit creation sets proper ownership pre-container start before.
 # TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.
 	docker compose up angular-build -d
 	$(MAKE) update.package
