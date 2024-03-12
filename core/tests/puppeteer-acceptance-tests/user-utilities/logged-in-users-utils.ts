@@ -43,6 +43,7 @@ const evenThoseWhoAreInSchoolUrl =
 const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
+const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -676,15 +677,29 @@ export class LoggedInUser extends BaseUser {
       this.page.waitForNavigation(),
       this.clickOn(watchAVideoButton),
     ]);
-    // Here we split the URL to remove the query parameters since Facebook
-    // adds a query parameter to the URL when the device is mobile.
-    if (this.page.url().split('?')[0] !== watchAVideoUrl) {
-      throw new Error (
-        'The Watch A Video button does not open the right page!');
-    } else {
-      showMessage(
-        'The Watch A Video button opens the right page.');
-    }
+    await this.executeAtBreakpoint(BREAKPOINTS.MOBILE, {
+      execute: async() => {
+        // Here we split the URL to remove the query parameters since Facebook
+        // adds a query parameter to the URL when the device is mobile.
+        const url = this.page.url().split('?')[0];
+        if (url !== mobileWatchAVideoUrl) {
+          throw new Error (
+            'The Watch A Video button does not open the right page!');
+        } else {
+          showMessage(
+            'The Watch A Video button opens the right page.');
+        }
+      },
+      otherwise: async() => {
+        if (this.page.url() !== watchAVideoUrl) {
+          throw new Error (
+            'The Watch A Video button does not open the right page!');
+        } else {
+          showMessage(
+            'The Watch A Video button opens the right page.');
+        }
+      }
+    });
   }
 
   /**
