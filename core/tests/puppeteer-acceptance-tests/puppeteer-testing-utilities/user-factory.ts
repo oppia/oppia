@@ -131,7 +131,7 @@ export class UserFactory {
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-    ): Promise<LoggedInUser & ExplorationEditor &
+  ): Promise<LoggedInUser & ExplorationEditor &
     MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(
       UserFactory.composeUserWithRoles(

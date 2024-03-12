@@ -89,7 +89,6 @@ const explorationTitleInput = '.e2e-test-exploration-title-input';
 const explorationCompletedMessage: string = 'div.toast-message';
 
 export class ExplorationEditor extends BaseUser {
-
   /**
    * Function to navigate to the creator dashboard page.
    */
@@ -104,7 +103,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async createExploration(text: string, interaction: string): Promise<void> {
     await this.clickOn(createExplorationButtonSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, { visible: true });
+    await this.page.waitForSelector(
+      dismissWelcomeModalSelector, { visible: true });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
@@ -146,7 +146,8 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} text - The text of the Exploration.
    * @param {number} numOfVersion - Number of versions to be created.
    */
-  async createMultipleRevisionsOfTheSameExploration(text: string, numOfVersion: number): Promise<void> {
+  async createMultipleRevisionsOfTheSameExploration(
+    text: string, numOfVersion: number): Promise<void> {
     await this.makeMetaDataChanges('changes');
     await this.saveExplorationDraft();
     await this.page.waitForTimeout(300);
@@ -175,9 +176,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to create a list of all the revisions created.
    * @param {string} versionsListSelector - Common selector for revisions.
    */
- 
+
   async getRevisionsList(
-    versionsListSelector: string
+      versionsListSelector: string
   ): Promise<{
     versionNo: string;
     notes: string;
@@ -252,7 +253,8 @@ export class ExplorationEditor extends BaseUser {
    * to changes in the paginator settings.
    * @param {number} itemsPerPage - Number of items/revisions to show per page.
    */
-  async ExpectPaginatorToChangeItemsPerPage(itemsPerPage: number): Promise<void> {
+  async ExpectPaginatorToChangeItemsPerPage(
+    itemsPerPage: number): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(paginatorToggler, { visible: true });
     await this.clickOn(paginatorToggler);
@@ -261,8 +263,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(versionsList);
     if (revisions.length !== itemsPerPage) {
-      throw new Error(`
-        Pagination Error: When the items per page is set to ${itemsPerPage},
+      throw new Error(
+        `Pagination Error: When the items per page is set to ${itemsPerPage},
         expected ${itemsPerPage} user revisions, but got ${revisions.length}`);
     } else {
       showMessage(
@@ -524,7 +526,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Exploration has not restarted successfully');
     }
   }
-};
+}
 
 export let ExplorationEditorFactory =
   (): ExplorationEditor => new ExplorationEditor();
