@@ -178,7 +178,7 @@ export class ExplorationEditor extends BaseUser {
    */
 
   async getRevisionsList(
-    versionsListSelector: string
+      versionsListSelector: string
   ): Promise<{
     versionNo: string;
     notes: string;
@@ -186,7 +186,7 @@ export class ExplorationEditor extends BaseUser {
     date: string;
   }[]> {
     let elements = await this.page.$$(versionsListSelector);
-    let revisions: { 
+    let revisions: {
       versionNo: string; notes: string; user: string; date: string; }[] = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
@@ -202,7 +202,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
     return revisions;
-  }  
+  }
 
   /**
    * Function to confirm the existence of the Version number, Notes, Username,
@@ -366,7 +366,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Revision is not reverting');
     }
-  }  
+  }
 
   /**
   * Function to create a new card in the exploration creator.
