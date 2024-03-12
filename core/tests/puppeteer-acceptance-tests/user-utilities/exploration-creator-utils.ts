@@ -228,7 +228,7 @@ export class ExplorationCreator extends BaseUser {
    *  This function verifies that the selected language is displayed correctly.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    const languageDropdown = await this.page.$('#mat-select-value-9');
+    const languageDropdown = await this.page.$(languageUpdateBar);
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
     }
