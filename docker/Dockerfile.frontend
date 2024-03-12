@@ -1,9 +1,5 @@
 FROM node:16.13.0 AS frontend
 
-# Define the Yarn cache directory.
-# This adjustment resolves the access error pertaining to /root/.yarn-cache.
-# Given that the container now operates under the node user rather than root, elevated privileges are required to access the yarn cache if default directory isn't changed.
-ENV YARN_CACHE_FOLDER /home/node/.yarn-cache
 WORKDIR /app/oppia
 
 RUN apt-get update -y && apt-get upgrade -y \
