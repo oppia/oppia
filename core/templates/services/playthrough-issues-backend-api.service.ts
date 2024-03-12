@@ -16,115 +16,153 @@
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 export interface FetchIssuesResponseBackendDict {
-  'unresolved_issues': PlaythroughIssueBackendDict[];
+  unresolved_issues: PlaythroughIssueBackendDict[];
 }
 
 import {
   PlaythroughIssue,
-  PlaythroughIssueBackendDict
+  PlaythroughIssueBackendDict,
 } from 'domain/statistics/playthrough-issue.model';
-import { ServicesConstants } from 'services/services.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {ServicesConstants} from 'services/services.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class PlaythroughIssuesBackendApiService {
   private cachedIssues: PlaythroughIssue[] = [];
 
   constructor(
-      private httpClient: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private httpClient: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async fetchIssuesAsync(
-      explorationId: string,
-      explorationVersion: number): Promise<PlaythroughIssue[]> {
+    explorationId: string,
+    explorationVersion: number
+  ): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues.length !== 0) {
       return Promise.resolve(this.cachedIssues);
     }
 
     return new Promise((resolve, reject) => {
-      this.httpClient.get<FetchIssuesResponseBackendDict>(
-        this.getFetchIssuesUrl(explorationId), {
-          params: { exp_version: explorationVersion.toString() }}).toPromise()
-        .then(response => {
-          resolve(this.cachedIssues = response.unresolved_issues.map(
-            PlaythroughIssue.createFromBackendDict));
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.httpClient
+        .get<FetchIssuesResponseBackendDict>(
+          this.getFetchIssuesUrl(explorationId),
+          {
+            params: {exp_version: explorationVersion.toString()},
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(
+              (this.cachedIssues = response.unresolved_issues.map(
+                PlaythroughIssue.createFromBackendDict
+              ))
+            );
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async fetchPlaythroughAsync(
-      explorationId: string,
-      playthroughId: string): Promise<PlaythroughIssue> {
+    explorationId: string,
+    playthroughId: string
+  ): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
-      this.httpClient.get<PlaythroughIssueBackendDict>(
-        this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
-        .then(response => {
-          resolve(PlaythroughIssue.createFromBackendDict(
-            response));
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.httpClient
+        .get<PlaythroughIssueBackendDict>(
+          this.getFetchPlaythroughUrl(explorationId, playthroughId)
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(PlaythroughIssue.createFromBackendDict(response));
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async resolveIssueAsync(
-      issueToResolve: PlaythroughIssue,
-      explorationId: string, explorationVersion: number): Promise<void> {
+    issueToResolve: PlaythroughIssue,
+    explorationId: string,
+    explorationVersion: number
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.httpClient.post(this.getResolveIssueUrl(explorationId), {
-        exp_issue_dict: issueToResolve.toBackendDict(),
-        exp_version: explorationVersion
-      }).toPromise()
-        .then(() => {
-          if (this.cachedIssues.length !== 0) {
-            const issueIndex = this.cachedIssues.findIndex(
-              issue => angular.equals(issue, issueToResolve));
-            if (issueIndex !== -1) {
-              this.cachedIssues.splice(issueIndex, 1);
-              resolve();
+      this.httpClient
+        .post(this.getResolveIssueUrl(explorationId), {
+          exp_issue_dict: issueToResolve.toBackendDict(),
+          exp_version: explorationVersion,
+        })
+        .toPromise()
+        .then(
+          () => {
+            if (this.cachedIssues.length !== 0) {
+              const issueIndex = this.cachedIssues.findIndex(issue =>
+                angular.equals(issue, issueToResolve)
+              );
+              if (issueIndex !== -1) {
+                this.cachedIssues.splice(issueIndex, 1);
+                resolve();
+              }
             }
+            reject(
+              'An issue which was not fetched from the backend ' +
+                'has been resolved'
+            );
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
           }
-          reject(
-            'An issue which was not fetched from the backend ' +
-            'has been resolved');
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+        );
     });
   }
 
   private getFetchIssuesUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.FETCH_ISSUES_URL, {
-        exploration_id: explorationId
-      });
+      ServicesConstants.FETCH_ISSUES_URL,
+      {
+        exploration_id: explorationId,
+      }
+    );
   }
 
   private getFetchPlaythroughUrl(
-      explorationId: string, playthroughId: string): string {
+    explorationId: string,
+    playthroughId: string
+  ): string {
     return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
+      ServicesConstants.FETCH_PLAYTHROUGH_URL,
+      {
         exploration_id: explorationId,
-        playthrough_id: playthroughId
-      });
+        playthrough_id: playthroughId,
+      }
+    );
   }
 
   private getResolveIssueUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.RESOLVE_ISSUE_URL, {
-        exploration_id: explorationId
-      });
+      ServicesConstants.RESOLVE_ISSUE_URL,
+      {
+        exploration_id: explorationId,
+      }
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'PlaythroughIssuesBackendApiService',
-  downgradeInjectable(PlaythroughIssuesBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'PlaythroughIssuesBackendApiService',
+    downgradeInjectable(PlaythroughIssuesBackendApiService)
+  );

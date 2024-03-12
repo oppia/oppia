@@ -16,10 +16,16 @@
  * @fileoverview Tests for translate-text service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import {
+  StateAndContent,
+  TranslateTextService,
+} from 'pages/contributor-dashboard-page/services/translate-text.service';
 
 describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
@@ -31,7 +37,7 @@ describe('TranslateTextService', () => {
       content_value: text,
       content_type: 'content',
       interaction_id: null,
-      rule_type: null
+      rule_type: null,
     };
   };
 
@@ -42,8 +48,14 @@ describe('TranslateTextService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextService = TestBed.inject(TranslateTextService);
     stateContent = new StateAndContent(
-      'stateName', 'contentId', 'contentText', 'pending', 'translation',
-      'html', 'content');
+      'stateName',
+      'contentId',
+      'contentText',
+      'pending',
+      'translation',
+      'html',
+      'content'
+    );
   });
 
   afterEach(() => {
@@ -56,17 +68,18 @@ describe('TranslateTextService', () => {
       const sampleStateWiseContentMapping = {
         stateName1: {
           contentId1: getTranslatableItem('text1'),
-          contentId2: getTranslatableItem('text2')
+          contentId2: getTranslatableItem('text2'),
         },
-        stateName2: {contentId3: getTranslatableItem('text3')}
+        stateName2: {contentId3: getTranslatableItem('text3')},
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=en');
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush({
         state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1
+        version: 1,
       });
       flushMicrotasks();
 
@@ -78,7 +91,7 @@ describe('TranslateTextService', () => {
         dataFormat: 'html',
         contentType: 'content',
         interactionId: null,
-        ruleType: null
+        ruleType: null,
       };
 
       const expectedTextAndAvailability2 = {
@@ -89,7 +102,7 @@ describe('TranslateTextService', () => {
         dataFormat: 'html',
         contentType: 'content',
         interactionId: null,
-        ruleType: null
+        ruleType: null,
       };
 
       const expectedTextAndAvailability1 = {
@@ -100,7 +113,7 @@ describe('TranslateTextService', () => {
         dataFormat: 'html',
         contentType: 'content',
         interactionId: null,
-        ruleType: null
+        ruleType: null,
       };
 
       const expectedTextAndPreviousAvailability1 = {
@@ -111,7 +124,7 @@ describe('TranslateTextService', () => {
         dataFormat: 'html',
         contentType: 'content',
         interactionId: null,
-        ruleType: null
+        ruleType: null,
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -135,72 +148,72 @@ describe('TranslateTextService', () => {
       expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
     }));
 
-    it('should return no more available for states with no texts',
-      fakeAsync(() => {
-        const expectedTextAndAvailability = {
-          text: 'text1',
-          more: false,
-          status: 'pending',
-          translation: '',
-          dataFormat: 'html',
-          contentType: 'content',
-          interactionId: null,
-          ruleType: null
-        };
-        const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: getTranslatableItem('text1')},
-          stateName2: {contentId2: getTranslatableItem('')}
-        };
-        translateTextService.init('1', 'en', () => {});
-        const req = httpTestingController.expectOne(
-          '/gettranslatabletexthandler?exp_id=1&language_code=en');
-        expect(req.request.method).toEqual('GET');
-        req.flush({
-          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-          version: 1
-        });
-        flushMicrotasks();
+    it('should return no more available for states with no texts', fakeAsync(() => {
+      const expectedTextAndAvailability = {
+        text: 'text1',
+        more: false,
+        status: 'pending',
+        translation: '',
+        dataFormat: 'html',
+        contentType: 'content',
+        interactionId: null,
+        ruleType: null,
+      };
+      const sampleStateWiseContentMapping = {
+        stateName1: {contentId1: getTranslatableItem('text1')},
+        stateName2: {contentId2: getTranslatableItem('')},
+      };
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
 
-        const textAndAvailability = translateTextService.getTextToTranslate();
+      const textAndAvailability = translateTextService.getTextToTranslate();
 
-        expect(textAndAvailability).toEqual(expectedTextAndAvailability);
-      }));
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+    }));
 
-    it('should return no text or metadata for completely empty states',
-      fakeAsync(() => {
-        const expectedTextAndAvailability = {
-          text: null,
-          more: false,
-          status: 'pending',
-          translation: '',
-          dataFormat: undefined,
-          contentType: undefined,
-          interactionId: undefined,
-          ruleType: undefined
-        };
-        const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: getTranslatableItem('')},
-          stateName2: {contentId2: getTranslatableItem('')}
-        };
-        translateTextService.init('1', 'en', () => {});
-        const req = httpTestingController.expectOne(
-          '/gettranslatabletexthandler?exp_id=1&language_code=en');
-        expect(req.request.method).toEqual('GET');
-        req.flush({
-          state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-          version: 1
-        });
-        flushMicrotasks();
+    it('should return no text or metadata for completely empty states', fakeAsync(() => {
+      const expectedTextAndAvailability = {
+        text: null,
+        more: false,
+        status: 'pending',
+        translation: '',
+        dataFormat: undefined,
+        contentType: undefined,
+        interactionId: undefined,
+        ruleType: undefined,
+      };
+      const sampleStateWiseContentMapping = {
+        stateName1: {contentId1: getTranslatableItem('')},
+        stateName2: {contentId2: getTranslatableItem('')},
+      };
+      translateTextService.init('1', 'en', () => {});
+      const req = httpTestingController.expectOne(
+        '/gettranslatabletexthandler?exp_id=1&language_code=en'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+        version: 1,
+      });
+      flushMicrotasks();
 
-        const textAndAvailability = translateTextService.getTextToTranslate();
+      const textAndAvailability = translateTextService.getTextToTranslate();
 
-        expect(textAndAvailability).toEqual(expectedTextAndAvailability);
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability);
 
-        const textAndPreviousAvailability = (
-          translateTextService.getPreviousTextToTranslate());
+      const textAndPreviousAvailability =
+        translateTextService.getPreviousTextToTranslate();
 
-        expect(textAndAvailability).toEqual(textAndPreviousAvailability);
-      }));
+      expect(textAndAvailability).toEqual(textAndPreviousAvailability);
+    }));
   });
 
   // Testing setters and getters of StateAndContent class.

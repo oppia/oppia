@@ -16,10 +16,10 @@
  * @fileoverview Component for the Set Input response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseSetInputComponent } from './oppia-response-set-input.component';
-import { TranslateModule } from '@ngx-translate/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseSetInputComponent} from './oppia-response-set-input.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('ResponseSetInputComponent', () => {
   let component: ResponseSetInputComponent;
@@ -38,16 +38,16 @@ describe('ResponseSetInputComponent', () => {
           useDefaultLang: true,
           isolate: false,
           extend: false,
-          defaultLanguage: 'en'
+          defaultLanguage: 'en',
         }),
       ],
       declarations: [ResponseSetInputComponent],
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
-      ]
+          useClass: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 

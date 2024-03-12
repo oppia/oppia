@@ -16,12 +16,10 @@
  * @fileoverview Unit tests for FeedbackThreadObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessage.model';
+import {FeedbackThreadObjectFactory} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 
 describe('FeedbackThreadObjectFactory', () => {
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
@@ -42,12 +40,12 @@ describe('FeedbackThreadObjectFactory', () => {
         state_name: 'state 1',
         thread_id: 'exp1.thread1',
         last_nonempty_message_author: 'author',
-        last_nonempty_message_text: 'tenth message'
+        last_nonempty_message_text: 'tenth message',
       };
 
-      let feedbackThread =
-        feedbackThreadObjectFactory.createFromBackendDict(
-          feedbackThreadBackendDict);
+      let feedbackThread = feedbackThreadObjectFactory.createFromBackendDict(
+        feedbackThreadBackendDict
+      );
       expect(feedbackThread.status).toEqual('accepted');
       expect(feedbackThread.subject).toEqual('sample subject');
       expect(feedbackThread.summary).toEqual('sample summary');
@@ -57,29 +55,30 @@ describe('FeedbackThreadObjectFactory', () => {
       expect(feedbackThread.stateName).toEqual('state 1');
       expect(feedbackThread.threadId).toEqual('exp1.thread1');
       expect(feedbackThread.isSuggestionThread()).toEqual(false);
-      expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
-        .toEqual('author');
-      expect(feedbackThread.lastNonemptyMessageSummary.text)
-        .toEqual('tenth message');
+      expect(feedbackThread.lastNonemptyMessageSummary.authorUsername).toEqual(
+        'author'
+      );
+      expect(feedbackThread.lastNonemptyMessageSummary.text).toEqual(
+        'tenth message'
+      );
     });
   });
 
   describe('FeedbackThread', () => {
     describe('.setMessages', () => {
       it('should update message-related fields', () => {
-        let feedbackThread =
-          feedbackThreadObjectFactory.createFromBackendDict({
-            last_updated_msecs: 1000,
-            original_author_username: 'author',
-            status: 'accepted',
-            subject: 'sample subject',
-            summary: 'sample summary',
-            message_count: 10,
-            state_name: 'state 1',
-            thread_id: 'exp1.thread1',
-            last_nonempty_message_author: 'author',
-            last_nonempty_message_text: 'tenth message'
-          });
+        let feedbackThread = feedbackThreadObjectFactory.createFromBackendDict({
+          last_updated_msecs: 1000,
+          original_author_username: 'author',
+          status: 'accepted',
+          subject: 'sample subject',
+          summary: 'sample summary',
+          message_count: 10,
+          state_name: 'state 1',
+          thread_id: 'exp1.thread1',
+          last_nonempty_message_author: 'author',
+          last_nonempty_message_text: 'tenth message',
+        });
 
         expect(feedbackThread.getMessages()).toEqual([]);
 
@@ -92,7 +91,7 @@ describe('FeedbackThreadObjectFactory', () => {
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
-            updated_status: null
+            updated_status: null,
           }),
           ThreadMessage.createFromBackendDict({
             author_username: 'author2',
@@ -102,18 +101,20 @@ describe('FeedbackThreadObjectFactory', () => {
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
-            updated_status: null
-          })
+            updated_status: null,
+          }),
         ];
 
         feedbackThread.setMessages(messages);
 
         expect(feedbackThread.messages).toEqual(messages);
         expect(feedbackThread.messageCount).toEqual(messages.length);
-        expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
-          .toEqual('author2');
-        expect(feedbackThread.lastNonemptyMessageSummary.text)
-          .toEqual('message2');
+        expect(
+          feedbackThread.lastNonemptyMessageSummary.authorUsername
+        ).toEqual('author2');
+        expect(feedbackThread.lastNonemptyMessageSummary.text).toEqual(
+          'message2'
+        );
       });
     });
   });

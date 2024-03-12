@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for syllabus addition success modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from
-  '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SyllabusAdditionSuccessModalComponent } from
-  './syllabus-addition-success-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SyllabusAdditionSuccessModalComponent} from './syllabus-addition-success-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,27 +31,25 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal Component', function() {
+describe('Delete Exploration Modal Component', function () {
   let component: SyllabusAdditionSuccessModalComponent;
   let fixture: ComponentFixture<SyllabusAdditionSuccessModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SyllabusAdditionSuccessModalComponent
+      declarations: [SyllabusAdditionSuccessModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      SyllabusAdditionSuccessModalComponent
-    );
+    fixture = TestBed.createComponent(SyllabusAdditionSuccessModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

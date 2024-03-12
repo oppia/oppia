@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for SkillMasteryBackendApiService.
  */
 
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { SkillMasteryBackendApiService, SkillMasteryBackendResponse } from 'domain/skill/skill-mastery-backend-api.service';
-import { SkillMastery } from './skill-mastery.model';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {
+  SkillMasteryBackendApiService,
+  SkillMasteryBackendResponse,
+} from 'domain/skill/skill-mastery-backend-api.service';
+import {SkillMastery} from './skill-mastery.model';
 
 describe('Skill mastery backend API service', () => {
   let skillMasteryBackendApiService: SkillMasteryBackendApiService;
@@ -34,123 +40,134 @@ describe('Skill mastery backend API service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [SkillMasteryBackendApiService]
+      providers: [SkillMasteryBackendApiService],
     });
 
-    skillMasteryBackendApiService =
-      TestBed.inject(SkillMasteryBackendApiService);
+    skillMasteryBackendApiService = TestBed.inject(
+      SkillMasteryBackendApiService
+    );
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async function() {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async function () {
       return Promise.resolve('sample-csrf-token');
     });
 
     let masteryPerSkillMapping = {
       skillId1: 0.3,
-      skillId2: 0.5
+      skillId2: 0.5,
     };
 
     sampleResponse = {
-      degrees_of_mastery: masteryPerSkillMapping
+      degrees_of_mastery: masteryPerSkillMapping,
     };
 
     sampleReturnedObject = SkillMastery.createFromBackendDict(
-      sampleResponse.degrees_of_mastery);
+      sampleResponse.degrees_of_mastery
+    );
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch the skill mastery degrees from the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let skillIds = ['skillId1', 'skillId2'];
+  it('should successfully fetch the skill mastery degrees from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let skillIds = ['skillId1', 'skillId2'];
 
-      let requestUrl = '/skill_mastery_handler/data' +
-        '?selected_skill_ids=' + encodeURI(JSON.stringify(skillIds));
+    let requestUrl =
+      '/skill_mastery_handler/data' +
+      '?selected_skill_ids=' +
+      encodeURI(JSON.stringify(skillIds));
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
-        ['skillId1', 'skillId2']).then(successHandler, failHandler);
+    skillMasteryBackendApiService
+      .fetchSkillMasteryDegreesAsync(['skillId1', 'skillId2'])
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleResponse);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleReturnedObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalledWith(sampleReturnedObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the rejection handler if backend request failed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let skillIds = ['skillId1', 'skillId2'];
+  it('should use the rejection handler if backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let skillIds = ['skillId1', 'skillId2'];
 
-      let requestUrl = '/skill_mastery_handler/data' +
-        '?selected_skill_ids=' + encodeURI(JSON.stringify(skillIds));
+    let requestUrl =
+      '/skill_mastery_handler/data' +
+      '?selected_skill_ids=' +
+      encodeURI(JSON.stringify(skillIds));
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
-        ['skillId1', 'skillId2']).then(successHandler, failHandler);
+    skillMasteryBackendApiService
+      .fetchSkillMasteryDegreesAsync(['skillId1', 'skillId2'])
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Error fetching skill mastery.'
-      }, {
-        status: 500, statusText: 'Error fetching skill mastery.'
-      });
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error fetching skill mastery.',
+      },
+      {
+        status: 500,
+        statusText: 'Error fetching skill mastery.',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error fetching skill mastery.');
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error fetching skill mastery.');
+  }));
 
-  it('should successfully update the skill mastery degrees in the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully update the skill mastery degrees in the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
-        masteryPerSkillMapping).then(successHandler, failHandler);
+    skillMasteryBackendApiService
+      .updateSkillMasteryDegreesAsync(masteryPerSkillMapping)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        '/skill_mastery_handler/data');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(null);
+    const req = httpTestingController.expectOne('/skill_mastery_handler/data');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(null);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the rejection handler if backend request failed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
-        masteryPerSkillMapping).then(successHandler, failHandler);
+    skillMasteryBackendApiService
+      .updateSkillMasteryDegreesAsync(masteryPerSkillMapping)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        '/skill_mastery_handler/data');
-      expect(req.request.method).toEqual('PUT');
-      req.flush({
-        error: 'Error updating skill mastery.'
-      }, {
-        status: 500, statusText: 'Error updating skill mastery.'
-      });
+    const req = httpTestingController.expectOne('/skill_mastery_handler/data');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {
+        error: 'Error updating skill mastery.',
+      },
+      {
+        status: 500,
+        statusText: 'Error updating skill mastery.',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error updating skill mastery.');
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error updating skill mastery.');
+  }));
 });

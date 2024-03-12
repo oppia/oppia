@@ -16,18 +16,18 @@
  * @fileoverview A file that contains Event Bus Service and Event Bus Group.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { OperatorFunction, Subject, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { BaseEvent } from './app-events';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {OperatorFunction, Subject, Subscription} from 'rxjs';
+import {filter} from 'rxjs/operators';
+import {BaseEvent} from './app-events';
 
 // Type unknown is used here because we don't know the type of the data
 // that will be passed with the event.
-export type Newable<T> = new(message: unknown) => T;
+export type Newable<T> = new (message: unknown) => T;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EventBusService {
   // Subjects are used for the event passing mechanism.
@@ -39,31 +39,32 @@ export class EventBusService {
   }
 
   /**
-  * This function will listen to messages of specific event types as specified
-  * by the first param.
-  * @param eventType The event that is to be listened for.
-  * @param action The action that is to be run when the event occurs.
-  * @param callbackContext Callback context if any.
-  *
-  * @returns A subscription to the event asked for.
-  */
+   * This function will listen to messages of specific event types as specified
+   * by the first param.
+   * @param eventType The event that is to be listened for.
+   * @param action The action that is to be run when the event occurs.
+   * @param callbackContext Callback context if any.
+   *
+   * @returns A subscription to the event asked for.
+   */
   on<T extends BaseEvent>(
-      eventType: Newable<T>,
-      action: (event: T) => void,
-      callbackContext = null): Subscription {
-    return this._subject$.pipe(
-      filter(
-        (event: T): boolean => {
-          return (event instanceof eventType);
-        }
-      ) as OperatorFunction<BaseEvent, T>).subscribe(
-      (event: T): void => {
+    eventType: Newable<T>,
+    action: (event: T) => void,
+    callbackContext = null
+  ): Subscription {
+    return this._subject$
+      .pipe(
+        filter((event: T): boolean => {
+          return event instanceof eventType;
+        }) as OperatorFunction<BaseEvent, T>
+      )
+      .subscribe((event: T): void => {
         try {
           action.call(callbackContext, event);
-        // We use unknown type because we are unsure of the type of error
-        // that was thrown. Since the catch block cannot identify the
-        // specific type of error, we are unable to further optimise the
-        // code by introducing more types of errors.
+          // We use unknown type because we are unsure of the type of error
+          // that was thrown. Since the catch block cannot identify the
+          // specific type of error, we are unable to further optimise the
+          // code by introducing more types of errors.
         } catch (error: unknown) {
           if (error instanceof Error) {
             this._errorHandler(error);
@@ -71,27 +72,27 @@ export class EventBusService {
             throw error;
           }
         }
-      }
-    );
+      });
   }
 
   /**
-  * A function to trigger a particular event.
-  * @param event OppiaEvent that we want to trigger.
-  */
+   * A function to trigger a particular event.
+   * @param event OppiaEvent that we want to trigger.
+   */
   emit<T extends BaseEvent>(event: T): void {
     this._subject$.next(event);
   }
 }
 
-angular.module('oppia').factory(
-  'EventBusService', downgradeInjectable(EventBusService));
+angular
+  .module('oppia')
+  .factory('EventBusService', downgradeInjectable(EventBusService));
 
 /**
-* This class is a wrapper around the EventBusService. This is not supposed to
-* be DI'ed in a component/ service. This is used to keep track of subscriptions
-* and unsubscribe all of them at once.
-*/
+ * This class is a wrapper around the EventBusService. This is not supposed to
+ * be DI'ed in a component/ service. This is used to keep track of subscriptions
+ * and unsubscribe all of them at once.
+ */
 export class EventBusGroup {
   private eventBus: EventBusService;
   private subscriptions: Subscription;
@@ -103,14 +104,14 @@ export class EventBusGroup {
 
   public emit(event: BaseEvent): EventBusGroup {
     this.eventBus.emit(event);
-    return (this);
+    return this;
   }
 
-
   public on<T extends BaseEvent>(
-      eventType: Newable<T>,
-      action: (event: T) => void,
-      callbackContext = null): void {
+    eventType: Newable<T>,
+    action: (event: T) => void,
+    callbackContext = null
+  ): void {
     this.subscriptions.add(
       this.eventBus.on<T>(eventType, action, callbackContext)
     );

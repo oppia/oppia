@@ -16,20 +16,20 @@
  * @fileoverview Component for a blog card.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ContextService } from 'services/context.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {BlogPostPageConstants} from 'pages/blog-post-page/blog-post-page.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ContextService} from 'services/context.service';
 import dayjs from 'dayjs';
-import { UserService } from 'services/user.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-blog-card',
-  templateUrl: './blog-card.component.html'
+  templateUrl: './blog-card.component.html',
 })
 export class BlogCardComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -53,33 +53,35 @@ export class BlogCardComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.blogPostSummary.thumbnailFilename) {
-      this.thumbnailUrl = this.assetsBackendApiService
-        .getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
-          this.blogPostSummary.thumbnailFilename);
+      this.thumbnailUrl =
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.BLOG_POST,
+          this.blogPostSummary.id,
+          this.blogPostSummary.thumbnailFilename
+        );
     }
-    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] =
       this.userService.getProfileImageDataUrl(
-        this.blogPostSummary.authorUsername));
+        this.blogPostSummary.authorUsername
+      );
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {
       throw new Error('Blog Post Summary published date is not defined');
     }
     this.publishedDateString = this.getDateStringInWords(publishedOn);
-    this.blogCardPreviewModeIsActive = (
-      this.contextService.isInBlogPostEditorPage());
+    this.blogCardPreviewModeIsActive =
+      this.contextService.isInBlogPostEditorPage();
   }
 
   getDateStringInWords(naiveDate: string): string {
-    return dayjs(
-      naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+    return dayjs(naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
   }
 
   navigateToBlogPostPage(): void {
     if (!this.blogCardPreviewModeIsActive) {
       let blogPostUrl = this.urlInterpolationService.interpolateUrl(
         BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
-        { blog_post_url: this.blogPostSummary.urlFragment }
+        {blog_post_url: this.blogPostSummary.urlFragment}
       );
       this.windowRef.nativeWindow.location.href = blogPostUrl;
     }

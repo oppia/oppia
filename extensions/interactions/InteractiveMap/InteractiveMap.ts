@@ -17,17 +17,21 @@
  */
 
 require(
-  'interactions/InteractiveMap/directives/' +
-  'interactive-map-rules.service.ts');
+  'interactions/InteractiveMap/directives/' + 'interactive-map-rules.service.ts'
+);
 require(
   'interactions/InteractiveMap/directives/' +
-  'interactive-map-validation.service.ts');
+    'interactive-map-validation.service.ts'
+);
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-interactive-interactive-map.component.ts');
+    'oppia-interactive-interactive-map.component.ts'
+);
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-response-interactive-map.component.ts');
+    'oppia-response-interactive-map.component.ts'
+);
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-short-response-interactive-map.component.ts');
+    'oppia-short-response-interactive-map.component.ts'
+);

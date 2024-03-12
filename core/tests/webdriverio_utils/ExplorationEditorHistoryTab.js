@@ -21,22 +21,22 @@ var forms = require('./forms.js');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorHistoryTab = function() {
+var ExplorationEditorHistoryTab = function () {
   /*
    * Interactive elements
    */
   var historyGraph = $('.e2e-test-history-graph');
-  var codeMirrorElementSelector = function() {
+  var codeMirrorElementSelector = function () {
     return $$('.CodeMirror-code');
   };
   var toastSuccessElement = $('.toast-success');
   var firstVersionDropdown = $('.e2e-test-history-version-dropdown-first');
   var secondVersionDropdown = $('.e2e-test-history-version-dropdown-second');
   var historyTableMessage = $('.e2e-test-history-table-message');
-  var stateNodeBackground = function(nodeElement) {
+  var stateNodeBackground = function (nodeElement) {
     return nodeElement.$('.e2e-test-node-background');
   };
-  var stateNodeLabel = function(nodeElement) {
+  var stateNodeLabel = function (nodeElement) {
     return nodeElement.$('.e2e-test-node-label');
   };
 
@@ -46,7 +46,7 @@ var ExplorationEditorHistoryTab = function() {
   var closeStateHistoryButton = $('.e2e-test-close-history-state-modal');
   var revertVersionButton = $('.e2e-test-revert-version');
   var resetGraphButton = $('.e2e-test-reset-graph');
-  var historyListOptionsSelector = function() {
+  var historyListOptionsSelector = function () {
     return $$('.e2e-test-history-list-options');
   };
   var confirmRevertVersionButton = $('.e2e-test-confirm-revert');
@@ -56,7 +56,7 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * Display
    */
-  var datesCommitsWereSavedSelector = function() {
+  var datesCommitsWereSavedSelector = function () {
     return $$('.e2e-test-history-tab-commit-date');
   };
   /*
@@ -66,14 +66,15 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * This method checks if the commit dates are being displayed in
    * the "List of Changes" section of the history tab.
-  */
-  this.expectCommitDatesToBeDisplayed = async function() {
+   */
+  this.expectCommitDatesToBeDisplayed = async function () {
     var datesCommitsWereSaved = await datesCommitsWereSavedSelector();
     var numCommitDates = datesCommitsWereSaved.length;
     for (var i = 0; i < numCommitDates; i++) {
       await waitFor.visibilityOf(
         datesCommitsWereSaved[i],
-        'Dates Commits Were Saved taking too long to appear');
+        'Dates Commits Were Saved taking too long to appear'
+      );
       var date = await datesCommitsWereSaved[i].getText();
       // The dates can be of varying format
       // (see getLocaleAbbreviatedDatetimeString). To play it
@@ -83,13 +84,15 @@ var ExplorationEditorHistoryTab = function() {
     }
   };
 
-  this.getHistoryGraph = function() {
+  this.getHistoryGraph = function () {
     return {
-      openStateHistory: async function(stateName) {
+      openStateHistory: async function (stateName) {
         var stateNodes = historyGraph.$$('.e2e-test-node');
-        var listOfNames = await stateNodes.map(async function(stateElement) {
-          await waitFor.visibilityOf(stateNodeLabel(
-            stateElement), 'State Node Label taking too long to appear');
+        var listOfNames = await stateNodes.map(async function (stateElement) {
+          await waitFor.visibilityOf(
+            stateNodeLabel(stateElement),
+            'State Node Label taking too long to appear'
+          );
           return await stateNodeLabel(stateElement).getText();
         });
         var matched = false;
@@ -103,39 +106,51 @@ var ExplorationEditorHistoryTab = function() {
         }
         if (!matched) {
           throw new Error(
-            'State ' + stateName + ' not found by getHistoryGraph.');
+            'State ' + stateName + ' not found by getHistoryGraph.'
+          );
         }
       },
-      closeStateHistory: async function() {
+      closeStateHistory: async function () {
         await waitFor.elementToBeClickable(
           closeStateHistoryButton,
-          'Close State History button is not clickable');
+          'Close State History button is not clickable'
+        );
         expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
         await action.click(
-          'Close State History Button', closeStateHistoryButton);
+          'Close State History Button',
+          closeStateHistoryButton
+        );
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
-          'Close State History button takes too long to disappear.');
+          'Close State History button takes too long to disappear.'
+        );
       },
-      openExplorationMetadataHistory: async function() {
+      openExplorationMetadataHistory: async function () {
         await action.click(
-          'View metadata changes button', viewMetadataHistoryButton);
+          'View metadata changes button',
+          viewMetadataHistoryButton
+        );
       },
-      closeExplorationMetadataHistory: async function() {
+      closeExplorationMetadataHistory: async function () {
         await waitFor.elementToBeClickable(
           closeMetadataHistoryButton,
-          'Close metadata history button is not clickable');
+          'Close metadata history button is not clickable'
+        );
         expect(await closeMetadataHistoryButton.isDisplayed()).toBe(true);
         await action.click(
-          'Close metadata history button', closeMetadataHistoryButton);
+          'Close metadata history button',
+          closeMetadataHistoryButton
+        );
         await waitFor.invisibilityOf(
           closeMetadataHistoryButton,
-          'Close metadata history button takes too long to disappear.');
+          'Close metadata history button takes too long to disappear.'
+        );
       },
-      deselectVersion: async function() {
+      deselectVersion: async function () {
         await waitFor.invisibilityOf(
           toastSuccessElement,
-          'Toast message is taking too long to disappear after saving changes');
+          'Toast message is taking too long to disappear after saving changes'
+        );
         await action.click('Reset graph button', resetGraphButton);
       },
       /*
@@ -144,14 +159,19 @@ var ExplorationEditorHistoryTab = function() {
        *        versionNumber1 (int) : history version # 1
        *        versionNumber2 (int) : history version # 2
        */
-      selectTwoVersions: async function(versionNumber1, versionNumber2) {
+      selectTwoVersions: async function (versionNumber1, versionNumber2) {
         // Array starts at 0.
         await action.matSelect(
-          'Version Number1 Button', firstVersionDropdown, versionNumber1);
+          'Version Number1 Button',
+          firstVersionDropdown,
+          versionNumber1
+        );
 
         await action.matSelect(
-          'Version Number2 Button', secondVersionDropdown,
-          versionNumber2);
+          'Version Number2 Button',
+          secondVersionDropdown,
+          versionNumber2
+        );
       },
       /*
        * This method compares the states in the history graph using each
@@ -165,19 +185,24 @@ var ExplorationEditorHistoryTab = function() {
        *                            label should appear after a space. It
        *                            may be truncated.)
        */
-      expectHistoryStatesToMatch: async function(expectedStates) {
+      expectHistoryStatesToMatch: async function (expectedStates) {
         await waitFor.visibilityOf(
-          historyGraph, 'History graph takes too long to be visible.');
+          historyGraph,
+          'History graph takes too long to be visible.'
+        );
         var stateNodes = historyGraph.$$('.e2e-test-node');
-        var states = await stateNodes.map(async function(stateElement) {
-          await waitFor.visibilityOf(await stateNodeLabel(
-            stateElement), 'State Node Label taking too long to appear');
+        var states = await stateNodes.map(async function (stateElement) {
+          await waitFor.visibilityOf(
+            await stateNodeLabel(stateElement),
+            'State Node Label taking too long to appear'
+          );
           var label = await stateNodeLabel(stateElement).getText();
-          var color = (await stateNodeBackground(
-            stateElement).getCSSProperty('fill')).value;
+          var color = (
+            await stateNodeBackground(stateElement).getCSSProperty('fill')
+          ).value;
           return {
             label: label,
-            color: color
+            color: color,
           };
         });
         expect(states.length).toEqual(expectedStates.length);
@@ -196,15 +221,18 @@ var ExplorationEditorHistoryTab = function() {
        *        addedLinks (int) : number of added links
        *        deletedLinks (int) : number of deleted links
        */
-      expectNumberOfLinksToMatch: async function(
-          totalLinks, addedLinks, deletedLinks) {
+      expectNumberOfLinksToMatch: async function (
+        totalLinks,
+        addedLinks,
+        deletedLinks
+      ) {
         var COLOR_ADDED = 'rgb(31,125,31)';
         var COLOR_DELETED = 'rgb(178,34,34)';
         var totalCount = 0;
         var addedCount = 0;
         var deletedCount = 0;
         var historyGraphLink = historyGraph.$$('.e2e-test-link');
-        await historyGraphLink.map(async function(link) {
+        await historyGraphLink.map(async function (link) {
           var linkColor = (await link.getCSSProperty('stroke')).value;
           totalCount++;
           if (linkColor === COLOR_ADDED) {
@@ -235,17 +263,15 @@ var ExplorationEditorHistoryTab = function() {
        *                             line
        *                     - highlighted: true or false
        */
-      expectTextToMatch: async function(v1StateContents, v2StateContents) {
+      expectTextToMatch: async function (v1StateContents, v2StateContents) {
         var codeMirrorElement = await codeMirrorElementSelector();
         var lastElement = codeMirrorElement.length - 1;
-        await forms.CodeMirrorChecker(
-          codeMirrorElement[0],
-          'first'
-        ).expectTextToBe(v1StateContents);
-        await forms.CodeMirrorChecker(
-          codeMirrorElement[lastElement],
-          'last'
-        ).expectTextToBe(v2StateContents);
+        await forms
+          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .expectTextToBe(v1StateContents);
+        await forms
+          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .expectTextToBe(v2StateContents);
       },
       /*
        *  This function compares regular/highlighted text contents of 2
@@ -258,42 +284,43 @@ var ExplorationEditorHistoryTab = function() {
        *        dict key - text : extract of string of expected text
        *        dict key - highlighted : true or false
        */
-      expectTextWithHighlightingToMatch: async function(
-          v1StateContents, v2StateContents) {
+      expectTextWithHighlightingToMatch: async function (
+        v1StateContents,
+        v2StateContents
+      ) {
         var codeMirrorElement = await codeMirrorElementSelector();
         var lastElement = codeMirrorElement.length - 1;
-        await forms.CodeMirrorChecker(
-          codeMirrorElement[0],
-          'first'
-        ).expectTextWithHighlightingToBe(v1StateContents);
-        await forms.CodeMirrorChecker(
-          codeMirrorElement[lastElement],
-          'last'
-        ).expectTextWithHighlightingToBe(v2StateContents);
-      }
+        await forms
+          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .expectTextWithHighlightingToBe(v1StateContents);
+        await forms
+          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .expectTextWithHighlightingToBe(v2StateContents);
+      },
     };
   };
 
   // This function assumes that the selected version is valid and found on the
   // first page of the exploration history.
-  this.revertToVersion = async function(version) {
+  this.revertToVersion = async function (version) {
     // Note: there is no 'revert' link next to the current version.
     var historyListOptions = await historyListOptionsSelector();
-    await action.click(
-      'History list options', historyListOptions[version - 1]);
-    await action.click(
-      'Revert version button', revertVersionButton);
-    await action.click(
-      'Confirm revert button', confirmRevertVersionButton);
+    await action.click('History list options', historyListOptions[version - 1]);
+    await action.click('Revert version button', revertVersionButton);
+    await action.click('Confirm revert button', confirmRevertVersionButton);
   };
 
-  this.expectRevertToVersion = async function(version) {
+  this.expectRevertToVersion = async function (version) {
     await waitFor.numberOfElementsToBe(
-      '.e2e-test-history-table-message', 'History Table message', 4);
+      '.e2e-test-history-table-message',
+      'History Table message',
+      4
+    );
     await waitFor.textToBePresentInElement(
       historyTableMessage,
       'Reverted exploration to version ' + version,
-      'Revert message takes too long to appear');
+      'Revert message takes too long to appear'
+    );
   };
 };
 

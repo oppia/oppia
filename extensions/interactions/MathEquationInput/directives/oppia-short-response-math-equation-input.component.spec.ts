@@ -17,28 +17,26 @@
  * component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { ShortResponseMathEquationInput } from './oppia-short-response-math-equation-input.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {ShortResponseMathEquationInput} from './oppia-short-response-math-equation-input.component';
 
-describe('ResponseNumericExpressionInput', function() {
+describe('ResponseNumericExpressionInput', function () {
   let component: ShortResponseMathEquationInput;
   let fixture: ComponentFixture<ShortResponseMathEquationInput>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [ShortResponseMathEquationInput]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [ShortResponseMathEquationInput],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      ShortResponseMathEquationInput);
+    fixture = TestBed.createComponent(ShortResponseMathEquationInput);
     component = fixture.componentInstance;
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.displayAnswer).toBe('answer');
   });

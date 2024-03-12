@@ -16,15 +16,15 @@
  * @fileoverview Tests for obile menu service for new lesson player.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { MobileMenuService } from './mobile-menu.service';
+import {TestBed} from '@angular/core/testing';
+import {MobileMenuService} from './mobile-menu.service';
 
 describe('MobileMenuService', () => {
   let service: MobileMenuService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MobileMenuService]
+      providers: [MobileMenuService],
     });
     service = TestBed.inject(MobileMenuService);
   });
@@ -34,14 +34,14 @@ describe('MobileMenuService', () => {
   });
 
   it('should initially have menu visibility set to false', () => {
-    service.getMenuVisibility().subscribe((visibility) => {
+    service.getMenuVisibility().subscribe(visibility => {
       expect(visibility).toBe(false);
     });
   });
 
   it('should update menu visibility when toggled', () => {
     let currentValue: boolean | undefined;
-    service.getMenuVisibility().subscribe(value => currentValue = value);
+    service.getMenuVisibility().subscribe(value => (currentValue = value));
     service.toggleMenuVisibility();
     expect(currentValue).toBe(true);
     service.toggleMenuVisibility();

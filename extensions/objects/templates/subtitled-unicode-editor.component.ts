@@ -16,13 +16,19 @@
  * @fileoverview Directive for Subtitled Unicode editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 @Component({
   selector: 'subtitled-unicode-editor',
-  templateUrl: './subtitled-unicode-editor.component.html'
+  templateUrl: './subtitled-unicode-editor.component.html',
 })
 export class SubtitledUnicodeEditorComponent {
   // These property is initialized using Angular lifecycle hooks
@@ -30,11 +36,11 @@ export class SubtitledUnicodeEditorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: SubtitledUnicode;
   @Output() valueChanged = new EventEmitter();
-  schema: { type: string } = {
+  schema: {type: string} = {
     type: 'unicode',
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   updateValue(val: string): void {
     if (this.value) {
@@ -48,11 +54,14 @@ export class SubtitledUnicodeEditorComponent {
     }
   }
 
-  getSchema(): { type: string } {
+  getSchema(): {type: string} {
     return this.schema;
   }
 }
 
-angular.module('oppia').directive('subtitledUnicodeEditor', downgradeComponent({
-  component: SubtitledUnicodeEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'subtitledUnicodeEditor',
+  downgradeComponent({
+    component: SubtitledUnicodeEditorComponent,
+  }) as angular.IDirectiveFactory
+);
