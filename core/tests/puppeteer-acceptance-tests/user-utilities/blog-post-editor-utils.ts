@@ -177,7 +177,6 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.waitForClickable(blogSaveBodyButton);
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);
@@ -210,7 +209,6 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content - duplicate');
-    await this.waitForClickable(blogSaveBodyButton);
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
   }
 
