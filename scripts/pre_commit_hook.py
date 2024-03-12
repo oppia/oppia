@@ -207,6 +207,11 @@ def check_changes_in_gcloud_path() -> None:
                 common.GCLOUD_PATH, release_constants_gcloud_path))
 
 
+def run_prettier() -> None:
+    """Runs prettier formatter."""
+    subprocess.run('npx lint-staged', shell=True, check=True)
+
+
 def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -237,6 +242,9 @@ def main(args: Optional[List[str]] = None) -> None:
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
+    print('Running prettier ...')
+    run_prettier()
+
     return
 
 
