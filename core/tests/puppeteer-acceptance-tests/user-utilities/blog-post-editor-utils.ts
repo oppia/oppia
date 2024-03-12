@@ -22,6 +22,7 @@ import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
+const blogSaveBodyButton = 'button.e2e-test-save-blog-post-content';
 const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
@@ -176,6 +177,7 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
+    await this.waitForClickable(blogSaveBodyButton);
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);
@@ -208,6 +210,7 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content - duplicate');
+    await this.waitForClickable(blogSaveBodyButton);
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
   }
 

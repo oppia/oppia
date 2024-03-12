@@ -18,6 +18,7 @@
 
 import puppeteer, {Page, Browser, Viewport} from 'puppeteer';
 import testConstants from './test-constants';
+import isElementClickable from '../functions/is-element-clickable';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -207,26 +208,12 @@ export class BaseUser {
   }
 
   /**
-   * This function executes the given function while at a certain width
-   * breakpoint or another function if the breakpoint is not met.
-  async executeAtBreakpoint(
-      breakpoint: number,
-      callbacks: {
-        execute: () => Promise<void>;
-        otherwise?: () => Promise<void>;
-      }
-  ): Promise<void> {
-    const viewport = this.page.viewport();
-    if (viewport === null) {
-      throw new Error('Viewport is not defined.');
-    }
-    if (viewport.width <= breakpoint) {
-      await callbacks.execute();
-    } else if (callbacks.otherwise) {
-      await callbacks.otherwise();
-    }
+   * This function waits for an element to be clickable.
+   */
+  async waitForClickable(selector: string): Promise<void> {
+    const element = await this.page.waitForSelector(selector);
+    await this.page.waitForFunction(isElementClickable, {}, element);
   }
-  */
 
   get viewport(): Viewport {
     const viewport = this.page.viewport();
