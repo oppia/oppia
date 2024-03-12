@@ -42,7 +42,7 @@ describe('Exploration Editor', function() {
 
       await explorationEditor.navigateToHistoryTab();
       await explorationEditor.
-      expectlatestRevisionToHaveVersionNoNotesUsernameDate();
+        expectlatestRevisionToHaveVersionNoNotesUsernameDate();
       await explorationEditor.expectRevisionsToBeOrderedByDate();
       await explorationEditor.filterRevisionsByUsername('explorationAdm');
       await explorationEditor.ExpectPaginatorToChangeItemsPerPage(15);

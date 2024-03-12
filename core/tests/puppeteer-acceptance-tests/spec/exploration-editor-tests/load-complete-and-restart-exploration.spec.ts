@@ -33,7 +33,7 @@ describe('Exploration Editor', function() {
 
   it('should be able to load, complete and restart an exploration preview',
     async function() {
-      await explorationEditor.navigateToCreatorDashboard(); 
+      await explorationEditor.navigateToCreatorDashboard();
       await explorationEditor.createExploration(
         'Exploration begins', ' Continue Button ');
       await explorationEditor.LoadExplorationWithQuestions(2);
@@ -44,7 +44,7 @@ describe('Exploration Editor', function() {
 
       await explorationEditor.completeTheExplorationInPreviewTab();
       await explorationEditor.expectTheExplorationToComplete();
-      
+
       await explorationEditor.restartTheExploration();
       await explorationEditor.expectTheExplorationToRestart(
         'Exploration begins');

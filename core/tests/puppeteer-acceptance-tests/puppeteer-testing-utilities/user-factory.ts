@@ -129,13 +129,13 @@ export class UserFactory {
   static createNewUser = async function<
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[]
   >(
-    username: string, email: string,
-    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-      ): Promise<LoggedInUser & ExplorationEditor &
+      username: string, email: string,
+      roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
+    ): Promise<LoggedInUser & ExplorationEditor &
     MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(
       UserFactory.composeUserWithRoles(
-      BaseUserFactory(), [LoggedInUserFactory()]),
+        BaseUserFactory(), [LoggedInUserFactory()]),
       [ExplorationEditorFactory()]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);
