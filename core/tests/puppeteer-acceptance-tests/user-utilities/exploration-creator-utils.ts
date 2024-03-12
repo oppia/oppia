@@ -32,13 +32,12 @@ const forButtonToBeEnabled =
 '.e2e-test-state-name-submit:not([disabled])';
 const introTitleSubmitButton = '.e2e-test-save-state-content';
 const interactionAddbutton = '.oppia-add-interaction-button';
-const endIneractionTab =
+const endInteractionTab =
 '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab =
 '.nav-link[aria-label="Exploration Setting Button"]';
-const addTitleBar = '.e2e-test-exploration-title-input';
-const addTitle = '.e2e-test-exploration-title-input';
+const addTitleBar = '#explorationTitle';
 const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
 const categoryDropDawn = '.mat-select-arrow-wrapper';
@@ -93,7 +92,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating Card Name.
    */
   async updateCardName(cardName: string): Promise<void> {
-    await this.page.waitForTimeout(500);
     await this.clickOn(addCardName);
     await this.type('.e2e-test-state-name-input', cardName);
     await this.page.waitForSelector(forButtonToBeEnabled);
@@ -104,7 +102,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating exploration intro text.
    */
   async updateExplorationIntroText(Introtext: string): Promise<void> {
-    await this.page.waitForTimeout(600);
     await this.clickOn('.e2e-test-edit-content-pencil-button');
     await this.page.waitForSelector('.e2e-test-rte', { visible: true });
     await this.type('.e2e-test-rte', Introtext);
@@ -116,7 +113,13 @@ export class ExplorationCreator extends BaseUser {
    */
   async addEndInteraction(): Promise<void> {
     await this.clickOn(interactionAddbutton);
-    await this.clickOn(endIneractionTab);
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */    
+    await this.page.waitForTimeout(350);
+    await this.clickOn(endInteractionTab);
     await this.clickOn(saveInteractionButton);
   }
 
@@ -135,8 +138,9 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating Title.
    */
   async addTitle(Title: string): Promise<void> {
+    await this.page.waitForSelector('#explorationTitle', { visible: true });
     await this.clickOn(addTitleBar);
-    await this.type(addTitle, Title);
+    await this.type(addTitleBar, Title);
   }
 
   /**
@@ -146,7 +150,7 @@ export class ExplorationCreator extends BaseUser {
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
     const title = await this.page.evaluate(
-      input =>input.value, titleInput);
+      input => input.value, titleInput);
     const titleLength = title.length;
 
     if (titleLength <= maxLength) {
@@ -220,7 +224,6 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectEnglishAsLanguage(): Promise<void> {
     await this.clickOn(languageUpdateBar);
-    await this.page.waitForTimeout(500);
     await this.clickOn(addLanguage);
   }
 
@@ -250,7 +253,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding tags.
    */
   async addTags(TagNames: string[]): Promise<void> {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       await this.clickOn(addTags);
       await this.type(addTags, TagNames[i]);
       await this.clickOn('.secondary-info-text');
@@ -414,7 +417,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(
   ): Promise<void> {
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector('.oppia-editor-publish-button:([disabled])');//checking
     try {
       await this.page.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
@@ -458,13 +461,12 @@ export class ExplorationCreator extends BaseUser {
    */
   async publishExploration(): Promise<void> {
     await this.saveDraftExploration();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector('.oppia-editor-publish-button:not([disabled])');
     await this.clickOn(publishButton);
     await this.clickOn(publishConfirmButton);
     await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
 
-    await this.page.waitForTimeout(500);
     explorationUrlAfterPublished = await this.page.url();
   }
 
@@ -487,7 +489,7 @@ export class ExplorationCreator extends BaseUser {
   async discardCurrentChanges(): Promise<void> {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector('a.e2e-test-discard-changes:not([disabled])');//working
     await this.clickOn(discardDraftButton);
     await this.clickOn(discardConfirmButton);
 
@@ -498,6 +500,11 @@ export class ExplorationCreator extends BaseUser {
   *This function checks whether changes has discarded successfully or not.
   */
   async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */       
     await this.page.waitForTimeout(400);
     const titleInput = await this.page.$(
       '.e2e-test-exploration-title-input');
